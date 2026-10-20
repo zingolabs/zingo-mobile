@@ -1,14 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { View, TouchableOpacity } from 'react-native';
-import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faQrcode,
-  faCopy,
-  faWallet,
-  faTags,
-} from '@fortawesome/free-solid-svg-icons';
+import { useTheme, slopFor } from '@app/theme';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import FadeText from '@ui/primitives/FadeText';
@@ -20,6 +13,10 @@ import {
 } from '@app/AppState';
 import Utils from '@app/utils';
 import { ContextAppLoaded } from '@app/context';
+import { TagsIcon } from '@ui/primitives/Icons/TagsIcon';
+import { WalletIcon } from '@ui/primitives/Icons/WalletIcon';
+import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
+import { QrCodeIcon } from '@ui/primitives/Icons/QrCodeIcon';
 
 type AlSummaryLineProps = {
   index: number;
@@ -71,7 +68,7 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
           marginTop: 15,
           paddingBottom: 15,
           borderBottomWidth: 1.5,
-          borderBottomColor: '#122033',
+          borderBottomColor: colors.borderSubtle,
           opacity: 1,
         }}
       >
@@ -84,10 +81,9 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
         >
           <TouchableOpacity onPress={() => {}}>
             <View style={{ flexDirection: 'row', marginBottom: 5 }}>
-              <FontAwesomeIcon
+              <TagsIcon
                 style={{ marginHorizontal: 10 }}
                 size={20}
-                icon={faTags}
                 color={colors.fgDefault}
               />
               <FadeText
@@ -103,10 +99,9 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
               </FadeText>
             </View>
             <View style={{ flexDirection: 'row' }}>
-              <FontAwesomeIcon
+              <WalletIcon
                 style={{ marginHorizontal: 10 }}
                 size={20}
-                icon={faWallet}
                 color={colors.fgDefault}
               />
               <FadeText
@@ -126,15 +121,15 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
           style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}
         >
           <TouchableOpacity
+            hitSlop={slopFor(20)}
             style={{ zIndex: 999, padding: 10 }}
             onPress={() => {
               doCopy();
             }}
           >
-            <FontAwesomeIcon
+            <CopyIcon
               style={{ opacity: 0.8 }}
               size={20}
-              icon={faCopy}
               color={colors.fgDefault}
             />
           </TouchableOpacity>
@@ -143,16 +138,13 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
           style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}
         >
           <TouchableOpacity
+            hitSlop={slopFor(24)}
             style={{ zIndex: 999, padding: 10 }}
             onPress={() => {
               doQr();
             }}
           >
-            <FontAwesomeIcon
-              size={24}
-              icon={faQrcode}
-              color={colors.fgDefault}
-            />
+            <QrCodeIcon size={24} color={colors.fgDefault} />
           </TouchableOpacity>
         </View>
       </View>

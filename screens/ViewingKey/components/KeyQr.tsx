@@ -13,13 +13,14 @@ import { create } from 'qrcode';
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { SnowflakeIcon } from '@ui/primitives/Icons/SnowflakeIcon';
+import { themeTokens } from '@app/theme';
 
 const VEIL_MS = 220;
 const BLUR_PT = 9;
 const QUIET = 2;
 const LOGO = 34;
-const INK = '#060B12';
-const PAPER = '#FFFFFF';
+const INK = themeTokens.fgQrInk;
+const PAPER = themeTokens.bgQrPaper;
 
 // Native filters run on the bitmap in device pixels; web runs in points.
 const BLUR_DEVIATION =
@@ -125,7 +126,7 @@ const KeyQr: React.FunctionComponent<KeyQrProps> = ({
           justifyContent: 'center',
         }}
       >
-        <SnowflakeIcon size={22} color={colors.fgViewOnly} strokeWidth={2} />
+        <SnowflakeIcon size={24} color={colors.fgViewOnly} />
       </View>
     </View>
   );

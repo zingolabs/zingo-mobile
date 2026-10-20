@@ -18,6 +18,7 @@ import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { SIDE, StepTitle } from './StepParts';
+import { fieldBorder } from '@ui/primitives/fieldBorder';
 
 export const CONFIRM_COUNT = 3;
 const NEXT_MS = 420;
@@ -25,16 +26,10 @@ const SLIDE_OUT_MS = 160;
 const SLIDE_IN_MS = 260;
 const SLIDE_PT = 24;
 const DONE_MS = 620;
-const FIELD_BG = '#041834';
-const HINT_INK = '#5B70A0';
 const SLOT_W = 20;
 const SLOT_H = 31;
 const SLOT_GAP = 6;
 const SLOT_FADE_MS = 140;
-const DASH_EMPTY = '#33486A';
-const DASH_FILL = '#5B70A0';
-const TRACK = '#13263F';
-const ERROR_INK = '#F2878A';
 
 /** Picks `n` distinct word positions (1-based, ascending) out of `count`. */
 export const pickPositions = (
@@ -60,7 +55,6 @@ export type WordCheck = {
   status: Status;
   type: (text: string) => void;
   submit: () => void;
-  nudge: () => void;
   shake: SharedValue<number>;
   slideX: SharedValue<number>;
   slideOpacity: SharedValue<number>;
@@ -151,16 +145,6 @@ export const useWordCheck = (
     }, NEXT_MS);
   };
 
-  const nudge = () => {
-    const step = (x: number) =>
-      withTiming(x, {
-        duration: 80,
-        easing: ease.standard,
-        reduceMotion: ReduceMotion.System,
-      });
-    shake.value = withSequence(step(-4), step(4), step(0));
-  };
-
   return {
     position,
     letters,
@@ -169,7 +153,6 @@ export const useWordCheck = (
     status,
     type,
     submit,
-    nudge,
     shake,
     slideX,
     slideOpacity,
@@ -188,6 +171,7 @@ const Segment: React.FunctionComponent<{ done: boolean; color: string }> = ({
   done,
   color,
 }) => {
+  const { colors } = useTheme();
   const fill = useAnimatedStyle(() => ({
     width: done
       ? withDelay(
@@ -206,7 +190,7 @@ const Segment: React.FunctionComponent<{ done: boolean; color: string }> = ({
         flex: 1,
         height: 3,
         borderRadius: 2,
-        backgroundColor: TRACK,
+        backgroundColor: colors.bgMutedSubtle,
         overflow: 'hidden',
       }}
     >
@@ -229,10 +213,10 @@ const Slot: React.FunctionComponent<{ letter: string; tone: SlotTone }> = ({
     tone === 'ok' || tone === 'cur'
       ? colors.fgAccent
       : tone === 'err'
-        ? colors.fgDangerEmphasis
+        ? colors.fgDanger
         : tone === 'fill'
-          ? DASH_FILL
-          : DASH_EMPTY;
+          ? colors.fgMuted
+          : colors.borderMuted;
   const dash = useAnimatedStyle(() => ({
     backgroundColor: withTiming(target, {
       duration: SLOT_FADE_MS,
@@ -245,7 +229,7 @@ const Slot: React.FunctionComponent<{ letter: string; tone: SlotTone }> = ({
       <Text
         style={{
           color: colors.fgDefault,
-          fontSize: 20,
+          fontSize: 22,
           lineHeight: 26,
           fontWeight: '600',
           textAlign: 'center',
@@ -288,14 +272,15 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
   }));
 
   const done = check.index + (check.status === 'ok' ? 1 : 0);
-  const border =
+  const border = fieldBorder(
+    colors,
+    focused,
     check.status === 'ok'
-      ? colors.fgAccent
+      ? 'valid'
       : check.status === 'err'
-        ? colors.fgDangerEmphasis
-        : focused
-          ? colors.borderFocus
-          : colors.bottomSheetBorder;
+        ? 'invalid'
+        : 'unknown',
+  );
 
   return (
     <View>
@@ -346,7 +331,7 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
           <Text
             style={{
               textAlign: 'center',
-              color: HINT_INK,
+              color: colors.fgMuted,
               fontSize: 12,
               marginTop: 4,
               marginBottom: 12,
@@ -361,7 +346,7 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
                 borderRadius: 12,
                 borderWidth: 1,
                 borderColor: border,
-                backgroundColor: FIELD_BG,
+                backgroundColor: colors.bgSurface,
                 justifyContent: 'center',
               },
               shakeStyle,
@@ -429,7 +414,7 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
                 top: 0,
                 bottom: 0,
                 opacity: 0,
-                fontSize: 20,
+                fontSize: 22,
                 textAlign: 'center',
               }}
             />
@@ -448,11 +433,7 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
                     justifyContent: 'center',
                   }}
                 >
-                  <CheckIcon
-                    size={13}
-                    color={colors.bgCanvas}
-                    strokeWidth={3}
-                  />
+                  <CheckIcon size={13} color={colors.bgCanvas} />
                 </View>
               </Animated.View>
             )}
@@ -466,7 +447,7 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
           marginTop: 10,
           minHeight: 16,
           textAlign: 'center',
-          color: ERROR_INK,
+          color: colors.fgDanger,
           fontSize: 12,
         }}
       >

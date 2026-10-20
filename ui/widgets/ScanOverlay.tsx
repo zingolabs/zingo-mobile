@@ -32,11 +32,11 @@ import CircularReveal, { RevealOrigin } from '@ui/widgets/CircularReveal';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { FlashlightIcon } from '@ui/primitives/Icons/FlashlightIcon';
+import { themeTokens } from '@app/theme';
 
 const FRAME = 240;
 const BRACKET = 28;
 const BRACKET_W = 3;
-const OUTSIDE_DIM = 'rgba(0,0,0,0.6)';
 const SWEEP_MS = 1800;
 const FOUND_HOLD_MS = 750;
 const MISS_HOLD_MS = 1600;
@@ -176,7 +176,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
 
   const frameLeft = (size.width - FRAME) / 2;
   const frameTop = (size.height - FRAME) / 2;
-  const bracketColor = stage === 'found' ? colors.fgAccent : '#FFFFFF';
+  const bracketColor = stage === 'found' ? colors.fgAccent : colors.fgDefault;
   const corner = (v: 'top' | 'bottom', h: 'left' | 'right') => ({
     position: 'absolute' as const,
     [v]: 0,
@@ -203,7 +203,10 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
       <CircularReveal origin={origin} open={open} onClosed={closed}>
         <View
           testID={testID}
-          style={[StyleSheet.absoluteFill, { backgroundColor: '#000' }]}
+          style={[
+            StyleSheet.absoluteFill,
+            { backgroundColor: colors.bgCanvas },
+          ]}
         >
           {hasPermission && device && (
             <Camera
@@ -295,15 +298,15 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
               hitSlop={8}
               style={{ position: 'absolute', left: 10, padding: 10 }}
             >
-              <ChevronLeft
-                size={22}
-                color={colors.fgAccent}
-                strokeWidth={2.2}
-              />
+              <ChevronLeft size={24} color={colors.fgAccent} />
             </Pressable>
             <Text
               accessibilityRole="header"
-              style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '700' }}
+              style={{
+                color: colors.fgDefault,
+                fontSize: 16,
+                fontWeight: '700',
+              }}
             >
               {texts.title}
             </Text>
@@ -328,10 +331,10 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
                   paddingHorizontal: 12,
                   paddingVertical: 6,
                   borderRadius: 14,
-                  backgroundColor: 'rgba(6,32,10,0.9)',
+                  backgroundColor: colors.bgAccentDisabled,
                 }}
               >
-                <CheckIcon size={14} color={colors.fgAccent} strokeWidth={3} />
+                <CheckIcon size={16} color={colors.fgAccent} />
                 <Text
                   style={{
                     color: colors.fgAccent,
@@ -349,8 +352,8 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
                 accessibilityLiveRegion="polite"
                 style={{
                   textAlign: 'center',
-                  color: stage === 'miss' ? colors.fgWarning : '#E6ECF4',
-                  fontSize: 14,
+                  color: stage === 'miss' ? colors.fgWarning : colors.fgDefault,
+                  fontSize: 15,
                   lineHeight: 20,
                 }}
               >
@@ -374,10 +377,13 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
               borderRadius: 26,
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: torch ? '#FFFFFF' : 'rgba(255,255,255,0.16)',
+              backgroundColor: torch ? colors.fgDefault : colors.bgMutedSubtle,
             }}
           >
-            <FlashlightIcon size={22} color={torch ? '#000000' : '#FFFFFF'} />
+            <FlashlightIcon
+              size={24}
+              color={torch ? colors.bgCanvas : colors.fgDefault}
+            />
           </Pressable>
         </View>
       </CircularReveal>
@@ -386,7 +392,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
 };
 
 const styles = StyleSheet.create({
-  dim: { position: 'absolute', backgroundColor: OUTSIDE_DIM },
+  dim: { position: 'absolute', backgroundColor: themeTokens.bgScrim },
 });
 
 export default ScanOverlay;

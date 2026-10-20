@@ -10,10 +10,6 @@ import { EyeOffIcon } from '@ui/primitives/Icons/EyeOffIcon';
 import { ShieldCheckIcon } from '@ui/primitives/Icons/ShieldCheckIcon';
 import { SIDE, StepTitle } from './StepParts';
 
-const TILE_BG = '#052520';
-const NOTE_TILE_BG = '#0A1B33';
-const NOTE_INK = '#8FB4E6';
-
 type InfoStepProps = {
   keychainNote: boolean;
 };
@@ -79,8 +75,8 @@ const InfoStep: React.FunctionComponent<InfoStepProps> = ({ keychainNote }) => {
               borderTopColor: colors.bottomSheetBorder,
             }}
           >
-            <Tile bg={TILE_BG}>
-              <Icon size={18} color={colors.fgAccent} strokeWidth={1.9} />
+            <Tile bg={colors.bgAccentSubtle}>
+              <Icon size={20} color={colors.fgAccent} />
             </Tile>
             <Text style={text}>
               {translate(`seedbackup.info-${key}`) as string}
@@ -104,8 +100,8 @@ const InfoStep: React.FunctionComponent<InfoStepProps> = ({ keychainNote }) => {
             borderColor: colors.bottomSheetBorder,
           }}
         >
-          <Tile bg={NOTE_TILE_BG}>
-            <ShieldCheckIcon size={17} color={NOTE_INK} strokeWidth={1.9} />
+          <Tile bg={colors.bgViewOnlySubtle}>
+            <ShieldCheckIcon size={16} color={colors.fgViewOnly} />
           </Tile>
           <Text style={text}>
             {

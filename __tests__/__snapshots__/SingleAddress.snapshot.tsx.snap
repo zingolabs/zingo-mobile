@@ -56,11 +56,13 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             }
           >
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#c3c3c3",
                   "fontSize": 15,
                   "fontWeight": "bold",
+                  "lineHeight": 21,
                   "marginRight": 10,
                   "opacity": 0.9,
                 }
@@ -144,6 +146,14 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
+            hitSlop={
+              {
+                "bottom": 12,
+                "left": 12,
+                "right": 12,
+                "top": 12,
+              }
+            }
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -160,7 +170,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             <View
               style={
                 {
-                  "borderColor": "#888888",
+                  "borderColor": "#4A6487",
                   "borderRadius": 30,
                   "marginHorizontal": 10,
                   "paddingHorizontal": 5,
@@ -190,6 +200,14 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
+            hitSlop={
+              {
+                "bottom": 12,
+                "left": 12,
+                "right": 12,
+                "top": 12,
+              }
+            }
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -206,41 +224,14 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             <View
               style={
                 {
-                  "borderColor": "#888888",
+                  "borderColor": "#4A6487",
                   "borderRadius": 30,
                   "marginHorizontal": 10,
                   "paddingHorizontal": 5,
                   "paddingVertical": 5,
                 }
               }
-            >
-              <
-                color="#c3c3c3"
-                icon={
-                  {
-                    "icon": [
-                      512,
-                      512,
-                      [
-                        61533,
-                        "check-circle",
-                      ],
-                      "f058",
-                      "M256 512a256 256 0 1 1 0-512 256 256 0 1 1 0 512zm0-464a208 208 0 1 0 0 416 208 208 0 1 0 0-416zm70.7 121.9c7.8-10.7 22.8-13.1 33.5-5.3 10.7 7.8 13.1 22.8 5.3 33.5L243.4 366.1c-4.1 5.7-10.5 9.3-17.5 9.8-7 .5-13.9-2-18.8-6.9l-55.9-55.9c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l36 36 105.6-145.2z",
-                    ],
-                    "iconName": "circle-check",
-                    "prefix": "far",
-                  }
-                }
-                size={20}
-                style={
-                  {
-                    "margin": 5,
-                    "opacity": 0.9,
-                  }
-                }
-              />
-            </View>
+            />
           </View>
         </View>
       </View>
@@ -303,9 +294,9 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
           accessibilityRole="button"
           accessibilityState={
             {
-              "busy": undefined,
+              "busy": false,
               "checked": undefined,
-              "disabled": undefined,
+              "disabled": false,
               "expanded": undefined,
               "selected": undefined,
             }
@@ -331,51 +322,33 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "transparent",
-              "borderRadius": 24,
-              "color": "#c3c3c3",
+              "backgroundColor": undefined,
+              "borderRadius": 999,
               "justifyContent": "center",
-              "maxWidth": "90%",
+              "maxWidth": "100%",
               "minHeight": 44,
-              "minWidth": "30%",
               "opacity": 1,
-              "padding": 0,
-              "paddingLeft": 20,
-              "paddingRight": 20,
+              "paddingHorizontal": 24,
+              "paddingVertical": 8,
             }
           }
           testID="receive.unified-address"
         >
-          <View
+          <Text
+            maxFontSizeMultiplier={1.5}
             style={
               {
-                "alignItems": "center",
-                "display": "flex",
-                "flexDirection": "row",
-                "justifyContent": "center",
-                "margin": 0,
-                "minHeight": 44,
-                "minWidth": 48,
-                "padding": 0,
+                "color": "#c3c3c3",
+                "fontFamily": "monospace",
+                "fontSize": 16,
+                "fontWeight": "700",
+                "opacity": 0.8,
+                "textAlign": "center",
               }
             }
           >
-            <Text
-              style={
-                {
-                  "color": "#c3c3c3",
-                  "fontFamily": "monospace",
-                  "fontSize": 16,
-                  "fontWeight": "600",
-                  "opacity": 0.8,
-                  "textAlign": "center",
-                  "textTransform": "none",
-                }
-              }
-            >
-              UA-orchard...1234567890
-            </Text>
-          </View>
+            UA-orchard...1234567890
+          </Text>
         </View>
       </View>
     </View>
@@ -495,6 +468,14 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
             accessible={true}
             collapsable={false}
             focusable={true}
+            hitSlop={
+              {
+                "bottom": 12,
+                "left": 12,
+                "right": 12,
+                "top": 12,
+              }
+            }
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -511,7 +492,7 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
             <View
               style={
                 {
-                  "borderColor": "#888888",
+                  "borderColor": "#4A6487",
                   "borderRadius": 30,
                   "marginHorizontal": 10,
                   "paddingHorizontal": 5,
@@ -526,9 +507,9 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
         accessibilityRole="button"
         accessibilityState={
           {
-            "busy": undefined,
+            "busy": false,
             "checked": undefined,
-            "disabled": undefined,
+            "disabled": false,
             "expanded": undefined,
             "selected": undefined,
           }
@@ -554,50 +535,32 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "transparent",
-            "borderRadius": 24,
-            "color": "#c3c3c3",
+            "backgroundColor": undefined,
+            "borderRadius": 999,
             "justifyContent": "center",
-            "maxWidth": "90%",
+            "maxWidth": "100%",
             "minHeight": 44,
-            "minWidth": "30%",
             "opacity": 1,
-            "padding": 0,
-            "paddingLeft": 20,
-            "paddingRight": 20,
+            "paddingHorizontal": 24,
+            "paddingVertical": 8,
           }
         }
       >
-        <View
+        <Text
+          maxFontSizeMultiplier={1.5}
           style={
             {
-              "alignItems": "center",
-              "display": "flex",
-              "flexDirection": "row",
-              "justifyContent": "center",
-              "margin": 0,
-              "minHeight": 44,
-              "minWidth": 48,
-              "padding": 0,
+              "color": "#c3c3c3",
+              "fontFamily": "monospace",
+              "fontSize": 16,
+              "fontWeight": "700",
+              "opacity": 0.8,
+              "textAlign": "center",
             }
           }
         >
-          <Text
-            style={
-              {
-                "color": "#c3c3c3",
-                "fontFamily": "monospace",
-                "fontSize": 16,
-                "fontWeight": "600",
-                "opacity": 0.8,
-                "textAlign": "center",
-                "textTransform": "none",
-              }
-            }
-          >
-            uview12345...1234567890
-          </Text>
-        </View>
+          uview12345...1234567890
+        </Text>
       </View>
     </View>
   </RCTScrollView>

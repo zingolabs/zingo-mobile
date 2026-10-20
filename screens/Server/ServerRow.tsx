@@ -7,19 +7,17 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faChevronLeft,
-  faChevronRight,
-} from '@fortawesome/free-solid-svg-icons';
 
-import { useTheme } from '@app/theme';
+import { space20, useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import BoldText from '@ui/primitives/BoldText';
 import RegText from '@ui/primitives/RegText';
+import Button from '@ui/primitives/Button';
+import { ChevronLeft, ChevronRight } from '@ui/primitives/Icons/Chevron';
 
-export const ROW_DIVIDER = '#0A1F3D';
-const RADIO_OFF = '#3A5070';
+/** The side margin of the cards, which the Done button lines up with. */
+export const CARD_SIDE = space20;
+
 const FAST_MS = 150;
 
 type RadioProps = { selected: boolean };
@@ -43,7 +41,7 @@ const Radio: React.FC<RadioProps> = ({ selected }) => {
         height: 18,
         borderRadius: 9,
         borderWidth: selected ? 2 : 1.5,
-        borderColor: selected ? colors.fgAccent : RADIO_OFF,
+        borderColor: selected ? colors.fgAccent : colors.borderMuted,
         alignItems: 'center',
         justifyContent: 'center',
       }}
@@ -75,8 +73,9 @@ export const Latency: React.FC<LatencyProps> = ({ ms, notResponding }) => {
     return null;
   }
   const bad = ms === null;
+  /** Not responding is a state, not an error: another server can be picked. */
   const dot = bad
-    ? colors.fgDangerEmphasis
+    ? colors.fgWarning
     : ms < FAST_MS
       ? colors.fgAccent
       : colors.fgMuted;
@@ -87,8 +86,8 @@ export const Latency: React.FC<LatencyProps> = ({ ms, notResponding }) => {
       />
       <RegText
         style={{
-          fontSize: 11.5,
-          color: bad ? colors.fgDanger : colors.fgMuted,
+          fontSize: 12,
+          color: bad ? colors.fgWarning : colors.fgMuted,
         }}
       >
         {bad ? notResponding : `${ms} ms`}
@@ -158,34 +157,28 @@ const ServerRow: React.FC<ServerRowProps> = ({
           paddingLeft: 14.5,
           paddingRight: 16,
           borderTopWidth: first ? 0 : 1,
-          borderTopColor: ROW_DIVIDER,
-          backgroundColor: pressed ? 'rgba(255,255,255,0.02)' : 'transparent',
+          borderTopColor: colors.borderSubtle,
+          opacity: pressed ? 0.7 : 1,
         })}
       >
         <Radio selected={selected} />
         <View style={{ flex: 1, minWidth: 0 }}>
           <RegText
             numberOfLines={1}
-            style={{ fontSize: 13.5, lineHeight: 19, fontWeight: '500' }}
+            style={{ fontSize: 15, lineHeight: 19, fontWeight: '500' }}
           >
             {title}
           </RegText>
           {!!sub && (
             <RegText
-              style={{ fontSize: 11, lineHeight: 16, color: colors.fgMuted }}
+              style={{ fontSize: 12, lineHeight: 16, color: colors.fgMuted }}
             >
               {sub}
             </RegText>
           )}
         </View>
         {right}
-        {chevron && (
-          <FontAwesomeIcon
-            icon={faChevronRight}
-            size={12}
-            color={colors.fgMuted}
-          />
-        )}
+        {chevron && <ChevronRight size={16} color={colors.fgMuted} />}
       </Pressable>
     </Animated.View>
   );
@@ -198,7 +191,7 @@ export const RowCard: React.FC<{ children: React.ReactNode }> = ({
   return (
     <View
       style={{
-        marginHorizontal: 21.5,
+        marginHorizontal: CARD_SIDE,
         borderRadius: 14,
         backgroundColor: colors.bgSurface,
         borderWidth: 1,
@@ -269,11 +262,7 @@ export const ScreenHeader: React.FC<{
           backgroundColor: pressed ? colors.bgSurface : 'transparent',
         })}
       >
-        <FontAwesomeIcon
-          icon={faChevronLeft}
-          size={18}
-          color={colors.fgAccent}
-        />
+        <ChevronLeft size={20} color={colors.fgAccent} />
       </Pressable>
       <BoldText
         style={{
@@ -297,34 +286,23 @@ export const DoneButton: React.FC<{
   onPress: () => void;
   disabled: boolean;
   testID: string;
-}> = ({ title, onPress, disabled, testID }) => {
-  const { colors } = useTheme();
-  return (
-    <Pressable
+}> = ({ title, onPress, disabled, testID }) => (
+  <View
+    style={{
+      position: 'absolute',
+      bottom: 44,
+      left: CARD_SIDE,
+      right: CARD_SIDE,
+    }}
+  >
+    <Button
       testID={testID}
+      variant="primary"
+      title={title}
       onPress={onPress}
       disabled={disabled}
-      accessibilityRole="button"
-      style={({ pressed }) => ({
-        position: 'absolute',
-        bottom: 44,
-        alignSelf: 'center',
-        width: 270,
-        height: 44,
-        borderRadius: 22,
-        backgroundColor: colors.bgAccent,
-        alignItems: 'center',
-        justifyContent: 'center',
-        transform: [{ scale: pressed ? 0.97 : 1 }],
-      })}
-    >
-      <RegText
-        style={{ fontSize: 16, color: colors.bgCanvas, fontWeight: '700' }}
-      >
-        {title}
-      </RegText>
-    </Pressable>
-  );
-};
+    />
+  </View>
+);
 
 export default ServerRow;

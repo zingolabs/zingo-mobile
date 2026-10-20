@@ -21,17 +21,8 @@ import {
   TextInputContentSizeChangeEventData,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
-import {
-  faCheck,
-  faInfoCircle,
-  faAddressCard,
-  faUserPlus,
-  faMagnifyingGlassPlus,
-  faXmark,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useNavigation, useScrollToTop } from '@react-navigation/native';
-import { useTheme } from '@app/theme';
+import { useTheme, space20, slopFor } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { getNumberFormatSettings } from 'react-native-localize';
 
@@ -48,7 +39,7 @@ import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
 import CurrencyAmount from '@ui/widgets/CurrencyAmount';
 import { usePriceHealth } from '@ui/widgets/priceFetcherStore';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import {
@@ -99,6 +90,13 @@ import SendErrorSheet from './components/SendErrorSheet';
 import { sendEmail } from '@app/services/sendEmail';
 import { retryServer } from '@app/services/retryServer';
 import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
+import { fieldBorder } from '@ui/primitives/fieldBorder';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
+import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
+import { ContactIcon } from '@ui/primitives/Icons/ContactIcon';
+import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
+import { ZoomInIcon } from '@ui/primitives/Icons/ZoomInIcon';
 
 type SendProps = HomeTabScreenProps<'Send'>;
 
@@ -159,6 +157,10 @@ const Send: React.FunctionComponent<SendProps> = () => {
     null,
   );
   const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - Invalid number, -2 - Invalid Amount
+  /** The field that has focus, for its blue edge. */
+  const [focusedField, setFocusedField] = useState<
+    'none' | 'address' | 'amount' | 'memo'
+  >('none');
   const [validMemo, setValidMemo] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState<boolean>(false);
   const [memoIcon, setMemoIcon] = useState<boolean>(false);
@@ -228,11 +230,21 @@ const Send: React.FunctionComponent<SendProps> = () => {
   // lists BOTH errors (they are often the same failure, shown under each label
   // so that is explicit).
   const showCalcError = !!(spendableBalanceLastError || proposeSendLastError);
-  // Nothing to spend, a balance still confirming or a failed read turn the
-  // spendable red, in ZEC and in the currency alike.
-  const spendableWarn =
-    stillConfirming || negativeMaxAmount || !!spendableBalanceLastError;
-  const spendableColor = spendableWarn ? colors.fgDanger : colors.fgDefault;
+  // Nothing to spend or a failed read turn the spendable red; a balance still
+  // confirming turns it orange. In ZEC and in the currency alike.
+  const spendableError = negativeMaxAmount || !!spendableBalanceLastError;
+  const spendableWarn = stillConfirming || spendableError;
+  const spendableColor = spendableError
+    ? colors.fgDanger
+    : stillConfirming
+      ? colors.fgWarning
+      : colors.fgDefault;
+  const memoTooLong =
+    Utils.countMemoBytes(
+      memoText,
+      includeUAMemoBoolean,
+      defaultUnifiedAddress,
+    ) > GlobalConst.memoMaxLength;
   const feeCalculationGenRef = useRef<number>(0);
   const { decimalSeparator } = getNumberFormatSettings();
   const keyboardHeight = useKeyboardHeight();
@@ -1051,7 +1063,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
         hitSlop={8}
         style={{ paddingHorizontal: 14, paddingVertical: 4 }}
       >
-        <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
+        <XIcon size={20} color={colors.fgMuted} />
       </Pressable>
     </View>
   );
@@ -1147,7 +1159,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
               <View
                 style={{
                   display: 'flex',
-                  paddingHorizontal: 16,
+                  paddingHorizontal: space20,
                   paddingTop: 5,
                   paddingBottom: 10,
                   marginTop: 0,
@@ -1187,14 +1199,11 @@ const Send: React.FunctionComponent<SendProps> = () => {
                   </View>
                   {validAddress === 1 && (
                     <View testID="send.address.check">
-                      <FontAwesomeIcon icon={faCheck} color={colors.fgAccent} />
+                      <CheckIcon size={16} color={colors.fgAccent} />
                     </View>
                   )}
                   {validAddress === -1 && (
-                    <ErrorText
-                      testID="send.address.error"
-                      style={{ color: colors.fgDanger }}
-                    >
+                    <ErrorText testID="send.address.error">
                       {
                         translate(
                           znsNotFound
@@ -1210,7 +1219,15 @@ const Send: React.FunctionComponent<SendProps> = () => {
                     flex: 1,
                     borderWidth: 1,
                     borderRadius: 12,
-                    borderColor: colors.borderMuted,
+                    borderColor: fieldBorder(
+                      colors,
+                      focusedField === 'address',
+                      validAddress === 1
+                        ? 'valid'
+                        : validAddress === -1
+                          ? 'invalid'
+                          : 'unknown',
+                    ),
                     marginTop: 5,
                     minHeight: 48,
                     justifyContent: 'center',
@@ -1225,6 +1242,8 @@ const Send: React.FunctionComponent<SendProps> = () => {
                     >
                       <TextInput
                         testID="send.addressplaceholder"
+                        onFocus={() => setFocusedField('address')}
+                        onBlur={() => setFocusedField('none')}
                         accessible={true}
                         accessibilityLabel={
                           translate('send.address-acc') as string
@@ -1241,7 +1260,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
                           fontWeight: '600',
                           fontSize: 15,
                           padding: 12,
-                          backgroundColor: 'transparent',
                         }}
                         value={addressText}
                         onChangeText={(text: string) => {
@@ -1260,15 +1278,15 @@ const Send: React.FunctionComponent<SendProps> = () => {
                     >
                       {addressText && (
                         <TouchableOpacity
+                          hitSlop={slopFor(20)}
                           testID="send.address.clear"
                           onPress={() => {
                             updateToField('', null, null, null, null);
                           }}
                         >
-                          <FontAwesomeIcon
+                          <XIcon
                             style={{ marginRight: 5 }}
                             size={20}
-                            icon={faXmark}
                             color={colors.fgAccentDisabled}
                           />
                         </TouchableOpacity>
@@ -1281,6 +1299,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                         if (validAddress === 1 && !addressIsSaved) {
                           return (
                             <TouchableOpacity
+                              hitSlop={slopFor(24)}
                               testID="send.add-address"
                               disabled={updatingToField}
                               onPress={() =>
@@ -1296,10 +1315,9 @@ const Send: React.FunctionComponent<SendProps> = () => {
                                 )
                               }
                             >
-                              <FontAwesomeIcon
+                              <UserPlusIcon
                                 style={{ marginRight: 5 }}
-                                size={28}
-                                icon={faUserPlus}
+                                size={24}
                                 color={
                                   updatingToField
                                     ? colors.fgAccentDisabled
@@ -1311,26 +1329,26 @@ const Send: React.FunctionComponent<SendProps> = () => {
                         }
                         return !updatingToField ? (
                           <TouchableOpacity
+                            hitSlop={slopFor(24)}
                             testID="send.address-book"
                             onPress={openBook}
                           >
-                            <FontAwesomeIcon
+                            <ContactIcon
                               style={{ marginRight: 5 }}
-                              size={28}
-                              icon={faAddressCard}
+                              size={24}
                               color={colors.fgAccent}
                             />
                           </TouchableOpacity>
                         ) : (
-                          <FontAwesomeIcon
+                          <ContactIcon
                             style={{ marginRight: 5 }}
-                            size={28}
-                            icon={faAddressCard}
+                            size={24}
                             color={colors.fgAccentDisabled}
                           />
                         );
                       })()}
                       <TouchableOpacity
+                        hitSlop={slopFor(24)}
                         ref={scanButton}
                         testID="send.scan-button"
                         accessible={true}
@@ -1343,7 +1361,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                       >
                         <ScanIcon
                           style={{ marginRight: 5 }}
-                          size={28}
+                          size={24}
                           color={colors.fgMuted}
                         />
                       </TouchableOpacity>
@@ -1376,12 +1394,12 @@ const Send: React.FunctionComponent<SendProps> = () => {
                     </View>
                   </View>
                   {validAmount === -1 && (
-                    <ErrorText style={{ color: colors.fgDanger }}>
+                    <ErrorText>
                       {translate('send.invalidnumber') as string}
                     </ErrorText>
                   )}
                   {validAmount === -2 && (
-                    <ErrorText style={{ color: colors.fgDanger }}>
+                    <ErrorText>
                       {translate('send.invalidamount') as string}
                     </ErrorText>
                   )}
@@ -1408,7 +1426,15 @@ const Send: React.FunctionComponent<SendProps> = () => {
                         alignItems: 'center',
                         borderWidth: 1,
                         borderRadius: 12,
-                        borderColor: colors.borderMuted,
+                        borderColor: fieldBorder(
+                          colors,
+                          focusedField === 'amount',
+                          validAmount === 1
+                            ? 'valid'
+                            : validAmount < 0
+                              ? 'invalid'
+                              : 'unknown',
+                        ),
                         minWidth: 48,
                         minHeight: 48,
                       }}
@@ -1435,6 +1461,8 @@ const Send: React.FunctionComponent<SendProps> = () => {
                       {inputZec ? (
                         <TextInput
                           testID="send.amount"
+                          onFocus={() => setFocusedField('amount')}
+                          onBlur={() => setFocusedField('none')}
                           placeholder={`0${decimalSeparator}00000`}
                           placeholderTextColor={colors.fgMuted}
                           keyboardType="numeric"
@@ -1448,7 +1476,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
                             fontSize: 16,
                             minHeight: 48,
                             marginLeft: 5,
-                            backgroundColor: 'transparent',
                           }}
                           value={amountText}
                           onChangeText={(text: string) => {
@@ -1467,6 +1494,8 @@ const Send: React.FunctionComponent<SendProps> = () => {
                         />
                       ) : (
                         <TextInput
+                          onFocus={() => setFocusedField('amount')}
+                          onBlur={() => setFocusedField('none')}
                           placeholder={`0${decimalSeparator}00`}
                           placeholderTextColor={colors.fgMuted}
                           keyboardType="numeric"
@@ -1480,7 +1509,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
                             fontSize: 16,
                             minHeight: 48,
                             marginLeft: 5,
-                            backgroundColor: 'transparent',
                           }}
                           value={amountCurrencyText}
                           onChangeText={(text: string) => {
@@ -1500,6 +1528,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                       )}
                       {(inputZec ? amountText : amountCurrencyText) ? (
                         <TouchableOpacity
+                          hitSlop={slopFor(20)}
                           onPress={() => {
                             // clearing the amount drops the MAX intent
                             sendAllRef.current = false;
@@ -1510,10 +1539,9 @@ const Send: React.FunctionComponent<SendProps> = () => {
                             }
                           }}
                         >
-                          <FontAwesomeIcon
+                          <XIcon
                             style={{ marginRight: 5 }}
                             size={20}
-                            icon={faXmark}
                             color={colors.fgAccentDisabled}
                           />
                         </TouchableOpacity>
@@ -1535,8 +1563,8 @@ const Send: React.FunctionComponent<SendProps> = () => {
                           testID="send.swap-entry"
                         >
                           <Swap
-                            width={28}
-                            height={28}
+                            width={24}
+                            height={24}
                             color={
                               quote.kind === 'none'
                                 ? colors.fgAccentDisabled
@@ -1622,7 +1650,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                       >
                         <RegText
                           style={{
-                            fontSize: 14,
+                            fontSize: 15,
                             color: spendableBalanceLastError
                               ? colors.fgDanger
                               : colors.fgDefault,
@@ -1642,7 +1670,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                               style={{ marginLeft: 0, marginRight: 0 }}
                               currencyName={info.currencyName}
                               color={spendableColor}
-                              size={14}
+                              size={15}
                               amtZec={maxAmount}
                               privacy={privacy}
                             />
@@ -1653,9 +1681,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                               price={quote.price}
                               amtZec={maxAmount}
                               privacy={privacy}
-                              color={
-                                spendableWarn ? colors.fgDanger : undefined
-                              }
+                              color={spendableWarn ? spendableColor : undefined}
                             />
                           )}
                         </View>
@@ -1678,8 +1704,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                             borderRadius: 10,
                           }}
                         >
-                          <FontAwesomeIcon
-                            icon={faInfoCircle}
+                          <InfoIcon
                             size={16}
                             color={colors.fgAccent}
                             style={{ marginRight: 5 }}
@@ -1707,8 +1732,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                             borderRadius: 10,
                           }}
                         >
-                          <FontAwesomeIcon
-                            icon={faInfoCircle}
+                          <InfoIcon
                             size={16}
                             color={colors.fgAccent}
                             style={{ marginRight: 5 }}
@@ -1748,7 +1772,11 @@ const Send: React.FunctionComponent<SendProps> = () => {
                           flexDirection: 'row',
                           borderWidth: 1,
                           borderRadius: 12,
-                          borderColor: colors.borderMuted,
+                          borderColor: fieldBorder(
+                            colors,
+                            focusedField === 'memo',
+                            memoTooLong ? 'invalid' : 'unknown',
+                          ),
                           minWidth: 48,
                           minHeight: 48,
                           maxHeight: 130,
@@ -1776,7 +1804,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
                             minWidth: 48,
                             minHeight: 48,
                             marginLeft: 5,
-                            backgroundColor: 'transparent',
                             textAlignVertical: 'top',
                           }}
                           value={memoText}
@@ -1830,7 +1857,9 @@ const Send: React.FunctionComponent<SendProps> = () => {
                             }
                           }}
                           maxLength={GlobalConst.memoMaxLength}
+                          onBlur={() => setFocusedField('none')}
                           onFocus={() => {
+                            setFocusedField('memo');
                             // Expand the Send sheet to its top snap so the memo
                             // field (and the rest of the form) is fully visible
                             // above the keyboard.
@@ -1852,31 +1881,31 @@ const Send: React.FunctionComponent<SendProps> = () => {
                         />
                         {memoText && (
                           <TouchableOpacity
+                            hitSlop={slopFor(20)}
                             onPress={() => {
                               updateToField(null, null, null, '', null);
                             }}
                           >
-                            <FontAwesomeIcon
+                            <XIcon
                               style={{
                                 marginTop: 7,
                                 marginRight: memoIcon ? 0 : 7,
                               }}
                               size={20}
-                              icon={faXmark}
                               color={colors.fgAccentDisabled}
                             />
                           </TouchableOpacity>
                         )}
                         {memoIcon && (
                           <TouchableOpacity
+                            hitSlop={slopFor(24)}
                             onPress={() => {
                               setMemoModalShow();
                             }}
                           >
-                            <FontAwesomeIcon
+                            <ZoomInIcon
                               style={{ margin: 7 }}
                               size={24}
-                              icon={faMagnifyingGlassPlus}
                               color={colors.fgMuted}
                             />
                           </TouchableOpacity>
@@ -1895,7 +1924,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                           style={{
                             marginTop: 0,
                             fontWeight: 'bold',
-                            fontSize: 12.5,
+                            fontSize: 13,
                             color: colors.fgDanger,
                           }}
                         >{`${Utils.countMemoBytes(memoText, includeUAMemoBoolean, defaultUnifiedAddress)} `}</FadeText>
@@ -1942,6 +1971,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                 )}
                 <View
                   style={{
+                    paddingHorizontal: space20,
                     flexGrow: 1,
                     flexDirection: 'row',
                     justifyContent: 'center',
@@ -1951,7 +1981,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                 >
                   {showCalcError ? (
                     <Button
-                      type={ButtonTypeEnum.Secondary}
+                      variant="text"
                       title={`${translate('send.calc-error') as string} ⓘ`}
                       onPress={() => sendErrorSheetRef.current?.present()}
                       testID="send.calc-error"
@@ -1966,7 +1996,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                       accessible={true}
                       accessibilityLabel={'title ' + translate('send.button')}
                       // NYM feature hidden for now — will be enabled in the future
-                      type={ButtonTypeEnum.Primary}
+                      variant="primary"
                       title={
                         validAmount === 1 &&
                         amountText &&

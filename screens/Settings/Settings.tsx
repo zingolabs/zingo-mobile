@@ -18,20 +18,13 @@ import {
 import Animated from 'react-native-reanimated';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 
-import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faDotCircle,
-  faChevronLeft,
-  faChevronRight,
-} from '@fortawesome/free-solid-svg-icons';
-import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
+import { space20, space32, useTheme } from '@app/theme';
 
 import RegText from '@ui/primitives/RegText';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
 import AppSheet from '@ui/primitives/AppSheet';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 
@@ -77,6 +70,9 @@ import { sendEmail } from '@app/services/sendEmail';
 import SaveSheet from '@ui/widgets/SaveSheet';
 import SwitchOff from '../../assets/img/switch-off.svg';
 import SettingSwitchOn from '../../assets/img/setting-switch-on.svg';
+import { ChevronLeft, ChevronRight } from '@ui/primitives/Icons/Chevron';
+import { RadioOffIcon } from '@ui/primitives/Icons/RadioOffIcon';
+import { RadioOnIcon } from '@ui/primitives/Icons/RadioOnIcon';
 
 type Options = {
   value: string;
@@ -494,15 +490,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                 style={{ flexDirection: 'row', alignItems: 'center' }}
                 onPress={() => setOption(typeOption(item.value))}
               >
-                <FontAwesomeIcon
-                  icon={
-                    typeOption(item.value) === valueOption
-                      ? faDotCircle
-                      : farCircle
-                  }
-                  size={16}
-                  color={colors.fgMuted}
-                />
+                {typeOption(item.value) === valueOption ? (
+                  <RadioOnIcon size={16} color={colors.fgMuted} />
+                ) : (
+                  <RadioOffIcon size={16} color={colors.fgMuted} />
+                )}
                 <RegText style={{ marginLeft: 10 }}>
                   {translate(`settings.value-${label}-${item.value}`) as string}
                 </RegText>
@@ -544,11 +536,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
           hitSlop={8}
           style={{ paddingHorizontal: 4, paddingVertical: 4 }}
         >
-          <FontAwesomeIcon
-            icon={faChevronLeft}
-            size={20}
-            color={colors.fgAccent}
-          />
+          <ChevronLeft size={20} color={colors.fgAccent} />
         </TouchableOpacity>
         <BoldText
           numberOfLines={1}
@@ -571,6 +559,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
       <BottomSheetFooter {...props} bottomInset={0}>
         <View
           style={{
+            paddingHorizontal: space20,
             backgroundColor: colors.bgSurface,
             paddingTop: 10,
             paddingBottom: 24,
@@ -582,7 +571,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
           <Button
             testID="settings.button.save"
             disabled={disabled || disabledButton}
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={translate('settings.save') as string}
             onPress={() => {
               setTimeout(async () => {
@@ -615,8 +604,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   const sectionHeader = (key: string) => (
     <FadeText
       style={{
-        marginLeft: 25,
-        marginRight: 25,
+        marginLeft: space20,
+        marginRight: space20,
         marginTop: 24,
         marginBottom: 4,
         fontSize: 12,
@@ -701,7 +690,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  marginHorizontal: 25,
+                  marginHorizontal: space20,
                   marginVertical: 15,
                 }}
               >
@@ -726,11 +715,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                         ) as string
                       }
                     </RegText>
-                    <FontAwesomeIcon
-                      icon={faChevronRight}
-                      size={12}
-                      color={colors.fgMuted}
-                    />
+                    <ChevronRight size={16} color={colors.fgMuted} />
                   </View>
                 </TouchableOpacity>
               </View>
@@ -738,7 +723,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
               {/* SECTION: Privacy & Security */}
               {sectionHeader('settings.section-privacysecurity')}
 
-              <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
+              <View style={{ marginHorizontal: space20, marginVertical: 15 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <View style={{ flex: 1 }}>
                     <InfoTooltip
@@ -777,8 +762,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
 
               <View
                 style={{
-                  marginLeft: 25,
-                  marginRight: 25,
+                  marginLeft: space20,
+                  marginRight: space20,
                   marginVertical: 15,
                 }}
               >
@@ -830,18 +815,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    marginHorizontal: 25,
+                    marginHorizontal: space20,
                     marginVertical: 15,
                   }}
                 >
-                  <BoldText style={{ color: '#07FF94' }}>
+                  <BoldText style={{ color: colors.bgNym }}>
                     {translate('settings.nym-network') as string}
                   </BoldText>
-                  <FontAwesomeIcon
-                    icon={faChevronRight}
-                    size={12}
-                    color={colors.fgMuted}
-                  />
+                  <ChevronRight size={16} color={colors.fgMuted} />
                 </TouchableOpacity>
               )}
 
@@ -850,8 +831,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  marginLeft: 25,
-                  marginRight: 25,
+                  marginLeft: space20,
+                  marginRight: space20,
                   marginVertical: 15,
                 }}
               >
@@ -876,11 +857,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                         ) as string
                       }
                     </RegText>
-                    <FontAwesomeIcon
-                      icon={faChevronRight}
-                      size={12}
-                      color={colors.fgMuted}
-                    />
+                    <ChevronRight size={16} color={colors.fgMuted} />
                   </View>
                 </TouchableOpacity>
               </View>
@@ -896,20 +873,16 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  marginHorizontal: 25,
+                  marginHorizontal: space20,
                   marginVertical: 15,
                 }}
               >
                 <BoldText>{translate('loadedapp.about') as string}</BoldText>
-                <FontAwesomeIcon
-                  icon={faChevronRight}
-                  size={12}
-                  color={colors.fgMuted}
-                />
+                <ChevronRight size={16} color={colors.fgMuted} />
               </TouchableOpacity>
 
               {(!recoveryInfoStored || recoveryInfoSave) && (
-                <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
+                <View style={{ marginHorizontal: space20, marginVertical: 15 }}>
                   {!recoveryInfoStored && (
                     <TouchableOpacity
                       testID="settings.recoveryinfo.save"
@@ -958,13 +931,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                 <>
                   {sectionHeader('settings.section-developer')}
                   <View style={{ width: '100%', marginBottom: 20 }}>
-                    <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
+                    <View
+                      style={{ marginHorizontal: space20, marginVertical: 15 }}
+                    >
                       <BoldText>
                         {translate('settings.performancelevel-title') as string}
                       </BoldText>
                     </View>
 
-                    <View style={{ marginLeft: 40, marginRight: 25 }}>
+                    <View style={{ marginLeft: space32, marginRight: space20 }}>
                       {optionsRadio(
                         PERFORMANCELEVELMENU,
                         setPerformanceLevel as React.Dispatch<
@@ -978,19 +953,21 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                     {!!lastError && (
                       <>
                         <View
-                          style={{ marginHorizontal: 25, marginVertical: 15 }}
+                          style={{
+                            marginHorizontal: space20,
+                            marginVertical: 15,
+                          }}
                         >
                           <BoldText>{'LAST ERROR'}</BoldText>
                         </View>
 
-                        <View style={{ marginLeft: 40, marginRight: 25 }}>
+                        <View style={{ marginHorizontal: space20 }}>
                           <Button
-                            type={ButtonTypeEnum.Primary}
+                            variant="primary"
                             title={translate('view-error') as string}
                             onPress={() => {
                               reportError(lastError);
                             }}
-                            twoButtons={true}
                           />
                         </View>
                       </>
@@ -998,7 +975,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                     {hasWalletBackup && (
                       <>
                         <View
-                          style={{ marginHorizontal: 25, marginVertical: 15 }}
+                          style={{
+                            marginHorizontal: space20,
+                            marginVertical: 15,
+                          }}
                         >
                           <BoldText>
                             {
@@ -1009,10 +989,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                           </BoldText>
                         </View>
 
-                        <View style={{ marginLeft: 40, marginRight: 25 }}>
+                        <View style={{ marginHorizontal: space20 }}>
                           <Button
                             testID="settings.restorebackupwallet"
-                            type={ButtonTypeEnum.Secondary}
+                            variant="text"
                             title={
                               translate('settings.restorebackup') as string
                             }
@@ -1053,7 +1033,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                                 ],
                               })
                             }
-                            twoButtons={true}
                           />
                         </View>
                       </>

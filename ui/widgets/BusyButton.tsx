@@ -62,7 +62,7 @@ const BusyButton: React.FunctionComponent<BusyButtonProps> = ({
     const bg = interpolateColor(
       on.value,
       [0, 1],
-      [colors.bgSecondaryDisabled, colors.bgAccent],
+      [colors.bgAccentDisabled, colors.bgAccent],
     );
     const width =
       naturalWidth.value > 0

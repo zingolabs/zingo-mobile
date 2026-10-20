@@ -9,7 +9,7 @@ import {
   LaunchingModeEnum,
   TranslateType,
 } from '@app/AppState';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
 import Utils from '@app/utils';
 
@@ -127,7 +127,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                 {props.translate('biometricsfailed-footer') as string}
               </Text>
               <Button
-                type={ButtonTypeEnum.Primary}
+                variant="primary"
                 title={props.translate('biometricsfailed-button') as string}
                 onPress={() => props.tryAgain && props.tryAgain()}
                 style={{ marginBottom: 10, marginTop: 10 }}

@@ -1,16 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { SnowflakeIcon } from '@ui/primitives/Icons/SnowflakeIcon';
 import { REVEAL_OPEN_MS } from '@ui/widgets/CircularReveal';
 import { ease } from '@app/theme/motion';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   StackActions,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
-import { useTheme } from '@app/theme';
+import { useTheme, iconSize, slopFor } from '@app/theme';
 import React, { useContext, useEffect, useRef } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
 import Animated, {
@@ -41,6 +39,7 @@ import BalanceRow from './components/BalanceRow';
 import PriceRow from './components/PriceRow';
 import { MessagesIcon } from '@ui/primitives/Icons/MessagesIcon';
 import { MenuMorphIcon } from '@ui/widgets/MenuMorphIcon';
+import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 
 type HeaderProps = {
   // general
@@ -292,6 +291,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           <View style={{ alignItems: 'center', flexDirection: 'row', gap: 14 }}>
             {!noDrawMenu && (
               <TouchableOpacity
+                hitSlop={slopFor(24)}
                 testID="header.drawmenu"
                 accessible={true}
                 accessibilityLabel={translate('menudrawer-acc') as string}
@@ -321,17 +321,14 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             {readOnly && !noUfvkIcon && (
               <Animated.View style={headerAnimatedStyle}>
                 <TouchableOpacity
+                  hitSlop={slopFor(24)}
                   testID="header.snowflake"
                   accessibilityRole="button"
                   accessibilityLabel={translate('viewingkey.title') as string}
                   onPress={ufvkShowModal}
                 >
                   <Animated.View ref={snowflake} style={snowStyle}>
-                    <SnowflakeIcon
-                      size={22}
-                      color={colors.fgViewOnly}
-                      strokeWidth={1.8}
-                    />
+                    <SnowflakeIcon size={iconSize} color={colors.fgViewOnly} />
                   </Animated.View>
                 </TouchableOpacity>
               </Animated.View>
@@ -364,11 +361,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   4.5 below. The nudge rides on the icon alone, leaving the
                   logo this corner falls back to where it already sat. */}
               <TouchableOpacity
+                hitSlop={slopFor(24)}
                 style={{ marginRight: 5, marginTop: 4.5 }}
                 testID="header.messages"
                 onPress={() => navigation.navigate(Route.Messages)}
               >
-                <MessagesIcon size={22} color="#B1BBC5" />
+                <MessagesIcon size={iconSize} color={colors.fgMuted} />
               </TouchableOpacity>
             </View>
           ) : (
@@ -399,11 +397,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         >
           {closeScreen ? (
             <>
-              <TouchableOpacity onPress={closeScreen}>
-                <FontAwesomeIcon
+              <TouchableOpacity hitSlop={slopFor(24)} onPress={closeScreen}>
+                <ChevronLeft
                   style={{ marginHorizontal: 10 }}
                   size={24}
-                  icon={faChevronLeft}
                   color={colors.fgAccent}
                 />
               </TouchableOpacity>
