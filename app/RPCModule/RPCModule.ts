@@ -108,6 +108,14 @@ interface RPCModuleAPI {
   shieldProcess(): Promise<string>;
   confirmProcess(): Promise<string>;
 
+  // Swap deposits. The amount crosses the bridge as a string of zatoshis.
+  sendSwapDepositProcess(
+    vaultAddress: string,
+    amount: string,
+    memoHex: string,
+  ): Promise<string>;
+  reserveRefundAddressProcess(): Promise<string>;
+
   // Ironwood migration (Orchard -> Ironwood drain)
   planOrchardDrainProcess(): Promise<string>;
   drainOrchardProcess(): Promise<string>;
