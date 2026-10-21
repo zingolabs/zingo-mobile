@@ -161,7 +161,9 @@ const CustomTabBar = ({
         <View style={styles.pill}>
           {state.routes.map((route, index) => {
             const isFocused = index === state.index;
-            const color = isFocused ? PILL_BG : themeTokens.fgDefault;
+            const color = isFocused
+              ? themeTokens.fgOnAccent
+              : themeTokens.fgDefault;
             return (
               <Pressable
                 key={route.key}

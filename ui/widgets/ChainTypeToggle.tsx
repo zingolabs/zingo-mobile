@@ -58,7 +58,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
           >
             <RegText
               style={{
-                color: selected ? colors.bgCanvas : colors.fgAccent,
+                color: selected ? colors.fgOnAccent : colors.fgAccent,
                 fontSize: 12,
               }}
             >

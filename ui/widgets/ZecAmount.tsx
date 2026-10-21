@@ -7,7 +7,7 @@ import {
   TextStyle,
   TouchableOpacity,
 } from 'react-native';
-import { useTheme } from '@app/theme';
+import { useTheme, fontScaleBody } from '@app/theme';
 import { getNumberFormatSettings } from 'react-native-localize';
 
 import Utils from '@app/utils';
@@ -88,6 +88,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
             />
           ) : (
             <Text
+              maxFontSizeMultiplier={fontScaleBody}
               style={{
                 fontSize: size * (smallPrefix ? 0.7 : 1),
                 color,
@@ -100,6 +101,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
           )}
           {privacyHigh ? (
             <Text
+              maxFontSizeMultiplier={fontScaleBody}
               style={{
                 fontSize: size,
                 fontWeight: '700',
@@ -113,6 +115,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
           ) : (
             <Text
               testID={`${testID}.big-part`}
+              maxFontSizeMultiplier={fontScaleBody}
               style={{
                 fontSize: size,
                 fontWeight: '700',
@@ -127,6 +130,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
           {splits.smallPart !== '0000' && !privacyHigh && (
             <Text
               testID={`${testID}.small-part`}
+              maxFontSizeMultiplier={fontScaleBody}
               style={{
                 fontSize: size * 0.7,
                 color,

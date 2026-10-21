@@ -390,7 +390,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               >
                 <Text
                   style={{
-                    color: colors.bgCanvas,
+                    color: colors.fgOnAccent,
                     fontSize: 13,
                     fontWeight: '700',
                   }}
@@ -494,7 +494,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
             >
               <Text
                 style={{
-                  color: colors.bgCanvas,
+                  color: colors.fgOnAccent,
                   fontSize: 15,
                   fontWeight: '700',
                 }}
@@ -527,7 +527,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
             >
               <Text
                 style={{
-                  color: colors.bgCanvas,
+                  color: colors.fgOnAccent,
                   fontSize: 15,
                   fontWeight: '700',
                 }}

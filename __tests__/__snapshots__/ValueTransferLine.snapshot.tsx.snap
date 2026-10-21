@@ -460,6 +460,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                       }
                     >
                       <Text
+                        maxFontSizeMultiplier={2}
                         style={
                           {
                             "color": "#888888",
@@ -474,6 +475,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                          0.1234
                       </Text>
                       <Text
+                        maxFontSizeMultiplier={2}
                         style={
                           {
                             "color": "#888888",
@@ -881,6 +883,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                       }
                     >
                       <Text
+                        maxFontSizeMultiplier={2}
                         style={
                           {
                             "color": "#5a8c5a",
@@ -895,6 +898,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                          0.1234
                       </Text>
                       <Text
+                        maxFontSizeMultiplier={2}
                         style={
                           {
                             "color": "#5a8c5a",
@@ -1273,6 +1277,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                       }
                     >
                       <Text
+                        maxFontSizeMultiplier={2}
                         style={
                           {
                             "color": "#18bd18",
@@ -1287,6 +1292,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                          0.7765
                       </Text>
                       <Text
+                        maxFontSizeMultiplier={2}
                         style={
                           {
                             "color": "#18bd18",
@@ -1797,6 +1803,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                       }
                     >
                       <Text
+                        maxFontSizeMultiplier={2}
                         style={
                           {
                             "color": "#c3c3c3",
@@ -1811,6 +1818,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                          0.1234
                       </Text>
                       <Text
+                        maxFontSizeMultiplier={2}
                         style={
                           {
                             "color": "#c3c3c3",

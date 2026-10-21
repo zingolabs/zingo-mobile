@@ -69,6 +69,7 @@ exports[`Component Components - test CurrencyAmount High Privacy - snapshot 1`] 
       }
     >
       <Text
+        maxFontSizeMultiplier={2}
         style={
           {
             "backgroundColor": "red",
@@ -192,6 +193,7 @@ exports[`Component Components - test ZecAmount High Privacy - snapshot 1`] = `
       }
     >
       <Text
+        maxFontSizeMultiplier={2}
         style={
           {
             "color": "red",
@@ -264,6 +266,7 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
       }
     >
       <Text
+        maxFontSizeMultiplier={2}
         style={
           {
             "color": "red",
@@ -278,6 +281,7 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
          1.1234
       </Text>
       <Text
+        maxFontSizeMultiplier={2}
         style={
           {
             "color": "red",
