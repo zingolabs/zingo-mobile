@@ -18,7 +18,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
-import { themeTokens } from '@app/theme';
 
 type PoolsProps = NativeStackScreenProps<AppDrawerParamList, 'Pools'>;
 
@@ -177,7 +176,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                           totalBalance.confirmedIronwoodBalance ===
                             totalBalance.totalIronwoodBalance
                             ? colors.fgAccent
-                            : themeTokens.fgWarning
+                            : colors.fgWarning
                         }
                         privacy={privacy}
                       />
@@ -188,7 +187,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                     style={{
                       height: 1,
                       width: '100%',
-                      backgroundColor: themeTokens.borderSubtle,
+                      backgroundColor: colors.borderSubtle,
                       marginTop: 15,
                       marginBottom: 10,
                     }}
@@ -236,7 +235,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                             totalBalance.confirmedOrchardBalance ===
                               totalBalance.totalOrchardBalance
                               ? colors.fgAccent
-                              : themeTokens.fgWarning
+                              : colors.fgWarning
                           }
                           privacy={privacy}
                         />
@@ -247,7 +246,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       style={{
                         height: 1,
                         width: '100%',
-                        backgroundColor: themeTokens.borderSubtle,
+                        backgroundColor: colors.borderSubtle,
                         marginTop: 15,
                         marginBottom: 10,
                       }}
@@ -296,7 +295,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                             totalBalance.confirmedSaplingBalance ===
                               totalBalance.totalSaplingBalance
                               ? colors.fgSyncing
-                              : themeTokens.fgWarning
+                              : colors.fgWarning
                           }
                           privacy={privacy}
                         />
@@ -307,7 +306,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       style={{
                         height: 1,
                         width: '100%',
-                        backgroundColor: themeTokens.borderSubtle,
+                        backgroundColor: colors.borderSubtle,
                         marginTop: 15,
                         marginBottom: 10,
                       }}
@@ -330,7 +329,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                           amtZec={totalBalance.totalTransparentBalance}
                           size={15}
                           currencyName={info.currencyName}
-                          color={themeTokens.fgWarning}
+                          color={colors.fgWarning}
                           privacy={privacy}
                         />
                       </DetailLine>
@@ -346,7 +345,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                           amtZec={totalBalance.confirmedTransparentBalance}
                           size={15}
                           currencyName={info.currencyName}
-                          color={themeTokens.fgWarning}
+                          color={colors.fgWarning}
                           privacy={privacy}
                         />
                       </DetailLine>

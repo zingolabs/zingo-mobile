@@ -52,7 +52,6 @@ import {
   ChevronUp,
 } from '@ui/primitives/Icons/Chevron';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
-import { themeTokens } from '@app/theme';
 // this is for https. (primary)
 //
 type ValueTransferDetailProps = NativeStackScreenProps<
@@ -425,7 +424,7 @@ const ValueTransferDetail: React.FunctionComponent<
               borderRadius: 10,
               borderColor:
                 valueTransfer.status === RPCValueTransfersStatusEnum.failed
-                  ? themeTokens.fgDanger
+                  ? colors.borderDanger
                   : colors.borderMuted,
             }}
           >
@@ -605,7 +604,7 @@ const ValueTransferDetail: React.FunctionComponent<
                       color:
                         valueTransfer.status ===
                         RPCValueTransfersStatusEnum.failed
-                          ? themeTokens.fgDanger
+                          ? colors.fgDanger
                           : valueTransfer.status ===
                                 RPCValueTransfersStatusEnum.transmitted ||
                               valueTransfer.status ===
