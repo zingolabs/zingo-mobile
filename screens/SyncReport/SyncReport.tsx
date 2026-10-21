@@ -432,7 +432,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             borderRadius: 12,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: pressed ? themeTokens.bgMutedSubtle : undefined,
+            backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
           })}
         >
           <ChevronLeft size={24} color={colors.fgAccent} />
@@ -481,7 +481,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             borderRadius: 12,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: pressed ? themeTokens.bgMutedSubtle : undefined,
+            backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
           })}
         >
           <Animated.View

@@ -426,7 +426,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
                 width: BADGE,
                 height: BADGE,
                 borderRadius: BADGE / 2,
-                backgroundColor: colors.fgDanger,
+                backgroundColor: colors.bgDanger,
                 borderWidth: 2,
                 borderColor: colors.bgCanvas,
                 alignItems: 'center',

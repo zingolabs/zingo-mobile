@@ -263,7 +263,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
             borderRadius: 12,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: pressed ? themeTokens.bgMutedSubtle : undefined,
+            backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
           })}
         >
           <ChevronLeft size={24} color={colors.fgAccent} />
@@ -630,11 +630,11 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                           alignItems: 'center',
                           justifyContent: 'center',
                           backgroundColor: pressed
-                            ? themeTokens.bgAccentSubtle
+                            ? colors.bgAccentSubtle
                             : undefined,
                         })}
                       >
-                        <UserPlusIcon size={20} color={themeTokens.fgAccent} />
+                        <UserPlusIcon size={20} color={colors.fgAccent} />
                       </Pressable>
                     )}
                   </View>
