@@ -31,7 +31,7 @@ const BTC: TokenEntryType = {
 
 const route = (overrides: Partial<RouteOptionType> = {}): RouteOptionType => ({
   routeId: 'route-near',
-  provider: SwapKitProviderEnum.NearIntents,
+  provider: SwapKitProviderEnum.Near,
   expectedReceiveAmount: '0.002',
   minReceiveAmount: '0.0019',
   totalFeesInSellAsset: '0.001',
@@ -115,11 +115,13 @@ test('Tests that the main action is ready when a valid destination address is bo
     destinationAddress: BTC_ADDRESS,
     sourceAddress: 't1ephemeral',
   });
-  let taken: ReturnType<typeof result.current.review> = null;
+  const taken: { review: ReturnType<typeof result.current.review> } = {
+    review: null,
+  };
   act(() => {
-    taken = result.current.review();
+    taken.review = result.current.review();
   });
-  expect(taken?.route.routeId).toBe('route-near');
+  expect(taken.review?.route.routeId).toBe('route-near');
 });
 
 test('Tests that a quote with no routes is asked once until an input changes', async () => {
