@@ -74,7 +74,7 @@ import { AppTheme } from '@app/theme';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
-import { ContextAppLoadedProvider } from '@app/context';
+import { ContextAppLoadedProvider, SwapServiceProvider } from '@app/context';
 import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
 import { otherServers, staticAlternatives } from '@app/uris/serverChoice';
 import selectingServer from '@app/services/selectingServer';
@@ -2049,24 +2049,26 @@ export class LoadedAppClass extends Component<
     return (
       <>
         <ContextAppLoadedProvider value={context}>
-          <PriceTrafficDriver />
-          <GestureHandlerRootView>
-            <BottomSheetModalProvider>
-              <BottomSheetBackHandler />
-              <ConfirmBottomSheet />
-              <OptionsPanelProvider>
-                <FadeInOnMount duration={HOME_FADE_MS}>
-                  <WalletNavigator />
-                </FadeInOnMount>
-              </OptionsPanelProvider>
-              <AddTagModalHost
-                ref={this.addTagModalRef}
-                target={this.state.addTagModalTarget}
-                setAddressBook={this.setAddressBook}
-                translate={this.state.translate}
-              />
-            </BottomSheetModalProvider>
-          </GestureHandlerRootView>
+          <SwapServiceProvider chainName={this.state.walletChainName}>
+            <PriceTrafficDriver />
+            <GestureHandlerRootView>
+              <BottomSheetModalProvider>
+                <BottomSheetBackHandler />
+                <ConfirmBottomSheet />
+                <OptionsPanelProvider>
+                  <FadeInOnMount duration={HOME_FADE_MS}>
+                    <WalletNavigator />
+                  </FadeInOnMount>
+                </OptionsPanelProvider>
+                <AddTagModalHost
+                  ref={this.addTagModalRef}
+                  target={this.state.addTagModalTarget}
+                  setAddressBook={this.setAddressBook}
+                  translate={this.state.translate}
+                />
+              </BottomSheetModalProvider>
+            </GestureHandlerRootView>
+          </SwapServiceProvider>
         </ContextAppLoadedProvider>
         <Toast config={toastConfig} />
       </>

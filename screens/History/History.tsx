@@ -45,7 +45,7 @@ import ViewOnlyNotice from './components/ViewOnlyNotice';
 import NoticeStack, { Notice, NOTICE_RADIUS } from '@ui/widgets/NoticeStack';
 import { PriceCard } from '@ui/widgets/Header/components/PriceRow';
 import { fiatQuote } from '@app/price/fiatQuote';
-import { ContextAppLoaded } from '@app/context';
+import { ContextAppLoaded, useValueTransfersWithSwaps } from '@app/context';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
@@ -437,9 +437,9 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       ? Math.max(activeSnap - handleH, 0)
       : undefined;
 
-  const mergedValueTransfers = useMemo(() => {
-    return valueTransfers ?? [];
-  }, [valueTransfers]);
+  const mergedValueTransfers = useValueTransfersWithSwaps(
+    useMemo(() => valueTransfers ?? [], [valueTransfers]),
+  );
 
   const fetchValueTransfersFiltered = useMemo(() => {
     if (mergedValueTransfers.length === 0 && valueTransfers === null) {
@@ -461,12 +461,14 @@ const History: React.FunctionComponent<HistoryProps> = () => {
             vt.kind === ValueTransferKindEnum.SendToSelf ||
             vt.kind === ValueTransferKindEnum.MemoToSelf ||
             vt.kind === ValueTransferKindEnum.Migration ||
-            vt.kind === ValueTransferKindEnum.Rejection)
+            vt.kind === ValueTransferKindEnum.Rejection ||
+            (vt.kind === ValueTransferKindEnum.Swap && !vt.swapIsInbound))
         ) {
           selectedKind = true;
         } else if (
           filterKind === FilterEnum.received &&
-          vt.kind === ValueTransferKindEnum.Received
+          (vt.kind === ValueTransferKindEnum.Received ||
+            (vt.kind === ValueTransferKindEnum.Swap && vt.swapIsInbound))
         ) {
           selectedKind = true;
         } else if (

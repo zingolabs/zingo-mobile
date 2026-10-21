@@ -24,22 +24,20 @@ export function swapRecordToValueTransfer(
     record.observedDepositTxHash ??
     record.depositAddress;
   const isInbound = record.direction === SwapDirectionEnum.Inbound;
-  // The row shows the side that is not ZEC, whichever direction the swap
-  // runs. The ZEC leg has its own row beside this one: the deposit this wallet
-  // broadcast for an outbound swap, the payout it received for an inbound one.
-  // An outbound swap still moving carries the quote-time estimate, since the
-  // provider has reported no payout yet. The status label says so.
+  // The row reads like every other row: the ZEC that left the wallet for an
+  // outbound swap, the ZEC that arrived for an inbound one. An inbound swap
+  // still moving carries the quote-time estimate, since the provider has
+  // reported no payout yet. The status label says so.
   const counterpartyAsset = isInbound ? record.sellAsset : record.receiveAsset;
   const displayAmountStr = isInbound
-    ? record.sellAmountHumanDecimal
-    : (record.actualReceiveAmount ?? record.expectedReceiveAmount);
+    ? (record.actualReceiveAmount ?? record.expectedReceiveAmount)
+    : record.sellAmountHumanDecimal;
   const displayAmount = parseFloat(displayAmountStr);
-  // Captured when the route was quoted, so the figure is what the swap was
-  // worth when it ran. Zero means SwapKit priced neither side, and the row
-  // hides the column at zero.
-  const counterpartyUsdUnitPrice = isInbound
-    ? record.fiatValueBasis.sellUsdUnitPrice
-    : record.fiatValueBasis.receiveUsdUnitPrice;
+  // ZEC's price when the route was quoted, so the figure is what the swap
+  // was worth when it ran. Zero means SwapKit priced neither side.
+  const zecUsdUnitPrice = isInbound
+    ? record.fiatValueBasis.receiveUsdUnitPrice
+    : record.fiatValueBasis.sellUsdUnitPrice;
 
   return {
     txid,
@@ -60,7 +58,7 @@ export function swapRecordToValueTransfer(
     swapIsInbound: isInbound,
     swapStatus: record.status,
     swapAssetTicker: counterpartyAsset.ticker ?? counterpartyAsset.symbol,
-    swapUsdUnitPrice: counterpartyUsdUnitPrice,
+    swapUsdUnitPrice: zecUsdUnitPrice,
     swapProvider: record.provider,
   };
 }

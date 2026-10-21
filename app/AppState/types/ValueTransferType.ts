@@ -22,9 +22,8 @@ export default interface ValueTransferType {
   swapRecordId?: string;
   swapIsInbound?: boolean;
   swapStatus?: string;
-  // The counterparty asset the row's `amount` is denominated in, and its USD
-  // unit price at quote time. A swap row shows no ZEC, so the wallet's
-  // currency name and ZEC price do not apply to it.
+  // The asset ZEC was traded against, and ZEC's USD unit price when the
+  // route was quoted, which is what the row's `amount` was worth then.
   swapAssetTicker?: string;
   swapUsdUnitPrice?: number;
   // The provider the swap ran through, for the logo the row shows.

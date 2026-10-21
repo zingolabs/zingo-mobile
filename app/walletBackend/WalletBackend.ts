@@ -103,6 +103,12 @@ export default class WalletBackend {
     return this.transactionService.sendTransaction(sendJson, sendAll);
   }
 
+  async sendSwapDeposit(
+    args: Parameters<TransactionService['sendSwapDeposit']>[0],
+  ) {
+    return this.transactionService.sendSwapDeposit(args);
+  }
+
   // The device's network came or went: the mixnet follows it the way it
   // follows the Offline mode.
   async networkChanged(connected: boolean) {
