@@ -63,7 +63,7 @@ const NET_AMBER = {
 };
 const NET_GREEN = {
   bg: themeTokens.bgAccentSubtle,
-  border: themeTokens.bgAccentDisabled,
+  border: themeTokens.borderAccent,
   ink: themeTokens.fgAccent,
 };
 const CHIP_LABEL = themeTokens.fgMuted;

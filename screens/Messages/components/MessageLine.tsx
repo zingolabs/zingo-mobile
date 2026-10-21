@@ -151,7 +151,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
               vt.kind === ValueTransferKindEnum.Received ? 0 : 20,
             backgroundColor:
               vt.kind === ValueTransferKindEnum.Received
-                ? colors.bgAccentDisabled
+                ? colors.bgAccentSubtle
                 : colors.bgAccentSubtle,
             opacity: vt.status === RPCValueTransfersStatusEnum.failed ? 0.5 : 1,
           }}

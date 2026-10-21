@@ -821,7 +821,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
             {loading ? (
               <ActivityIndicator
                 size="large"
-                color={colors.fgAccent}
+                color={colors.fgMuted}
                 style={{ marginVertical: 20 }}
               />
             ) : (
@@ -869,7 +869,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                         >
                           <ActivityIndicator
                             size="small"
-                            color={colors.fgAccent}
+                            color={colors.fgMuted}
                           />
                         </View>
                       ) : !!valueTransfersSliced &&
@@ -883,7 +883,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                             marginBottom: 200,
                           }}
                         >
-                          <FadeText style={{ color: colors.fgAccent }}>
+                          <FadeText>
                             {translate('history.end') as string}
                           </FadeText>
                         </View>
@@ -899,9 +899,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                       marginTop: 30,
                     }}
                   >
-                    <FadeText style={{ color: colors.fgAccent }}>
-                      {translate('history.empty') as string}
-                    </FadeText>
+                    <FadeText>{translate('history.empty') as string}</FadeText>
                   </View>
                 )}
               </View>
@@ -930,7 +928,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
               height: 36,
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: colors.bgChrome,
+              backgroundColor: colors.bgSurface,
               borderRadius: 50,
               transform: [{ scale: pressed ? 0.9 : 1 }],
               opacity: isScrollingToTop ? 0.5 : 1,

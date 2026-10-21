@@ -100,7 +100,7 @@ const ValueTransferDetail: React.FunctionComponent<
       ? route.params.totalLength
       : 0,
   );
-  const [spendColor, setSpendColor] = useState<string>(colors.fgAccentDisabled);
+  const [spendColor, setSpendColor] = useState<string>(colors.fgWarning);
   const [expandTxid, setExpandTxid] = useState<boolean>(false);
   const [showNavigator, setShowNavigator] = useState<boolean>(true);
   const [containerH, setContainerH] = useState<number>(0);
@@ -195,7 +195,7 @@ const ValueTransferDetail: React.FunctionComponent<
         ? colors.fgMuted
         : valueTransfer.confirmations >= 0 &&
             valueTransfer.confirmations < GlobalConst.minConfirmations
-          ? colors.fgAccentDisabled
+          ? colors.fgWarning
           : valueTransfer.kind === ValueTransferKindEnum.Received ||
               valueTransfer.kind === ValueTransferKindEnum.Shield
             ? colors.fgAccent
@@ -203,7 +203,7 @@ const ValueTransferDetail: React.FunctionComponent<
     setSpendColor(spendCo);
   }, [
     colors.fgAccent,
-    colors.fgAccentDisabled,
+    colors.fgWarning,
     colors.fgDefault,
     colors.fgMuted,
     valueTransfer.confirmations,
@@ -587,7 +587,7 @@ const ValueTransferDetail: React.FunctionComponent<
                     RPCValueTransfersStatusEnum.calculated) && (
                   <TriangleAlert
                     style={{ marginRight: 5 }}
-                    color={colors.fgSyncing}
+                    color={colors.fgWarning}
                     size={16}
                   />
                 )}
@@ -610,7 +610,7 @@ const ValueTransferDetail: React.FunctionComponent<
                               valueTransfer.status ===
                                 RPCValueTransfersStatusEnum.calculated
                             ? colors.fgAccent
-                            : colors.fgAccentDisabled,
+                            : colors.fgWarning,
                       fontSize: 12,
                       opacity: 1,
                       fontWeight: '700',
@@ -642,7 +642,7 @@ const ValueTransferDetail: React.FunctionComponent<
                     GlobalConst.minConfirmations && (
                     <FadeText
                       style={{
-                        color: colors.fgAccentDisabled,
+                        color: colors.fgWarning,
                         fontSize: 12,
                         opacity: 1,
                         fontWeight: '700',
@@ -951,7 +951,7 @@ const ValueTransferDetail: React.FunctionComponent<
                     )}
                     {!contactFound(memoUA) && thisWalletAddress(memoUA) && (
                       <View style={{ flexDirection: 'row' }}>
-                        <RegText color={colors.fgAccentDisabled}>
+                        <RegText color={colors.fgMuted}>
                           {translate('addressbook.thiswalletaddress') as string}
                         </RegText>
                       </View>
