@@ -52,9 +52,7 @@ const COPY_SQUEEZE_MS = 110;
 const COPY_SPRING_MS = 150;
 const COPY_HOLD_MS = 1400;
 const EDIT_MS = 420;
-const EDIT_AT = 470;
 const DELETE_MS = 360;
-const DELETE_AT = 380;
 const SEND_MS = 420;
 const SEND_RESET_AT = 900;
 const ACTIONS_H = 92;
@@ -310,7 +308,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
     switch (button) {
       case 'send':
         fly.value = withTiming(1, { ...motion(SEND_MS), easing: ease.in });
-        later(SEND_MS + 30, onSend);
+        onSend();
         later(SEND_RESET_AT, () => {
           fly.value = 0;
           busy.current = false;
@@ -331,7 +329,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
         return;
       case 'edit':
         pen.value = withTiming(1, motion(EDIT_MS));
-        later(EDIT_AT, onEdit);
+        onEdit();
         later(SEND_RESET_AT, () => {
           pen.value = 0;
           busy.current = false;
@@ -342,7 +340,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
           ...motion(DELETE_MS),
           easing: ease.spring,
         });
-        later(DELETE_AT, onDelete);
+        onDelete();
         later(SEND_RESET_AT, () => {
           lid.value = 0;
           busy.current = false;
