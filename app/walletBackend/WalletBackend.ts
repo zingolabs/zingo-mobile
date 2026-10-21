@@ -4,7 +4,10 @@ import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { DataService } from './modules/DataService';
 import { MixnetCoordinator } from './modules/MixnetCoordinator';
 import { SyncCoordinator } from './modules/SyncCoordinator';
-import { TransactionService } from './modules/TransactionService';
+import {
+  SwapDepositArgs,
+  TransactionService,
+} from './modules/TransactionService';
 import { WalletLifecycleService } from './modules/WalletLifecycleService';
 
 // Wires the sub-services together and exposes one API to LoadedApp.
@@ -103,10 +106,12 @@ export default class WalletBackend {
     return this.transactionService.sendTransaction(sendJson, sendAll);
   }
 
-  async sendSwapDeposit(
-    args: Parameters<TransactionService['sendSwapDeposit']>[0],
-  ) {
+  async sendSwapDeposit(args: SwapDepositArgs) {
     return this.transactionService.sendSwapDeposit(args);
+  }
+
+  async resumeSwapDeposit() {
+    return this.transactionService.resumeSwapDeposit();
   }
 
   // The device's network came or went: the mixnet follows it the way it

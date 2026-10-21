@@ -22,6 +22,7 @@ import TransparentAddressClass from './classes/TransparentAddressClass';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import type { SwapDepositArgs } from '@app/walletBackend/modules/TransactionService';
 import type {
   SendOutcome,
   SendPermit,
@@ -106,6 +107,10 @@ export default interface AppContextLoaded {
     s: SendPageStateClass,
     sendAll?: boolean,
   ) => Promise<SendOutcome<string>>;
+  // A swap deposit: the txids in order, the vault payment last. The resume
+  // transmits the OP_RETURN step of a deposit whose deshield already went out.
+  sendSwapDeposit: (args: SwapDepositArgs) => Promise<string[]>;
+  resumeSwapDeposit: () => Promise<string[]>;
   setServerOption: (
     value: ServerType,
     selectServer: SelectServerEnum,

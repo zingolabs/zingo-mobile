@@ -8,6 +8,7 @@
 import WalletBackend from './WalletBackend';
 
 export type { FfiError, FfiErrorCode, FfiResult } from './ffi';
+export type { SwapDepositArgs } from './modules/TransactionService';
 export type {
   CadencePlanRoute,
   ReschedulePartsRoute,
