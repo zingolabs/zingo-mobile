@@ -1122,6 +1122,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
+    fun deriveRefundAddressProcess(promise: Promise) {
+        FfiOutcome.settling(promise, "derive_refund_address") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.deriveRefundAddress()
+        }
+    }
+
+    @ReactMethod
     fun planOrchardDrainProcess(promise: Promise) {
         FfiOutcome.settling(promise, "plan_orchard_drain") {
             uniffi.zingo.initLogging()
