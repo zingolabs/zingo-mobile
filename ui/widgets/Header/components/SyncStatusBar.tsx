@@ -230,7 +230,9 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                   }}
                 >
                   <CloudDownloadIcon
-                    color={!netInfo.isConnected ? 'red' : 'yellow'}
+                    color={
+                      !netInfo.isConnected ? colors.fgDanger : colors.fgSyncing
+                    }
                     size={16}
                   />
                 </TouchableOpacity>
@@ -264,7 +266,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                 paddingHorizontal: 3,
               }}
             >
-              <WifiIcon color={'red'} size={16} />
+              <WifiIcon color={colors.fgDanger} size={16} />
               <FadeText style={{ fontSize: 12, marginLeft: 2 }}>
                 {translate('settings.server-offline') as string}
               </FadeText>
