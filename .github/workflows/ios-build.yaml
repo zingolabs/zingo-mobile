@@ -186,7 +186,7 @@ jobs:
           cargo run \
             --manifest-path zingolib/tools/workbench/Cargo.toml \
             --bin build-binding-layer -- \
-            ios --out zingolib/bindings/swift/build
+            ios
           echo "BUILD_SECONDS=$(( $(date +%s) - started ))" >> "$GITHUB_ENV"
 
       # One table row per run in the job summary.
