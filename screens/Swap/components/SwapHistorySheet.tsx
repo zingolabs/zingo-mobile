@@ -21,6 +21,8 @@ import SheetTitle from './SheetTitle';
 
 type SwapHistorySheetProps = {
   records: SwapRecordType[];
+  /** Opens a swap where it stands: its deposit, its tracking or its detail. */
+  onOpen: (record: SwapRecordType) => void;
 };
 
 /** What a record traded, the way the user reads it: sold → bought. */
@@ -31,12 +33,9 @@ export function swapPairLabel(record: SwapRecordType): string {
   return `${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sell} → ${formatAmountForDisplay(bought)} ${buy}`;
 }
 
-/**
- * The wallet's swaps, the ones in flight first. A row opens nothing yet: the
- * swap's detail comes with the execution screens.
- */
+/** The wallet's swaps, the ones in flight first. */
 const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
-  ({ records }, ref) => {
+  ({ records, onOpen }, ref) => {
     const { translate, language } = useContext(ContextAppLoaded);
     const { colors } = useTheme();
     const dismiss = useCallback(() => {
@@ -110,6 +109,8 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
                 leading={state.icon}
                 title={swapPairLabel(record)}
                 subtitle={`${state.label} · ${Utils.formatDate(record.createdAtMs, 'MMM d, h:mm aaa', language)}`}
+                chevron
+                onPress={() => onOpen(record)}
               />
             );
           })}

@@ -22,6 +22,8 @@ import {
 import type { ComputingEnd } from '@app/walletBackend/transforms/sendSettlement';
 import { RPCDrainTxType } from '@app/walletBackend/types/RPCDrainPlanType';
 import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanType';
+import type { SwapReview } from '@screens/Swap/useSwapForm';
+import type { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
 
 // The root stack: one section, chosen by the session, plus the scanner,
 // which sits above every section and its bottom-sheet portal.
@@ -147,6 +149,11 @@ export type AppDrawerParamList = {
   [Route.AddressList]: AddressListNavigationState | undefined;
   [Route.ValueTransferDetail]: ValueTransferDetailNavigationState | undefined;
   [Route.Confirm]: ConfirmNavigationState | undefined;
+  [Route.SwapReview]: SwapReviewNavigationState;
+  [Route.SwapDeposit]: SwapRecordNavigationState;
+  [Route.SwapTracking]: SwapRecordNavigationState;
+  [Route.SwapResult]: SwapRecordNavigationState;
+  [Route.SwapDetail]: SwapRecordNavigationState;
 };
 
 export type AddressBookNavigationState = {
@@ -200,6 +207,20 @@ export type ConfirmNavigationState = {
   proposalPools: ProposalPoolsType;
   sendAllAmount: boolean;
   sendPageState: SendPageStateClass;
+};
+
+// What the swap form agreed to, copied when Continue was pressed so a
+// refresh behind the review cannot move it.
+export type SwapReviewNavigationState = {
+  review: SwapReview;
+  direction: SwapDirectionEnum;
+};
+
+// A swap by its local record id; the screen reads the live record.
+export type SwapRecordNavigationState = {
+  recordId: string;
+  // Why the wallet's own broadcast of an outbound deposit did not go out.
+  broadcastError?: string;
 };
 
 // What `useNavigation()` gives inside the wallet: the wallet stack and the

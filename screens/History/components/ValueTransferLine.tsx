@@ -40,6 +40,8 @@ import { ArrowDownIcon } from '@ui/primitives/Icons/ArrowDownIcon';
 import { ArrowUpIcon } from '@ui/primitives/Icons/ArrowUpIcon';
 import { RefreshIcon } from '@ui/primitives/Icons/RefreshIcon';
 import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
+import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
+import { swapScreenFor } from '@screens/Swap/swapRoute';
 //import Utils from '@app/utils';
 
 type ValueTransferLineProps = {
@@ -309,12 +311,17 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
       )}
       <TouchableOpacity
         style={{ zIndex: 999 }}
-        // A swap row opens nothing yet: its detail is the swap record's, which
-        // the swap screens bring.
-        disabled={isSwap || undefined}
         onPress={async () => {
           closeAllSwipeables();
           await new Promise(r => requestAnimationFrame(r));
+          // A swap row opens the swap where it stands, from its own record.
+          if (isSwap && vt.swapRecordId && vt.swapStatus) {
+            navigation.navigate(
+              swapScreenFor(vt.swapStatus as SwapStatusEnum),
+              { recordId: vt.swapRecordId },
+            );
+            return;
+          }
           setValueTransferDetailModalShow(index, vt);
         }}
       >

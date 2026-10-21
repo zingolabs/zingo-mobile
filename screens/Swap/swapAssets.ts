@@ -95,3 +95,22 @@ export function tokenToSwapAsset(token: TokenEntryType): SwapAssetType {
     decimals: token.decimals,
   };
 }
+
+/**
+ * A quoted asset as a catalog entry, for the logo. The catalog's own entry
+ * carried a logo URL; a record keeps the asset alone, so the logo falls back
+ * to the bundled chain mark or the lettered disc.
+ */
+export function tokenEntryOf(asset: SwapAssetType): TokenEntryType {
+  return asset.swapKitId === ZEC_ASSET.swapKitId
+    ? ZEC_TOKEN_ENTRY
+    : {
+        chain: asset.chain,
+        chainId: asset.chainId,
+        ticker: asset.ticker ?? asset.symbol,
+        identifier: asset.swapKitId,
+        symbol: asset.symbol,
+        name: asset.ticker ?? asset.symbol,
+        decimals: asset.decimals,
+      };
+}
