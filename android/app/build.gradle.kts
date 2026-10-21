@@ -346,6 +346,21 @@ androidComponents {
 }
 
 
+// The React Native plugin registers the Sonatype snapshot repository first
+// on every project, so each uncached lookup asks it before Maven Central.
+// Only a nightly (-SNAPSHOT) react-native resolves there, and package.json
+// pins a release. The plugin offers no switch for it, so this hook removes
+// it. The plugins block applies the plugin before this script body runs,
+// so the plugin's afterEvaluate registers first and this hook runs after it.
+val snapshotRepositoryHost = "central.sonatype.com"
+afterEvaluate {
+    rootProject.allprojects {
+        repositories.removeAll { repository ->
+            repository is MavenArtifactRepository && repository.url.host == snapshotRepositoryHost
+        }
+    }
+}
+
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
