@@ -584,7 +584,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
             <LoadingDots
               size={6}
               gap={5}
-              color={colors.bgCanvas}
+              color={colors.fgOnAccent}
               testID="walleterror.open.dots"
             />
           </Animated.View>
@@ -597,7 +597,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
             <RegText
               style={{
                 fontSize: 16,
-                color: colors.bgCanvas,
+                color: colors.fgOnAccent,
                 fontWeight: '700',
               }}
             >

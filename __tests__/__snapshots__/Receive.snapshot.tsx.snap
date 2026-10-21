@@ -241,6 +241,7 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
                 }
               >
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
@@ -255,6 +256,7 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
                    1.6234
                 </Text>
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",

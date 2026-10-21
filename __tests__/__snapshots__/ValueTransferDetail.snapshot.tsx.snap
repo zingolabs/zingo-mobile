@@ -367,6 +367,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
             }
           >
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#c3c3c3",
@@ -381,6 +382,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                0.7765
             </Text>
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#c3c3c3",
@@ -448,6 +450,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
             }
           >
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#c3c3c3",
@@ -745,6 +748,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                 }
               >
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
@@ -759,6 +763,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                    0.7765
                 </Text>
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
@@ -826,6 +831,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                 }
               >
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
@@ -1285,6 +1291,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
             }
           >
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#c3c3c3",
@@ -1299,6 +1306,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                0.1234
             </Text>
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#c3c3c3",
@@ -1366,6 +1374,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
             }
           >
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#c3c3c3",
@@ -1626,6 +1635,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                 }
               >
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
@@ -1873,6 +1883,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                 }
               >
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
@@ -1887,6 +1898,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                    0.1234
                 </Text>
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
@@ -1954,6 +1966,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                 }
               >
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",

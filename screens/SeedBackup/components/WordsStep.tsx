@@ -153,7 +153,7 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
                 { borderColor: checked ? colors.bgAccent : colors.borderMuted },
               ]}
             >
-              {checked && <DrawnTick color={colors.bgCanvas} />}
+              {checked && <DrawnTick color={colors.fgOnAccent} />}
             </Animated.View>
           </Animated.View>
         </View>
