@@ -535,7 +535,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
         >
           <RegText
             numberOfLines={1}
-            style={{ fontSize: 15, lineHeight: 19, fontWeight: '500' }}
+            style={{ fontSize: 15, lineHeight: 19, fontWeight: '600' }}
           >
             {cardName}
           </RegText>

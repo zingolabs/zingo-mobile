@@ -127,11 +127,7 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
               doCopy();
             }}
           >
-            <CopyIcon
-              style={{ opacity: 0.8 }}
-              size={20}
-              color={colors.fgDefault}
-            />
+            <CopyIcon size={20} color={colors.fgDefault} />
           </TouchableOpacity>
         </View>
         <View

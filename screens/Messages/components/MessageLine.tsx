@@ -200,7 +200,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                       <TriangleAlert color={colors.fgWarning} size={16} />
                       <RegText
                         style={{
-                          opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4,
+                          color: colors.fgMuted,
                         }}
                       >
                         {memoUA}
@@ -208,7 +208,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                       {contactFound(memoUA).found && (
                         <View style={{ flexDirection: 'row' }}>
                           {!thisWalletAddress(memoUA) && (
-                            <RegText style={{ opacity: 0.6 }}>
+                            <RegText style={{ color: colors.fgMuted }}>
                               {translate('addressbook.likely') as string}
                             </RegText>
                           )}

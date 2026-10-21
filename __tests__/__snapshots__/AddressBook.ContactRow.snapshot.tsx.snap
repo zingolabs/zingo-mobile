@@ -278,7 +278,7 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
                     "color": "#c3c3c3",
                     "fontFamily": "Menlo",
                     "fontSize": 12,
-                    "fontWeight": "500",
+                    "fontWeight": "400",
                   }
                 }
               >
@@ -373,7 +373,7 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
                   {
                     "color": "#c3c3c3",
                     "fontSize": 12,
-                    "fontWeight": "500",
+                    "fontWeight": "400",
                     "lineHeight": 15,
                   }
                 }
@@ -443,7 +443,7 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
                   {
                     "color": "#c3c3c3",
                     "fontSize": 12,
-                    "fontWeight": "500",
+                    "fontWeight": "400",
                     "lineHeight": 15,
                   }
                 }
@@ -530,7 +530,7 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
                   {
                     "color": "#c3c3c3",
                     "fontSize": 12,
-                    "fontWeight": "500",
+                    "fontWeight": "400",
                     "lineHeight": 15,
                   }
                 }
@@ -623,7 +623,7 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
                   {
                     "color": "#E5484D",
                     "fontSize": 12,
-                    "fontWeight": "500",
+                    "fontWeight": "400",
                     "lineHeight": 15,
                   }
                 }

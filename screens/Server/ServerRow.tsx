@@ -165,7 +165,7 @@ const ServerRow: React.FC<ServerRowProps> = ({
         <View style={{ flex: 1, minWidth: 0 }}>
           <RegText
             numberOfLines={1}
-            style={{ fontSize: 15, lineHeight: 19, fontWeight: '500' }}
+            style={{ fontSize: 15, lineHeight: 19, fontWeight: '600' }}
           >
             {title}
           </RegText>

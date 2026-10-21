@@ -934,15 +934,13 @@ const ValueTransferDetail: React.FunctionComponent<
                     {!thisWalletAddress(memoUA) && (
                       <TriangleAlert color={colors.fgWarning} size={16} />
                     )}
-                    <RegText
-                      style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}
-                    >
+                    <RegText style={{ color: colors.fgMuted }}>
                       {memoUA}
                     </RegText>
                     {contactFound(memoUA) && (
                       <View style={{ flexDirection: 'row' }}>
                         {!thisWalletAddress(memoUA) && (
-                          <RegText style={{ opacity: 0.6 }}>
+                          <RegText style={{ color: colors.fgMuted }}>
                             {translate('addressbook.likely') as string}
                           </RegText>
                         )}

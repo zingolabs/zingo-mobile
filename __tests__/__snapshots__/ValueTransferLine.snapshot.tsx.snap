@@ -413,7 +413,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                     {
                       "flexDirection": "row",
                       "marginHorizontal": 5,
-                      "opacity": 0.7,
                     }
                   }
                 >
@@ -841,7 +840,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                     {
                       "flexDirection": "row",
                       "marginHorizontal": 5,
-                      "opacity": 1,
                     }
                   }
                 >
@@ -1240,7 +1238,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                     {
                       "flexDirection": "row",
                       "marginHorizontal": 5,
-                      "opacity": 1,
                     }
                   }
                 >
@@ -1768,7 +1765,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                     {
                       "flexDirection": "row",
                       "marginHorizontal": 5,
-                      "opacity": 1,
                     }
                   }
                 >

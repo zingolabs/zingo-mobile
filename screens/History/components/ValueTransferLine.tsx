@@ -207,11 +207,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   closeAllSwipeables();
                 }}
               >
-                <FileTextIcon
-                  style={{ opacity: 0.8 }}
-                  size={24}
-                  color={colors.fgDefault}
-                />
+                <FileTextIcon size={24} color={colors.fgDefault} />
               </TouchableOpacity>
             </View>
             {!!vt.address && !readOnly && server.kind !== 'offline' && (
@@ -365,7 +361,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               }
               trailing={
                 <ZecAmount
-                  style={{ opacity: failed ? 0.7 : 1 }}
                   size={15}
                   currencyName={info.currencyName}
                   color={failed ? colors.fgMuted : amountColor}

@@ -122,7 +122,7 @@ const Action: React.FunctionComponent<ActionProps> = ({
             color: red ? RED : INK_CODE,
             fontSize: 12,
             lineHeight: 15,
-            fontWeight: '500',
+            fontWeight: '400',
           }}
         >
           {label}
