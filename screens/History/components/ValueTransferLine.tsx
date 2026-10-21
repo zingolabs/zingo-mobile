@@ -281,7 +281,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     <View
       testID={`vt-${index + 1}`}
       style={{
-        display: 'flex',
+        flex: 1,
         flexDirection: 'column',
       }}
     >
@@ -298,7 +298,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
         </View>
       )}
       <TouchableOpacity
-        style={{ zIndex: 999 }}
+        style={{ zIndex: 999, flex: 1, justifyContent: 'center' }}
         onPress={async () => {
           closeAllSwipeables();
           await new Promise(r => requestAnimationFrame(r));
@@ -410,21 +410,25 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 </Text>
               </View>
             )}
-            {/* Lines of the same TXID render flush against each other; the
-                separator only marks the boundary between transactions, and
-                stops at the row's gutter like its content. */}
-            {!nextLineWithSameTxid && (
-              <View
-                style={{
-                  height: 1,
-                  marginHorizontal: space16,
-                  backgroundColor: colors.borderSubtle,
-                }}
-              />
-            )}
           </View>
         </Swipeable>
       </TouchableOpacity>
+      {/* Lines of the same TXID render flush against each other; the
+          separator only marks the boundary between transactions. It sits
+          at the bottom of the list's fixed-height cell, not under the
+          content, so the cell's spare height never gathers below it. */}
+      {!nextLineWithSameTxid && (
+        <View
+          style={{
+            position: 'absolute',
+            left: space16,
+            right: space16,
+            bottom: 0,
+            height: 1,
+            backgroundColor: colors.borderSubtle,
+          }}
+        />
+      )}
     </View>
   );
 };
