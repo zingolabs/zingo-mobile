@@ -367,7 +367,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                       size={
                         Platform.OS === GlobalConst.platformOSios ? 'small' : 12
                       }
-                      color={colors.fgAccent}
+                      color={colors.fgMuted}
                     />
                   ) : (
                     <RegText>{privacyLevel}</RegText>

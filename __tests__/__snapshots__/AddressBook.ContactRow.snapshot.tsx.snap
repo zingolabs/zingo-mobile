@@ -51,7 +51,7 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
         style={
           {
             "alignItems": "flex-end",
-            "backgroundColor": "#5a8c5a",
+            "backgroundColor": "#18bd18",
             "justifyContent": "center",
             "paddingRight": 31,
             "width": 0,

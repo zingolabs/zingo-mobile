@@ -225,7 +225,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
     : (translate('walletseed.ok-restored') as string);
   const strip = seedBackedUp
     ? {
-        border: colors.bgAccentDisabled,
+        border: colors.borderAccent,
         bg: colors.bgAccentSubtle,
         tile: colors.bgAccentSubtle,
       }

@@ -35,8 +35,8 @@ const INK_CODE = themeTokens.fgDefault;
 const ACT_BG = themeTokens.bgCanvas;
 const ACT_PRESSED = themeTokens.bgMutedSubtle;
 const RED = themeTokens.fgDanger;
-const SWIPE_BG = themeTokens.bgAccentDisabled;
-const SWIPE_INK = themeTokens.fgDefault;
+const SWIPE_BG = themeTokens.bgAccent;
+const SWIPE_INK = themeTokens.fgOnAccent;
 const FLASH = themeTokens.bgAccentSubtle;
 
 const UNFOLD_MS = 260;

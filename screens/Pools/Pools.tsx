@@ -130,7 +130,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                 {!orchardPool && !saplingPool && !transparentPool && (
                   <ActivityIndicator
                     size="large"
-                    color={colors.fgAccent}
+                    color={colors.fgMuted}
                     style={{ marginVertical: 20 }}
                   />
                 )}
@@ -294,7 +294,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                             totalBalance.confirmedSaplingBalance > 0 &&
                             totalBalance.confirmedSaplingBalance ===
                               totalBalance.totalSaplingBalance
-                              ? colors.fgSyncing
+                              ? colors.fgAccent
                               : colors.fgWarning
                           }
                           privacy={privacy}
@@ -369,7 +369,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                     >
                       <InfoIcon
                         size={16}
-                        color={colors.fgAccent}
+                        color={colors.fgMuted}
                         style={{ marginRight: 5 }}
                       />
                       <FadeText>{translate('pools.dust') as string}</FadeText>
@@ -389,7 +389,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                   >
                     <InfoIcon
                       size={16}
-                      color={colors.fgAccent}
+                      color={colors.fgMuted}
                       style={{ marginRight: 5 }}
                     />
                     <FadeText>{translate('send.somefunds') as string}</FadeText>

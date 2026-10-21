@@ -331,7 +331,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
                   paddingHorizontal: 12,
                   paddingVertical: 6,
                   borderRadius: 14,
-                  backgroundColor: colors.bgAccentDisabled,
+                  backgroundColor: colors.bgAccentSubtle,
                 }}
               >
                 <CheckIcon size={16} color={colors.fgAccent} />

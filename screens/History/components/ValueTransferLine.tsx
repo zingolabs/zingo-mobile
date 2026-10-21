@@ -133,7 +133,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     vt.status === RPCValueTransfersStatusEnum.failed
       ? colors.fgMuted
       : vt.confirmations >= 0 && vt.confirmations < GlobalConst.minConfirmations
-        ? colors.fgAccentDisabled
+        ? colors.fgWarning
         : vt.kind === ValueTransferKindEnum.Received ||
             vt.kind === ValueTransferKindEnum.Shield
           ? colors.fgAccent
@@ -189,7 +189,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               justifyContent: 'center',
               alignItems: 'center',
               transform: [{ translateX: trans }],
-              backgroundColor: colors.bgChrome,
+              backgroundColor: colors.bgSurface,
             }}
           >
             <View
@@ -318,7 +318,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               leading={
                 <KindIcon
                   size={iconSize}
-                  color={inFlight ? colors.fgSyncing : amountColor}
+                  color={inFlight ? colors.fgWarning : amountColor}
                 />
               }
               title={
@@ -357,9 +357,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                       <MessagesIcon
                         style={{ marginLeft: space8 }}
                         size={iconSizeSm}
-                        color={
-                          failed ? colors.fgMuted : colors.fgAccentDisabled
-                        }
+                        color={failed ? colors.fgMuted : colors.fgMuted}
                       />
                     )}
                   </View>
@@ -388,7 +386,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 {inFlight && (
                   <TriangleAlert
                     style={{ marginRight: space4 }}
-                    color={colors.fgSyncing}
+                    color={colors.fgWarning}
                     size={iconSizeSm}
                   />
                 )}
@@ -399,7 +397,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                       ? colors.fgDanger
                       : inFlight
                         ? colors.fgAccent
-                        : colors.fgAccentDisabled
+                        : colors.fgWarning
                   }
                   style={{
                     fontWeight: '700',

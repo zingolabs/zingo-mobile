@@ -188,7 +188,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                 <XIcon
                   style={{ marginRight: 10 }}
                   size={20}
-                  color={colors.fgAccentDisabled}
+                  color={colors.fgMuted}
                 />
               </TouchableOpacity>
             )}

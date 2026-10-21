@@ -83,7 +83,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "#040C17",
+              "backgroundColor": "#031124",
               "flexDirection": "row",
               "justifyContent": "center",
               "transform": [
@@ -599,7 +599,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "#040C17",
+              "backgroundColor": "#031124",
               "flexDirection": "row",
               "justifyContent": "center",
               "transform": [
@@ -893,7 +893,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                         maxFontSizeMultiplier={2}
                         style={
                           {
-                            "color": "#5a8c5a",
+                            "color": "#F99D00",
                             "fontSize": 15,
                             "fontWeight": "700",
                             "margin": 0,
@@ -908,7 +908,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                         maxFontSizeMultiplier={2}
                         style={
                           {
-                            "color": "#5a8c5a",
+                            "color": "#F99D00",
                             "fontSize": 10.5,
                             "margin": 0,
                             "marginBottom": 1,
@@ -939,7 +939,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
               maxFontSizeMultiplier={2}
               style={
                 {
-                  "color": "#5a8c5a",
+                  "color": "#F99D00",
                   "fontSize": 12,
                   "fontWeight": "700",
                   "lineHeight": 16,
@@ -1052,7 +1052,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "#040C17",
+              "backgroundColor": "#031124",
               "flexDirection": "row",
               "justifyContent": "center",
               "transform": [
@@ -1438,7 +1438,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "#040C17",
+              "backgroundColor": "#031124",
               "flexDirection": "row",
               "justifyContent": "center",
               "transform": [

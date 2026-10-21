@@ -212,7 +212,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
     },
     calculating: {
       key: 'migrationsending.status-calculating',
-      color: colors.fgAccent,
+      color: colors.fgWarning,
     },
     calculated: {
       key: 'migrationsending.status-calculated',
@@ -224,7 +224,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
     },
     sent: {
       key: 'migrationsending.status-sent',
-      color: colors.fgAccent,
+      color: colors.fgWarning,
     },
   };
 
@@ -367,7 +367,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
                 )}
               </Text>
               <Text
-                style={{ color: colors.fgAccent, fontSize: 14, flexShrink: 1 }}
+                style={{ color: colors.fgDefault, fontSize: 14, flexShrink: 1 }}
                 numberOfLines={1}
               >
                 {value}

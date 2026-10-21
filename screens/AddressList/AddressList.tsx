@@ -275,16 +275,14 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
                 marginTop: 30,
               }}
             >
-              <FadeText style={{ color: colors.fgAccent }}>
-                {translate('addressbook.empty') as string}
-              </FadeText>
+              <FadeText>{translate('addressbook.empty') as string}</FadeText>
             </View>
           )}
           {loading ? (
             <ActivityIndicator
               style={{ marginTop: 7, marginRight: 7 }}
               size={20}
-              color={colors.fgAccentDisabled}
+              color={colors.fgMuted}
             />
           ) : (
             <>
@@ -338,9 +336,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
                     marginBottom: 30,
                   }}
                 >
-                  <FadeText style={{ color: colors.fgAccent }}>
-                    {translate('addressbook.end') as string}
-                  </FadeText>
+                  <FadeText>{translate('addressbook.end') as string}</FadeText>
                 </View>
               )}
             </>
@@ -358,7 +354,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
             right: 10,
             paddingHorizontal: 5,
             paddingVertical: 10,
-            backgroundColor: colors.bgChrome,
+            backgroundColor: colors.bgSurface,
             borderRadius: 50,
             transform: [{ scale: pressed ? 0.9 : 1 }],
             borderWidth: 1,

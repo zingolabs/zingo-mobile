@@ -174,7 +174,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                   <XIcon
                     style={{ marginRight: 5 }}
                     size={20}
-                    color={colors.fgAccentDisabled}
+                    color={colors.fgMuted}
                   />
                 </TouchableOpacity>
               )}

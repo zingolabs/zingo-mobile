@@ -53,7 +53,7 @@ const PrivacyToggle: React.FC<PrivacyToggleProps> = React.memo(
             {privacy ? (
               <LockIcon size={20} color={colors.fgAccent} />
             ) : (
-              <LockOpenIcon size={20} color={colors.fgAccentDisabled} />
+              <LockOpenIcon size={20} color={colors.fgMuted} />
             )}
           </View>
         </View>

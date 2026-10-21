@@ -183,7 +183,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                       alignItems: 'center',
                       justifyContent: 'center',
                       padding: 1,
-                      borderColor: colors.borderAccentDisabled,
+                      borderColor: colors.borderAccent,
                       borderWidth: 1,
                       borderRadius: 10,
                       minWidth: 25,
@@ -205,7 +205,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                           padding: 3,
                         }}
                       >
-                        <WifiIcon color={colors.fgAccentDisabled} size={16} />
+                        <WifiIcon color={colors.fgAccent} size={16} />
                       </View>
                     </TouchableOpacity>
                   </View>

@@ -90,7 +90,7 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
                 style={{
                   fontSize: 18,
                   marginHorizontal: 10,
-                  color: colors.fgAccent,
+                  color: colors.fgDefault,
                   opacity: 1,
                   fontWeight: 'bold',
                 }}

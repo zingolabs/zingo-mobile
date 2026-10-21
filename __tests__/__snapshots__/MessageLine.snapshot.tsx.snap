@@ -50,7 +50,7 @@ exports[`MessageLine - snapshots MessageLine received with messageAddress, no mo
       style={
         {
           "alignItems": "flex-start",
-          "backgroundColor": "#5a8c5a",
+          "backgroundColor": "#18bd181F",
           "borderBottomEndRadius": 20,
           "borderBottomStartRadius": 0,
           "borderRadius": 20,

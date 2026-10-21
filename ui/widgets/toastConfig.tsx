@@ -10,7 +10,7 @@ const AppInfoToast: React.FC<ToastConfigParams<undefined>> = ({ text1 }) => {
     <View style={{ width: '100%', paddingHorizontal: 10 }}>
       <View
         style={{
-          backgroundColor: colors.bgAccentDisabled,
+          backgroundColor: colors.bgSurface,
           paddingLeft: 20,
           paddingRight: 15,
           paddingVertical: 10,

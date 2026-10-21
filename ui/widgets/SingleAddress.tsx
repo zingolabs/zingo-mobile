@@ -155,7 +155,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     }}
                   >
                     <ShieldIcon
-                      color={colors.fgAccent}
+                      color={colors.fgMuted}
                       size={20}
                       style={{ marginRight: 10 }}
                     />
