@@ -1,6 +1,6 @@
 import {
   isValidChainAddress,
-  normalizeChainAddress,
+  canonicalChainAddress,
 } from '@app/swap/addressValidators';
 import { extractPlainAddress } from '@app/swap/extractPlainAddress';
 
@@ -126,14 +126,14 @@ test.each([segwit[0], segwit[3]])(
 test.each([...segwit, ...otherBech32])(
   'Tests that %s stores an address in lowercase when every letter is uppercase: %s',
   (chain, address) => {
-    expect(normalizeChainAddress(chain, address.toUpperCase())).toBe(address);
+    expect(canonicalChainAddress(chain, address.toUpperCase())).toBe(address);
   },
 );
 
 test.each([...segwit, ...otherBech32])(
   'Tests that %s stores an address as typed when every letter is lowercase: %s',
   (chain, address) => {
-    expect(normalizeChainAddress(chain, address)).toBe(address);
+    expect(canonicalChainAddress(chain, address)).toBe(address);
   },
 );
 
@@ -141,7 +141,7 @@ test.each(segwit)(
   'Tests that %s stores a SegWit address as typed when the letters have mixed case: %s',
   (chain, address) => {
     const mixed = address[0].toUpperCase() + address.slice(1);
-    expect(normalizeChainAddress(chain, mixed)).toBe(mixed);
+    expect(canonicalChainAddress(chain, mixed)).toBe(mixed);
   },
 );
 
@@ -149,7 +149,7 @@ test.each([segwit[0], segwit[3]])(
   'Tests that %s stores a SegWit address as typed when a Kelvin sign replaces an ASCII letter: %s',
   (chain, address) => {
     const unicode = address.toUpperCase().replace('K', '\u212a');
-    expect(normalizeChainAddress(chain, unicode)).toBe(unicode);
+    expect(canonicalChainAddress(chain, unicode)).toBe(unicode);
   },
 );
 
@@ -160,6 +160,6 @@ test.each([
 ])(
   'Tests that %s stores an address as typed when the address is Base58, hex or base32: %s',
   (chain, address) => {
-    expect(normalizeChainAddress(chain, address)).toBe(address);
+    expect(canonicalChainAddress(chain, address)).toBe(address);
   },
 );
