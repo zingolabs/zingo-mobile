@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useContext } from 'react';
 import { View } from 'react-native';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { space16, space8, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import { askGate, enactGateAnswer } from '@app/services/gateController';
@@ -47,7 +47,7 @@ const AuthorizeSheet = forwardRef<BottomSheetModal, AuthorizeSheetProps>(
 
     return (
       <AppSheetModal ref={ref} handle contentStyle={{ paddingBottom: 32 }}>
-        <BottomSheetView
+        <View
           style={{
             alignItems: 'center',
             paddingHorizontal: space16,
@@ -91,7 +91,7 @@ const AuthorizeSheet = forwardRef<BottomSheetModal, AuthorizeSheetProps>(
               />
             </ButtonStack>
           </View>
-        </BottomSheetView>
+        </View>
       </AppSheetModal>
     );
   },

@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useContext } from 'react';
 import { View } from 'react-native';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { space12, space16, space8, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
@@ -56,7 +56,7 @@ const InsufficientFundsSheet = forwardRef<
       }
       contentStyle={{ paddingBottom: 30 }}
     >
-      <BottomSheetView style={{ paddingHorizontal: space16 }}>
+      <View style={{ paddingHorizontal: space16 }}>
         <View style={{ alignItems: 'center', marginBottom: space12 }}>
           <WalletIcon size={40} color={colors.fgWarning} />
         </View>
@@ -94,7 +94,7 @@ const InsufficientFundsSheet = forwardRef<
             )}
           </ButtonStack>
         </View>
-      </BottomSheetView>
+      </View>
     </AppSheetModal>
   );
 });

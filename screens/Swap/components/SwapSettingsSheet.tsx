@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useContext, useState } from 'react';
 import { View } from 'react-native';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { space12, space16, space8 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
@@ -97,7 +97,7 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
           paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
         }}
       >
-        <BottomSheetView style={{ paddingHorizontal: space16 }}>
+        <View style={{ paddingHorizontal: space16 }}>
           <Text variant="bodyStrong" style={{ marginTop: space8 }}>
             {translate('swap.slippage') as string}
           </Text>
@@ -172,7 +172,7 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
               }}
             />
           </View>
-        </BottomSheetView>
+        </View>
       </AppSheetModal>
     );
   },

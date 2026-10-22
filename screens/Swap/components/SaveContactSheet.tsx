@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useContext, useState } from 'react';
 import { View } from 'react-native';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { space12, space16, space8, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import type { AddressBookFileClass } from '@app/AppState';
@@ -64,9 +64,7 @@ const SaveContactSheet = forwardRef<BottomSheetModal, SaveContactSheetProps>(
           paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
         }}
       >
-        <BottomSheetView
-          style={{ paddingHorizontal: space16, rowGap: space12 }}
-        >
+        <View style={{ paddingHorizontal: space16, rowGap: space12 }}>
           <View
             style={{
               flexDirection: 'row',
@@ -105,7 +103,7 @@ const SaveContactSheet = forwardRef<BottomSheetModal, SaveContactSheetProps>(
               dismiss();
             }}
           />
-        </BottomSheetView>
+        </View>
       </AppSheetModal>
     );
   },
