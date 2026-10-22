@@ -742,7 +742,7 @@
     "detail-of": "de",
     "detail-came-back": "voltaram",
     "detail-date": "Data",
-    "detail-transactions": "Transações",
+    "detail-transactions": "Transações Zcash",
     "leg-to-self": "Enviado para você",
     "leg-payment-to": "Pagamento para",
     "leg-zec-received": "ZEC recebido",
@@ -836,7 +836,8 @@
     "memo-hint-btc": "No Bitcoin o memo vai como OP_RETURN. Se sua carteira não puder, volte e escolha NEAR.",
     "deposit-you-get": "Você vai receber",
     "result-refunded-buy": "O swap não foi concluído, então o {coin} voltou para seu endereço de reembolso, menos a taxa de rede.",
-    "result-missing": "Falta"
+    "result-missing": "Falta",
+    "detail-save-contact": "Salvar este endereço de {coin} como contato"
   },
   "history": {
     "shield-all": "Blindar Todos os Fundos",
@@ -938,7 +939,8 @@
     "swapped-from": "Trocado de",
     "refund-back": "Reembolso",
     "fee": "Taxa",
-    "swap-moves-acc": "Ver os movimentos em ZEC"
+    "swap-moves-acc": "Ver os movimentos em ZEC",
+    "filter-swaps": "Swaps"
   },
   "walleterror": {
     "chain-title": "Esta carteira é da {net}",

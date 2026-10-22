@@ -423,6 +423,11 @@ const History: React.FunctionComponent<HistoryProps> = () => {
           vt.kind === ValueTransferKindEnum.Shield
         ) {
           selectedKind = true;
+        } else if (
+          filterKind === FilterEnum.swaps &&
+          vt.kind === ValueTransferKindEnum.Swap
+        ) {
+          selectedKind = true;
         }
       }
       if (filterFailed) {

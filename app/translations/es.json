@@ -742,7 +742,7 @@
     "detail-of": "de",
     "detail-came-back": "han vuelto",
     "detail-date": "Fecha",
-    "detail-transactions": "Transacciones",
+    "detail-transactions": "Transacciones de Zcash",
     "leg-to-self": "Enviado a ti mismo",
     "leg-payment-to": "Pago a",
     "leg-zec-received": "ZEC recibido",
@@ -836,7 +836,8 @@
     "memo-hint-btc": "En Bitcoin el memo va como OP_RETURN. Si tu monedero no puede, vuelve atrás y elige NEAR.",
     "deposit-you-get": "Recibirás",
     "result-refunded-buy": "El swap no se completó, así que el {coin} volvió a tu dirección de reembolso, menos la comisión de red.",
-    "result-missing": "Falta"
+    "result-missing": "Falta",
+    "detail-save-contact": "Guardar esta dirección de {coin} como contacto"
   },
   "history": {
     "shield-all": "Blindar Todos\nlos fondos",
@@ -938,7 +939,8 @@
     "swapped-from": "Cambiado desde",
     "refund-back": "Reembolso",
     "fee": "Comisión",
-    "swap-moves-acc": "Ver los movimientos en ZEC"
+    "swap-moves-acc": "Ver los movimientos en ZEC",
+    "filter-swaps": "Swaps"
   },
   "walleterror": {
     "chain-title": "Este monedero es de {net}",

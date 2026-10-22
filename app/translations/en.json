@@ -742,7 +742,7 @@
     "detail-of": "of",
     "detail-came-back": "came back",
     "detail-date": "Date",
-    "detail-transactions": "Transactions",
+    "detail-transactions": "Zcash transactions",
     "leg-to-self": "Sent to yourself",
     "leg-payment-to": "Payment to",
     "leg-zec-received": "ZEC received",
@@ -836,7 +836,8 @@
     "memo-hint-btc": "On Bitcoin the memo goes as an OP_RETURN. If your wallet can’t do that, go back and choose NEAR.",
     "deposit-you-get": "You’ll get",
     "result-refunded-buy": "The swap didn’t complete, so the {coin} went back to your refund address, minus the network fee.",
-    "result-missing": "Missing"
+    "result-missing": "Missing",
+    "detail-save-contact": "Save this {coin} address as a contact"
   },
   "history": {
     "shield-all": "Shield All funds",
@@ -938,7 +939,8 @@
     "swapped-from": "Swapped from",
     "refund-back": "Refund",
     "fee": "Fee",
-    "swap-moves-acc": "Show the ZEC movements"
+    "swap-moves-acc": "Show the ZEC movements",
+    "filter-swaps": "Swaps"
   },
   "walleterror": {
     "chain-title": "This wallet is on {net}",

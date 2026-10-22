@@ -114,6 +114,19 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
               {translate('history.shield') as string}
             </Chip>
             <Chip
+              testID="history.filter.swaps"
+              selected={filterKindLocal === FilterEnum.swaps}
+              onPress={() => {
+                setFilterKindLocal(
+                  filterKindLocal === FilterEnum.swaps
+                    ? null
+                    : FilterEnum.swaps,
+                );
+              }}
+            >
+              {translate('history.filter-swaps') as string}
+            </Chip>
+            <Chip
               selected={filterFailedLocal}
               onPress={() => {
                 setFilterFailedLocal(!filterFailedLocal);

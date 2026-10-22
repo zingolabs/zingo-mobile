@@ -742,7 +742,7 @@
     "detail-of": "из",
     "detail-came-back": "вернулось",
     "detail-date": "Дата",
-    "detail-transactions": "Транзакции",
+    "detail-transactions": "Транзакции Zcash",
     "leg-to-self": "Отправлено себе",
     "leg-payment-to": "Платёж",
     "leg-zec-received": "ZEC получен",
@@ -836,7 +836,8 @@
     "memo-hint-btc": "В Bitcoin мемо передаётся как OP_RETURN. Если кошелёк этого не умеет, вернитесь и выберите NEAR.",
     "deposit-you-get": "Вы получите",
     "result-refunded-buy": "Обмен не завершился, поэтому {coin} вернулись на адрес возврата за вычетом сетевой комиссии.",
-    "result-missing": "Не хватает"
+    "result-missing": "Не хватает",
+    "detail-save-contact": "Сохранить этот адрес {coin} как контакт"
   },
   "history": {
     "shield-all": "Экранирование всех средств",
@@ -938,7 +939,8 @@
     "swapped-from": "Обменяно с",
     "refund-back": "Возврат",
     "fee": "Комиссия",
-    "swap-moves-acc": "Показать движения ZEC"
+    "swap-moves-acc": "Показать движения ZEC",
+    "filter-swaps": "Обмены"
   },
   "walleterror": {
     "chain-title": "Этот кошелёк в сети {net}",

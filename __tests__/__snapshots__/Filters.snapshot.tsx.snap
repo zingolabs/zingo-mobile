@@ -243,6 +243,72 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
                 "checked": undefined,
                 "disabled": undefined,
                 "expanded": undefined,
+                "selected": false,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            hitSlop={
+              {
+                "bottom": 6,
+                "top": 6,
+              }
+            }
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "alignItems": "center",
+                "backgroundColor": undefined,
+                "borderColor": "#4A6487",
+                "borderRadius": 999,
+                "borderWidth": 1,
+                "justifyContent": "center",
+                "minHeight": 32,
+                "opacity": 1,
+                "paddingHorizontal": 12,
+              }
+            }
+            testID="history.filter.swaps"
+          >
+            <Text
+              maxFontSizeMultiplier={2}
+              style={
+                {
+                  "color": "#888888",
+                  "fontSize": 13,
+                  "fontWeight": "600",
+                  "lineHeight": 18,
+                }
+              }
+            >
+              text translated
+            </Text>
+          </View>
+          <View
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
                 "selected": true,
               }
             }
@@ -801,6 +867,72 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
                 "paddingHorizontal": 12,
               }
             }
+          >
+            <Text
+              maxFontSizeMultiplier={2}
+              style={
+                {
+                  "color": "#888888",
+                  "fontSize": 13,
+                  "fontWeight": "600",
+                  "lineHeight": 18,
+                }
+              }
+            >
+              text translated
+            </Text>
+          </View>
+          <View
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": false,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            hitSlop={
+              {
+                "bottom": 6,
+                "top": 6,
+              }
+            }
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "alignItems": "center",
+                "backgroundColor": undefined,
+                "borderColor": "#4A6487",
+                "borderRadius": 999,
+                "borderWidth": 1,
+                "justifyContent": "center",
+                "minHeight": 32,
+                "opacity": 1,
+                "paddingHorizontal": 12,
+              }
+            }
+            testID="history.filter.swaps"
           >
             <Text
               maxFontSizeMultiplier={2}

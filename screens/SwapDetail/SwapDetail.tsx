@@ -1,16 +1,31 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import Animated from 'react-native-reanimated';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Linking, Pressable, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { radiusMd, space12, space16, space8, useTheme } from '@app/theme';
+import { radiusLg, space12, space8, useTheme } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
-import { Route, ValueTransferKindEnum } from '@app/AppState';
+import {
+  Route,
+  SnackbarDurationEnum,
+  ValueTransferKindEnum,
+} from '@app/AppState';
+import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
+import { useUnfold } from '@app/hooks/useUnfold';
 import { ContextAppLoaded, useSwapRecords, useSwapService } from '@app/context';
 import {
   SwapDirectionEnum,
   SwapStore,
   buildChainExplorerUrl,
+  canonicalChainAddress,
   canRemoveSwap,
   formatAmountForDisplay,
   isPrePaymentStatus,
@@ -37,6 +52,10 @@ import DetailHero from '@screens/Swap/components/DetailHero';
 import DetailRows from '@screens/Swap/components/DetailRows';
 import type { DetailRow } from '@screens/Swap/components/DetailRows';
 import ShieldNote from '@screens/Swap/components/ShieldNote';
+import SaveContactSheet from '@screens/Swap/components/SaveContactSheet';
+import ContactInitial from '@screens/Swap/components/ContactInitial';
+import { InfoTipHost } from '@ui/widgets/InfoTip';
+import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
 import { swapOutcome } from '@screens/Swap/swapProgress';
 import { legName, legsOf } from '@screens/Swap/swapLegs';
@@ -64,7 +83,11 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
     blockExplorer,
     valueTransfers,
     info,
+    addressBook,
+    setAddressBook,
+    addLastSnackbar,
   } = useContext(ContextAppLoaded);
+  const saveSheetRef = useRef<BottomSheetModal>(null);
   const { colors } = useTheme();
   const swapService = useSwapService();
   const records = useSwapRecords();
@@ -199,6 +222,20 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         ? `${formatAmountForDisplay(record.totalFeesInReceiveAsset)} ${getSym}`
         : '';
   const reason = record.refundInfo?.refundReason ?? record.failureReason;
+  /** The contact a finished sale reached, when its address is saved. */
+  const contact =
+    done && sell
+      ? addressBook.find(
+          c =>
+            c.swapChain.toUpperCase() ===
+              record.receiveAsset.chain.toUpperCase() &&
+            c.address ===
+              canonicalChainAddress(
+                record.receiveAsset.chain,
+                record.destinationAddress,
+              ),
+        )
+      : undefined;
   const rows: DetailRow[] = [
     {
       label: t('swap.detail-date'),
@@ -214,8 +251,17 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
       ? [
           {
             label: t('swap.detail-sent-to'),
-            value: Utils.trimToSmall(record.destinationAddress, 6),
+            value: contact
+              ? `${contact.label}  ${Utils.trimToSmall(record.destinationAddress, 4)}`
+              : Utils.trimToSmall(record.destinationAddress, 6),
             copy: record.destinationAddress,
+            leading: contact ? (
+              <ContactInitial
+                name={contact.label}
+                color={contact.color}
+                size={24}
+              />
+            ) : undefined,
           },
         ]
       : []),
@@ -258,184 +304,274 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
   const LegsChevron = legsOpen ? ChevronUp : ChevronDown;
 
   return (
-    <SwapFlowScreen
-      testID="swap.detail"
-      title={t('swap.detail-title')}
-      onBack={close}
-      footer={
-        <ButtonStack>
-          {canRemoveSwap(record.status) && (
-            <Button
-              testID="swap.detail.remove"
-              variant="quiet"
-              title={t('swap.detail-remove')}
-              onPress={remove}
-            />
-          )}
-          {!!explorerUrl && (
-            <Button
-              testID="swap.detail.explorer"
-              variant="text"
-              title={t('swap.detail-explorer')}
-              onPress={() => Linking.openURL(explorerUrl)}
-            />
-          )}
-        </ButtonStack>
-      }
-    >
-      <DetailHero
-        icon={
-          isTerminalStatus(record.status) ? (
-            <SwapIcon size={18} color={colors.fgDefault} />
-          ) : (
-            <ClockIcon size={18} color={colors.fgDefault} />
-          )
-        }
-        badge={other}
-        title={title}
-        amount={hero.amount}
-        unit={hero.unit}
-        tone={hero.tone}
-        line={hero.line}
-        pill={pill.text}
-        pillTone={pill.tone}
-      />
-
-      {awaitingDeposit && (
-        <View style={{ marginVertical: space12, rowGap: space12 }}>
-          <Text variant="bodyStrong">
-            {t(sell ? 'swap.deposit-unsent-title' : 'swap.deposit-title')}
-          </Text>
-          <DepositSlip record={record} paid={sell} />
-          <Text variant="bodySmall" tone="muted">
-            {t(
-              sell
-                ? 'swap.deposit-paid-elsewhere'
-                : 'swap.deposit-already-paid',
+    <InfoTipHost>
+      <SwapFlowScreen
+        testID="swap.detail"
+        title={t('swap.detail-title')}
+        onBack={close}
+        footer={
+          <ButtonStack>
+            {canRemoveSwap(record.status) && (
+              <Button
+                testID="swap.detail.remove"
+                variant="quiet"
+                title={t('swap.detail-remove')}
+                onPress={remove}
+              />
             )}
-          </Text>
-          <TextField
-            testID="swap.detail.hash"
-            label={t('swap.deposit-hash')}
-            value={hash}
-            onChangeText={setHash}
-            placeholder={t('swap.deposit-hash-placeholder')}
-            mono
-            error={attachError || undefined}
-            trailingLabel={t('swap.paste')}
-            onTrailingPress={async () =>
-              setHash((await Clipboard.getString()).trim())
-            }
-          />
-          <Button
-            inline
-            variant="text"
-            title={t('swap.deposit-follow')}
-            disabled={attaching || hash.trim().length === 0}
-            busy={attaching}
-            onPress={attach}
-          />
-        </View>
-      )}
+            {!!explorerUrl && (
+              <Button
+                testID="swap.detail.explorer"
+                variant="text"
+                title={t('swap.detail-explorer')}
+                onPress={() => Linking.openURL(explorerUrl)}
+              />
+            )}
+          </ButtonStack>
+        }
+      >
+        <DetailHero
+          icon={
+            isTerminalStatus(record.status) ? (
+              <SwapIcon size={18} color={colors.fgDefault} />
+            ) : (
+              <ClockIcon size={18} color={colors.fgDefault} />
+            )
+          }
+          badge={other}
+          title={title}
+          amount={hero.amount}
+          unit={hero.unit}
+          tone={hero.tone}
+          line={hero.line}
+          pill={pill.text}
+          pillTone={pill.tone}
+        />
 
-      <DetailRows rows={rows} />
+        {awaitingDeposit && (
+          <View style={{ marginVertical: space12, rowGap: space12 }}>
+            <Text variant="bodyStrong">
+              {t(sell ? 'swap.deposit-unsent-title' : 'swap.deposit-title')}
+            </Text>
+            <DepositSlip record={record} paid={sell} />
+            <Text variant="bodySmall" tone="muted">
+              {t(
+                sell
+                  ? 'swap.deposit-paid-elsewhere'
+                  : 'swap.deposit-already-paid',
+              )}
+            </Text>
+            <TextField
+              testID="swap.detail.hash"
+              label={t('swap.deposit-hash')}
+              value={hash}
+              onChangeText={setHash}
+              placeholder={t('swap.deposit-hash-placeholder')}
+              mono
+              error={attachError || undefined}
+              trailingLabel={t('swap.paste')}
+              onTrailingPress={async () =>
+                setHash((await Clipboard.getString()).trim())
+              }
+            />
+            <Button
+              inline
+              variant="text"
+              title={t('swap.deposit-follow')}
+              disabled={attaching || hash.trim().length === 0}
+              busy={attaching}
+              onPress={attach}
+            />
+          </View>
+        )}
 
-      {legs.length > 0 && (
-        <View style={{ marginTop: space12 }}>
+        <DetailRows rows={rows} />
+
+        {done && sell && !contact && (
           <Pressable
-            testID="swap.detail.legs"
+            testID="swap.detail.save-contact"
             accessibilityRole="button"
-            accessibilityState={{ expanded: legsOpen }}
-            onPress={() => setLegsOpen(open => !open)}
+            onPress={() => saveSheetRef.current?.present()}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingVertical: 11,
+              justifyContent: 'center',
+              columnGap: space8,
+              minHeight: 44,
+              marginTop: space8,
             }}
           >
-            <Text variant="bodySmall" tone={legsOpen ? 'default' : 'muted'}>
-              {`${t('swap.detail-transactions')} · ${legs.length}`}
+            <UserPlusIcon size={18} color={colors.fgPriceUp} />
+            <Text
+              variant="caption"
+              style={{ fontWeight: '700', color: colors.fgPriceUp }}
+            >
+              {t('swap.detail-save-contact').replace('{coin}', getSym)}
             </Text>
-            <LegsChevron size={15} color={colors.fgMuted} />
           </Pressable>
-          {legsOpen && (
-            <View
+        )}
+
+        {legs.length > 0 && (
+          <View style={{ marginTop: space12 }}>
+            <Pressable
+              testID="swap.detail.legs"
+              accessibilityRole="button"
+              accessibilityState={{ expanded: legsOpen }}
+              onPress={() => setLegsOpen(open => !open)}
               style={{
-                borderWidth: 1,
-                borderColor: colors.bottomSheetBorder,
-                borderRadius: radiusMd,
-                paddingHorizontal: space16,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingVertical: 11,
               }}
             >
-              {legs.map((leg, index) => {
-                const received = leg.kind === ValueTransferKindEnum.Received;
-                return (
-                  <Pressable
-                    key={`${leg.txid}:${leg.kind}`}
-                    testID={`swap.detail.leg.${index}`}
-                    accessibilityRole="button"
-                    onPress={() =>
-                      navigation.navigate(Route.SwapTransaction, {
-                        recordId,
-                        txid: leg.txid,
-                        kind: leg.kind,
-                      })
-                    }
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      columnGap: space12,
-                      paddingVertical: 11,
-                      borderTopWidth: index === 0 ? 0 : 1,
-                      borderTopColor: colors.bottomSheetBorder,
-                    }}
-                  >
-                    <View style={{ flexShrink: 1 }}>
-                      <Text variant="bodyStrong" style={{ fontSize: 13 }}>
-                        {legName(leg, record, t)}
-                      </Text>
-                      <Text variant="caption" tone="muted">
-                        {Utils.formatDate(
-                          leg.time * 1000,
-                          'MMM d, h:mm aaa',
-                          language,
-                        )}
-                      </Text>
-                    </View>
-                    <View
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  columnGap: 8,
+                }}
+              >
+                <Text variant="bodySmall" tone={legsOpen ? 'default' : 'muted'}>
+                  {t('swap.detail-transactions')}
+                </Text>
+                <View
+                  style={{
+                    minWidth: 20,
+                    paddingHorizontal: 6,
+                    borderRadius: 10,
+                    backgroundColor: colors.bgMutedSubtle,
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text variant="caption" tone="muted">
+                    {String(legs.length)}
+                  </Text>
+                </View>
+              </View>
+              <LegsChevron size={15} color={colors.fgMuted} />
+            </Pressable>
+            {legsOpen && (
+              <LegsCard>
+                {legs.map((leg, index) => {
+                  const received = leg.kind === ValueTransferKindEnum.Received;
+                  return (
+                    <Pressable
+                      key={`${leg.txid}:${leg.kind}`}
+                      testID={`swap.detail.leg.${index}`}
+                      accessibilityRole="button"
+                      onPress={() =>
+                        navigation.navigate(Route.SwapTransaction, {
+                          recordId,
+                          txid: leg.txid,
+                          kind: leg.kind,
+                        })
+                      }
                       style={{
                         flexDirection: 'row',
                         alignItems: 'center',
-                        columnGap: space8,
+                        justifyContent: 'space-between',
+                        columnGap: space12,
+                        minHeight: 44,
+                        paddingVertical: 10,
+                        paddingHorizontal: 14,
+                        borderTopWidth: index === 0 ? 0 : 1,
+                        borderTopColor: colors.borderSubtle,
                       }}
                     >
-                      <Text
-                        variant="bodyStrong"
+                      <View style={{ flexShrink: 1 }}>
+                        <Text variant="bodyStrong" style={{ fontSize: 13 }}>
+                          {legName(leg, record, t)}
+                        </Text>
+                        <Text variant="caption" tone="muted">
+                          {Utils.formatDate(
+                            leg.time * 1000,
+                            'MMM d, h:mm aaa',
+                            language,
+                          )}
+                        </Text>
+                      </View>
+                      <View
                         style={{
-                          color: received ? colors.fgPriceUp : colors.fgDefault,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          columnGap: space8,
                         }}
                       >
-                        {`${received ? '+' : '−'}${leg.amount.toFixed(4)} ${info.currencyName}`}
-                      </Text>
-                      <ChevronRight size={16} color={colors.fgMuted} />
-                    </View>
-                  </Pressable>
-                );
-              })}
-            </View>
-          )}
-        </View>
-      )}
+                        <Text
+                          variant="bodyStrong"
+                          style={{
+                            color: received
+                              ? colors.fgPriceUp
+                              : colors.fgDefault,
+                          }}
+                        >
+                          {`${received ? '+' : '−'}${leg.amount.toFixed(4)} ${info.currencyName}`}
+                        </Text>
+                        <ChevronRight size={16} color={colors.fgMuted} />
+                      </View>
+                    </Pressable>
+                  );
+                })}
+              </LegsCard>
+            )}
+          </View>
+        )}
 
-      {receivedTransparent && (
-        <View style={{ marginTop: space12 }}>
-          <ShieldNote text={t('swap.shield-note')} />
-        </View>
-      )}
-    </SwapFlowScreen>
+        {receivedTransparent && (
+          <View style={{ marginTop: space12 }}>
+            <ShieldNote text={t('swap.shield-note')} />
+          </View>
+        )}
+        {done && sell && (
+          <SaveContactSheet
+            ref={saveSheetRef}
+            address={canonicalChainAddress(
+              record.receiveAsset.chain,
+              record.destinationAddress,
+            )}
+            chain={record.receiveAsset.chain}
+            book={addressBook}
+            onSave={async name => {
+              setAddressBook(
+                await AddressBookFileImpl.saveChainContact(
+                  name,
+                  record.destinationAddress,
+                  record.receiveAsset.chain,
+                ),
+              );
+              addLastSnackbar(
+                t('addressbook.added').replace('{name}', name),
+                SnackbarDurationEnum.short,
+              );
+            }}
+          />
+        )}
+      </SwapFlowScreen>
+    </InfoTipHost>
   );
 };
+
+/** The swap's Zcash transactions, unfolding as the summary opens. */
+function LegsCard({ children }: { children: React.ReactNode }) {
+  const { colors } = useTheme();
+  const unfold = useUnfold();
+  return (
+    <Animated.View
+      style={[
+        {
+          borderWidth: 1,
+          borderColor: colors.bottomSheetBorder,
+          borderRadius: radiusLg,
+          backgroundColor: colors.bgCanvas,
+          marginTop: 4,
+        },
+        unfold,
+      ]}
+    >
+      {children}
+    </Animated.View>
+  );
+}
 
 export default SwapDetail;

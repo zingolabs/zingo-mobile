@@ -742,7 +742,7 @@
     "detail-of": "/",
     "detail-came-back": "geri döndü",
     "detail-date": "Tarih",
-    "detail-transactions": "İşlemler",
+    "detail-transactions": "Zcash işlemleri",
     "leg-to-self": "Kendinize gönderildi",
     "leg-payment-to": "Ödeme:",
     "leg-zec-received": "ZEC alındı",
@@ -836,7 +836,8 @@
     "memo-hint-btc": "Bitcoin’de not OP_RETURN olarak gider. Cüzdanınız bunu yapamıyorsa geri dönüp NEAR’ı seçin.",
     "deposit-you-get": "Alacağınız",
     "result-refunded-buy": "Takas tamamlanmadı, bu yüzden {coin} ağ ücreti düşülerek iade adresinize döndü.",
-    "result-missing": "Eksik"
+    "result-missing": "Eksik",
+    "detail-save-contact": "Bu {coin} adresini kişi olarak kaydet"
   },
   "history": {
     "shield-all": "Tüm Fonları Koru",
@@ -938,7 +939,8 @@
     "swapped-from": "Takas edildi ←",
     "refund-back": "İade",
     "fee": "Ücret",
-    "swap-moves-acc": "ZEC hareketlerini göster"
+    "swap-moves-acc": "ZEC hareketlerini göster",
+    "filter-swaps": "Takaslar"
   },
   "walleterror": {
     "chain-title": "Bu cüzdan {net} ağında",

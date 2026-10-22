@@ -119,14 +119,17 @@ const tickerOf = (asset: SwapRecordType['sellAsset']): string =>
 
 /**
  * A swap's row: what it got on top, what left under it. A refund shows what
- * it cost and what came back; a swap still moving says where it stands.
+ * it cost and what came back; a swap still moving says where it stands. A
+ * sale that reached a saved contact is titled with the contact's name.
  */
 export function swapRowText(args: {
   record: SwapRecordType;
   when: string;
   t: Translate;
+  /** The address book's name for where a finished sale went. */
+  contactName?: string;
 }): RowText {
-  const { record, when, t } = args;
+  const { record, when, t, contactName } = args;
   const sell = record.direction === SwapDirectionEnum.Outbound;
   const sellSym = tickerOf(record.sellAsset);
   const getSym = tickerOf(record.receiveAsset);
@@ -143,7 +146,14 @@ export function swapRowText(args: {
     case SwapStatusEnum.Completed:
       return {
         ...base,
-        title: `${t(sell ? 'history.swapped-to' : 'history.swapped-from')} ${other}`,
+        ...(sell && contactName
+          ? {
+              title: contactName,
+              line: `${t('history.swapped-to')} ${other} · ${line}`,
+            }
+          : {
+              title: `${t(sell ? 'history.swapped-to' : 'history.swapped-from')} ${other}`,
+            }),
         top: `+${got} ${getSym}`,
         topTone: 'positive',
         bottom: `−${sold}`,

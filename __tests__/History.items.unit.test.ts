@@ -204,3 +204,48 @@ test('Tests that a recent row reads in minutes and an older one by day', () => {
     'Oct 17',
   );
 });
+
+test('Tests that a running swap sits above every month while it runs and goes back by date when it ends', () => {
+  const older = record({
+    recordId: 'rec-old',
+    status: SwapStatusEnum.Processing,
+    createdAtMs: 1_000_000_000,
+    broadcast: undefined,
+  });
+  const newer = vt('d'.repeat(64), 2_000_000, ValueTransferKindEnum.Received);
+  const rows = [newer, swapRow(older)];
+
+  const running = buildHistoryItems({
+    rows,
+    all: rows,
+    records: [older],
+    open: new Set(),
+    monthOf,
+  });
+  expect(running.map(i => i.kind)).toEqual(['swap', 'month', 'transfer']);
+
+  const ended = buildHistoryItems({
+    rows,
+    all: rows,
+    records: [{ ...older, status: SwapStatusEnum.Completed }],
+    open: new Set(),
+    monthOf,
+  });
+  expect(ended.map(i => i.kind)).toEqual([
+    'month',
+    'transfer',
+    'month',
+    'swap',
+  ]);
+});
+
+test('Tests that a finished sale is titled with the contact name when its address is saved', () => {
+  const text = swapRowText({
+    record: record(),
+    when: 'Oct 2',
+    t: key => key,
+    contactName: 'Marta',
+  });
+  expect(text.title).toBe('Marta');
+  expect(text.line).toBe('history.swapped-to BTC · MayaChain · Oct 2');
+});
