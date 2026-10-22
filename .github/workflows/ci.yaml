@@ -166,11 +166,10 @@ jobs:
         config:
           - { abi: x86_64, api-level: 34, target: default }
     uses: ./.github/workflows/android-ubuntu-integration-test-ci.yaml
-    needs: [create-timestamp, create-cache-key]
+    needs: create-timestamp
     secrets: inherit
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       abi: ${{ matrix.config.abi }}
       api-level: ${{ matrix.config['api-level'] }}
       target: ${{ matrix.config.target }}

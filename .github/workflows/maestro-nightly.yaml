@@ -6,26 +6,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  create-cache-key:
-    uses: ./.github/workflows/create-cache-key.yaml
-
-  android-build:
-    uses: ./.github/workflows/android-build.yaml
-    needs: create-cache-key
-    with:
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-      # x86_64 so the artifact runs on GitHub Actions' Linux Android emulator
-      # (the Linux runners are x86_64; an arm64-v8a APK would not install).
-      arch: x86_64
-
-  ios-build:
-    strategy:
-      fail-fast: false
-    uses: ./.github/workflows/ios-build.yaml
-    needs: create-cache-key
-    with:
-      cache-key: ${{ needs.create-cache-key.outputs.ios-cache-key }}
-
   maestro-android:
     name: Maestro — Android
     runs-on: ubuntu-24.04
