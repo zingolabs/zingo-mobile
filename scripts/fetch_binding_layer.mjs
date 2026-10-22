@@ -11,11 +11,12 @@ import { mkdirSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 
 const PACKAGE = join('node_modules', 'zingolib-bundle-pin');
-const PIN = 'binding-layer.json';
+export const PIN = 'binding-layer.json';
+export const IOS_STORE = join('ios', 'binding-layer');
 export const STORES = [
   join('android', 'build', 'binding-layer'),
   join('ios', 'build', 'binding-layer'),
-  join('ios', 'binding-layer'),
+  IOS_STORE,
 ];
 
 export function fetchArgv(root, args) {
