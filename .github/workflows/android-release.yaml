@@ -21,14 +21,18 @@ permissions:
   contents: write
 
 jobs:
-  # The job runs in android_builder:018, the image that zingolib's builder
-  # uses, so the builder runs its plan here with --in-image. Each ABI's
-  # output carries the same Kotlin bindings beside its two libraries.
+  # The job runs in the image that zingolib's builder pins
+  # (binding_layer::PUBLISHED_ANDROID_IMAGE), so the builder runs its plan
+  # here with --in-image. Each ABI's output carries the same Kotlin
+  # bindings beside its two libraries.
   binding-layer:
     name: Build the Binding Layer (${{ matrix.arch }})
     runs-on: ubuntu-24.04
     container:
-      image: zingodevops/android_builder:018
+      image: ghcr.io/zingolabs/android_builder:019
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     env:
       RUSTUP_HOME: ${{ github.workspace }}/.rustup
       CARGO_HOME:  ${{ github.workspace }}/.cargo
