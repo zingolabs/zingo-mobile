@@ -37,6 +37,7 @@ export const Route = {
   MixnetDoctor: 'MixnetDoctor',
   Insight: 'Insight',
   Computing: 'Computing',
+  SwapTransaction: 'SwapTransaction',
   SyncReport: 'SyncReport',
   Pools: 'Pools',
   MeetIronwood: 'MeetIronwood',

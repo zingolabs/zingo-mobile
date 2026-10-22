@@ -13,6 +13,7 @@ import type { Request } from '@app/navigation/results';
 import {
   AddressKindEnum,
   ChainNameEnum,
+  ValueTransferKindEnum,
   LaunchingModeEnum,
   Route,
   SendPageStateClass,
@@ -154,6 +155,7 @@ export type AppDrawerParamList = {
   [Route.SwapTracking]: SwapRecordNavigationState;
   [Route.SwapResult]: SwapRecordNavigationState;
   [Route.SwapDetail]: SwapRecordNavigationState;
+  [Route.SwapTransaction]: SwapTransactionNavigationState;
 };
 
 export type AddressBookNavigationState = {
@@ -214,6 +216,14 @@ export type ConfirmNavigationState = {
 export type SwapReviewNavigationState = {
   review: SwapReview;
   direction: SwapDirectionEnum;
+};
+
+// One of a swap's Zcash transactions: its txid and kind, since a send to
+// self lists the same txid twice.
+export type SwapTransactionNavigationState = {
+  recordId: string;
+  txid: string;
+  kind: ValueTransferKindEnum;
 };
 
 // A swap by its local record id; the screen reads the live record.

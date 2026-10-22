@@ -49,7 +49,6 @@ import TextInputAddress from '@ui/widgets/TextInputAddress';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import { SlidersIcon } from '@ui/primitives/Icons/SlidersIcon';
 import { HistoryIcon } from '@ui/primitives/Icons/HistoryIcon';
-import { ChevronRight } from '@ui/primitives/Icons/Chevron';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
@@ -492,42 +491,17 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                       columnGap: space4,
                     }}
                   >
-                    <Text variant="bodyStrong">
+                    <Text
+                      variant="bodyStrong"
+                      style={{
+                        textDecorationLine: 'underline',
+                      }}
+                    >
                       {form.chosenRoute
                         ? providerShortLabel(form.chosenRoute.provider)
                         : '—'}
                     </Text>
-                    {!!form.chosenRoute?.estimatedTimeText && (
-                      <Text variant="bodySmall" tone="muted">
-                        {`· ${form.chosenRoute.estimatedTimeText}`}
-                      </Text>
-                    )}
-                    <Text variant="bodySmall" tone="accent">
-                      {translate('swap.change') as string}
-                    </Text>
-                    <ChevronRight size={14} color={colors.fgAccent} />
                   </Pressable>,
-                )}
-                <View
-                  style={{
-                    height: 1,
-                    backgroundColor: colors.bottomSheetBorder,
-                  }}
-                />
-                {row(
-                  form.quoting
-                    ? (translate('swap.refreshing') as string)
-                    : form.rateLimited
-                      ? (translate('swap.paused-busy') as string)
-                      : `${translate('swap.price-new-in') as string} ${form.secondsToRefresh} s`,
-                  <Button
-                    inline
-                    size="small"
-                    variant="text"
-                    title={translate('swap.refresh') as string}
-                    disabled={form.refreshDisabled}
-                    onPress={form.refreshNow}
-                  />,
                 )}
                 {form.rateLimited && (
                   <Text

@@ -59,6 +59,7 @@ const SwapDeposit = React.lazy(() => import('@screens/SwapDeposit'));
 const SwapTracking = React.lazy(() => import('@screens/SwapTracking'));
 const SwapResult = React.lazy(() => import('@screens/SwapResult'));
 const SwapDetail = React.lazy(() => import('@screens/SwapDetail'));
+const SwapTransaction = React.lazy(() => import('@screens/SwapTransaction'));
 
 const Stack = createNativeStackNavigator<AppDrawerParamList>();
 const Tab = createBottomTabNavigator<HomeTabParamList>();
@@ -142,6 +143,10 @@ export function WalletNavigator() {
         <Stack.Screen name={Route.Confirm} component={Confirm} />
         <Stack.Screen name={Route.Computing} component={ComputingTxContent} />
         <Stack.Screen name={Route.SwapDetail} component={SwapDetail} />
+        <Stack.Screen
+          name={Route.SwapTransaction}
+          component={SwapTransaction}
+        />
       </Stack.Group>
       {/* One-way flows: no swipe back; each screen closes itself, and the
         ones that broadcast block hardware back while they run. */}
