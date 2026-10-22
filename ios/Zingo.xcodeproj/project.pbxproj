@@ -247,6 +247,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Zingo" */;
 			buildPhases = (
+				A0161467000000000000C001 /* Fetch the Binding Layer */,
 				175DE3CE7A4FE94269419EDC /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
@@ -430,6 +431,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Zingo/Pods-Zingo-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A0161467000000000000C001 /* Fetch the Binding Layer */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Fetch the Binding Layer";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -euo pipefail\n\nWITH_ENVIRONMENT=\"../node_modules/react-native/scripts/xcode/with-environment.sh\"\n/bin/sh -c \". $WITH_ENVIRONMENT >/dev/null && \\\"\\$NODE_BINARY\\\" ../scripts/fetch_binding_layer.mjs --platform ios\"\n";
 			showEnvVarsInLog = 0;
 		};
 		A76AF120724DF996D4A6D846 /* [CP] Embed Pods Frameworks */ = {

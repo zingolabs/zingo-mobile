@@ -23,7 +23,9 @@ destination.
 2. Go to the cloned repo `cd zingo-mobile`.
 3. From the root of the project, install JS deps: `yarn`
 4. Fetch the Binding Layer: `yarn --silent fetch:binding-layer --platform ios`.
-   The command needs network access to `ghcr.io` the first time.
+   The command needs network access to `ghcr.io` the first time. The
+   `Zingo` target runs the same fetch as its first build phase, which
+   refreshes the package after a pin move.
 5. In the `ios` directory, run: `pod install`
 
 ## Launching the app
