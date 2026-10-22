@@ -1,13 +1,54 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View, ScrollView } from 'react-native';
-import { useTheme, space8 } from '@app/theme';
+import { View } from 'react-native';
+import { space8 } from '@app/theme';
 
 import { FilterEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import Button from '@ui/primitives/Button';
 import Chip from '@ui/primitives/Chip';
-import ButtonStack from '@ui/primitives/ButtonStack';
+import Text from '@ui/primitives/Text';
+
+/** One kind of transfer at a time, as the redesign's filters sheet offers. */
+export type HistoryFilter =
+  'all' | 'received' | 'sent' | 'shielded' | 'failed' | 'memo' | 'swaps';
+
+/** The kinds in the order the sheet lists them, with their label keys. */
+export const HISTORY_FILTERS: ReadonlyArray<[HistoryFilter, string]> = [
+  ['all', 'history.filter-all'],
+  ['received', 'history.received'],
+  ['sent', 'history.sent'],
+  ['shielded', 'history.shield'],
+  ['failed', 'history.failed'],
+  ['memo', 'history.filter-memo'],
+  ['swaps', 'history.filter-swaps'],
+];
+
+/** The one filter the History state holds, read back from its flags. */
+export function filterOf(
+  kind: FilterEnum | null,
+  failed: boolean,
+  memos: boolean,
+): HistoryFilter {
+  if (failed) {
+    return 'failed';
+  }
+  if (memos) {
+    return 'memo';
+  }
+  switch (kind) {
+    case FilterEnum.received:
+      return 'received';
+    case FilterEnum.sent:
+      return 'sent';
+    case FilterEnum.shielded:
+      return 'shielded';
+    case FilterEnum.swaps:
+      return 'swaps';
+    default:
+      return 'all';
+  }
+}
 
 type FiltersProps = {
   closeSheet: () => void;
@@ -20,6 +61,11 @@ type FiltersProps = {
   filterWithFunds: boolean;
   setFilterWithFunds: (f: boolean) => void;
 };
+
+/**
+ * The filters sheet: one chip per kind of transfer, one picked at a time,
+ * and nothing changes until Apply.
+ */
 const Filters: React.FunctionComponent<FiltersProps> = ({
   closeSheet,
   filterKind,
@@ -28,167 +74,66 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
   setFilterFailed,
   filterMemos,
   setFilterMemos,
-  filterWithFunds,
   setFilterWithFunds,
 }) => {
-  const context = useContext(ContextAppLoaded);
-  const { translate } = context;
-  const { colors } = useTheme();
-
-  const [filterWithFundsLocal, setFilterWithFundsLocal] =
-    useState<boolean>(filterWithFunds);
-  const [filterKindLocal, setFilterKindLocal] = useState<FilterEnum | null>(
-    filterKind,
+  const { translate } = useContext(ContextAppLoaded);
+  const t = (key: string) => (translate(key) as string).trim();
+  const [picked, setPicked] = useState<HistoryFilter>(
+    filterOf(filterKind, filterFailed, filterMemos),
   );
-  const [filterFailedLocal, setFilterFailedLocal] =
-    useState<boolean>(filterFailed);
-  const [filterMemosLocal, setFilterMemosLocal] =
-    useState<boolean>(filterMemos);
 
-  const clearLocal = () => {
-    setFilterWithFundsLocal(false);
-    setFilterKindLocal(null);
-    setFilterFailedLocal(false);
-    setFilterMemosLocal(false);
+  const apply = () => {
+    setFilterWithFunds(false);
+    setFilterFailed(picked === 'failed');
+    setFilterMemos(picked === 'memo');
+    setFilterKind(
+      picked === 'received'
+        ? FilterEnum.received
+        : picked === 'sent'
+          ? FilterEnum.sent
+          : picked === 'shielded'
+            ? FilterEnum.shielded
+            : picked === 'swaps'
+              ? FilterEnum.swaps
+              : null,
+    );
+    closeSheet();
   };
 
-  console.log('Filters render');
-
   return (
-    <View
-      style={{
-        backgroundColor: colors.bgSurface,
-      }}
-    >
-      <View style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
-        <ScrollView
-          contentContainerStyle={{
-            width: '100%',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-          }}
-        >
-          <View
-            style={{
-              width: '90%',
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              marginTop: 10,
-              alignItems: 'center',
-              justifyContent: 'flex-start',
-              gap: space8,
-            }}
+    <View style={{ paddingHorizontal: 20 }}>
+      <Text variant="caption" tone="muted" style={{ textAlign: 'center' }}>
+        {t('history.filter-sub')}
+      </Text>
+      <View
+        accessibilityRole="radiogroup"
+        style={{
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          gap: space8,
+          marginTop: 18,
+        }}
+      >
+        {HISTORY_FILTERS.map(([key, label]) => (
+          <Chip
+            key={key}
+            testID={`history.filter.${key}`}
+            selected={picked === key}
+            onPress={() => setPicked(key)}
           >
-            <Chip
-              selected={filterKindLocal === FilterEnum.sent}
-              onPress={() => {
-                setFilterKindLocal(
-                  filterKindLocal === FilterEnum.sent ? null : FilterEnum.sent,
-                );
-              }}
-            >
-              {translate('history.sent') as string}
-            </Chip>
-            <Chip
-              selected={filterKindLocal === FilterEnum.received}
-              onPress={() => {
-                setFilterKindLocal(
-                  filterKindLocal === FilterEnum.received
-                    ? null
-                    : FilterEnum.received,
-                );
-              }}
-            >
-              {translate('history.received') as string}
-            </Chip>
-            <Chip
-              selected={filterKindLocal === FilterEnum.shielded}
-              onPress={() => {
-                setFilterKindLocal(
-                  filterKindLocal === FilterEnum.shielded
-                    ? null
-                    : FilterEnum.shielded,
-                );
-              }}
-            >
-              {translate('history.shield') as string}
-            </Chip>
-            <Chip
-              testID="history.filter.swaps"
-              selected={filterKindLocal === FilterEnum.swaps}
-              onPress={() => {
-                setFilterKindLocal(
-                  filterKindLocal === FilterEnum.swaps
-                    ? null
-                    : FilterEnum.swaps,
-                );
-              }}
-            >
-              {translate('history.filter-swaps') as string}
-            </Chip>
-            <Chip
-              selected={filterFailedLocal}
-              onPress={() => {
-                setFilterFailedLocal(!filterFailedLocal);
-              }}
-            >
-              {translate('history.failed') as string}
-            </Chip>
-            <Chip
-              selected={filterMemosLocal}
-              onPress={() => {
-                setFilterMemosLocal(!filterMemosLocal);
-              }}
-            >
-              {translate('history.memo') as string}
-            </Chip>
-            <Chip
-              selected={filterWithFundsLocal}
-              onPress={() => {
-                setFilterWithFundsLocal(!filterWithFundsLocal);
-              }}
-            >
-              {translate('history.filter-withfunds') as string}
-            </Chip>
-          </View>
-        </ScrollView>
-        <View
-          style={{
-            flexGrow: 1,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginVertical: 5,
-            marginTop: 30,
-          }}
-        >
-          <ButtonStack>
-            <Button
-              variant="text"
-              title={translate('clear') as string}
-              onPress={() => {
-                setFilterWithFunds(false);
-                setFilterKind(null);
-                setFilterFailed(false);
-                setFilterMemos(false);
-                clearLocal();
-                closeSheet();
-              }}
-            />
-            <Button
-              variant="primary"
-              title={translate('save') as string}
-              onPress={() => {
-                setFilterWithFunds(filterWithFundsLocal);
-                setFilterKind(filterKindLocal);
-                setFilterFailed(filterFailedLocal);
-                setFilterMemos(filterMemosLocal);
-                clearLocal();
-                closeSheet();
-              }}
-            />
-          </ButtonStack>
-        </View>
+            {t(label)}
+          </Chip>
+        ))}
+      </View>
+      <View style={{ marginTop: 20, rowGap: 8 }}>
+        <Button
+          testID="history.filter.apply"
+          variant="primary"
+          title={t('history.filter-apply')}
+          onPress={apply}
+        />
+        <Button variant="quiet" title={t('cancel')} onPress={closeSheet} />
       </View>
     </View>
   );

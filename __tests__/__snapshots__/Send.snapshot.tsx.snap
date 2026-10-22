@@ -1738,7 +1738,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
               }
               testID="header.balance"
             >
-              1.6235
+              1.6234
             </Text>
             <Text
               maxFontSizeMultiplier={2}

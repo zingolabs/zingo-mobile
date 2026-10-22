@@ -174,7 +174,8 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
             >
               {privacy
                 ? MASK
-                : Utils.parseNumberFloatToStringLocale(fiatTotal, 4)}
+                : /** Cut to four decimals, never rounded up. */
+                  Utils.splitZecAmountIntoBigSmall(fiatTotal).bigPart}
             </Text>
             <Text
               style={{ fontSize: 18, fontWeight: '700', color: colors.fgMuted }}
