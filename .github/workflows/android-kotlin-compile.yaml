@@ -36,7 +36,7 @@ jobs:
         uses: ./.github/actions/gradle-cache
 
       # Gradle fetches the Binding Layer when its repository resolves. The
-      # check configures the project with yarn shadowed and fails on a fetch.
+      # check configures the project with the fetch shadowed and fails on it.
       - name: Check that configuration runs no fetch
         run: yarn --silent check:fetch-lazy
 

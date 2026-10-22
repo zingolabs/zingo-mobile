@@ -41,7 +41,7 @@
     "build:beta:release:split": "cd android && ./gradlew assembleBetaRelease -PsplitApk=true && cd ..",
     "build:beta:debug": "cd android && ./gradlew assembleBetaDebug && cd ..",
     "build:beta:debug:split": "cd android && ./gradlew assembleBetaDebug -PsplitApk=true && cd ..",
-    "fetch:binding-layer": "mkdir -p android/build/binding-layer ios/build/binding-layer ios/binding-layer && node --permission --allow-fs-read=node_modules/zingolib-bundle-pin --allow-fs-read=binding-layer.json --allow-fs-read=android/build/binding-layer --allow-fs-read=ios/build/binding-layer --allow-fs-read=ios/binding-layer --allow-fs-write=android/build/binding-layer --allow-fs-write=ios/build/binding-layer --allow-fs-write=ios/binding-layer node_modules/zingolib-bundle-pin/bin/fetch_binding_layer.mjs",
+    "fetch:binding-layer": "node scripts/fetch_binding_layer.mjs",
     "pin": "node --permission --allow-fs-read=node_modules/zingolib-bundle-pin --allow-fs-read=binding-layer.json --allow-fs-read=binding-layer.json.partial --allow-fs-write=binding-layer.json --allow-fs-write=binding-layer.json.partial node_modules/zingolib-bundle-pin/bin/pin_binding_layer.mjs",
     "check:fetch-lazy": "node scripts/binding_layer_fetch_lazy.mjs",
     "release:prod:prep": "node scripts/release/release-prep.mjs prod",

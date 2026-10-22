@@ -105,12 +105,13 @@ val includeUniversalApk = (project.findProperty("includeUniversalApk") as? Strin
 // names (zingo-mobile/0020). The pin is the one source of the coordinate.
 // The fetch extracts the bundle as a Maven repository and prints its root
 // first. Gradle runs it when the repository resolves, not at configuration.
+// Gradle execs node by name, which resolves on every platform.
 val bindingLayerPin = groovy.json.JsonSlurper().parse(rootProject.file("../binding-layer.json")) as Map<*, *>
 val bindingLayerCoordinate = (bindingLayerPin["coordinates"] as Map<*, *>)["android"] as String
 val bindingLayerGroup = bindingLayerCoordinate.substringBefore(":")
 val bindingLayerFetch = providers.exec {
     workingDir(rootProject.file(".."))
-    commandLine("yarn", "--silent", "fetch:binding-layer", "--platform", "android")
+    commandLine("node", rootProject.file("../scripts/fetch_binding_layer.mjs").absolutePath, "--platform", "android")
     isIgnoreExitValue = true
 }
 val bindingLayerRepository = bindingLayerFetch.result.map { result ->

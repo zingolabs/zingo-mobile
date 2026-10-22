@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// Configures the Android project with yarn shadowed by a shim that records
-// every call. Fails when the configuration runs the Binding Layer fetch.
+// Configures the Android project with node shadowed by a shim that records
+// every fetch and forwards every other call. Fails when the configuration
+// runs the Binding Layer fetch.
 // Runs Gradle without the daemon, which resolves commands from the PATH
 // it started with.
 //
@@ -21,12 +22,19 @@ import { fileURLToPath } from 'node:url';
 const SCRIPTS_DIR = dirname(fileURLToPath(import.meta.url));
 const ANDROID_DIR = resolve(SCRIPTS_DIR, '..', 'android');
 
-const shimDir = mkdtempSync(join(tmpdir(), 'yarn-shim-'));
+const shimDir = mkdtempSync(join(tmpdir(), 'node-shim-'));
 const calls = join(shimDir, 'calls.log');
-const shim = join(shimDir, 'yarn');
+const shim = join(shimDir, 'node');
 writeFileSync(
   shim,
-  ['#!/bin/sh', `printf '%s\\n' "$*" >> "${calls}"`, 'exit 7', ''].join('\n'),
+  [
+    '#!/bin/sh',
+    'case "$*" in',
+    `  *fetch_binding_layer.mjs*) printf '%s\\n' "$*" >> "${calls}"; exit 7 ;;`,
+    `  *) exec "${process.execPath}" "$@" ;;`,
+    'esac',
+    '',
+  ].join('\n'),
 );
 chmodSync(shim, 0o755);
 
@@ -41,7 +49,7 @@ const { status } = spawnSync(
 );
 
 if (existsSync(calls)) {
-  console.error('Gradle configuration ran yarn:');
+  console.error('Gradle configuration ran the fetch:');
   console.error(readFileSync(calls, 'utf8'));
   process.exit(1);
 }
