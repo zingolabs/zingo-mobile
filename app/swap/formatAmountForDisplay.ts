@@ -14,8 +14,8 @@
  *     the user is likely to eyeball (rates, USD-side conversions).
  *   - Values < 1 use up to 8 decimals — the "smallest denomination" limit
  *     for the assets in scope (satoshis, zatoshis).
- *   - Trailing zeros after the decimal point are stripped; the decimal
- *     point itself is stripped if nothing remains after it.
+ *   - Trailing zeros after the decimal point are stripped, down to one:
+ *     the redesign shows 2.5 ZEC and 2.0 ZEC, never 2.5000 or a bare 2.
  *
  * **Do NOT** use this for values the user has to reproduce byte-for-byte:
  *   - The "Exact amount" row on channel-based providers (NEAR Intents,
@@ -29,5 +29,5 @@ export function formatAmountForDisplay(raw: string | undefined): string {
   const decimals = Math.abs(n) >= 1 ? 4 : 8;
   const fixed = n.toFixed(decimals);
   if (!fixed.includes('.')) return fixed;
-  return fixed.replace(/0+$/, '').replace(/\.$/, '');
+  return fixed.replace(/0+$/, '').replace(/\.$/, '.0');
 }
