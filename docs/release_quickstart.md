@@ -196,7 +196,7 @@ cd android && ./gradlew bundleProdRelease   # AAB
    release** → upload AAB.
 5. Fill **Release notes** (EN at minimum) → **Save → Review release → Roll
    out**.
-7. First release of an Open testing track needs Google's content review
+6. First release of an Open testing track needs Google's content review
    (typically 1-3 days). After approval, share the **opt-in URL** from the
    Open testing → **Testers** tab.
 

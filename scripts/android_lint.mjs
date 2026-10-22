@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Android Lint on the app module. Static analysis on the host, with no
 // emulator, no device and no container. Gradle takes the Binding Layer
-// from the pinned Prebuilt Bundle, so the host needs Node, a JDK and the
+// from the pinned Prebuilt Bundle. The host needs Node, a JDK and the
 // Android SDK alone. Catches NewApi (a call above minSdk behind a too-low
 // SDK_INT guard), which otherwise only shows up as a crash on a user's
 // older device. Cross-platform: Linux, macOS, Windows.

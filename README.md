@@ -59,7 +59,7 @@ live in [zingolabs/zingolib](https://github.com/zingolabs/zingolib), which
 publishes them as Prebuilt Bundles. This repository pins one published
 zingolib commit in `binding-layer.json`, the Bundle Pin (ADR
 zingo-mobile/0020). The Android and iOS builds fetch the pinned bundles
-through the `fetch:binding-layer` script, so a build host needs Node and
+through the `fetch:binding-layer` script. A build host needs Node and
 network access to `ghcr.io` the first time. `yarn pin <commit>` moves the
 pin to another published commit.
 
