@@ -1077,7 +1077,9 @@
     "miss-address": "Esse código não é um endereço Zcash.",
     "hint-any": "Aponte a câmera para o código QR de um endereço.",
     "text": "Faça o Scan de uma Chave de Visualização Unificada completa",
-    "scanaddress": "Escaneie um Endereço Zcash"
+    "scanaddress": "Escaneie um Endereço Zcash",
+    "hint-chain": "Aponte a câmera para o código QR de um endereço de {chain}.",
+    "miss-chain": "Esse código não é um endereço de {chain}."
   },
   "pools": {
     "title": "Fundos nas Pools",

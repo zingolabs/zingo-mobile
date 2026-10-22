@@ -1077,7 +1077,9 @@
     "miss-address": "Bu kod bir Zcash adresi değil.",
     "hint-any": "Kamerayı bir adresin QR koduna doğrultun.",
     "text": "Birleştirilmiş Tam Görüntüleme Anahtarını Tara",
-    "scanaddress": "Bir Zcash Adresini Tara"
+    "scanaddress": "Bir Zcash Adresini Tara",
+    "hint-chain": "Kamerayı bir {chain} adresinin QR koduna doğrultun.",
+    "miss-chain": "Bu kod bir {chain} adresi değil."
   },
   "pools": {
     "title": "Fon Havuzları",

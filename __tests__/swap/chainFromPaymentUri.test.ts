@@ -62,6 +62,16 @@ describe('addressFromPaymentUri', () => {
     );
   });
 
+  it('Tests that an EVM field takes the address when the ethereum URI names no chain id', () => {
+    expect(addressFromPaymentUri('BASE', `ethereum:${EVM}`)).toBe(EVM);
+    expect(addressFromPaymentUri('BSC', `ethereum:${EVM}?value=1e18`)).toBe(
+      EVM,
+    );
+    expect(addressFromPaymentUri('BTC', `ethereum:${EVM}`)).toBe(
+      `ethereum:${EVM}`,
+    );
+  });
+
   it('Tests that the text is left as it is when the URI names another chain', () => {
     expect(addressFromPaymentUri('ETH', `ethereum:${EVM}@8453`)).toBe(
       `ethereum:${EVM}@8453`,

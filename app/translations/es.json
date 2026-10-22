@@ -1077,7 +1077,9 @@
     "miss-address": "Ese código no es una dirección Zcash.",
     "hint-any": "Apunta la cámara al código QR de una dirección.",
     "text": "Escanea una Clave de Visualización Totalmente Unificada",
-    "scanaddress": "Escanea una dirección Zcash"
+    "scanaddress": "Escanea una dirección Zcash",
+    "hint-chain": "Apunta la cámara al código QR de una dirección de {chain}.",
+    "miss-chain": "Ese código no es una dirección de {chain}."
   },
   "pools": {
     "title": "Agrupaciones de Fondos",

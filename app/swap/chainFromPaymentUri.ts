@@ -1,3 +1,5 @@
+import { isEvmChain } from './addressValidators';
+
 /**
  * The chain a payment URI names for certain, as the address book's chain codes,
  * or undefined when it names none.
@@ -66,18 +68,29 @@ export function chainFromPaymentUri(text: string): string | undefined {
  * check refuses it: a URI naming another network must never yield an address
  * for this one.
  *
+ * An `ethereum:` URI without a chain id fits any EVM field: wallets put it
+ * on the receive QR of every EVM network, and the form already names the
+ * network. With a chain id, the id must be the field's.
+ *
  * An EIP-681 token transfer (`ethereum:<token>/transfer?address=<to>`) names
  * the token contract first and the recipient in `address`; only the recipient
  * is an address to pay, so a transfer without one yields nothing usable.
  */
 export function addressFromPaymentUri(chain: string, text: string): string {
   const trimmed = text.trim();
-  if (chainFromPaymentUri(trimmed) !== chain) return trimmed;
+  const ethereum = /^ethereum:/i.test(trimmed);
   const body = trimmed.slice(trimmed.indexOf(':') + 1);
   const [path, query = ''] = body.split('?');
-  if (/^ethereum:/i.test(trimmed) && path.includes('/')) {
-    const to = new URLSearchParams(query).get('address');
-    return to ? to.trim() : trimmed;
+  const genericEvm =
+    ethereum && !/^(pay-)?[^@/]+@/i.test(path) && isEvmChain(chain);
+  if (chainFromPaymentUri(trimmed) !== chain && !genericEvm) return trimmed;
+  if (ethereum && path.includes('/')) {
+    /** By hand: React Native's URLSearchParams does not implement get. */
+    const to = query
+      .split('&')
+      .map(pair => pair.split('='))
+      .find(([key]) => key === 'address')?.[1];
+    return to ? decodeURIComponent(to).trim() : trimmed;
   }
   return path
     .replace(/^pay-/i, '')

@@ -13,6 +13,7 @@ import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import { addressFromPaymentUri, validateAddressForChain } from '@app/swap';
 import { GlobalConst } from '@app/AppState';
+import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
@@ -88,17 +89,26 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   // A swap chain's address is checked by its own format.
   const setQrcodeModalShow = () => {
     const chain = swapChain ?? GlobalConst.zecSwapChain;
+    const zcash = chain === GlobalConst.zecSwapChain;
+    const named = (key: string) =>
+      (translate(key) as string).replace(
+        '{chain}',
+        chainDisplayName(chain) || chain,
+      );
     openScanner({
       request: scanRequest,
       // A Zcash field takes an address or a payment URI, as when pasted.
-      accepts:
-        chain === GlobalConst.zecSwapChain
-          ? { kind: 'zcash', chain: server.chainName }
-          : { kind: 'chain', chain, network: server.chainName },
+      accepts: zcash
+        ? { kind: 'zcash', chain: server.chainName }
+        : { kind: 'chain', chain, network: server.chainName },
       texts: {
         title: translate('scanner.title') as string,
-        hint: translate('scanner.hint-address') as string,
-        miss: translate('scanner.miss-address') as string,
+        hint: zcash
+          ? (translate('scanner.hint-address') as string)
+          : named('scanner.hint-chain'),
+        miss: zcash
+          ? (translate('scanner.miss-address') as string)
+          : named('scanner.miss-chain'),
         found: translate('scanner.found') as string,
         back: translate('scanner.back') as string,
         torch: translate('scanner.torch') as string,

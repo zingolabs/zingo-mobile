@@ -1077,7 +1077,9 @@
     "miss-address": "That code isn't a Zcash address.",
     "hint-any": "Point the camera at an address QR code.",
     "text": "Scan a Unified Full Viewing Key",
-    "scanaddress": "Scan a Zcash Address"
+    "scanaddress": "Scan a Zcash Address",
+    "hint-chain": "Point the camera at a {chain} address QR code.",
+    "miss-chain": "That code isn't a {chain} address."
   },
   "pools": {
     "title": "Fund Pools",
