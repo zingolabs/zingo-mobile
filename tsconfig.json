@@ -6,11 +6,10 @@
     "types": [
       "node", "jest"
     ],
-    "baseUrl": ".",
     "paths": {
-      "@app/*": ["app/*"],
-      "@screens/*": ["screens/*"],
-      "@ui/*": ["ui/*"]
+      "@app/*": ["./app/*"],
+      "@screens/*": ["./screens/*"],
+      "@ui/*": ["./ui/*"]
     }
   },
 }

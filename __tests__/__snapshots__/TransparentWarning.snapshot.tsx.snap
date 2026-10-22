@@ -11,11 +11,10 @@ exports[`TransparentWarning - snapshot TransparentWarning renders correctly 1`] 
   <View
     style={
       {
-        "alignSelf": "center",
         "backgroundColor": "#031124",
         "borderRadius": 8,
-        "padding": 16,
-        "width": "90%",
+        "paddingHorizontal": 20,
+        "paddingVertical": 16,
       }
     }
   >

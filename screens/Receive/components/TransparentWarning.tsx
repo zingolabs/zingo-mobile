@@ -26,11 +26,10 @@ const TransparentWarning = ({
     >
       <View
         style={{
-          width: '90%',
-          padding: 16,
+          paddingHorizontal: 20,
+          paddingVertical: 16,
           borderRadius: 8,
           backgroundColor: colors.bgSurface,
-          alignSelf: 'center',
         }}
       >
         <View>

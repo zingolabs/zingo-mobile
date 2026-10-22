@@ -6,7 +6,7 @@ exports[`MessageLine - snapshots MessageLine received with messageAddress, no mo
     {
       "display": "flex",
       "flexDirection": "column",
-      "marginHorizontal": 10,
+      "marginHorizontal": 20,
     }
   }
   testID="m-2"
@@ -182,13 +182,36 @@ hello
             <View
               style={
                 {
-                  "alignItems": "flex-end",
+                  "alignItems": "baseline",
                   "flexDirection": "row",
                   "margin": 0,
                   "padding": 0,
                 }
               }
             >
+              <View
+                style={
+                  {
+                    "height": 20.225993866741007,
+                    "marginRight": 2.2944856425982714,
+                    "width": 13.939514914970726,
+                  }
+                }
+              />
+              <Text
+                maxFontSizeMultiplier={2}
+                style={
+                  {
+                    "color": "#18bd18",
+                    "fontSize": 12,
+                    "fontWeight": "700",
+                    "margin": 0,
+                    "padding": 0,
+                  }
+                }
+              >
+                EC
+              </Text>
               <Text
                 maxFontSizeMultiplier={2}
                 style={
@@ -211,7 +234,6 @@ hello
                     "color": "#18bd18",
                     "fontSize": 8.399999999999999,
                     "margin": 0,
-                    "marginBottom": 0.8,
                     "padding": 0,
                   }
                 }
@@ -268,7 +290,7 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
     {
       "display": "flex",
       "flexDirection": "column",
-      "marginHorizontal": 10,
+      "marginHorizontal": 20,
     }
   }
   testID="m-1"
@@ -281,7 +303,7 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
         "borderColor": "#011401",
         "borderTopWidth": 1,
         "paddingBottom": 5,
-        "paddingLeft": 15,
+        "paddingLeft": 0,
         "paddingTop": 5,
       }
     }
@@ -560,13 +582,36 @@ hello
             <View
               style={
                 {
-                  "alignItems": "flex-end",
+                  "alignItems": "baseline",
                   "flexDirection": "row",
                   "margin": 0,
                   "padding": 0,
                 }
               }
             >
+              <View
+                style={
+                  {
+                    "height": 20.225993866741007,
+                    "marginRight": 2.2944856425982714,
+                    "width": 13.939514914970726,
+                  }
+                }
+              />
+              <Text
+                maxFontSizeMultiplier={2}
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "fontSize": 12,
+                    "fontWeight": "700",
+                    "margin": 0,
+                    "padding": 0,
+                  }
+                }
+              >
+                EC
+              </Text>
               <Text
                 maxFontSizeMultiplier={2}
                 style={
@@ -589,7 +634,6 @@ hello
                     "color": "#c3c3c3",
                     "fontSize": 8.399999999999999,
                     "margin": 0,
-                    "marginBottom": 0.8,
                     "padding": 0,
                   }
                 }

@@ -156,7 +156,7 @@ const AddressRowHead: React.FunctionComponent<AddressRowHeadProps> = ({
               color: INK_CODE,
               fontFamily: MONO,
               fontSize: 12,
-              fontWeight: '500',
+              fontWeight: '400',
             }}
           >
             {Utils.trimToSmall(address, 7)}
