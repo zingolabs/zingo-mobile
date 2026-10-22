@@ -158,15 +158,6 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
-      - name: Check out zingolib
-        uses: ./.github/actions/zingolib-submodule
-
-      - name: Restore the Binding Layer
-        uses: ./.github/actions/binding-layer-android
-        with:
-          abi: ${{ env.ABI }}
-          cache-key: ${{ env.CACHE-KEY }}
-
       - name: Set envs for x86_64
         if: ${{ env.ABI == 'x86_64' }}
         run: echo "AVD-ARCH=x86_64" >> $GITHUB_ENV

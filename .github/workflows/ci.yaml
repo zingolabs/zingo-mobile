@@ -28,17 +28,30 @@ jobs:
   # the whole run (see CONTEXT.md). Nightly leaves fail-all off to keep
   # the complete picture.
 
-  # The four Gradle checks below compile against the Kotlin bindings that
-  # the kotlin-bindings action generates on the host at workflow launch.
-  # They start before any cross build and finish while andr-build runs.
+  # The Bundle Pin at binding-layer.json names the two Prebuilt Bundles
+  # (zingo-mobile/0020). One required job per platform fetches by digest
+  # and checks the registry's tag. Every Gradle and Xcode job fetches for
+  # itself by an anonymous pull verified by digest.
+  binding-layer-android:
+    uses: ./.github/workflows/binding-layer-fetch.yaml
+    with:
+      platform: android
+      fail-all: true
+
+  binding-layer-ios:
+    uses: ./.github/workflows/binding-layer-fetch.yaml
+    with:
+      platform: ios
+      fail-all: true
+
+  # The four Gradle checks below compile against the Binding Layer AAR
+  # that Gradle fetches by the Bundle Pin. They start at workflow launch.
 
   # Catches app-module Kotlin compile breakage (e.g. classpath conflicts) in
   # a few minutes, long before the emulator jobs report.
   andr-kotlin-compile:
     uses: ./.github/workflows/android-kotlin-compile.yaml
-    needs: create-cache-key
     with:
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       fail-all: true
 
   # Static analysis of the app module. NewApi is the one that matters here:
@@ -46,9 +59,7 @@ jobs:
   # as a crash on a user's older device.
   andr-lint:
     uses: ./.github/workflows/android-lint.yaml
-    needs: create-cache-key
     with:
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       runner: ${{ vars.CI_GRADLE_RUNNER || 'ubuntu-24.04' }}
       fail-all: true
 
@@ -57,9 +68,7 @@ jobs:
   # the compile check.
   andr-unit-test:
     uses: ./.github/workflows/android-unit-test.yaml
-    needs: create-cache-key
     with:
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       fail-all: true
 
   jest-test:
@@ -90,10 +99,8 @@ jobs:
 
   andr-dependency-analysis:
     uses: ./.github/workflows/android-dependency-analysis.yaml
-    needs: create-cache-key
     secrets: inherit
     with:
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       runner: ${{ vars.CI_GRADLE_RUNNER || 'ubuntu-24.04' }}
       fail-all: true
 
@@ -103,6 +110,10 @@ jobs:
   create-cache-key:
     uses: ./.github/workflows/create-cache-key.yaml
 
+  # The Binding Layer build from the submodule still runs below, and
+  # nothing consumes it. Step 6 of zingolib#2930 deletes it, and until
+  # then one revert of the consumption restores the old path.
+  #
   # PR CI executes tests on the emulator ABI (x86_64 / API 34), not the
   # device ABIs: KVM accelerates an AVD only when the guest matches the
   # x86_64 host, so arm64-v8a and armeabi-v7a can never run on hosted
@@ -139,7 +150,7 @@ jobs:
 
   andr-apk-build:
     uses: ./.github/workflows/android-apk-build.yaml
-    needs: [create-cache-key, andr-build]
+    needs: create-cache-key
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       abi: x86_64
@@ -147,17 +158,15 @@ jobs:
       fail-all: true
       gradle-cache-writer: ${{ github.event_name == 'push' && github.ref_name == github.event.repository.default_branch }}
 
-  # The device tests need the Binding Layer and build their own debug
-  # app, and they start beside andr-apk-build.
+  # The device tests build their own debug app, which fetches the
+  # Binding Layer, and they start beside andr-apk-build.
   andr-ubu-integra-test-ci:
     strategy:
       matrix:
         config:
           - { abi: x86_64, api-level: 34, target: default }
     uses: ./.github/workflows/android-ubuntu-integration-test-ci.yaml
-    # The offline device test job builds the debug app in the job, and
-    # that build packages the Binding Layer that andr-build produces.
-    needs: [create-timestamp, create-cache-key, andr-build]
+    needs: [create-timestamp, create-cache-key]
     secrets: inherit
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
@@ -177,13 +186,10 @@ jobs:
       cache-key: ${{ needs.create-cache-key.outputs.ios-cache-key }}
       fail-all: true
 
-  # The test job starts at workflow launch and front-loads its setup. On
-  # a cache miss it holds at the artifact gate until the Binding
-  # Layer artifact lands.
+  # The test job starts at workflow launch and fetches the iOS Prebuilt
+  # Bundle itself.
   ios-integration-test:
     uses: ./.github/workflows/ios-integration-test.yaml
-    needs: create-cache-key
     secrets: inherit
     with:
-      cache-key: ${{ needs.create-cache-key.outputs.ios-cache-key }}
       fail-all: true
