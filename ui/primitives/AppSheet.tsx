@@ -2,6 +2,10 @@ import React, { createContext, useContext } from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import BottomSheet, { BottomSheetFooterProps } from '@gorhom/bottom-sheet';
 import { radiusSheet, useTheme } from '@app/theme';
+import { duration, ease } from '@app/theme/motion';
+
+/** The panel moves between its stops like every sheet: 420 ms, (.2,0,0,1). */
+const SHEET_MOTION = { duration: duration.sheet, easing: ease.emphasized };
 import SheetRim from './SheetRim';
 
 type AppSheetProps = {
@@ -73,6 +77,7 @@ const AppSheet = React.forwardRef<BottomSheet, AppSheetProps>(
             borderTopRightRadius: radiusSheet,
           }}
           handleComponent={SheetHandle}
+          animationConfigs={SHEET_MOTION}
           footerComponent={renderFooter}
         >
           <View

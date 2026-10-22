@@ -4,6 +4,8 @@ export type ThemeColors = {
   bgCanvas: string;
   bgSurface: string;
   bgChrome: string;
+  /** The floating tab bar, a step darker than the panel. */
+  bgTabBar: string;
   bottomSheetBorder: string;
   /** Fields: blue at rest and in focus, accent when valid, danger when not. */
   borderFocus: string;
@@ -100,9 +102,10 @@ export const themeTokens: ThemeColors = {
   bgCanvas: '#060B12',
   bgSurface: surface,
   bgChrome: surface,
+  bgTabBar: '#040C17',
   bottomSheetBorder: '#05234C',
   borderFocus: '#0B3A75',
-  borderSubtle: '#FFFFFF0F',
+  borderSubtle: '#0A1F3D',
   sheetHandle: '#1B3C6B',
   bgScrim: '#02060C9E',
 

@@ -11,6 +11,7 @@ const colors: ThemeColors = {
   bgCanvas: '#011401',
   bgSurface: '#031124',
   bgChrome: '#040C17',
+  bgTabBar: '#040C17',
   bottomSheetBorder: '#05234C',
   borderFocus: '#0B3A75',
   borderSubtle: '#FFFFFF0F',

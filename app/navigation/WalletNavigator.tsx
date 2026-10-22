@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { Easing } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
   BottomTabBarProps,
@@ -9,6 +10,7 @@ import { Route } from '@app/AppState';
 import { ContextAppLoaded, useSwapService } from '@app/context';
 import { AppDrawerParamList, HomeTabParamList } from '@app/types';
 import CustomTabBar from './CustomTabBar';
+import { duration } from '@app/theme/motion';
 import LoadedAppOptionsPanelHost from '@app/LoadedApp/LoadedAppOptionsPanelHost';
 
 import { AddressBook } from '@screens/AddressBook';
@@ -62,6 +64,34 @@ const SwapDetail = React.lazy(() => import('@screens/SwapDetail'));
 const SwapTransaction = React.lazy(() => import('@screens/SwapTransaction'));
 
 const Stack = createNativeStackNavigator<AppDrawerParamList>();
+
+/**
+ * Switching home tabs cross-fades the content. The tab navigator animates
+ * with React Native's Animated, so the curve is its Easing.
+ */
+const TAB_FADE = {
+  animation: 'fade',
+  transitionSpec: {
+    animation: 'timing',
+    config: {
+      duration: duration.tabFade,
+      easing: Easing.bezier(0.2, 0, 0, 1),
+    },
+  },
+} as const;
+
+/**
+ * A screen opened in depth (a transaction, a review, your addresses) rises
+ * from the bottom as a full panel. The native stack takes a duration (iOS
+ * honours it) but not the design's curve, (.32,.72,0,1).
+ */
+const PANEL = {
+  animation: 'slide_from_bottom',
+  animationDuration: duration.panelIn,
+} as const;
+
+/** A step inside a full panel (review, sending, sent) cross-fades. */
+const STEP = { animation: 'fade', animationDuration: duration.step } as const;
 const Tab = createBottomTabNavigator<HomeTabParamList>();
 
 const renderTabBar = (props: BottomTabBarProps) => <CustomTabBar {...props} />;
@@ -78,7 +108,7 @@ function HomeTabs() {
       initialRouteName={Route.History}
       backBehavior="initialRoute"
       tabBar={renderTabBar}
-      screenOptions={{ headerShown: false }}
+      screenOptions={{ headerShown: false, ...TAB_FADE }}
     >
       <Tab.Screen name={Route.History} component={History} />
       {!readOnly && server.kind === 'remote' && (
@@ -137,15 +167,33 @@ export function WalletNavigator() {
         <Stack.Screen
           name={Route.ValueTransferDetail}
           component={ValueTransferDetail}
+          options={PANEL}
         />
-        <Stack.Screen name={Route.AddressList} component={AddressList} />
+        <Stack.Screen
+          name={Route.AddressList}
+          component={AddressList}
+          options={PANEL}
+        />
         <Stack.Screen name={Route.Messages} component={MessageList} />
-        <Stack.Screen name={Route.Confirm} component={Confirm} />
-        <Stack.Screen name={Route.Computing} component={ComputingTxContent} />
-        <Stack.Screen name={Route.SwapDetail} component={SwapDetail} />
+        <Stack.Screen
+          name={Route.Confirm}
+          component={Confirm}
+          options={PANEL}
+        />
+        <Stack.Screen
+          name={Route.Computing}
+          component={ComputingTxContent}
+          options={STEP}
+        />
+        <Stack.Screen
+          name={Route.SwapDetail}
+          component={SwapDetail}
+          options={PANEL}
+        />
         <Stack.Screen
           name={Route.SwapTransaction}
           component={SwapTransaction}
+          options={PANEL}
         />
       </Stack.Group>
       {/* One-way flows: no swipe back; each screen closes itself, and the
@@ -188,10 +236,26 @@ export function WalletNavigator() {
           name={Route.MigrationBatchSending}
           component={MigrationBatchSending}
         />
-        <Stack.Screen name={Route.SwapReview} component={SwapReview} />
-        <Stack.Screen name={Route.SwapDeposit} component={SwapDeposit} />
-        <Stack.Screen name={Route.SwapTracking} component={SwapTracking} />
-        <Stack.Screen name={Route.SwapResult} component={SwapResult} />
+        <Stack.Screen
+          name={Route.SwapReview}
+          component={SwapReview}
+          options={PANEL}
+        />
+        <Stack.Screen
+          name={Route.SwapDeposit}
+          component={SwapDeposit}
+          options={PANEL}
+        />
+        <Stack.Screen
+          name={Route.SwapTracking}
+          component={SwapTracking}
+          options={PANEL}
+        />
+        <Stack.Screen
+          name={Route.SwapResult}
+          component={SwapResult}
+          options={PANEL}
+        />
       </Stack.Group>
       {/* Overlays draw their own container transform over the screen
         behind them. */}

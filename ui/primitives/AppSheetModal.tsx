@@ -9,6 +9,10 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { radiusSheet, useTheme } from '@app/theme';
+import { duration, ease } from '@app/theme/motion';
+
+/** Every sheet opens and closes in 420 ms on (.2,0,0,1). */
+const SHEET_MOTION = { duration: duration.sheet, easing: ease.emphasized };
 import SheetRim from './SheetRim';
 
 type AppSheetModalProps = {
@@ -101,6 +105,7 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
         accessible={accessible}
         enableDynamicSizing={!fixed}
         snapPoints={snapPoints}
+        animationConfigs={SHEET_MOTION}
         enablePanDownToClose={enablePanDownToClose}
         stackBehavior="push"
         keyboardBehavior="interactive"

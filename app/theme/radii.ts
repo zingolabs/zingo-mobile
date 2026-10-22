@@ -2,9 +2,11 @@
 
 /** Tags, icon tiles, small fields. */
 export const radiusSm = 8;
-/** Cards, grouped rows, text fields and banners. */
+/** Text fields, and the banners until the notice stack moves to its own radius. */
 export const radiusMd = 12;
+/** Cards and groups of rows, from the redesign style guide. */
+export const radiusLg = 16;
 /** Buttons, chips, toggles, avatars and the floating tab bar. */
 export const radiusPill = 999;
-/** Top corners of the Home, Send and Receive bottom sheets. */
-export const radiusSheet = 40;
+/** Top corners of the panel and of every sheet, from the redesign style guide. */
+export const radiusSheet = 28;
