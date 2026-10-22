@@ -371,21 +371,29 @@ androidComponents {
 // pins a release. The plugin offers no switch for it, so this hook removes
 // it. The plugins block applies the plugin before this script body runs,
 // so the plugin's afterEvaluate registers first and this hook runs after it.
+// Reading the url of the Binding Layer repository runs the fetch, and the
+// hook skips that repository by name.
 val snapshotRepositoryHost = "central.sonatype.com"
+val bindingLayerRepositoryName = "bindingLayer"
 afterEvaluate {
     rootProject.allprojects {
         repositories.removeAll { repository ->
-            repository is MavenArtifactRepository && repository.url.host == snapshotRepositoryHost
+            repository is MavenArtifactRepository &&
+                repository.name != bindingLayerRepositoryName &&
+                repository.url.host == snapshotRepositoryHost
         }
     }
 }
 
-// The exclusive content pins the group to the fetched repository, so no
-// remote repository is asked for the coordinate and none can shadow it.
+// The exclusive content pins the group to the fetched repository. No remote
+// repository is asked for the coordinate and none can shadow it.
 repositories {
     exclusiveContent {
         forRepository {
-            maven { setUrl(bindingLayerRepository.map { uri(it) }) }
+            maven {
+                name = bindingLayerRepositoryName
+                setUrl(bindingLayerRepository.map { uri(it) })
+            }
         }
         filter { includeGroup(bindingLayerGroup) }
     }

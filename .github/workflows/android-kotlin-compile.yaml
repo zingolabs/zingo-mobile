@@ -35,6 +35,11 @@ jobs:
       - name: Gradle cache
         uses: ./.github/actions/gradle-cache
 
+      # Gradle fetches the Binding Layer when its repository resolves. The
+      # check configures the project with yarn shadowed and fails on a fetch.
+      - name: Check that configuration runs no fetch
+        run: yarn --silent check:fetch-lazy
+
       # The app module compiles against the Binding Layer AAR, which Gradle
       # fetches by the Bundle Pin.
       - name: Compile release Kotlin
