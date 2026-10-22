@@ -919,13 +919,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // is ever encoded as error prose inside the success channel.
 
     @ReactMethod
-    fun setBroadcastCandidates(candidatesJson: String, promise: Promise) {
-        FfiOutcome.settling(promise, "set_broadcast_candidates") {
-            uniffi.zingo.setBroadcastCandidates(candidatesJson = candidatesJson)
-        }
-    }
-
-    @ReactMethod
     fun attachMixnet(socks5Addr: String, exitNode: String, promise: Promise) {
         FfiOutcome.settling(promise, "attach_mixnet") {
             uniffi.zingo.initLogging()

@@ -37,7 +37,6 @@ android/app/beta/release/
 *.aab
 *.apk
 ios/Zingolib.xcframework/
-ios/ZingoNymProxyFFI.xcframework/
 ios/NymHost.xcframework/
 ios/zingo.swift
 ios/zingo_nym_proxy_ffi.swift
