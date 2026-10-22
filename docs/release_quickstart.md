@@ -49,12 +49,12 @@ workflow described below.
 
 ## Release order: tag first, then build
 
-The native libs come from the Binding Layer in the `zingolib` submodule. On
-Android, the app's Gradle build includes the submodule's
-`bindings/android` build, which compiles them when they are missing or stale;
-`yarn rust:android` runs that step alone. On iOS, Xcode never invokes cargo:
-`yarn rust:ios` writes the XCFrameworks into `zingolib/bindings/swift/build`,
-and the archive packages whatever is already there.
+The native libs come from the Prebuilt Bundles that `binding-layer.json` pins.
+On Android, the app's Gradle build fetches the pinned AAR and resolves it from
+the fetched Maven repository. On iOS, `yarn --silent fetch:binding-layer
+--platform ios` extracts the pinned `ZingoBindings` package under
+`ios/binding-layer`, and the archive packages it from there. The tag only
+names the app's own `zm_` half of the descriptor.
 
 The **zingolib** line of the About screen reads
 `<zingolib descriptor>-zm_<tag>`, or `-zm_<version>_<hash5>` off a tag, with
@@ -80,8 +80,7 @@ Correct order for any store build:
 1. `yarn release:<channel>:prep <ver> <build>`
 2. `git commit` the bump
 3. `git tag ...` — the tag must exist locally before step 5; push it whenever
-4. `yarn rust:android` / `yarn rust:ios` — builds the native libs
-5. Build the AAB (Android Studio / gradle) or Archive in Xcode, on the tagged
+4. Build the AAB (Android Studio / gradle) or Archive in Xcode, on the tagged
    commit with a clean tree, so the descriptor is a bare `zm_<tag>`
 
 Anything other than a bare `zm_<tag>` on the About screen means the shipped
@@ -128,8 +127,8 @@ These APKs are signed with `debug.keystore`.
 ### iOS
 
 1. `yarn release:prod:prep <ver> <build>`, commit the diff, and create the tag.
-2. `yarn rust:ios` — rebuild the xcframework on the tag (see
-   [Release order](#release-order-tag-first-then-build)).
+2. `yarn --silent fetch:binding-layer --platform ios` — the pinned Binding
+   Layer (see [Release order](#release-order-tag-first-then-build)).
 3. Open `ios/Zingo.xcworkspace` in Xcode.
 4. Select scheme **Zingo**, destination **Any iOS Device (arm64)**.
 5. **Product → Archive**.
@@ -145,14 +144,13 @@ These APKs are signed with `debug.keystore`.
 1. `yarn release:prod:prep <ver> <build>` (use the same numbers as the matching
    iOS bump for consistency, even though they're independent under the hood),
    commit, and create the tag.
-2. `yarn rust:android` — rebuild the `.so`s on the tag (see
-   [Release order](#release-order-tag-first-then-build)).
-3. Android Studio → **Build → Generate Signed App Bundle / APK** → AAB.
-4. Point the wizard at the release keystore and enter its passwords (see
+2. Android Studio → **Build → Generate Signed App Bundle / APK** → AAB. The
+   Gradle build fetches the pinned Binding Layer.
+3. Point the wizard at the release keystore and enter its passwords (see
    *First-time dev setup* below for where they live).
-5. Build variant: **prodRelease**.
-6. Output AAB lands under `android/app/prod/release/`.
-7. Play Console → app "Zingo" → **Production** → Create new release → upload
+4. Build variant: **prodRelease**.
+5. Output AAB lands under `android/app/prod/release/`.
+6. Play Console → app "Zingo" → **Production** → Create new release → upload
    AAB → fill release notes → Review release → Roll out.
 
 CLI equivalents (without local signing config in place, gradle falls back to
@@ -169,8 +167,8 @@ cd android && ./gradlew bundleProdRelease   # AAB
 ### iOS (TestFlight External + public link)
 
 1. `yarn release:beta:prep <ver> <build>`, commit, and create the tag.
-2. `yarn rust:ios` — rebuild the xcframework on the tag (see
-   [Release order](#release-order-tag-first-then-build)).
+2. `yarn --silent fetch:binding-layer --platform ios` — the pinned Binding
+   Layer (see [Release order](#release-order-tag-first-then-build)).
 3. Xcode scheme **Zingo Beta** → **Product → Archive** → **Distribute App →
    App Store Connect → Upload**.
 4. After "build processed", in App Store Connect → app "Zingo Beta" →
@@ -189,14 +187,12 @@ cd android && ./gradlew bundleProdRelease   # AAB
 ### Android (Play Open Testing + public link)
 
 1. `yarn release:beta:prep <ver> <build>`, commit, and create the tag.
-2. `yarn rust:android` — rebuild the `.so`s on the tag (see
-   [Release order](#release-order-tag-first-then-build)).
-3. Android Studio → **Build → Generate Signed App Bundle / APK** → AAB →
-   variant **betaRelease**.
-4. AAB at `android/app/beta/release/app-beta-release.aab`.
-5. Play Console → app "Zingo Beta" → **Testing → Open testing → Create new
+2. Android Studio → **Build → Generate Signed App Bundle / APK** → AAB →
+   variant **betaRelease**. The Gradle build fetches the pinned Binding Layer.
+3. AAB at `android/app/beta/release/app-beta-release.aab`.
+4. Play Console → app "Zingo Beta" → **Testing → Open testing → Create new
    release** → upload AAB.
-6. Fill **Release notes** (EN at minimum) → **Save → Review release → Roll
+5. Fill **Release notes** (EN at minimum) → **Save → Review release → Roll
    out**.
 7. First release of an Open testing track needs Google's content review
    (typically 1-3 days). After approval, share the **opt-in URL** from the
@@ -254,4 +250,4 @@ the zingolib descriptor joined to the app build's `zm_` descriptor, see
 ### Known caveats
 - **Bundle ID case sensitivity**: both iOS and Android use `.Beta` (capital B). The `applicationIdSuffix` in `build.gradle.kts` is intentionally capital to match what's registered in App Store Connect and Play Console.
 - **AAB / APK never committed**: gitignored (`*.aab`, `*.apk`, `android/app/beta/release/`, `android/app/release/`).
-- **UniFFI bindings refresh**: the Kotlin bindings are generated, not checked in. The `zingo-binding-layer` Gradle build writes them into `zingolib/bindings/android/build/binding-layer/kotlin` and regenerates them whenever the submodule's sources change.
+- **UniFFI bindings**: the Kotlin and Swift bindings ship compiled inside the pinned Prebuilt Bundles. A Binding Layer change is published by zingolib and pinned with `yarn pin <commit>`.
