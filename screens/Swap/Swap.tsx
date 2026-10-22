@@ -14,6 +14,7 @@ import {
   slopFor,
   space12,
   space16,
+  space20,
   space4,
   space8,
   useTheme,
@@ -51,7 +52,7 @@ import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import { SlidersIcon } from '@ui/primitives/Icons/SlidersIcon';
 import { HistoryIcon } from '@ui/primitives/Icons/HistoryIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
-import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
+import InfoTooltip from '@ui/widgets/InfoTooltip';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import {
   DEFAULT_SLIPPAGE_BPS,
@@ -131,6 +132,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     quote.kind === 'quote' &&
     info.currencyName === GlobalConst.zecSwapChain;
   const [unit, setUnit] = useState<'coin' | 'usd'>('coin');
+  const [privacyTipOpen, setPrivacyTipOpen] = useState<boolean>(false);
   const [usdText, setUsdText] = useState<string>('');
   const usdMode = usdAvailable && unit === 'usd';
   const price = quote.kind === 'quote' ? quote.price : 0;
@@ -259,9 +261,9 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingTop: 8,
-        paddingBottom: 6,
-        paddingHorizontal: space16,
+        paddingTop: space16,
+        paddingBottom: space8,
+        paddingHorizontal: space20,
       }}
     >
       <Pressable
@@ -542,6 +544,13 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                   swapChain={form.counterpartyChain}
                   scanRequest="swap.address"
                   pasteLabel={translate('swap.paste') as string}
+                  placeholder={(
+                    translate('swap.address-placeholder') as string
+                  ).replace(
+                    '{chain}',
+                    chainDisplayName(form.counterpartyChain) ||
+                      form.counterpartyChain,
+                  )}
                 />
                 {form.addressShowError ? (
                   <View
@@ -594,19 +603,19 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                 <Banner tone="warning" title={form.quoteError} />
               )}
 
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                columnGap: space4,
-                marginTop: space4,
-              }}
-            >
-              <Text variant="caption" tone="muted">
-                {translate('swap.privacy-note') as string}
-              </Text>
-              <InfoIcon size={16} color={colors.fgMuted} />
+            <View style={{ marginTop: space4 }}>
+              <InfoTooltip
+                testID="swap.privacy-info"
+                label={translate('swap.privacy-note') as string}
+                title={translate('swap.privacy-tip-title') as string}
+                text={translate('swap.privacy-tip') as string}
+                open={privacyTipOpen}
+                onToggle={setPrivacyTipOpen}
+              >
+                <Text variant="caption" tone="muted">
+                  {translate('swap.privacy-note') as string}
+                </Text>
+              </InfoTooltip>
             </View>
 
             <View style={{ marginTop: space8 }}>

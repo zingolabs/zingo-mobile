@@ -813,7 +813,10 @@
     "msg-below-provider-minimum": "Tutar bu sağlayıcının minimumunun altında.",
     "msg-needs-at-least": "En az {amount} gerekiyor.",
     "msg-needs-usd": "Şu anda bu takas için en az {amount} gerekiyor.",
-    "msg-not-available": "Şu anda bu takas için kullanılamıyor."
+    "msg-not-available": "Şu anda bu takas için kullanılamıyor.",
+    "address-placeholder": "{chain} adresi",
+    "privacy-tip-title": "Sağlayıcı neleri görür",
+    "privacy-tip": "Takas, iki taraftaki tutarları ve adresleri gören harici bir sağlayıcı üzerinden yapılır. Takasın Zcash tarafı zincirde görünen şeffaf bir işlemdir. Aldığınız ZEC’i yeniden gizli hale getirmek için korumaya alın."
   },
   "history": {
     "shield-all": "Tüm Fonları Koru",

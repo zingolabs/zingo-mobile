@@ -70,6 +70,22 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
     const { colors } = useTheme();
     const fixed = snapPoints !== undefined;
 
+    const body = (
+      <>
+        <View
+          style={[
+            fixed ? styles.maskFill : styles.mask,
+            { backgroundColor: colors.bgSurface },
+            contentStyle,
+          ]}
+        >
+          {header}
+          {children}
+        </View>
+        {!handle && <SheetRim />}
+      </>
+    );
+
     const renderBackdrop = (props: BottomSheetBackdropProps) => (
       <BottomSheetBackdrop
         {...props}
@@ -112,19 +128,12 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
         backdropComponent={renderBackdrop}
         footerComponent={renderFooter}
       >
-        <BottomSheetView style={fixed ? styles.fill : undefined}>
-          <View
-            style={[
-              fixed ? styles.maskFill : styles.mask,
-              { backgroundColor: colors.bgSurface },
-              contentStyle,
-            ]}
-          >
-            {header}
-            {children}
-          </View>
-          {!handle && <SheetRim />}
-        </BottomSheetView>
+        {fixed ? (
+          /** A fixed sheet holds a list: BottomSheetView measures static content and stops a scroll view inside it. */
+          <View style={styles.fill}>{body}</View>
+        ) : (
+          <BottomSheetView>{body}</BottomSheetView>
+        )}
       </BottomSheetModal>
     );
   },

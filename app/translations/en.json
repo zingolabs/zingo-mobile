@@ -813,7 +813,10 @@
     "msg-below-provider-minimum": "The amount is below this provider's minimum.",
     "msg-needs-at-least": "Needs at least {amount}.",
     "msg-needs-usd": "Needs at least {amount} for this swap right now.",
-    "msg-not-available": "Not available for this swap right now."
+    "msg-not-available": "Not available for this swap right now.",
+    "address-placeholder": "{chain} address",
+    "privacy-tip-title": "What the provider sees",
+    "privacy-tip": "A swap goes through an outside provider, which sees the amounts and the addresses on both sides. The Zcash side of the swap is a transparent transaction, visible on chain. Shield the ZEC you receive to make it private again."
   },
   "history": {
     "shield-all": "Shield All funds",

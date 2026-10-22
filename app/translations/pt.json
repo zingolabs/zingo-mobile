@@ -813,7 +813,10 @@
     "msg-below-provider-minimum": "O valor está abaixo do mínimo deste provedor.",
     "msg-needs-at-least": "Precisa de pelo menos {amount}.",
     "msg-needs-usd": "Precisa de pelo menos {amount} para este swap agora.",
-    "msg-not-available": "Não está disponível para este swap agora."
+    "msg-not-available": "Não está disponível para este swap agora.",
+    "address-placeholder": "Endereço de {chain}",
+    "privacy-tip-title": "O que o provedor vê",
+    "privacy-tip": "Um swap passa por um provedor externo, que vê os valores e os endereços dos dois lados. O lado Zcash do swap é uma transação transparente, visível na cadeia. Proteja o ZEC que receber para que volte a ser privado."
   },
   "history": {
     "shield-all": "Blindar Todos os Fundos",

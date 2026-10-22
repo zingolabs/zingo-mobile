@@ -4,12 +4,12 @@ import { View, TouchableOpacity, TextInput } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme, slopFor } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
+import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 
 import { ContextAppLoaded } from '@app/context';
 import { Request, useResult } from '@app/navigation/results';
 import { openScanner } from '@app/navigation/navigate';
 import ErrorText from '@ui/primitives/ErrorText';
-import Text from '@ui/primitives/Text';
 import RegText from '@ui/primitives/RegText';
 import { addressFromPaymentUri, validateAddressForChain } from '@app/swap';
 import { GlobalConst } from '@app/AppState';
@@ -29,8 +29,10 @@ type TextInputAddressProps = {
   swapChain?: string;
   // The request the scanner answers with the code it read.
   scanRequest: Request;
-  /** Shown as a button in the empty field that pastes the clipboard. */
+  /** Names the paste button the empty field shows; no label, no button. */
   pasteLabel?: string;
+  /** Replaces the Zcash hint (address or ZNS name) for another chain's field. */
+  placeholder?: string;
 };
 const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   address,
@@ -41,6 +43,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   swapChain,
   scanRequest,
   pasteLabel,
+  placeholder,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server } = context;
@@ -156,7 +159,10 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                 testID="send.addressplaceholder"
                 onFocus={() => setFocused(true)}
                 onBlur={() => setFocused(false)}
-                placeholder={translate('send.addressplaceholder') as string}
+                placeholder={
+                  placeholder ??
+                  (translate('send.addressplaceholder') as string)
+                }
                 placeholderTextColor={colors.fgMuted}
                 style={{
                   color: colors.fgDefault,
@@ -195,13 +201,12 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                 <TouchableOpacity
                   testID="send.paste-button"
                   accessibilityRole="button"
+                  accessibilityLabel={pasteLabel}
                   hitSlop={8}
                   onPress={async () => take(await Clipboard.getString())}
-                  style={{ marginRight: 10 }}
+                  style={{ marginRight: 12 }}
                 >
-                  <Text variant="bodyStrong" tone="accent">
-                    {pasteLabel}
-                  </Text>
+                  <ClipboardPasteIcon size={22} color={colors.fgMuted} />
                 </TouchableOpacity>
               )}
               <TouchableOpacity
