@@ -816,7 +816,8 @@
     "msg-not-available": "Şu anda bu takas için kullanılamıyor.",
     "address-placeholder": "{chain} adresi",
     "privacy-tip-title": "Sağlayıcı neleri görür",
-    "privacy-tip": "Takas, iki taraftaki tutarları ve adresleri gören harici bir sağlayıcı üzerinden yapılır. Takasın Zcash tarafı zincirde görünen şeffaf bir işlemdir. Aldığınız ZEC’i yeniden gizli hale getirmek için korumaya alın."
+    "privacy-tip": "Takas, iki taraftaki tutarları ve adresleri gören harici bir sağlayıcı üzerinden yapılır. Takasın Zcash tarafı zincirde görünen şeffaf bir işlemdir. Aldığınız ZEC’i yeniden gizli hale getirmek için korumaya alın.",
+    "address-saved": "Adres kabul edildi. Adres defterinizde {name} olarak kayıtlı."
   },
   "history": {
     "shield-all": "Tüm Fonları Koru",

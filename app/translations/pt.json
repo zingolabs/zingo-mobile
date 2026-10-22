@@ -816,7 +816,8 @@
     "msg-not-available": "Não está disponível para este swap agora.",
     "address-placeholder": "Endereço de {chain}",
     "privacy-tip-title": "O que o provedor vê",
-    "privacy-tip": "Um swap passa por um provedor externo, que vê os valores e os endereços dos dois lados. O lado Zcash do swap é uma transação transparente, visível na cadeia. Proteja o ZEC que receber para que volte a ser privado."
+    "privacy-tip": "Um swap passa por um provedor externo, que vê os valores e os endereços dos dois lados. O lado Zcash do swap é uma transação transparente, visível na cadeia. Proteja o ZEC que receber para que volte a ser privado.",
+    "address-saved": "Endereço aceito. É {name} no seu catálogo de endereços."
   },
   "history": {
     "shield-all": "Blindar Todos os Fundos",

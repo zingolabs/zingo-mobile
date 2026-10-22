@@ -19,10 +19,12 @@ import {
   space8,
   useTheme,
 } from '@app/theme';
-import { GlobalConst, Route } from '@app/AppState';
+import { GlobalConst, Route, SnackbarDurationEnum } from '@app/AppState';
+import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import { HomeTabScreenProps } from '@app/types';
 import { ContextAppLoaded, useSwapRecords, useSwapService } from '@app/context';
 import {
+  canonicalChainAddress,
   formatAmountForDisplay,
   isTerminalStatus,
   providerShortLabel,
@@ -48,6 +50,7 @@ import Button from '@ui/primitives/Button';
 import Card from '@ui/widgets/Card';
 import Banner from '@ui/widgets/Banner';
 import TextInputAddress from '@ui/widgets/TextInputAddress';
+import SaveContactSheet from './components/SaveContactSheet';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import { SlidersIcon } from '@ui/primitives/Icons/SlidersIcon';
 import { HistoryIcon } from '@ui/primitives/Icons/HistoryIcon';
@@ -91,6 +94,8 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     mixnetView,
     setPrivacyOption,
     addLastSnackbar,
+    addressBook,
+    setAddressBook,
     setShieldingAmount,
     setBackgroundError,
   } = context;
@@ -116,6 +121,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
   const settingsSheetRef = useRef<BottomSheetModal>(null);
   const historySheetRef = useRef<BottomSheetModal>(null);
   const insufficientSheetRef = useRef<BottomSheetModal>(null);
+  const saveContactSheetRef = useRef<BottomSheetModal>(null);
 
   // Fixed under the header's icons: the form needs the height, and the
   // balance it would reveal is already on the card.
@@ -179,6 +185,14 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     pending?.status === SwapStatusEnum.AwaitingExternalDeposit
       ? (translate('swap.pending-waiting') as string)
       : (translate('swap.pending-swapping') as string);
+
+  /** The address book's contact for the address in the field, on its chain. */
+  const savedContact = addressBook.find(
+    c =>
+      c.swapChain.toUpperCase() === form.counterpartyChain.toUpperCase() &&
+      c.address ===
+        canonicalChainAddress(form.counterpartyChain, form.activeAddress),
+  );
 
   const chainLabel = form.selectedToken
     ? form.selectedToken.chain === form.selectedToken.symbol
@@ -544,6 +558,14 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                   swapChain={form.counterpartyChain}
                   scanRequest="swap.address"
                   pasteLabel={translate('swap.paste') as string}
+                  onSaveContact={
+                    savedContact
+                      ? undefined
+                      : () => saveContactSheetRef.current?.present()
+                  }
+                  saveContactLabel={
+                    translate('addressbook.new-contact') as string
+                  }
                   placeholder={(
                     translate('swap.address-placeholder') as string
                   ).replace(
@@ -575,7 +597,12 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                   >
                     <CheckIcon size={14} color={colors.fgMuted} />
                     <Text variant="caption" tone="muted">
-                      {translate('swap.address-ok') as string}
+                      {savedContact
+                        ? (translate('swap.address-saved') as string).replace(
+                            '{name}',
+                            savedContact.label,
+                          )
+                        : (translate('swap.address-ok') as string)}
                     </Text>
                   </View>
                 ) : !form.isOutbound ? (
@@ -654,6 +681,28 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
         receiveSymbol={receiveSymbol}
         receiveUsdUnitPrice={receiveUsdUnitPrice}
         onSelect={form.pickRoute}
+      />
+      <SaveContactSheet
+        ref={saveContactSheetRef}
+        address={canonicalChainAddress(
+          form.counterpartyChain,
+          form.activeAddress,
+        )}
+        chain={form.counterpartyChain}
+        book={addressBook}
+        onSave={async name => {
+          setAddressBook(
+            await AddressBookFileImpl.saveChainContact(
+              name,
+              form.activeAddress,
+              form.counterpartyChain,
+            ),
+          );
+          addLastSnackbar(
+            (translate('addressbook.added') as string).replace('{name}', name),
+            SnackbarDurationEnum.short,
+          );
+        }}
       />
       <SwapSettingsSheet
         ref={settingsSheetRef}

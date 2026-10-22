@@ -138,6 +138,24 @@ export default class AddressBookFileImpl {
     return await this.writeAddressBook(sorted);
   }
 
+  /** Saves another chain's address from a swap, and returns the book in name order. */
+  static async saveChainContact(
+    label: string,
+    address: string,
+    swapChain: string,
+  ): Promise<AddressBookFileClass[]> {
+    const book = await this.writeAddressBookItem(
+      label,
+      address,
+      Utils.generateColorList(1)[0],
+      false,
+      ChainNameEnum.mainChainName,
+      swapChain,
+    );
+    const sorted = [...book].sort((a, b) => a.label.localeCompare(b.label));
+    return await this.writeAddressBook(sorted);
+  }
+
   // Read the entire address book
   static async readAddressBook(): Promise<AddressBookFileClass[]> {
     try {

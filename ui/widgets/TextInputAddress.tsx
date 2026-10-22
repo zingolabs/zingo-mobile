@@ -5,6 +5,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme, slopFor } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
+import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
 
 import { ContextAppLoaded } from '@app/context';
 import { Request, useResult } from '@app/navigation/results';
@@ -34,6 +35,9 @@ type TextInputAddressProps = {
   pasteLabel?: string;
   /** Replaces the Zcash hint (address or ZNS name) for another chain's field. */
   placeholder?: string;
+  /** Saves a valid address to the address book; no handler, no button. */
+  onSaveContact?: () => void;
+  saveContactLabel?: string;
 };
 const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   address,
@@ -45,6 +49,8 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   scanRequest,
   pasteLabel,
   placeholder,
+  onSaveContact,
+  saveContactLabel,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server } = context;
@@ -205,6 +211,18 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                     size={20}
                     color={colors.fgAccentDisabled}
                   />
+                </TouchableOpacity>
+              )}
+              {validAddress === 1 && !disabled && !!onSaveContact && (
+                <TouchableOpacity
+                  testID="send.save-contact-button"
+                  accessibilityRole="button"
+                  accessibilityLabel={saveContactLabel}
+                  hitSlop={8}
+                  onPress={onSaveContact}
+                  style={{ marginRight: 12 }}
+                >
+                  <UserPlusIcon size={22} color={colors.fgMuted} />
                 </TouchableOpacity>
               )}
               {!address && !disabled && !!pasteLabel && (

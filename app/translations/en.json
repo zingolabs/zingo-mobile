@@ -816,7 +816,8 @@
     "msg-not-available": "Not available for this swap right now.",
     "address-placeholder": "{chain} address",
     "privacy-tip-title": "What the provider sees",
-    "privacy-tip": "A swap goes through an outside provider, which sees the amounts and the addresses on both sides. The Zcash side of the swap is a transparent transaction, visible on chain. Shield the ZEC you receive to make it private again."
+    "privacy-tip": "A swap goes through an outside provider, which sees the amounts and the addresses on both sides. The Zcash side of the swap is a transparent transaction, visible on chain. Shield the ZEC you receive to make it private again.",
+    "address-saved": "Address accepted. It is {name} in your address book."
   },
   "history": {
     "shield-all": "Shield All funds",
