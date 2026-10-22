@@ -63,7 +63,7 @@ const KeyCard: React.FunctionComponent<KeyCardProps> = ({
           color: colors.fgDefault,
           fontFamily: MONO,
           fontSize: 14,
-          fontWeight: '500',
+          fontWeight: '400',
           marginTop: 4,
         }}
       >

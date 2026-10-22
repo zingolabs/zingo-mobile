@@ -1043,7 +1043,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
         justifyContent: 'space-between',
         paddingTop: 8,
         paddingBottom: 6,
-        paddingHorizontal: 16,
+        paddingHorizontal: 0,
       }}
     >
       <View style={{ width: 48 }} />

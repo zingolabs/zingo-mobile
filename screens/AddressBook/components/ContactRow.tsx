@@ -47,14 +47,11 @@ const FLASH_HOLD_MS = 490;
 const FLASH_FADE_MS = 910;
 const COLLAPSE_MS = 260;
 const SEND_AT = 72;
-const LEAVE_MS = 280;
 const COPY_SQUEEZE_MS = 110;
 const COPY_SPRING_MS = 150;
 const COPY_HOLD_MS = 1400;
 const EDIT_MS = 420;
-const EDIT_AT = 470;
 const DELETE_MS = 360;
-const DELETE_AT = 380;
 const SEND_MS = 420;
 const SEND_RESET_AT = 900;
 const ACTIONS_H = 92;
@@ -122,7 +119,7 @@ const Action: React.FunctionComponent<ActionProps> = ({
             color: red ? RED : INK_CODE,
             fontSize: 12,
             lineHeight: 15,
-            fontWeight: '500',
+            fontWeight: '400',
           }}
         >
           {label}
@@ -161,7 +158,6 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
   const shown = useSharedValue(open ? 1 : 0);
   const glow = useSharedValue(0);
   const gone = useSharedValue(0);
-  const leave = useSharedValue(0);
   const rowH = useSharedValue(0);
   const [rowW, setRowW] = useState(0);
   const swipeable = useRef<Swipeable | null>(null);
@@ -224,7 +220,6 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
 
   const rowStyle = useAnimatedStyle(() => ({
     opacity: 1 - gone.value,
-    transform: [{ translateX: leave.value }],
     height: gone.value === 0 ? 'auto' : rowH.value * (1 - gone.value),
   }));
   const glowStyle = useAnimatedStyle(() => ({ opacity: glow.value }));
@@ -309,8 +304,8 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
     });
     switch (button) {
       case 'send':
-        fly.value = withTiming(1, { ...motion(SEND_MS), easing: ease.in });
-        later(SEND_MS + 30, onSend);
+        fly.value = withTiming(1, { ...motion(SEND_MS), easing: ease.out });
+        onSend();
         later(SEND_RESET_AT, () => {
           fly.value = 0;
           busy.current = false;
@@ -331,7 +326,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
         return;
       case 'edit':
         pen.value = withTiming(1, motion(EDIT_MS));
-        later(EDIT_AT, onEdit);
+        onEdit();
         later(SEND_RESET_AT, () => {
           pen.value = 0;
           busy.current = false;
@@ -342,7 +337,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
           ...motion(DELETE_MS),
           easing: ease.spring,
         });
-        later(DELETE_AT, onDelete);
+        onDelete();
         later(SEND_RESET_AT, () => {
           lid.value = 0;
           busy.current = false;
@@ -378,22 +373,8 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
         renderRightActions={renderSend}
         onSwipeableOpenStartDrag={onSwipe}
         onSwipeableWillOpen={() => {
-          const sent = () => {
-            onSend();
-            later(SEND_RESET_AT, () => {
-              swipeable.current?.close();
-              leave.value = 0;
-            });
-          };
-          leave.value = withTiming(
-            -rowW,
-            { duration: LEAVE_MS, easing: ease.in },
-            finished => {
-              if (finished) {
-                runOnJS(sent)();
-              }
-            },
-          );
+          onSend();
+          later(SEND_RESET_AT, () => swipeable.current?.close());
         }}
       >
         <View style={{ backgroundColor: colors.bgSurface }}>

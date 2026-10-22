@@ -268,7 +268,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
         justifyContent: 'space-between',
         paddingTop: 8,
         paddingBottom: 6,
-        paddingHorizontal: 16,
+        paddingHorizontal: 20,
       }}
     >
       <View style={{ width: 48 }} />

@@ -236,7 +236,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
   return (
     <View
       testID={`addressbook.sheet.${edit.kind}`}
-      style={{ paddingHorizontal: 22 }}
+      style={{ paddingHorizontal: 20 }}
     >
       <BoldText
         style={{

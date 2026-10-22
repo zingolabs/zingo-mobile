@@ -149,7 +149,7 @@ export const WordGrid: React.FunctionComponent<{
                     textAlign: 'right',
                     color: colors.fgMuted,
                     fontSize: 12,
-                    fontWeight: '500',
+                    fontWeight: '400',
                   }}
                 >
                   {n}
@@ -231,7 +231,7 @@ export const InfoRow: React.FunctionComponent<{
         testID={`${testID}-info`}
         alignStart
         label={label}
-        labelStyle={{ fontSize: 12, fontWeight: '500', color: colors.fgMuted }}
+        labelStyle={{ fontSize: 12, fontWeight: '600', color: colors.fgMuted }}
         title={tipTitle}
         text={tipBody}
         open={open}

@@ -337,7 +337,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
     <View
       style={
         {
-          "paddingHorizontal": 22,
+          "paddingHorizontal": 20,
         }
       }
       testID="addressbook.sheet.new"

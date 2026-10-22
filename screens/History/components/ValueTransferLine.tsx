@@ -8,7 +8,7 @@ import {
   iconSizeSm,
   slopFor,
   space12,
-  space16,
+  space20,
   space4,
   space8,
   useTheme,
@@ -85,7 +85,7 @@ const labelKey = (
   KIND_LABEL[kind][confirmations === 0 ? 0 : 1];
 
 /** The status line lines up with the row's text: padding, icon and gap. */
-const STATUS_INDENT = space16 + iconSize + space12;
+const STATUS_INDENT = space20 + iconSize + space12;
 
 const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   index,
@@ -207,11 +207,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   closeAllSwipeables();
                 }}
               >
-                <FileTextIcon
-                  style={{ opacity: 0.8 }}
-                  size={24}
-                  color={colors.fgDefault}
-                />
+                <FileTextIcon size={24} color={colors.fgDefault} />
               </TouchableOpacity>
             </View>
             {!!vt.address && !readOnly && server.kind !== 'offline' && (
@@ -288,7 +284,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
       {month !== '' && (
         <View
           style={{
-            paddingLeft: 15,
+            paddingLeft: space20,
             paddingTop: 10,
             paddingBottom: 0,
             backgroundColor: colors.bgSurface,
@@ -365,7 +361,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               }
               trailing={
                 <ZecAmount
-                  style={{ opacity: failed ? 0.7 : 1 }}
                   size={15}
                   currencyName={info.currencyName}
                   color={failed ? colors.fgMuted : amountColor}
@@ -419,8 +414,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
         <View
           style={{
             position: 'absolute',
-            left: space16,
-            right: space16,
+            left: space20,
+            right: space20,
             bottom: 0,
             height: 1,
             backgroundColor: colors.borderSubtle,
