@@ -512,8 +512,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     private fun syncSettings(performancelevel: String, minconfirmations: String) =
         uniffi.zingo.SyncSettings(performanceLevel = performancelevel, minConfirmations = minconfirmations.toUInt())
 
+    private fun indexerChoice(serveruri: String) =
+        if (serveruri.isEmpty()) uniffi.zingo.IndexerChoice.Offline else uniffi.zingo.IndexerChoice.Named(uri = serveruri)
+
     private fun connection(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String) =
-        uniffi.zingo.IndexerConnection(serverUri = serveruri, chainHint = chainhint, sync = syncSettings(performancelevel, minconfirmations))
+        uniffi.zingo.IndexerConnection(indexer = indexerChoice(serveruri), chainHint = chainhint, sync = syncSettings(performancelevel, minconfirmations))
 
     @ReactMethod
     fun createNewWallet(serveruri: String, birthday: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
@@ -821,7 +824,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun changeServerProcess(serveruri: String, promise: Promise) {
         FfiOutcome.settling(promise, "change_server") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.changeServer(serveruri = serveruri)
+            uniffi.zingo.changeServer(choice = indexerChoice(serveruri))
         }
     }
 

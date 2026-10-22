@@ -455,6 +455,10 @@ class RPCModule: NSObject {
     SyncSettings(performanceLevel: performancelevel, minConfirmations: UInt32(minconfirmations) ?? 0)
   }
 
+  private func indexerChoice(_ serveruri: String) -> IndexerChoice {
+    serveruri.isEmpty ? .offline : .named(uri: serveruri)
+  }
+
   private func connection(
     serveruri: String,
     chainhint: String,
@@ -462,7 +466,7 @@ class RPCModule: NSObject {
     minconfirmations: String
   ) -> IndexerConnection {
     IndexerConnection(
-      serverUri: serveruri,
+      indexer: indexerChoice(serveruri),
       chainHint: chainhint,
       sync: syncSettings(performancelevel: performancelevel, minconfirmations: minconfirmations))
   }
@@ -981,7 +985,7 @@ class RPCModule: NSObject {
   func changeServerProcess(_ serveruri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try changeServer(serveruri: serveruri)
+          try changeServer(choice: indexerChoice(serveruri))
         }.settle(resolve: resolve, reject: reject)
       }
   }

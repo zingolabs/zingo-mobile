@@ -24,7 +24,7 @@ const val OFFLINE_CHAIN_HINT = "regtest"
 /** The connection the instrumented tests open a wallet with. */
 fun testConnection(serverUri: String, chainHint: String): uniffi.zingo.IndexerConnection =
     uniffi.zingo.IndexerConnection(
-        serverUri = serverUri,
+        indexer = if (serverUri.isEmpty()) uniffi.zingo.IndexerChoice.Offline else uniffi.zingo.IndexerChoice.Named(uri = serverUri),
         chainHint = chainHint,
         sync = uniffi.zingo.SyncSettings(performanceLevel = "Medium", minConfirmations = 1u),
     )
