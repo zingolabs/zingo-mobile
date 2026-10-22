@@ -4,6 +4,7 @@ import { SwapOperationEnum } from '@app/swap/enums/SwapErrorCategoryEnum';
 import { SwapKitHttpError, SwapKitNetworkError } from '@app/swap/errors';
 import { createDefaultProviderRegistry } from '@app/swap/providers/ProviderRegistry';
 import type { SwapKitClient } from '@app/swap/SwapKitClient';
+import { english } from '../../__mocks__/dataMocks/swap/englishText';
 import type { SwapPoller } from '@app/swap/SwapPoller';
 import type { SwapStore } from '@app/swap/SwapStore';
 import type { TokenCatalog } from '@app/swap/TokenCatalog';
@@ -480,7 +481,9 @@ describe('providers that returned nothing', () => {
     const { routes, unavailable } = await askForQuote(service);
 
     expect(routes.map(r => r.provider)).toEqual([SwapKitProviderEnum.Near]);
-    expect(unavailable).toEqual([
+    expect(
+      unavailable.map(row => ({ ...row, reason: english(row.reason) })),
+    ).toEqual([
       {
         provider: SwapKitProviderEnum.MayachainStreaming,
         reason: 'Needs at least 0.42 ZEC.',
@@ -518,7 +521,9 @@ describe('providers that returned nothing', () => {
       ),
     );
 
-    expect(unavailable).toContainEqual({
+    expect(
+      unavailable.map(row => ({ ...row, reason: english(row.reason) })),
+    ).toContainEqual({
       provider: SwapKitProviderEnum.Near,
       reason: 'Needs at least 0.01068069 ZEC.',
     });

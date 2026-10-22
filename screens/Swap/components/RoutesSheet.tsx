@@ -8,7 +8,9 @@ import {
   describeCostVsMarket,
   formatAmountForDisplay,
   providerShortLabel,
+  renderSwapText,
 } from '@app/swap';
+import type { SwapTextType } from '@app/swap';
 import type { RouteOptionType, UnavailableProviderType } from '@app/swap';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
@@ -46,6 +48,8 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
     ref,
   ) => {
     const { translate } = useContext(ContextAppLoaded);
+    const say = (text: SwapTextType) =>
+      renderSwapText(text, key => (translate(key) as string).trim());
     const { colors } = useTheme();
     const dismiss = useCallback(() => {
       (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss();
@@ -78,7 +82,8 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
           {routes.map(route => {
             const selected = route.routeId === selectedRouteId;
             const best = route.tags?.includes('RECOMMENDED');
-            const costVsMarket = describeCostVsMarket(route.costVsMarketBps);
+            const cost = describeCostVsMarket(route.costVsMarketBps);
+            const costVsMarket = cost && say(cost);
             const details = [
               usd(route.expectedReceiveAmount),
               route.estimatedTimeText,
@@ -160,7 +165,7 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
                   </Tag>
                 </View>
               }
-              subtitle={entry.reason}
+              subtitle={say(entry.reason)}
             />
           ))}
           <Text

@@ -1,4 +1,10 @@
-import { describeCostVsMarket } from '@app/swap/costVsMarket';
+import { describeCostVsMarket as describeCostVsMarketText } from '@app/swap/costVsMarket';
+import { english } from '../../__mocks__/dataMocks/swap/englishText';
+
+/** The sentence as the English app shows it. */
+const describeCostVsMarket = (
+  ...args: Parameters<typeof describeCostVsMarketText>
+) => english(describeCostVsMarketText(...args));
 
 /**
  * The figures are the ones two live quotes returned for 0.05 ZEC to USDC on

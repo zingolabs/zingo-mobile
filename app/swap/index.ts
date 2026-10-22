@@ -154,6 +154,8 @@ export {
   zecNetworkFeeReserve,
 } from './depositRouting';
 export { quoteAddressPair, quoteBindsAddress } from './quoteAddressBinding';
+export { renderSwapText, swapKey, swapRaw } from './swapText';
+export type { SwapTextType } from './swapText';
 export { unavailableProviders } from './unavailableProviders';
 export type { UnavailableProviderType } from './unavailableProviders';
 export {

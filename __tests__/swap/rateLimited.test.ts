@@ -4,8 +4,13 @@ import {
   RATE_LIMIT_DEFAULT_WAIT_MS,
   isRateLimited,
   rateLimitWaitMs,
-  rateLimitedNotice,
+  rateLimitedNotice as rateLimitedNoticeText,
 } from '@app/swap/rateLimited';
+import { english } from '../../__mocks__/dataMocks/swap/englishText';
+
+/** The sentence as the English app shows it. */
+const rateLimitedNotice = (...args: Parameters<typeof rateLimitedNoticeText>) =>
+  english(rateLimitedNoticeText(...args));
 
 const NOW = Date.parse('2026-10-13T10:00:00Z');
 

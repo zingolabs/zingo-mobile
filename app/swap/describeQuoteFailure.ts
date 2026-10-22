@@ -1,5 +1,7 @@
 import { SwapKitHttpError } from './errors';
 import { RATE_LIMITED_MESSAGE, isRateLimited } from './rateLimited';
+import { swapKey, swapRaw } from './swapText';
+import type { SwapTextType } from './swapText';
 
 /**
  * Why asking for a quote failed, in the user's terms.
@@ -15,15 +17,15 @@ import { RATE_LIMITED_MESSAGE, isRateLimited } from './rateLimited';
  * user as a wallet that has been locked out. The answer does not say what the
  * limit is, so neither does this.
  */
-export function describeQuoteFailure(error: unknown): string {
+export function describeQuoteFailure(error: unknown): SwapTextType {
   if (isRateLimited(error)) return RATE_LIMITED_MESSAGE;
   const raw =
     `${error instanceof SwapKitHttpError ? `${error.message} ${error.body}` : String(error)}`.toLowerCase();
 
   if (raw.includes('swapsizeexceeded')) {
-    return 'That amount is over the limit for a single swap. Try a smaller amount.';
+    return swapKey('swap.msg-over-limit');
   }
-  return `${error}`;
+  return swapRaw(`${error}`);
 }
 
 export default describeQuoteFailure;

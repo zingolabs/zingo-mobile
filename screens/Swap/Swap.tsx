@@ -26,6 +26,7 @@ import {
   isTerminalStatus,
   providerShortLabel,
   rateLimitedNotice,
+  renderSwapText,
 } from '@app/swap';
 import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
@@ -509,7 +510,10 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                     tone="warning"
                     style={{ paddingBottom: space8 }}
                   >
-                    {rateLimitedNotice(form.rateLimitedUntilMs - form.nowMs)}
+                    {renderSwapText(
+                      rateLimitedNotice(form.rateLimitedUntilMs - form.nowMs),
+                      key => (translate(key) as string).trim(),
+                    )}
                   </Text>
                 )}
                 {!!form.quoteNotice && (

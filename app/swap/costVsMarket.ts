@@ -19,14 +19,19 @@
  * the fee is already inside it.
  */
 
+import { swapKey } from './swapText';
+import type { SwapTextType } from './swapText';
+
 /** Below this many basis points either way, the route is at market. */
 const AT_MARKET_BPS = 0.5;
 
 export function describeCostVsMarket(
   bps: number | undefined,
-): string | undefined {
+): SwapTextType | undefined {
   if (typeof bps !== 'number' || !Number.isFinite(bps)) return undefined;
-  if (Math.abs(bps) < AT_MARKET_BPS) return 'At market value, fees included';
+  if (Math.abs(bps) < AT_MARKET_BPS) return swapKey('swap.msg-at-market');
   const percent = (Math.abs(bps) / 100).toFixed(2);
-  return `${percent}% ${bps < 0 ? 'below' : 'above'} market value, fees included`;
+  return swapKey(bps < 0 ? 'swap.msg-below-market' : 'swap.msg-above-market', {
+    percent,
+  });
 }

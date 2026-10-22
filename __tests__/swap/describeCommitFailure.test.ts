@@ -2,9 +2,15 @@ import { SwapOperationEnum } from '@app/swap/enums/SwapErrorCategoryEnum';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
 import { SwapKitHttpError } from '@app/swap/errors';
 import {
-  describeCommitFailure,
+  describeCommitFailure as describeCommitFailureText,
   commitRefusalCondemnsRoute,
 } from '@app/swap/describeCommitFailure';
+import { english } from '../../__mocks__/dataMocks/swap/englishText';
+
+/** The sentence as the English app shows it. */
+const describeCommitFailure = (
+  ...args: Parameters<typeof describeCommitFailureText>
+) => english(describeCommitFailureText(...args));
 
 const httpError = (body: string) =>
   new SwapKitHttpError({
