@@ -46,13 +46,14 @@ const AddTagModalHost = forwardRef<
     )?.current?.dismiss();
   }, [ref]);
 
-  const save = async (name: string, address: string) => {
+  const save = async (name: string, address: string, chain: string) => {
     setAddressBook(
       await AddressBookFileImpl.saveContact(
         undefined,
         name,
         address,
         walletChain,
+        chain,
       ),
     );
     dismiss();
