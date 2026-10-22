@@ -548,13 +548,34 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
 
             {!!form.selectedToken && (
               <View>
-                <Text
-                  variant="caption"
-                  tone="muted"
-                  style={{ marginBottom: space4 }}
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    columnGap: space8,
+                    marginBottom: space4,
+                  }}
                 >
-                  {`${translate(form.isOutbound ? 'swap.dest-address' : 'swap.refund-address') as string} (${chainLabel})`}
-                </Text>
+                  <Text
+                    variant="caption"
+                    tone="muted"
+                    numberOfLines={1}
+                    style={{ flexShrink: 1 }}
+                  >
+                    {`${translate(form.isOutbound ? 'swap.dest-address' : 'swap.refund-address') as string} (${chainLabel})`}
+                  </Text>
+                  {!!savedContact && form.addressValid && (
+                    <Text
+                      testID="swap.address.contact"
+                      variant="caption"
+                      tone="accent"
+                      numberOfLines={1}
+                      style={{ fontWeight: '600', flexShrink: 1 }}
+                    >
+                      {savedContact.label}
+                    </Text>
+                  )}
+                </View>
                 <TextInputAddress
                   address={form.activeAddress}
                   setAddress={form.setActiveAddress}
@@ -615,12 +636,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                   >
                     <CheckIcon size={14} color={colors.fgMuted} />
                     <Text variant="caption" tone="muted">
-                      {savedContact
-                        ? (translate('swap.address-saved') as string).replace(
-                            '{name}',
-                            savedContact.label,
-                          )
-                        : (translate('swap.address-ok') as string)}
+                      {translate('swap.address-ok') as string}
                     </Text>
                   </View>
                 ) : !form.isOutbound ? (
