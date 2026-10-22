@@ -179,7 +179,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
           "backgroundColor": "#031124",
           "flexDirection": "row",
           "justifyContent": "flex-end",
-          "marginRight": 30,
+          "marginRight": 20,
           "marginTop": 5,
         }
       }
@@ -292,7 +292,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
           "borderRadius": 10,
           "borderWidth": 1,
           "display": "flex",
-          "margin": 25,
+          "marginBottom": 25,
+          "marginHorizontal": 20,
           "marginTop": 5,
           "padding": 10,
         }
@@ -490,7 +491,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
     <View
       style={
         {
-          "margin": 10,
+          "marginHorizontal": 20,
+          "marginVertical": 10,
         }
       }
     >
@@ -1147,7 +1149,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
           "backgroundColor": "#031124",
           "flexDirection": "row",
           "justifyContent": "flex-end",
-          "marginRight": 30,
+          "marginRight": 20,
           "marginTop": 5,
         }
       }
@@ -1260,7 +1262,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
           "borderRadius": 10,
           "borderWidth": 1,
           "display": "flex",
-          "margin": 25,
+          "marginBottom": 25,
+          "marginHorizontal": 20,
           "marginTop": 5,
           "padding": 10,
         }
@@ -1458,7 +1461,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
     <View
       style={
         {
-          "margin": 10,
+          "marginHorizontal": 20,
+          "marginVertical": 10,
         }
       }
     >

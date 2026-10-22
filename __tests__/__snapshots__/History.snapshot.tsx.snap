@@ -990,7 +990,7 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
           "flexDirection": "row",
           "justifyContent": "space-between",
           "paddingBottom": 6,
-          "paddingHorizontal": 16,
+          "paddingHorizontal": 20,
           "paddingTop": 8,
         }
       }
@@ -2078,7 +2078,7 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
           "flexDirection": "row",
           "justifyContent": "space-between",
           "paddingBottom": 6,
-          "paddingHorizontal": 16,
+          "paddingHorizontal": 20,
           "paddingTop": 8,
         }
       }

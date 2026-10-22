@@ -359,7 +359,7 @@ const ValueTransferDetail: React.FunctionComponent<
               flexDirection: 'row',
               justifyContent: 'flex-end',
               alignItems: 'center',
-              marginRight: 30,
+              marginRight: 20,
               marginTop: 5,
               backgroundColor: colors.bgSurface,
             }}
@@ -417,7 +417,8 @@ const ValueTransferDetail: React.FunctionComponent<
             style={{
               display: 'flex',
               alignItems: 'center',
-              margin: 25,
+              marginHorizontal: 20,
+              marginBottom: 25,
               marginTop: showNavigator ? 5 : 25,
               padding: 10,
               borderWidth: 1,
@@ -550,7 +551,7 @@ const ValueTransferDetail: React.FunctionComponent<
                 <>
                   <View
                     style={{
-                      paddingHorizontal: 16,
+                      paddingHorizontal: 20,
                       flexGrow: 1,
                       flexDirection: 'row',
                       justifyContent: 'center',
@@ -663,7 +664,7 @@ const ValueTransferDetail: React.FunctionComponent<
               </View>
             )}
 
-          <View style={{ margin: 10 }}>
+          <View style={{ marginHorizontal: 20, marginVertical: 10 }}>
             <View
               style={{
                 display: 'flex',

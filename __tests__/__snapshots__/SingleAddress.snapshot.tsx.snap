@@ -16,6 +16,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
       {
         "alignItems": "center",
         "paddingBottom": 100,
+        "paddingHorizontal": 20,
       }
     }
     style={
@@ -94,7 +95,6 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
         style={
           {
             "backgroundColor": "#c3c3c3",
-            "marginHorizontal": 20,
             "marginTop": 10,
             "padding": 10,
           }
@@ -370,6 +370,7 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
       {
         "alignItems": "center",
         "paddingBottom": 100,
+        "paddingHorizontal": 20,
       }
     }
     style={
@@ -415,7 +416,6 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
         style={
           {
             "backgroundColor": "#c3c3c3",
-            "marginHorizontal": 20,
             "marginTop": 10,
             "padding": 10,
           }

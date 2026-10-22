@@ -6,7 +6,7 @@ exports[`MessageLine - snapshots MessageLine received with messageAddress, no mo
     {
       "display": "flex",
       "flexDirection": "column",
-      "marginHorizontal": 10,
+      "marginHorizontal": 20,
     }
   }
   testID="m-2"
@@ -290,7 +290,7 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
     {
       "display": "flex",
       "flexDirection": "column",
-      "marginHorizontal": 10,
+      "marginHorizontal": 20,
     }
   }
   testID="m-1"
@@ -303,7 +303,7 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
         "borderColor": "#011401",
         "borderTopWidth": 1,
         "paddingBottom": 5,
-        "paddingLeft": 15,
+        "paddingLeft": 0,
         "paddingTop": 5,
       }
     }

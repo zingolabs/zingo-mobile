@@ -241,7 +241,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                 "flexDirection": "row",
                 "gap": 12,
                 "minHeight": 56,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 20,
                 "paddingVertical": 12,
               }
             }
@@ -528,9 +528,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
         "backgroundColor": "#FFFFFF0F",
         "bottom": 0,
         "height": 1,
-        "left": 16,
+        "left": 20,
         "position": "absolute",
-        "right": 16,
+        "right": 20,
       }
     }
   />
@@ -778,7 +778,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                 "flexDirection": "row",
                 "gap": 12,
                 "minHeight": 56,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 20,
                 "paddingVertical": 12,
               }
             }
@@ -973,7 +973,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                 "alignItems": "center",
                 "flexDirection": "row",
                 "justifyContent": "flex-start",
-                "paddingLeft": 52,
+                "paddingLeft": 56,
               }
             }
           >
@@ -1002,9 +1002,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
         "backgroundColor": "#FFFFFF0F",
         "bottom": 0,
         "height": 1,
-        "left": 16,
+        "left": 20,
         "position": "absolute",
-        "right": 16,
+        "right": 20,
       }
     }
   />
@@ -1198,7 +1198,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                 "flexDirection": "row",
                 "gap": 12,
                 "minHeight": 56,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 20,
                 "paddingVertical": 12,
               }
             }
@@ -1409,7 +1409,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
       {
         "backgroundColor": "#031124",
         "paddingBottom": 0,
-        "paddingLeft": 15,
+        "paddingLeft": 20,
         "paddingTop": 10,
       }
     }
@@ -1659,7 +1659,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                 "flexDirection": "row",
                 "gap": 12,
                 "minHeight": 56,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 20,
                 "paddingVertical": 12,
               }
             }
@@ -1946,9 +1946,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
         "backgroundColor": "#FFFFFF0F",
         "bottom": 0,
         "height": 1,
-        "left": 16,
+        "left": 20,
         "position": "absolute",
-        "right": 16,
+        "right": 20,
       }
     }
   />

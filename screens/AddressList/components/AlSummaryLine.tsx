@@ -64,6 +64,7 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
       <View
         style={{
           display: 'flex',
+          paddingHorizontal: 10,
           flexDirection: 'row',
           marginTop: 15,
           paddingBottom: 15,
@@ -131,11 +132,15 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
           </TouchableOpacity>
         </View>
         <View
-          style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}
+          style={{
+            width: 50,
+            justifyContent: 'center',
+            alignItems: 'flex-end',
+          }}
         >
           <TouchableOpacity
             hitSlop={slopFor(24)}
-            style={{ zIndex: 999, padding: 10 }}
+            style={{ zIndex: 999, paddingVertical: 10, paddingLeft: 10 }}
             onPress={() => {
               doQr();
             }}

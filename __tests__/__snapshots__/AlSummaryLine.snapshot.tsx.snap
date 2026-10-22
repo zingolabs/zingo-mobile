@@ -19,6 +19,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine address with contact label 1`] 
         "marginTop": 15,
         "opacity": 1,
         "paddingBottom": 15,
+        "paddingHorizontal": 10,
       }
     }
   >
@@ -169,7 +170,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine address with contact label 1`] 
     <View
       style={
         {
-          "alignItems": "center",
+          "alignItems": "flex-end",
           "justifyContent": "center",
           "width": 50,
         }
@@ -214,7 +215,8 @@ exports[`AlSummaryLine - snapshots AlSummaryLine address with contact label 1`] 
         style={
           {
             "opacity": 1,
-            "padding": 10,
+            "paddingLeft": 10,
+            "paddingVertical": 10,
             "zIndex": 999,
           }
         }
@@ -243,6 +245,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine transparent address 1`] = `
         "marginTop": 15,
         "opacity": 1,
         "paddingBottom": 15,
+        "paddingHorizontal": 10,
       }
     }
   >
@@ -393,7 +396,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine transparent address 1`] = `
     <View
       style={
         {
-          "alignItems": "center",
+          "alignItems": "flex-end",
           "justifyContent": "center",
           "width": 50,
         }
@@ -438,7 +441,8 @@ exports[`AlSummaryLine - snapshots AlSummaryLine transparent address 1`] = `
         style={
           {
             "opacity": 1,
-            "padding": 10,
+            "paddingLeft": 10,
+            "paddingVertical": 10,
             "zIndex": 999,
           }
         }
@@ -467,6 +471,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine unified address 1`] = `
         "marginTop": 15,
         "opacity": 1,
         "paddingBottom": 15,
+        "paddingHorizontal": 10,
       }
     }
   >
@@ -617,7 +622,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine unified address 1`] = `
     <View
       style={
         {
-          "alignItems": "center",
+          "alignItems": "flex-end",
           "justifyContent": "center",
           "width": 50,
         }
@@ -662,7 +667,8 @@ exports[`AlSummaryLine - snapshots AlSummaryLine unified address 1`] = `
         style={
           {
             "opacity": 1,
-            "padding": 10,
+            "paddingLeft": 10,
+            "paddingVertical": 10,
             "zIndex": 999,
           }
         }

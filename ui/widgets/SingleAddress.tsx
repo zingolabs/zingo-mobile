@@ -89,6 +89,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         style={{ width: '100%' }}
         contentContainerStyle={{
           alignItems: 'center',
+          paddingHorizontal: 20,
           paddingBottom: 100,
         }}
       >
@@ -241,7 +242,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
             <View
               style={{
                 marginTop: 10,
-                marginHorizontal: 20,
                 padding: 10,
                 backgroundColor: colors.fgDefault,
               }}
