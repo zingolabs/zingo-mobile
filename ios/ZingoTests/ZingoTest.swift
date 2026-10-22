@@ -587,6 +587,7 @@ class FfiOutcomeTests: XCTestCase {
         (ZingolibError.Read(message: "boom"), "Read"),
         (ZingolibError.Send(message: "boom"), "Send"),
         (ZingolibError.Shield(message: "boom"), "Shield"),
+        (ZingolibError.SendAfterDeshield(message: "boom"), "SendAfterDeshield"),
         (ZingolibError.InvalidInput(message: "boom"), "InvalidInput"),
         (ZingolibError.Wallet(message: "boom"), "Wallet"),
         (ZingolibError.Indexer(message: "boom"), "Indexer"),

@@ -37,6 +37,7 @@ enum FfiOutcome {
     case .Read(let message): return ("Read", message)
     case .Send(let message): return ("Send", message)
     case .Shield(let message): return ("Shield", message)
+    case .SendAfterDeshield(let message): return ("SendAfterDeshield", message)
     case .InvalidInput(let message): return ("InvalidInput", message)
     case .Wallet(let message): return ("Wallet", message)
     case .Indexer(let message): return ("Indexer", message)
@@ -985,7 +986,7 @@ class RPCModule: NSObject {
   func changeServerProcess(_ serveruri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try changeServer(choice: indexerChoice(serveruri))
+          try changeServer(choice: self.indexerChoice(serveruri))
         }.settle(resolve: resolve, reject: reject)
       }
   }
