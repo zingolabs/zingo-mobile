@@ -40,6 +40,11 @@ jobs:
       - name: Check that configuration runs no fetch
         run: yarn --silent check:fetch-lazy
 
+      # No tracked file names the snapshot host, and no project resolves
+      # through a snapshot repository once every project is evaluated.
+      - name: Audit the repositories
+        run: yarn --silent check:repositories
+
       # The app module compiles against the Binding Layer AAR, which Gradle
       # fetches by the Bundle Pin.
       - name: Compile release Kotlin
