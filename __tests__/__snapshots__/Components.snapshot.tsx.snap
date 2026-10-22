@@ -185,13 +185,36 @@ exports[`Component Components - test ZecAmount High Privacy - snapshot 1`] = `
     <View
       style={
         {
-          "alignItems": "flex-end",
+          "alignItems": "baseline",
           "flexDirection": "row",
           "margin": 0,
           "padding": 0,
         }
       }
     >
+      <View
+        style={
+          {
+            "height": 33.70998977790168,
+            "marginRight": 3.8241427376637858,
+            "width": 23.232524858284545,
+          }
+        }
+      />
+      <Text
+        maxFontSizeMultiplier={2}
+        style={
+          {
+            "color": "red",
+            "fontSize": 20,
+            "fontWeight": "700",
+            "margin": 0,
+            "padding": 0,
+          }
+        }
+      >
+        EC
+      </Text>
       <Text
         maxFontSizeMultiplier={2}
         style={
@@ -258,13 +281,36 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
     <View
       style={
         {
-          "alignItems": "flex-end",
+          "alignItems": "baseline",
           "flexDirection": "row",
           "margin": 0,
           "padding": 0,
         }
       }
     >
+      <View
+        style={
+          {
+            "height": 33.70998977790168,
+            "marginRight": 3.8241427376637858,
+            "width": 23.232524858284545,
+          }
+        }
+      />
+      <Text
+        maxFontSizeMultiplier={2}
+        style={
+          {
+            "color": "red",
+            "fontSize": 20,
+            "fontWeight": "700",
+            "margin": 0,
+            "padding": 0,
+          }
+        }
+      >
+        EC
+      </Text>
       <Text
         maxFontSizeMultiplier={2}
         style={
@@ -287,7 +333,6 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
             "color": "red",
             "fontSize": 14,
             "margin": 0,
-            "marginBottom": 1.3333333333333333,
             "padding": 0,
           }
         }

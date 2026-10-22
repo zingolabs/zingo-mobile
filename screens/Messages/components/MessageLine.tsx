@@ -111,12 +111,12 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
   return (
     <View
       testID={`m-${index + 1}`}
-      style={{ display: 'flex', flexDirection: 'column', marginHorizontal: 10 }}
+      style={{ display: 'flex', flexDirection: 'column', marginHorizontal: 20 }}
     >
       {month !== '' && (
         <View
           style={{
-            paddingLeft: 15,
+            paddingLeft: 0,
             paddingTop: 5,
             paddingBottom: 5,
             borderTopWidth: 1,
@@ -200,7 +200,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                       <TriangleAlert color={colors.fgWarning} size={16} />
                       <RegText
                         style={{
-                          opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4,
+                          color: colors.fgMuted,
                         }}
                       >
                         {memoUA}
@@ -208,7 +208,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                       {contactFound(memoUA).found && (
                         <View style={{ flexDirection: 'row' }}>
                           {!thisWalletAddress(memoUA) && (
-                            <RegText style={{ opacity: 0.6 }}>
+                            <RegText style={{ color: colors.fgMuted }}>
                               {translate('addressbook.likely') as string}
                             </RegText>
                           )}

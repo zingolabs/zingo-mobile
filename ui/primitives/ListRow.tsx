@@ -5,7 +5,7 @@ import {
   iconSizeMd,
   rowMinHeight,
   space12,
-  space16,
+  space20,
   useTheme,
 } from '@app/theme';
 import Text from './Text';
@@ -81,7 +81,7 @@ const ListRow: React.FunctionComponent<ListRowProps> = ({
     alignItems: 'center' as const,
     gap: space12,
     paddingVertical: space12,
-    paddingHorizontal: space16,
+    paddingHorizontal: space20,
     borderTopWidth: divider ? 1 : 0,
     borderTopColor: colors.borderSubtle,
   };

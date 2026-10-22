@@ -723,7 +723,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       style={{
         paddingTop: 8,
         paddingBottom: 6,
-        paddingHorizontal: 16,
+        paddingHorizontal: 20,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
