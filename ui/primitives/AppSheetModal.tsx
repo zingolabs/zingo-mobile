@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useRef } from 'react';
 import { Keyboard, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import {
   BottomSheetBackdrop,
@@ -14,6 +14,7 @@ import { duration, ease } from '@app/theme/motion';
 /** Every sheet opens and closes in 420 ms on (.2,0,0,1). */
 const SHEET_MOTION = { duration: duration.sheet, easing: ease.emphasized };
 import SheetRim from './SheetRim';
+import { SheetPresence } from './SheetPresence';
 
 type AppSheetModalProps = {
   header?: React.ReactNode;
@@ -73,6 +74,17 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
   ) => {
     const { colors } = useTheme();
     const fixed = snapPoints !== undefined;
+    const presence = useContext(SheetPresence);
+    const wasOpen = useRef(false);
+    /** Reports opening and closing once each, not every snap in between. */
+    const changed = (index: number) => {
+      const open = index >= 0;
+      if (open !== wasOpen.current) {
+        wasOpen.current = open;
+        presence(open);
+      }
+      onChange?.(index);
+    };
 
     const body = (
       <>
@@ -116,7 +128,7 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
             Keyboard.dismiss();
           }
         }}
-        onChange={onChange}
+        onChange={changed}
         onDismiss={onDismiss}
         handleComponent={handle ? undefined : null}
         handleStyle={styles.handle}

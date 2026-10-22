@@ -20,7 +20,8 @@ type AssetButtonProps = {
 
 /**
  * The asset chip: logo, ticker and, when the asset sits on a chain that is
- * not its own, the chain under it. A chevron says it opens the picker.
+ * not its own, the chain under it. The one that opens the picker has an edge
+ * and a chevron; the fixed ZEC side is just the coin.
  */
 export default function AssetButton({
   token,
@@ -44,25 +45,31 @@ export default function AssetButton({
         flexDirection: 'row',
         alignItems: 'center',
         columnGap: space8,
-        height: 44,
-        paddingLeft: 9,
-        paddingRight: onPress ? 12 : 14,
+        height: 42,
+        paddingLeft: onPress ? 7 : 0,
+        paddingRight: onPress ? 10 : 0,
         borderRadius: radiusPill,
-        borderWidth: 1,
-        borderColor: colors.borderMuted,
+        borderWidth: onPress ? 1 : 0,
+        borderColor: colors.bottomSheetBorder,
         opacity: pressed ? 0.7 : 1,
       })}
     >
       <TokenLogo
         token={token}
-        size={28}
+        size={26}
         surfaceColor={surfaceColor}
-        forceBadge
+        forceBadge={!!onPress}
       />
       <View>
-        <Text variant="bodyStrong">{ticker}</Text>
+        <Text variant="bodyStrong" style={{ lineHeight: 18 }}>
+          {ticker}
+        </Text>
         {!!network && (
-          <Text variant="caption" tone="muted">
+          <Text
+            variant="caption"
+            tone="muted"
+            style={{ fontSize: 11, lineHeight: 14 }}
+          >
             {network}
           </Text>
         )}

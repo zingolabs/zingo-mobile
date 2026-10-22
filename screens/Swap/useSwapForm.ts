@@ -101,6 +101,8 @@ export type SwapFormArgs = {
   zecChain: ChainNameEnum;
   /** The mixnet gate is shut, so an outbound deposit cannot leave yet. */
   mixnetBlocked: boolean;
+  /** A sheet is open over the form: the quote countdown holds until it closes. */
+  paused: boolean;
 };
 
 /**
@@ -115,6 +117,7 @@ export function useSwapForm({
   spendable,
   zecChain,
   mixnetBlocked,
+  paused,
 }: SwapFormArgs) {
   const [direction, setDirection] = useState<SwapDirectionEnum>(() =>
     spendable > 0 ? SwapDirectionEnum.Outbound : SwapDirectionEnum.Inbound,
@@ -152,6 +155,8 @@ export function useSwapForm({
   const [destinationAddress, setDestinationAddress] = useState<string>('');
   const [refundAddress, setRefundAddress] = useState<string>('');
   const [addressValid, setAddressValid] = useState<boolean>(true);
+  /** The address refused is a Zcash one: swap sends to another coin. */
+  const [addressIsZcash, setAddressIsZcash] = useState<boolean>(false);
 
   // The refund-scope address declared to SwapKit as this swap's wallet side.
   // Derived rather than reserved, so browsing quotes leaves the wallet's
@@ -313,11 +318,12 @@ export function useSwapForm({
   const counterpartyChain = selectedToken?.chain ?? '';
 
   // An address valid for the previous chain is almost certainly wrong for the
-  // new one, and leaving it invites sending to it.
+  // new one, and leaving it invites sending to it. A flip keeps the chain, so
+  // the address typed for one direction carries over to the other's empty one.
   useEffect(() => {
     setDestinationAddress('');
     setRefundAddress('');
-  }, [direction, counterpartyChain]);
+  }, [counterpartyChain]);
 
   const activeAddress = isOutbound ? destinationAddress : refundAddress;
   const setActiveAddress = isOutbound
@@ -332,8 +338,17 @@ export function useSwapForm({
         activeAddress,
         zecChain,
       );
+      const zcash =
+        !valid &&
+        counterpartyChain !== ZEC_ASSET.chain &&
+        (await validateAddressForChain(
+          ZEC_ASSET.chain,
+          activeAddress,
+          zecChain,
+        ));
       if (!cancelled) {
         setAddressValid(valid);
+        setAddressIsZcash(zcash);
       }
     })();
     return () => {
@@ -662,15 +677,37 @@ export function useSwapForm({
     ],
   );
 
+  // Time spent under a sheet does not count toward the next quote: the
+  // countdown carries on from where it was when the sheet closes.
+  const [pauseShiftMs, setPauseShiftMs] = useState<number>(0);
+  const pausedAtRef = useRef<number>(0);
+  useEffect(() => setPauseShiftMs(0), [refreshedAtMs]);
+  useEffect(() => {
+    if (paused) {
+      pausedAtRef.current = Date.now();
+      return;
+    }
+    if (pausedAtRef.current > 0) {
+      const held = Date.now() - pausedAtRef.current;
+      pausedAtRef.current = 0;
+      setPauseShiftMs(shift => shift + held);
+    }
+  }, [paused]);
+
   // A fixed cadence rather than the providers' own expiries, which advertise
   // tens of minutes the rate does not have. Paused while the user reviews.
   useEffect(() => {
-    if ((!routes?.length && rateLimitedUntilMs === 0) || reviewing || quoting) {
+    if (
+      (!routes?.length && rateLimitedUntilMs === 0) ||
+      reviewing ||
+      quoting ||
+      paused
+    ) {
       return;
     }
     const timer = setInterval(() => setNowMs(Date.now()), 1000);
     return () => clearInterval(timer);
-  }, [routes, reviewing, quoting, rateLimitedUntilMs]);
+  }, [routes, reviewing, quoting, paused, rateLimitedUntilMs]);
 
   const rateLimited = nowMs < rateLimitedUntilMs;
   useEffect(() => {
@@ -684,23 +721,25 @@ export function useSwapForm({
 
   const secondsToRefresh = Math.max(
     0,
-    Math.ceil((refreshedAtMs + QUOTE_REFRESH_MS - nowMs) / 1000),
+    Math.ceil((refreshedAtMs + pauseShiftMs + QUOTE_REFRESH_MS - nowMs) / 1000),
   );
 
   useEffect(() => {
-    if (!routes?.length || reviewing || quoting || rateLimited) {
+    if (!routes?.length || reviewing || quoting || rateLimited || paused) {
       return;
     }
-    if (nowMs - refreshedAtMs < QUOTE_REFRESH_MS) {
+    if (nowMs - refreshedAtMs - pauseShiftMs < QUOTE_REFRESH_MS) {
       return;
     }
     requestQuote();
   }, [
     nowMs,
     refreshedAtMs,
+    pauseShiftMs,
     routes,
     reviewing,
     quoting,
+    paused,
     rateLimited,
     requestQuote,
   ]);
@@ -715,10 +754,15 @@ export function useSwapForm({
   }, [requestQuote]);
 
   const flip = useCallback(() => {
+    if (isOutbound) {
+      setRefundAddress(current => current || destinationAddress);
+    } else {
+      setDestinationAddress(current => current || refundAddress);
+    }
     setDirection(
       isOutbound ? SwapDirectionEnum.Inbound : SwapDirectionEnum.Outbound,
     );
-  }, [isOutbound]);
+  }, [isOutbound, destinationAddress, refundAddress]);
 
   const pickRoute = useCallback((routeId: string) => {
     setChosenRouteId(routeId);
@@ -815,6 +859,7 @@ export function useSwapForm({
     activeAddress,
     setActiveAddress,
     addressValid,
+    addressIsZcash,
     addressShowError,
     canonicalAddress,
     nearNeedsConfirm,

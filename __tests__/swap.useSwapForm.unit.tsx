@@ -60,6 +60,7 @@ const render = (swapService: SwapService, spendable = 10) =>
       spendable,
       zecChain: ChainNameEnum.mainChainName,
       mixnetBlocked: false,
+      paused: false,
     }),
   );
 
@@ -170,4 +171,34 @@ test('Tests that an amount over the spendable balance is refused when selling ZE
 
   expect(result.current.overBalance).toBe(true);
   expect(result.current.cta).toBe('overBalance');
+});
+
+test('Tests that the quote countdown holds while a sheet is open and carries on when it closes', async () => {
+  const { swapService, quote } = service();
+  const { result, rerender } = renderHook(
+    ({ paused }: { paused: boolean }) =>
+      useSwapForm({
+        swapService,
+        spendable: 10,
+        zecChain: ChainNameEnum.mainChainName,
+        mixnetBlocked: false,
+        paused,
+      }),
+    { initialProps: { paused: false } },
+  );
+  await waitFor(() => expect(result.current.selectedToken).toEqual(BTC));
+  act(() => result.current.setAmount('1'));
+  await settle(1000);
+  await waitFor(() => expect(result.current.routes).toHaveLength(1));
+  expect(quote).toHaveBeenCalledTimes(1);
+
+  rerender({ paused: true });
+  await settle(30_000);
+  expect(quote).toHaveBeenCalledTimes(1);
+
+  rerender({ paused: false });
+  await settle(15_000);
+  expect(quote).toHaveBeenCalledTimes(1);
+  await settle(7_000);
+  await waitFor(() => expect(quote).toHaveBeenCalledTimes(2));
 });
