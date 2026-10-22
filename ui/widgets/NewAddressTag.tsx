@@ -62,7 +62,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
   };
 
   return (
-    <View testID="addresstag.sheet" style={{ paddingHorizontal: 22 }}>
+    <View testID="addresstag.sheet" style={{ paddingHorizontal: 20 }}>
       <BoldText
         style={{
           marginTop: 4,

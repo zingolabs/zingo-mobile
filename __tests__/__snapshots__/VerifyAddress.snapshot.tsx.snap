@@ -5,6 +5,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
   style={
     {
       "backgroundColor": "#031124",
+      "paddingHorizontal": 10,
     }
   }
 >

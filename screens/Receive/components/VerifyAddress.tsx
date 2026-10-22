@@ -91,6 +91,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
     <View
       style={{
         backgroundColor: colors.bgSurface,
+        paddingHorizontal: 10,
       }}
     >
       <TextInputAddress
@@ -109,6 +110,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             justifyContent: 'center',
             alignItems: 'center',
             marginVertical: 5,
+            paddingHorizontal: 10,
           }}
         >
           <FadeText style={{ color: colors.fgDanger }}>{errorAddress}</FadeText>
@@ -122,6 +124,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             justifyContent: 'center',
             alignItems: 'center',
             marginVertical: 5,
+            paddingHorizontal: 10,
           }}
         >
           {verifyOK ? (
@@ -130,7 +133,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'flex-start',
-                width: '90%',
+                width: '100%',
               }}
             >
               <VerifyCheckIcon
@@ -147,7 +150,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'flex-start',
-                width: '90%',
+                width: '100%',
               }}
             >
               <VerifyXIcon
