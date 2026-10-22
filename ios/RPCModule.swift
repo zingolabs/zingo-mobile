@@ -37,6 +37,7 @@ enum FfiOutcome {
     case .Read(let message): return ("Read", message)
     case .Send(let message): return ("Send", message)
     case .Shield(let message): return ("Shield", message)
+    case .SendAfterDeshield(let message): return ("SendAfterDeshield", message)
     case .InvalidInput(let message): return ("InvalidInput", message)
     case .Wallet(let message): return ("Wallet", message)
     case .Indexer(let message): return ("Indexer", message)
