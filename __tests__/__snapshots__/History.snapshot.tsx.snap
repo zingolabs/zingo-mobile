@@ -235,13 +235,36 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                 <View
                   style={
                     {
-                      "alignItems": "flex-end",
+                      "alignItems": "baseline",
                       "flexDirection": "row",
                       "margin": 0,
                       "padding": 0,
                     }
                   }
                 >
+                  <View
+                    style={
+                      {
+                        "height": 42.47458712015612,
+                        "marginRight": 4.818419849456371,
+                        "width": 29.27298132143853,
+                      }
+                    }
+                  />
+                  <Text
+                    maxFontSizeMultiplier={2}
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "fontSize": 25.2,
+                        "fontWeight": "700",
+                        "margin": 0,
+                        "padding": 0,
+                      }
+                    }
+                  >
+                    EC
+                  </Text>
                   <Text
                     maxFontSizeMultiplier={2}
                     style={
@@ -1285,13 +1308,36 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                 <View
                   style={
                     {
-                      "alignItems": "flex-end",
+                      "alignItems": "baseline",
                       "flexDirection": "row",
                       "margin": 0,
                       "padding": 0,
                     }
                   }
                 >
+                  <View
+                    style={
+                      {
+                        "height": 42.47458712015612,
+                        "marginRight": 4.818419849456371,
+                        "width": 29.27298132143853,
+                      }
+                    }
+                  />
+                  <Text
+                    maxFontSizeMultiplier={2}
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "fontSize": 25.2,
+                        "fontWeight": "700",
+                        "margin": 0,
+                        "padding": 0,
+                      }
+                    }
+                  >
+                    EC
+                  </Text>
                   <Text
                     maxFontSizeMultiplier={2}
                     style={
@@ -1314,7 +1360,6 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                         "color": "#c3c3c3",
                         "fontSize": 25.2,
                         "margin": 0,
-                        "marginBottom": 4.8,
                         "padding": 0,
                       }
                     }
