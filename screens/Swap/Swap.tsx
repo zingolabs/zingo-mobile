@@ -548,7 +548,11 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
 
             {!!form.selectedToken && (
               <View>
-                <Text variant="caption" tone="muted">
+                <Text
+                  variant="caption"
+                  tone="muted"
+                  style={{ marginBottom: space4 }}
+                >
                   {`${translate(form.isOutbound ? 'swap.dest-address' : 'swap.refund-address') as string} (${chainLabel})`}
                 </Text>
                 <TextInputAddress
@@ -559,6 +563,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                   showLabel={false}
                   swapChain={form.counterpartyChain}
                   scanRequest="swap.address"
+                  flush
                   pasteLabel={translate('swap.paste') as string}
                   onSaveContact={
                     savedContact
@@ -591,6 +596,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                       flexDirection: 'row',
                       alignItems: 'center',
                       columnGap: space4,
+                      marginTop: space8,
                     }}
                   >
                     <TriangleAlert size={14} color={colors.fgDanger} />
@@ -604,6 +610,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                       flexDirection: 'row',
                       alignItems: 'center',
                       columnGap: space4,
+                      marginTop: space8,
                     }}
                   >
                     <CheckIcon size={14} color={colors.fgMuted} />

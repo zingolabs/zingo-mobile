@@ -42,6 +42,8 @@ type TextInputAddressProps = {
   /** Opens the address book to choose a contact; no handler, no button. */
   onPickContact?: () => void;
   pickContactLabel?: string;
+  /** Sits flush under a label of its own: no outer padding, 48 pt tall. */
+  flush?: boolean;
 };
 const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   address,
@@ -57,6 +59,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   saveContactLabel,
   onPickContact,
   pickContactLabel,
+  flush,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server } = context;
@@ -132,7 +135,13 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
 
   return (
     <View style={{ display: 'flex', flexDirection: 'column' }}>
-      <View style={{ display: 'flex', padding: 10, marginTop: 10 }}>
+      <View
+        style={{
+          display: 'flex',
+          padding: flush ? 0 : 10,
+          marginTop: flush ? 0 : 10,
+        }}
+      >
         {showLabel && (
           <View
             style={{
@@ -165,10 +174,15 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                   ? 'invalid'
                   : 'unknown',
             ),
-            marginTop: 5,
+            marginTop: flush ? 0 : 5,
           }}
         >
-          <View style={{ flexDirection: 'row' }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              ...(flush && { minHeight: 48 }),
+            }}
+          >
             <View
               accessible={true}
               accessibilityLabel={translate('send.address-acc') as string}
