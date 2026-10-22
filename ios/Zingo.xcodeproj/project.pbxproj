@@ -78,7 +78,7 @@
 		8E84DCC50BD0296D0F292579 /* Pods-Zingo-ZingoTests.debug-beta.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Zingo-ZingoTests.debug-beta.xcconfig"; path = "Target Support Files/Pods-Zingo-ZingoTests/Pods-Zingo-ZingoTests.debug-beta.xcconfig"; sourceTree = "<group>"; };
 		96E8D7BC5D3F3F73EA296DFA /* libPods-Zingo-ZingoTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Zingo-ZingoTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A651BC798997B244C79A0F6 /* Pods-Zingo-ZingoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Zingo-ZingoTests.release.xcconfig"; path = "Target Support Files/Pods-Zingo-ZingoTests/Pods-Zingo-ZingoTests.release.xcconfig"; sourceTree = "<group>"; };
-		A0161467000000000000F001 /* swift */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = swift; path = ../zingolib/bindings/swift; sourceTree = "<group>"; };
+		A0161467000000000000F001 /* ZingoBindings */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = ZingoBindings; path = "binding-layer/ZingoBindings"; sourceTree = "<group>"; };
 		D07A0007DA1CE0DE00000001 /* DeviceAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceAuth.swift; sourceTree = "<group>"; };
 		D07A0007DA1CE0DE00000002 /* DeviceAuthBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceAuthBridge.m; sourceTree = "<group>"; };
 		D07A0007DA1CE0DE000000A1 /* PrivacyGuard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyGuard.swift; sourceTree = "<group>"; };
@@ -179,7 +179,7 @@
 			isa = PBXGroup;
 			children = (
 				1F0893FE2BA4C4380089FD88 /* PrivacyInfo.xcprivacy */,
-				A0161467000000000000F001 /* swift */,
+				A0161467000000000000F001 /* ZingoBindings */,
 				13B07FAE1A68108700A75B9A /* Zingo */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* ZingoTests */,
