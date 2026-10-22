@@ -837,7 +837,9 @@
     "deposit-you-get": "Recibirás",
     "result-refunded-buy": "El swap no se completó, así que el {coin} volvió a tu dirección de reembolso, menos la comisión de red.",
     "result-missing": "Falta",
-    "detail-save-contact": "Guardar esta dirección de {coin} como contacto"
+    "detail-save-contact": "Guardar esta dirección de {coin} como contacto",
+    "tx-privacy": "Privacidad",
+    "tx-private": "Privado · NYM Enhanced"
   },
   "history": {
     "shield-all": "Blindar Todos\nlos fondos",

@@ -837,7 +837,9 @@
     "deposit-you-get": "Вы получите",
     "result-refunded-buy": "Обмен не завершился, поэтому {coin} вернулись на адрес возврата за вычетом сетевой комиссии.",
     "result-missing": "Не хватает",
-    "detail-save-contact": "Сохранить этот адрес {coin} как контакт"
+    "detail-save-contact": "Сохранить этот адрес {coin} как контакт",
+    "tx-privacy": "Приватность",
+    "tx-private": "Приватно · NYM Enhanced"
   },
   "history": {
     "shield-all": "Экранирование всех средств",

@@ -17,8 +17,8 @@ export type DetailRow = {
   wrap?: boolean;
   /** What the label means, behind an info icon; needs an InfoTipHost above. */
   tip?: string;
-  /** Green for what you get, amber for what came back. */
-  tone?: 'positive' | 'warning';
+  /** Green for what you get, amber for what came back, Nym green for the mixnet. */
+  tone?: 'positive' | 'warning' | 'nym';
   /** Drawn before the value: a contact's avatar. */
   leading?: React.ReactNode;
   /** A shortened address or id, set in the monospace face. */
@@ -34,7 +34,9 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
       ? colors.fgPriceUp
       : tone === 'warning'
         ? colors.fgTransparent
-        : colors.fgDefault;
+        : tone === 'nym'
+          ? colors.bgNym
+          : colors.fgDefault;
   return (
     <View
       style={{

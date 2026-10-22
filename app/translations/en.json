@@ -837,7 +837,9 @@
     "deposit-you-get": "You’ll get",
     "result-refunded-buy": "The swap didn’t complete, so the {coin} went back to your refund address, minus the network fee.",
     "result-missing": "Missing",
-    "detail-save-contact": "Save this {coin} address as a contact"
+    "detail-save-contact": "Save this {coin} address as a contact",
+    "tx-privacy": "Privacy",
+    "tx-private": "Private · NYM Enhanced"
   },
   "history": {
     "shield-all": "Shield All funds",

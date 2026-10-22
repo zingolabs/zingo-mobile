@@ -83,6 +83,15 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
         language,
       ),
     },
+    ...(role.warn
+      ? [
+          {
+            label: t('swap.tx-privacy'),
+            value: t('swap.tx-private'),
+            tone: 'nym' as const,
+          },
+        ]
+      : []),
     ...(leg.address
       ? [
           {
