@@ -6,6 +6,7 @@ import {
   Platform,
   TextStyle,
   TouchableOpacity,
+  useWindowDimensions,
 } from 'react-native';
 import { useTheme, fontScaleBody } from '@app/theme';
 import { getNumberFormatSettings } from 'react-native-localize';
@@ -41,6 +42,9 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
   const splits = Utils.splitZecAmountIntoBigSmall(amtZec);
   const { colors } = useTheme();
   const { decimalSeparator } = getNumberFormatSettings();
+  /** The digits grow with the OS text size up to the cap; the Ž glyph and
+      the offsets that sit it on their baseline have to grow with them. */
+  const scale = Math.min(useWindowDimensions().fontScale, fontScaleBody);
 
   if (!size) {
     size = 24;
@@ -75,15 +79,15 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
         >
           {!!currencyName && currencyName === CurrencyNameEnum.ZEC ? (
             <SvgXml
-              width={size * 2 * (smallPrefix ? 0.7 : 1)}
-              height={size * (smallPrefix ? 0.7 : 1)}
+              width={size * scale * 2 * (smallPrefix ? 0.7 : 1)}
+              height={size * scale * (smallPrefix ? 0.7 : 1)}
               xml={xml}
               fill={color}
               style={{
                 marginBottom:
                   Platform.OS === GlobalConst.platformOSandroid
-                    ? size / (smallPrefix ? 4 : 6.5)
-                    : size / (smallPrefix ? 6 : 20),
+                    ? (size * scale) / (smallPrefix ? 4 : 6.5)
+                    : (size * scale) / (smallPrefix ? 6 : 20),
               }}
             />
           ) : (
@@ -138,8 +142,8 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
                 padding: 0,
                 marginBottom:
                   Platform.OS === GlobalConst.platformOSandroid
-                    ? size / 10
-                    : size / 15,
+                    ? (size * scale) / 10
+                    : (size * scale) / 15,
               }}
             >
               {splits.smallPart}

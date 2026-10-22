@@ -388,7 +388,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                   "color": "#c3c3c3",
                   "fontSize": 15.399999999999999,
                   "margin": 0,
-                  "marginBottom": 1.4666666666666666,
+                  "marginBottom": 2.933333333333333,
                   "padding": 0,
                 }
               }
@@ -769,7 +769,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                       "color": "#c3c3c3",
                       "fontSize": 10.5,
                       "margin": 0,
-                      "marginBottom": 1,
+                      "marginBottom": 2,
                       "padding": 0,
                     }
                   }
@@ -1312,7 +1312,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                   "color": "#c3c3c3",
                   "fontSize": 15.399999999999999,
                   "margin": 0,
-                  "marginBottom": 1.4666666666666666,
+                  "marginBottom": 2.933333333333333,
                   "padding": 0,
                 }
               }
@@ -1904,7 +1904,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                       "color": "#c3c3c3",
                       "fontSize": 10.5,
                       "margin": 0,
-                      "marginBottom": 1,
+                      "marginBottom": 2,
                       "padding": 0,
                     }
                   }

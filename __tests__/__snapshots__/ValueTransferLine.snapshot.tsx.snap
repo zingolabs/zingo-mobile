@@ -482,7 +482,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                             "color": "#888888",
                             "fontSize": 10.5,
                             "margin": 0,
-                            "marginBottom": 1,
+                            "marginBottom": 2,
                             "padding": 0,
                           }
                         }
@@ -909,7 +909,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                             "color": "#F99D00",
                             "fontSize": 10.5,
                             "margin": 0,
-                            "marginBottom": 1,
+                            "marginBottom": 2,
                             "padding": 0,
                           }
                         }
@@ -1307,7 +1307,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                             "color": "#18bd18",
                             "fontSize": 10.5,
                             "margin": 0,
-                            "marginBottom": 1,
+                            "marginBottom": 2,
                             "padding": 0,
                           }
                         }
@@ -1834,7 +1834,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                             "color": "#c3c3c3",
                             "fontSize": 10.5,
                             "margin": 0,
-                            "marginBottom": 1,
+                            "marginBottom": 2,
                             "padding": 0,
                           }
                         }

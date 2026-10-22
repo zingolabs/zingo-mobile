@@ -211,7 +211,7 @@ hello
                     "color": "#18bd18",
                     "fontSize": 8.399999999999999,
                     "margin": 0,
-                    "marginBottom": 0.8,
+                    "marginBottom": 1.6,
                     "padding": 0,
                   }
                 }
@@ -589,7 +589,7 @@ hello
                     "color": "#c3c3c3",
                     "fontSize": 8.399999999999999,
                     "margin": 0,
-                    "marginBottom": 0.8,
+                    "marginBottom": 1.6,
                     "padding": 0,
                   }
                 }

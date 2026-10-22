@@ -958,7 +958,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                       "color": "#F99D00",
                       "fontSize": 10.5,
                       "margin": 0,
-                      "marginBottom": 1,
+                      "marginBottom": 2,
                       "padding": 0,
                     }
                   }
@@ -1066,7 +1066,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                       "color": "#F99D00",
                       "fontSize": 10.5,
                       "margin": 0,
-                      "marginBottom": 1,
+                      "marginBottom": 2,
                       "padding": 0,
                     }
                   }
