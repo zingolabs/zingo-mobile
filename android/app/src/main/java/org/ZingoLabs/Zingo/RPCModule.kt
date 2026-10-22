@@ -512,9 +512,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     private fun syncSettings(performancelevel: String, minconfirmations: String) =
         uniffi.zingo.SyncSettings(performanceLevel = performancelevel, minConfirmations = minconfirmations.toUInt())
 
-    private fun indexerChoice(serveruri: String) =
-        if (serveruri.isEmpty()) uniffi.zingo.IndexerChoice.Offline else uniffi.zingo.IndexerChoice.Named(uri = serveruri)
-
     private fun connection(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String) =
         uniffi.zingo.IndexerConnection(indexer = indexerChoice(serveruri), chainHint = chainhint, sync = syncSettings(performancelevel, minconfirmations))
 
@@ -1245,3 +1242,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
 }
+
+internal fun indexerChoice(serveruri: String): uniffi.zingo.IndexerChoice =
+    if (serveruri.isEmpty()) uniffi.zingo.IndexerChoice.Offline else uniffi.zingo.IndexerChoice.Named(uri = serveruri)
