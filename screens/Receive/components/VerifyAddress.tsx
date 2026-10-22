@@ -171,6 +171,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             gap: 10,
             marginVertical: 5,
             marginTop: 15,
+            paddingHorizontal: 10,
           }}
         >
           <ButtonStack>
