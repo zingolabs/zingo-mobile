@@ -541,6 +541,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                   showLabel={false}
                   swapChain={form.counterpartyChain}
                   scanRequest="swap.address"
+                  pasteLabel={translate('swap.paste') as string}
                 />
                 {form.addressShowError ? (
                   <View

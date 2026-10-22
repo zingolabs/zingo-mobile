@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
 import { View, TouchableOpacity, TextInput } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme, slopFor } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 
@@ -8,8 +9,9 @@ import { ContextAppLoaded } from '@app/context';
 import { Request, useResult } from '@app/navigation/results';
 import { openScanner } from '@app/navigation/navigate';
 import ErrorText from '@ui/primitives/ErrorText';
+import Text from '@ui/primitives/Text';
 import RegText from '@ui/primitives/RegText';
-import { validateAddressForChain } from '@app/swap';
+import { addressFromPaymentUri, validateAddressForChain } from '@app/swap';
 import { GlobalConst } from '@app/AppState';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
@@ -27,6 +29,8 @@ type TextInputAddressProps = {
   swapChain?: string;
   // The request the scanner answers with the code it read.
   scanRequest: Request;
+  /** Shown as a button in the empty field that pastes the clipboard. */
+  pasteLabel?: string;
 };
 const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   address,
@@ -36,6 +40,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   showLabel,
   swapChain,
   scanRequest,
+  pasteLabel,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server } = context;
@@ -68,7 +73,15 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
     };
   }, [address, server.chainName, swapChain, setError, translate]);
 
-  useResult(scanRequest, a => setAddress(a));
+  /** A swap chain's field keeps the address out of a payment URI for it. */
+  const take = (text: string) =>
+    setAddress(
+      swapChain && swapChain !== GlobalConst.zecSwapChain
+        ? addressFromPaymentUri(swapChain, text)
+        : text,
+    );
+
+  useResult(scanRequest, take);
   // A swap chain's address is checked by its own format.
   const setQrcodeModalShow = () => {
     const chain = swapChain ?? GlobalConst.zecSwapChain;
@@ -152,7 +165,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                   padding: 10,
                 }}
                 value={address}
-                onChangeText={(text: string) => setAddress(text)}
+                onChangeText={take}
                 editable={!disabled}
               />
             </View>
@@ -176,6 +189,19 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                     size={20}
                     color={colors.fgAccentDisabled}
                   />
+                </TouchableOpacity>
+              )}
+              {!address && !disabled && !!pasteLabel && (
+                <TouchableOpacity
+                  testID="send.paste-button"
+                  accessibilityRole="button"
+                  hitSlop={8}
+                  onPress={async () => take(await Clipboard.getString())}
+                  style={{ marginRight: 10 }}
+                >
+                  <Text variant="bodyStrong" tone="accent">
+                    {pasteLabel}
+                  </Text>
                 </TouchableOpacity>
               )}
               <TouchableOpacity
