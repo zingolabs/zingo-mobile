@@ -1,63 +1,49 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
-import { useTheme } from '@app/theme';
-import { SnackbarDurationEnum, TranslateType } from '@app/AppState';
-import { LockIcon } from '@ui/primitives/Icons/LockIcon';
-import { LockOpenIcon } from '@ui/primitives/Icons/LockOpenIcon';
+import { Pressable } from 'react-native';
+import { slopFor, useTheme } from '@app/theme';
+import { TranslateType } from '@app/AppState';
+import { EyeIcon } from '@ui/primitives/Icons/EyeIcon';
+import { EyeOffIcon } from '@ui/primitives/Icons/EyeOffIcon';
 
 type PrivacyToggleProps = {
   privacy: boolean;
   setPrivacyOption: (value: boolean) => Promise<void>;
-  addLastSnackbar: (message: string, duration?: SnackbarDurationEnum) => void;
   translate: (key: string) => TranslateType;
 };
 
+/**
+ * The eye beside "Total balance": it masks every amount in the app with
+ * "•••••" until it is tapped again. A 44 pt target around an 18 pt icon.
+ */
 const PrivacyToggle: React.FC<PrivacyToggleProps> = React.memo(
-  ({ privacy, setPrivacyOption, addLastSnackbar, translate }) => {
+  ({ privacy, setPrivacyOption, translate }) => {
     const { colors } = useTheme();
-
+    const Icon = privacy ? EyeOffIcon : EyeIcon;
     return (
-      <TouchableOpacity
-        onPress={() => {
-          addLastSnackbar(
-            `${translate('change-privacy')} ${
-              privacy
-                ? translate('settings.value-privacy-false')
-                : (((translate('settings.value-privacy-true') as string) +
-                    translate('change-privacy-legend')) as string)
-            }`,
-          );
-          setPrivacyOption(!privacy);
+      <Pressable
+        testID="header.privacy"
+        accessibilityRole="button"
+        accessibilityLabel={
+          translate(
+            privacy ? 'header.show-amounts' : 'header.hide-amounts',
+          ) as string
+        }
+        hitSlop={slopFor(30)}
+        onPress={() => setPrivacyOption(!privacy)}
+        style={{
+          width: 30,
+          height: 30,
+          marginVertical: -4,
+          marginLeft: -2,
+          marginRight: -6,
+          borderRadius: 8,
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: colors.bgCanvas,
-              padding: 0,
-              minWidth: 25,
-              minHeight: 25,
-            }}
-          >
-            {privacy ? (
-              <LockIcon size={20} color={colors.fgAccent} />
-            ) : (
-              <LockOpenIcon size={20} color={colors.fgAccentDisabled} />
-            )}
-          </View>
-        </View>
-      </TouchableOpacity>
+        <Icon size={18} color={colors.fgMuted} />
+      </Pressable>
     );
   },
 );

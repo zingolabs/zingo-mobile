@@ -44,6 +44,9 @@ import { ITEM_HEIGHT, buildHistoryItems, monthAt } from './historyItems';
 import type { HistoryItem } from './historyItems';
 import IronwoodMigrationBanner from './components/IronwoodMigrationBanner';
 import SeedBackupNotice from './components/SeedBackupNotice';
+import TransparentNotice from './components/TransparentNotice';
+import ShieldSheet from './components/ShieldSheet';
+import { useShieldFunds } from '@app/hooks/useShieldFunds';
 import ViewOnlyNotice from './components/ViewOnlyNotice';
 import NoticeStack, { Notice, NOTICE_RADIUS } from '@ui/widgets/NoticeStack';
 import { PriceCard } from '@ui/widgets/Header/components/PriceRow';
@@ -73,6 +76,9 @@ import Filters from './components/Filters';
 import { FiltersIcon } from '@ui/primitives/Icons/FiltersIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { ChevronUp } from '@ui/primitives/Icons/Chevron';
+
+/** How long a finished backup keeps its green pill before the card leaves. */
+const SEED_LEAVE_MS = 900;
 
 const ViewTypes = {
   MONTH: 0,
@@ -104,7 +110,27 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     seedBackedUp,
     viewOnlyNoticeDismissed,
     dismissViewOnlyNotice,
+    somePending,
+    shieldingAmount,
+    mixnetView,
+    sendPermitNow,
+    setScrollToBottom,
   } = context;
+  const shieldSheetRef = useRef<BottomSheetModal>(null);
+  const { showShieldButton, shieldingFee, shieldNow } = useShieldFunds({
+    readOnly,
+    setShieldingAmount,
+    server,
+    somePending,
+    totalBalance,
+    shieldingAmount,
+    translate,
+    addLastSnackbar,
+    setBackgroundError,
+    setScrollToTop,
+    setScrollToBottom,
+    sendPermitNow,
+  });
   const { colors } = useTheme();
 
   const PAGE_SIZE = 50;
@@ -163,11 +189,39 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       setBackingUp(false);
     }
   }, [focused]);
-  const showSeedNotice = !readOnly && !seedBackedUp;
+  // A backup finished while the flow was open: the card stays a moment once
+  // History is back, so its pill can turn green before it leaves.
+  const [seedLeaving, setSeedLeaving] = useState<boolean>(false);
+  const seedWasPending = useRef<boolean>(!seedBackedUp);
+  useEffect(() => {
+    if (!seedBackedUp) {
+      seedWasPending.current = true;
+      return;
+    }
+    if (!focused || !seedWasPending.current) {
+      return;
+    }
+    seedWasPending.current = false;
+    setSeedLeaving(true);
+    const timer = setTimeout(() => setSeedLeaving(false), SEED_LEAVE_MS);
+    return () => clearTimeout(timer);
+  }, [seedBackedUp, focused]);
+  const showSeedNotice = !readOnly && (!seedBackedUp || seedLeaving);
 
   const showPrice = fiatQuote(zecPrice, server, info.chainName).kind !== 'none';
 
   const notices: Notice[] = [];
+  if (showShieldButton) {
+    notices.push({
+      key: 'transparent',
+      node: (
+        <TransparentNotice
+          amount={shieldingAmount}
+          onShield={() => shieldSheetRef.current?.present()}
+        />
+      ),
+    });
+  }
   if (readOnly && !viewOnlyNoticeDismissed) {
     notices.push({
       key: 'viewonly',
@@ -202,6 +256,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       node: (
         <SeedBackupNotice
           covered={backingUp && !focused}
+          backedUp={seedBackedUp}
           onBackUp={from => {
             setBackingUp(true);
             navigation.navigate(Route.SeedBackup, {
@@ -231,7 +286,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
   const historySheetRef = useRef<BottomSheet>(null);
   const internalSnapIndexRef = useRef<number>(0);
 
-  type SnapId = 'balance' | 'usd' | 'max';
+  type SnapId = 'balance' | 'usd' | 'header' | 'max';
   const currentSnapIdRef = useRef<SnapId>('balance');
   useDismissSheetsOnBlur();
   const sheetSlideStyle = useOptionsPanelSheetSlide();
@@ -336,9 +391,16 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     const snapMax = Math.max(containerH - TOP_ICONS_H - SNAP_GAP, snapLow + 1);
 
     if (bannerH > 0) {
-      const bannerSafe = Math.min(Math.max(snapBase, 100), snapMax - 1);
+      // Three stops, as the redesign has them: under the notices, under the
+      // balance (over the notices) and under the top bar.
+      const bannerSafe = Math.min(Math.max(snapBase, 100), snapMax - 2);
+      const underBalance = Math.min(
+        Math.max(containerH - headerH - SNAP_GAP, bannerSafe + 1),
+        snapMax - 1,
+      );
       return [
         { id: 'balance', value: bannerSafe },
+        { id: 'header', value: underBalance },
         { id: 'max', value: snapMax },
       ];
     }
@@ -1003,6 +1065,13 @@ const History: React.FunctionComponent<HistoryProps> = () => {
           />
         )}
       </AppSheetModal>
+      <ShieldSheet
+        ref={shieldSheetRef}
+        amount={shieldingAmount}
+        fee={shieldingFee}
+        mixnetView={mixnetView}
+        onShield={shieldNow}
+      />
     </View>
   );
 };

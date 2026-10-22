@@ -430,7 +430,20 @@
     "nonetwork": "Cihazınızın ağ bağlantısı olmadığı için mixnet kapalı. Ağ geri gelir gelmez kendiliğinden yeniden bağlanır."
   },
   "header": {
-    "lastupdate": "Son güncelleme:"
+    "lastupdate": "Son güncelleme:",
+    "total-balance": "Toplam bakiye",
+    "hide-amounts": "Tutarları gizle",
+    "show-amounts": "Tutarları göster",
+    "sync-synced": "Senkronize",
+    "sync-just-now": "şimdi",
+    "sync-minutes-ago": "{n} dk önce",
+    "sync-balance-from": "{ago} bakiyesi",
+    "sync-no-internet": "İnternet yok",
+    "sync-offline": "Çevrimdışı",
+    "sync-connecting": "{host} sunucusuna bağlanılıyor…",
+    "sync-syncing": "Senkronize ediliyor %{n}",
+    "sync-mobile-data": "Mobil veri",
+    "sync-open-report": "Senkronizasyon raporunu aç"
   },
   "info": {
     "error-price-fetch": "ZEC fiyatı alınamadı.",
@@ -1382,7 +1395,21 @@
     "title": "Kurtarma ifadesi",
     "pending": "yedeklenmedi",
     "body-pending": "Telefonunuzu kaybederseniz fonlarınızı kurtarmanın tek yolu budur.",
-    "button": "Yedekle"
+    "button": "Yedekle",
+    "done": "yedeklendi"
+  },
+  "shield": {
+    "title": "Şeffaf fonları korumaya al",
+    "sub": "Herkese açık bakiyenizi korumalı bakiyenize taşır, böylece kimse göremez.",
+    "from": "Kaynak",
+    "transparent": "Şeffaf",
+    "amount": "Tutar",
+    "fee": "Ağ ücreti",
+    "you-get": "Orchard’da alacağınız",
+    "button": "Korumaya al",
+    "notice-title": "Şeffaf fonlar",
+    "notice-public": "herkese açık",
+    "notice-body": "{amount} herkes tarafından görülebilir. Gizli tutmak için korumaya alın."
   },
   "seedbackup": {
     "close": "Kapat",

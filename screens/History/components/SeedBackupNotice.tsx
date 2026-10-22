@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useRef } from 'react';
 import { View } from 'react-native';
 import {
@@ -8,15 +7,17 @@ import {
 } from 'react-native-reanimated';
 
 import { ease } from '@app/theme/motion';
+import { useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import { CardRect } from '@app/types';
-import Button from '@ui/primitives/Button';
-import Banner from '@ui/widgets/Banner';
-import Tag from '@ui/widgets/Tag';
+import NoticeCard from '@ui/widgets/NoticeCard';
+import { SproutIcon } from '@ui/primitives/Icons/SproutIcon';
 
 type SeedBackupNoticeProps = {
   // The flow is open over the card: its contents step aside for the container transform.
   covered: boolean;
+  /** The backup is done: the pill turns green before the card leaves the stack. */
+  backedUp?: boolean;
   onBackUp: (from: CardRect) => void;
 };
 
@@ -26,9 +27,11 @@ const UNCOVER_MS = 200;
 // The seed phrase notice on History. Back up opens the flow from this card.
 const SeedBackupNotice: React.FunctionComponent<SeedBackupNoticeProps> = ({
   covered,
+  backedUp,
   onBackUp,
 }) => {
   const { translate } = useContext(ContextAppLoaded);
+  const { colors } = useTheme();
   const card = useRef<View>(null);
 
   const contents = useAnimatedStyle(() => ({
@@ -45,31 +48,24 @@ const SeedBackupNotice: React.FunctionComponent<SeedBackupNoticeProps> = ({
     );
 
   return (
-    <Banner
+    <NoticeCard
       ref={card}
       testID="seedbackup.notice"
-      tone="seed"
+      icon={<SproutIcon size={16} color={colors.fgPriceUp} />}
       title={translate('seednotice.title') as string}
-      tag={
-        <Tag tone="warning">{translate('seednotice.pending') as string}</Tag>
+      pill={
+        backedUp
+          ? { text: translate('seednotice.done') as string, tone: 'positive' }
+          : { text: translate('seednotice.pending') as string, tone: 'warning' }
       }
+      body={translate('seednotice.body-pending') as string}
       contentStyle={contents}
-      actionBeside
-      action={
-        <Button
-          testID="seedbackup.start"
-          variant="primary"
-          size="small"
-          inline
-          /** The compact pill it had beside the notice text. */
-          style={{ minHeight: 0, paddingHorizontal: 16, paddingVertical: 7 }}
-          title={translate('seednotice.button') as string}
-          onPress={open}
-        />
-      }
-    >
-      {translate('seednotice.body-pending') as string}
-    </Banner>
+      action={{
+        title: translate('seednotice.button') as string,
+        onPress: open,
+        testID: 'seedbackup.start',
+      }}
+    />
   );
 };
 

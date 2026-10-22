@@ -31,10 +31,11 @@ import {
 } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { getZingoLogo } from '@app/utils/ZingoAppData';
-import { useShieldFunds } from '@app/hooks/useShieldFunds';
 import { useSyncStatus } from '@app/hooks/useSyncStatus';
 import BoldText from '@ui/primitives/BoldText';
-import SyncStatusBar from './components/SyncStatusBar';
+import SyncLine from './components/SyncLine';
+import MixnetIcon from '@ui/primitives/Icons/MixnetIcon';
+import { viewPhase } from '@app/walletBackend/transforms/mixnetView';
 import BalanceRow from './components/BalanceRow';
 import PriceRow from './components/PriceRow';
 import { MessagesIcon } from '@ui/primitives/Icons/MessagesIcon';
@@ -87,12 +88,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   translate: translateProp,
   netInfo: netInfoProp,
   privacy: privacyProp,
-  setBackgroundError,
   noPrivacy,
   setPrivacyOption,
-  addLastSnackbar,
   receivedLegend,
-  setShieldingAmount,
   closeScreen,
   noUfvkIcon,
   showMessagesIcon,
@@ -109,15 +107,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     syncingStatus,
     zecPrice,
     readOnly,
-    valueTransfersTotal,
-    somePending,
-    shieldingAmount,
     server,
     mixnetView,
-    sendPermitNow,
     seedBackedUp,
-    setScrollToTop,
-    setScrollToBottom,
   } = context;
 
   const translate = translateProp ?? context.translate;
@@ -157,33 +149,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     opacity: headerOpacity.value,
   }));
 
-  const {
-    percentageOutputsScanned,
-    syncInProgress,
-    viewSyncStatus,
-    opacityValue,
-  } = useSyncStatus({ syncingStatus, noSyncingStatus });
-
-  const {
-    showShieldButton,
-    shieldingFee,
-    onPressShieldFunds,
-    calculateAmountToShield,
-    calculatePoolsToShield,
-    calculateDisableButtonToShield,
-  } = useShieldFunds({
-    readOnly,
-    setShieldingAmount,
-    server,
-    somePending,
-    totalBalance,
-    shieldingAmount,
-    translate,
-    addLastSnackbar,
-    setBackgroundError,
-    setScrollToTop,
-    setScrollToBottom,
-    sendPermitNow,
+  const mixnetPhase = viewPhase(mixnetView);
+  const { percentageOutputsScanned, syncInProgress } = useSyncStatus({
+    syncingStatus,
+    noSyncingStatus,
   });
 
   // The viewing key opens as a circle out of the snowflake, which turns 60°
@@ -227,45 +196,53 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             },
           ]}
         >
-          <SyncStatusBar
-            noSyncingStatus={noSyncingStatus}
-            server={server}
-            netInfo={netInfo}
-            percentageOutputsScanned={percentageOutputsScanned}
-            syncInProgress={syncInProgress}
-            viewSyncStatus={viewSyncStatus}
-            opacityValue={opacityValue}
-            mixnetView={mixnetView}
-            translate={translate}
-            privacy={privacy}
-            noPrivacy={noPrivacy}
-            setPrivacyOption={setPrivacyOption}
-            addLastSnackbar={addLastSnackbar}
-            noBalance={noBalance}
-          />
+          {/* The mixnet icon alone in the middle of the bar, level with the menu. */}
+          <View
+            style={{
+              height: 57,
+              alignItems: 'center',
+              justifyContent: 'center',
+              paddingTop: 12,
+            }}
+          >
+            {mixnetPhase !== 'absent' && (
+              <TouchableOpacity
+                testID="header.mixnet-status"
+                hitSlop={slopFor(44)}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  translate('settings.nym-diagnostics') as string
+                }
+                onPress={() => navigation.navigate(Route.MixnetDoctor)}
+              >
+                <MixnetIcon phase={mixnetPhase} />
+              </TouchableOpacity>
+            )}
+          </View>
 
           <BalanceRow
             noBalance={noBalance}
             noPrivacy={noPrivacy}
             setPrivacyOption={setPrivacyOption}
-            addLastSnackbar={addLastSnackbar}
             privacy={privacy}
             translate={translate}
             totalBalance={totalBalance}
             info={info}
             zecPrice={zecPrice}
             server={server}
-            showShieldButton={showShieldButton}
-            shieldingFee={shieldingFee}
-            valueTransfersTotal={valueTransfersTotal}
-            calculateAmountToShield={calculateAmountToShield}
-            calculatePoolsToShield={calculatePoolsToShield}
-            calculateDisableButtonToShield={calculateDisableButtonToShield}
-            onPressShieldFunds={onPressShieldFunds}
             receivedLegend={receivedLegend}
-            mixnetView={mixnetView}
             onUsdRowLayout={onUsdRowLayout}
           />
+
+          {!noBalance && !noSyncingStatus && (
+            <SyncLine
+              server={server}
+              netInfo={netInfo}
+              percentage={percentageOutputsScanned}
+              syncInProgress={syncInProgress}
+              translate={translate}
+            />
+          )}
 
           {!noBalance && !noPriceRow && (
             <PriceRow
