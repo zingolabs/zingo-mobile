@@ -13,6 +13,7 @@ import Banner from '@ui/widgets/Banner';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { DEFAULT_SLIPPAGE_BPS } from '@screens/Swap/useSwapForm';
 import SheetTitle from './SheetTitle';
+import { InfoTipButton, InfoTipHost } from '@ui/widgets/InfoTip';
 
 type SwapSettingsSheetProps = {
   slippageBps: number;
@@ -97,82 +98,117 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
           paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
         }}
       >
-        <View style={{ paddingHorizontal: space16 }}>
-          <Text variant="bodyStrong" style={{ marginTop: space8 }}>
-            {translate('swap.slippage') as string}
-          </Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              columnGap: space8,
-              rowGap: space8,
-              marginTop: space12,
-            }}
-          >
-            {PRESETS_BPS.map(bps => (
-              <Chip
-                key={bps}
-                testID={`swap.slippage.${bps}`}
-                selected={!editing && preset === bps}
-                onPress={() => {
-                  setEditing(false);
-                  setPreset(bps);
+        <InfoTipHost fill={false}>
+          <View style={{ paddingHorizontal: space16 }}>
+            {/* One row when it fits; the chips drop under the label when not. */}
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                columnGap: space12,
+                rowGap: space8,
+                marginTop: space8,
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  columnGap: 2,
                 }}
               >
-                {`${formatSlippagePercent(bps)}%`}
-              </Chip>
-            ))}
-            <Chip
-              testID="swap.slippage.custom"
-              selected={editing}
-              onPress={() => setEditing(true)}
+                <Text variant="bodyStrong">
+                  {translate('swap.slippage') as string}
+                </Text>
+                <InfoTipButton
+                  testID="swap.slippage-info"
+                  label={translate('swap.slippage') as string}
+                  text={translate('swap.tip-slip') as string}
+                />
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  columnGap: space8,
+                  rowGap: space8,
+                }}
+              >
+                {PRESETS_BPS.map(bps => (
+                  <Chip
+                    key={bps}
+                    testID={`swap.slippage.${bps}`}
+                    selected={!editing && preset === bps}
+                    onPress={() => {
+                      setEditing(false);
+                      setPreset(bps);
+                    }}
+                  >
+                    {`${formatSlippagePercent(bps)}%`}
+                  </Chip>
+                ))}
+                <Chip
+                  testID="swap.slippage.custom"
+                  selected={editing}
+                  onPress={() => setEditing(true)}
+                >
+                  {editing && customValid
+                    ? `${formatSlippagePercent(parsedCustom)}%`
+                    : (translate('swap.slippage-other') as string)}
+                </Chip>
+              </View>
+            </View>
+            <Text
+              variant="bodySmall"
+              tone="muted"
+              style={{ marginTop: space12 }}
             >
-              {editing && customValid
-                ? `${formatSlippagePercent(parsedCustom)}%`
-                : (translate('swap.slippage-other') as string)}
-            </Chip>
-          </View>
-          <Text variant="bodySmall" tone="muted" style={{ marginTop: space12 }}>
-            {editing
-              ? (translate('swap.slippage-custom') as string)
-              : `${translate('swap.slippage-help') as string} ${formatSlippagePercent(DEFAULT_SLIPPAGE_BPS)}%.`}
-          </Text>
-          {low && (
-            <View style={{ marginTop: space12 }}>
-              <Banner
-                tone="warning"
-                title={`${formatSlippagePercent(draft)}% ${translate('swap.slippage-low') as string}`}
+              {(translate('swap.slippage-help') as string).replace(
+                '{n}',
+                formatSlippagePercent(DEFAULT_SLIPPAGE_BPS),
+              )}
+            </Text>
+            {editing && (
+              <View style={{ marginTop: space12 }}>
+                <TextField
+                  testID="swap.slippage.input"
+                  label={translate('swap.slippage') as string}
+                  value={custom}
+                  onChangeText={setCustom}
+                  placeholder={formatSlippagePercent(slippageBps)}
+                  error={customError}
+                  helper={customHelper}
+                  valid={customValid}
+                />
+              </View>
+            )}
+            {low && (
+              <View style={{ marginTop: space12 }}>
+                <Banner
+                  tone="warning"
+                  title={(translate('swap.slippage-low') as string).replace(
+                    '{n}',
+                    formatSlippagePercent(draft),
+                  )}
+                />
+              </View>
+            )}
+            <View style={{ marginTop: space16 }}>
+              <Button
+                testID="swap.slippage.done"
+                variant="primary"
+                title={translate('swap.done') as string}
+                disabled={editing && !customValid}
+                onPress={() => {
+                  onChange(editing && customValid ? parsedCustom : preset);
+                  dismiss();
+                }}
               />
             </View>
-          )}
-          {editing && (
-            <View style={{ marginTop: space12 }}>
-              <TextField
-                testID="swap.slippage.input"
-                label={translate('swap.slippage') as string}
-                value={custom}
-                onChangeText={setCustom}
-                placeholder={formatSlippagePercent(slippageBps)}
-                error={customError}
-                helper={customHelper}
-                valid={customValid}
-              />
-            </View>
-          )}
-          <View style={{ marginTop: space16 }}>
-            <Button
-              testID="swap.slippage.done"
-              variant="primary"
-              title={translate('swap.done') as string}
-              disabled={editing && !customValid}
-              onPress={() => {
-                onChange(editing && customValid ? parsedCustom : preset);
-                dismiss();
-              }}
-            />
           </View>
-        </View>
+        </InfoTipHost>
       </AppSheetModal>
     );
   },

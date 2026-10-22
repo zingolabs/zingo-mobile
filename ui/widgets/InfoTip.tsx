@@ -39,7 +39,14 @@ const exit = new Keyframe({ 0: { opacity: 1 }, 100: { opacity: 0 } })
  * it, or over it when there is no room below. Any touch outside closes it,
  * the icon included, so it never stays open by mistake.
  */
-export function InfoTipHost({ children }: { children: React.ReactNode }) {
+export function InfoTipHost({
+  children,
+  fill = true,
+}: {
+  children: React.ReactNode;
+  /** Fills its parent; off inside a sheet that sizes to its content. */
+  fill?: boolean;
+}) {
   const { colors } = useTheme();
   const { width: screenW, height: screenH } = useWindowDimensions();
   const hostRef = useRef<View>(null);
@@ -76,7 +83,11 @@ export function InfoTipHost({ children }: { children: React.ReactNode }) {
 
   return (
     <InfoTipContext.Provider value={show}>
-      <View ref={hostRef} style={{ flex: 1 }} collapsable={false}>
+      <View
+        ref={hostRef}
+        style={fill ? { flex: 1 } : undefined}
+        collapsable={false}
+      >
         {children}
         {!!shown && !!layout && (
           <>
