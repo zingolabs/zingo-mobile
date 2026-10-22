@@ -11,6 +11,7 @@ export type Request =
   | 'receive.address'
   | 'receive.addressIndex'
   | 'swap.address'
+  | 'swap.contact'
   | 'swap.review';
 
 type Listener = (value: string) => void;

@@ -105,7 +105,8 @@
     "mine-note": "Enviar para seus próprios endereços custa apenas a taxa de rede. Use para mover fundos entre pools.",
     "in-use": "Em uso",
     "mine-unified": "Unificado",
-    "mine-transparent": "Transparente"
+    "mine-transparent": "Transparente",
+    "no-chain": "Ainda não há contatos de {chain}."
   },
   "change-privacy-legend": ".\nToque para revelar os valores ocultos.",
   "txtcopied": "Texto copiado para a Área de Transferência",

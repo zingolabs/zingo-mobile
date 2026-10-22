@@ -105,7 +105,8 @@
     "mine-note": "Kendi adreslerinize göndermek yalnızca ağ ücretine mal olur. Fonları havuzlar arasında taşımak için kullanın.",
     "in-use": "Kullanımda",
     "mine-unified": "Birleşik",
-    "mine-transparent": "Şeffaf"
+    "mine-transparent": "Şeffaf",
+    "no-chain": "Henüz {chain} kişisi yok."
   },
   "change-privacy-legend": ".\nGizli değerleri göstermek için dokunun.",
   "txtcopied": "Metin panoya kopyalandı",

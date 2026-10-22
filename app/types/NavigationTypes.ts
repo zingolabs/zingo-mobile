@@ -162,6 +162,8 @@ export type AddressBookNavigationState = {
   // Opens the book as a picker; the chosen address is delivered under this
   // request.
   pick: Request;
+  /** SwapKit chain code of the contacts offered; Zcash when absent. */
+  chain?: string;
 };
 
 export type AddressListNavigationState = {

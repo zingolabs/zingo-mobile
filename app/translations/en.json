@@ -105,7 +105,8 @@
     "mine-note": "Sending to your own addresses only costs the network fee. Use it to move funds between pools.",
     "in-use": "In use",
     "mine-unified": "Unified",
-    "mine-transparent": "Transparent"
+    "mine-transparent": "Transparent",
+    "no-chain": "No {chain} contacts yet."
   },
   "change-privacy-legend": ".\nTap to reveal the hidden values.",
   "txtcopied": "Text copied to Clipboard",

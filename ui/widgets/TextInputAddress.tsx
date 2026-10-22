@@ -6,6 +6,7 @@ import { useTheme, slopFor } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
+import { ContactIcon } from '@ui/primitives/Icons/ContactIcon';
 
 import { ContextAppLoaded } from '@app/context';
 import { Request, useResult } from '@app/navigation/results';
@@ -38,6 +39,9 @@ type TextInputAddressProps = {
   /** Saves a valid address to the address book; no handler, no button. */
   onSaveContact?: () => void;
   saveContactLabel?: string;
+  /** Opens the address book to choose a contact; no handler, no button. */
+  onPickContact?: () => void;
+  pickContactLabel?: string;
 };
 const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   address,
@@ -51,6 +55,8 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   placeholder,
   onSaveContact,
   saveContactLabel,
+  onPickContact,
+  pickContactLabel,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server } = context;
@@ -235,6 +241,18 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                   style={{ marginRight: 12 }}
                 >
                   <ClipboardPasteIcon size={22} color={colors.fgMuted} />
+                </TouchableOpacity>
+              )}
+              {!disabled && !!onPickContact && (
+                <TouchableOpacity
+                  testID="send.address-book"
+                  accessibilityRole="button"
+                  accessibilityLabel={pickContactLabel}
+                  hitSlop={8}
+                  onPress={onPickContact}
+                  style={{ marginRight: 12 }}
+                >
+                  <ContactIcon size={24} color={colors.fgAccent} />
                 </TouchableOpacity>
               )}
               <TouchableOpacity

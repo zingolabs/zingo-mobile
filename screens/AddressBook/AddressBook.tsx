@@ -21,6 +21,7 @@ import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { useOptionsPanel } from '@app/context/optionsPanel';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
+import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { showConfirm } from '@app/services/showConfirm';
 import { deliver } from '@app/navigation/results';
@@ -163,6 +164,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   const [victim, setVictim] = useState<Victim>({ kind: 'none' });
   const [tab, setTab] = useState<Tab>('contacts');
   const pick = route.params?.pick;
+  const pickChain = route.params?.chain ?? GlobalConst.zecSwapChain;
+  /** Your own addresses are Zcash ones, so only a Zcash pick offers them. */
+  const pickZcash = pickChain.toUpperCase() === GlobalConst.zecSwapChain;
 
   const scrollRef = useRef<ScrollView>(null);
   const contactSheet = useRef<BottomSheetModal>(null);
@@ -170,10 +174,11 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
 
   const canSend = !readOnly && server.kind !== 'offline';
   const contacts = listedContacts(addressBook, walletChain, query).filter(
-    contact => !pick || contact.swapChain === GlobalConst.zecSwapChain,
+    contact =>
+      !pick || contact.swapChain.toUpperCase() === pickChain.toUpperCase(),
   );
   const mine =
-    pick && tab === 'wallet'
+    pick && pickZcash && tab === 'wallet'
       ? mineEntries(
           addresses ?? [],
           addressBook,
@@ -287,9 +292,14 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           '{query}',
           query.trim(),
         )
-      : (translate(
-          pick ? 'addressbook.no-zcash' : 'addressbook.empty',
-        ) as string);
+      : !pick
+        ? (translate('addressbook.empty') as string)
+        : pickZcash
+          ? (translate('addressbook.no-zcash') as string)
+          : (translate('addressbook.no-chain') as string).replace(
+              '{chain}',
+              chainDisplayName(pickChain) || pickChain,
+            );
 
   return (
     <View
@@ -357,7 +367,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           }
           clearLabel={translate('clear') as string}
         />
-        {!!pick && (
+        {!!pick && pickZcash && (
           <SegmentedSwitch
             testID="addressbook.tabs"
             options={[
@@ -389,7 +399,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           paddingBottom: pick ? insets.bottom + 16 : 16,
         }}
       >
-        {tab === 'wallet' ? (
+        {tab === 'wallet' && pickZcash ? (
           mine.length > 0 ? (
             <>
               <View

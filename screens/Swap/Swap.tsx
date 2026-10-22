@@ -204,6 +204,8 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
   const ctaEnabled = form.cta === 'ready' || form.cta === 'insufficient';
   // The review answers under one request: cancelled, done, or a refusal
   // with its provider and reason, which takes the route off the list.
+  useResult('swap.contact', address => form.setActiveAddress(address));
+
   useResult('swap.review', answer => {
     if (answer === 'done') {
       form.finish();
@@ -562,6 +564,15 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                     savedContact
                       ? undefined
                       : () => saveContactSheetRef.current?.present()
+                  }
+                  onPickContact={() =>
+                    navigation.navigate(Route.AddressBook, {
+                      pick: 'swap.contact',
+                      chain: form.counterpartyChain,
+                    })
+                  }
+                  pickContactLabel={
+                    translate('addressbook.pick-title') as string
                   }
                   saveContactLabel={
                     translate('addressbook.new-contact') as string
