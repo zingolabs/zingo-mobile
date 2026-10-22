@@ -9,7 +9,6 @@
 import { spawnSync } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 const PACKAGE = join('node_modules', 'zingolib-bundle-pin');
 const PIN = 'binding-layer.json';
@@ -32,10 +31,8 @@ export function fetchArgv(root, args) {
   ];
 }
 
-if (
-  basename(process.argv[1] ?? '') === basename(fileURLToPath(import.meta.url))
-) {
-  const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+if (basename(process.argv[1] ?? '') === 'fetch_binding_layer.mjs') {
+  const root = resolve(dirname(process.argv[1]), '..');
   for (const store of STORES) {
     mkdirSync(join(root, store), { recursive: true });
   }
