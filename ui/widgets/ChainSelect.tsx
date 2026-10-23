@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { radiusSheet, useTheme } from '@app/theme';
+import { radiusSheet, useTheme, iconSizeMd } from '@app/theme';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -259,7 +259,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
                 hitSlop={8}
                 style={{ padding: 14 }}
               >
-                <XIcon size={20} color={colors.fgDefault} />
+                <XIcon size={iconSizeMd} color={colors.fgMuted} />
               </Pressable>
             </View>
 

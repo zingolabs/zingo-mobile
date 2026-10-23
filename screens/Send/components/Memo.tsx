@@ -9,7 +9,7 @@ import {
   TextInputEndEditingEventData,
   NativeSyntheticEvent,
 } from 'react-native';
-import { useTheme, slopFor } from '@app/theme';
+import { useTheme, slopFor, iconSizeMd } from '@app/theme';
 
 import { GlobalConst, TranslateType } from '@app/AppState';
 import Utils from '@app/utils';
@@ -117,8 +117,8 @@ const Memo: React.FunctionComponent<MemoProps> = ({
           <TouchableOpacity hitSlop={slopFor(20)} onPress={() => setMemo('')}>
             <XIcon
               style={{ margin: 10 }}
-              size={20}
-              color={colors.fgAccentDisabled}
+              size={iconSizeMd}
+              color={colors.fgMuted}
             />
           </TouchableOpacity>
         ) : null}

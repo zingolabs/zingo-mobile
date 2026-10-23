@@ -4,7 +4,6 @@ import { Pressable, StyleProp, View, ViewStyle } from 'react-native';
 import Animated, { AnimatedStyle } from 'react-native-reanimated';
 import {
   iconSizeMd,
-  iconSizeSm,
   radiusMd,
   radiusSm,
   space12,
@@ -170,7 +169,7 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
               justifyContent: 'center',
             }}
           >
-            <XIcon size={iconSizeSm} color={colors.fgMuted} />
+            <XIcon size={iconSizeMd} color={colors.fgMuted} />
           </Pressable>
         )}
       </Animated.View>

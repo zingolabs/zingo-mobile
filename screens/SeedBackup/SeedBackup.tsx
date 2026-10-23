@@ -27,7 +27,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { useTheme } from '@app/theme';
+import { useTheme, iconSizeMd } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { SnackbarDurationEnum } from '@app/AppState';
@@ -531,7 +531,7 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
                     backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
                   })}
                 >
-                  <XIcon size={20} color={colors.fgMuted} />
+                  <XIcon size={iconSizeMd} color={colors.fgMuted} />
                 </Pressable>
               </Animated.View>
             )}

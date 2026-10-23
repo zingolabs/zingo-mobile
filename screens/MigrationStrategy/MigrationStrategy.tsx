@@ -8,7 +8,7 @@ import React, {
   useState,
 } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { useTheme } from '@app/theme';
+import { useTheme, iconSizeMd } from '@app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import BoldText from '@ui/primitives/BoldText';
@@ -287,7 +287,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
             justifyContent: 'center',
           }}
         >
-          <XIcon size={20} color={colors.fgMuted} />
+          <XIcon size={iconSizeMd} color={colors.fgMuted} />
         </TouchableOpacity>
         <ScrollView
           style={{ flex: 1 }}

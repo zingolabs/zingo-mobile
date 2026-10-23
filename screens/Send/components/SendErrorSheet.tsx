@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback } from 'react';
 import { Keyboard, Pressable, StyleSheet, View } from 'react-native';
-import { radiusSheet, useTheme } from '@app/theme';
+import { radiusSheet, useTheme, iconSizeMd } from '@app/theme';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -117,7 +117,7 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
               hitSlop={8}
               style={{ padding: 14 }}
             >
-              <XIcon size={20} color={colors.fgDefault} />
+              <XIcon size={iconSizeMd} color={colors.fgMuted} />
             </Pressable>
           </View>
         </View>
