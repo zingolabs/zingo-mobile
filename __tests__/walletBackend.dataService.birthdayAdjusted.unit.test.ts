@@ -41,8 +41,9 @@ test.each([
 ])(
   'Tests that no notice fires when zingolib reports %s',
   async (_case, adjustment) => {
-    const { service, onBirthdayChanged, onBirthdayAdjusted } =
-      serviceReporting({ seed_phrase: 'a b c', birthday: 419200, ...adjustment });
+    const { service, onBirthdayChanged, onBirthdayAdjusted } = serviceReporting(
+      { seed_phrase: 'a b c', birthday: 419200, ...adjustment },
+    );
 
     await service.fetchWalletBirthdaySeedUfvk();
 
