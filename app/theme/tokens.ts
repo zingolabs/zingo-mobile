@@ -7,6 +7,8 @@ export type ThemeColors = {
   /** The floating tab bar, a step darker than the panel. */
   bgTabBar: string;
   bottomSheetBorder: string;
+  /** The upward shadow the front notice casts onto the balance. */
+  shadowNotice: string;
   /** Fields: blue at rest and in focus, accent when valid, danger when not. */
   borderFocus: string;
   /** Hairline between rows inside a card. */
@@ -104,6 +106,7 @@ export const themeTokens: ThemeColors = {
   bgChrome: surface,
   bgTabBar: '#040C17',
   bottomSheetBorder: '#05234C',
+  shadowNotice: '#02050A8C',
   borderFocus: '#0B3A75',
   borderSubtle: '#0A1F3D',
   sheetHandle: '#1B3C6B',

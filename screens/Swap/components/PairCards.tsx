@@ -45,7 +45,7 @@ type PairCardsProps = {
   amountText: string;
   onChangeAmountText: (text: string) => void;
   amountPlaceholder: string;
-  /** The unit the amount is typed in; USD only while selling ZEC. */
+  /** The unit the amount is typed in; USD once the coin has a price. */
   unit: 'coin' | 'usd';
   /** Switches the unit; absent when no price is available. */
   onToggleUnit?: () => void;

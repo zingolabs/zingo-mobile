@@ -71,6 +71,8 @@ import AssetPickerSheet from './components/AssetPickerSheet';
 import RoutesSheet from './components/RoutesSheet';
 import SwapSettingsSheet from './components/SwapSettingsSheet';
 import SwapHistorySheet, { swapPairLabel } from './components/SwapHistorySheet';
+import { tokenToSwapAsset } from './swapAssets';
+import { useCoinPrice } from './useCoinPrice';
 import InsufficientFundsSheet from './components/InsufficientFundsSheet';
 
 type SwapProps = HomeTabScreenProps<'Swap'>;
@@ -141,17 +143,32 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     [containerH],
   );
 
-  // Selling ZEC, the amount can be typed in USD; the swap is always quoted
-  // and sent in ZEC.
+  // The amount can be typed in USD; the swap is always quoted and sent in
+  // the coin. Selling ZEC, the price is the wallet's ZEC price. Buying, it is
+  // the coin's USD price from SwapKit, which only comes with a quote: the
+  // last one seen for each coin is kept, so USD is offered from the first
+  // quote on, and a requote does not rewrite what was typed.
   const quote = fiatQuote(zecPrice, server, walletChainName);
-  const usdAvailable =
-    form.isOutbound &&
-    quote.kind === 'quote' &&
-    info.currencyName === GlobalConst.zecSwapChain;
+  const sellCoinPrice = useCoinPrice(
+    form.quoteContext?.quoteInput.sellAsset.swapKitId,
+    form.quoteContext?.fiatValueBasis.sellUsdUnitPrice ?? 0,
+    form.selectedToken
+      ? tokenToSwapAsset(form.selectedToken).swapKitId
+      : undefined,
+  );
+  const price = form.isOutbound
+    ? quote.kind === 'quote' && info.currencyName === GlobalConst.zecSwapChain
+      ? quote.price
+      : 0
+    : sellCoinPrice;
+  const usdAvailable = price > 0;
   const [unit, setUnit] = useState<'coin' | 'usd'>('coin');
   const [usdText, setUsdText] = useState<string>('');
   const usdMode = usdAvailable && unit === 'usd';
-  const price = quote.kind === 'quote' ? quote.price : 0;
+  /** What the amount is typed in, when not in USD. */
+  const sellSymbol = form.isOutbound
+    ? info.currencyName
+    : form.selectedToken?.ticker || form.selectedToken?.symbol || '';
   const onChangeAmountText = (text: string) => {
     if (usdMode) {
       setUsdText(text);
@@ -459,11 +476,9 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                   unit={usdMode ? 'usd' : 'coin'}
                   onToggleUnit={usdAvailable ? toggleUnit : undefined}
                   altText={
-                    form.isOutbound
-                      ? usdMode
-                        ? `≈ ${form.amount || '0'} ${info.currencyName}`
-                        : usdOf(form.amount)
-                      : ''
+                    usdMode
+                      ? `≈ ${form.amount || '0'} ${sellSymbol}`
+                      : usdOf(form.amount)
                   }
                   availableText={
                     form.isOutbound
