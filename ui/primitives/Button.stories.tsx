@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import Button from './Button';
 import ButtonStack from './ButtonStack';
+import { CopyIcon } from './Icons/CopyIcon';
 
 const meta: Meta<typeof Button> = {
   title: 'Components/Button',
@@ -17,7 +18,7 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'text', 'quiet', 'danger', 'nym'],
+      options: ['primary', 'text', 'quiet', 'danger', 'nym', 'secondary'],
     },
   },
 };
@@ -32,6 +33,10 @@ export const Danger: Story = {
   args: { variant: 'danger', title: 'Delete wallet' },
 };
 export const Nym: Story = { args: { variant: 'nym', title: 'Send via Nym' } };
+/** Outlined, on the inset fill of its surface; for actions of equal weight. */
+export const Secondary: Story = {
+  args: { variant: 'secondary', title: 'Copy', icon: CopyIcon },
+};
 export const Small: Story = { args: { size: 'small', title: 'Back up' } };
 export const Disabled: Story = { args: { disabled: true } };
 export const Inline: Story = { args: { inline: true, variant: 'text' } };
