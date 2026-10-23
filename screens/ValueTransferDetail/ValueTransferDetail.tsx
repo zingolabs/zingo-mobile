@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
+import Tag from '@ui/widgets/Tag';
 import { Linking, Pressable, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
@@ -142,27 +143,23 @@ const ValueTransferDetail: React.FunctionComponent<
   const status = failed
     ? {
         text: t('history.state-failed'),
-        fg: colors.fgDanger,
-        bg: colors.bgDangerSubtle,
+        tone: 'danger' as const,
       }
     : vt.confirmations === 0
       ? {
           text: t('history.in-mempool'),
-          fg: colors.fgWarning,
-          bg: colors.bgWarningSubtle,
+          tone: 'warning' as const,
         }
       : pending
         ? {
             text: t('history.confirming')
               .replace('{n}', String(vt.confirmations))
               .replace('{of}', String(GlobalConst.minConfirmations)),
-            fg: colors.fgWarning,
-            bg: colors.bgWarningSubtle,
+            tone: 'warning' as const,
           }
         : {
             text: t('swap.tx-confirmed'),
-            fg: colors.fgAccent,
-            bg: colors.bgAccentSubtle,
+            tone: 'accent' as const,
           };
 
   const quote = fiatQuote(zecPrice, server, info.chainName);
@@ -328,55 +325,35 @@ const ValueTransferDetail: React.FunctionComponent<
         </Text>
         <Text
           testID="valuetransferdetail.amount"
-          style={{
-            marginTop: 12,
-            fontSize: 36,
-            lineHeight: 40,
-            fontWeight: '700',
-            fontVariant: ['tabular-nums'],
-            color: failed
+          variant="balance"
+          color={
+            failed
               ? colors.fgMuted
               : received
                 ? colors.fgAccent
-                : colors.fgDefault,
-          }}
+                : colors.fgDefault
+          }
+          style={{ marginTop: 12, fontVariant: ['tabular-nums'] }}
         >
           {privacy ? MASK : `${sign}${split.bigPart}`}
           {!privacy && split.smallPart !== '0000' && !!split.smallPart && (
-            <Text style={{ fontSize: 24, color: colors.fgMuted }}>
+            <Text variant="screenTitle" tone="muted">
               {split.smallPart}
             </Text>
           )}
-          <Text style={{ fontSize: 18, color: colors.fgMuted }}>
+          <Text variant="subtitle" tone="muted">
             {` ${info.currencyName}`}
           </Text>
         </Text>
         {!!todayUsd && (
-          <Text variant="bodySmall" tone="muted" style={{ marginTop: 2 }}>
+          <Text variant="bodySmall" tone="muted" style={{ marginTop: 4 }}>
             {privacy
               ? MASK
               : t('history.today-price').replace('{usd}', todayUsd)}
           </Text>
         )}
-        <View
-          style={{
-            marginTop: 12,
-            paddingHorizontal: 6,
-            borderRadius: 5,
-            backgroundColor: status.bg,
-          }}
-        >
-          <Text
-            variant="caption"
-            style={{
-              color: status.fg,
-              fontWeight: '600',
-              letterSpacing: 0.5,
-              textTransform: 'uppercase',
-            }}
-          >
-            {status.text}
-          </Text>
+        <View style={{ marginTop: 12 }}>
+          <Tag tone={status.tone}>{status.text}</Tag>
         </View>
       </View>
 
@@ -388,8 +365,8 @@ const ValueTransferDetail: React.FunctionComponent<
         <View
           style={{
             marginTop: 12,
-            paddingVertical: 10,
-            paddingHorizontal: 14,
+            paddingVertical: 12,
+            paddingHorizontal: 16,
             rowGap: 4,
             borderRadius: radiusMd,
             borderWidth: 1,
@@ -431,7 +408,7 @@ const ValueTransferDetail: React.FunctionComponent<
                   SnackbarDurationEnum.short,
                 );
               }}
-              style={{ rowGap: 2 }}
+              style={{ rowGap: 4 }}
             >
               <View
                 style={{

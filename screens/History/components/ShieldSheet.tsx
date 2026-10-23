@@ -3,7 +3,7 @@ import React, { forwardRef, useCallback, useContext, useState } from 'react';
 import { View } from 'react-native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { radiusMd, useTheme } from '@app/theme';
+import { radiusMd, useTheme, iconSize, radiusPill } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   MixnetView,
@@ -57,7 +57,7 @@ const ShieldSheet = forwardRef<BottomSheetModal, ShieldSheetProps>(
           justifyContent: 'space-between',
           alignItems: 'center',
           minHeight: 44,
-          paddingHorizontal: 14,
+          paddingHorizontal: 16,
           borderTopWidth: first ? 0 : 1,
           borderTopColor: colors.borderSubtle,
         }}
@@ -65,10 +65,7 @@ const ShieldSheet = forwardRef<BottomSheetModal, ShieldSheetProps>(
         <Text variant="caption" tone="muted">
           {label}
         </Text>
-        <Text
-          variant="bodySmall"
-          style={{ fontWeight: total ? '700' : '600', fontSize: 12 }}
-        >
+        <Text variant="bodySmall" style={{ fontWeight: total ? '700' : '600' }}>
           {value}
         </Text>
       </View>
@@ -82,19 +79,19 @@ const ShieldSheet = forwardRef<BottomSheetModal, ShieldSheetProps>(
         contentStyle={{ paddingBottom: insets.bottom + 24 }}
       >
         <View testID="shield.sheet" style={{ paddingHorizontal: 20 }}>
-          <View style={{ alignItems: 'center', marginTop: 2 }}>
+          <View style={{ alignItems: 'center', marginTop: 4 }}>
             <View
               style={{
                 width: 52,
                 height: 52,
-                borderRadius: 26,
+                borderRadius: radiusPill,
                 backgroundColor: colors.bgAccentSubtle,
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginBottom: 10,
+                marginBottom: 12,
               }}
             >
-              <ShieldIcon size={24} color={colors.fgAccent} />
+              <ShieldIcon size={iconSize} color={colors.fgAccent} />
             </View>
           </View>
           <Text
@@ -106,7 +103,7 @@ const ShieldSheet = forwardRef<BottomSheetModal, ShieldSheetProps>(
           <Text
             variant="caption"
             tone="muted"
-            style={{ textAlign: 'center', marginTop: 6 }}
+            style={{ textAlign: 'center', marginTop: 8 }}
           >
             {t('shield.sub')}
           </Text>

@@ -11,7 +11,7 @@ import Animated, {
   withDelay,
   withTiming,
 } from 'react-native-reanimated';
-import { useTheme } from '@app/theme';
+import { useTheme, iconSize } from '@app/theme';
 import { SproutIcon } from '@ui/primitives/Icons/SproutIcon';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
@@ -105,7 +105,7 @@ export default function SentMark() {
           sproutStyle,
         ]}
       >
-        <SproutIcon size={28} color={colors.fgAccent} />
+        <SproutIcon size={iconSize} color={colors.fgAccent} />
       </Animated.View>
     </View>
   );

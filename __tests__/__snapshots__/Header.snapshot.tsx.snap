@@ -33,7 +33,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
-            "columnGap": 6,
+            "columnGap": 8,
             "flexDirection": "row",
             "height": 22,
             "marginTop": 4,
@@ -62,12 +62,12 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
             "flexDirection": "row",
             "justifyContent": "center",
             "marginBottom": 20,
-            "marginTop": 2,
+            "marginTop": 4,
           }
         }
       >
         <Text
-          maxFontSizeMultiplier={2}
+          maxFontSizeMultiplier={1.3}
           style={
             {
               "color": "#c3c3c3",
@@ -76,7 +76,6 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
                 "tabular-nums",
               ],
               "fontWeight": "700",
-              "letterSpacing": -0.8,
               "lineHeight": 40,
             }
           }
@@ -85,12 +84,13 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
           1.6234
         </Text>
         <Text
-          maxFontSizeMultiplier={2}
+          maxFontSizeMultiplier={1.5}
           style={
             {
               "color": "#888888",
               "fontSize": 18,
               "fontWeight": "700",
+              "lineHeight": 24,
             }
           }
         >
@@ -143,12 +143,12 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
               {
                 "alignItems": "center",
                 "backgroundColor": "#011401",
-                "borderRadius": 10,
+                "borderRadius": 8,
                 "display": "flex",
                 "flexDirection": "row",
                 "justifyContent": "center",
                 "margin": 0,
-                "marginLeft": 5,
+                "marginLeft": 4,
                 "minHeight": 25,
                 "minWidth": 25,
                 "padding": 0,
@@ -194,11 +194,11 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
             "alignItems": "center",
             "backgroundColor": "transparent",
             "borderRadius": 999,
-            "columnGap": 6,
+            "columnGap": 8,
             "flexDirection": "row",
             "height": 28,
-            "marginTop": 6,
-            "paddingHorizontal": 10,
+            "marginTop": 8,
+            "paddingHorizontal": 12,
           }
         }
         testID="header.syncline"

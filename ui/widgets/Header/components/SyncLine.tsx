@@ -13,7 +13,7 @@ import Animated, {
 import { useNavigation } from '@react-navigation/native';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import { WalletNavigation } from '@app/types';
-import { radiusPill, useTheme } from '@app/theme';
+import { radiusPill, useTheme, iconSizeSm } from '@app/theme';
 import { Route, ServerType, TranslateType } from '@app/AppState';
 import NetInfoType from '@app/AppState/types/NetInfoType';
 import { markSynced, useLastSynced } from '@app/hooks/lastSynced';
@@ -65,7 +65,7 @@ function Spinner({ track, arc }: { track: string; arc: string }) {
         {
           width: 12,
           height: 12,
-          borderRadius: 6,
+          borderRadius: radiusPill,
           borderWidth: 2,
           borderColor: track,
           borderTopColor: arc,
@@ -150,7 +150,7 @@ export default function SyncLine({
     case 'noInternet':
       body = (
         <>
-          <CloudDownloadIcon size={14} color={colors.fgWarning} />
+          <CloudDownloadIcon size={iconSizeSm} color={colors.fgWarning} />
           {strong(t('header.sync-no-internet'), colors.fgWarning)}
           {!!balanceAge && sep}
           {!!balanceAge && (
@@ -171,7 +171,7 @@ export default function SyncLine({
             style={{
               width: 7,
               height: 7,
-              borderRadius: 4,
+              borderRadius: radiusPill,
               backgroundColor: colors.borderMuted,
             }}
           />
@@ -204,7 +204,7 @@ export default function SyncLine({
             style={{
               width: 56,
               height: 4,
-              borderRadius: 2,
+              borderRadius: radiusPill,
               backgroundColor: colors.sheetHandle,
               overflow: 'hidden',
             }}
@@ -213,7 +213,7 @@ export default function SyncLine({
               style={{
                 width: `${Math.min(100, Math.max(0, percentage))}%`,
                 height: 4,
-                borderRadius: 2,
+                borderRadius: radiusPill,
                 backgroundColor: colors.fgSyncing,
               }}
             />
@@ -240,7 +240,7 @@ export default function SyncLine({
             style={{
               width: 7,
               height: 7,
-              borderRadius: 4,
+              borderRadius: radiusPill,
               backgroundColor: colors.fgAccent,
             }}
           />
@@ -265,10 +265,10 @@ export default function SyncLine({
       style={({ pressed }) => ({
         flexDirection: 'row',
         alignItems: 'center',
-        columnGap: 6,
+        columnGap: 8,
         height: 28,
-        marginTop: 6,
-        paddingHorizontal: 10,
+        marginTop: 8,
+        paddingHorizontal: 12,
         borderRadius: radiusPill,
         backgroundColor: pressed ? colors.bgMutedSubtle : 'transparent',
       })}
@@ -277,7 +277,7 @@ export default function SyncLine({
       {metered && (
         <>
           {sep}
-          <CloudDownloadIcon size={14} color={colors.fgWarning} />
+          <CloudDownloadIcon size={iconSizeSm} color={colors.fgWarning} />
           {strong(t('header.sync-mobile-data'), colors.fgWarning)}
         </>
       )}

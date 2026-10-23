@@ -6,7 +6,7 @@ import BottomSheet, {
   BottomSheetFooterProps,
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
-import { slopFor, space16, space20, useTheme } from '@app/theme';
+import { slopFor, space16, space20, useTheme, iconSize } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import Header from '@ui/widgets/Header';
@@ -71,7 +71,7 @@ export default function FullPanel({
             hitSlop={slopFor(24)}
             onPress={onBack}
           >
-            <ChevronLeft size={22} color={colors.fgAccent} />
+            <ChevronLeft size={iconSize} color={colors.fgAccent} />
           </Pressable>
         )}
       </View>
@@ -91,7 +91,7 @@ export default function FullPanel({
             hitSlop={slopFor(24)}
             onPress={onClose}
           >
-            <XIcon size={22} color={colors.fgDefault} />
+            <XIcon size={iconSize} color={colors.fgDefault} />
           </Pressable>
         )}
       </View>
@@ -105,8 +105,8 @@ export default function FullPanel({
           <View
             style={{
               paddingHorizontal: space20,
-              paddingTop: 10,
-              paddingBottom: 30,
+              paddingTop: 12,
+              paddingBottom: 32,
               backgroundColor: colors.bgSurface,
             }}
           >

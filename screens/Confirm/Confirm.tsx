@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useMemo } from 'react';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
@@ -25,8 +25,6 @@ import { SendPageStateClass, ProposalPoolsType } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type ConfirmProps = NativeStackScreenProps<AppDrawerParamList, 'Confirm'>;
-
-const MONO = Platform.select({ ios: 'Menlo', default: 'monospace' });
 
 const poolCrossingKey = ({
   source,
@@ -171,7 +169,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
               testID="send.confirm.refusal"
               variant="caption"
               tone="muted"
-              style={{ textAlign: 'center', marginBottom: 10 }}
+              style={{ textAlign: 'center', marginBottom: 12 }}
             >
               {t(permit.errorKey)}
             </Text>
@@ -200,9 +198,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           style={{
             color: colors.bgNym,
             fontWeight: '600',
-            letterSpacing: 0.7,
             textTransform: 'uppercase',
-            marginBottom: 6,
+            marginBottom: 8,
           }}
         >
           {t('send.nym-processing-title')}
@@ -216,44 +213,32 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           ) : (
             <>
               {t('send.sending-to').replace('{who}', '')}
-              <Text style={{ fontFamily: MONO, fontSize: 13 }}>
-                {Utils.trimToSmall(to.to, 6)}
-              </Text>
+              <Text variant="address">{Utils.trimToSmall(to.to, 6)}</Text>
             </>
           )}
         </Text>
         <Text
           variant="caption"
           tone="muted"
-          style={{ marginTop: 2, textAlign: 'center' }}
+          style={{ marginTop: 4, textAlign: 'center' }}
         >
-          <Text style={{ fontFamily: MONO, fontSize: 12 }}>
-            {Utils.trimToSmall(to.to, 8)}
-          </Text>
+          <Text variant="address">{Utils.trimToSmall(to.to, 8)}</Text>
           {` · ${t(kindKey(to.to))}`}
         </Text>
         <Text
           testID="send.confirm.amount"
-          style={{
-            marginTop: 12,
-            fontSize: 36,
-            lineHeight: 40,
-            fontWeight: '700',
-            fontVariant: ['tabular-nums'],
-            color: colors.fgDefault,
-          }}
+          variant="balance"
+          style={{ marginTop: 12, fontVariant: ['tabular-nums'] }}
         >
           {zec4(amount)}
-          <Text
-            style={{ fontSize: 18, color: colors.fgMuted }}
-          >{` ${unit}`}</Text>
+          <Text variant="subtitle" tone="muted">{` ${unit}`}</Text>
         </Text>
         {quote.kind === 'quote' && (
           <Text
             testID="send.confirm.fiat"
             variant="bodySmall"
             tone="muted"
-            style={{ marginTop: 2, fontVariant: ['tabular-nums'] }}
+            style={{ marginTop: 4, fontVariant: ['tabular-nums'] }}
           >
             {'$' + toFiatText(to.amount, quote.price)}
           </Text>

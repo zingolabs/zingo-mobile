@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { space12, space20, useTheme } from '@app/theme';
+import { space12, space20, useTheme, iconSizeSm } from '@app/theme';
 import Text from '@ui/primitives/Text';
 import { MessagesIcon } from '@ui/primitives/Icons/MessagesIcon';
 import type { RowText } from '@screens/History/historyRowText';
@@ -98,8 +98,8 @@ export default function HistoryRowBody({
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            columnGap: 6,
-            marginTop: 2,
+            columnGap: 8,
+            marginTop: 4,
           }}
         >
           {!!text.state && (
@@ -119,7 +119,7 @@ export default function HistoryRowBody({
           >
             {text.line}
           </Text>
-          {memo && <MessagesIcon size={12} color={colors.fgMuted} />}
+          {memo && <MessagesIcon size={iconSizeSm} color={colors.fgMuted} />}
         </View>
       </View>
       <View style={{ alignItems: 'flex-end' }}>
@@ -135,7 +135,7 @@ export default function HistoryRowBody({
             variant="caption"
             tone="muted"
             numberOfLines={1}
-            style={{ marginTop: 2 }}
+            style={{ marginTop: 4 }}
           >
             {privacy ? MASK : text.bottom}
           </Text>

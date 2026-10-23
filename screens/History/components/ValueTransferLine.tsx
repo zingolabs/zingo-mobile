@@ -3,7 +3,7 @@ import React, { useCallback, useContext, useEffect, useRef } from 'react';
 import { Animated, View, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
-import { slopFor, useTheme } from '@app/theme';
+import { slopFor, useTheme, iconSizeMd, iconSize } from '@app/theme';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import {
   ValueTransferType,
@@ -107,13 +107,13 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   const iconColor = colors.fgDefault;
   const icon =
     vt.kind === ValueTransferKindEnum.Received ? (
-      <ArrowDownIcon size={18} color={iconColor} />
+      <ArrowDownIcon size={iconSizeMd} color={iconColor} />
     ) : vt.kind === ValueTransferKindEnum.Shield ? (
-      <ShieldIcon size={18} color={iconColor} />
+      <ShieldIcon size={iconSizeMd} color={iconColor} />
     ) : vt.kind === ValueTransferKindEnum.Migration ? (
-      <SwapIcon size={18} color={iconColor} />
+      <SwapIcon size={iconSizeMd} color={iconColor} />
     ) : (
-      <ArrowUpIcon size={18} color={iconColor} />
+      <ArrowUpIcon size={iconSizeMd} color={iconColor} />
     );
   const haveMemo = !!vt.memos && vt.memos.length > 0 && !!vt.memos.join('');
 
@@ -154,7 +154,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               >
                 <FileTextIcon
                   style={{ opacity: 0.8 }}
-                  size={24}
+                  size={iconSize}
                   color={colors.fgDefault}
                 />
               </TouchableOpacity>
@@ -180,7 +180,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     closeAllSwipeables();
                   }}
                 >
-                  <PlaneIcon size={24} color={colors.fgAccent} />
+                  <PlaneIcon size={iconSize} color={colors.fgAccent} />
                 </TouchableOpacity>
               </View>
             )}

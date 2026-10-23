@@ -112,7 +112,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
           flexWrap: 'wrap',
           justifyContent: 'center',
           gap: space8,
-          marginTop: 18,
+          marginTop: 16,
         }}
       >
         {HISTORY_FILTERS.map(([key, label]) => (

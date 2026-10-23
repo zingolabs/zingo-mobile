@@ -286,9 +286,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
               style={
                 {
                   "alignItems": "center",
-                  "columnGap": 6,
+                  "columnGap": 8,
                   "flexDirection": "row",
-                  "marginTop": 2,
+                  "marginTop": 4,
                 }
               }
             >
@@ -352,7 +352,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                   "fontSize": 12,
                   "fontWeight": "400",
                   "lineHeight": 16,
-                  "marginTop": 2,
+                  "marginTop": 4,
                 }
               }
             >
@@ -652,9 +652,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
               style={
                 {
                   "alignItems": "center",
-                  "columnGap": 6,
+                  "columnGap": 8,
                   "flexDirection": "row",
-                  "marginTop": 2,
+                  "marginTop": 4,
                 }
               }
             >
@@ -718,7 +718,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                   "fontSize": 12,
                   "fontWeight": "400",
                   "lineHeight": 16,
-                  "marginTop": 2,
+                  "marginTop": 4,
                 }
               }
             >
@@ -963,9 +963,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
               style={
                 {
                   "alignItems": "center",
-                  "columnGap": 6,
+                  "columnGap": 8,
                   "flexDirection": "row",
-                  "marginTop": 2,
+                  "marginTop": 4,
                 }
               }
             >
@@ -1015,7 +1015,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                   "fontSize": 12,
                   "fontWeight": "400",
                   "lineHeight": 16,
-                  "marginTop": 2,
+                  "marginTop": 4,
                 }
               }
             >
@@ -1315,9 +1315,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
               style={
                 {
                   "alignItems": "center",
-                  "columnGap": 6,
+                  "columnGap": 8,
                   "flexDirection": "row",
-                  "marginTop": 2,
+                  "marginTop": 4,
                 }
               }
             >
@@ -1367,7 +1367,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                   "fontSize": 12,
                   "fontWeight": "400",
                   "lineHeight": 16,
-                  "marginTop": 2,
+                  "marginTop": 4,
                 }
               }
             >
