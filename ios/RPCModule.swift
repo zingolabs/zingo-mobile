@@ -811,6 +811,15 @@ class RPCModule: NSObject {
       }
   }
 
+  @objc(defaultIndexerInfo:resolve:reject:)
+  func defaultIndexerInfo(_ chainHint: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try defaultIndexer(chainHint: chainHint) ?? ""
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
   @objc(getLatestBlockWalletInfo:reject:)
   func getLatestBlockWalletInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
