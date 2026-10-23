@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
+import { BannerPlainContext } from '@ui/widgets/Banner';
 import { Pressable, View } from 'react-native';
 import Text from '@ui/primitives/Text';
 import Animated, {
@@ -169,7 +170,9 @@ const Card: React.FunctionComponent<{
     >
       <Animated.View style={content}>
         <View onLayout={e => onMeasure(e.nativeEvent.layout.height)}>
-          {children}
+          <BannerPlainContext.Provider value={true}>
+            {children}
+          </BannerPlainContext.Provider>
         </View>
       </Animated.View>
       <Animated.View

@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { forwardRef } from 'react';
+import React, { createContext, forwardRef, useContext } from 'react';
 import { Pressable, StyleProp, View, ViewStyle } from 'react-native';
 import Animated, { AnimatedStyle } from 'react-native-reanimated';
 import {
@@ -18,6 +18,13 @@ import { SnowflakeIcon } from '@ui/primitives/Icons/SnowflakeIcon';
 import { SproutIcon } from '@ui/primitives/Icons/SproutIcon';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
+
+/**
+ * Set by the notice stack: every banner in it takes the plain card surface
+ * and edge, so the stack reads as one deck whatever the notice; only the
+ * icon, its tile, the text and the tag change.
+ */
+export const BannerPlainContext = createContext(false);
 
 /** No danger tone: errors belong next to what failed, or in a sheet. */
 export type BannerTone = 'seed' | 'warning' | 'viewOnly' | 'info';
@@ -76,6 +83,8 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
   ref,
 ) {
   const { colors } = useTheme();
+  const inStack = useContext(BannerPlainContext);
+  const flat = plain || inStack;
   const paint = {
     seed: {
       bg: colors.bgSurface,
@@ -111,8 +120,8 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
         padding: space16,
         borderRadius: radiusMd,
         borderWidth: 1,
-        borderColor: plain ? colors.bottomSheetBorder : paint.edge,
-        backgroundColor: plain ? colors.bgSurface : paint.bg,
+        borderColor: flat ? colors.bottomSheetBorder : paint.edge,
+        backgroundColor: flat ? colors.bgSurface : paint.bg,
       }}
     >
       <Animated.View
