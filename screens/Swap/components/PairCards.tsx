@@ -8,7 +8,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { radiusLg, space4, space8, useTheme } from '@app/theme';
+import { radiusMd, space4, space8, useTheme } from '@app/theme';
 import type { TokenEntryType } from '@app/swap';
 import Text from '@ui/primitives/Text';
 import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
@@ -192,7 +192,7 @@ export default function PairCards({
     backgroundColor: surface,
     borderColor: colors.bottomSheetBorder,
     borderWidth: 1,
-    borderRadius: radiusLg,
+    borderRadius: radiusMd,
     paddingTop: 12,
     paddingHorizontal: 14,
     paddingBottom: 6,

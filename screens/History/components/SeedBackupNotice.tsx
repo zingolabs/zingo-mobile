@@ -7,16 +7,16 @@ import {
 } from 'react-native-reanimated';
 
 import { ease } from '@app/theme/motion';
-import { useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import { CardRect } from '@app/types';
-import NoticeCard from '@ui/widgets/NoticeCard';
-import { SproutIcon } from '@ui/primitives/Icons/SproutIcon';
+import Button from '@ui/primitives/Button';
+import Banner from '@ui/widgets/Banner';
+import Tag from '@ui/widgets/Tag';
 
 type SeedBackupNoticeProps = {
   // The flow is open over the card: its contents step aside for the container transform.
   covered: boolean;
-  /** The backup is done: the pill turns green before the card leaves the stack. */
+  /** The backup is done: the tag turns green before the card leaves the stack. */
   backedUp?: boolean;
   onBackUp: (from: CardRect) => void;
 };
@@ -31,7 +31,6 @@ const SeedBackupNotice: React.FunctionComponent<SeedBackupNoticeProps> = ({
   onBackUp,
 }) => {
   const { translate } = useContext(ContextAppLoaded);
-  const { colors } = useTheme();
   const card = useRef<View>(null);
 
   const contents = useAnimatedStyle(() => ({
@@ -48,24 +47,33 @@ const SeedBackupNotice: React.FunctionComponent<SeedBackupNoticeProps> = ({
     );
 
   return (
-    <NoticeCard
+    <Banner
       ref={card}
       testID="seedbackup.notice"
-      icon={<SproutIcon size={16} color={colors.fgPriceUp} />}
+      tone="seed"
       title={translate('seednotice.title') as string}
-      pill={
-        backedUp
-          ? { text: translate('seednotice.done') as string, tone: 'positive' }
-          : { text: translate('seednotice.pending') as string, tone: 'warning' }
+      tag={
+        backedUp ? (
+          <Tag tone="accent">{translate('seednotice.done') as string}</Tag>
+        ) : (
+          <Tag tone="warning">{translate('seednotice.pending') as string}</Tag>
+        )
       }
-      body={translate('seednotice.body-pending') as string}
       contentStyle={contents}
-      action={{
-        title: translate('seednotice.button') as string,
-        onPress: open,
-        testID: 'seedbackup.start',
-      }}
-    />
+      actionBeside
+      action={
+        <Button
+          testID="seedbackup.start"
+          variant="primary"
+          size="small"
+          inline
+          title={translate('seednotice.button') as string}
+          onPress={open}
+        />
+      }
+    >
+      {translate('seednotice.body-pending') as string}
+    </Banner>
   );
 };
 

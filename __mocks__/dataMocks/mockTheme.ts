@@ -13,7 +13,6 @@ const colors: ThemeColors = {
   bgChrome: '#040C17',
   bgTabBar: '#040C17',
   bottomSheetBorder: '#05234C',
-  shadowNotice: '#000000',
   borderFocus: '#0B3A75',
   borderSubtle: '#FFFFFF0F',
   sheetHandle: '#1B3C6B',

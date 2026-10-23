@@ -11,7 +11,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Linking, Pressable, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { radiusLg, space12, space8, useTheme } from '@app/theme';
+import { radiusMd, space12, space8, useTheme } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import {
   Route,
@@ -562,7 +562,7 @@ function LegsCard({ children }: { children: React.ReactNode }) {
         {
           borderWidth: 1,
           borderColor: colors.bottomSheetBorder,
-          borderRadius: radiusLg,
+          borderRadius: radiusMd,
           backgroundColor: colors.bgCanvas,
           marginTop: 4,
         },

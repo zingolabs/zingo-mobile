@@ -3,7 +3,7 @@ import React, { forwardRef, useCallback, useContext, useState } from 'react';
 import { View } from 'react-native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { radiusLg, useTheme } from '@app/theme';
+import { radiusMd, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   MixnetView,
@@ -113,7 +113,7 @@ const ShieldSheet = forwardRef<BottomSheetModal, ShieldSheetProps>(
           <View
             style={{
               marginTop: 20,
-              borderRadius: radiusLg,
+              borderRadius: radiusMd,
               borderWidth: 1,
               borderColor: colors.bottomSheetBorder,
               backgroundColor: colors.bgCanvas,

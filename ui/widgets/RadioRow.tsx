@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import { radiusLg, useTheme } from '@app/theme';
+import { radiusMd, useTheme } from '@app/theme';
 import Text from '@ui/primitives/Text';
 import Radio from '@ui/primitives/Radio';
 
@@ -46,7 +46,7 @@ export function RadioList({
       testID={testID}
       accessibilityRole="radiogroup"
       style={{
-        borderRadius: radiusLg,
+        borderRadius: radiusMd,
         borderWidth: 1,
         borderColor: colors.bottomSheetBorder,
         backgroundColor: colors.bgCanvas,

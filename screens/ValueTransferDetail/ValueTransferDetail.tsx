@@ -4,7 +4,7 @@ import { Linking, Pressable, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { radiusLg, useTheme } from '@app/theme';
+import { radiusMd, useTheme } from '@app/theme';
 import {
   BlockExplorerEnum,
   ChainNameEnum,
@@ -402,7 +402,7 @@ const ValueTransferDetail: React.FunctionComponent<
             paddingVertical: 10,
             paddingHorizontal: 14,
             rowGap: 4,
-            borderRadius: radiusLg,
+            borderRadius: radiusMd,
             borderWidth: 1,
             borderColor: colors.bottomSheetBorder,
             backgroundColor: colors.bgCanvas,

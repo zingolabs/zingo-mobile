@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { Pressable, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { radiusLg, radiusPill, space12, space4, useTheme } from '@app/theme';
+import { radiusMd, radiusPill, space12, space4, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   buildDepositQr,
@@ -139,7 +139,7 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
           paddingTop: 20,
           paddingHorizontal: 16,
           paddingBottom: 16,
-          borderRadius: radiusLg,
+          borderRadius: radiusMd,
           backgroundColor: colors.bgCanvas,
           borderWidth: 1,
           borderColor: colors.bottomSheetBorder,
@@ -200,7 +200,7 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
         style={{
           borderWidth: 1,
           borderColor: colors.bottomSheetBorder,
-          borderRadius: radiusLg,
+          borderRadius: radiusMd,
           backgroundColor: colors.bgCanvas,
         }}
       >

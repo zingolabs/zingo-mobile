@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
-import { radiusLg, radiusPill, useTheme } from '@app/theme';
+import { radiusMd, radiusPill, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import Text from '@ui/primitives/Text';
 import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
@@ -61,7 +61,7 @@ export default function AmountCard({
       </Text>
       <View
         style={{
-          borderRadius: radiusLg,
+          borderRadius: radiusMd,
           borderWidth: 1,
           borderColor: invalid
             ? colors.borderDanger

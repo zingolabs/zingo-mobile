@@ -335,7 +335,7 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
           {
             "backgroundColor": "#011401",
             "borderColor": "#05234C",
-            "borderRadius": 16,
+            "borderRadius": 12,
             "borderWidth": 1,
           }
         }
@@ -1015,7 +1015,7 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
           {
             "backgroundColor": "#011401",
             "borderColor": "#05234C",
-            "borderRadius": 16,
+            "borderRadius": 12,
             "borderWidth": 1,
           }
         }

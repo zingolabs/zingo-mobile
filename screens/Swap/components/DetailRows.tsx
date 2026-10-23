@@ -2,7 +2,7 @@
 import React, { useContext } from 'react';
 import { Pressable, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { radiusLg, space12, useTheme } from '@app/theme';
+import { radiusMd, space12, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import Text from '@ui/primitives/Text';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
@@ -44,7 +44,7 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
       style={{
         borderWidth: 1,
         borderColor: colors.bottomSheetBorder,
-        borderRadius: radiusLg,
+        borderRadius: radiusMd,
         backgroundColor: colors.bgCanvas,
       }}
     >

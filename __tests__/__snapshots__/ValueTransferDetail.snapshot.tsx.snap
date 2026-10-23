@@ -316,7 +316,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
           {
             "backgroundColor": "#011401",
             "borderColor": "#05234C",
-            "borderRadius": 16,
+            "borderRadius": 12,
             "borderWidth": 1,
           }
         }
@@ -637,7 +637,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
         {
           "backgroundColor": "#011401",
           "borderColor": "#05234C",
-          "borderRadius": 16,
+          "borderRadius": 12,
           "borderWidth": 1,
           "marginTop": 12,
           "paddingHorizontal": 14,
@@ -1029,7 +1029,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
           {
             "backgroundColor": "#011401",
             "borderColor": "#05234C",
-            "borderRadius": 16,
+            "borderRadius": 12,
             "borderWidth": 1,
           }
         }
@@ -1461,7 +1461,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
         {
           "backgroundColor": "#011401",
           "borderColor": "#05234C",
-          "borderRadius": 16,
+          "borderRadius": 12,
           "borderWidth": 1,
           "marginTop": 12,
           "paddingHorizontal": 14,

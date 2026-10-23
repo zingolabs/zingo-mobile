@@ -8,7 +8,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import { radiusLg, radiusPill, slopFor, useTheme } from '@app/theme';
+import { radiusMd, radiusPill, slopFor, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   AddressKindEnum,
@@ -151,7 +151,7 @@ export default function AddressCard({
           marginTop: 4,
           paddingTop: 16,
           paddingBottom: 14,
-          borderRadius: radiusLg,
+          borderRadius: radiusMd,
           borderWidth: 1,
           borderColor: colors.bottomSheetBorder,
           backgroundColor: colors.bgCanvas,

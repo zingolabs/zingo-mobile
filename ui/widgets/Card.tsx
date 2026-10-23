@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import { radiusLg, space12, space16, touchTarget, useTheme } from '@app/theme';
+import { radiusMd, space12, space16, touchTarget, useTheme } from '@app/theme';
 
 export type CardTone =
   'default' | 'selected' | 'orchard' | 'ironwood' | 'sapling';
@@ -39,7 +39,7 @@ const Card: React.FunctionComponent<CardProps> = ({
     backgroundColor: paint.bg,
     borderColor: paint.edge,
     borderWidth: 1,
-    borderRadius: radiusLg,
+    borderRadius: radiusMd,
     overflow: 'hidden' as const,
     ...(flush ? {} : { padding: space16, gap: space12 }),
   };
