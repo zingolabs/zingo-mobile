@@ -50,6 +50,18 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
         : formatSlippagePercent(slippageBps),
     );
 
+    // A preset picked but not yet applied: nothing changes until Done.
+    const [preset, setPreset] = useState<number>(slippageBps);
+    const reset = useCallback(() => {
+      setPreset(slippageBps);
+      setEditing(!PRESETS_BPS.includes(slippageBps));
+      setCustom(
+        PRESETS_BPS.includes(slippageBps)
+          ? ''
+          : formatSlippagePercent(slippageBps),
+      );
+    }, [slippageBps]);
+
     const dismiss = useCallback(() => {
       (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss();
     }, [ref]);
@@ -59,7 +71,7 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
       Number.isFinite(parsedCustom) &&
       parsedCustom >= MIN_BPS &&
       parsedCustom <= MAX_BPS;
-    const draft = editing ? (customValid ? parsedCustom : null) : slippageBps;
+    const draft = editing ? (customValid ? parsedCustom : null) : preset;
     const low = draft !== null && draft < DEFAULT_SLIPPAGE_BPS;
     const high = draft !== null && draft > HIGH_BPS;
 
@@ -73,6 +85,7 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
     return (
       <AppSheetModal
         ref={ref}
+        onDismiss={reset}
         header={
           <SheetTitle
             title={translate('swap.settings-title') as string}
@@ -101,10 +114,10 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
                 <Chip
                   key={bps}
                   testID={`swap.slippage.${bps}`}
-                  selected={!editing && slippageBps === bps}
+                  selected={!editing && preset === bps}
                   onPress={() => {
                     setEditing(false);
-                    onChange(bps);
+                    setPreset(bps);
                   }}
                 >
                   {`${formatSlippagePercent(bps)}%`}
@@ -155,9 +168,7 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
               title={translate('swap.done') as string}
               disabled={editing && !customValid}
               onPress={() => {
-                if (editing && customValid) {
-                  onChange(parsedCustom);
-                }
+                onChange(editing && customValid ? parsedCustom : preset);
                 dismiss();
               }}
             />

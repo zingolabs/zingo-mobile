@@ -12,7 +12,6 @@ import {
   RefreshControl,
   ActivityIndicator,
   Dimensions,
-  Platform,
   Pressable,
   StyleSheet,
 } from 'react-native';
@@ -23,7 +22,6 @@ import { useTheme, slopFor } from '@app/theme';
 import {
   ChainNameEnum,
   FilterEnum,
-  GlobalConst,
   isIronwoodActive,
   Route,
   ValueTransferKindEnum,
@@ -39,13 +37,22 @@ import AppSheet from '@ui/primitives/AppSheet';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import RingBorder from '@ui/primitives/RingBorder';
 import ValueTransferLine from './components/ValueTransferLine';
+import SwapLine from './components/SwapLine';
+import LegLine from './components/LegLine';
+import MonthHeader from './components/MonthHeader';
+import { ITEM_HEIGHT, buildHistoryItems, monthAt } from './historyItems';
+import type { HistoryItem } from './historyItems';
 import IronwoodMigrationBanner from './components/IronwoodMigrationBanner';
 import SeedBackupNotice from './components/SeedBackupNotice';
 import ViewOnlyNotice from './components/ViewOnlyNotice';
 import NoticeStack, { Notice, NOTICE_RADIUS } from '@ui/widgets/NoticeStack';
 import { PriceCard } from '@ui/widgets/Header/components/PriceRow';
 import { fiatQuote } from '@app/price/fiatQuote';
-import { ContextAppLoaded, useValueTransfersWithSwaps } from '@app/context';
+import {
+  ContextAppLoaded,
+  useSwapRecords,
+  useValueTransfersWithSwaps,
+} from '@app/context';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
@@ -68,10 +75,9 @@ import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { ChevronUp } from '@ui/primitives/Icons/Chevron';
 
 const ViewTypes = {
-  WITH_MONTH: 0,
-  WITHOUT_MONTH: 1,
-  WITH_MONTH_REFRESH: 2,
-  WITHOUT_MONTH_REFRESH: 3,
+  MONTH: 0,
+  ROW: 1,
+  LEG: 2,
 };
 
 type HistoryProps = HomeTabScreenProps<'History'>;
@@ -257,71 +263,6 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     });
   }, []);
 
-  const layoutProvider = useMemo(
-    () =>
-      new LayoutProvider(
-        (index: number) => {
-          const lastData = valueTransfersSliced[index - 1];
-          const data = valueTransfersSliced[index];
-
-          if (index === 0) {
-            if (data.confirmations === 0) {
-              return ViewTypes.WITH_MONTH_REFRESH;
-            } else {
-              return ViewTypes.WITH_MONTH;
-            }
-          }
-
-          let lasttxmonth =
-            lastData && lastData.time
-              ? Utils.formatDate(lastData.time * 1000, 'MMM yyyy', language)
-              : '--- ----';
-          let txmonth =
-            data && data.time
-              ? Utils.formatDate(data.time * 1000, 'MMM yyyy', language)
-              : '--- ----';
-
-          if (txmonth !== lasttxmonth) {
-            if (data.confirmations === 0) {
-              return ViewTypes.WITH_MONTH_REFRESH;
-            } else {
-              return ViewTypes.WITH_MONTH;
-            }
-          } else {
-            if (data.confirmations === 0) {
-              return ViewTypes.WITHOUT_MONTH_REFRESH;
-            } else {
-              return ViewTypes.WITHOUT_MONTH;
-            }
-          }
-        },
-        (type, dim) => {
-          if (type === ViewTypes.WITHOUT_MONTH) {
-            // two lines
-            dim.width = Dimensions.get('window').width;
-            dim.height =
-              Platform.OS === GlobalConst.platformOSandroid ? 70 : 60;
-          } else if (type === ViewTypes.WITHOUT_MONTH_REFRESH) {
-            // three lines
-            dim.width = Dimensions.get('window').width;
-            dim.height =
-              (Platform.OS === GlobalConst.platformOSandroid ? 70 : 55) + 15;
-          } else if (type === ViewTypes.WITH_MONTH) {
-            // two lines with month
-            dim.width = Dimensions.get('window').width;
-            dim.height =
-              Platform.OS === GlobalConst.platformOSandroid ? 105 : 90;
-          } else if (type === ViewTypes.WITH_MONTH_REFRESH) {
-            // three lines with month
-            dim.width = Dimensions.get('window').width;
-            dim.height =
-              (Platform.OS === GlobalConst.platformOSandroid ? 105 : 85) + 15;
-          }
-        },
-      ),
-    [language, valueTransfersSliced],
-  );
-
   const _dataProvider = useMemo(
     () =>
       new DataProvider(
@@ -331,10 +272,16 @@ const History: React.FunctionComponent<HistoryProps> = () => {
         // existing transfer matter visually: status (pending → confirmed)
         // and confirmations (advance with each new block). txid is the
         // identity guard.
-        (r1: ValueTransferType, r2: ValueTransferType) =>
-          r1.txid !== r2.txid ||
-          r1.status !== r2.status ||
-          r1.confirmations !== r2.confirmations,
+        (r1: HistoryItem, r2: HistoryItem) =>
+          r1.key !== r2.key ||
+          (r1.kind !== 'month' &&
+            r2.kind !== 'month' &&
+            (r1.vt.status !== r2.vt.status ||
+              r1.vt.confirmations !== r2.vt.confirmations ||
+              r1.vt.swapStatus !== r2.vt.swapStatus)) ||
+          (r1.kind === 'swap' &&
+            r2.kind === 'swap' &&
+            (r1.open !== r2.open || r1.legCount !== r2.legCount)),
       ),
     [],
   );
@@ -516,12 +463,75 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       setValueTransfersFiltered(vtf);
       const vtfs = vtf.slice(0, numVt);
       setValueTransfersSliced(vtfs);
-      setDataProvider(data => data.cloneWithRows(vtfs));
       setLoading(false);
     }
   }, [fetchValueTransfersFiltered, numVt, valueTransfers, server.chainName]);
 
   const hasMore = numVt < valueTransfersFiltered.length;
+
+  // The swaps whose Zcash transactions are unfolded under their row.
+  const swapRecords = useSwapRecords();
+  const [openSwaps, setOpenSwaps] = useState<ReadonlySet<string>>(new Set());
+  const toggleSwap = useCallback((recordId: string) => {
+    setOpenSwaps(previous => {
+      const next = new Set(previous);
+      if (next.has(recordId)) {
+        next.delete(recordId);
+      } else {
+        next.add(recordId);
+      }
+      return next;
+    });
+  }, []);
+  const historyItems = useMemo(
+    () =>
+      buildHistoryItems({
+        rows: valueTransfersSliced,
+        all: mergedValueTransfers,
+        records: swapRecords,
+        open: openSwaps,
+        monthOf: timeSec =>
+          Utils.formatDate(timeSec * 1000, 'MMM yyyy', language),
+      }),
+    [
+      valueTransfersSliced,
+      mergedValueTransfers,
+      swapRecords,
+      openSwaps,
+      language,
+    ],
+  );
+  // The month pinned over the list while its rows scroll under it.
+  const [pinnedMonth, setPinnedMonth] = useState<string>('');
+  const historyItemsRef = useRef<HistoryItem[]>([]);
+  historyItemsRef.current = historyItems;
+  useEffect(() => {
+    setDataProvider(data => data.cloneWithRows(historyItems));
+  }, [historyItems]);
+
+  const layoutProvider = useMemo(
+    () =>
+      new LayoutProvider(
+        (index: number) => {
+          const item = historyItems[index];
+          return item?.kind === 'month'
+            ? ViewTypes.MONTH
+            : item?.kind === 'leg'
+              ? ViewTypes.LEG
+              : ViewTypes.ROW;
+        },
+        (type, dim) => {
+          dim.width = Dimensions.get('window').width;
+          dim.height =
+            type === ViewTypes.MONTH
+              ? ITEM_HEIGHT.month
+              : type === ViewTypes.LEG
+                ? ITEM_HEIGHT.leg
+                : ITEM_HEIGHT.transfer;
+        },
+      ),
+    [historyItems],
+  );
 
   // Auto-pagination: RecyclerListView fires onEndReached when the user
   // approaches the bottom of the list — bump `numVt` so the next page
@@ -595,6 +605,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
 
   const handleScroll = useCallback(
     (_rawEvent: ScrollEvent, _offsetX: number, offsetY: number) => {
+      setPinnedMonth(monthAt(historyItemsRef.current, offsetY));
       const isTop = offsetY <= 100;
 
       // If we're scrolling to top and we've reached the top, stop the scrolling state
@@ -630,35 +641,49 @@ const History: React.FunctionComponent<HistoryProps> = () => {
   );
 
   const rowRenderer = (
-    type: string | number,
-    data: ValueTransferType,
+    _type: string | number,
+    item: HistoryItem,
     index: number,
   ) => {
-    let txmonth =
-      data && data.time
-        ? Utils.formatDate(data.time * 1000, 'MMM yyyy', language)
-        : '--- ----';
-
-    return (
-      <ValueTransferLine
-        index={index}
-        vt={data}
-        month={
-          type === ViewTypes.WITH_MONTH || type === ViewTypes.WITH_MONTH_REFRESH
-            ? txmonth
-            : ''
-        }
-        setValueTransferDetailModalShow={setValueTransferDetailModalShow}
-        nextLineWithSameTxid={
-          index >= valueTransfersSliced.length - 1
-            ? false
-            : valueTransfersSliced[index + 1].txid === data.txid
-        }
-        registerSwipeable={registerSwipeable(index)}
-        closeAllSwipeables={() => closeAllSwipeables()}
-        closeOtherSwipeables={() => closeAllSwipeables(index)}
-      />
-    );
+    switch (item.kind) {
+      case 'month':
+        return <MonthHeader label={item.label} />;
+      case 'leg':
+        return <LegLine vt={item.vt} recordId={item.recordId} />;
+      case 'swap':
+        return item.record ? (
+          <SwapLine
+            index={index}
+            record={item.record}
+            hairline={!item.first}
+            legCount={item.legCount}
+            open={item.open}
+            onToggle={() => toggleSwap(item.record?.recordId ?? '')}
+          />
+        ) : (
+          <ValueTransferLine
+            index={index}
+            vt={item.vt}
+            hairline={!item.first}
+            setValueTransferDetailModalShow={setValueTransferDetailModalShow}
+            registerSwipeable={registerSwipeable(index)}
+            closeAllSwipeables={() => closeAllSwipeables()}
+            closeOtherSwipeables={() => closeAllSwipeables(index)}
+          />
+        );
+      default:
+        return (
+          <ValueTransferLine
+            index={index}
+            vt={item.vt}
+            hairline={!item.first}
+            setValueTransferDetailModalShow={setValueTransferDetailModalShow}
+            registerSwipeable={registerSwipeable(index)}
+            closeAllSwipeables={() => closeAllSwipeables()}
+            closeOtherSwipeables={() => closeAllSwipeables(index)}
+          />
+        );
+    }
   };
 
   const historyHeader = (
@@ -885,7 +910,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                             marginBottom: 200,
                           }}
                         >
-                          <FadeText style={{ color: colors.fgAccent }}>
+                          <FadeText>
                             {translate('history.end') as string}
                           </FadeText>
                         </View>
@@ -904,6 +929,14 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                     <FadeText style={{ color: colors.fgAccent }}>
                       {translate('history.empty') as string}
                     </FadeText>
+                  </View>
+                )}
+                {!!pinnedMonth && (
+                  <View
+                    pointerEvents="none"
+                    style={{ position: 'absolute', top: 0, left: 0, right: 0 }}
+                  >
+                    <MonthHeader label={pinnedMonth} />
                   </View>
                 )}
               </View>

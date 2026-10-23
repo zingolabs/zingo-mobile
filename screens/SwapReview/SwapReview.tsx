@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useContext, useState } from 'react';
-import { View } from 'react-native';
+import React, { useCallback, useContext, useRef, useState } from 'react';
+import { Pressable, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
   radiusMd,
@@ -27,11 +27,12 @@ import type { DepositInstructionsType } from '@app/swap';
 import { reserveRefundAddress } from '@app/walletBackend';
 import { sendGateOpen } from '@app/walletBackend/transforms/mixnetView';
 import { deliver } from '@app/navigation/results';
-import { useBiometricGate } from '@app/hooks/useBiometricGate';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { ChevronDown, ChevronUp } from '@ui/primitives/Icons/Chevron';
+import AuthorizeSheet from './AuthorizeSheet';
 import Utils from '@app/utils';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
-import Banner from '@ui/widgets/Banner';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
 import { WifiIcon } from '@ui/primitives/Icons/WifiIcon';
@@ -69,15 +70,7 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
 }) => {
   const { review, direction } = route.params;
   const context = useContext(ContextAppLoaded);
-  const {
-    translate,
-    biometrics,
-    addLastSnackbar,
-    mixnetView,
-    info,
-    language,
-    sendSwapDeposit,
-  } = context;
+  const { translate, biometrics, mixnetView, info, sendSwapDeposit } = context;
   const { colors } = useTheme();
   const swapService = useSwapService();
   const isOutbound = direction === SwapDirectionEnum.Outbound;
@@ -91,14 +84,10 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
     navigation.goBack();
   }, [leave, navigation]);
 
-  // Spending from this wallet asks for the device lock on entry, as Confirm
-  // does for a send. A deposit paid from the other wallet takes nothing here.
-  const screenGate = useBiometricGate({
-    needsAuth: biometrics && isOutbound,
-    translate,
-    addLastSnackbar,
-    onCancel: back,
-  });
+  // Spending from this wallet asks for the device lock when Confirm is
+  // pressed. A deposit paid from the other wallet takes nothing here.
+  const authSheetRef = useRef<BottomSheetModal>(null);
+  const [advancedOpen, setAdvancedOpen] = useState<boolean>(false);
 
   const [committing, setCommitting] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
@@ -206,9 +195,13 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
     leave,
   ]);
 
-  if (screenGate.kind !== 'passed') {
-    return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
-  }
+  const onConfirm = () => {
+    if (isOutbound && biometrics) {
+      authSheetRef.current?.present();
+      return;
+    }
+    commit();
+  };
 
   const row = (
     label: string,
@@ -289,7 +282,7 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
         }
         busy={committing}
         disabled={committing || !swapService || (isOutbound && !mixnetReady)}
-        onPress={commit}
+        onPress={onConfirm}
       />
     </View>
   );
@@ -393,44 +386,57 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
           {translate('swap.review-next-address') as string}
         </Text>
       )}
-      <View
+      <Pressable
+        testID="swap.review.advanced"
+        accessibilityRole="button"
+        accessibilityState={{ expanded: advancedOpen }}
+        onPress={() => setAdvancedOpen(open => !open)}
         style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
           marginTop: space12,
-          borderWidth: 1,
-          borderColor: colors.bottomSheetBorder,
-          borderRadius: radiusMd,
-          paddingHorizontal: space16,
+          paddingVertical: 11,
         }}
       >
-        {row(
-          translate('swap.slippage') as string,
-          `${formatSlippagePercent(slippage)}%`,
+        <Text variant="bodySmall" tone={advancedOpen ? 'default' : 'muted'}>
+          {translate('swap.review-advanced') as string}
+        </Text>
+        {advancedOpen ? (
+          <ChevronUp size={15} color={colors.fgMuted} />
+        ) : (
+          <ChevronDown size={15} color={colors.fgMuted} />
         )}
-        {isOutbound && (
-          <>
-            {divider}
-            {row(
-              translate('swap.review-if-refunded') as string,
-              translate('swap.review-refund-new-address') as string,
-            )}
-          </>
-        )}
-      </View>
-      {isOutbound && (
-        <View style={{ marginTop: space12 }}>
-          <Banner
-            tone="info"
-            title={translate('swap.review-irreversible') as string}
-          />
+      </Pressable>
+      {advancedOpen && (
+        <View
+          style={{
+            borderWidth: 1,
+            borderColor: colors.bottomSheetBorder,
+            borderRadius: radiusMd,
+            paddingHorizontal: space16,
+          }}
+        >
+          {row(
+            translate('swap.slippage') as string,
+            `${formatSlippagePercent(slippage)}%`,
+          )}
+          {isOutbound && (
+            <>
+              {divider}
+              {row(
+                translate('swap.review-if-refunded') as string,
+                translate('swap.review-refund-new-address') as string,
+              )}
+            </>
+          )}
         </View>
       )}
-      <Text
-        variant="caption"
-        tone="muted"
-        style={{ textAlign: 'center', marginTop: space12 }}
-      >
-        {Utils.formatDate(Date.now(), 'MMM d, h:mm aaa', language)}
-      </Text>
+      <AuthorizeSheet
+        ref={authSheetRef}
+        summary={`${translate('swap.auth-line-1') as string} ${formatAmountForDisplay(quoteInput.sellAmountHumanDecimal)} ${sellSymbol} ${translate('swap.auth-line-2') as string} ${providerShortLabel(chosen.provider)}.`}
+        onAuthorized={commit}
+      />
     </SwapFlowScreen>
   );
 };
