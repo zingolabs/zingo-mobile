@@ -1284,6 +1284,15 @@ class RPCModule: NSObject {
       }
   }
 
+  @objc(deriveRefundAddressProcess:reject:)
+  func deriveRefundAddressProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try deriveRefundAddress()
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
   @objc(planOrchardDrainProcess:reject:)
   func planOrchardDrainProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {

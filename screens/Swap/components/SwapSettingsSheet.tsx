@@ -1,0 +1,171 @@
+/* eslint-disable react-native/no-inline-styles */
+import React, { forwardRef, useCallback, useContext, useState } from 'react';
+import { View } from 'react-native';
+import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import { space12, space16, space8 } from '@app/theme';
+import { ContextAppLoaded } from '@app/context';
+import AppSheetModal from '@ui/primitives/AppSheetModal';
+import Text from '@ui/primitives/Text';
+import Chip from '@ui/primitives/Chip';
+import TextField from '@ui/primitives/TextField';
+import Button from '@ui/primitives/Button';
+import Banner from '@ui/widgets/Banner';
+import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
+import { DEFAULT_SLIPPAGE_BPS } from '@screens/Swap/useSwapForm';
+import SheetTitle from './SheetTitle';
+
+type SwapSettingsSheetProps = {
+  slippageBps: number;
+  onChange: (bps: number) => void;
+};
+
+/** 0.5%, 1%, 3%. */
+const PRESETS_BPS: ReadonlyArray<number> = [50, 100, 300];
+/** The tolerance can be set between these. */
+const MIN_BPS = 10;
+const MAX_BPS = 1_000;
+/** Past this, the fill may land well under the estimate. */
+const HIGH_BPS = 500;
+
+export function formatSlippagePercent(bps: number): string {
+  return (bps / 100).toFixed(bps % 100 === 0 ? 0 : 1);
+}
+
+/**
+ * The slippage tolerance: how far the price may move while the swap travels
+ * before the provider returns the funds instead of filling. Lower protects
+ * the amount, higher fails less. Neither is the safe choice in general,
+ * which is why it is the user's.
+ */
+const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
+  ({ slippageBps, onChange }, ref) => {
+    const { translate } = useContext(ContextAppLoaded);
+    const keyboardHeight = useKeyboardHeight();
+    const [editing, setEditing] = useState<boolean>(
+      !PRESETS_BPS.includes(slippageBps),
+    );
+    const [custom, setCustom] = useState<string>(
+      PRESETS_BPS.includes(slippageBps)
+        ? ''
+        : formatSlippagePercent(slippageBps),
+    );
+
+    const dismiss = useCallback(() => {
+      (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss();
+    }, [ref]);
+
+    const parsedCustom = Math.round(parseFloat(custom.replace(',', '.')) * 100);
+    const customValid =
+      Number.isFinite(parsedCustom) &&
+      parsedCustom >= MIN_BPS &&
+      parsedCustom <= MAX_BPS;
+    const draft = editing ? (customValid ? parsedCustom : null) : slippageBps;
+    const low = draft !== null && draft < DEFAULT_SLIPPAGE_BPS;
+    const high = draft !== null && draft > HIGH_BPS;
+
+    const customError =
+      editing && custom.length > 0 && !customValid
+        ? (translate('swap.slippage-range') as string)
+        : undefined;
+    const customHelper =
+      editing && high ? (translate('swap.slippage-high') as string) : undefined;
+
+    return (
+      <AppSheetModal
+        ref={ref}
+        header={
+          <SheetTitle
+            title={translate('swap.settings-title') as string}
+            onClose={dismiss}
+            closeLabel={translate('swap.close') as string}
+          />
+        }
+        contentStyle={{
+          paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
+        }}
+      >
+        <BottomSheetView style={{ paddingHorizontal: space16 }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              columnGap: space8,
+            }}
+          >
+            <Text variant="bodyStrong">
+              {translate('swap.slippage') as string}
+            </Text>
+            <View style={{ flexDirection: 'row', columnGap: space8 }}>
+              {PRESETS_BPS.map(bps => (
+                <Chip
+                  key={bps}
+                  testID={`swap.slippage.${bps}`}
+                  selected={!editing && slippageBps === bps}
+                  onPress={() => {
+                    setEditing(false);
+                    onChange(bps);
+                  }}
+                >
+                  {`${formatSlippagePercent(bps)}%`}
+                </Chip>
+              ))}
+              <Chip
+                testID="swap.slippage.custom"
+                selected={editing}
+                onPress={() => setEditing(true)}
+              >
+                {editing && customValid
+                  ? `${formatSlippagePercent(parsedCustom)}%`
+                  : (translate('swap.slippage-other') as string)}
+              </Chip>
+            </View>
+          </View>
+          <Text variant="bodySmall" tone="muted" style={{ marginTop: space12 }}>
+            {editing
+              ? (translate('swap.slippage-custom') as string)
+              : `${translate('swap.slippage-help') as string} ${formatSlippagePercent(DEFAULT_SLIPPAGE_BPS)}%.`}
+          </Text>
+          {low && (
+            <View style={{ marginTop: space12 }}>
+              <Banner
+                tone="warning"
+                title={`${formatSlippagePercent(draft)}% ${translate('swap.slippage-low') as string}`}
+              />
+            </View>
+          )}
+          {editing && (
+            <View style={{ marginTop: space12 }}>
+              <TextField
+                testID="swap.slippage.input"
+                label={translate('swap.slippage') as string}
+                value={custom}
+                onChangeText={setCustom}
+                placeholder={formatSlippagePercent(slippageBps)}
+                error={customError}
+                helper={customHelper}
+                valid={customValid}
+              />
+            </View>
+          )}
+          <View style={{ marginTop: space16 }}>
+            <Button
+              testID="swap.slippage.done"
+              variant="primary"
+              title={translate('swap.done') as string}
+              disabled={editing && !customValid}
+              onPress={() => {
+                if (editing && customValid) {
+                  onChange(parsedCustom);
+                }
+                dismiss();
+              }}
+            />
+          </View>
+        </BottomSheetView>
+      </AppSheetModal>
+    );
+  },
+);
+
+export default SwapSettingsSheet;

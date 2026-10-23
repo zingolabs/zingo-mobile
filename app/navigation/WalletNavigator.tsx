@@ -6,7 +6,7 @@ import {
 } from '@react-navigation/bottom-tabs';
 
 import { Route } from '@app/AppState';
-import { ContextAppLoaded } from '@app/context';
+import { ContextAppLoaded, useSwapService } from '@app/context';
 import { AppDrawerParamList, HomeTabParamList } from '@app/types';
 import CustomTabBar from './CustomTabBar';
 import LoadedAppOptionsPanelHost from '@app/LoadedApp/LoadedAppOptionsPanelHost';
@@ -15,6 +15,7 @@ import { AddressBook } from '@screens/AddressBook';
 import History from '@screens/History';
 import Send from '@screens/Send';
 import Receive from '@screens/Receive';
+import Swap from '@screens/Swap';
 import Settings from '@screens/Settings';
 import WalletServer from '@screens/Server/WalletServer';
 import { MessageList } from '@screens/Messages';
@@ -60,9 +61,11 @@ const Tab = createBottomTabNavigator<HomeTabParamList>();
 const renderTabBar = (props: BottomTabBarProps) => <CustomTabBar {...props} />;
 
 // The home tabs. Send needs a wallet that can spend and a server to send
-// through; without either the tab is absent.
+// through; without either the tab is absent. Swap needs the same plus the
+// swap service, which exists on mainnet alone.
 function HomeTabs() {
   const { readOnly, server } = useContext(ContextAppLoaded);
+  const swapService = useSwapService();
   return (
     <Tab.Navigator
       detachInactiveScreens={true}
@@ -76,6 +79,9 @@ function HomeTabs() {
         <Tab.Screen name={Route.Send} component={Send} />
       )}
       <Tab.Screen name={Route.Receive} component={Receive} />
+      {!readOnly && server.kind === 'remote' && !!swapService && (
+        <Tab.Screen name={Route.Swap} component={Swap} />
+      )}
     </Tab.Navigator>
   );
 }

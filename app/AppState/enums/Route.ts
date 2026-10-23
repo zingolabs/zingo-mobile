@@ -25,6 +25,7 @@ export const Route = {
   History: 'History',
   Send: 'Send',
   Receive: 'Receive',
+  Swap: 'Swap',
   Messages: 'Messages',
   Settings: 'Settings',
   About: 'About',

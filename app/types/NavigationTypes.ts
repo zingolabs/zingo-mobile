@@ -57,6 +57,7 @@ export type HomeTabParamList = {
   [Route.History]: undefined;
   [Route.Send]: undefined;
   [Route.Receive]: undefined;
+  [Route.Swap]: undefined;
 };
 
 // What the loading section hands the wallet section when a wallet opens.
@@ -99,6 +100,7 @@ export type AppDrawerParamList = {
   [Route.History]: undefined;
   [Route.Send]: undefined;
   [Route.Receive]: undefined;
+  [Route.Swap]: undefined;
   [Route.Messages]: undefined;
   [Route.Settings]: undefined;
   [Route.Server]: undefined;

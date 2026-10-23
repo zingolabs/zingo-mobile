@@ -134,7 +134,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const homeTab =
     route.name === Route.History ||
     route.name === Route.Send ||
-    route.name === Route.Receive;
+    route.name === Route.Receive ||
+    route.name === Route.Swap;
   // The panel lives in the home: from a pushed screen the button pops back
   // to it and shows the panel there.
   const toggleMenuDrawer = () => {

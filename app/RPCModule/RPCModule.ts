@@ -115,6 +115,7 @@ interface RPCModuleAPI {
     memoHex: string,
   ): Promise<string>;
   reserveRefundAddressProcess(): Promise<string>;
+  deriveRefundAddressProcess(): Promise<string>;
 
   // Ironwood migration (Orchard -> Ironwood drain)
   planOrchardDrainProcess(): Promise<string>;

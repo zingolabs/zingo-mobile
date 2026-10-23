@@ -9,7 +9,8 @@ export type Request =
   | 'send.contact'
   | 'addressbook.address'
   | 'receive.address'
-  | 'receive.addressIndex';
+  | 'receive.addressIndex'
+  | 'swap.address';
 
 type Listener = (value: string) => void;
 

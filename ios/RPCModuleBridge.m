@@ -244,6 +244,9 @@ RCT_EXTERN_METHOD(sendSwapDepositProcess:
 RCT_EXTERN_METHOD(reserveRefundAddressProcess:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(deriveRefundAddressProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(planOrchardDrainProcess:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)

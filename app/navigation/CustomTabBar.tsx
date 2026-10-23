@@ -14,6 +14,7 @@ import { SendFilledIcon } from '@ui/primitives/Icons/SendFilledIcon';
 import { SendOutlineIcon } from '@ui/primitives/Icons/SendOutlineIcon';
 import { ReceiveIcon } from '@ui/primitives/Icons/ReceiveIcon';
 import { ReceiveFilledIcon } from '@ui/primitives/Icons/ReceiveFilledIcon';
+import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
 
 const ICON_SIZE = 28;
 const SEND_SIZE = 25;
@@ -43,6 +44,9 @@ function renderNavIcon(
     ) : (
       <SendOutlineIcon size={SEND_SIZE} color={color} />
     );
+  }
+  if (routeName === Route.Swap) {
+    return <SwapIcon size={SEND_SIZE} color={color} />;
   }
   return isFocused ? (
     <ReceiveFilledIcon size={ICON_SIZE} color={color} />

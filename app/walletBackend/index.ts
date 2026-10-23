@@ -56,6 +56,7 @@ export {
   removeTransaction,
   rescheduleParts,
   reserveRefundAddress,
+  deriveRefundAddress,
   deleteExistingWallet,
   resolvedTrue,
   restoreWalletFromSeed,
