@@ -138,7 +138,14 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
   const open = openProp ?? openOwn;
   const onToggle = onToggleProp ?? setOpenOwn;
   const iconRef = useRef<View>(null);
+  const layerRef = useRef<View>(null);
   const [anchor, setAnchor] = useState<Anchor | null>(null);
+  /**
+   * The layer's own place in the same coordinates as the icon's: the
+   * layer may start above the app's window (under a translucent status
+   * bar), so the icon is placed relative to it, not to the screen.
+   */
+  const [layer, setLayer] = useState<Anchor | null>(null);
   const [bubbleH, setBubbleH] = useState(0);
   const spin = useSharedValue(0);
   const spinStyle = useAnimatedStyle(() => ({
@@ -153,6 +160,7 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
         easing: ease.out,
       });
       setAnchor(null);
+      setLayer(null);
       setBubbleH(0);
       iconRef.current?.measureInWindow((x, y, w, h) =>
         setAnchor({ x, y, w, h }),
@@ -163,12 +171,16 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
   const close = () => onToggle(false);
 
   const place =
-    anchor && bubbleH > 0
+    anchor && layer && bubbleH > 0
       ? placeBubble({
-          anchor,
+          anchor: {
+            ...anchor,
+            x: anchor.x - layer.x,
+            y: anchor.y - layer.y,
+          },
           bubbleH,
-          screenW,
-          screenH,
+          screenW: layer.w || screenW,
+          screenH: layer.h || screenH,
           insetTop: insets.top,
           insetBottom: insets.bottom,
           below,
@@ -215,10 +227,16 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
         onRequestClose={close}
       >
         <Pressable
+          ref={layerRef}
           testID={testID ? `${testID}-close` : undefined}
           accessibilityRole="button"
           accessibilityLabel={label}
           onPress={close}
+          onLayout={() =>
+            layerRef.current?.measureInWindow((x, y, w, h) =>
+              setLayer({ x, y, w, h }),
+            )
+          }
           style={{ flex: 1 }}
         >
           <Animated.View
