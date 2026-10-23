@@ -1,5 +1,7 @@
 import React, { useContext } from 'react';
 import { Pressable } from 'react-native';
+import Animated from 'react-native-reanimated';
+import { useUnfold } from '@app/hooks/useUnfold';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
 import { useTheme } from '@app/theme';
@@ -29,6 +31,7 @@ function LegLine({
     useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const t = (key: string) => (translate(key) as string).trim();
+  const unfold = useUnfold();
   const quote = fiatQuote(zecPrice, server, server.chainName);
   const price =
     vt.zecPrice && vt.zecPrice > 0
@@ -44,22 +47,29 @@ function LegLine({
     t,
   });
   return (
-    <Pressable
-      testID={`leg-${vt.txid}`}
-      accessibilityRole="button"
-      onPress={() =>
-        navigation.navigate(Route.SwapTransaction, {
-          recordId,
-          txid: vt.txid,
-          kind: vt.kind,
-        })
-      }
-      style={({ pressed }) => ({
-        backgroundColor: pressed ? colors.bgMutedSubtle : colors.bgSurface,
-      })}
-    >
-      <HistoryRowBody text={text} privacy={privacy} hairline={false} compact />
-    </Pressable>
+    <Animated.View style={unfold}>
+      <Pressable
+        testID={`leg-${vt.txid}`}
+        accessibilityRole="button"
+        onPress={() =>
+          navigation.navigate(Route.SwapTransaction, {
+            recordId,
+            txid: vt.txid,
+            kind: vt.kind,
+          })
+        }
+        style={({ pressed }) => ({
+          backgroundColor: pressed ? colors.bgMutedSubtle : colors.bgSurface,
+        })}
+      >
+        <HistoryRowBody
+          text={text}
+          privacy={privacy}
+          hairline={false}
+          compact
+        />
+      </Pressable>
+    </Animated.View>
   );
 }
 

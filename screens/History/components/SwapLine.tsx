@@ -5,7 +5,11 @@ import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
 import { slopFor, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import { SwapDirectionEnum } from '@app/swap';
+import {
+  SwapDirectionEnum,
+  SwapStatusEnum,
+  canonicalChainAddress,
+} from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
 import Utils from '@app/utils';
 import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
@@ -17,7 +21,8 @@ import {
   swapInFlight,
   swapRowText,
 } from '@screens/History/historyRowText';
-import HistoryAvatar from './HistoryAvatar';
+import HistoryAvatar, { AVATAR_SIZE } from './HistoryAvatar';
+import ContactInitial from '@screens/Swap/components/ContactInitial';
 import HistoryRowBody from './HistoryRowBody';
 
 type SwapLineProps = {
@@ -44,11 +49,27 @@ function SwapLine({
   onToggle,
 }: SwapLineProps) {
   const navigation = useNavigation<WalletNavigation>();
-  const { translate, language, privacy } = useContext(ContextAppLoaded);
+  const { translate, language, privacy, addressBook } =
+    useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const t = (key: string) => (translate(key) as string).trim();
+  const sale = record.direction === SwapDirectionEnum.Outbound;
+  const contact =
+    sale && record.status === SwapStatusEnum.Completed
+      ? addressBook.find(
+          c =>
+            c.swapChain.toUpperCase() ===
+              record.receiveAsset.chain.toUpperCase() &&
+            c.address ===
+              canonicalChainAddress(
+                record.receiveAsset.chain,
+                record.destinationAddress,
+              ),
+        )
+      : undefined;
   const text = swapRowText({
     record,
+    contactName: contact?.label,
     when: shortWhen(record.createdAtMs, Date.now(), t, ms =>
       Utils.formatDate(ms, 'MMM d', language),
     ),
@@ -79,7 +100,18 @@ function SwapLine({
       })}
     >
       <HistoryRowBody
-        leading={<HistoryAvatar icon={icon} badge={other} />}
+        leading={
+          contact ? (
+            <ContactInitial
+              name={contact.label}
+              color={contact.color}
+              size={AVATAR_SIZE}
+              badge={other.ticker ?? other.symbol}
+            />
+          ) : (
+            <HistoryAvatar icon={icon} badge={other} />
+          )
+        }
         text={text}
         privacy={privacy}
         hairline={hairline}

@@ -1,6 +1,7 @@
 import { ValueTransferKindEnum } from '@app/AppState';
 import type { ValueTransferType } from '@app/AppState';
 import { swapTxidIndex } from '@app/swap/groupHistoryBySwap';
+import { isTerminalStatus } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
 
 /** One entry of the History list, in the order it draws. */
@@ -40,6 +41,9 @@ export type HistoryItem =
  * `rows` is what the list shows, filtered and paged; `all` is every
  * transfer, so a swap's legs are found even when they were paged or
  * filtered out. A transaction a swap made never shows as a row of its own.
+ *
+ * A swap still running sits at the top, above every month, until it ends;
+ * then it goes back to its place by date.
  */
 export function buildHistoryItems(args: {
   rows: ValueTransferType[];
@@ -63,28 +67,21 @@ export function buildHistoryItems(args: {
   }
 
   const items: HistoryItem[] = [];
-  let month = '';
-  for (const vt of rows) {
-    const isSwap = vt.kind === ValueTransferKindEnum.Swap;
-    if (!isSwap && index.has(vt.txid)) {
-      continue;
-    }
-    const label = monthOf(vt.time);
-    const first = label !== month;
-    if (first) {
-      month = label;
-      items.push({ kind: 'month', key: `month:${label}`, label });
-    }
-    if (!isSwap || !vt.swapRecordId) {
-      items.push({
-        kind: 'transfer',
-        key: `vt:${vt.txid}:${vt.kind}`,
-        vt,
-        first,
-      });
-      continue;
-    }
-    const recordId = vt.swapRecordId;
+  const live = (vt: ValueTransferType): boolean => {
+    const record = vt.swapRecordId
+      ? recordById.get(vt.swapRecordId)
+      : undefined;
+    return (
+      vt.kind === ValueTransferKindEnum.Swap &&
+      !!record &&
+      !isTerminalStatus(record.status)
+    );
+  };
+  const pushSwap = (
+    vt: ValueTransferType,
+    recordId: string,
+    first: boolean,
+  ) => {
     const legs = [...(legsOf.get(recordId) ?? [])].sort(
       (a, b) => a.time - b.time,
     );
@@ -109,6 +106,34 @@ export function buildHistoryItems(args: {
         }),
       );
     }
+  };
+
+  rows
+    .filter(live)
+    .forEach((vt, i) => pushSwap(vt, vt.swapRecordId ?? '', i === 0));
+
+  let month = '';
+  for (const vt of rows) {
+    const isSwap = vt.kind === ValueTransferKindEnum.Swap;
+    if ((!isSwap && index.has(vt.txid)) || live(vt)) {
+      continue;
+    }
+    const label = monthOf(vt.time);
+    const first = label !== month;
+    if (first) {
+      month = label;
+      items.push({ kind: 'month', key: `month:${label}`, label });
+    }
+    if (!isSwap || !vt.swapRecordId) {
+      items.push({
+        kind: 'transfer',
+        key: `vt:${vt.txid}:${vt.kind}`,
+        vt,
+        first,
+      });
+      continue;
+    }
+    pushSwap(vt, vt.swapRecordId, first);
   }
   return items;
 }

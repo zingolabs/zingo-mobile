@@ -1,11 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { forwardRef, useCallback, useContext } from 'react';
+import React, { forwardRef, useCallback, useContext, useMemo } from 'react';
 import { View } from 'react-native';
 import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { space16, space8, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
-  describeCostVsMarket,
   formatAmountForDisplay,
   providerShortLabel,
   renderSwapText,
@@ -16,6 +15,7 @@ import AppSheetModal from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
 import ListRow from '@ui/primitives/ListRow';
 import Tag from '@ui/widgets/Tag';
+import Button from '@ui/primitives/Button';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import SheetTitle from './SheetTitle';
 
@@ -31,9 +31,9 @@ type RoutesSheetProps = {
 };
 
 /**
- * The routes a quote returned, side by side: what arrives, what it is worth,
- * how long it takes and through whom. The providers that returned nothing are
- * listed under them, inert, with what they said about why.
+ * The routes a quote returned, best price first: what arrives, what it is
+ * worth, how long it takes and through whom. The providers that answered but
+ * cannot be used are listed under them, inert, with their reason.
  */
 const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
   (
@@ -54,6 +54,17 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
     const dismiss = useCallback(() => {
       (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss();
     }, [ref]);
+
+    /** Best price first, whatever order the providers answered in. */
+    const sorted = useMemo(
+      () =>
+        [...routes].sort(
+          (a, b) =>
+            parseFloat(b.expectedReceiveAmount) -
+            parseFloat(a.expectedReceiveAmount),
+        ),
+      [routes],
+    );
 
     const usd = (amount: string): string => {
       const value = parseFloat(amount) * receiveUsdUnitPrice;
@@ -79,15 +90,16 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
             paddingBottom: 30,
           }}
         >
-          {routes.map(route => {
+          <Text variant="caption" tone="muted" style={{ marginBottom: space8 }}>
+            {translate('swap.routes-sub') as string}
+          </Text>
+          {sorted.map((route, index) => {
             const selected = route.routeId === selectedRouteId;
-            const best = route.tags?.includes('RECOMMENDED');
-            const cost = describeCostVsMarket(route.costVsMarketBps);
-            const costVsMarket = cost && say(cost);
+            const best = index === 0;
             const details = [
               usd(route.expectedReceiveAmount),
-              route.estimatedTimeText,
-              `${translate('swap.via') as string} ${providerShortLabel(route.provider)}`,
+              route.estimatedTimeText ? `~${route.estimatedTimeText}` : '',
+              providerShortLabel(route.provider),
             ]
               .filter(Boolean)
               .join(' · ');
@@ -118,14 +130,6 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
                     <Text variant="bodySmall" tone="muted">
                       {details}
                     </Text>
-                    <Text variant="bodySmall" tone="muted">
-                      {`${translate('swap.routes-at-least') as string} ${formatAmountForDisplay(route.minReceiveAmount)} ${receiveSymbol}`}
-                    </Text>
-                    {!!costVsMarket && (
-                      <Text variant="bodySmall" tone="muted">
-                        {costVsMarket}
-                      </Text>
-                    )}
                     {!!route.warningsText && (
                       <Text variant="bodySmall" tone="warning">
                         {route.warningsText}
@@ -168,13 +172,13 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
               subtitle={say(entry.reason)}
             />
           ))}
-          <Text
-            variant="caption"
-            tone="muted"
-            style={{ textAlign: 'center', marginTop: space16 }}
-          >
-            {translate('swap.routes-refresh-note') as string}
-          </Text>
+          <View style={{ marginTop: space16 }}>
+            <Button
+              variant="quiet"
+              title={translate('swap.close') as string}
+              onPress={dismiss}
+            />
+          </View>
         </BottomSheetScrollView>
       </AppSheetModal>
     );

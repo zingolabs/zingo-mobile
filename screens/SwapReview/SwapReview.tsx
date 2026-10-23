@@ -1,20 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useRef, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import {
-  radiusMd,
-  space12,
-  space16,
-  space4,
-  space8,
-  useTheme,
-} from '@app/theme';
+import { space8, useTheme } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import { Route } from '@app/AppState';
 import { ContextAppLoaded, useSwapService } from '@app/context';
 import {
   SwapDirectionEnum,
+  canonicalChainAddress,
   commitRefusalCondemnsRoute,
   depositCarriesMemo,
   depositSpendsSourceAddress,
@@ -29,16 +23,18 @@ import { reserveRefundAddress } from '@app/walletBackend';
 import { sendGateOpen } from '@app/walletBackend/transforms/mixnetView';
 import { deliver } from '@app/navigation/results';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { ChevronDown, ChevronUp } from '@ui/primitives/Icons/Chevron';
 import AuthorizeSheet from './AuthorizeSheet';
 import Utils from '@app/utils';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
-import { WifiIcon } from '@ui/primitives/Icons/WifiIcon';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
-import SwapSummaryCard from '@screens/Swap/components/SwapSummaryCard';
+import PairHero from '@screens/Swap/components/PairHero';
+import NymNote from '@screens/Swap/components/NymNote';
+import DetailRows from '@screens/Swap/components/DetailRows';
+import ContactInitial from '@screens/Swap/components/ContactInitial';
+import { InfoTipHost } from '@ui/widgets/InfoTip';
 import { formatSlippagePercent } from '@screens/Swap/components/SwapSettingsSheet';
 
 type SwapReviewProps = NativeStackScreenProps<
@@ -71,7 +67,14 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
 }) => {
   const { review, direction } = route.params;
   const context = useContext(ContextAppLoaded);
-  const { translate, biometrics, mixnetView, info, sendSwapDeposit } = context;
+  const {
+    translate,
+    biometrics,
+    mixnetView,
+    info,
+    sendSwapDeposit,
+    addressBook,
+  } = context;
   const { colors } = useTheme();
   const swapService = useSwapService();
   const isOutbound = direction === SwapDirectionEnum.Outbound;
@@ -88,7 +91,6 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
   // Spending from this wallet asks for the device lock when Confirm is
   // pressed. A deposit paid from the other wallet takes nothing here.
   const authSheetRef = useRef<BottomSheetModal>(null);
-  const [advancedOpen, setAdvancedOpen] = useState<boolean>(false);
 
   const [committing, setCommitting] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
@@ -113,8 +115,6 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
     : chosen.totalFeesInReceiveAsset
       ? `${formatAmountForDisplay(chosen.totalFeesInReceiveAsset)} ${receiveSymbol}`
       : '—';
-  const minReceiveUsd =
-    parseFloat(chosen.minReceiveAmount) * fiatValueBasis.receiveUsdUnitPrice;
   // Inbound, the far side is the source: where the sold asset returns.
   const address = isOutbound
     ? quoteInput.destinationAddress
@@ -208,43 +208,37 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
     commit();
   };
 
-  const row = (
-    label: string,
-    value: string,
-    sub?: string,
-    valueTone: 'default' | 'accent' = 'default',
-  ) => (
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        columnGap: space12,
-        paddingVertical: 11,
-      }}
-    >
-      <Text variant="bodySmall" tone="muted">
-        {label}
-      </Text>
-      <View style={{ alignItems: 'flex-end', flexShrink: 1 }}>
-        <Text
-          variant="bodyStrong"
-          tone={valueTone}
-          style={{ textAlign: 'right' }}
-        >
-          {value}
-        </Text>
-        {!!sub && (
-          <Text variant="caption" tone="muted">
-            {sub}
-          </Text>
-        )}
-      </View>
-    </View>
-  );
-  const divider = (
-    <View style={{ height: 1, backgroundColor: colors.bottomSheetBorder }} />
-  );
+  /** The fee as a share of what is sold, with its dollars; the amount when no share can be told. */
+  const sellAmount = parseFloat(quoteInput.sellAmountHumanDecimal);
+  const feesInSell = parseFloat(chosen.totalFeesInSellAsset ?? '');
+  const feesInReceive = parseFloat(chosen.totalFeesInReceiveAsset ?? '');
+  const receiveAmount = parseFloat(chosen.expectedReceiveAmount);
+  const feeShare = Number.isFinite(feesInSell)
+    ? feesInSell / sellAmount
+    : Number.isFinite(feesInReceive)
+      ? feesInReceive / (receiveAmount + feesInReceive)
+      : NaN;
+  const feeUsd = Number.isFinite(feesInSell)
+    ? feesInSell * fiatValueBasis.sellUsdUnitPrice
+    : feesInReceive * fiatValueBasis.receiveUsdUnitPrice;
+  const feeValue = Number.isFinite(feeShare)
+    ? [
+        `${(feeShare * 100).toFixed(2)}%`,
+        Number.isFinite(feeUsd) && feeUsd > 0 ? `≈ $${feeUsd.toFixed(2)}` : '',
+      ]
+        .filter(Boolean)
+        .join(' · ')
+    : feeText;
+  const receiveUsd = receiveAmount * fiatValueBasis.receiveUsdUnitPrice;
+
+  const counterpartyChain = counterparty.chain;
+  const contact = address
+    ? addressBook.find(
+        c =>
+          c.swapChain.toUpperCase() === counterpartyChain.toUpperCase() &&
+          c.address === canonicalChainAddress(counterpartyChain, address),
+      )
+    : undefined;
 
   const footer = (
     <View style={{ rowGap: space8 }}>
@@ -253,196 +247,190 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
           {error}
         </Text>
       )}
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          columnGap: space4,
-        }}
-      >
-        {isOutbound && !mixnetReady ? (
-          <>
-            <WifiIcon size={14} color={colors.fgWarning} />
-            <Text variant="caption" tone="warning">
-              {translate('swap.review-mixnet-wait') as string}
-            </Text>
-          </>
-        ) : (
-          <>
-            <ClockIcon size={14} color={colors.fgMuted} />
-            <Text variant="caption" tone="muted">
-              {translate('swap.review-price-fixed') as string}
-            </Text>
-          </>
-        )}
-      </View>
       <Button
         testID="swap.review.confirm"
         variant={isOutbound ? 'nym' : 'primary'}
         title={
           isOutbound
-            ? (translate('swap.review-confirm') as string)
+            ? mixnetReady
+              ? (translate('swap.review-confirm') as string)
+              : (translate('swap.review-mixnet-wait') as string)
             : (translate('swap.review-generate') as string)
         }
         busy={committing}
         disabled={committing || !swapService || (isOutbound && !mixnetReady)}
         onPress={onConfirm}
       />
+      <Button
+        testID="swap.review.cancel"
+        variant="quiet"
+        title={translate('swap.cancel') as string}
+        disabled={committing}
+        onPress={back}
+      />
     </View>
   );
 
   return (
-    <SwapFlowScreen
-      testID="swap.review"
-      title={
-        isOutbound
-          ? (translate('swap.review-title-sell') as string)
-          : (translate('swap.review-title-buy') as string)
-      }
-      onBack={committing ? undefined : back}
-      footer={footer}
-    >
-      <SwapSummaryCard
-        testID="swap.review.summary"
-        sides={[
-          {
-            label: translate('swap.you-send') as string,
-            asset: quoteInput.sellAsset,
-            amount: quoteInput.sellAmountHumanDecimal,
-            usdUnitPrice: fiatValueBasis.sellUsdUnitPrice,
-          },
-          {
-            label: isOutbound
-              ? (translate('swap.you-receive') as string)
-              : (translate('swap.receive-in-zingo') as string),
-            asset: quoteInput.receiveAsset,
-            amount: chosen.expectedReceiveAmount,
-            usdUnitPrice: fiatValueBasis.receiveUsdUnitPrice,
-          },
-        ]}
-      />
-      <View
-        style={{
-          marginTop: space12,
-          borderWidth: 1,
-          borderColor: colors.bottomSheetBorder,
-          borderRadius: radiusMd,
-          paddingHorizontal: space16,
-        }}
+    <InfoTipHost>
+      <SwapFlowScreen
+        testID="swap.review"
+        title={translate('swap.review-title') as string}
+        onBack={committing ? undefined : back}
+        footer={footer}
       >
-        {row(
-          translate('swap.review-min') as string,
-          `${formatAmountForDisplay(chosen.minReceiveAmount)} ${receiveSymbol}`,
-          fiatValueBasis.receiveUsdUnitPrice > 0 &&
-            Number.isFinite(minReceiveUsd)
-            ? `≈ $${minReceiveUsd.toFixed(2)}`
-            : undefined,
-          'accent',
-        )}
-        {divider}
-        {row(translate('swap.review-fees') as string, feeText)}
-        {isOutbound && (
-          <>
-            {divider}
-            {row(
-              translate('swap.review-zcash-fee') as string,
-              `${Utils.parseNumberFloatToStringLocale(feeReserve, 4)} ${info.currencyName}`,
-              translate(
-                depositCarriesMemo(chosen.provider)
-                  ? 'swap.review-two-tx'
-                  : 'swap.review-one-tx',
-              ) as string,
-            )}
-          </>
-        )}
-        {!!counterpartyNetwork && (
-          <>
-            {divider}
-            {row(
-              translate(
-                isOutbound
-                  ? 'swap.review-dest-network'
-                  : 'swap.review-source-network',
-              ) as string,
-              counterpartyNetwork,
-            )}
-          </>
-        )}
-        {divider}
-        {row(
-          translate('swap.review-arrives') as string,
-          `${chosen.estimatedTimeText ? `${chosen.estimatedTimeText} · ` : ''}${providerShortLabel(chosen.provider)}`,
-        )}
-        {divider}
-        {row(
-          translate(
-            isOutbound ? 'swap.review-to-address' : 'swap.refund-address',
-          ) as string,
-          Utils.trimToSmall(address ?? '', 8),
-        )}
-      </View>
-      {!isOutbound && (
-        <Text
-          variant="caption"
-          tone="muted"
-          style={{ textAlign: 'center', marginTop: space12 }}
-        >
-          {translate('swap.review-next-address') as string}
-        </Text>
-      )}
-      <Pressable
-        testID="swap.review.advanced"
-        accessibilityRole="button"
-        accessibilityState={{ expanded: advancedOpen }}
-        onPress={() => setAdvancedOpen(open => !open)}
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginTop: space12,
-          paddingVertical: 11,
-        }}
-      >
-        <Text variant="bodySmall" tone={advancedOpen ? 'default' : 'muted'}>
-          {translate('swap.review-advanced') as string}
-        </Text>
-        {advancedOpen ? (
-          <ChevronUp size={15} color={colors.fgMuted} />
-        ) : (
-          <ChevronDown size={15} color={colors.fgMuted} />
-        )}
-      </Pressable>
-      {advancedOpen && (
+        <PairHero
+          from={quoteInput.sellAsset}
+          to={quoteInput.receiveAsset}
+          processing={
+            isOutbound
+              ? (translate('send.nym-processing-title') as string)
+              : undefined
+          }
+          title={(
+            translate(
+              isOutbound ? 'swap.review-swap-to' : 'swap.review-swap-from',
+            ) as string
+          ).replace('{coin}', isOutbound ? receiveSymbol : sellSymbol)}
+          amount={formatAmountForDisplay(chosen.expectedReceiveAmount)}
+          unit={receiveSymbol}
+          line={[
+            (translate('swap.review-for') as string).replace(
+              '{amount}',
+              `${formatAmountForDisplay(quoteInput.sellAmountHumanDecimal)} ${sellSymbol}`,
+            ),
+            fiatValueBasis.receiveUsdUnitPrice > 0 &&
+            Number.isFinite(receiveUsd)
+              ? `≈ $${receiveUsd.toFixed(2)}`
+              : '',
+          ]
+            .filter(Boolean)
+            .join(' · ')}
+        />
+        <View style={{ marginTop: 24 }}>
+          <DetailRows
+            rows={[
+              {
+                label: translate('swap.you-send') as string,
+                value: `${formatAmountForDisplay(quoteInput.sellAmountHumanDecimal)} ${sellSymbol}`,
+              },
+              {
+                label: translate('swap.review-min') as string,
+                value: `${formatAmountForDisplay(chosen.minReceiveAmount)} ${receiveSymbol}`,
+                tone: 'positive',
+                tip: translate('swap.tip-min') as string,
+              },
+              {
+                label: translate('swap.review-fees') as string,
+                value: feeValue,
+                tip: translate('swap.tip-fees') as string,
+              },
+              ...(isOutbound
+                ? [
+                    {
+                      label: translate('swap.review-zcash-fee') as string,
+                      value: `${Utils.parseNumberFloatToStringLocale(feeReserve, 4)} ${info.currencyName} · ${
+                        translate(
+                          depositCarriesMemo(chosen.provider)
+                            ? 'swap.review-two-tx'
+                            : 'swap.review-one-tx',
+                        ) as string
+                      }`,
+                      tip: translate('swap.tip-net') as string,
+                    },
+                  ]
+                : []),
+              ...(counterpartyNetwork
+                ? [
+                    {
+                      label: translate(
+                        isOutbound
+                          ? 'swap.review-dest-network'
+                          : 'swap.review-source-network',
+                      ) as string,
+                      value: counterpartyNetwork,
+                    },
+                  ]
+                : []),
+              {
+                label: translate('swap.review-arrives') as string,
+                value: [
+                  chosen.estimatedTimeText
+                    ? `~${chosen.estimatedTimeText}`
+                    : '',
+                  providerShortLabel(chosen.provider),
+                ]
+                  .filter(Boolean)
+                  .join(' · '),
+              },
+              {
+                label: translate(
+                  isOutbound ? 'swap.review-to' : 'swap.refund-address',
+                ) as string,
+                value: contact
+                  ? `${contact.label}  ${Utils.trimToSmall(address ?? '', 6)}`
+                  : Utils.trimToSmall(address ?? '', 6),
+                mono: !contact,
+                leading: contact ? (
+                  <ContactInitial
+                    name={contact.label}
+                    color={contact.color}
+                    size={24}
+                  />
+                ) : undefined,
+              },
+              {
+                label: translate('swap.slippage') as string,
+                value: `${formatSlippagePercent(slippage)}%`,
+                tip: translate('swap.tip-slip') as string,
+              },
+              ...(isOutbound
+                ? [
+                    {
+                      label: translate('swap.review-if-refunded') as string,
+                      value: translate(
+                        'swap.review-refund-new-address',
+                      ) as string,
+                    },
+                  ]
+                : []),
+            ]}
+          />
+        </View>
         <View
           style={{
-            borderWidth: 1,
-            borderColor: colors.bottomSheetBorder,
-            borderRadius: radiusMd,
-            paddingHorizontal: space16,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            columnGap: 6,
+            marginTop: 14,
           }}
         >
-          {row(
-            translate('swap.slippage') as string,
-            `${formatSlippagePercent(slippage)}%`,
-          )}
-          {isOutbound && (
-            <>
-              {divider}
-              {row(
-                translate('swap.review-if-refunded') as string,
-                translate('swap.review-refund-new-address') as string,
-              )}
-            </>
+          <ClockIcon size={14} color={colors.fgMuted} />
+          <Text variant="caption" tone="muted">
+            {translate('swap.review-price-fixed') as string}
+          </Text>
+        </View>
+        <View style={{ marginTop: 16 }}>
+          {isOutbound ? (
+            <NymNote text={translate('swap.review-nym-note') as string} />
+          ) : (
+            <Text
+              variant="caption"
+              tone="muted"
+              style={{ textAlign: 'center' }}
+            >
+              {translate('swap.review-next-address') as string}
+            </Text>
           )}
         </View>
-      )}
-      <AuthorizeSheet
-        ref={authSheetRef}
-        summary={`${translate('swap.auth-line-1') as string} ${formatAmountForDisplay(quoteInput.sellAmountHumanDecimal)} ${sellSymbol} ${translate('swap.auth-line-2') as string} ${providerShortLabel(chosen.provider)}.`}
-        onAuthorized={commit}
-      />
-    </SwapFlowScreen>
+        <AuthorizeSheet
+          ref={authSheetRef}
+          summary={`${translate('swap.auth-line-1') as string} ${formatAmountForDisplay(quoteInput.sellAmountHumanDecimal)} ${sellSymbol} ${translate('swap.auth-line-2') as string} ${providerShortLabel(chosen.provider)}.`}
+          onAuthorized={commit}
+        />
+      </SwapFlowScreen>
+    </InfoTipHost>
   );
 };
 

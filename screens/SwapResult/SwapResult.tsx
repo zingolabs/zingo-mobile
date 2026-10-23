@@ -7,7 +7,12 @@ import { radiusMd, space12, space16, space8, useTheme } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import { Route } from '@app/AppState';
 import { ContextAppLoaded, useSwapService } from '@app/context';
-import { SwapDirectionEnum, formatAmountForDisplay } from '@app/swap';
+import {
+  SwapDirectionEnum,
+  canonicalChainAddress,
+  formatAmountForDisplay,
+} from '@app/swap';
+import Utils from '@app/utils';
 import { leaveFlow } from '@app/navigation/navigate';
 import { useShieldFunds } from '@app/hooks/useShieldFunds';
 import Text from '@ui/primitives/Text';
@@ -41,7 +46,7 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
 }) => {
   const { recordId } = route.params;
   const context = useContext(ContextAppLoaded);
-  const { translate, info, totalBalance } = context;
+  const { translate, info, totalBalance, addressBook } = context;
   const { colors } = useTheme();
   const swapService = useSwapService();
   const record = useSwapRecord(recordId);
@@ -204,7 +209,19 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
   );
 
   if (outcome === 'completed') {
-    const title = `${translate('swap.result-received') as string} ${formatAmountForDisplay(received)} ${receiveSymbol}`;
+    const title = (translate('swap.result-received') as string).replace(
+      '{amount}',
+      `${formatAmountForDisplay(received)} ${receiveSymbol}`,
+    );
+    /** Who the coins reached: the contact's name, or the address shortened. */
+    const destination = record.destinationAddress;
+    const reached = addressBook.find(
+      c =>
+        c.swapChain.toUpperCase() === record.receiveAsset.chain.toUpperCase() &&
+        c.address ===
+          canonicalChainAddress(record.receiveAsset.chain, destination),
+    );
+    const who = reached ? reached.label : Utils.trimToSmall(destination, 6);
     return (
       <SwapFlowScreen
         testID="swap.result"
@@ -253,8 +270,13 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
           <CheckIcon size={38} color={colors.fgAccent} />,
           title,
           isOutbound
-            ? (translate('swap.result-at-your-address') as string)
-            : (translate('swap.result-in-your-wallet') as string),
+            ? (translate('swap.result-at-your-address') as string).replace(
+                '{who}',
+                who,
+              )
+            : transparentFunds
+              ? ''
+              : (translate('swap.result-in-your-wallet') as string),
         )}
         {!isOutbound &&
           transparentFunds &&
@@ -290,10 +312,16 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
         {head(
           'warning',
           <RefreshIcon size={34} color={colors.fgWarning} />,
-          `${translate('swap.result-refunded-title') as string} ${sellSymbol}`,
+          (translate('swap.result-refunded-title') as string).replace(
+            '{coin}',
+            sellSymbol,
+          ),
           isOutbound
             ? (translate('swap.result-refunded-sell') as string)
-            : `${translate('swap.result-refunded-buy-1') as string} ${sellSymbol} ${translate('swap.result-refunded-buy-2') as string}`,
+            : (translate('swap.result-refunded-buy') as string).replace(
+                '{coin}',
+                sellSymbol,
+              ),
         )}
         {rows([
           [
@@ -339,6 +367,8 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
   if (outcome === 'incomplete') {
     const need = record.sellAmountHumanDecimal;
     const got = refund?.depositedAmountText;
+    const missing =
+      parseFloat(refund?.minDepositText ?? need) - parseFloat(got ?? '0');
     return (
       <SwapFlowScreen
         testID="swap.result"
@@ -382,14 +412,16 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
             `${formatAmountForDisplay(refund?.minDepositText ?? need)} ${sellSymbol}`,
             'default',
           ],
+          ...(got && missing > 0
+            ? [
+                [
+                  translate('swap.result-missing') as string,
+                  `${formatAmountForDisplay(String(missing))} ${sellSymbol}`,
+                  'warning',
+                ] as [string, string, 'warning'],
+              ]
+            : []),
         ])}
-        <Text
-          variant="caption"
-          tone="muted"
-          style={{ textAlign: 'center', marginTop: space16 }}
-        >
-          {translate('swap.result-incomplete-note') as string}
-        </Text>
       </SwapFlowScreen>
     );
   }

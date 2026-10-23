@@ -2,10 +2,11 @@
 import React, { useContext } from 'react';
 import { Pressable, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { radiusMd, space12, space16, space4, useTheme } from '@app/theme';
+import { radiusLg, space12, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import Text from '@ui/primitives/Text';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
+import { InfoTipButton } from '@ui/widgets/InfoTip';
 
 export type DetailRow = {
   label: string;
@@ -14,19 +15,35 @@ export type DetailRow = {
   copy?: string;
   /** Long words that wrap instead of sitting on one line. */
   wrap?: boolean;
+  /** What the label means, behind an info icon; needs an InfoTipHost above. */
+  tip?: string;
+  /** Green for what you get, amber for what came back, Nym green for the mixnet. */
+  tone?: 'positive' | 'warning' | 'nym';
+  /** Drawn before the value: a contact's avatar. */
+  leading?: React.ReactNode;
+  /** A shortened address or id, set in the monospace face. */
+  mono?: boolean;
 };
 
 /** A detail's facts, label on the left and value on the right. */
 export default function DetailRows({ rows }: { rows: DetailRow[] }) {
   const { translate, addLastSnackbar } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
+  const toneColor = (tone: DetailRow['tone']) =>
+    tone === 'positive'
+      ? colors.fgPriceUp
+      : tone === 'warning'
+        ? colors.fgTransparent
+        : tone === 'nym'
+          ? colors.bgNym
+          : colors.fgDefault;
   return (
     <View
       style={{
         borderWidth: 1,
         borderColor: colors.bottomSheetBorder,
-        borderRadius: radiusMd,
-        paddingHorizontal: space16,
+        borderRadius: radiusLg,
+        backgroundColor: colors.bgCanvas,
       }}
     >
       {rows.map((row, index) => (
@@ -35,43 +52,68 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
-            alignItems: 'flex-start',
+            alignItems: 'center',
             columnGap: space12,
-            paddingVertical: 11,
+            minHeight: 44,
+            paddingVertical: 10,
+            paddingHorizontal: 14,
             borderTopWidth: index === 0 ? 0 : 1,
-            borderTopColor: colors.bottomSheetBorder,
+            borderTopColor: colors.borderSubtle,
           }}
         >
-          <Text variant="bodySmall" tone="muted">
-            {row.label}
-          </Text>
-          {row.copy ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={translate('swap.copy') as string}
-              hitSlop={8}
-              onPress={() => {
-                Clipboard.setString(row.copy ?? '');
-                addLastSnackbar(translate('swap.copied') as string);
-              }}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                columnGap: space4,
-              }}
-            >
-              <Text variant="address">{row.value}</Text>
-              <CopyIcon size={14} color={colors.fgAccent} />
-            </Pressable>
-          ) : (
+          <View
+            style={{ flexDirection: 'row', alignItems: 'center', columnGap: 4 }}
+          >
+            <Text variant="caption" tone="muted">
+              {row.label}
+            </Text>
+            {!!row.tip && <InfoTipButton label={row.label} text={row.tip} />}
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              columnGap: 8,
+              flexShrink: 1,
+              minWidth: 0,
+            }}
+          >
+            {row.leading}
             <Text
-              variant="bodyStrong"
+              variant={row.mono || row.copy ? 'address' : 'bodySmall'}
               numberOfLines={row.wrap ? undefined : 1}
-              style={{ flexShrink: 1, textAlign: 'right' }}
+              style={{
+                flexShrink: 1,
+                textAlign: 'right',
+                fontWeight: '600',
+                fontSize: 12,
+                color: toneColor(row.tone),
+              }}
             >
               {row.value}
             </Text>
-          )}
+            {!!row.copy && (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={translate('swap.copy') as string}
+                hitSlop={8}
+                onPress={() => {
+                  Clipboard.setString(row.copy ?? '');
+                  addLastSnackbar(translate('swap.copied') as string);
+                }}
+                style={{
+                  width: 28,
+                  height: 28,
+                  marginVertical: -6,
+                  marginRight: -8,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <CopyIcon size={16} color={colors.fgMuted} />
+              </Pressable>
+            )}
+          </View>
         </View>
       ))}
     </View>

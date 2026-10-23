@@ -17,6 +17,7 @@ import ListRow from '@ui/primitives/ListRow';
 import SearchField from '@ui/widgets/SearchField';
 import Banner from '@ui/widgets/Banner';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
+import { ChainLogo } from '@ui/widgets/ChainSelect';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import TokenLogo from './TokenLogo';
 import SheetTitle from './SheetTitle';
@@ -35,6 +36,9 @@ const POPULAR = ['BTC', 'ETH', 'SOL', 'USDC', 'USDT'];
 
 /** Rows rendered at once. The catalog runs to hundreds of entries. */
 const VISIBLE_LIMIT = 60;
+
+/** Network badges stacked on a coin that lives on several. */
+const BADGES = 4;
 
 const lower = (value: string | undefined): string =>
   (value ?? '').toLowerCase();
@@ -56,15 +60,20 @@ function groupByTicker(tokens: TokenEntryType[]): TickerGroup[] {
   return [...groups.values()];
 }
 
+const networkName = (token: TokenEntryType): string =>
+  chainDisplayName(token.chain) || token.chain;
+
 /**
- * The asset picker. One row per ticker; a ticker on several networks opens a
- * second step that names them, since sending on the wrong network loses the
- * funds. Search matches ticker, name and network, the closest match first.
+ * The asset picker. One row per ticker; a coin on several networks shows
+ * their badges and opens them in the same sheet, since sending on the wrong
+ * network loses the funds. Search finds coins by ticker and name, and lists
+ * apart the coins that live on a network matching it.
  */
 const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
   ({ tokens, selected, onSelect }, ref) => {
     const { translate } = useContext(ContextAppLoaded);
     const { colors } = useTheme();
+    const t = (key: string) => translate(key) as string;
     const [query, setQuery] = useState<string>('');
     const [networksOf, setNetworksOf] = useState<TickerGroup | null>(null);
 
@@ -77,13 +86,13 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
     const matches = useMemo(() => {
       const q = query.trim().toLowerCase();
       if (!q) {
-        const popular = POPULAR.map(t =>
-          groups.find(g => g.ticker === t),
+        const popular = POPULAR.map(ticker =>
+          groups.find(g => g.ticker === ticker),
         ).filter((g): g is TickerGroup => !!g);
         const rest = groups
           .filter(g => !POPULAR.includes(g.ticker))
           .sort((a, b) => a.ticker.localeCompare(b.ticker));
-        return { popular, rest: rest.slice(0, VISIBLE_LIMIT) };
+        return { popular, rest: rest.slice(0, VISIBLE_LIMIT), onNetwork: [] };
       }
       const rank = (g: TickerGroup): number => {
         const ticker = g.ticker.toLowerCase();
@@ -93,24 +102,30 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
         if (ticker.startsWith(q)) {
           return 1;
         }
-        if (g.tokens.some(t => lower(t.chain) === q)) {
+        if (lower(g.name).startsWith(q)) {
           return 2;
         }
-        if (lower(g.name).startsWith(q)) {
-          return 3;
-        }
-        return 4;
+        return 3;
       };
-      const hit = (g: TickerGroup): boolean =>
-        g.ticker.toLowerCase().includes(q) ||
-        lower(g.name).includes(q) ||
-        g.tokens.some(t => lower(t.chain).includes(q));
+      const direct = groups
+        .filter(
+          g => g.ticker.toLowerCase().includes(q) || lower(g.name).includes(q),
+        )
+        .sort((a, b) => rank(a) - rank(b));
+      const onNetwork = groups
+        .filter(g => !direct.includes(g))
+        .flatMap(g =>
+          g.tokens.filter(
+            token =>
+              (lower(token.chain).includes(q) ||
+                lower(networkName(token)).includes(q)) &&
+              (g.tokens.length > 1 || token.chain !== token.symbol),
+          ),
+        );
       return {
         popular: [],
-        rest: groups
-          .filter(hit)
-          .sort((a, b) => rank(a) - rank(b))
-          .slice(0, VISIBLE_LIMIT),
+        rest: direct.slice(0, VISIBLE_LIMIT),
+        onNetwork: onNetwork.slice(0, VISIBLE_LIMIT),
       };
     }, [groups, query]);
 
@@ -120,6 +135,26 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
       setQuery('');
       dismiss();
     };
+
+    const check = <CheckIcon size={18} color={colors.fgAccent} />;
+
+    const badgeStack = (group: TickerGroup) => (
+      <View style={{ flexDirection: 'row' }}>
+        {group.tokens.slice(0, BADGES).map((token, index) => (
+          <View
+            key={token.identifier}
+            style={{
+              marginLeft: index === 0 ? 0 : -5,
+              borderRadius: 9,
+              borderWidth: 2,
+              borderColor: colors.bgSurface,
+            }}
+          >
+            <ChainLogo chain={token.chain} size={14} />
+          </View>
+        ))}
+      </View>
+    );
 
     const row = (group: TickerGroup) => {
       const multi = group.tokens.length > 1;
@@ -141,11 +176,23 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
           subtitle={group.name}
           trailing={
             multi ? (
-              <Text variant="bodySmall" tone="muted">
-                {`${group.tokens.length} ${translate('swap.assets-networks') as string}`}
-              </Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  columnGap: 6,
+                }}
+              >
+                {badgeStack(group)}
+                <Text variant="caption" tone="muted">
+                  {t('swap.assets-networks').replace(
+                    '{n}',
+                    String(group.tokens.length),
+                  )}
+                </Text>
+              </View>
             ) : isSelected ? (
-              <CheckIcon size={17} color={colors.fgAccent} />
+              check
             ) : undefined
           }
           chevron={multi}
@@ -154,19 +201,62 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
       );
     };
 
+    const networkRow = (token: TokenEntryType) => (
+      <ListRow
+        key={token.identifier}
+        testID={`swap.asset.${token.identifier}`}
+        leading={
+          <TokenLogo
+            token={token}
+            size={32}
+            surfaceColor={colors.bgSurface}
+            forceBadge
+          />
+        }
+        title={(token.ticker || token.symbol || '').toUpperCase()}
+        subtitle={t('swap.asset-on')
+          .replace('{asset}', token.name ?? token.ticker ?? '')
+          .replace('{network}', networkName(token))}
+        trailing={token.identifier === selected?.identifier ? check : undefined}
+        onPress={() => pick(token)}
+      />
+    );
+
+    const groupLabel = (text: string, first: boolean) => (
+      <Text
+        variant="caption"
+        tone="muted"
+        style={{
+          fontWeight: '700',
+          marginTop: first ? space12 : space16,
+          marginBottom: space8,
+        }}
+      >
+        {text}
+      </Text>
+    );
+
     const header = (
       <SheetTitle
         title={
           networksOf
-            ? `${networksOf.ticker} · ${translate('swap.assets-network-title') as string}`
-            : (translate('swap.assets-title') as string)
+            ? t('swap.assets-network-title').replace(
+                '{coin}',
+                networksOf.ticker,
+              )
+            : t('swap.assets-title')
         }
         onClose={dismiss}
-        closeLabel={translate('swap.close') as string}
+        closeLabel={t('swap.close')}
         onBack={networksOf ? () => setNetworksOf(null) : undefined}
-        backLabel={translate('swap.assets-all') as string}
+        backLabel={t('swap.assets-all')}
       />
     );
+
+    const nothing =
+      matches.popular.length === 0 &&
+      matches.rest.length === 0 &&
+      matches.onNetwork.length === 0;
 
     return (
       <AppSheetModal
@@ -187,26 +277,20 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
           >
             <Banner
               tone="warning"
-              title={`${networksOf.ticker} ${translate('swap.assets-network-warning') as string}`}
+              title={t('swap.assets-network-warning').replace(
+                '{coin}',
+                networksOf.ticker,
+              )}
             />
             <View style={{ height: space12 }} />
             {networksOf.tokens.map(token => (
               <ListRow
                 key={token.identifier}
                 testID={`swap.network.${token.chain}`}
-                leading={
-                  <TokenLogo
-                    token={token}
-                    size={32}
-                    surfaceColor={colors.bgSurface}
-                    forceBadge
-                  />
-                }
-                title={chainDisplayName(token.chain) || token.chain}
+                leading={<ChainLogo chain={token.chain} size={32} />}
+                title={networkName(token)}
                 trailing={
-                  token.identifier === selected?.identifier ? (
-                    <CheckIcon size={17} color={colors.fgAccent} />
-                  ) : undefined
+                  token.identifier === selected?.identifier ? check : undefined
                 }
                 onPress={() => pick(token)}
               />
@@ -223,40 +307,36 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
             <SearchField
               value={query}
               onChangeText={setQuery}
-              placeholder={translate('swap.assets-search') as string}
+              placeholder={t('swap.assets-search')}
               testID="swap.asset-search"
             />
-            {matches.popular.length > 0 && (
-              <Text
-                variant="caption"
-                tone="muted"
-                style={{ marginTop: space12, marginBottom: space8 }}
-              >
-                {translate('swap.assets-popular') as string}
-              </Text>
-            )}
+            {matches.popular.length > 0 &&
+              groupLabel(t('swap.assets-popular'), true)}
             {matches.popular.map(row)}
-            {matches.popular.length > 0 && matches.rest.length > 0 && (
-              <Text
-                variant="caption"
-                tone="muted"
-                style={{ marginTop: space16, marginBottom: space8 }}
-              >
-                {translate('swap.assets-more') as string}
-              </Text>
+            {matches.popular.length > 0 &&
+              matches.rest.length > 0 &&
+              groupLabel(t('swap.assets-more'), false)}
+            {matches.popular.length === 0 && matches.rest.length > 0 && (
+              <View style={{ height: space12 }} />
             )}
             {matches.rest.map(row)}
-            {matches.popular.length === 0 && matches.rest.length === 0 && (
+            {matches.onNetwork.length > 0 &&
+              groupLabel(
+                t('swap.assets-on-network'),
+                matches.rest.length === 0,
+              )}
+            {matches.onNetwork.map(networkRow)}
+            {nothing && (
               <View style={{ alignItems: 'center', paddingVertical: 48 }}>
                 <Text variant="body" tone="muted">
-                  {`${translate('swap.assets-empty') as string} “${query.trim()}”`}
+                  {t('swap.assets-empty').replace('{query}', query.trim())}
                 </Text>
                 <Text
                   variant="bodySmall"
                   tone="muted"
                   style={{ marginTop: space8 }}
                 >
-                  {translate('swap.assets-empty-hint') as string}
+                  {t('swap.assets-empty-hint')}
                 </Text>
               </View>
             )}

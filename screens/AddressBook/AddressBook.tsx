@@ -212,13 +212,14 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     await AddressBookFileImpl.writeAddressBook(sorted);
   };
 
-  const save = async (name: string, address: string) => {
+  const save = async (name: string, address: string, chain: string) => {
     setAddressBook(
       await AddressBookFileImpl.saveContact(
         edit.kind === 'edit' ? edit.contact : undefined,
         name,
         address,
         walletChain,
+        chain,
       ),
     );
     contactSheet.current?.dismiss();
@@ -518,7 +519,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                     first={index === 0}
                     open={!pick && openAddress === contact.address}
                     sendable={!pick && canSend && zcash}
-                    editable={zcash}
+                    editable
                     flash={flashAddress === contact.address}
                     leaving={leavingAddress === contact.address}
                     onToggle={() =>

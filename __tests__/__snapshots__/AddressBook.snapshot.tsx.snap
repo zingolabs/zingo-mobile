@@ -440,7 +440,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
               {
                 "busy": undefined,
                 "checked": undefined,
-                "disabled": true,
+                "disabled": false,
                 "expanded": undefined,
                 "selected": undefined,
               }
@@ -455,7 +455,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
             }
             accessible={true}
             collapsable={false}
-            focusable={false}
+            focusable={true}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -757,6 +757,3797 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                   }
                 >
                   ZEC
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/btc.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Bitcoin
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  BTC
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/eth.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Ethereum
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  ETH
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/adi.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  ADI
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  ADI
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/arb.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Arbitrum
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  ARB
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "backgroundColor": "#7d2be2",
+                    "borderRadius": 18,
+                    "height": 36,
+                    "justifyContent": "center",
+                    "width": 36,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 12,
+                      "fontWeight": "600",
+                    }
+                  }
+                >
+                  ARC
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  ARC
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  ARC
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/avax.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Avalanche
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  AVAX
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/base.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Base
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  BASE
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/bera.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Berachain
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  BERA
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/bsc.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  BNB Chain
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  BSC
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/cro.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Cronos
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  CRO
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/ftm.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Fantom
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  FTM
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/gno.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  GNO
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  GNO
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "backgroundColor": "#e08414",
+                    "borderRadius": 18,
+                    "height": 36,
+                    "justifyContent": "center",
+                    "width": 36,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#060B12",
+                      "fontSize": 12,
+                      "fontWeight": "600",
+                    }
+                  }
+                >
+                  HOO
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  HOOD
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  HOOD
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "backgroundColor": "#094b7a",
+                    "borderRadius": 18,
+                    "height": 36,
+                    "justifyContent": "center",
+                    "width": 36,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 12,
+                      "fontWeight": "600",
+                    }
+                  }
+                >
+                  HYP
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  HYPE
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  HYPE
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "backgroundColor": "#f9a94d",
+                    "borderRadius": 18,
+                    "height": 36,
+                    "justifyContent": "center",
+                    "width": 36,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#060B12",
+                      "fontSize": 12,
+                      "fontWeight": "600",
+                    }
+                  }
+                >
+                  HYP
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  HYPEREVM
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  HYPEREVM
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/kava.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Kava
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  KAVA
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/linea.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  LINEA
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  LINEA
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/mnt.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Mantle
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  MNT
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/monad.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  MONAD
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  MONAD
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/op.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Optimism
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  OP
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/pol.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Polygon
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  POL
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/xlayer.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  XLAYER
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  XLAYER
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/bch.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Bitcoin Cash
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  BCH
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/ltc.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Litecoin
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  LTC
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/doge.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Dogecoin
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  DOGE
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/dash.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Dash
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  DASH
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/near.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Near
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  NEAR
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/tron.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  TRON
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  TRON
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/atom.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Cosmos
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  ATOM
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/xrp.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  XRP Ledger
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  XRP
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/xlm.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Stellar
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  XLM
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/ada.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Cardano
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  ADA
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/dot.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Polkadot
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  DOT
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/sui.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Sui
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  SUI
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/ton.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  TON
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  TON
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/strk.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Starknet
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  STRK
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "backgroundColor": "#7641c6",
+                    "borderRadius": 18,
+                    "height": 36,
+                    "justifyContent": "center",
+                    "width": 36,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 12,
+                      "fontWeight": "600",
+                    }
+                  }
+                >
+                  ALE
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  ALEO
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  ALEO
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/thor.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Thorchain
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  THOR
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/maya.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Mayachain
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  MAYA
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "backgroundColor": "#ce794c",
+                    "borderRadius": 18,
+                    "height": 36,
+                    "justifyContent": "center",
+                    "width": 36,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#060B12",
+                      "fontSize": 12,
+                      "fontWeight": "600",
+                    }
+                  }
+                >
+                  XMR
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  XMR
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  XMR
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomColor": "#FFFFFF0F",
+                  "borderBottomWidth": 1.5,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                  "paddingHorizontal": 20,
+                  "paddingVertical": 12,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/chains/sol.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "500",
+                    }
+                  }
+                >
+                  Solana
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  SOL
                 </Text>
               </View>
             </View>

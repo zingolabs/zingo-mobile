@@ -191,7 +191,7 @@ describe('unavailableProviders', () => {
     });
 
     expect(camel[0].reason).toMatch(/refusing requests/);
-    expect(minimum[0].reason).toBe('Needs at least 2 ZEC.');
+    expect(minimum[0].reason).toBe('Needs at least 2.0 ZEC.');
   });
 
   // An identifier reaching the screen is the bug this closes. Anything not
@@ -238,7 +238,7 @@ describe('unavailableProviders', () => {
       sellAssetTicker: 'ZEC',
     });
 
-    expect(result[0].reason).toBe('Needs at least 1 ZEC.');
+    expect(result[0].reason).toBe('Needs at least 1.0 ZEC.');
   });
 });
 
@@ -282,7 +282,7 @@ describe('unavailableProviders and routes this app cannot take', () => {
     expect(result).toEqual([
       {
         provider: SwapKitProviderEnum.Flashnet,
-        reason: 'Needs at least 1 ZEC.',
+        reason: 'Needs at least 1.0 ZEC.',
       },
     ]);
   });
