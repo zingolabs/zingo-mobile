@@ -847,17 +847,6 @@ class RPCModule: NSObject {
       }
   }
 
-  // The app-supplied migration broadcast candidate pool (its indexer
-  // registry); zingolib embeds no default set.
-  @objc(setBroadcastCandidates:resolve:reject:)
-  func setBroadcastCandidatesProcess(_ candidatesJson: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try setBroadcastCandidates(candidatesJson: candidatesJson)
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
   // Mixnet Mode (send-over-nym). The wallet-side FFI seam, bridged on both
   // platforms; the local proxy is hosted separately by NymTransportModule.
   @objc(attachMixnet:exitNode:resolve:reject:)

@@ -14,10 +14,10 @@
 ## Building
 
 The Binding Layer comes from the iOS Prebuilt Bundle that `binding-layer.json`
-pins: the `ZingoBindings` Swift package with two XCFrameworks (`Zingolib`,
-`ZingoNymProxyFFI`) and the Swift sources. The fetch extracts it under
-`ios/binding-layer/ZingoBindings`, where the Xcode project references it as a
-local package. Each XCFramework contains both the device slice (arm64) and
+pins: the `ZingoBindings` Swift package with one XCFramework (`Zingolib`, which
+carries the wallet and the Nym proxy) and the Swift sources. The fetch extracts
+it under `ios/binding-layer/ZingoBindings`, where the Xcode project references
+it as a local package. The XCFramework contains both the device slice (arm64) and
 the simulator slice (arm64 + x86_64), and Xcode picks the slice by the build
 destination.
 
