@@ -83,56 +83,54 @@ const inbound = (overrides: Partial<SwapRecordType> = {}): SwapRecordType =>
   });
 
 describe('the amount on the row', () => {
-  // The ZEC leg of a swap already has its own row beside this one, and those
-  // are not deduplicated away. Repeating the ZEC figure here would say what
-  // the neighbouring row already said, so the row carries the side nothing
-  // else in the wallet can show.
-  it('shows what is being bought on an outbound swap', () => {
+  // The row reads like every other row in the list: the ZEC that left the
+  // wallet, or the ZEC that arrived. The asset on the other side names the
+  // pair beside it.
+  it('shows the ZEC sold on an outbound swap', () => {
     const vt = swapRecordToValueTransfer(outbound());
-
-    expect(vt.amount).toBe(0.002);
-    expect(vt.swapAssetTicker).toBe('BTC');
-  });
-
-  it('shows what was paid on an inbound swap', () => {
-    const vt = swapRecordToValueTransfer(inbound());
 
     expect(vt.amount).toBe(1.5);
     expect(vt.swapAssetTicker).toBe('BTC');
   });
 
+  it('shows the ZEC bought on an inbound swap', () => {
+    const vt = swapRecordToValueTransfer(inbound());
+
+    expect(vt.amount).toBe(0.002);
+    expect(vt.swapAssetTicker).toBe('BTC');
+  });
+
   // Once the provider reports what it really paid out, that beats the
-  // quote-time estimate the outbound row started with.
-  it('prefers the realised payout over the estimate once outbound settles', () => {
+  // quote-time estimate the inbound row started with.
+  it('prefers the realised payout over the estimate once inbound settles', () => {
     expect(
-      swapRecordToValueTransfer(outbound({ actualReceiveAmount: '0.0031' }))
+      swapRecordToValueTransfer(inbound({ actualReceiveAmount: '0.0031' }))
         .amount,
     ).toBe(0.0031);
   });
 
-  // Inbound reads the amount the user sent, which is fixed at commit time, so
-  // a payout figure arriving later does not move it.
-  it('keeps the inbound row on the amount paid', () => {
+  // Outbound reads the amount the user sent, which is fixed at commit time,
+  // so a payout figure arriving later does not move it.
+  it('keeps the outbound row on the amount paid', () => {
     expect(
-      swapRecordToValueTransfer(inbound({ actualReceiveAmount: '0.0031' }))
+      swapRecordToValueTransfer(outbound({ actualReceiveAmount: '0.0031' }))
         .amount,
     ).toBe(1.5);
   });
 
   it('falls back to zero rather than NaN when an amount is unreadable', () => {
     expect(
-      swapRecordToValueTransfer(inbound({ sellAmountHumanDecimal: '' })).amount,
+      swapRecordToValueTransfer(inbound({ expectedReceiveAmount: '' })).amount,
     ).toBe(0);
   });
 });
 
 describe('the price on the row', () => {
-  // Pricing a BTC amount at the ZEC rate would be a wrong number rather than a
-  // missing one, so the row carries the counterparty's own price, captured
-  // when the route was quoted.
-  it('carries the price of the side it is showing', () => {
-    expect(swapRecordToValueTransfer(outbound()).swapUsdUnitPrice).toBe(60000);
-    expect(swapRecordToValueTransfer(inbound()).swapUsdUnitPrice).toBe(60000);
+  // The amount is ZEC, so the price is ZEC's, captured when the route was
+  // quoted rather than read from today's ticker.
+  it('carries the price of ZEC when the route was quoted', () => {
+    expect(swapRecordToValueTransfer(outbound()).swapUsdUnitPrice).toBe(30);
+    expect(swapRecordToValueTransfer(inbound()).swapUsdUnitPrice).toBe(30);
   });
 
   // Zero is what the renderers read as "no figure to show", and it is what

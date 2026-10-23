@@ -193,6 +193,8 @@ jobs:
           cache: yarn
 
       - name: Yarn install
+        env:
+          SWAPKIT_API_KEY: ${{ secrets.SWAPKIT_API_KEY }}
         run: yarn install --frozen-lockfile
 
       - name: Assemble APKs (4 ABI splits + universal)

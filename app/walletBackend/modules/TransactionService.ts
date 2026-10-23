@@ -11,6 +11,7 @@ import RPCModule from '@app/RPCModule';
 import { RPCSendProposeType } from '@app/walletBackend/types/RPCSendProposeType';
 import { RPCSendType } from '@app/walletBackend/types/RPCSendType';
 import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
+import { depositSpendsSourceAddress } from '@app/swap/depositRouting';
 import { SyncCoordinator } from './SyncCoordinator';
 
 export class TransactionService {
@@ -106,4 +107,66 @@ export class TransactionService {
 
     return sendTxPromise;
   }
+
+  // Pays a swap deposit, answering every txid in order, the vault payment
+  // last. A memo rides in an OP_RETURN, which a shielded spend cannot carry:
+  // a memo-bearing deposit is a deshield to a wallet-owned transparent
+  // address and that address paying the vault, through its own native entry
+  // point. The same pair, carrying no memo, serves a provider that checks the
+  // deposit came from the declared source address. Otherwise it is one
+  // ordinary send, with Maya's shielded memo as a 0 ZEC note beside it.
+  async sendSwapDeposit(args: {
+    depositAddress: string;
+    amountAtomic: number;
+    memoBytes?: Uint8Array;
+    viaSourceAddress?: boolean;
+    shieldedMemoAddress?: string;
+  }): Promise<string[]> {
+    const carriesMemo = !!args.memoBytes && args.memoBytes.length > 0;
+    if (!depositSpendsSourceAddress(args)) {
+      const sendJson: Array<SendJsonToTypeType> = [
+        { address: args.depositAddress, amount: args.amountAtomic },
+      ];
+      if (args.shieldedMemoAddress && args.memoBytes && carriesMemo) {
+        sendJson.push({
+          address: args.shieldedMemoAddress,
+          amount: 0,
+          memo: utf8Text(args.memoBytes),
+        });
+      }
+      const joined = await this.sendTransaction(sendJson);
+      return joined
+        .split(',')
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+    }
+
+    await this.syncCoordinator.clearTimers();
+    this.setInSend(true);
+    this.config.keepAwake(true);
+    try {
+      const answer = await RPCModule.sendSwapDepositProcess(
+        args.depositAddress,
+        String(args.amountAtomic),
+        args.memoBytes && carriesMemo ? bytesToHex(args.memoBytes) : '',
+      );
+      const parsed: RPCSendType = JSON.parse(answer);
+      if (parsed.error) {
+        throw new Error(parsed.error);
+      }
+      return parsed.txids ?? [];
+    } finally {
+      await this.syncCoordinator.refreshSync();
+      await this.syncCoordinator.configure();
+      this.setInSend(false);
+    }
+  }
+}
+
+function bytesToHex(bytes: Uint8Array): string {
+  return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function utf8Text(bytes: Uint8Array): string {
+  return new TextDecoder().decode(bytes);
 }

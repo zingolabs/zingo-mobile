@@ -37,6 +37,7 @@ enum FfiOutcome {
     case .Read(let message): return ("Read", message)
     case .Send(let message): return ("Send", message)
     case .Shield(let message): return ("Shield", message)
+    case .SendAfterDeshield(let message): return ("SendAfterDeshield", message)
     case .InvalidInput(let message): return ("InvalidInput", message)
     case .Wallet(let message): return ("Wallet", message)
     case .Indexer(let message): return ("Indexer", message)
@@ -210,6 +211,21 @@ class RPCModule: NSObject {
   // Moves the existing wallet file to the resting protection this build
   // writes: class C plus backup exclusion. Old builds wrote class A, and
   // a synced wallet can open without a save.
+  // The swap records live in AsyncStorage, in Application Support. iCloud
+  // backs that folder up unless told otherwise, and the wallet file it
+  // belongs with is excluded, so the folder is created ahead of the first
+  // write and excluded the same way.
+  func excludeSwapStoreFromBackup() {
+    let fm = FileManager.default
+    guard let support = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first,
+          let bundleId = Bundle.main.bundleIdentifier else { return }
+    var storage = support.appendingPathComponent(bundleId).appendingPathComponent("RCTAsyncLocalStorage_V1")
+    try? fm.createDirectory(at: storage, withIntermediateDirectories: true)
+    var resourceValues = URLResourceValues()
+    resourceValues.isExcludedFromBackup = true
+    try? storage.setResourceValues(resourceValues)
+  }
+
   func applyWalletFileProtection() {
     let fm = FileManager.default
     guard let path = try? getFileName(Constants.WalletFileName.rawValue), fm.fileExists(atPath: path) else { return }
@@ -283,6 +299,7 @@ class RPCModule: NSObject {
   func walletExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     completePendingSwap()
     applyWalletFileProtection()
+    excludeSwapStoreFromBackup()
     do {
       let result = try fileExists(Constants.WalletFileName.rawValue)
       DispatchQueue.main.async {
@@ -300,6 +317,7 @@ class RPCModule: NSObject {
   func walletBackupExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     completePendingSwap()
     applyWalletFileProtection()
+    excludeSwapStoreFromBackup()
     do {
       let result = try fileExists(Constants.WalletBackupFileName.rawValue)
       DispatchQueue.main.async {
@@ -1241,6 +1259,27 @@ class RPCModule: NSObject {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
           try confirm()
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  @objc(sendSwapDepositProcess:amount:memo_hex:resolve:reject:)
+  func sendSwapDepositProcess(_ vault_address: String, amount: String, memo_hex: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try sendSwapDeposit(
+            vaultAddress: vault_address,
+            amount: FfiArgs.requiredU64(amount, name: "amount"),
+            memoHex: memo_hex)
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  @objc(reserveRefundAddressProcess:reject:)
+  func reserveRefundAddressProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try reserveRefundAddress()
         }.settle(resolve: resolve, reject: reject)
       }
   }

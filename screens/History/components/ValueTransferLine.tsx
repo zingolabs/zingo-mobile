@@ -146,7 +146,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     vt.confirmations < GlobalConst.minConfirmations &&
     vt.status !== RPCValueTransfersStatusEnum.failed
       ? RefreshIcon
-      : vt.kind === ValueTransferKindEnum.Migration
+      : vt.kind === ValueTransferKindEnum.Migration ||
+          vt.kind === ValueTransferKindEnum.Swap
         ? SwapIcon
         : vt.kind === ValueTransferKindEnum.Received ||
             vt.kind === ValueTransferKindEnum.Shield
@@ -154,6 +155,13 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
           : ArrowUpIcon;
 
   const haveMemo = vt.memos && vt.memos.length > 0 && !!vt.memos.join('');
+  const isSwap = vt.kind === ValueTransferKindEnum.Swap;
+  // The pair the swap trades, in the slot the address takes on other rows.
+  const swapPair = isSwap
+    ? vt.swapIsInbound
+      ? `${vt.swapAssetTicker} → ${info.currencyName}`
+      : `${info.currencyName} → ${vt.swapAssetTicker}`
+    : '';
   const failed = vt.status === RPCValueTransfersStatusEnum.failed;
   const inFlight =
     vt.status === RPCValueTransfersStatusEnum.transmitted ||
@@ -301,6 +309,9 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
       )}
       <TouchableOpacity
         style={{ zIndex: 999 }}
+        // A swap row opens nothing yet: its detail is the swap record's, which
+        // the swap screens bring.
+        disabled={isSwap || undefined}
         onPress={async () => {
           closeAllSwipeables();
           await new Promise(r => requestAnimationFrame(r));
@@ -336,7 +347,12 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   </Text>
                   {/* One line in every row: the address takes what is
                       left and is clipped, so no row grows a second line. */}
-                  {!!vt.address && !pending && (
+                  {isSwap && (
+                    <Text variant="body" tone="muted">
+                      {swapPair}
+                    </Text>
+                  )}
+                  {!!vt.address && !pending && !isSwap && (
                     <View style={{ flexShrink: 1, overflow: 'hidden' }}>
                       <AddressItem address={vt.address} oneLine={true} />
                     </View>

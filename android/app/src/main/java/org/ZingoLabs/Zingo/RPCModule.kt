@@ -1102,6 +1102,26 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
+    fun sendSwapDepositProcess(vaultAddress: String, amount: String, memoHex: String, promise: Promise) {
+        FfiOutcome.settling(promise, "send_swap_deposit") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.sendSwapDeposit(
+                vaultAddress = vaultAddress,
+                amount = FfiArgs.requiredU64(amount, "amount"),
+                memoHex = memoHex,
+            )
+        }
+    }
+
+    @ReactMethod
+    fun reserveRefundAddressProcess(promise: Promise) {
+        FfiOutcome.settling(promise, "reserve_refund_address") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.reserveRefundAddress()
+        }
+    }
+
+    @ReactMethod
     fun planOrchardDrainProcess(promise: Promise) {
         FfiOutcome.settling(promise, "plan_orchard_drain") {
             uniffi.zingo.initLogging()

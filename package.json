@@ -32,7 +32,7 @@
     "prettier": "prettier './**/*.{js,jsx,ts,tsx}' -w",
     "prettier:check": "prettier --check './**/*.{js,jsx,ts,tsx}'",
     "coverage": "jest --coverage",
-    "postinstall": "patch-package",
+    "postinstall": "patch-package && node scripts/generate-swapkit-secrets.js",
     "build:prod:release": "cd android && ./gradlew assembleProdRelease && cd ..",
     "build:prod:release:split": "cd android && ./gradlew assembleProdRelease -PsplitApk=true && cd ..",
     "build:prod:debug": "cd android && ./gradlew assembleProdDebug && cd ..",
@@ -42,7 +42,7 @@
     "build:beta:debug": "cd android && ./gradlew assembleBetaDebug && cd ..",
     "build:beta:debug:split": "cd android && ./gradlew assembleBetaDebug -PsplitApk=true && cd ..",
     "rust:android": "cd android && ./gradlew :zingo-binding-layer:buildBindingLayer && cd ..",
-    "rust:ios": "cargo run --quiet --manifest-path zingolib/tools/workbench/Cargo.toml --bin build-binding-layer -- ios --out zingolib/bindings/swift/build",
+    "rust:ios": "cargo run --quiet --manifest-path zingolib/tools/workbench/Cargo.toml --bin build-binding-layer -- ios",
     "release:prod:prep": "node scripts/release/release-prep.mjs prod",
     "release:beta:prep": "node scripts/release/release-prep.mjs beta",
     "pods": "cd ios && pod install && cd .."
