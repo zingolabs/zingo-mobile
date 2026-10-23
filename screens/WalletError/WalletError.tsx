@@ -63,7 +63,7 @@ const NET_AMBER = {
 };
 const NET_GREEN = {
   bg: themeTokens.bgAccentSubtle,
-  border: themeTokens.bgAccentDisabled,
+  border: themeTokens.borderAccent,
   ink: themeTokens.fgAccent,
 };
 const CHIP_LABEL = themeTokens.fgMuted;
@@ -426,7 +426,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
                 width: BADGE,
                 height: BADGE,
                 borderRadius: BADGE / 2,
-                backgroundColor: colors.fgDanger,
+                backgroundColor: colors.bgDanger,
                 borderWidth: 2,
                 borderColor: colors.bgCanvas,
                 alignItems: 'center',

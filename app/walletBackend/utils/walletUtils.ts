@@ -20,9 +20,9 @@ import {
 import { isNumber } from 'lodash';
 import RPCModule from '@app/RPCModule';
 import { callFfi, FfiResult } from '@app/walletBackend/ffi';
-import { serverUris } from '@app/uris';
 import { RPCZecPriceType } from '@app/walletBackend/types/RPCZecPriceType';
 import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
+import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
 
 export type ZecPriceErrorKey =
   'info.error-price-fetch' | 'info.error-price-payload';
@@ -72,30 +72,6 @@ export async function walletExists(): Promise<boolean> {
   return resolvedTrue(await callFfi(RPCModule.walletExists()));
 }
 
-// Runs before every wallet init. A custom (off-registry) server pins migration
-// transmission to itself, since no registry pool applies. A registry server
-// leaves it unset so the library's curated Destination pool, which excludes
-// the sync operator, routes instead.
-async function applyBroadcastCandidates(
-  serverUri: string,
-  chainHint: string,
-): Promise<void> {
-  const chain = chainHint.split(':')[0];
-  const registry = serverUris(() => '')
-    .filter(s => (s.chainName as string) === chain && !s.obsolete)
-    .map(s => s.uri);
-  const strip = (uri: string) => uri.replace(/\/+$/, '');
-  const isCustom =
-    serverUri !== '' && !registry.some(uri => strip(uri) === strip(serverUri));
-  const payload = isCustom ? { transmissionUri: serverUri } : {};
-  try {
-    await RPCModule.setBroadcastCandidates(JSON.stringify(payload));
-  } catch {
-    // Best-effort pre-init: migration-over-mixnet refuses explicitly if unset,
-    // so a failure here must not block wallet creation.
-  }
-}
-
 // Bootstraps a brand-new wallet for the given server/chain. The success value
 // is the raw JSON (parseable as RPCWalletInfoType).
 //
@@ -108,7 +84,6 @@ export async function createNewWallet(
   performanceLevel: string,
   minConfirmations: string,
 ): Promise<FfiResult<string>> {
-  await applyBroadcastCandidates(serverUri, chainHint);
   return callFfi(
     RPCModule.createNewWallet(
       serverUri,
@@ -129,7 +104,6 @@ export async function restoreWalletFromSeed(
   performanceLevel: string,
   minConfirmations: string,
 ): Promise<FfiResult<string>> {
-  await applyBroadcastCandidates(serverUri, chainHint);
   return callFfi(
     RPCModule.restoreWalletFromSeed(
       seed,
@@ -151,7 +125,6 @@ export async function restoreWalletFromUfvk(
   performanceLevel: string,
   minConfirmations: string,
 ): Promise<FfiResult<string>> {
-  await applyBroadcastCandidates(serverUri, chainHint);
   return callFfi(
     RPCModule.restoreWalletFromUfvk(
       ufvk,
@@ -171,7 +144,6 @@ export async function loadExistingWallet(
   performanceLevel: string,
   minConfirmations: string,
 ): Promise<FfiResult<string>> {
-  await applyBroadcastCandidates(serverUri, chainHint);
   return callFfi(
     RPCModule.loadExistingWallet(
       serverUri,
@@ -712,6 +684,10 @@ export async function shieldConfirm(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.confirmProcess());
 }
 
+// The keys and birthday a wallet reports, with the height zingolib was given
+// when it raised the birthday to Sapling activation in this process.
+export type FetchedWallet = WalletType & { birthdayAdjustedFrom?: number };
+
 /**
  * Returns the wallet's secret material for the backup/seed display screens.
  *
@@ -721,7 +697,7 @@ export async function shieldConfirm(): Promise<FfiResult<string>> {
  */
 export async function fetchWallet(
   readOnly: boolean,
-): Promise<WalletType | null> {
+): Promise<FetchedWallet | null> {
   if (readOnly) {
     // only viewing key & birthday
     const result = await callFfi(RPCModule.getUfvkInfo());
@@ -729,11 +705,14 @@ export async function fetchWallet(
       return null;
     }
     try {
-      const RPCufvk: WalletType = JSON.parse(result.value);
+      const RPCufvk: RPCUfvkType = JSON.parse(result.value);
 
-      const wallet: WalletType = {} as WalletType;
+      const wallet: FetchedWallet = {} as FetchedWallet;
       if (isNumber(RPCufvk.birthday)) {
         wallet.birthday = RPCufvk.birthday;
+      }
+      if (isNumber(RPCufvk.birthday_adjusted_from)) {
+        wallet.birthdayAdjustedFrom = RPCufvk.birthday_adjusted_from;
       }
       if (RPCufvk.ufvk) {
         wallet.ufvk = RPCufvk.ufvk;
@@ -752,12 +731,15 @@ export async function fetchWallet(
     try {
       const RPCseed: RPCSeedType = JSON.parse(result.value);
 
-      const wallet: WalletType = {} as WalletType;
+      const wallet: FetchedWallet = {} as FetchedWallet;
       if (RPCseed.seed_phrase) {
         wallet.seed = RPCseed.seed_phrase;
       }
       if (isNumber(RPCseed.birthday)) {
         wallet.birthday = RPCseed.birthday;
+      }
+      if (isNumber(RPCseed.birthday_adjusted_from)) {
+        wallet.birthdayAdjustedFrom = RPCseed.birthday_adjusted_from;
       }
 
       return wallet;

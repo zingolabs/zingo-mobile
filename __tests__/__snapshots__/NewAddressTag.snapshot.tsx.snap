@@ -4,7 +4,7 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
 <View
   style={
     {
-      "paddingHorizontal": 22,
+      "paddingHorizontal": 20,
     }
   }
   testID="addresstag.sheet"

@@ -63,7 +63,7 @@ const ConfirmBottomSheet: React.FC = () => {
       dismissable={false}
       onDismiss={handleSheetDismissed}
       contentStyle={{
-        paddingHorizontal: 22,
+        paddingHorizontal: 20,
         paddingBottom: insets.bottom + 24,
       }}
     >

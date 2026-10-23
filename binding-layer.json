@@ -1,0 +1,10 @@
+{
+  "commit": "c060a45041adeeb3f36571bbbdc645a582701bcc",
+  "digests": {
+    "android": "sha256:ffa8e20e3ca4f5934d6daf37f76f81407eb661163848ea72fdc9b67305c09e92",
+    "ios": "sha256:ac219448a0cb070facd351cca14903c7e48f40210935f31a58bfae80c3519d42"
+  },
+  "coordinates": {
+    "android": "org.zingolabs:zingo-binding-layer:7.0.0-c060a45041adeeb3"
+  }
+}

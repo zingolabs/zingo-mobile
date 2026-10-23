@@ -140,7 +140,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
         }}
       >
         {loading ? (
-          <ActivityIndicator size="large" color={colors.fgAccent} />
+          <ActivityIndicator size="large" color={colors.fgMuted} />
         ) : (
           <Text
             style={{
@@ -341,7 +341,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
             progress={notesConfirmed / notesTotal}
             active={broadcasting ? notesConfirmed : undefined}
             activeSpan={status?.parts_broadcast ?? 0}
-            activeColor={colors.fgSyncing}
+            activeColor={colors.fgWarning}
           />
         </View>
         <Text

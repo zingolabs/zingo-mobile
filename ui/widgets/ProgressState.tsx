@@ -162,7 +162,8 @@ const ProgressState: React.FC<ProgressStateProps> = ({
               height: RING,
               borderRadius: RING / 2,
               borderWidth: 2,
-              borderColor: state === 'done' ? colors.fgAccent : colors.fgDanger,
+              borderColor:
+                state === 'done' ? colors.borderAccent : colors.borderDanger,
               alignItems: 'center',
               justifyContent: 'center',
             }}

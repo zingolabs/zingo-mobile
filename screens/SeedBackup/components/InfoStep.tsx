@@ -75,8 +75,8 @@ const InfoStep: React.FunctionComponent<InfoStepProps> = ({ keychainNote }) => {
               borderTopColor: colors.bottomSheetBorder,
             }}
           >
-            <Tile bg={colors.bgAccentSubtle}>
-              <Icon size={20} color={colors.fgAccent} />
+            <Tile bg={colors.bgMutedSubtle}>
+              <Icon size={20} color={colors.fgMuted} />
             </Tile>
             <Text style={text}>
               {translate(`seedbackup.info-${key}`) as string}

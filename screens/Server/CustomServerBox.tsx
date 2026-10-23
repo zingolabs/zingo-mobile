@@ -14,10 +14,9 @@ import { ease } from '@app/theme/motion';
 import { ChainNameEnum } from '@app/AppState';
 import RegText from '@ui/primitives/RegText';
 import ServerLog, { LogLine } from './ServerLog';
-import { DEFAULT_PORT, schemeFor } from './useCustomServer';
+import { schemeFor } from './useCustomServer';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
 import Button from '@ui/primitives/Button';
-import ButtonStack from '@ui/primitives/ButtonStack';
 
 type CustomServerBoxProps = {
   chain: ChainNameEnum;
@@ -221,8 +220,6 @@ const CustomServerBox: React.FC<CustomServerBoxProps> = ({
               onTest();
             }}
             editable={!disabled && !busy}
-            placeholder={DEFAULT_PORT}
-            placeholderTextColor={colors.fgMuted}
             keyboardType="number-pad"
             maxLength={5}
             returnKeyType="go"
@@ -238,8 +235,10 @@ const CustomServerBox: React.FC<CustomServerBoxProps> = ({
         </View>
       </Animated.View>
 
-      <View style={{ marginTop: space8 }}>
-        <ButtonStack>
+      {/** Test and Save sit side by side: they act on the server field, they
+          are not the form's actions, so they do not stack. */}
+      <View style={{ marginTop: space8, flexDirection: 'row', gap: space8 }}>
+        <View style={{ flex: 1 }}>
           <Button
             testID="server.custom.test"
             variant="text"
@@ -251,20 +250,20 @@ const CustomServerBox: React.FC<CustomServerBoxProps> = ({
               onTest();
             }}
           />
-          <Animated.View style={saveStyle}>
-            <Button
-              testID="server.custom.save"
-              variant={saved && !busy ? 'text' : 'primary'}
-              title={saved && !busy ? labels.saved : labels.save}
-              busy={working === 'save'}
-              disabled={saveOff}
-              onPress={() => {
-                blur();
-                onSave();
-              }}
-            />
-          </Animated.View>
-        </ButtonStack>
+        </View>
+        <Animated.View style={[{ flex: 1 }, saveStyle]}>
+          <Button
+            testID="server.custom.save"
+            variant={saved && !busy ? 'text' : 'primary'}
+            title={saved && !busy ? labels.saved : labels.save}
+            busy={working === 'save'}
+            disabled={saveOff}
+            onPress={() => {
+              blur();
+              onSave();
+            }}
+          />
+        </Animated.View>
       </View>
 
       <ServerLog

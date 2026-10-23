@@ -294,7 +294,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
       statusKind === 'ready'
         ? colors.fgAccent
         : statusKind === 'splitting' || statusKind === 'confirming'
-          ? colors.fgSyncing
+          ? colors.fgWarning
           : colors.fgWarning;
     const statusLabel = translate(
       `ironwoodbanner.status-${statusKind}`,
@@ -321,7 +321,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
                 .replace('{blocks}', String(blocksUntil));
     const nextActionActive = !splitting && (ready || !nextWake);
     const nextActionColor = confirming
-      ? colors.fgSyncing
+      ? colors.fgWarning
       : nextActionActive
         ? colors.fgAccent
         : colors.fgWarning;
@@ -384,7 +384,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
                   progress={notesConfirmed / notesTotal}
                   active={broadcasting ? notesConfirmed : undefined}
                   activeSpan={migration.parts_broadcast}
-                  activeColor={colors.fgSyncing}
+                  activeColor={colors.fgWarning}
                   height={8}
                 />
               </View>

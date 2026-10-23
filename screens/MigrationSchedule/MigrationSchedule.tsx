@@ -235,7 +235,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
         }}
       >
         {loading ? (
-          <ActivityIndicator size="large" color={colors.fgAccent} />
+          <ActivityIndicator size="large" color={colors.fgMuted} />
         ) : (
           <Text
             style={{
