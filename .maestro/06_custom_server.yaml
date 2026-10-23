@@ -5,12 +5,12 @@ appId: org.ZingoLabs.Zingo
 
 # The Server screen is the last item of the options panel.
 - tapOn:
-    id: "header.drawmenu"
+    id: 'header.drawmenu'
 - tapOn:
-    id: "menu.server"
+    id: 'menu.server'
 - extendedWaitUntil:
     visible:
-      id: "server.card"
+      id: 'server.card'
     timeout: 10000
 # The screen is still moving when the card first shows. A tap resolved
 # during that animation lands where the row no longer is (see
@@ -19,12 +19,14 @@ appId: org.ZingoLabs.Zingo
     timeout: 5000
 
 - tapOn:
-    id: "server.custom"
+    id: 'server.custom'
 - extendedWaitUntil:
     visible:
-      id: "server.custom.host"
+      id: 'server.custom.host'
     timeout: 5000
 
+# The custom box takes Zingo's own endpoint, the Default Indexer zingolib
+# defines, so the flow tests the custom path against a server that exists.
 # The driver can drop characters while it types, and a save then targets
 # a host that does not exist. Each box is read back and typed again when
 # the text differs. Both boxes select their text when they take focus, so
@@ -34,52 +36,58 @@ appId: org.ZingoLabs.Zingo
     maxRetries: 3
     commands:
       - tapOn:
-          id: "server.custom.port"
+          id: 'server.custom.port'
       - tapOn:
-          id: "server.custom.host"
-      - inputText: "na.zec.rocks"
+          id: 'server.custom.host'
+      - inputText: 'mainnet.zainod.zingolabs.dev'
       - assertVisible:
-          id: "server.custom.host"
-          text: "na\\.zec\\.rocks"
+          id: 'server.custom.host'
+          text: "mainnet\\.zainod\\.zingolabs\\.dev"
 - retry:
     maxRetries: 3
     commands:
       - tapOn:
-          id: "server.custom.host"
+          id: 'server.custom.host'
       - tapOn:
-          id: "server.custom.port"
-      - inputText: "443"
+          id: 'server.custom.port'
+      - inputText: '443'
       - assertVisible:
-          id: "server.custom.port"
-          text: "443"
-- hideKeyboard
+          id: 'server.custom.port'
+          text: '443'
+# Maestro cannot hide the keyboard on iOS for this screen; a tap on the
+# Custom row, already selected, is a no-op that dismisses it on both.
+- tapOn:
+    id: 'server.custom'
 
 # Save tests the server first, then reconnects the wallet to it. The
 # message box ends in a green line once Zingo uses it.
 - tapOn:
-    id: "server.custom.save"
+    id: 'server.custom.save'
 - extendedWaitUntil:
     visible:
-      id: "server.custom.log.final.ok"
+      id: 'server.custom.log.final.ok'
     timeout: 120000
 
-# Back on History, the check icon renders once the sync on the saved
-# server is not in progress.
+# Back on the options panel, which stays open under a pushed screen; the
+# toggle closes it. On Home, the check icon renders once the sync on the
+# saved server is not in progress.
 - tapOn:
-    id: "server.back"
+    id: 'server.back'
+- tapOn:
+    id: 'header.drawmenu'
 - extendedWaitUntil:
     visible:
-      id: "header.checkicon"
+      id: 'header.checkicon'
     timeout: 300000
 
 # The Server screen opens on the saved server, and the card names it.
 - tapOn:
-    id: "header.drawmenu"
+    id: 'header.drawmenu'
 - tapOn:
-    id: "menu.server"
+    id: 'menu.server'
 - extendedWaitUntil:
     visible:
-      id: "server.card"
+      id: 'server.card'
     timeout: 10000
 # On Android the name and the status are two texts inside the card. On
 # iOS the card is one element whose text joins them.
@@ -88,19 +96,19 @@ appId: org.ZingoLabs.Zingo
       platform: Android
     commands:
       - assertVisible:
-          text: "na\\.zec\\.rocks"
+          text: "mainnet\\.zainod\\.zingolabs\\.dev"
           childOf:
-            id: "server.card"
+            id: 'server.card'
 - runFlow:
     when:
       platform: iOS
     commands:
       - assertVisible:
-          id: "server.card"
-          text: "na\\.zec\\.rocks, .*"
+          id: 'server.card'
+          text: "mainnet\\.zainod\\.zingolabs\\.dev, .*"
 # The custom box opens on the saved address, and its message box says
 # Zingo uses it once the card has checked the server.
 - extendedWaitUntil:
     visible:
-      id: "server.custom.log.final.ok"
+      id: 'server.custom.log.final.ok'
     timeout: 30000
