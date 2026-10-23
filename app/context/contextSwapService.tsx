@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 
 import { ChainNameEnum, ValueTransferType } from '@app/AppState';
+import { resetPinnedAddress } from '@app/hooks/usePinnedAddress';
 import {
   SwapService,
   SwapStore,
@@ -92,6 +93,8 @@ export function SwapServiceProvider({
       SwapStore.unbind().catch(error =>
         console.error(`SwapServiceProvider: unbind failed ${error}`),
       );
+      // The pinned Receive address is per wallet too.
+      resetPinnedAddress();
     };
   }, [chainName, apiKey]);
 

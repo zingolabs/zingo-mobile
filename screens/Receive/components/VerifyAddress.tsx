@@ -93,6 +93,17 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
         backgroundColor: colors.bgSurface,
       }}
     >
+      <FadeText
+        style={{
+          textAlign: 'center',
+          fontSize: 12,
+          lineHeight: 16,
+          marginHorizontal: 20,
+          marginBottom: 6,
+        }}
+      >
+        {translate('receive.verify-sub') as string}
+      </FadeText>
       <TextInputAddress
         address={address}
         setAddress={updateAddress}
@@ -134,10 +145,13 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
               }}
             >
               <VerifyCheckIcon
-                color={colors.fgAccent}
+                color={colors.fgPriceUp}
                 style={{ marginRight: 10 }}
               />
-              <FadeText style={{ color: colors.fgDefault }}>
+              <FadeText
+                testID="receive.verify-mine"
+                style={{ color: colors.fgPriceUp, flexShrink: 1 }}
+              >
                 {translate('receive.verification-success') as string}
               </FadeText>
             </View>
@@ -151,10 +165,13 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
               }}
             >
               <VerifyXIcon
-                color={colors.fgDanger}
+                color={colors.fgPriceDown}
                 style={{ marginRight: 10 }}
               />
-              <FadeText style={{ color: colors.fgDefault }}>
+              <FadeText
+                testID="receive.verify-not-mine"
+                style={{ color: colors.fgPriceDown, flexShrink: 1 }}
+              >
                 {translate('receive.verification-failure') as string}
               </FadeText>
             </View>

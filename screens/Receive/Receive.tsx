@@ -7,61 +7,70 @@ import React, {
   useMemo,
   useCallback,
 } from 'react';
-import { Keyboard, Pressable, StyleSheet, View } from 'react-native';
+import {
+  Keyboard,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 import Animated from 'react-native-reanimated';
-import { useTheme } from '@app/theme';
-import SelectBottomSheet from '@ui/widgets/SelectBottomSheet';
+import { useNavigation } from '@react-navigation/native';
+import { slopFor, space20, useTheme } from '@app/theme';
 
 import Clipboard from '@react-native-clipboard/clipboard';
-import SingleAddress from '@ui/widgets/SingleAddress';
-import { HomeTabScreenProps } from '@app/types';
+import { HomeTabScreenProps, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
 import BoldText from '@ui/primitives/BoldText';
+import RegText from '@ui/primitives/RegText';
 import AppSheet from '@ui/primitives/AppSheet';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 
-import {
-  AddressKindEnum,
-  ChainNameEnum,
-  UnifiedAddressClass,
-  TransparentAddressClass,
-  SnackbarDurationEnum,
-} from '@app/AppState';
-import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
+import { ChainNameEnum, Route, SnackbarDurationEnum } from '@app/AppState';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import NewAddress from './components/NewAddress';
 import VerifyAddress from './components/VerifyAddress';
+import AddressCard from './components/AddressCard';
 import NewAddressTag from '@ui/widgets/NewAddressTag';
-import TransparentWarning from './components/TransparentWarning';
-import ExpandedAddress from '@ui/widgets/ExpandedAddress';
+import { useResult } from '@app/navigation/results';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 import { usePriceSnapAutoClose } from '@app/hooks/usePriceSnapAutoClose';
+import { usePinnedAddress } from '@app/hooks/usePinnedAddress';
 import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
-import { ChevronDown } from '@ui/primitives/Icons/Chevron';
+import { ListIcon } from '@ui/primitives/Icons/ListIcon';
 import { PlusIcon } from '@ui/primitives/Icons/PlusIcon';
+import { useOwnAddresses } from './ownAddresses';
+import { useReceiveSelection } from './useReceiveSelection';
 
 type ReceiveProps = HomeTabScreenProps<'Receive'>;
 
+type SheetType = 'NA' | 'VA' | 'NAT';
+
+/**
+ * Receive: one of the wallet's addresses on a card with its QR. It opens on
+ * the pinned address, or on the newest shielded one; a new address becomes
+ * the current one. The list icon opens Your addresses, the "+" a new one.
+ */
 const Receive: React.FunctionComponent<ReceiveProps> = () => {
+  const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
   const {
     setAddressBook,
     translate,
     addresses,
+    addressBook,
     defaultUnifiedAddress,
     addLastSnackbar,
     setPrivacyOption,
   } = context;
   const { colors } = useTheme();
+  const t = (key: string) => translate(key) as string;
 
-  const [index, setIndex] = useState<number>(0);
-  const [sheetType, setSheetType] = useState<
-    'NA' | 'VA' | 'NAT' | 'TW' | 'EA' | null
-  >(null);
+  const [sheetType, setSheetType] = useState<SheetType | null>(null);
 
   // measured dynamically to compute receive sheet snap points
   const [containerH, setContainerH] = useState<number>(0);
@@ -69,13 +78,14 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
   const [usdRowH, setUsdRowH] = useState<number>(0);
   const [priceRowH, setPriceRowH] = useState<number>(0);
 
-  const [uAddr, setUAddr] = useState<UnifiedAddressClass[]>([]);
-  const [tAddr, setTAddr] = useState<TransparentAddressClass[]>([]);
-  const [uAddrIndex, setUAddrIndex] = useState<number | null>(null);
-  const [tAddrIndex, setTAddrIndex] = useState<number | null>(null);
+  const { shielded, transparent } = useOwnAddresses();
+  const all = useMemo(
+    () => [...shielded, ...transparent],
+    [shielded, transparent],
+  );
+  const { loaded: pinLoaded, pin, setPin } = usePinnedAddress();
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
-  const scopeSelectRef = useRef<BottomSheetModal>(null);
   const receiveSheetRef = useRef<BottomSheet>(null);
   const sheetSlideStyle = useOptionsPanelSheetSlide();
   const keyboardHeight = useKeyboardHeight();
@@ -193,8 +203,22 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
     receiveSnapPoints.length,
   );
 
-  const show = useCallback((_sheetType: 'NA' | 'VA' | 'NAT' | 'TW' | 'EA') => {
-    setSheetType(_sheetType);
+  const [selected, setSelected] = useReceiveSelection(
+    shielded,
+    transparent,
+    pin,
+    pinLoaded,
+  );
+  useResult('receive.pick', setSelected);
+
+  const current = all.find(a => a.address === selected) ?? all[0];
+  const tag = current
+    ? (addressBook.find(entry => entry.address === current.address)?.label ??
+      '')
+    : '';
+
+  const show = useCallback((type: SheetType) => {
+    setSheetType(type);
     bottomSheetRef.current?.present();
   }, []);
 
@@ -204,61 +228,30 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
     bottomSheetRef.current?.dismiss();
   }, []);
 
-  useEffect(() => {
-    if (addresses && addresses.length > 0) {
-      // we offering now two types:
-      // 1. UA
-      // 2. T
-      const uAdd =
-        addresses.filter(
-          (a: UnifiedAddressClass | TransparentAddressClass) =>
-            a.addressKind === AddressKindEnum.u,
-        ) || [];
-      // we are filtering only the `external` addresses... for now.
-      const tAdd =
-        addresses.filter(
-          (a: UnifiedAddressClass | TransparentAddressClass) =>
-            a.addressKind === AddressKindEnum.t &&
-            a.scope === RPCAddressScopeEnum.external,
-        ) || [];
-      setUAddr(uAdd as UnifiedAddressClass[]);
-      setTAddr(tAdd as TransparentAddressClass[]);
-      setUAddrIndex(uAdd.length > 0 ? uAdd.length - 1 : 0);
-      setTAddrIndex(tAdd.length > 0 ? tAdd.length - 1 : 0);
+  const togglePin = () => {
+    if (!current) {
+      return;
     }
-  }, [addresses]);
-
-  const canPickScope = tAddr && tAddr.length > 0;
-
-  const scopeItems = useMemo(
-    () => [
-      { label: translate('receive.scope-shielded') as string, value: 'u' },
-      { label: translate('receive.scope-transparent') as string, value: 't' },
-    ],
-    [translate],
-  );
-
-  const modalTitle = useMemo(() => {
-    switch (sheetType) {
-      case 'NA':
-        return (
-          index === 0
-            ? translate('receive.newu-option')
-            : translate('receive.transparent.newt-option')
-        ) as string;
-      case 'VA':
-        return translate('receive.verify') as string;
-      case 'NAT':
-        // Receive only deals with this wallet's own addresses.
-        return translate('addressbook.add-tag') as string;
-      case 'TW':
-        return translate('receive.modal-transparent.title') as string;
-      case 'EA':
-        return translate('receive.title-address') as string;
-      default:
-        return '';
+    if (pin === current.address) {
+      setPin('');
+      addLastSnackbar(t('receive.unpinned'), SnackbarDurationEnum.short);
+    } else {
+      setPin(current.address);
+      addLastSnackbar(t('receive.pinned'), SnackbarDurationEnum.short);
     }
-  }, [sheetType, index, translate]);
+  };
+
+  const doCopy = () => {
+    Clipboard.setString(current?.address ?? '');
+    addLastSnackbar(t('history.addresscopied'), SnackbarDurationEnum.short);
+  };
+
+  const modalTitle =
+    sheetType === 'NA'
+      ? t('receive.new-title')
+      : sheetType === 'VA'
+        ? t('receive.verify-title')
+        : '';
 
   const xHeader = (
     <View
@@ -276,7 +269,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
         numberOfLines={1}
         style={{
           flex: 1,
-          fontSize: 16,
+          fontSize: 15,
           lineHeight: 28,
           textAlign: 'center',
         }}
@@ -293,120 +286,47 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
     </View>
   );
 
-  const doCopy = () => {
-    Clipboard.setString(
-      index === 0 && uAddrIndex !== null
-        ? uAddr[uAddrIndex].address
-        : index === 1 && tAddrIndex !== null
-          ? tAddr[tAddrIndex].address
-          : '',
-    );
-    addLastSnackbar(
-      translate('history.addresscopied') as string,
-      SnackbarDurationEnum.short,
-    );
-  };
-
-  // Resolve the address currently shown based on the scope index.
-  const currentAddress = useMemo(() => {
-    if (index === 0) {
-      if (uAddrIndex !== null && uAddr.length > 0) {
-        return uAddr[uAddrIndex];
-      }
-      return new UnifiedAddressClass(
-        0,
-        translate('receive.noaddress') as string,
-        AddressKindEnum.u,
-        false,
-        false,
-        false,
-      );
-    }
-    if (tAddrIndex !== null && tAddr.length > 0) {
-      return tAddr[tAddrIndex];
-    }
-    return new TransparentAddressClass(
-      0,
-      translate('receive.noaddress') as string,
-      AddressKindEnum.t,
-      RPCAddressScopeEnum.external,
-    );
-  }, [index, uAddrIndex, tAddrIndex, uAddr, tAddr, translate]);
-
-  const setCurrentAddrIndex = index === 0 ? setUAddrIndex : setTAddrIndex;
-  const currentTotal = index === 0 ? uAddr.length : tAddr.length;
-  const currentAddrIndex = index === 0 ? (uAddrIndex ?? 0) : (tAddrIndex ?? 0);
-
   const receiveHeader = (
     <View
       style={{
+        flexDirection: 'row',
+        alignItems: 'center',
         paddingTop: 8,
         paddingBottom: 6,
         paddingHorizontal: 16,
       }}
     >
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}
+      <Pressable
+        testID="receive.addresses"
+        accessibilityRole="button"
+        accessibilityLabel={t('receive.your-addresses')}
+        hitSlop={slopFor(24)}
+        onPress={() =>
+          navigation.navigate(Route.AddressList, { current: current?.address })
+        }
+        style={{ paddingHorizontal: 14, paddingVertical: 4 }}
       >
-        <View style={{ width: 46 }} />
-        <View
-          style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {canPickScope ? (
-            <Pressable
-              onPress={() => scopeSelectRef.current?.present()}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                paddingHorizontal: 2,
-                paddingVertical: 4,
-              }}
-            >
-              <ChevronDown
-                size={16}
-                color={colors.fgMuted}
-                style={{ marginRight: 8 }}
-              />
-              <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
-                {
-                  (index === 0
-                    ? translate('receive.scope-shielded')
-                    : translate('receive.scope-transparent')) as string
-                }
-              </BoldText>
-            </Pressable>
-          ) : (
-            <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
-              {
-                (index === 0
-                  ? translate('receive.scope-shielded')
-                  : translate('receive.scope-transparent')) as string
-              }
-            </BoldText>
-          )}
-        </View>
-        <Pressable
-          onPress={() => show('NA')}
-          hitSlop={8}
-          style={{
-            paddingHorizontal: 14,
-            paddingVertical: 4,
-          }}
-        >
-          <PlusIcon size={20} color={colors.fgMuted} />
-        </Pressable>
-      </View>
+        <ListIcon size={20} color={colors.fgMuted} />
+      </Pressable>
+      <BoldText
+        style={{ flex: 1, textAlign: 'center', fontSize: 16, lineHeight: 28 }}
+      >
+        {t('receive.title')}
+      </BoldText>
+      <Pressable
+        testID="receive.new"
+        accessibilityRole="button"
+        accessibilityLabel={t('receive.new-title')}
+        onPress={() => show('NA')}
+        hitSlop={slopFor(24)}
+        style={{ paddingHorizontal: 14, paddingVertical: 4 }}
+      >
+        <PlusIcon size={20} color={colors.fgMuted} />
+      </Pressable>
     </View>
   );
 
-  const returnPage = (
+  return (
     <View
       style={{ flex: 1 }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
@@ -414,7 +334,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
     >
       <View
         accessible={true}
-        accessibilityLabel={translate('receive.title-acc') as string}
+        accessibilityLabel={t('receive.title-acc')}
         style={{
           display: 'flex',
           justifyContent: 'flex-start',
@@ -446,18 +366,30 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
             enableContentPanningGesture
             header={receiveHeader}
           >
-            <View accessible={false} style={{ flex: 1 }}>
-              {!!addresses && !!defaultUnifiedAddress && (
-                <SingleAddress
-                  address={currentAddress}
-                  index={currentAddrIndex}
-                  setIndex={setCurrentAddrIndex}
-                  total={currentTotal}
-                  show={show}
-                  hasTransparent={index === 0 && tAddr && tAddr.length > 0}
+            <ScrollView
+              bounces={false}
+              alwaysBounceVertical={false}
+              contentContainerStyle={{
+                paddingHorizontal: space20,
+                paddingBottom: 100,
+              }}
+            >
+              {!!addresses && !!defaultUnifiedAddress && current ? (
+                <AddressCard
+                  address={current}
+                  tag={tag}
+                  pinned={pin === current.address}
+                  onTogglePin={togglePin}
+                  onCopy={doCopy}
+                  onVerify={() => show('VA')}
+                  onAddTag={() => show('NAT')}
                 />
+              ) : (
+                <RegText style={{ textAlign: 'center', marginTop: 50 }}>
+                  {t('receive.noaddress')}
+                </RegText>
               )}
-            </View>
+            </ScrollView>
           </AppSheet>
         )}
       </Animated.View>
@@ -470,69 +402,19 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
         }}
       >
         {sheetType === 'NA' && (
-          <NewAddress
-            addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}
-            closeSheet={hide}
-            setAddressBook={setAddressBook}
-          />
+          <NewAddress closeSheet={hide} setAddressBook={setAddressBook} />
         )}
         {sheetType === 'NAT' && (
           <NewAddressTag
-            address={
-              index === 0 && uAddrIndex !== null
-                ? uAddr[uAddrIndex].address
-                : index === 1 && tAddrIndex !== null
-                  ? tAddr[tAddrIndex].address
-                  : ''
-            }
+            address={current?.address ?? ''}
             closeSheet={hide}
             setAddressBook={setAddressBook}
           />
         )}
         {sheetType === 'VA' && <VerifyAddress closeSheet={hide} />}
-        {sheetType === 'TW' && (
-          <TransparentWarning
-            closeSheet={hide}
-            onSuccess={() => {
-              setIndex(1);
-            }}
-          />
-        )}
-        {sheetType === 'EA' && (
-          <ExpandedAddress
-            onCopy={doCopy}
-            closeSheet={hide}
-            title={translate('receive.title-address') as string}
-            button={translate('receive.copy-address-button') as string}
-            address={
-              index === 0 && uAddrIndex !== null
-                ? uAddr[uAddrIndex].address
-                : index === 1 && tAddrIndex !== null
-                  ? tAddr[tAddrIndex].address
-                  : ''
-            }
-          />
-        )}
       </AppSheetModal>
-      <SelectBottomSheet
-        ref={scopeSelectRef}
-        title={translate('receive.select-scope-placeholder') as string}
-        items={scopeItems}
-        value={index === 0 ? 'u' : 't'}
-        onChange={v => {
-          if (v === 'u') {
-            setIndex(0);
-          } else if (v === 't') {
-            setIndex(1);
-          }
-        }}
-      />
     </View>
   );
-
-  //console.log('render Receive - 4', uAddr, uAddrIndex, tAddr, tAddrIndex, defaultUnifiedAddress);
-
-  return returnPage;
 };
 
 export default Receive;

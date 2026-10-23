@@ -19,6 +19,8 @@ const NAME_MAX = 32;
 type NewAddressTagProps = {
   /** One of this wallet's own addresses. */
   address: string;
+  /** The tag being edited, from Your addresses; absent to add one. */
+  current?: AddressBookFileClass;
   closeSheet: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
 };
@@ -27,12 +29,13 @@ type NewAddressTagProps = {
 // contact sheet: the tag, the chain (Zcash) and the address it names.
 const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
   address,
+  current,
   closeSheet,
   setAddressBook,
 }) => {
   const { translate, server } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
-  const [label, setLabel] = useState('');
+  const [label, setLabel] = useState(current?.label ?? '');
   const [saving, setSaving] = useState(false);
   const [focused, setFocused] = useState(false);
   const ready = label.trim().length > 0;
@@ -44,7 +47,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
       await AddressBookFileImpl.writeAddressBookItem(
         label.trim(),
         address,
-        Utils.generateColorList(1)[0],
+        current?.color ?? Utils.generateColorList(1)[0],
         true,
         server.chainName,
         GlobalConst.zecSwapChain,
@@ -71,8 +74,23 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
           lineHeight: 21,
         }}
       >
-        {translate('addressbook.add-tag') as string}
+        {
+          translate(
+            current ? 'receive.edit-tag' : 'addressbook.add-tag',
+          ) as string
+        }
       </BoldText>
+      <RegText
+        style={{
+          marginTop: 6,
+          textAlign: 'center',
+          fontSize: 12,
+          lineHeight: 16,
+          color: colors.fgMuted,
+        }}
+      >
+        {translate('receive.tag-sub') as string}
+      </RegText>
 
       <View style={{ marginTop: 10 }}>
         <RegText>{translate('addressbook.tag') as string}</RegText>

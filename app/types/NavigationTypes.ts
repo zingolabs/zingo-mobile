@@ -11,7 +11,6 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { RevealOrigin } from '@ui/widgets/CircularReveal';
 import type { Request } from '@app/navigation/results';
 import {
-  AddressKindEnum,
   ChainNameEnum,
   ValueTransferKindEnum,
   LaunchingModeEnum,
@@ -166,10 +165,9 @@ export type AddressBookNavigationState = {
   chain?: string;
 };
 
+/** The address Receive shows, marked in the list; the pick returns as 'receive.pick'. */
 export type AddressListNavigationState = {
-  addressKind: AddressKindEnum;
-  // The chosen index is delivered under this request.
-  request: Request;
+  current?: string;
 };
 
 // Which codes the scanner takes: any, a Zcash address or URI on a chain, or

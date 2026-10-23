@@ -1,380 +1,217 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-  useRef,
-} from 'react';
-import {
-  View,
-  ScrollView,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  ActivityIndicator,
-  Pressable,
-  TouchableOpacity,
-} from 'react-native';
-
-import { useScrollToTop } from '@react-navigation/native';
-import { useTheme, slopFor } from '@app/theme';
-import {
-  AddressKindEnum,
-  TransparentAddressClass,
-  UnifiedAddressClass,
-} from '@app/AppState';
+import React, { useContext, useRef, useState } from 'react';
+import { Keyboard, Platform, Pressable, View } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { slopFor, useTheme } from '@app/theme';
+import { AddressKindEnum, SnackbarDurationEnum } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
-import FadeText from '@ui/primitives/FadeText';
-import BoldText from '@ui/primitives/BoldText';
-import Button from '@ui/primitives/Button';
-import AppSheet from '@ui/primitives/AppSheet';
-import AlSummaryLine from './components/AlSummaryLine';
 import { ContextAppLoaded } from '@app/context';
 import { deliver } from '@app/navigation/results';
-import Header from '@ui/widgets/Header';
-import BottomSheet from '@gorhom/bottom-sheet';
-import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
-import { ChevronLeft, ChevronUp } from '@ui/primitives/Icons/Chevron';
+import { usePinnedAddress } from '@app/hooks/usePinnedAddress';
+import Utils from '@app/utils';
+import Text from '@ui/primitives/Text';
+import AppSheetModal from '@ui/primitives/AppSheetModal';
+import FullPanel from '@ui/widgets/FullPanel';
+import NewAddressTag from '@ui/widgets/NewAddressTag';
+import RadioRow, { RadioList } from '@ui/widgets/RadioRow';
+import { PencilIcon } from '@ui/primitives/Icons/PencilIcon';
+import { TagIcon } from '@ui/primitives/Icons/TagIcon';
+import { PinButton } from '@screens/Receive/components/AddressCard';
+import { addressKindKey } from '@screens/Receive/addressKind';
+import { OwnAddress, useOwnAddresses } from '@screens/Receive/ownAddresses';
+
+const MONO = Platform.select({ ios: 'Menlo', default: 'monospace' });
+/** Long enough for the radio to show the pick before the panel leaves. */
+const PICK_LEAVE_MS = 260;
 
 type AddressListProps = NativeStackScreenProps<
   AppDrawerParamList,
   'AddressList'
 >;
 
+/**
+ * Your addresses: every address of the wallet in two radio groups, the
+ * shielded ones and the transparent ones, the pinned one first in its
+ * group. Picking one shows it in Receive; the pin and the tag of each row
+ * can be changed right here.
+ */
 const AddressList: React.FunctionComponent<AddressListProps> = ({
   navigation,
   route,
 }) => {
-  // The chosen index goes back to the screen that asked for it.
-  const setIndex = (index: number) => {
-    if (route.params) {
-      deliver(route.params.request, String(index));
-    }
-  };
-  const context = useContext(ContextAppLoaded);
-  const { translate, addresses } = context;
+  const { translate, addressBook, setAddressBook, addLastSnackbar } =
+    useContext(ContextAppLoaded);
   const { colors } = useTheme();
+  const t = (key: string) => translate(key) as string;
+  const { shielded, transparent } = useOwnAddresses();
+  const { pin, setPin } = usePinnedAddress();
+  const [current, setCurrent] = useState<string>(route.params?.current ?? '');
+  const [tagging, setTagging] = useState<string>('');
+  const tagSheetRef = useRef<BottomSheetModal>(null);
 
-  const [numAl, setNumAl] = useState<number>(50);
-  const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
-  const [addressesSliced, setAddressesSliced] = useState<
-    (UnifiedAddressClass | TransparentAddressClass)[]
-  >([]);
+  const tagOf = (address: string) =>
+    addressBook.find(entry => entry.address === address);
 
-  const [isAtTop, setIsAtTop] = useState<boolean>(true);
-  const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  const [addressKind, setAddressKind] = useState<AddressKindEnum>(
-    !!route.params && route.params.addressKind !== undefined
-      ? route.params.addressKind
-      : AddressKindEnum.u,
-  );
-  const [containerH, setContainerH] = useState<number>(0);
-  const [headerH, setHeaderH] = useState<number>(0);
-
-  const scrollViewRef = useRef<ScrollView>(null);
-  const addressListSheetRef = useRef<BottomSheet>(null);
-
-  useScrollToTop(scrollViewRef as unknown as React.RefObject<ScrollView>);
-
-  const closeScreen = useCallback(() => {
+  const close = () => {
     if (navigation.canGoBack()) {
       navigation.goBack();
     }
-  }, [navigation]);
+  };
 
-  const addressListSnapPoints = useFullSheetSnapPoints(containerH, headerH);
+  const pick = (address: string) => {
+    setCurrent(address);
+    deliver('receive.pick', address);
+    setTimeout(close, PICK_LEAVE_MS);
+  };
 
-  const handleTitle = useMemo(
-    () =>
-      `${translate('addresslist.title')} - ${
-        addressKind === AddressKindEnum.u
-          ? translate('addresslist.unified')
-          : translate('addresslist.transparent')
-      }`,
-    [addressKind, translate],
-  );
+  const togglePin = (address: string) => {
+    if (pin === address) {
+      setPin('');
+      addLastSnackbar(t('receive.unpinned'), SnackbarDurationEnum.short);
+    } else {
+      setPin(address);
+      addLastSnackbar(t('receive.pinned'), SnackbarDurationEnum.short);
+    }
+  };
 
-  const addressListHeader = (
+  const openTag = (address: string) => {
+    setTagging(address);
+    tagSheetRef.current?.present();
+  };
+  const closeTag = () => {
+    Keyboard.dismiss();
+    tagSheetRef.current?.dismiss();
+    setTagging('');
+  };
+
+  const row = (address: OwnAddress, index: number) => {
+    const tag = tagOf(address.address)?.label ?? '';
+    const kind = t(addressKindKey(address));
+    const isT = address.addressKind === AddressKindEnum.t;
+    return (
+      <RadioRow
+        key={address.address}
+        testID={`addresslist.row.${address.address}`}
+        first={index === 0}
+        title={tag || kind}
+        pill={isT ? { text: t('receive.public'), tone: 'warning' } : undefined}
+        sub={
+          <>
+            <Text
+              style={{
+                fontFamily: MONO,
+                fontSize: 12,
+                color: colors.fgDefault,
+              }}
+            >
+              {Utils.trimToSmall(address.address, 8)}
+            </Text>
+            {tag ? ` · ${kind}` : ''}
+          </>
+        }
+        selected={address.address === current}
+        onPress={() => pick(address.address)}
+        trailing={
+          <>
+            <PinButton
+              pinned={pin === address.address}
+              onPress={() => togglePin(address.address)}
+            />
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t(
+                tag ? 'receive.edit-tag' : 'addressbook.add-tag',
+              )}
+              hitSlop={slopFor(40)}
+              onPress={() => openTag(address.address)}
+              style={({ pressed }) => ({
+                width: 40,
+                height: 40,
+                borderRadius: 10,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: pressed ? colors.bgMutedSubtle : 'transparent',
+              })}
+            >
+              {tag ? (
+                <PencilIcon size={16} color={colors.fgMuted} />
+              ) : (
+                <TagIcon size={16} color={colors.fgMuted} />
+              )}
+            </Pressable>
+          </>
+        }
+      />
+    );
+  };
+
+  /** The pinned address goes first in its group; the rest keep their order. */
+  const pinnedFirst = <T extends OwnAddress>(list: T[]) =>
+    [...list].sort(
+      (a, b) => Number(b.address === pin) - Number(a.address === pin),
+    );
+
+  const group = (title: string, note: string) => (
     <View
       style={{
-        paddingTop: 12,
-        paddingBottom: 8,
-        paddingHorizontal: 16,
+        flexDirection: 'row',
+        alignItems: 'baseline',
+        justifyContent: 'space-between',
+        marginTop: 20,
+        marginBottom: 8,
+        marginHorizontal: 4,
       }}
     >
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <TouchableOpacity
-          onPress={closeScreen}
-          hitSlop={8}
-          style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-        >
-          <ChevronLeft size={20} color={colors.fgAccent} />
-        </TouchableOpacity>
-        <BoldText
-          numberOfLines={1}
-          style={{
-            flex: 1,
-            fontSize: 16,
-            lineHeight: 28,
-            textAlign: 'center',
-          }}
-        >
-          {handleTitle}
-        </BoldText>
-        <View style={{ width: 28 }} />
-      </View>
+      <Text style={{ fontSize: 13, lineHeight: 18, fontWeight: '700' }}>
+        {title}
+      </Text>
+      <Text variant="caption" tone="muted">
+        {note}
+      </Text>
     </View>
   );
-
-  useEffect(() => {
-    const _addressKind =
-      !!route.params && route.params.addressKind !== undefined
-        ? route.params.addressKind
-        : AddressKindEnum.u;
-    setAddressKind(_addressKind);
-  }, [route, route.params, route.params?.addressKind]);
-
-  const fetchAddressBookFiltered = useMemo(async () => {
-    if (!addresses) {
-      return [];
-    }
-    if (addressKind === AddressKindEnum.u) {
-      return addresses.filter(
-        (a: UnifiedAddressClass | TransparentAddressClass) =>
-          a.addressKind === addressKind,
-      );
-    } else {
-      return addresses.filter(
-        (a: UnifiedAddressClass | TransparentAddressClass) =>
-          a.addressKind === addressKind &&
-          a.scope === RPCAddressScopeEnum.external,
-      );
-    }
-  }, [addressKind, addresses]);
-
-  useEffect(() => {
-    (async () => {
-      const abf = await fetchAddressBookFiltered;
-      setLoadMoreButton(numAl < abf.length);
-      setAddressesSliced(abf.slice(0, numAl));
-      setLoading(false);
-    })();
-  }, [fetchAddressBookFiltered, numAl]);
-
-  const loadMoreClicked = useCallback(() => {
-    setNumAl(numAl + 50);
-  }, [numAl]);
-
-  const handleScrollToTop = useCallback(() => {
-    if (scrollViewRef.current && !isScrollingToTop) {
-      setIsScrollingToTop(true);
-
-      // Clear any existing timeout
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-      }
-
-      // Force set to top immediately for UI feedback
-      setIsAtTop(true);
-
-      // Scroll to top
-      scrollViewRef.current.scrollTo({ y: 0, animated: true });
-
-      // Set timeout to reset scrolling state
-      scrollTimeoutRef.current = setTimeout(() => {
-        setIsScrollingToTop(false);
-        // Double-check position after scroll animation
-        if (scrollViewRef.current) {
-          setIsAtTop(true); // For ScrollView, assume success
-        }
-      }, 800);
-    }
-  }, [isScrollingToTop]);
-
-  const handleScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const { contentOffset } = event.nativeEvent;
-      const isTop = contentOffset.y <= 100;
-
-      // If we're scrolling to top and we've reached the top, stop the scrolling state
-      if (isScrollingToTop && isTop) {
-        setIsScrollingToTop(false);
-        if (scrollTimeoutRef.current) {
-          clearTimeout(scrollTimeoutRef.current);
-          scrollTimeoutRef.current = null;
-        }
-      }
-
-      // Always update isAtTop for manual scrolling
-      setIsAtTop(isTop);
-    },
-    [isScrollingToTop],
-  );
-
-  //console.log('render Address Book - 4', currentItem, action, addressBook);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: colors.bgCanvas,
-      }}
-      onLayout={e => setContainerH(e.nativeEvent.layout.height)}
+    <FullPanel
+      title={t('receive.your-addresses')}
+      onBack={close}
+      testID="addresslist"
     >
-      <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
-        <Header
-          title={''}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noPrivacy={true}
-          noUfvkIcon={true}
-        />
-      </View>
-      <AppSheet
-        ref={addressListSheetRef}
-        snapPoints={addressListSnapPoints}
-        header={addressListHeader}
+      <Text
+        variant="bodySmall"
+        tone="muted"
+        style={{ marginHorizontal: 2, marginTop: 4, lineHeight: 18 }}
       >
-        <ScrollView
-          ref={scrollViewRef}
-          onScroll={handleScroll}
-          scrollEventThrottle={100}
-          testID="addressbook.scroll-view"
-          keyboardShouldPersistTaps="handled"
-          bounces={false}
-          alwaysBounceVertical={false}
-          style={{
-            flex: 1,
-          }}
-          contentContainerStyle={{
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            justifyContent: 'flex-start',
-          }}
-        >
-          {addressesSliced.length === 0 && !loading && (
-            <View
-              style={{
-                height: 150,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                marginTop: 30,
-              }}
-            >
-              <FadeText style={{ color: colors.fgAccent }}>
-                {translate('addressbook.empty') as string}
-              </FadeText>
-            </View>
-          )}
-          {loading ? (
-            <ActivityIndicator
-              style={{ marginTop: 7, marginRight: 7 }}
-              size={20}
-              color={colors.fgAccentDisabled}
-            />
-          ) : (
-            <>
-              {addressesSliced.map((alItem, index) => {
-                return (
-                  <View key={`container-${index}-${alItem.address}`}>
-                    <AlSummaryLine
-                      key={`line-${index}-${alItem.address}`}
-                      index={index}
-                      setIndex={setIndex}
-                      item={alItem}
-                      closeScreen={() => {
-                        if (navigation.canGoBack()) {
-                          navigation.goBack();
-                        }
-                      }}
-                    />
-                  </View>
-                );
-              })}
-            </>
-          )}
-          {loadMoreButton ? (
-            <View
-              style={{
-                height: 150,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                paddingHorizontal: 16,
-                marginTop: 5,
-                marginBottom: 30,
-              }}
-            >
-              <Button
-                variant="text"
-                title={translate('addressbook.loadmore') as string}
-                onPress={loadMoreClicked}
-              />
-            </View>
-          ) : (
-            <>
-              {!!addressesSliced && !!addressesSliced.length && !loading && (
-                <View
-                  style={{
-                    height: 150,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                    marginTop: 5,
-                    marginBottom: 30,
-                  }}
-                >
-                  <FadeText style={{ color: colors.fgAccent }}>
-                    {translate('addressbook.end') as string}
-                  </FadeText>
-                </View>
-              )}
-            </>
-          )}
-        </ScrollView>
-      </AppSheet>
-      {!isAtTop && (
-        <Pressable
-          hitSlop={slopFor(16)}
-          onPress={handleScrollToTop}
-          disabled={isScrollingToTop}
-          style={({ pressed }) => ({
-            position: 'absolute',
-            bottom: 105,
-            right: 10,
-            paddingHorizontal: 5,
-            paddingVertical: 10,
-            backgroundColor: colors.bgChrome,
-            borderRadius: 50,
-            transform: [{ scale: pressed ? 0.9 : 1 }],
-            borderWidth: 1,
-            borderColor: colors.borderMuted,
-            opacity: isScrollingToTop ? 0.5 : 1,
-          })}
-        >
-          <ChevronUp
-            style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-            size={16}
-            color={colors.fgMuted}
-          />
-        </Pressable>
+        {t('receive.addresses-lead')}
+      </Text>
+      {group(
+        t('receive.group-shielded'),
+        t('receive.group-count').replace('{n}', String(shielded.length)),
       )}
-    </View>
+      <RadioList testID="addresslist.shielded">
+        {pinnedFirst(shielded).map(row)}
+      </RadioList>
+      {transparent.length > 0 && (
+        <>
+          {group(t('receive.group-transparent'), t('receive.public-note'))}
+          <RadioList testID="addresslist.transparent">
+            {pinnedFirst(transparent).map(row)}
+          </RadioList>
+        </>
+      )}
+      <AppSheetModal ref={tagSheetRef} handle>
+        {!!tagging && (
+          <NewAddressTag
+            address={tagging}
+            current={tagOf(tagging)}
+            closeSheet={closeTag}
+            setAddressBook={setAddressBook}
+          />
+        )}
+      </AppSheetModal>
+    </FullPanel>
   );
 };
 
-export default React.memo(AddressList);
+export default AddressList;
