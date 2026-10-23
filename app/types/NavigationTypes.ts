@@ -20,7 +20,7 @@ import {
   ValueTransferType,
   ProposalPoolsType,
 } from '@app/AppState';
-import type { ComputingEnd } from '@app/walletBackend/transforms/sendSettlement';
+import type { ComputingParams } from '@app/walletBackend/transforms/sendSettlement';
 import { RPCDrainTxType } from '@app/walletBackend/types/RPCDrainPlanType';
 import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanType';
 import type { SwapReview } from '@screens/Swap/useSwapForm';
@@ -110,7 +110,7 @@ export type AppDrawerParamList = {
   [Route.About]: undefined;
   [Route.MixnetDoctor]: undefined;
   [Route.Insight]: undefined;
-  [Route.Computing]: ComputingEnd | undefined;
+  [Route.Computing]: ComputingParams | undefined;
   [Route.SyncReport]: undefined;
   [Route.Pools]: undefined;
   [Route.MeetIronwood]: undefined;

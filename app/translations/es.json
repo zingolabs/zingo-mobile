@@ -568,7 +568,22 @@
     "memo-private": "Solo el destinatario puede leerlo",
     "memo-count": "{n} / {max} bytes",
     "memo-add": "Añadir un memo",
-    "review": "Revisar"
+    "review": "Revisar",
+    "network-fee": "Comisión de red",
+    "total": "Total",
+    "sending-to": "Enviando a {who}",
+    "confirm-nym": "Enviar a través de NYM",
+    "confirm-nym-all": "Enviar todo a través de NYM",
+    "review-transparent": "Va a una dirección transparente, así que la cantidad y la dirección son públicas.",
+    "step-build": "Preparando tu transacción",
+    "step-proof": "Creando la prueba privada",
+    "step-nym": "Enviándola por la mixnet de NYM",
+    "sending-line": "{amount} ZEC a {who} · vía NYM",
+    "sent-title": "Enviado",
+    "sent-line": "{amount} ZEC a {who}",
+    "sent-body": "Ya va de camino. Aparece en el historial y se confirma en un minuto aproximadamente.",
+    "done": "Hecho",
+    "view-transaction": "Ver transacción"
   },
   "receive": {
     "u-title": "Blindadas",

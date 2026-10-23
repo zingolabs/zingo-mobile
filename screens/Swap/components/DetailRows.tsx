@@ -23,6 +23,8 @@ export type DetailRow = {
   leading?: React.ReactNode;
   /** A shortened address or id, set in the monospace face. */
   mono?: boolean;
+  /** A word after the value in Nym green: the review's NYM Enhanced. */
+  badge?: string;
 };
 
 /** A detail's facts, label on the left and value on the right. */
@@ -92,6 +94,14 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
             >
               {row.value}
             </Text>
+            {!!row.badge && (
+              <Text
+                variant="bodySmall"
+                style={{ fontWeight: '600', fontSize: 12, color: colors.bgNym }}
+              >
+                {row.badge}
+              </Text>
+            )}
             {!!row.copy && (
               <Pressable
                 accessibilityRole="button"

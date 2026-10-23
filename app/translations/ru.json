@@ -568,7 +568,22 @@
     "memo-private": "Прочитать может только получатель",
     "memo-count": "{n} / {max} байт",
     "memo-add": "Добавить мемо",
-    "review": "Проверить"
+    "review": "Проверить",
+    "network-fee": "Комиссия сети",
+    "total": "Итого",
+    "sending-to": "Отправка: {who}",
+    "confirm-nym": "Отправить через NYM",
+    "confirm-nym-all": "Отправить всё через NYM",
+    "review-transparent": "Адрес прозрачный, поэтому сумма и адрес будут публичными.",
+    "step-build": "Собираем транзакцию",
+    "step-proof": "Создаём приватное доказательство",
+    "step-nym": "Отправляем через mixnet NYM",
+    "sending-line": "{amount} ZEC → {who} · через NYM",
+    "sent-title": "Отправлено",
+    "sent-line": "{amount} ZEC → {who}",
+    "sent-body": "Уже в пути. Транзакция появится в истории и подтвердится примерно через минуту.",
+    "done": "Готово",
+    "view-transaction": "Открыть транзакцию"
   },
   "receive": {
     "u-title": "Защищёный",

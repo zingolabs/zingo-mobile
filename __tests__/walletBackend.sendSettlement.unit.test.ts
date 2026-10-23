@@ -17,7 +17,7 @@ describe('settleSend', () => {
 
     const settlement = await settleSend(attempt, switchServer, true);
 
-    expect(settlement).toEqual({ kind: 'sent' });
+    expect(settlement).toEqual({ kind: 'sent', txid: 'txid' });
     expect(attempt).toHaveBeenCalledTimes(1);
     expect(switchServer).not.toHaveBeenCalled();
   });
@@ -64,7 +64,7 @@ describe('settleSend', () => {
 
     const settlement = await settleSend(attempt, switchServer, true);
 
-    expect(settlement).toEqual({ kind: 'sent' });
+    expect(settlement).toEqual({ kind: 'sent', txid: 'txid' });
     expect(attempt.mock.invocationCallOrder[0]).toBeLessThan(
       switchServer.mock.invocationCallOrder[0],
     );
