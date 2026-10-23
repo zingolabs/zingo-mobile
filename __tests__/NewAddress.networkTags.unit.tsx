@@ -159,18 +159,14 @@ async function saveTag(
   const closeSheet = jest.fn();
   const form = render(
     <ContextAppLoadedProvider value={context}>
-      <NewAddress
-        addressKind={kind}
-        setAddressBook={setAddressBook}
-        closeSheet={closeSheet}
-      />
+      <NewAddress setAddressBook={setAddressBook} closeSheet={closeSheet} />
     </ContextAppLoadedProvider>,
   );
-  fireEvent.changeText(
-    screen.getByPlaceholderText('addressbook.label-placeholder'),
-    'New tag',
-  );
-  fireEvent.press(screen.getByText('save'));
+  if (kind === AddressKindEnum.t) {
+    fireEvent.press(screen.getByTestId('receive.new-kind.transparent'));
+  }
+  fireEvent.changeText(screen.getByTestId('receive.new-tag'), 'New tag');
+  fireEvent.press(screen.getByTestId('receive.new-create'));
   await waitFor(() => expect(closeSheet).toHaveBeenCalled());
   form.unmount();
 

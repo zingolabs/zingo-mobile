@@ -24,6 +24,21 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
   >
     text translated
   </Text>
+  <Text
+    maxFontSizeMultiplier={2}
+    style={
+      {
+        "color": "#888888",
+        "fontSize": 12,
+        "fontWeight": "400",
+        "lineHeight": 16,
+        "marginTop": 6,
+        "textAlign": "center",
+      }
+    }
+  >
+    text translated
+  </Text>
   <View
     style={
       {

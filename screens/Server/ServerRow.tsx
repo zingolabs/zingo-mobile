@@ -14,52 +14,12 @@ import BoldText from '@ui/primitives/BoldText';
 import RegText from '@ui/primitives/RegText';
 import Button from '@ui/primitives/Button';
 import { ChevronLeft, ChevronRight } from '@ui/primitives/Icons/Chevron';
+import Radio from '@ui/primitives/Radio';
 
 /** The side margin of the cards, which the Done button lines up with. */
 export const CARD_SIDE = space20;
 
 const FAST_MS = 150;
-
-type RadioProps = { selected: boolean };
-
-const Radio: React.FC<RadioProps> = ({ selected }) => {
-  const { colors } = useTheme();
-  const dot = useSharedValue(selected ? 1 : 0);
-  useEffect(() => {
-    dot.value = withTiming(selected ? 1 : 0, {
-      duration: 200,
-      easing: selected ? ease.spring : ease.standard,
-    });
-  }, [selected, dot]);
-  const dotStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: dot.value }],
-  }));
-  return (
-    <View
-      style={{
-        width: 18,
-        height: 18,
-        borderRadius: 9,
-        borderWidth: selected ? 2 : 1.5,
-        borderColor: selected ? colors.fgAccent : colors.borderMuted,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <Animated.View
-        style={[
-          {
-            width: 9,
-            height: 9,
-            borderRadius: 4.5,
-            backgroundColor: colors.fgAccent,
-          },
-          dotStyle,
-        ]}
-      />
-    </View>
-  );
-};
 
 type LatencyProps = {
   // undefined while unknown, null when the server did not answer.

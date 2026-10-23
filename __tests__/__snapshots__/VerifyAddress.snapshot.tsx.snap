@@ -8,6 +8,22 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
     }
   }
 >
+  <Text
+    maxFontSizeMultiplier={2}
+    style={
+      {
+        "color": "#888888",
+        "fontSize": 12,
+        "fontWeight": "400",
+        "lineHeight": 16,
+        "marginBottom": 6,
+        "marginHorizontal": 20,
+        "textAlign": "center",
+      }
+    }
+  >
+    text translated
+  </Text>
   <View
     style={
       {
