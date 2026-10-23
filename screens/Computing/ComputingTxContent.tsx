@@ -11,7 +11,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import { space20, useTheme, radiusPill } from '@app/theme';
 import ProgressState from '@ui/widgets/ProgressState';
-import RegText from '@ui/primitives/RegText';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
@@ -168,27 +167,27 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
                   onPress={() => setShowErrorDetails(v => !v)}
                   hitSlop={8}
                 >
-                  <RegText
+                  <Text
+                    variant="caption"
+                    tone="danger"
                     style={{
-                      color: colors.fgDanger,
+                      fontWeight: '700',
                       textDecorationLine: 'underline',
                     }}
                   >
                     {t('loadedapp.transactionfailed-details')}
-                  </RegText>
+                  </Text>
                 </TouchableOpacity>
                 {showErrorDetails && (
-                  <RegText
-                    style={{
-                      marginTop: 12,
-                      textAlign: 'center',
-                      color: colors.fgMuted,
-                    }}
+                  <Text
+                    variant="caption"
+                    tone="muted"
+                    style={{ marginTop: 12, textAlign: 'center' }}
                   >
                     {failure.kind === 'error'
                       ? t(failure.errorKey)
                       : failure.text}
-                  </RegText>
+                  </Text>
                 )}
               </View>
             )}

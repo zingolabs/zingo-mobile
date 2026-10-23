@@ -27,10 +27,10 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
     maxFontSizeMultiplier={2}
     style={
       {
-        "color": "#c3c3c3",
-        "fontSize": 12,
+        "color": "#888888",
+        "fontSize": 13,
         "fontWeight": "600",
-        "lineHeight": 16,
+        "lineHeight": 18,
         "marginBottom": 8,
         "marginTop": 16,
       }

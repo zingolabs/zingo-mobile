@@ -161,7 +161,7 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
               </Chip>
             </View>
           </View>
-          <Text variant="bodySmall" tone="muted" style={{ marginTop: space12 }}>
+          <Text variant="caption" tone="muted" style={{ marginTop: space12 }}>
             {(translate('swap.slippage-help') as string).replace(
               '{n}',
               formatSlippagePercent(DEFAULT_SLIPPAGE_BPS),

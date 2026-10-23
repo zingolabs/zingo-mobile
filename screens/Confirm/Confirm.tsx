@@ -222,7 +222,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           tone="muted"
           style={{ marginTop: 4, textAlign: 'center' }}
         >
-          <Text variant="address">{Utils.trimToSmall(to.to, 8)}</Text>
+          <Text variant="address">{Utils.trimToSmall(to.to, 6)}</Text>
           {` · ${t(kindKey(to.to))}`}
         </Text>
         <Text

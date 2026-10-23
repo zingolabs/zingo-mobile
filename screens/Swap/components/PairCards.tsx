@@ -235,7 +235,7 @@ export default function PairCards({
         onLayout={e => setSendH(e.nativeEvent.layout.height)}
       >
         <Animated.View style={[header, { opacity: words }]}>
-          <Text variant="caption" tone="muted" style={{ fontWeight: '600' }}>
+          <Text variant="bodySmall" tone="muted" style={{ fontWeight: '600' }}>
             {texts.youSend}
           </Text>
           {isOutbound && !!availableText && (
@@ -316,7 +316,7 @@ export default function PairCards({
                 columnGap: space8,
               }}
             >
-              <Text variant="caption" tone="muted">
+              <Text variant="bodySmall" tone="muted">
                 {altText}
               </Text>
               <View style={{ transform: [{ rotate: '90deg' }] }}>
@@ -324,7 +324,7 @@ export default function PairCards({
               </View>
             </Pressable>
           ) : (
-            <Text variant="caption" tone="muted">
+            <Text variant="bodySmall" tone="muted">
               {altText}
             </Text>
           )}
@@ -368,7 +368,11 @@ export default function PairCards({
               columnGap: space4,
             }}
           >
-            <Text variant="caption" tone="muted" style={{ fontWeight: '600' }}>
+            <Text
+              variant="bodySmall"
+              tone="muted"
+              style={{ fontWeight: '600' }}
+            >
               {texts.youReceive}
             </Text>
             {!isOutbound && !!texts.receiveTip && (
@@ -439,7 +443,7 @@ export default function PairCards({
           </View>
         </Animated.View>
         <Animated.View style={[underRow, { opacity: words }]}>
-          <Text variant="caption" tone="muted">
+          <Text variant="bodySmall" tone="muted">
             {receiveAltText}
           </Text>
         </Animated.View>

@@ -180,7 +180,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
       onBack={close}
       testID="addresslist"
     >
-      <Text variant="bodySmall" tone="muted" style={{ marginTop: space4 }}>
+      <Text variant="caption" tone="muted" style={{ marginTop: space4 }}>
         {t('receive.addresses-lead')}
       </Text>
       {group(

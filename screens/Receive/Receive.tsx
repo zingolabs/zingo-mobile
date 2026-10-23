@@ -7,17 +7,17 @@ import React, {
   useMemo,
   useCallback,
 } from 'react';
+import Text from '@ui/primitives/Text';
 import TitleBar from '@ui/widgets/TitleBar';
 import { Keyboard, ScrollView, StyleSheet, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
-import { space20 } from '@app/theme';
+import { space20, space32 } from '@app/theme';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import { HomeTabScreenProps, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
-import RegText from '@ui/primitives/RegText';
 import AppSheet from '@ui/primitives/AppSheet';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 
@@ -334,9 +334,13 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
                   onAddTag={() => show('NAT')}
                 />
               ) : (
-                <RegText style={{ textAlign: 'center', marginTop: 50 }}>
+                <Text
+                  variant="body"
+                  tone="muted"
+                  style={{ textAlign: 'center', marginTop: space32 }}
+                >
                   {t('receive.noaddress')}
-                </RegText>
+                </Text>
               )}
             </ScrollView>
           </AppSheet>

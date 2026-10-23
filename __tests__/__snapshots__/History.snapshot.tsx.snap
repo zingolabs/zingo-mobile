@@ -1190,10 +1190,6 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
         <View
           style={
             {
-              "backgroundColor": "#011401",
-              "borderColor": "#05234C",
-              "borderRadius": 12,
-              "borderWidth": 1,
               "marginTop": 20,
             }
           }
@@ -1201,162 +1197,281 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
           <View
             style={
               {
-                "alignItems": "center",
-                "borderTopColor": "#FFFFFF0F",
-                "borderTopWidth": 0,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "minHeight": 44,
-                "paddingHorizontal": 16,
+                "backgroundColor": "#011401",
+                "borderColor": "#05234C",
+                "borderRadius": 12,
+                "borderWidth": 1,
               }
             }
           >
-            <Text
-              maxFontSizeMultiplier={2}
+            <View
               style={
                 {
-                  "color": "#888888",
-                  "fontSize": 12,
-                  "fontWeight": "400",
-                  "lineHeight": 16,
+                  "alignItems": "center",
+                  "borderTopColor": "#FFFFFF0F",
+                  "borderTopWidth": 0,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "minHeight": 44,
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 12,
                 }
               }
             >
-              text translated
-            </Text>
-            <Text
-              maxFontSizeMultiplier={2}
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "columnGap": 4,
+                    "flexDirection": "row",
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                      "lineHeight": 16,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "columnGap": 8,
+                    "flexDirection": "row",
+                    "flexShrink": 1,
+                    "minWidth": 0,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  numberOfLines={1}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "flexShrink": 1,
+                      "fontSize": 13,
+                      "fontWeight": "600",
+                      "lineHeight": 18,
+                      "textAlign": "right",
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+              </View>
+            </View>
+            <View
               style={
                 {
-                  "color": "#c3c3c3",
-                  "fontSize": 13,
-                  "fontWeight": "600",
-                  "lineHeight": 18,
+                  "alignItems": "center",
+                  "borderTopColor": "#FFFFFF0F",
+                  "borderTopWidth": 1,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "minHeight": 44,
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 12,
                 }
               }
             >
-              text translated
-            </Text>
-          </View>
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "borderTopColor": "#FFFFFF0F",
-                "borderTopWidth": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "minHeight": 44,
-                "paddingHorizontal": 16,
-              }
-            }
-          >
-            <Text
-              maxFontSizeMultiplier={2}
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "columnGap": 4,
+                    "flexDirection": "row",
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                      "lineHeight": 16,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "columnGap": 8,
+                    "flexDirection": "row",
+                    "flexShrink": 1,
+                    "minWidth": 0,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  numberOfLines={1}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "flexShrink": 1,
+                      "fontSize": 13,
+                      "fontWeight": "600",
+                      "lineHeight": 18,
+                      "textAlign": "right",
+                    }
+                  }
+                >
+                  0.0 ZEC
+                </Text>
+              </View>
+            </View>
+            <View
               style={
                 {
-                  "color": "#888888",
-                  "fontSize": 12,
-                  "fontWeight": "400",
-                  "lineHeight": 16,
+                  "alignItems": "center",
+                  "borderTopColor": "#FFFFFF0F",
+                  "borderTopWidth": 1,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "minHeight": 44,
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 12,
                 }
               }
             >
-              text translated
-            </Text>
-            <Text
-              maxFontSizeMultiplier={2}
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "columnGap": 4,
+                    "flexDirection": "row",
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                      "lineHeight": 16,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "columnGap": 8,
+                    "flexDirection": "row",
+                    "flexShrink": 1,
+                    "minWidth": 0,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  numberOfLines={1}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "flexShrink": 1,
+                      "fontSize": 13,
+                      "fontWeight": "600",
+                      "lineHeight": 18,
+                      "textAlign": "right",
+                    }
+                  }
+                >
+                  0.0 ZEC
+                </Text>
+              </View>
+            </View>
+            <View
               style={
                 {
-                  "color": "#c3c3c3",
-                  "fontSize": 13,
-                  "fontWeight": "600",
-                  "lineHeight": 18,
+                  "alignItems": "center",
+                  "borderTopColor": "#FFFFFF0F",
+                  "borderTopWidth": 1,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "minHeight": 44,
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 12,
                 }
               }
             >
-              0.0000 ZEC
-            </Text>
-          </View>
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "borderTopColor": "#FFFFFF0F",
-                "borderTopWidth": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "minHeight": 44,
-                "paddingHorizontal": 16,
-              }
-            }
-          >
-            <Text
-              maxFontSizeMultiplier={2}
-              style={
-                {
-                  "color": "#888888",
-                  "fontSize": 12,
-                  "fontWeight": "400",
-                  "lineHeight": 16,
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "columnGap": 4,
+                    "flexDirection": "row",
+                  }
                 }
-              }
-            >
-              text translated
-            </Text>
-            <Text
-              maxFontSizeMultiplier={2}
-              style={
-                {
-                  "color": "#c3c3c3",
-                  "fontSize": 13,
-                  "fontWeight": "600",
-                  "lineHeight": 18,
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                      "lineHeight": 16,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "columnGap": 8,
+                    "flexDirection": "row",
+                    "flexShrink": 1,
+                    "minWidth": 0,
+                  }
                 }
-              }
-            >
-              0.0000 ZEC
-            </Text>
-          </View>
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "borderTopColor": "#FFFFFF0F",
-                "borderTopWidth": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "minHeight": 44,
-                "paddingHorizontal": 16,
-              }
-            }
-          >
-            <Text
-              maxFontSizeMultiplier={2}
-              style={
-                {
-                  "color": "#888888",
-                  "fontSize": 12,
-                  "fontWeight": "400",
-                  "lineHeight": 16,
-                }
-              }
-            >
-              text translated
-            </Text>
-            <Text
-              maxFontSizeMultiplier={2}
-              style={
-                {
-                  "color": "#c3c3c3",
-                  "fontSize": 13,
-                  "fontWeight": "700",
-                  "lineHeight": 18,
-                }
-              }
-            >
-              0.0000 ZEC
-            </Text>
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  numberOfLines={1}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "flexShrink": 1,
+                      "fontSize": 13,
+                      "fontWeight": "700",
+                      "lineHeight": 18,
+                      "textAlign": "right",
+                    }
+                  }
+                >
+                  0.0 ZEC
+                </Text>
+              </View>
+            </View>
           </View>
         </View>
         <View
@@ -2686,10 +2801,6 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
         <View
           style={
             {
-              "backgroundColor": "#011401",
-              "borderColor": "#05234C",
-              "borderRadius": 12,
-              "borderWidth": 1,
               "marginTop": 20,
             }
           }
@@ -2697,162 +2808,281 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
           <View
             style={
               {
-                "alignItems": "center",
-                "borderTopColor": "#FFFFFF0F",
-                "borderTopWidth": 0,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "minHeight": 44,
-                "paddingHorizontal": 16,
+                "backgroundColor": "#011401",
+                "borderColor": "#05234C",
+                "borderRadius": 12,
+                "borderWidth": 1,
               }
             }
           >
-            <Text
-              maxFontSizeMultiplier={2}
+            <View
               style={
                 {
-                  "color": "#888888",
-                  "fontSize": 12,
-                  "fontWeight": "400",
-                  "lineHeight": 16,
+                  "alignItems": "center",
+                  "borderTopColor": "#FFFFFF0F",
+                  "borderTopWidth": 0,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "minHeight": 44,
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 12,
                 }
               }
             >
-              text translated
-            </Text>
-            <Text
-              maxFontSizeMultiplier={2}
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "columnGap": 4,
+                    "flexDirection": "row",
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                      "lineHeight": 16,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "columnGap": 8,
+                    "flexDirection": "row",
+                    "flexShrink": 1,
+                    "minWidth": 0,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  numberOfLines={1}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "flexShrink": 1,
+                      "fontSize": 13,
+                      "fontWeight": "600",
+                      "lineHeight": 18,
+                      "textAlign": "right",
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+              </View>
+            </View>
+            <View
               style={
                 {
-                  "color": "#c3c3c3",
-                  "fontSize": 13,
-                  "fontWeight": "600",
-                  "lineHeight": 18,
+                  "alignItems": "center",
+                  "borderTopColor": "#FFFFFF0F",
+                  "borderTopWidth": 1,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "minHeight": 44,
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 12,
                 }
               }
             >
-              text translated
-            </Text>
-          </View>
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "borderTopColor": "#FFFFFF0F",
-                "borderTopWidth": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "minHeight": 44,
-                "paddingHorizontal": 16,
-              }
-            }
-          >
-            <Text
-              maxFontSizeMultiplier={2}
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "columnGap": 4,
+                    "flexDirection": "row",
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                      "lineHeight": 16,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "columnGap": 8,
+                    "flexDirection": "row",
+                    "flexShrink": 1,
+                    "minWidth": 0,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  numberOfLines={1}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "flexShrink": 1,
+                      "fontSize": 13,
+                      "fontWeight": "600",
+                      "lineHeight": 18,
+                      "textAlign": "right",
+                    }
+                  }
+                >
+                  0.0 ZEC
+                </Text>
+              </View>
+            </View>
+            <View
               style={
                 {
-                  "color": "#888888",
-                  "fontSize": 12,
-                  "fontWeight": "400",
-                  "lineHeight": 16,
+                  "alignItems": "center",
+                  "borderTopColor": "#FFFFFF0F",
+                  "borderTopWidth": 1,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "minHeight": 44,
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 12,
                 }
               }
             >
-              text translated
-            </Text>
-            <Text
-              maxFontSizeMultiplier={2}
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "columnGap": 4,
+                    "flexDirection": "row",
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                      "lineHeight": 16,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "columnGap": 8,
+                    "flexDirection": "row",
+                    "flexShrink": 1,
+                    "minWidth": 0,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  numberOfLines={1}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "flexShrink": 1,
+                      "fontSize": 13,
+                      "fontWeight": "600",
+                      "lineHeight": 18,
+                      "textAlign": "right",
+                    }
+                  }
+                >
+                  0.0 ZEC
+                </Text>
+              </View>
+            </View>
+            <View
               style={
                 {
-                  "color": "#c3c3c3",
-                  "fontSize": 13,
-                  "fontWeight": "600",
-                  "lineHeight": 18,
+                  "alignItems": "center",
+                  "borderTopColor": "#FFFFFF0F",
+                  "borderTopWidth": 1,
+                  "columnGap": 12,
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "minHeight": 44,
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 12,
                 }
               }
             >
-              0.0000 ZEC
-            </Text>
-          </View>
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "borderTopColor": "#FFFFFF0F",
-                "borderTopWidth": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "minHeight": 44,
-                "paddingHorizontal": 16,
-              }
-            }
-          >
-            <Text
-              maxFontSizeMultiplier={2}
-              style={
-                {
-                  "color": "#888888",
-                  "fontSize": 12,
-                  "fontWeight": "400",
-                  "lineHeight": 16,
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "columnGap": 4,
+                    "flexDirection": "row",
+                  }
                 }
-              }
-            >
-              text translated
-            </Text>
-            <Text
-              maxFontSizeMultiplier={2}
-              style={
-                {
-                  "color": "#c3c3c3",
-                  "fontSize": 13,
-                  "fontWeight": "600",
-                  "lineHeight": 18,
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                      "lineHeight": 16,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "columnGap": 8,
+                    "flexDirection": "row",
+                    "flexShrink": 1,
+                    "minWidth": 0,
+                  }
                 }
-              }
-            >
-              0.0000 ZEC
-            </Text>
-          </View>
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "borderTopColor": "#FFFFFF0F",
-                "borderTopWidth": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "minHeight": 44,
-                "paddingHorizontal": 16,
-              }
-            }
-          >
-            <Text
-              maxFontSizeMultiplier={2}
-              style={
-                {
-                  "color": "#888888",
-                  "fontSize": 12,
-                  "fontWeight": "400",
-                  "lineHeight": 16,
-                }
-              }
-            >
-              text translated
-            </Text>
-            <Text
-              maxFontSizeMultiplier={2}
-              style={
-                {
-                  "color": "#c3c3c3",
-                  "fontSize": 13,
-                  "fontWeight": "700",
-                  "lineHeight": 18,
-                }
-              }
-            >
-              0.0000 ZEC
-            </Text>
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  numberOfLines={1}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "flexShrink": 1,
+                      "fontSize": 13,
+                      "fontWeight": "700",
+                      "lineHeight": 18,
+                      "textAlign": "right",
+                    }
+                  }
+                >
+                  0.0 ZEC
+                </Text>
+              </View>
+            </View>
           </View>
         </View>
         <View

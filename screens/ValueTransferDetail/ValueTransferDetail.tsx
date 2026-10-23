@@ -6,7 +6,7 @@ import { Linking, Pressable, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { radiusMd, useTheme } from '@app/theme';
+import { radiusMd, useTheme, iconSizeSm } from '@app/theme';
 import {
   BlockExplorerEnum,
   ChainNameEnum,
@@ -416,7 +416,7 @@ const ValueTransferDetail: React.FunctionComponent<
                   {GlobalConst.replyTo}
                 </Text>
                 {!ownAddress(memoUA) && (
-                  <TriangleAlert size={14} color={colors.fgWarning} />
+                  <TriangleAlert size={iconSizeSm} color={colors.fgWarning} />
                 )}
               </View>
               <Text variant="address">{memoUA}</Text>

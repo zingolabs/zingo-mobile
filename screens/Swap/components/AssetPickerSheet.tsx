@@ -347,7 +347,7 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
                   {t('swap.assets-empty').replace('{query}', query.trim())}
                 </Text>
                 <Text
-                  variant="bodySmall"
+                  variant="caption"
                   tone="muted"
                   style={{ marginTop: space8 }}
                 >

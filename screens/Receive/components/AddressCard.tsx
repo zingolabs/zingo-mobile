@@ -186,9 +186,9 @@ export default function AddressCard({
                 style={{ minHeight: touchTarget, justifyContent: 'center' }}
               >
                 <Text
-                  variant="bodySmall"
+                  variant="caption"
                   style={{
-                    fontWeight: '600',
+                    fontWeight: '700',
                     textDecorationLine: 'underline',
                     textDecorationColor: colors.fgMuted,
                   }}

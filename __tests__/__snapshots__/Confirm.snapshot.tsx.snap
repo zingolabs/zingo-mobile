@@ -134,7 +134,7 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
                 }
               }
             >
-              UA-12345...34567890
+              UA-123...567890
             </Text>
              · text translated
           </Text>
@@ -668,7 +668,7 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
                 }
               }
             >
-              UA-12345...34567890
+              UA-123...567890
             </Text>
              · text translated
           </Text>

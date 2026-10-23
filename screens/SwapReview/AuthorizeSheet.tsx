@@ -70,7 +70,7 @@ const AuthorizeSheet = forwardRef<BottomSheetModal, AuthorizeSheetProps>(
             {translate('swap.auth-title') as string}
           </Text>
           <Text
-            variant="bodySmall"
+            variant="caption"
             tone="muted"
             style={{ marginTop: 8, textAlign: 'center' }}
           >

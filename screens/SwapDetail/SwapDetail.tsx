@@ -6,6 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { formatZecAmount } from '@app/utils/formatZecAmount';
 import Animated from 'react-native-reanimated';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Linking, Pressable, View } from 'react-native';
@@ -259,7 +260,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
           {
             label: t('swap.detail-sent-to'),
             value: contact
-              ? `${contact.label}  ${Utils.trimToSmall(record.destinationAddress, 4)}`
+              ? `${contact.label}  ${Utils.trimToSmall(record.destinationAddress, 6)}`
               : Utils.trimToSmall(record.destinationAddress, 6),
             copy: record.destinationAddress,
             leading: contact ? (
@@ -511,7 +512,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
                           color: received ? colors.fgAccent : colors.fgDefault,
                         }}
                       >
-                        {`${received ? '+' : '−'}${leg.amount.toFixed(4)} ${info.currencyName}`}
+                        {`${received ? '+' : '−'}${formatZecAmount(leg.amount)} ${info.currencyName}`}
                       </Text>
                       <ChevronRight size={iconSizeSm} color={colors.fgMuted} />
                     </View>

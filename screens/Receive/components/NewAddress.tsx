@@ -123,7 +123,8 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
         {t('receive.new-sub')}
       </Text>
       <Text
-        variant="caption"
+        variant="bodySmall"
+        tone="muted"
         style={{ fontWeight: '600', marginTop: space16, marginBottom: space8 }}
       >
         {t('receive.new-type')}

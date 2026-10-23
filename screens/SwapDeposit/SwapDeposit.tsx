@@ -227,7 +227,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
         <View style={{ height: space12 }} />
         <DepositSlip record={record} paid />
         <View style={{ marginTop: space16 }}>
-          <Text variant="bodySmall" tone="muted">
+          <Text variant="caption" tone="muted">
             {translate('swap.deposit-paid-elsewhere') as string}
           </Text>
           <View style={{ height: space8 }} />

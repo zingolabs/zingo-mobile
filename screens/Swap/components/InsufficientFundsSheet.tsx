@@ -64,7 +64,7 @@ const InsufficientFundsSheet = forwardRef<
           {translate('swap.insufficient-body') as string}
         </Text>
         <Text
-          variant="bodySmall"
+          variant="caption"
           tone="muted"
           style={{ textAlign: 'center', marginTop: space8 }}
         >

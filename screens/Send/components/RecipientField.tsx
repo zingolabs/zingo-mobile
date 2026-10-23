@@ -200,7 +200,7 @@ export default function RecipientField({
           {contact?.label ?? pickedName}
         </Text>
         <Text variant="address" tone="muted" numberOfLines={1}>
-          {Utils.trimToSmall(text, 8)}
+          {Utils.trimToSmall(text, 6)}
         </Text>
       </View>
     </View>

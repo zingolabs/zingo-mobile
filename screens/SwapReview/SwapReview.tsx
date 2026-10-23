@@ -242,7 +242,7 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
   const footer = (
     <View style={{ rowGap: space8 }}>
       {!!error && (
-        <Text variant="caption" tone="danger" style={{ textAlign: 'center' }}>
+        <Text variant="bodySmall" tone="danger" style={{ textAlign: 'center' }}>
           {error}
         </Text>
       )}

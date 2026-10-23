@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useMemo, useRef, useState } from 'react';
+import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import TitleBar from '@ui/widgets/TitleBar';
 import {
   Platform,
@@ -60,7 +61,6 @@ import { HistoryIcon } from '@ui/primitives/Icons/HistoryIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
 import { SheetPresence } from '@ui/primitives/SheetPresence';
-import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import { ChevronDown, ChevronUp } from '@ui/primitives/Icons/Chevron';
 import {
   DEFAULT_SLIPPAGE_BPS,
@@ -518,8 +518,8 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                     columnGap: 8,
                   }}
                 >
-                  <TriangleAlert size={14} color={colors.fgDanger} />
-                  <Text variant="caption" style={{ color: colors.fgDanger }}>
+                  <InfoIcon size={iconSizeSm} color={colors.fgDanger} />
+                  <Text variant="bodySmall" tone="danger">
                     {translate('swap.over-balance') as string}
                   </Text>
                 </View>
@@ -673,10 +673,11 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                         paddingHorizontal: 4,
                       }}
                     >
-                      <TriangleAlert size={14} color={colors.fgDanger} />
+                      <InfoIcon size={iconSizeSm} color={colors.fgDanger} />
                       <Text
-                        variant="caption"
-                        style={{ color: colors.fgDanger, flexShrink: 1 }}
+                        variant="bodySmall"
+                        tone="danger"
+                        style={{ flexShrink: 1 }}
                       >
                         {form.addressIsZcash
                           ? (translate('swap.address-zcash') as string)

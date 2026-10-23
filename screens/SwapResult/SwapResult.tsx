@@ -1,11 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useState } from 'react';
+import DetailRows from '@screens/Swap/components/DetailRows';
 import { View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
   radiusMd,
-  space12,
   space16,
   space8,
   useTheme,
@@ -134,7 +134,7 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
         >
           {icon}
         </View>
-        <Text variant="screenTitle" style={{ textAlign: 'center' }}>
+        <Text variant="subtitle" style={{ textAlign: 'center' }}>
           {title}
         </Text>
         <Text
@@ -151,39 +151,20 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
   const rows = (
     items: [string, string, 'default' | 'accent' | 'warning'][],
   ) => (
-    <View
-      style={{
-        marginTop: space16,
-        borderWidth: 1,
-        borderColor: colors.bottomSheetBorder,
-        borderRadius: radiusMd,
-        paddingHorizontal: space16,
-      }}
-    >
-      {items.map(([label, value, tone], index) => (
-        <View
-          key={label}
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            columnGap: space12,
-            paddingVertical: 12,
-            borderTopWidth: index === 0 ? 0 : 1,
-            borderTopColor: colors.bottomSheetBorder,
-          }}
-        >
-          <Text variant="bodySmall" tone="muted">
-            {label}
-          </Text>
-          <Text
-            variant="bodyStrong"
-            tone={tone}
-            style={{ flexShrink: 1, textAlign: 'right' }}
-          >
-            {value}
-          </Text>
-        </View>
-      ))}
+    <View style={{ marginTop: space16 }}>
+      <DetailRows
+        rows={items.map(([label, value, tone]) => ({
+          label,
+          value,
+          wrap: true,
+          tone:
+            tone === 'accent'
+              ? 'positive'
+              : tone === 'warning'
+                ? 'warning'
+                : undefined,
+        }))}
+      />
     </View>
   );
 
