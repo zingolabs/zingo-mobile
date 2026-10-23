@@ -18,7 +18,11 @@ const meta: Meta<typeof ComputingTxContent> = {
 export default meta;
 type Story = StoryObj<typeof ComputingTxContent>;
 
-export const Computing: Story = {};
+/**
+ * Static as the others: the screen is a full panel (a sheet) that measures
+ * on a real rendering step, so its capture needs the frame-by-frame play.
+ */
+export const Computing: Story = { tags: ['static'] };
 
 export const Created: Story = {
   tags: ['static'],
