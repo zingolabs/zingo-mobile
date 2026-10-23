@@ -1122,39 +1122,6 @@
     "@eslint/core" "^0.17.0"
     levn "^0.4.1"
 
-"@fortawesome/fontawesome-common-types@7.3.0":
-  version "7.3.0"
-  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-7.3.0.tgz#d4e0cce53a07298186aae03832b7a67694391438"
-  integrity sha512-X/vND0Y1l9fVJ9O79UgtZnXSpz4aNF3bXlDxiJAEAm6kgeSftp9wjjBPgqzazJV8YlmxfRoeXNfSCJ48sf/Hhw==
-
-"@fortawesome/fontawesome-svg-core@^7.3.0":
-  version "7.3.0"
-  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-svg-core/-/fontawesome-svg-core-7.3.0.tgz#84676feb2d87ce128be2773f3885553ed3f3e1bd"
-  integrity sha512-MFbTNLDWkLJwbozDvHOZ7hwyDjQcBMBattlcOQ6ZmV5YD9bBrqdl1rNtmVjQ/lzqveXXX3sMz2Ew6fAgXoxmkw==
-  dependencies:
-    "@fortawesome/fontawesome-common-types" "7.3.0"
-
-"@fortawesome/free-regular-svg-icons@^7.3.0":
-  version "7.3.0"
-  resolved "https://registry.yarnpkg.com/@fortawesome/free-regular-svg-icons/-/free-regular-svg-icons-7.3.0.tgz#d80abdf52838bbe85fdddabf3984dbe35f1a2071"
-  integrity sha512-4675NiHzJJs0dLStFpp5G1JNfMYxqFSxZ2iCaiMfHptjlc8McLG9oqcd5pFEiPiqfiV2YG25cJ9EYWIEhUvp+A==
-  dependencies:
-    "@fortawesome/fontawesome-common-types" "7.3.0"
-
-"@fortawesome/free-solid-svg-icons@^7.3.0":
-  version "7.3.0"
-  resolved "https://registry.yarnpkg.com/@fortawesome/free-solid-svg-icons/-/free-solid-svg-icons-7.3.0.tgz#1363f85b09e1c057461e7491a5eafb13883140ee"
-  integrity sha512-YxI/CuwWeI3nPIoYU//vkDS+3ige/67DPZ6XwMATpYEFESzO9L8zfJOKllGRgIlpT/uebrZCcvAzp3peD7GmTw==
-  dependencies:
-    "@fortawesome/fontawesome-common-types" "7.3.0"
-
-"@fortawesome/react-native-fontawesome@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@fortawesome/react-native-fontawesome/-/react-native-fontawesome-1.0.0.tgz#b1cec25c9d7b82eb44b782e558615e616358b63c"
-  integrity sha512-whGM1GewA1kO0r+RxSY4cefcXNAiKGMh9PIkfid8lMd7ndO/yDAEHBiHTYVfeCICm7DwbmcAUWBJZ6HcFeN7fg==
-  dependencies:
-    humps "^2.0.1"
-
 "@gorhom/bottom-sheet@^5.2.6":
   version "5.2.14"
   resolved "https://registry.yarnpkg.com/@gorhom/bottom-sheet/-/bottom-sheet-5.2.14.tgz#2b74ad9293b0ad40518487c6dcd151cadd5b3de3"
@@ -5662,11 +5629,6 @@ human-signals@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/human-signals/-/human-signals-2.1.0.tgz#dc91fcba42e4d06e4abaed33b3e7a3c02f514ea0"
   integrity sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==
-
-humps@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/humps/-/humps-2.0.1.tgz#dd02ea6081bd0568dc5d073184463957ba9ef9aa"
-  integrity sha512-E0eIbrFWUhwfXJmsbdjRQFQPrl5pTEoKlz163j1mTqqUnU9PgR4AgB8AIITzuB3vLBdxZXyZ9TDIrwB2OASz4g==
 
 hyphenate-style-name@^1.0.3:
   version "1.1.0"
@@ -10330,6 +10292,11 @@ zcashname-sdk@^0.12.0:
     "@noble/ed25519" "^2.0.0"
     "@noble/hashes" "^2.2.0"
     bech32 "^2.0.0"
+
+zingolib-bundle-pin@0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/zingolib-bundle-pin/-/zingolib-bundle-pin-0.4.0.tgz#9c875dab5c068b8ba2eff76a03e34f997ef18034"
+  integrity sha512-6Hqu/1hQ+NA7tj6Ny/9+7e38JmcOxYzrntxHDc2MCv1jT82GSD/YlrOU31faAb+6RdaJLqs+fOfs+6cG+zrAjA==
 
 "zod-validation-error@^3.5.0 || ^4.0.0":
   version "4.0.2"

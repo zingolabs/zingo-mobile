@@ -6,33 +6,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  create-cache-key:
-    uses: ./.github/workflows/create-cache-key.yaml
-
-  android-build:
-    uses: ./.github/workflows/android-build.yaml
-    needs: create-cache-key
-    with:
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-      # x86_64 so the artifact runs on GitHub Actions' Linux Android emulator
-      # (the Linux runners are x86_64; an arm64-v8a APK would not install).
-      arch: x86_64
-
-  ios-build:
-    strategy:
-      fail-fast: false
-    uses: ./.github/workflows/ios-build.yaml
-    needs: create-cache-key
-    with:
-      cache-key: ${{ needs.create-cache-key.outputs.ios-cache-key }}
-
   maestro-android:
     name: Maestro — Android
     runs-on: ubuntu-24.04
-    needs: [create-cache-key, android-build]
-    env:
-      ABI: x86_64
-      CACHE-KEY: ${{ needs.create-cache-key.outputs.cache-key }}
 
     steps:
       - name: Checkout repository
@@ -47,19 +23,10 @@ jobs:
       - name: Gradle cache
         uses: ./.github/actions/gradle-cache
 
-      - name: Check out zingolib
-        uses: ./.github/actions/zingolib-submodule
-
-      - name: Restore the Binding Layer
-        uses: ./.github/actions/binding-layer-android
-        with:
-          abi: ${{ env.ABI }}
-          cache-key: ${{ env.CACHE-KEY }}
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22.18.0
+          node-version-file: .nvmrc
           cache: yarn
 
       - name: Yarn install
@@ -130,54 +97,30 @@ jobs:
   maestro-ios:
     name: Maestro — iOS
     runs-on: macos-15
-    needs: [create-cache-key, ios-build]
-    env:
-      CACHE-KEY: ${{ needs.create-cache-key.outputs.ios-cache-key }}
 
     steps:
-      - name: Xcode 16.4
+      # Pinned to the Xcode of the release machine.
+      - name: Xcode 26.3
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.4'
+          xcode-version: '26.3'
 
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Check out zingolib
-        uses: ./.github/actions/zingolib-submodule
-
-      # Restore the Binding Layer produced by .github/workflows/ios-build.yaml
-      # into the zingolib submodule, where the Xcode project takes it from.
-      #
-      # Restored twice on purpose: on 2026-09-23 the cache service confirmed
-      # this very key as a hit and then aborted the download 40s later, and
-      # fail-on-cache-miss turned that blip into a lost night. The first
-      # attempt is allowed to fail; only the second one is fatal.
-      - name: iOS Binding Layer cache
-        id: ios-xcframework-cache
-        continue-on-error: true
-        uses: actions/cache/restore@v6
-        with:
-          path: zingolib/bindings/swift/build
-          key: binding-layer-ios-${{ env.CACHE-KEY }}
-          fail-on-cache-miss: true
-
-      - name: iOS Binding Layer cache (retry)
-        if: steps.ios-xcframework-cache.outcome != 'success'
-        uses: actions/cache/restore@v6
-        with:
-          path: zingolib/bindings/swift/build
-          key: binding-layer-ios-${{ env.CACHE-KEY }}
-          fail-on-cache-miss: true
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22.18.0
+          node-version-file: .nvmrc
           cache: yarn
 
       - name: Yarn install
         run: yarn
+
+      # The fetch extracts the ZingoBindings package under ios/binding-layer,
+      # where the Xcode project references it.
+      - name: Fetch the iOS Prebuilt Bundle
+        run: yarn --silent fetch:binding-layer --platform ios
 
       - name: Pod install
         uses: nick-fields/retry@v4

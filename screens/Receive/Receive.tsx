@@ -10,12 +10,6 @@ import React, {
 import { Keyboard, Pressable, StyleSheet, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faChevronDown,
-  faPlus,
-  faXmark,
-} from '@fortawesome/free-solid-svg-icons';
 import SelectBottomSheet from '@ui/widgets/SelectBottomSheet';
 
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -46,6 +40,9 @@ import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 import { usePriceSnapAutoClose } from '@app/hooks/usePriceSnapAutoClose';
 import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { ChevronDown } from '@ui/primitives/Icons/Chevron';
+import { PlusIcon } from '@ui/primitives/Icons/PlusIcon';
 
 type ReceiveProps = HomeTabScreenProps<'Receive'>;
 
@@ -271,7 +268,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
         justifyContent: 'space-between',
         paddingTop: 8,
         paddingBottom: 6,
-        paddingHorizontal: 16,
+        paddingHorizontal: 20,
       }}
     >
       <View style={{ width: 48 }} />
@@ -291,7 +288,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
         hitSlop={8}
         style={{ paddingHorizontal: 14, paddingVertical: 4 }}
       >
-        <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
+        <XIcon size={20} color={colors.fgMuted} />
       </Pressable>
     </View>
   );
@@ -372,9 +369,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
                 paddingVertical: 4,
               }}
             >
-              <FontAwesomeIcon
-                icon={faChevronDown}
-                size={14}
+              <ChevronDown
+                size={16}
                 color={colors.fgMuted}
                 style={{ marginRight: 8 }}
               />
@@ -404,7 +400,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
             paddingVertical: 4,
           }}
         >
-          <FontAwesomeIcon icon={faPlus} size={18} color={colors.fgMuted} />
+          <PlusIcon size={20} color={colors.fgMuted} />
         </Pressable>
       </View>
     </View>

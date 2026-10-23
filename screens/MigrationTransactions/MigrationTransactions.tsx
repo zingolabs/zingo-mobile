@@ -6,7 +6,8 @@ import { useTheme } from '@app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
@@ -14,6 +15,7 @@ import { Route } from '@app/AppState';
 import Utils from '@app/utils';
 import { planOrchardDrain } from '@app/walletBackend';
 import { RPCDrainPlanType } from '@app/walletBackend/types/RPCDrainPlanType';
+import { themeTokens } from '@app/theme';
 
 type MigrationTransactionsProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -41,7 +43,7 @@ const Row: React.FunctionComponent<{
     <Text
       style={{
         color: bold ? colors.fgDefault : colors.fgMuted,
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: bold ? '700' : '400',
         marginRight: 12,
       }}
@@ -53,7 +55,7 @@ const Row: React.FunctionComponent<{
         <Text
           style={{
             color: colors.fgDefault,
-            fontSize: 14,
+            fontSize: 15,
             fontWeight: bold ? '700' : '400',
             textAlign: 'right',
           }}
@@ -69,7 +71,7 @@ const Row: React.FunctionComponent<{
 
 // The transaction cards sit a shade darker than the summary, so the summary
 // reads as the surface and the detail recedes.
-const TX_CARD_BACKGROUND = '#020D1C';
+const TX_CARD_BACKGROUND = themeTokens.bgSurface;
 
 const Card: React.FunctionComponent<{
   colors: AppTheme['colors'];
@@ -177,7 +179,7 @@ const MigrationTransactions: React.FunctionComponent<
           padding: 24,
         }}
       >
-        <ActivityIndicator size="large" color={colors.fgAccent} />
+        <ActivityIndicator size="large" color={colors.fgMuted} />
         <Text
           style={{
             color: colors.fgMuted,
@@ -210,7 +212,7 @@ const MigrationTransactions: React.FunctionComponent<
             <Text
               style={{
                 color: colors.fgDefault,
-                fontSize: 17,
+                fontSize: 18,
                 fontWeight: '700',
                 marginBottom: 10,
                 textAlign: 'center',
@@ -221,7 +223,7 @@ const MigrationTransactions: React.FunctionComponent<
             <Text
               style={{
                 color: colors.fgMuted,
-                fontSize: 14,
+                fontSize: 15,
                 textAlign: 'center',
               }}
             >
@@ -238,7 +240,7 @@ const MigrationTransactions: React.FunctionComponent<
           }}
         >
           <Button
-            type={ButtonTypeEnum.Ghost}
+            variant="text"
             title={translate('migrationtransactions.back') as string}
             onPress={() => navigation.goBack()}
           />
@@ -260,7 +262,7 @@ const MigrationTransactions: React.FunctionComponent<
             <Text
               style={{
                 color: colors.fgDefault,
-                fontSize: 17,
+                fontSize: 18,
                 fontWeight: '700',
                 marginBottom: 10,
                 textAlign: 'center',
@@ -271,7 +273,7 @@ const MigrationTransactions: React.FunctionComponent<
             <Text
               style={{
                 color: colors.fgMuted,
-                fontSize: 14,
+                fontSize: 15,
                 textAlign: 'center',
               }}
             >
@@ -288,20 +290,20 @@ const MigrationTransactions: React.FunctionComponent<
             paddingHorizontal: 24,
           }}
         >
-          <Button
-            testID="migrationtransactions.pending-back"
-            type={ButtonTypeEnum.Ghost}
-            title={translate('migrationtransactions.back') as string}
-            onPress={() => navigation.goBack()}
-            twoButtons={true}
-          />
-          <Button
-            testID="migrationtransactions.retry"
-            type={ButtonTypeEnum.Primary}
-            title={translate('migrationtransactions.retry') as string}
-            onPress={fetchPlan}
-            twoButtons={true}
-          />
+          <ButtonStack>
+            <Button
+              testID="migrationtransactions.pending-back"
+              variant="text"
+              title={translate('migrationtransactions.back') as string}
+              onPress={() => navigation.goBack()}
+            />
+            <Button
+              testID="migrationtransactions.retry"
+              variant="primary"
+              title={translate('migrationtransactions.retry') as string}
+              onPress={fetchPlan}
+            />
+          </ButtonStack>
         </View>
       </View>
     );
@@ -321,7 +323,7 @@ const MigrationTransactions: React.FunctionComponent<
             <Text
               style={{
                 color: colors.fgDefault,
-                fontSize: 17,
+                fontSize: 18,
                 fontWeight: '700',
                 marginBottom: 10,
                 textAlign: 'center',
@@ -332,7 +334,7 @@ const MigrationTransactions: React.FunctionComponent<
             <Text
               style={{
                 color: colors.fgMuted,
-                fontSize: 14,
+                fontSize: 15,
                 textAlign: 'center',
               }}
             >
@@ -349,7 +351,7 @@ const MigrationTransactions: React.FunctionComponent<
           }}
         >
           <Button
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={translate('migrationtransactions.close') as string}
             onPress={goHome}
           />
@@ -489,20 +491,20 @@ const MigrationTransactions: React.FunctionComponent<
           paddingHorizontal: 24,
         }}
       >
-        <Button
-          testID="migrationtransactions.back"
-          type={ButtonTypeEnum.Ghost}
-          title={translate('migrationtransactions.back') as string}
-          onPress={() => navigation.goBack()}
-          twoButtons={true}
-        />
-        <Button
-          testID="migrationtransactions.accept"
-          type={ButtonTypeEnum.Primary}
-          title={translate('migrationtransactions.accept') as string}
-          onPress={onAccept}
-          twoButtons={true}
-        />
+        <ButtonStack>
+          <Button
+            testID="migrationtransactions.back"
+            variant="text"
+            title={translate('migrationtransactions.back') as string}
+            onPress={() => navigation.goBack()}
+          />
+          <Button
+            testID="migrationtransactions.accept"
+            variant="primary"
+            title={translate('migrationtransactions.accept') as string}
+            onPress={onAccept}
+          />
+        </ButtonStack>
       </View>
     </View>
   );

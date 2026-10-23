@@ -26,11 +26,10 @@ const TransparentWarning = ({
     >
       <View
         style={{
-          width: '90%',
-          padding: 16,
+          paddingHorizontal: 20,
+          paddingVertical: 16,
           borderRadius: 8,
           backgroundColor: colors.bgSurface,
-          alignSelf: 'center',
         }}
       >
         <View>
@@ -62,12 +61,12 @@ const TransparentWarning = ({
             }}
           >
             <TriangleAlert
-              size={12}
+              size={16}
               style={{ marginRight: 8 }}
-              color={colors.fgWarningEmphasis}
+              color={colors.fgWarning}
             />
 
-            <Text style={{ color: colors.fgWarningEmphasis, fontSize: 12 }}>
+            <Text style={{ color: colors.fgWarning, fontSize: 12 }}>
               {translate('receive.modal-transparent.button') as string}
             </Text>
           </TouchableOpacity>

@@ -4,10 +4,7 @@ import Svg, { Rect } from 'react-native-svg';
 import { MixnetPhase } from '@app/walletBackend/transforms/mixnetView';
 import NymOff from '../../../assets/img/nym-off.svg';
 import NymOn from '../../../assets/img/nym-on.svg';
-
-const HALO_GREEN = '#07FF94';
-const HALO_CORAL = '#FF6F61';
-const HALO_YELLOW = '#FFC400';
+import { useTheme } from '@app/theme';
 
 const ICON = 14;
 const RING = 22;
@@ -85,6 +82,7 @@ const HaloRect = ({ color }: { color: string }) => (
 );
 
 const MixnetIcon = ({ phase }: { phase: MixnetPhase }) => {
+  const { colors } = useTheme();
   const animating = phase === 'connecting' || phase === 'reconnecting';
 
   useEffect(() => {
@@ -106,7 +104,7 @@ const MixnetIcon = ({ phase }: { phase: MixnetPhase }) => {
             height={SIDE}
             rx={RADIUS}
             ry={RADIUS}
-            stroke={phase === 'reconnecting' ? HALO_YELLOW : HALO_GREEN}
+            stroke={phase === 'reconnecting' ? colors.fgWarning : colors.bgNym}
             strokeWidth={STROKE}
             fill="none"
             strokeLinecap="round"
@@ -115,7 +113,7 @@ const MixnetIcon = ({ phase }: { phase: MixnetPhase }) => {
           />
         </Svg>
       )}
-      {phase === 'lost' && <HaloRect color={HALO_CORAL} />}
+      {phase === 'lost' && <HaloRect color={colors.fgDanger} />}
       {/* The switched-off glyph is the whole report for `off`: no halo, no
           animation — a resting transport, not a failing one. */}
       {phase === 'off' ? (

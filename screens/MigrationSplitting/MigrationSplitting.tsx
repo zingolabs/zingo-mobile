@@ -18,11 +18,10 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import ProgressBar from '@ui/primitives/ProgressBar';
 import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
@@ -32,6 +31,7 @@ import useTrickleProgress from '@app/hooks/useTrickleProgress';
 import { planIronwoodMigration, quickSplit } from '@app/walletBackend';
 import { RPCSplitOutcomeType } from '@app/walletBackend/types/RPCSplitOutcomeType';
 import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanType';
+import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 
 type MigrationSplittingProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -328,7 +328,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
     },
     creating: {
       key: 'migrationsplitting.status-creating',
-      color: colors.fgAccent,
+      color: colors.fgWarning,
     },
     sent: {
       key: 'migrationsplitting.status-sent',
@@ -394,18 +394,18 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
             paddingHorizontal: 24,
           }}
         >
-          <Button
-            type={ButtonTypeEnum.Ghost}
-            title={translate('migrationsplitting.close') as string}
-            onPress={goHome}
-            twoButtons={true}
-          />
-          <Button
-            type={ButtonTypeEnum.Primary}
-            title={translate('migrationsplitting.retry') as string}
-            onPress={onRetry}
-            twoButtons={true}
-          />
+          <ButtonStack>
+            <Button
+              variant="quiet"
+              title={translate('migrationsplitting.close') as string}
+              onPress={goHome}
+            />
+            <Button
+              variant="primary"
+              title={translate('migrationsplitting.retry') as string}
+              onPress={onRetry}
+            />
+          </ButtonStack>
         </View>
       </View>
     );
@@ -452,11 +452,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
                 marginBottom: 14,
               }}
             >
-              <FontAwesomeIcon
-                icon={faCheck}
-                size={16}
-                color={colors.fgAccent}
-              />
+              <CheckIcon size={16} color={colors.fgAccent} />
               <Text
                 style={{
                   color: colors.fgDefault,
@@ -472,7 +468,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
                 )}
               </Text>
               <Text
-                style={{ color: colors.fgAccent, fontSize: 14, flexShrink: 1 }}
+                style={{ color: colors.fgDefault, fontSize: 14, flexShrink: 1 }}
                 numberOfLines={1}
               >
                 {row.label}
@@ -499,7 +495,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
         >
           <Button
             testID="migrationsplitting.continue"
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={translate('migrationsplitting.continue') as string}
             onPress={() => navigation.navigate(Route.MigrationCadence)}
           />
@@ -564,7 +560,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
             marginBottom: 20,
           }}
         >
-          <ActivityIndicator size="small" color={colors.fgAccent} />
+          <ActivityIndicator size="small" color={colors.fgMuted} />
           <Text
             style={{
               color: colors.fgDefault,
@@ -621,7 +617,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
                 )}
               </Text>
               <Text
-                style={{ color: colors.fgAccent, fontSize: 14, flexShrink: 1 }}
+                style={{ color: colors.fgDefault, fontSize: 14, flexShrink: 1 }}
                 numberOfLines={1}
               >
                 {row.label}

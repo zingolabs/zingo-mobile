@@ -7,7 +7,7 @@ import {
   Pressable,
   TouchableOpacity,
 } from 'react-native';
-import { useTheme } from '@app/theme';
+import { useTheme, fieldMinHeight, radiusMd, slopFor } from '@app/theme';
 
 import {
   AddressBookFileClass,
@@ -17,10 +17,9 @@ import {
 } from '@app/AppState';
 import RegText from '@ui/primitives/RegText';
 import { ContextAppLoaded } from '@app/context';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import { AddressUnifiedTypeEnum } from '@app/AppState';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronDown, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import SelectBottomSheet from '@ui/widgets/SelectBottomSheet';
 import {
@@ -31,6 +30,9 @@ import { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddres
 import { RPCTransparentAddressType } from '@app/walletBackend/types/RPCTransparentAddressType';
 import Utils from '@app/utils';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
+import { fieldBorder } from '@ui/primitives/fieldBorder';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { ChevronDown } from '@ui/primitives/Icons/Chevron';
 
 type NewAddressProps = {
   addressKind: AddressKindEnum;
@@ -47,6 +49,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
   const { colors } = useTheme();
 
   const [label, setLabel] = useState<string>('');
+  const [focused, setFocused] = useState(false);
   const [type, setType] = useState<AddressUnifiedTypeEnum>(
     AddressUnifiedTypeEnum.orchard,
   );
@@ -152,7 +155,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
               flexGrow: 1,
               borderWidth: 1,
               borderRadius: 12,
-              borderColor: colors.borderMuted,
+              borderColor: fieldBorder(colors, focused),
               minWidth: 48,
               minHeight: 48,
               maxHeight: 150,
@@ -161,14 +164,15 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
             }}
           >
             <TextInput
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
               style={{
                 color: colors.fgDefault,
                 fontWeight: '600',
-                fontSize: 14,
+                fontSize: 15,
                 flex: 1,
                 minHeight: 48,
                 marginLeft: 5,
-                backgroundColor: 'transparent',
               }}
               placeholder={translate('addressbook.label-placeholder') as string}
               placeholderTextColor={colors.fgMuted}
@@ -177,12 +181,14 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
               maxLength={50}
             />
             {label && (
-              <TouchableOpacity onPress={() => setLabel('')}>
-                <FontAwesomeIcon
+              <TouchableOpacity
+                hitSlop={slopFor(20)}
+                onPress={() => setLabel('')}
+              >
+                <XIcon
                   style={{ marginRight: 10 }}
                   size={20}
-                  icon={faXmark}
-                  color={colors.fgAccentDisabled}
+                  color={colors.fgMuted}
                 />
               </TouchableOpacity>
             )}
@@ -213,12 +219,11 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                     flexGrow: 1,
                     flexDirection: 'row',
                     borderWidth: 1,
-                    borderRadius: 5,
-                    borderColor: colors.fgDefault,
-                    backgroundColor: '#303d4f',
+                    borderRadius: radiusMd,
+                    borderColor: fieldBorder(colors, false),
+                    backgroundColor: colors.bgSurface,
                     minWidth: 48,
-                    minHeight: 48,
-                    maxHeight: 48,
+                    minHeight: fieldMinHeight,
                     justifyContent: 'space-between',
                     alignItems: 'center',
                   }}
@@ -228,7 +233,6 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                       color: colors.fgDefault,
                       fontWeight: '600',
                       marginLeft: 20,
-                      backgroundColor: 'transparent',
                     }}
                   >
                     {type === AddressUnifiedTypeEnum.orchard
@@ -241,9 +245,8 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                           ? (translate('receive.shielded-sapling') as string)
                           : ''}
                   </RegText>
-                  <FontAwesomeIcon
-                    size={12}
-                    icon={faChevronDown}
+                  <ChevronDown
+                    size={16}
                     color={colors.fgDefault}
                     style={{ marginRight: 20 }}
                   />
@@ -261,29 +264,29 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
             alignItems: 'center',
             marginVertical: 5,
             marginTop: 15,
+            paddingHorizontal: 10,
           }}
         >
-          <Button
-            type={ButtonTypeEnum.Link}
-            title={translate('cancel') as string}
-            onPress={() => {
-              setLabel('');
-              Keyboard.dismiss();
-              setTimeout(() => {
-                closeSheet();
-              }, 100);
-            }}
-            twoButtons={true}
-          />
-          <Button
-            type={ButtonTypeEnum.Primary}
-            title={translate('save') as string}
-            style={{ marginLeft: 10 }}
-            onPress={() => {
-              createAddress();
-            }}
-            twoButtons={true}
-          />
+          <ButtonStack>
+            <Button
+              variant="quiet"
+              title={translate('cancel') as string}
+              onPress={() => {
+                setLabel('');
+                Keyboard.dismiss();
+                setTimeout(() => {
+                  closeSheet();
+                }, 100);
+              }}
+            />
+            <Button
+              variant="primary"
+              title={translate('save') as string}
+              onPress={() => {
+                createAddress();
+              }}
+            />
+          </ButtonStack>
         </View>
       </View>
       <SelectBottomSheet

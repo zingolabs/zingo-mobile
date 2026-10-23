@@ -2,9 +2,9 @@
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@app/theme';
-import { faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { SnackbarDurationEnum, TranslateType } from '@app/AppState';
+import { LockIcon } from '@ui/primitives/Icons/LockIcon';
+import { LockOpenIcon } from '@ui/primitives/Icons/LockOpenIcon';
 
 type PrivacyToggleProps = {
   privacy: boolean;
@@ -51,17 +51,9 @@ const PrivacyToggle: React.FC<PrivacyToggleProps> = React.memo(
             }}
           >
             {privacy ? (
-              <FontAwesomeIcon
-                icon={faLock}
-                size={20}
-                color={colors.fgAccent}
-              />
+              <LockIcon size={20} color={colors.fgAccent} />
             ) : (
-              <FontAwesomeIcon
-                icon={faLockOpen}
-                size={20}
-                color={colors.fgAccentDisabled}
-              />
+              <LockOpenIcon size={20} color={colors.fgMuted} />
             )}
           </View>
         </View>

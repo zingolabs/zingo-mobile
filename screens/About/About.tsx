@@ -3,8 +3,6 @@ import React, { useCallback, useContext, useRef, useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 
 import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 import FadeText from '@ui/primitives/FadeText';
@@ -17,6 +15,7 @@ import DetailLine from '@ui/widgets/DetailLine';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
+import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 
 type AboutProps = NativeStackScreenProps<AppDrawerParamList, 'About'>;
 
@@ -59,11 +58,7 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
         hitSlop={8}
         style={{ paddingHorizontal: 4, paddingVertical: 4 }}
       >
-        <FontAwesomeIcon
-          icon={faChevronLeft}
-          size={20}
-          color={colors.fgAccent}
-        />
+        <ChevronLeft size={20} color={colors.fgAccent} />
       </TouchableOpacity>
       <BoldText
         numberOfLines={1}

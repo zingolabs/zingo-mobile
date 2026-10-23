@@ -16,8 +16,6 @@ import {
   BottomSheetModal,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 
 import { radiusSheet, useTheme } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
@@ -27,6 +25,7 @@ import BoldText from '@ui/primitives/BoldText';
 import RegText from '@ui/primitives/RegText';
 import SheetRim from '@ui/primitives/SheetRim';
 import { BUTTON_HEIGHT } from '@ui/primitives/Button';
+import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 
 type DeleteWalletSheetProps = {
   context: DeleteWalletContext;
@@ -39,10 +38,6 @@ const DRAIN_MS = 250;
 const PULSE_MS = 220;
 const SETTLE_MS = 260;
 const RELEASE_FLOOR = 0.02;
-const ICON_BG = '#2A1218';
-const ICON_BORDER = '#6B2A33';
-const ICON_FG = '#F07A86';
-const HOLD_LABEL = '#FFE9EA';
 
 const SheetHandle: React.FC = () => {
   const { colors } = useTheme();
@@ -183,18 +178,14 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
               width: 52,
               height: 52,
               borderRadius: 26,
-              backgroundColor: ICON_BG,
+              backgroundColor: colors.bgDangerSubtle,
               borderWidth: 1,
-              borderColor: ICON_BORDER,
+              borderColor: colors.borderDanger,
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <FontAwesomeIcon
-              icon={faTriangleExclamation}
-              size={20}
-              color={ICON_FG}
-            />
+            <TriangleAlert size={20} color={colors.fgDanger} />
           </View>
           <BoldText
             style={{
@@ -215,7 +206,7 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
           <RegText
             style={{
               marginTop: 5,
-              fontSize: 10.5,
+              fontSize: 12,
               lineHeight: 16,
               textAlign: 'center',
               color: colors.fgMuted,
@@ -234,7 +225,7 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
                 height: BUTTON_HEIGHT,
                 borderRadius: 999,
                 borderWidth: 1.5,
-                borderColor: colors.fgDangerEmphasis,
+                borderColor: colors.borderDanger,
                 overflow: 'hidden',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -249,13 +240,13 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
                     right: 0,
                     top: 0,
                     bottom: 0,
-                    backgroundColor: colors.fgDangerEmphasis,
+                    backgroundColor: colors.bgDanger,
                     transformOrigin: 'left',
                   },
                   fillStyle,
                 ]}
               />
-              <RegText style={{ fontSize: 15, color: HOLD_LABEL }}>
+              <RegText style={{ fontSize: 15, color: colors.fgDefault }}>
                 {
                   translate(
                     context === 'replace'
@@ -281,7 +272,7 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
           >
             <RegText
               style={{
-                fontSize: 12.5,
+                fontSize: 13,
                 fontWeight: '700',
                 color: colors.fgMuted,
               }}

@@ -10,7 +10,11 @@ import { useTheme } from '@app/theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { LoadingSession, useSession } from '@app/navigation/session';
+import {
+  GateDeclined,
+  LoadingSession,
+  useSession,
+} from '@app/navigation/session';
 import { LoadingNavigator } from '@app/navigation/LoadingNavigator';
 import {
   currentRoute,
@@ -110,7 +114,7 @@ import {
   probeUri,
   recommendedServers,
 } from '@app/services/serverPicking';
-import { isEqual } from 'lodash';
+import { defaultTo, isEqual, max } from 'lodash';
 import {
   createUpdateRecoveryWalletInfo,
   getRecoveryWalletInfo,
@@ -192,7 +196,12 @@ export default function LoadingApp(props: LoadingAppProps) {
     }),
     [],
   );
-  const i18n = useMemo(() => new I18n(file), [file]);
+  const i18n = useMemo(() => {
+    const instance = new I18n(file);
+    /** A key missing in a locale shows the English text, never `[missing … translation]`. */
+    instance.enableFallback = true;
+    return instance;
+  }, [file]);
 
   const translate: (key: string) => TranslateType = (key: string) =>
     substituteZingoName(i18n.t(key) as TranslateType);
@@ -334,6 +343,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         openBoot={() =>
           setSession({ kind: 'boot', startingApp: true, newWallet: false })
         }
+        openLock={gate => setSession({ kind: 'locked', gate })}
         theme={theme}
         translate={translate}
         language={language}
@@ -355,6 +365,7 @@ type LoadingAppClassProps = {
   openWallet: (params: LoadedAppNavigationState) => void;
   openOnboarding: (start: 'Welcome' | 'OpenError') => void;
   openBoot: () => void;
+  openLock: (gate: GateDeclined) => void;
   translate: (key: string) => TranslateType;
   theme: AppTheme;
   language: LanguageEnum;
@@ -519,8 +530,14 @@ export class LoadingAppClass extends Component<
       const proceed = enactGateAnswer(
         startGate,
         {
-          // The narrowed answer is the gate outcome, whole.
-          lock: declined => this.setState({ biometricGate: declined }),
+          // The narrowed answer is the gate outcome, whole. The session
+          // picks the lock screen and the state feeds it: this class stays
+          // mounted across the switch, so its constructor never reads the
+          // session's gate.
+          lock: declined => {
+            this.setState({ biometricGate: declined });
+            this.props.openLock(declined);
+          },
           notice: this.addLastSnackbar,
         },
         this.state.translate,
@@ -1315,29 +1332,17 @@ export class LoadingAppClass extends Component<
       }
     }
 
-    let walletBirthday = birthday.toString() || '0';
-    if (parseInt(walletBirthday, 10) < 0) {
-      walletBirthday = '0';
-    }
-    if (isNaN(parseInt(walletBirthday, 10))) {
-      walletBirthday = '0';
-    }
-
-    // birthday cannot be lower than sapling activation height
-    if (
-      Number(walletBirthday) < activationHeight[this.state.server.chainName]
-    ) {
-      // no reporting button, no needed.
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        this.state.translate('loadingapp.invalidbirthday-label') as string,
-        this.state.translate('loadingapp.invalidbirthday-error') as string,
-        false,
-        this.state.translate,
-      );
-      return;
-    }
+    /**
+     * zingolib refuses a birthday below Sapling activation, and no shielded
+     * note exists below it, so an empty field, a saved 0 or a lower height
+     * all start at activation.
+     */
+    const walletBirthday = String(
+      max([
+        Math.trunc(defaultTo(birthday, 0)),
+        activationHeight[this.state.server.chainName],
+      ]),
+    );
 
     this.setState({ actionButtonsDisabled: true });
     // From the form, the Import button collapses first; from the Keychain

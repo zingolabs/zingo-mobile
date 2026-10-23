@@ -19,7 +19,7 @@ const WalletProgress: React.FunctionComponent<WalletProgressProps> = ({
   const { translate } = useContext(ContextAppLoading);
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'transparent' }}>
+    <View style={{ flex: 1 }}>
       <View
         style={{
           position: 'absolute',

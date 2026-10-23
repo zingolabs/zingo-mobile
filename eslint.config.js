@@ -18,7 +18,7 @@ module.exports = [
   {
     // Imports that leave the current folder go through the @app, @screens
     // and @ui aliases. assets/ and .storybook/ have no alias and stay
-    // relative.
+    // relative. Icons are own components, never FontAwesome.
     files: ['app/**', 'screens/**', 'ui/**'],
     rules: {
       'no-restricted-imports': [
@@ -26,11 +26,49 @@ module.exports = [
         {
           patterns: [
             {
+              group: ['@fortawesome/*'],
+              message:
+                'Draw icons on ui/primitives/Icons/Icon, not with FontAwesome.',
+            },
+            {
               regex: '^(\\.\\./)+(?!\\.\\./|assets/|\\.storybook/)',
               message:
                 'Import through @app/, @screens/ or @ui/ instead of a parent-relative path.',
             },
           ],
+        },
+      ],
+    },
+  },
+  {
+    // The color lock: a color is named by its token in app/theme, never by
+    // value.
+    files: ['app/**', 'screens/**', 'ui/**'],
+    ignores: ['app/theme/**', '**/*.stories.tsx'],
+    rules: {
+      'react-native/no-color-literals': 'error',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            'Literal[value=/^#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/]',
+          message: 'Use a color token from app/theme, not a hex value.',
+        },
+        {
+          selector: 'Literal[value=/^rgba?[(]/]',
+          message: 'Use a color token from app/theme, not an rgb value.',
+        },
+        {
+          // A named color where a color is expected: a style property or a
+          // JSX attribute that carries a color (the BIP39 list has "black").
+          selector:
+            ':matches(Property[key.name=/[cC]olor$|^fill$|^stroke$/], JSXAttribute[name.name=/[cC]olor$|^fill$|^stroke$/]) :matches(Literal, JSXExpressionContainer > Literal)[value=/^(red|yellow|green|blue|white|black|coral|gray|grey|orange|pink|purple|cyan|magenta|silver|gold|navy|teal|lime|olive|maroon|brown|tan|crimson|salmon|tomato|ivory|beige|khaki|violet|indigo)$/i]',
+          message: 'Use a color token from app/theme, not a named color.',
+        },
+        {
+          selector:
+            'TemplateElement[value.raw=/#[0-9a-fA-F]{3,8}([^0-9a-zA-Z]|$)|rgba?[(]/]',
+          message: 'Use a color token from app/theme, not a color in a string.',
         },
       ],
     },

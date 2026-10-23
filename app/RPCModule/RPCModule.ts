@@ -155,8 +155,6 @@ interface RPCModuleAPI {
     minConfirmations: string,
   ): Promise<string>;
 
-  setBroadcastCandidates(candidatesJson: string): Promise<string>;
-
   attachMixnet(socks5Addr: string, exitNode: string): Promise<string>;
   enableMixnet(proxyPath: string): Promise<string>;
   disableMixnet(): Promise<string>;

@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect } from 'react';
 import { Text, View, TextStyle, TouchableOpacity } from 'react-native';
-import { useTheme } from '@app/theme';
+import { useTheme, fontScaleBody } from '@app/theme';
 import { getNumberFormatSettings } from 'react-native-localize';
 import Animated, {
   ReduceMotion,
@@ -30,8 +30,6 @@ type CurrencyAmountProps = {
 
 export type PriceTint = 'none' | 'up' | 'down';
 
-const TINT_UP = '#3CC52A';
-const TINT_DOWN = '#F2878A';
 const TINT_MS = 500;
 
 // The amount eases to green or red for the direction of a price move.
@@ -42,14 +40,18 @@ const TintedText: React.FunctionComponent<{
   selectable?: boolean;
   children: string;
 }> = ({ tint, base, style, selectable, children }) => {
+  const { colors } = useTheme();
+  const up = colors.fgPriceUp;
+  const down = colors.fgPriceDown;
   const tinted = useAnimatedStyle(() => ({
-    color: withTiming(
-      tint === 'up' ? TINT_UP : tint === 'down' ? TINT_DOWN : base,
-      { duration: TINT_MS, reduceMotion: ReduceMotion.Never },
-    ),
+    color: withTiming(tint === 'up' ? up : tint === 'down' ? down : base, {
+      duration: TINT_MS,
+      reduceMotion: ReduceMotion.Never,
+    }),
   }));
   return (
     <Animated.Text
+      maxFontSizeMultiplier={fontScaleBody}
       style={[
         {
           color: base,
@@ -115,6 +117,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
         <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
           {privacyHigh ? (
             <Text
+              maxFontSizeMultiplier={fontScaleBody}
               style={{
                 color: baseColor,
                 fontSize: 20,
@@ -135,6 +138,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
             </TintedText>
           ) : (
             <Text
+              maxFontSizeMultiplier={fontScaleBody}
               style={{
                 color: baseColor,
                 fontSize: 20,

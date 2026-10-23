@@ -8,14 +8,12 @@ import { useTheme } from '@app/theme';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import BoldText from '@ui/primitives/BoldText';
 import RegText from '@ui/primitives/RegText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import {
   ConfirmButton,
   ConfirmOptions,
   registerConfirmListener,
 } from '@app/services/showConfirm';
-
-const SOFT_INK = '#8DA0B8';
 
 // The confirmation sheet behind showConfirm: title, message, the actions as
 // full-width pills (red when destructive) and Cancel as a link under them.
@@ -65,7 +63,7 @@ const ConfirmBottomSheet: React.FC = () => {
       dismissable={false}
       onDismiss={handleSheetDismissed}
       contentStyle={{
-        paddingHorizontal: 22,
+        paddingHorizontal: 20,
         paddingBottom: insets.bottom + 24,
       }}
     >
@@ -74,7 +72,7 @@ const ConfirmBottomSheet: React.FC = () => {
         style={{
           marginTop: 4,
           textAlign: 'center',
-          fontSize: 15.5,
+          fontSize: 15,
           lineHeight: 21,
         }}
       >
@@ -83,7 +81,9 @@ const ConfirmBottomSheet: React.FC = () => {
       {!!options?.message && (
         <RegText
           testID="confirm.message"
-          color={options.messageTone === 'danger' ? colors.fgDanger : SOFT_INK}
+          color={
+            options.messageTone === 'danger' ? colors.fgDanger : colors.fgMuted
+          }
           style={{
             marginTop: 6,
             fontSize: 12,
@@ -100,27 +100,24 @@ const ConfirmBottomSheet: React.FC = () => {
           <Button
             key={`${i}-${b.text}`}
             testID={`confirm.action.${i}`}
-            type={
+            variant={
               b.style === 'destructive'
-                ? ButtonTypeEnum.Danger
+                ? 'danger'
                 : b.style === 'ghost'
-                  ? ButtonTypeEnum.Link
-                  : ButtonTypeEnum.Primary
+                  ? 'text'
+                  : 'primary'
             }
             title={b.text}
             onPress={() => handleButton(b)}
-            fullWidth
-            textStyle={{ fontSize: 15 }}
           />
         ))}
       </View>
       {!!cancel && (
         <Button
           testID="confirm.cancel"
-          type={ButtonTypeEnum.Link}
+          variant="quiet"
           title={cancel.text}
           onPress={() => handleButton(cancel)}
-          fullWidth
           style={{ marginTop: 8 }}
         />
       )}

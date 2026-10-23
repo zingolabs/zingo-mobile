@@ -22,9 +22,6 @@ import BoldText from '@ui/primitives/BoldText';
 import TransactionCreatedIcon from '../../assets/img/transaction-created.svg';
 import TransactionFailedIcon from '../../assets/img/transaction-failed.svg';
 
-export const RING_GREEN = '#149D05';
-export const RING_RED = '#822929';
-
 // One dot grows from 0.55 to 1 and from 35% to full opacity and back over
 // the first 80% of a 1.1 s loop; the next dot starts 160 ms later.
 const LOOP_MS = 1100;
@@ -165,7 +162,8 @@ const ProgressState: React.FC<ProgressStateProps> = ({
               height: RING,
               borderRadius: RING / 2,
               borderWidth: 2,
-              borderColor: state === 'done' ? RING_GREEN : RING_RED,
+              borderColor:
+                state === 'done' ? colors.borderAccent : colors.borderDanger,
               alignItems: 'center',
               justifyContent: 'center',
             }}
@@ -180,12 +178,12 @@ const ProgressState: React.FC<ProgressStateProps> = ({
           </Animated.View>
         )}
       </View>
-      <BoldText style={{ fontSize: 17, textAlign: 'center' }}>{title}</BoldText>
+      <BoldText style={{ fontSize: 18, textAlign: 'center' }}>{title}</BoldText>
       {!!body && (
         <RegText
           style={{
             marginTop: 8,
-            fontSize: 11.5,
+            fontSize: 12,
             lineHeight: 18,
             textAlign: 'center',
             color: colors.fgMuted,

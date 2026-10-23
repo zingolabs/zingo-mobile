@@ -25,8 +25,6 @@ import { EyeOffIcon } from '@ui/primitives/Icons/EyeOffIcon';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
 import { SIDE } from './StepParts';
 
-const WORD_BG = '#041936';
-const NUMBER_INK = '#61748F';
 export const VEIL_MS = 220;
 // The words blur by this much while hidden; the numbers stay sharp.
 const BLUR_PT = 6;
@@ -139,7 +137,7 @@ export const WordGrid: React.FunctionComponent<{
                   flex: 1,
                   height: WORD_H,
                   borderRadius: 8,
-                  backgroundColor: WORD_BG,
+                  backgroundColor: colors.bgSurface,
                   flexDirection: 'row',
                   alignItems: 'center',
                 }}
@@ -149,9 +147,9 @@ export const WordGrid: React.FunctionComponent<{
                     width: 24,
                     marginRight: 6,
                     textAlign: 'right',
-                    color: NUMBER_INK,
-                    fontSize: 11,
-                    fontWeight: '500',
+                    color: colors.fgMuted,
+                    fontSize: 12,
+                    fontWeight: '400',
                   }}
                 >
                   {n}
@@ -233,7 +231,7 @@ export const InfoRow: React.FunctionComponent<{
         testID={`${testID}-info`}
         alignStart
         label={label}
-        labelStyle={{ fontSize: 12, fontWeight: '500', color: colors.fgMuted }}
+        labelStyle={{ fontSize: 12, fontWeight: '600', color: colors.fgMuted }}
         title={tipTitle}
         text={tipBody}
         open={open}
@@ -314,9 +312,9 @@ export const CopyShowButtons: React.FunctionComponent<{
             entering={copied ? iconPop() : undefined}
           >
             {copied ? (
-              <CheckIcon size={15} color={colors.fgAccent} strokeWidth={2.6} />
+              <CheckIcon size={16} color={colors.fgAccent} />
             ) : (
-              <CopyIcon size={15} color={colors.fgDefault} />
+              <CopyIcon size={16} color={colors.fgDefault} />
             )}
           </Animated.View>
         </View>
@@ -342,9 +340,9 @@ export const CopyShowButtons: React.FunctionComponent<{
             entering={turned ? iconTurn() : undefined}
           >
             {hidden ? (
-              <EyeIcon size={15} color={colors.fgDefault} />
+              <EyeIcon size={16} color={colors.fgDefault} />
             ) : (
-              <EyeOffIcon size={15} color={colors.fgDefault} />
+              <EyeOffIcon size={16} color={colors.fgDefault} />
             )}
           </Animated.View>
         </View>

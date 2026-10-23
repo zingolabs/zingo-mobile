@@ -167,8 +167,6 @@
     "readingwallet-label": "Error Cüzdan okunurken hata oluştu",
     "invalidseedufvk-label": "Geçersiz Tohum İfadesi / Görüntüleme Anahtarı",
     "invalidseedufvk-error": "Tohum İfadesi / Görüntüleme Anahtarı geçersizdi. Lütfen değeri gözden geçirin ve düzeltin.",
-    "invalidbirthday-label": "Geçersiz doğum günü",
-    "invalidbirthday-error": "Doğum günü geçersiz. Değeri gözden geçirin ve düzeltin.",
     "emptyseedufvk-label": "Geçersiz Tohum İfadesi / Görüntüleme Anahtarı",
     "emptyseedufvk-error": " Tohum İfadesi  / Görüntüleme Anahtarı boş bırakıldı. Lütfen değeri kontrol edin ve düzeltin.",
     "custom": "Özel Sunucu...",
@@ -191,8 +189,8 @@
     "info": "Sunucu bilgisi",
     "options": "Seçenekler",
     "walletseed": "Cüzdan Tohumu",
-    "walletufvk": "Cüzdan Görüntüleme Anahtarı",
-    "report": "Senkronizasyon / Yeniden Tarama Raporu",
+    "walletufvk": "İzleme Anahtarı",
+    "report": "Eşitleme Raporu",
     "changewallet": "Başka bir cüzdana geç",
     "restorebackupwallet": "Son Cüzdan Yedeğini Geri Yükle",
     "fundpools": "Fon Havuzları",
@@ -434,6 +432,8 @@
     "lastupdate": "Son güncelleme:"
   },
   "info": {
+    "error-price-fetch": "ZEC fiyatı alınamadı.",
+    "error-price-payload": "ZEC fiyatı hatalı biçimde geldi.",
     "version": "Versiyon",
     "serverversion": "Sunucu versiyonu",
     "zainod": "Sunucu URL",

@@ -17,12 +17,6 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useTheme } from '@app/theme';
-import {
-  faChevronLeft,
-  faCircleInfo,
-  faXmark,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
@@ -47,6 +41,9 @@ import {
   viewingKeyProblem,
 } from '@app/utils/seedPhrase';
 import { duration, ease } from '@app/theme/motion';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
+import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 
 const activationHeight = {
   main: 419200,
@@ -285,7 +282,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   const buttonBottom = keyboardHeight > 0 ? keyboardHeight + 12 : BUTTON_BOTTOM;
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'transparent' }}>
+    <View style={{ flex: 1 }}>
       <BoldText
         style={{
           position: 'absolute',
@@ -333,17 +330,13 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             marginBottom: 20,
           }}
         >
-          <BoldText style={{ fontSize: 12.5, lineHeight: 16 }}>
+          <BoldText style={{ fontSize: 13, lineHeight: 16 }}>
             {translate('import.seed-label') as string}
           </BoldText>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
             {!!seedufvkText && (
               <TouchableOpacity onPress={() => setSeedufvkText('')} hitSlop={8}>
-                <FontAwesomeIcon
-                  size={16}
-                  icon={faXmark}
-                  color={colors.fgMuted}
-                />
+                <XIcon size={16} color={colors.fgMuted} />
               </TouchableOpacity>
             )}
             <Pressable
@@ -360,12 +353,10 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 borderRadius: 9,
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: pressed
-                  ? 'rgba(211,226,248,0.08)'
-                  : 'transparent',
+                backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
               })}
             >
-              <ScanIcon size={22} color={colors.fgMuted} />
+              <ScanIcon size={24} color={colors.fgMuted} />
             </Pressable>
           </View>
         </View>
@@ -405,7 +396,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 overflow: 'hidden',
               },
               birthdayBorder,
-              birthdayLow && { borderColor: colors.fgDangerEmphasis },
+              birthdayLow && { borderColor: colors.borderDanger },
             ]}
           >
             <TextInput
@@ -423,7 +414,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 height: 42,
                 paddingHorizontal: 15,
                 paddingVertical: 0,
-                backgroundColor: 'transparent',
               }}
               value={birthday}
               onChangeText={(text: string) => {
@@ -451,11 +441,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 hitSlop={8}
                 style={{ paddingRight: 12 }}
               >
-                <FontAwesomeIcon
-                  size={14}
-                  icon={faXmark}
-                  color={colors.fgMuted}
-                />
+                <XIcon size={16} color={colors.fgMuted} />
               </TouchableOpacity>
             )}
           </Animated.View>
@@ -474,13 +460,8 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             gap: 11,
           }}
         >
-          <FontAwesomeIcon
-            icon={faCircleInfo}
-            size={13}
-            color={colors.fgAccent}
-            style={{ marginTop: 1 }}
-          />
-          <RegText style={{ flex: 1, fontSize: 9.5, lineHeight: 13 }}>
+          <InfoIcon size={16} color={colors.fgMuted} style={{ marginTop: 1 }} />
+          <RegText style={{ flex: 1, fontSize: 12, lineHeight: 13 }}>
             {translate('import.text') as string}
           </RegText>
         </View>
@@ -532,14 +513,10 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             justifyContent: 'center',
             zIndex: 3,
             opacity: busy ? 0.4 : 1,
-            backgroundColor: pressed ? colors.bgSurface : 'transparent',
+            backgroundColor: pressed ? colors.bgSurface : undefined,
           })}
         >
-          <FontAwesomeIcon
-            icon={faChevronLeft}
-            size={18}
-            color={colors.fgAccent}
-          />
+          <ChevronLeft size={20} color={colors.fgAccent} />
         </Pressable>
       )}
       {scan.kind === 'open' && (

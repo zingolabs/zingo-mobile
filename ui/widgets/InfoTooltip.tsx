@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useRef, useState } from 'react';
-import { Pressable, Text, TextStyle, View } from 'react-native';
+import { Pressable, TextStyle, View } from 'react-native';
 import Animated, {
   Keyframe,
   ReduceMotion,
@@ -13,6 +13,7 @@ import { useTheme } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
 import BoldText from '@ui/primitives/BoldText';
 import RegText from '@ui/primitives/RegText';
+import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 
 type InfoTooltipProps = {
   label: string;
@@ -34,8 +35,6 @@ type InfoTooltipProps = {
 };
 
 const ARROW = 10;
-const ICON_FILL = '#A8B3C4';
-const ICON_INK = '#060B12';
 const GAP = 8;
 
 const bubbleEnter = (rise: number) =>
@@ -111,7 +110,7 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
         {children ?? (
-          <BoldText style={{ fontSize: 12.5, lineHeight: 18, ...labelStyle }}>
+          <BoldText style={{ fontSize: 13, lineHeight: 18, ...labelStyle }}>
             {label}
           </BoldText>
         )}
@@ -125,27 +124,7 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
           accessibilityState={{ expanded: open }}
         >
           <Animated.View style={spinStyle}>
-            <View
-              style={{
-                width: 14,
-                height: 14,
-                borderRadius: 7,
-                backgroundColor: ICON_FILL,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Text
-                style={{
-                  color: ICON_INK,
-                  fontSize: 9.5,
-                  lineHeight: 14,
-                  fontWeight: '700',
-                }}
-              >
-                i
-              </Text>
-            </View>
+            <InfoIcon size={16} color={colors.fgMuted} />
           </Animated.View>
         </Pressable>
       </View>
@@ -177,13 +156,13 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
           >
             {!!title && (
               <BoldText
-                style={{ fontSize: 10.5, lineHeight: 14, marginBottom: 3 }}
+                style={{ fontSize: 12, lineHeight: 14, marginBottom: 3 }}
               >
                 {title}
               </BoldText>
             )}
             <RegText
-              style={{ fontSize: 10, lineHeight: 13, color: colors.fgMuted }}
+              style={{ fontSize: 12, lineHeight: 13, color: colors.fgMuted }}
             >
               {text}
             </RegText>

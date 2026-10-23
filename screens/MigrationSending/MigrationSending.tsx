@@ -8,7 +8,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import ProgressBar from '@ui/primitives/ProgressBar';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
@@ -212,7 +212,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
     },
     calculating: {
       key: 'migrationsending.status-calculating',
-      color: colors.fgAccent,
+      color: colors.fgWarning,
     },
     calculated: {
       key: 'migrationsending.status-calculated',
@@ -224,7 +224,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
     },
     sent: {
       key: 'migrationsending.status-sent',
-      color: colors.fgAccent,
+      color: colors.fgWarning,
     },
   };
 
@@ -275,7 +275,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
           }}
         >
           <Button
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={translate('migrationsending.close') as string}
             onPress={goHome}
           />
@@ -367,7 +367,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
                 )}
               </Text>
               <Text
-                style={{ color: colors.fgAccent, fontSize: 14, flexShrink: 1 }}
+                style={{ color: colors.fgDefault, fontSize: 14, flexShrink: 1 }}
                 numberOfLines={1}
               >
                 {value}

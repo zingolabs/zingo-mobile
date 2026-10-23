@@ -4,20 +4,19 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
 <View
   style={
     {
-      "backgroundColor": "transparent",
       "flex": 1,
     }
   }
 >
   <Text
+    maxFontSizeMultiplier={2}
     style={
       {
         "color": "#c3c3c3",
         "fontSize": 16,
-        "fontWeight": "bold",
+        "fontWeight": "600",
         "left": 0,
         "lineHeight": 22,
-        "opacity": 0.87,
         "position": "absolute",
         "right": 0,
         "textAlign": "center",
@@ -36,13 +35,13 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
     }
   >
     <Text
+      maxFontSizeMultiplier={2}
       style={
         {
           "color": "#c3c3c3",
-          "fontSize": 12.5,
-          "fontWeight": "bold",
+          "fontSize": 13,
+          "fontWeight": "600",
           "lineHeight": 16,
-          "opacity": 0.87,
         }
       }
     />
@@ -90,7 +89,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "transparent",
+            "backgroundColor": undefined,
             "borderRadius": 9,
             "height": 34,
             "justifyContent": "center",
@@ -205,7 +204,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "transparent",
+                  "opacity": 0,
                 }
               }
             />
@@ -227,7 +226,6 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
             spellCheck={false}
             style={
               {
-                "backgroundColor": "transparent",
                 "color": "#c3c3c3",
                 "fontSize": 15,
                 "height": 25,
@@ -248,7 +246,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
             {
               "bottom": 12,
               "color": "#888888",
-              "fontSize": 11,
+              "fontSize": 12,
               "position": "absolute",
               "right": 13,
             },
@@ -287,13 +285,13 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         }
       >
         <Text
+          maxFontSizeMultiplier={2}
           style={
             {
               "color": "#c3c3c3",
-              "fontSize": 12.5,
-              "fontWeight": "bold",
+              "fontSize": 13,
+              "fontWeight": "600",
               "lineHeight": 18,
-              "opacity": 0.87,
             }
           }
         />
@@ -334,33 +332,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         >
           <View
             style={{}}
-          >
-            <View
-              style={
-                {
-                  "alignItems": "center",
-                  "backgroundColor": "#A8B3C4",
-                  "borderRadius": 7,
-                  "height": 14,
-                  "justifyContent": "center",
-                  "width": 14,
-                }
-              }
-            >
-              <Text
-                style={
-                  {
-                    "color": "#060B12",
-                    "fontSize": 9.5,
-                    "fontWeight": "700",
-                    "lineHeight": 14,
-                  }
-                }
-              >
-                i
-              </Text>
-            </View>
-          </View>
+          />
         </View>
       </View>
     </View>
@@ -395,7 +367,6 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         placeholderTextColor="#888888"
         style={
           {
-            "backgroundColor": "transparent",
             "color": "#c3c3c3",
             "flex": 1,
             "fontSize": 13,
@@ -422,39 +393,15 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
       }
     }
   >
-    <
-      color="#18bd18"
-      icon={
-        {
-          "icon": [
-            512,
-            512,
-            [
-              "info-circle",
-            ],
-            "f05a",
-            "M256 512a256 256 0 1 0 0-512 256 256 0 1 0 0 512zM224 160a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm-8 64l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24z",
-          ],
-          "iconName": "circle-info",
-          "prefix": "fas",
-        }
-      }
-      size={13}
-      style={
-        {
-          "marginTop": 1,
-        }
-      }
-    />
     <Text
+      maxFontSizeMultiplier={2}
       style={
         {
           "color": "#c3c3c3",
           "flex": 1,
-          "fontSize": 9.5,
+          "fontSize": 12,
           "fontWeight": "400",
           "lineHeight": 13,
-          "opacity": 1,
         }
       }
     />
@@ -542,11 +489,12 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
             testID="import.button.ok"
           >
             <Text
+              maxFontSizeMultiplier={1.5}
               numberOfLines={1}
               style={
                 [
                   {
-                    "color": "#011401",
+                    "color": "#060B12",
                     "fontSize": 14.5,
                     "fontWeight": "700",
                     "textAlign": "center",
@@ -608,7 +556,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
     style={
       {
         "alignItems": "center",
-        "backgroundColor": "transparent",
+        "backgroundColor": undefined,
         "borderRadius": 10,
         "height": 44,
         "justifyContent": "center",
@@ -621,26 +569,6 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
       }
     }
     testID="import.back"
-  >
-    <
-      color="#18bd18"
-      icon={
-        {
-          "icon": [
-            320,
-            512,
-            [
-              9001,
-            ],
-            "f053",
-            "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z",
-          ],
-          "iconName": "chevron-left",
-          "prefix": "fas",
-        }
-      }
-      size={18}
-    />
-  </View>
+  />
 </View>
 `;

@@ -197,8 +197,8 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           style={
             [
               {
-                "backgroundColor": "#0A2A1A",
-                "borderColor": "#1E6B2A",
+                "backgroundColor": "#18bd181F",
+                "borderColor": "#18bd18",
                 "borderRadius": 999,
                 "borderWidth": 1,
                 "bottom": 3,
@@ -306,7 +306,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "#8DA0B8",
+                "color": "#888888",
                 "fontSize": 13,
                 "fontWeight": "600",
               }
@@ -353,7 +353,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "#8DA0B8",
+              "color": "#888888",
               "fontSize": 12,
               "marginBottom": 8,
               "marginTop": 2,
@@ -457,8 +457,8 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
             style={
               {
                 "alignItems": "center",
-                "backgroundColor": "#0A1B33",
-                "borderColor": "#1D4C7F",
+                "backgroundColor": "#8FB4E61F",
+                "borderColor": "#4A6487",
                 "borderRadius": 10,
                 "borderWidth": 1,
                 "flex": 1,
@@ -472,7 +472,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               style={
                 {
                   "color": "#c3c3c3",
-                  "fontSize": 11.5,
+                  "fontSize": 12,
                   "fontWeight": "600",
                 }
               }
@@ -514,8 +514,8 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
             style={
               {
                 "alignItems": "center",
-                "backgroundColor": "#0A1B33",
-                "borderColor": "#1D4C7F",
+                "backgroundColor": "#8FB4E61F",
+                "borderColor": "#4A6487",
                 "borderRadius": 10,
                 "borderWidth": 1,
                 "flex": 1,
@@ -529,7 +529,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               style={
                 {
                   "color": "#c3c3c3",
-                  "fontSize": 11.5,
+                  "fontSize": 12,
                   "fontWeight": "600",
                 }
               }
@@ -571,8 +571,8 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
             style={
               {
                 "alignItems": "center",
-                "backgroundColor": "#0A1B33",
-                "borderColor": "#1D4C7F",
+                "backgroundColor": "#8FB4E61F",
+                "borderColor": "#4A6487",
                 "borderRadius": 10,
                 "borderWidth": 1,
                 "flex": 1,
@@ -586,7 +586,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               style={
                 {
                   "color": "#c3c3c3",
-                  "fontSize": 11.5,
+                  "fontSize": 12,
                   "fontWeight": "600",
                 }
               }
@@ -628,8 +628,8 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
             style={
               {
                 "alignItems": "center",
-                "backgroundColor": "#0A1B33",
-                "borderColor": "#1D4C7F",
+                "backgroundColor": "#8FB4E61F",
+                "borderColor": "#4A6487",
                 "borderRadius": 10,
                 "borderWidth": 1,
                 "flex": 1,
@@ -643,7 +643,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               style={
                 {
                   "color": "#c3c3c3",
-                  "fontSize": 11.5,
+                  "fontSize": 12,
                   "fontWeight": "600",
                 }
               }
@@ -803,8 +803,8 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "#8DA0B8",
-                    "fontSize": 11.5,
+                    "color": "#888888",
+                    "fontSize": 12,
                     "lineHeight": 15,
                     "marginTop": 2,
                     "textAlign": "center",
@@ -858,8 +858,8 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "#7D93B3",
-                "fontSize": 11,
+                "color": "#888888",
+                "fontSize": 12,
               }
             }
           >
@@ -869,8 +869,8 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "#8DA0B8",
-              "fontSize": 12.5,
+              "color": "#888888",
+              "fontSize": 13,
               "marginHorizontal": 10,
               "marginVertical": 22,
               "textAlign": "center",

@@ -10,7 +10,7 @@ import { useIsFocused } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useTheme } from '@app/theme';
+import { useTheme, slopFor } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { Route, SnackbarDurationEnum } from '@app/AppState';
@@ -42,11 +42,6 @@ const PUSH_OUT_MS = 320;
 const VK_HEAD = 10;
 const VK_TAIL = 6;
 const KEY_QR = 190;
-
-const STRIP = {
-  ok: { border: '#0E4A12', bg: '#04160B', tile: '#052520' },
-  no: { border: '#5A3A12', bg: '#17120B', tile: '#2A1F10' },
-};
 
 type Tip = 'none' | 'birthday' | 'vk';
 
@@ -228,7 +223,17 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
         }),
       )
     : (translate('walletseed.ok-restored') as string);
-  const strip = seedBackedUp ? STRIP.ok : STRIP.no;
+  const strip = seedBackedUp
+    ? {
+        border: colors.borderAccent,
+        bg: colors.bgAccentSubtle,
+        tile: colors.bgAccentSubtle,
+      }
+    : {
+        border: colors.borderWarning,
+        bg: colors.bgWarning,
+        tile: colors.bgWarningSubtle,
+      };
   const ready = readOnly ? !!vk : words.length > 0;
   const veiled = hidden || shot !== 'none' || captured;
   const vkShort =
@@ -277,10 +282,10 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               borderRadius: 12,
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
+              backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
             })}
           >
-            <ChevronLeft size={22} color={colors.fgAccent} strokeWidth={2.2} />
+            <ChevronLeft size={24} color={colors.fgAccent} />
           </Pressable>
           <Text
             accessibilityRole="header"
@@ -302,7 +307,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               marginBottom: 16,
               textAlign: 'center',
               color: colors.fgMuted,
-              fontSize: 14,
+              fontSize: 15,
               lineHeight: 20,
             }}
           >
@@ -342,20 +347,16 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               }}
             >
               {seedBackedUp ? (
-                <ShieldCheckIcon
-                  size={17}
-                  color={colors.fgAccent}
-                  strokeWidth={1.9}
-                />
+                <ShieldCheckIcon size={16} color={colors.fgAccent} />
               ) : (
-                <TriangleAlert size={17} color={colors.fgWarning} />
+                <TriangleAlert size={16} color={colors.fgWarning} />
               )}
             </View>
             <View style={{ flex: 1 }}>
               <Text
                 style={{
                   color: seedBackedUp ? colors.fgAccent : colors.fgWarning,
-                  fontSize: 14,
+                  fontSize: 15,
                   fontWeight: '700',
                 }}
               >
@@ -389,7 +390,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               >
                 <Text
                   style={{
-                    color: colors.bgCanvas,
+                    color: colors.fgOnAccent,
                     fontSize: 13,
                     fontWeight: '700',
                   }}
@@ -434,6 +435,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               value={vkShort}
               trailing={
                 <Pressable
+                  hitSlop={slopFor(16)}
                   testID="walletseed.vk-copy"
                   accessibilityRole="button"
                   accessibilityLabel={translate('walletseed.vk-copy') as string}
@@ -446,12 +448,10 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
                     borderRadius: 8,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: pressed
-                      ? 'rgba(211,226,248,0.08)'
-                      : undefined,
+                    backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
                   })}
                 >
-                  <CopyIcon size={15} color={colors.fgDefault} />
+                  <CopyIcon size={16} color={colors.fgDefault} />
                 </Pressable>
               }
             />
@@ -482,7 +482,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               onPress={() => confirm(action)}
               style={({ pressed }) => ({
                 height: 44,
-                marginHorizontal: 52,
+                marginHorizontal: SIDE,
                 borderRadius: 22,
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -494,7 +494,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
             >
               <Text
                 style={{
-                  color: colors.bgCanvas,
+                  color: colors.fgOnAccent,
                   fontSize: 15,
                   fontWeight: '700',
                 }}
@@ -517,7 +517,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               onPress={() => navigation.goBack()}
               style={({ pressed }) => ({
                 height: 44,
-                marginHorizontal: 52,
+                marginHorizontal: SIDE,
                 borderRadius: 22,
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -527,7 +527,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
             >
               <Text
                 style={{
-                  color: colors.bgCanvas,
+                  color: colors.fgOnAccent,
                   fontSize: 15,
                   fontWeight: '700',
                 }}

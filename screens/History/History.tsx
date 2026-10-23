@@ -18,9 +18,7 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAngleUp, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { useTheme, slopFor } from '@app/theme';
 
 import {
   ChainNameEnum,
@@ -66,6 +64,8 @@ import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTr
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import Filters from './components/Filters';
 import { FiltersIcon } from '@ui/primitives/Icons/FiltersIcon';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { ChevronUp } from '@ui/primitives/Icons/Chevron';
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -300,22 +300,22 @@ const History: React.FunctionComponent<HistoryProps> = () => {
             // two lines
             dim.width = Dimensions.get('window').width;
             dim.height =
-              Platform.OS === GlobalConst.platformOSandroid ? 70 : 60;
+              Platform.OS === GlobalConst.platformOSandroid ? 70 : 64;
           } else if (type === ViewTypes.WITHOUT_MONTH_REFRESH) {
             // three lines
             dim.width = Dimensions.get('window').width;
             dim.height =
-              (Platform.OS === GlobalConst.platformOSandroid ? 70 : 55) + 15;
+              (Platform.OS === GlobalConst.platformOSandroid ? 70 : 64) + 24;
           } else if (type === ViewTypes.WITH_MONTH) {
             // two lines with month
             dim.width = Dimensions.get('window').width;
             dim.height =
-              Platform.OS === GlobalConst.platformOSandroid ? 105 : 90;
+              Platform.OS === GlobalConst.platformOSandroid ? 105 : 95;
           } else if (type === ViewTypes.WITH_MONTH_REFRESH) {
             // three lines with month
             dim.width = Dimensions.get('window').width;
             dim.height =
-              (Platform.OS === GlobalConst.platformOSandroid ? 105 : 85) + 15;
+              (Platform.OS === GlobalConst.platformOSandroid ? 105 : 95) + 24;
           }
         },
       ),
@@ -723,7 +723,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       style={{
         paddingTop: 8,
         paddingBottom: 6,
-        paddingHorizontal: 16,
+        paddingHorizontal: 20,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -749,7 +749,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
           paddingVertical: 4,
         }}
       >
-        <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
+        <XIcon size={20} color={colors.fgMuted} />
       </Pressable>
     </View>
   );
@@ -821,7 +821,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
             {loading ? (
               <ActivityIndicator
                 size="large"
-                color={colors.fgAccent}
+                color={colors.fgMuted}
                 style={{ marginVertical: 20 }}
               />
             ) : (
@@ -869,7 +869,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                         >
                           <ActivityIndicator
                             size="small"
-                            color={colors.fgAccent}
+                            color={colors.fgMuted}
                           />
                         </View>
                       ) : !!valueTransfersSliced &&
@@ -883,7 +883,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                             marginBottom: 200,
                           }}
                         >
-                          <FadeText style={{ color: colors.fgAccent }}>
+                          <FadeText>
                             {translate('history.end') as string}
                           </FadeText>
                         </View>
@@ -899,9 +899,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                       marginTop: 30,
                     }}
                   >
-                    <FadeText style={{ color: colors.fgAccent }}>
-                      {translate('history.empty') as string}
-                    </FadeText>
+                    <FadeText>{translate('history.empty') as string}</FadeText>
                   </View>
                 )}
               </View>
@@ -916,6 +914,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
             platforms. */}
         {!isAtTop && (
           <Pressable
+            hitSlop={slopFor(36)}
             onPress={handleScrollToTop}
             disabled={isScrollingToTop}
             style={({ pressed }) => ({
@@ -929,23 +928,16 @@ const History: React.FunctionComponent<HistoryProps> = () => {
               height: 36,
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: colors.bgChrome,
+              backgroundColor: colors.bgSurface,
               borderRadius: 50,
               transform: [{ scale: pressed ? 0.9 : 1 }],
               opacity: isScrollingToTop ? 0.5 : 1,
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 3 },
-              shadowOpacity: 0.8,
-              shadowRadius: 14,
-              elevation: 9,
+              borderWidth: 1,
+              borderColor: colors.bottomSheetBorder,
             })}
           >
             <RingBorder size={36} />
-            <FontAwesomeIcon
-              size={16}
-              icon={faAngleUp}
-              color={colors.fgMuted}
-            />
+            <ChevronUp size={16} color={colors.fgMuted} />
           </Pressable>
         )}
       </Animated.View>

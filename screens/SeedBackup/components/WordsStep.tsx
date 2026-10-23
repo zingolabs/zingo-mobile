@@ -5,7 +5,6 @@ import Animated, {
   Keyframe,
   ReduceMotion,
   useAnimatedProps,
-  useAnimatedStyle,
   useSharedValue,
   withDelay,
   withTiming,
@@ -18,7 +17,6 @@ import { ContextAppLoaded } from '@app/context';
 import { SIDE, StepTitle } from './StepParts';
 import { CopyShowButtons, InfoRow, VEIL_MS, WordGrid } from './SeedParts';
 
-const BOX_BORDER = '#1E4A80';
 // Length of the tick path below, in viewBox units.
 const TICK_LENGTH = 21.3;
 
@@ -74,8 +72,6 @@ type WordsStepProps = {
   onCopy: () => void;
   checked: boolean;
   onCheck: () => void;
-  // Bumps on a press of the disabled "I saved it", to point at the box.
-  nudge: number;
 };
 
 // The 24 words in order, with the birthday, Copy, Show and the paper checkbox.
@@ -88,29 +84,12 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
   onCopy,
   checked,
   onCheck,
-  nudge,
 }) => {
   const { translate } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const [tipOpen, setTipOpen] = useState(false);
   // The box pops as feedback to a tap, not when the step mounts checked.
   const [tapped, setTapped] = useState(false);
-
-  const flash = useSharedValue(0);
-  useEffect(() => {
-    if (nudge > 0) {
-      flash.value = 1;
-      flash.value = withTiming(0, {
-        duration: 420,
-        easing: ease.out,
-        reduceMotion: ReduceMotion.System,
-      });
-    }
-  }, [nudge, flash]);
-  const boxNudge = useAnimatedStyle(() => ({
-    transform: [{ scale: 1 + flash.value * 0.25 }],
-    borderColor: flash.value > 0.05 ? colors.fgAccent : BOX_BORDER,
-  }));
 
   return (
     <View onTouchStart={() => tipOpen && setTipOpen(false)}>
@@ -171,10 +150,10 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
                   justifyContent: 'center',
                   backgroundColor: checked ? colors.bgAccent : colors.bgSurface,
                 },
-                checked ? { borderColor: colors.bgAccent } : boxNudge,
+                { borderColor: checked ? colors.bgAccent : colors.borderMuted },
               ]}
             >
-              {checked && <DrawnTick color={colors.bgCanvas} />}
+              {checked && <DrawnTick color={colors.fgOnAccent} />}
             </Animated.View>
           </Animated.View>
         </View>

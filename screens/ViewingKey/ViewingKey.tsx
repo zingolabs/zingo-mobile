@@ -41,9 +41,11 @@ import CardExpand from '@ui/widgets/CardExpand';
 import { CopyShowButtons } from '@screens/SeedBackup/components/SeedParts';
 import { SIDE } from '@screens/SeedBackup/components/StepParts';
 import KeyCard from './components/KeyCard';
+import Button from '@ui/primitives/Button';
+import { themeTokens } from '@app/theme';
 
 const QR = 196;
-const TILE_BG = '#0A1B33';
+const TILE_BG = themeTokens.bgViewOnlySubtle;
 const PUSH_IN_MS = 380;
 const PUSH_OUT_MS = 320;
 
@@ -230,10 +232,10 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
               borderRadius: 12,
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
+              backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
             })}
           >
-            <ChevronLeft size={22} color={colors.fgAccent} strokeWidth={2.2} />
+            <ChevronLeft size={24} color={colors.fgAccent} />
           </Pressable>
           <Text
             accessibilityRole="header"
@@ -256,7 +258,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
         <Text
           style={{
             color: colors.fgMuted,
-            fontSize: 14,
+            fontSize: 15,
             lineHeight: 20,
             textAlign: 'center',
             marginHorizontal: SIDE,
@@ -304,7 +306,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
                   justifyContent: 'center',
                 }}
               >
-                <Icon size={16} color={colors.fgViewOnly} strokeWidth={1.9} />
+                <Icon size={16} color={colors.fgViewOnly} />
               </View>
               <Text
                 style={{
@@ -320,34 +322,26 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
           ))}
         </View>
 
-        <Pressable
-          testID="viewingkey.done"
-          accessibilityRole="button"
-          disabled={!!switchTo && !key}
-          onPress={switchTo ? confirmSwitch : close}
-          style={({ pressed }) => ({
+        <View
+          style={{
             position: 'absolute',
-            left: 52,
-            right: 52,
+            left: SIDE,
+            right: SIDE,
             bottom: insets.bottom + 24,
-            height: 44,
-            borderRadius: 22,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: colors.bgAccent,
-            transform: [{ scale: pressed ? 0.97 : 1 }],
-          })}
+          }}
         >
-          <Text
-            style={{ color: colors.bgCanvas, fontSize: 15, fontWeight: '700' }}
-          >
-            {
+          <Button
+            testID="viewingkey.done"
+            variant="primary"
+            disabled={!!switchTo && !key}
+            onPress={switchTo ? confirmSwitch : close}
+            title={
               translate(
                 switchTo ? 'viewingkey.switch' : 'seedbackup.done',
               ) as string
             }
-          </Text>
-        </Pressable>
+          />
+        </View>
       </View>
     </View>
   );

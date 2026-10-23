@@ -5,7 +5,8 @@ import { useTheme } from '@app/theme';
 
 import { GlobalConst, SnackbarDurationEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import { checkMyAddress } from '@app/walletBackend';
 import { parseZcashURI } from '@app/uris';
 import Utils from '@app/utils';
@@ -90,6 +91,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
     <View
       style={{
         backgroundColor: colors.bgSurface,
+        paddingHorizontal: 10,
       }}
     >
       <TextInputAddress
@@ -108,9 +110,10 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             justifyContent: 'center',
             alignItems: 'center',
             marginVertical: 5,
+            paddingHorizontal: 10,
           }}
         >
-          <FadeText style={{ color: colors.fgAccent }}>{errorAddress}</FadeText>
+          <FadeText style={{ color: colors.fgDanger }}>{errorAddress}</FadeText>
         </View>
       )}
       {verifyOK !== null && (
@@ -121,6 +124,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             justifyContent: 'center',
             alignItems: 'center',
             marginVertical: 5,
+            paddingHorizontal: 10,
           }}
         >
           {verifyOK ? (
@@ -129,7 +133,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'flex-start',
-                width: '90%',
+                width: '100%',
               }}
             >
               <VerifyCheckIcon
@@ -146,11 +150,11 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'flex-start',
-                width: '90%',
+                width: '100%',
               }}
             >
               <VerifyXIcon
-                color={colors.fgDangerEmphasis}
+                color={colors.fgDanger}
                 style={{ marginRight: 10 }}
               />
               <FadeText style={{ color: colors.fgDefault }}>
@@ -170,30 +174,31 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             gap: 10,
             marginVertical: 5,
             marginTop: 15,
+            paddingHorizontal: 10,
           }}
         >
-          <Button
-            type={ButtonTypeEnum.Link}
-            title={translate('cancel') as string}
-            onPress={() => {
-              setAddress('');
-              setVerifyOK(null);
-              Keyboard.dismiss();
-              setTimeout(() => {
-                closeSheet();
-              }, 100);
-            }}
-            twoButtons={true}
-          />
-          <Button
-            type={ButtonTypeEnum.Primary}
-            title={translate('verify') as string}
-            onPress={() => {
-              verifyAddress();
-            }}
-            twoButtons={true}
-            disabled={!address || !!errorAddress}
-          />
+          <ButtonStack>
+            <Button
+              variant="quiet"
+              title={translate('cancel') as string}
+              onPress={() => {
+                setAddress('');
+                setVerifyOK(null);
+                Keyboard.dismiss();
+                setTimeout(() => {
+                  closeSheet();
+                }, 100);
+              }}
+            />
+            <Button
+              variant="primary"
+              title={translate('verify') as string}
+              onPress={() => {
+                verifyAddress();
+              }}
+              disabled={!address || !!errorAddress}
+            />
+          </ButtonStack>
         </View>
       </View>
     </View>

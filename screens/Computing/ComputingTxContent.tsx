@@ -13,9 +13,9 @@ import BottomSheet, {
   BottomSheetFooter,
   BottomSheetFooterProps,
 } from '@gorhom/bottom-sheet';
-import ProgressState, { RING_RED } from '@ui/widgets/ProgressState';
+import ProgressState from '@ui/widgets/ProgressState';
 import RegText from '@ui/primitives/RegText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
@@ -83,6 +83,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
       <BottomSheetFooter {...props} bottomInset={0}>
         <View
           style={{
+            paddingHorizontal: 20,
             backgroundColor: colors.bgSurface,
             paddingTop: 10,
             paddingBottom: 24,
@@ -94,7 +95,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
         >
           {isTerminal && (
             <Button
-              type={ButtonTypeEnum.Primary}
+              variant="primary"
               title={translate('loadedapp.continue') as string}
               onPress={onContinue}
             />
@@ -128,7 +129,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
         snapPoints={computingSnapPoints}
         renderFooter={renderComputingFooter}
         contentStyle={{
-          paddingHorizontal: 24,
+          paddingHorizontal: 20,
           paddingTop: 106,
           paddingBottom: 106,
           alignItems: 'center',
@@ -166,7 +167,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
             >
               <RegText
                 style={{
-                  color: RING_RED,
+                  color: colors.fgDanger,
                   textDecorationLine: 'underline',
                 }}
               >

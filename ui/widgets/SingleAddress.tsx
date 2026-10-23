@@ -4,7 +4,7 @@ import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
-import { useTheme } from '@app/theme';
+import { useTheme, slopFor } from '@app/theme';
 
 import { ContextAppLoaded } from '@app/context';
 import { useResult } from '@app/navigation/results';
@@ -23,11 +23,10 @@ import { EyeIcon } from '@ui/primitives/Icons/EyeIcon';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
 import { ListIcon } from '@ui/primitives/Icons/ListIcon';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
 import Address from './Address/Address';
 import { getZingoLogo } from '@app/utils/ZingoAppData';
 import { useTimedReveal } from '@app/hooks/useTimedReveal';
+import { CheckCircleLineIcon } from '@ui/primitives/Icons/CheckCircleLineIcon';
 
 type SingleAddressProps = {
   address?: UnifiedAddressClass | TransparentAddressClass;
@@ -90,6 +89,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         style={{ width: '100%' }}
         contentContainerStyle={{
           alignItems: 'center',
+          paddingHorizontal: 20,
           paddingBottom: 100,
         }}
       >
@@ -115,14 +115,14 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 }}
               >
                 <TriangleAlert
-                  color="#F79700"
+                  color={colors.fgWarning}
                   size={20}
                   style={{ marginRight: 10 }}
                 />
                 <Text
                   style={{
-                    color: '#F79700',
-                    fontSize: 14,
+                    color: colors.fgWarning,
+                    fontSize: 13,
                     flexShrink: 1,
                   }}
                 >
@@ -156,14 +156,13 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     }}
                   >
                     <ShieldIcon
-                      color={colors.fgAccent}
+                      color={colors.fgMuted}
                       size={20}
                       style={{ marginRight: 10 }}
                     />
                     <RegText
                       style={{
-                        fontWeight: 'bold',
-                        opacity: 0.9,
+                        fontWeight: '700',
                         marginRight: 10,
                       }}
                     >
@@ -203,14 +202,13 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     }}
                   >
                     <EyeIcon
-                      color={colors.fgWarningDark}
+                      color={colors.fgWarning}
                       size={20}
                       style={{ marginRight: 10 }}
                     />
                     <RegText
                       style={{
-                        fontWeight: 'bold',
-                        opacity: 0.9,
+                        fontWeight: '700',
                         marginRight: 10,
                       }}
                     >
@@ -244,7 +242,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
             <View
               style={{
                 marginTop: 10,
-                marginHorizontal: 20,
                 padding: 10,
                 backgroundColor: colors.fgDefault,
               }}
@@ -321,7 +318,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   marginBottom: 5,
                 }}
               >
-                <TouchableOpacity onPress={doCopy}>
+                <TouchableOpacity hitSlop={slopFor(20)} onPress={doCopy}>
                   <View
                     style={{
                       borderRadius: 30,
@@ -334,14 +331,16 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     <CopyIcon
                       color={colors.fgDefault}
                       size={20}
-                      opacity={0.9}
                       style={{ margin: 3 }}
                     />
                   </View>
                 </TouchableOpacity>
                 {address && (
                   <>
-                    <TouchableOpacity onPress={() => show('VA')}>
+                    <TouchableOpacity
+                      hitSlop={slopFor(20)}
+                      onPress={() => show('VA')}
+                    >
                       <View
                         style={{
                           borderRadius: 30,
@@ -351,16 +350,18 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                           marginHorizontal: 10,
                         }}
                       >
-                        <FontAwesomeIcon
-                          style={{ margin: 5, opacity: 0.9 }}
+                        <CheckCircleLineIcon
+                          style={{ margin: 5 }}
                           size={20}
-                          icon={faCircleCheck}
                           color={colors.fgDefault}
                         />
                       </View>
                     </TouchableOpacity>
                     {total > 1 && (
-                      <TouchableOpacity onPress={doAddressList}>
+                      <TouchableOpacity
+                        hitSlop={slopFor(20)}
+                        onPress={doAddressList}
+                      >
                         <View
                           style={{
                             borderRadius: 30,
@@ -373,7 +374,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                           <ListIcon
                             color={colors.fgDefault}
                             size={20}
-                            opacity={0.9}
                             style={{ margin: 3 }}
                           />
                         </View>
@@ -386,7 +386,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
             {ufvk && (
               <Address
                 address={ufvk}
-                style={{ color: colors.fgDefault, fontSize: 18, opacity: 0.8 }}
+                style={{ color: colors.fgDefault, fontSize: 18 }}
                 onPress={() => show('EA')}
               />
             )}
@@ -427,7 +427,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   style={{
                     color: colors.fgDefault,
                     fontSize: 18,
-                    opacity: 0.8,
                   }}
                   onPress={() => show('EA')}
                   testID={
