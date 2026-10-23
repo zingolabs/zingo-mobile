@@ -11,16 +11,16 @@ import { CopyIcon } from './CopyIcon';
 import { EyeIcon } from './EyeIcon';
 import { EyeOffIcon } from './EyeOffIcon';
 import { FiltersIcon } from './FiltersIcon';
-import { HouseFilledIcon } from './HouseFilledIcon';
-import { HouseOutlineIcon } from './HouseOutlineIcon';
 import { KeyIcon } from './KeyIcon';
+import {
+  HomeTabIcon,
+  ReceiveTabIcon,
+  SendTabIcon,
+  SwapTabIcon,
+} from './TabIcons';
 import { ListIcon } from './ListIcon';
 import { MessagesIcon } from './MessagesIcon';
 import { PencilIcon } from './PencilIcon';
-import { ReceiveFilledIcon } from './ReceiveFilledIcon';
-import { ReceiveIcon } from './ReceiveIcon';
-import { SendFilledIcon } from './SendFilledIcon';
-import { SendOutlineIcon } from './SendOutlineIcon';
 import { ShieldCheckIcon } from './ShieldCheckIcon';
 import { ShieldIcon } from './ShieldIcon';
 import { SkullIcon } from './SkullIcon';
@@ -64,16 +64,14 @@ const icons = {
   Eye: EyeIcon,
   EyeOff: EyeOffIcon,
   Filters: FiltersIcon,
-  HouseFilled: HouseFilledIcon,
-  HouseOutline: HouseOutlineIcon,
+  HomeTab: HomeTabIcon,
   Key: KeyIcon,
   List: ListIcon,
   Messages: MessagesIcon,
   Pencil: PencilIcon,
-  ReceiveFilled: ReceiveFilledIcon,
-  Receive: ReceiveIcon,
-  SendFilled: SendFilledIcon,
-  SendOutline: SendOutlineIcon,
+  ReceiveTab: ReceiveTabIcon,
+  SendTab: SendTabIcon,
+  SwapTab: SwapTabIcon,
   Shield: ShieldIcon,
   ShieldCheck: ShieldCheckIcon,
   Skull: SkullIcon,

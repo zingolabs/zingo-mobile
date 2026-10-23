@@ -8,51 +8,48 @@ import {
 import { TabActions } from '@react-navigation/native';
 import { useTheme, themeTokens } from '@app/theme';
 import { Route } from '@app/AppState';
-import { HouseFilledIcon } from '@ui/primitives/Icons/HouseFilledIcon';
-import { HouseOutlineIcon } from '@ui/primitives/Icons/HouseOutlineIcon';
-import { SendFilledIcon } from '@ui/primitives/Icons/SendFilledIcon';
-import { SendOutlineIcon } from '@ui/primitives/Icons/SendOutlineIcon';
-import { ReceiveIcon } from '@ui/primitives/Icons/ReceiveIcon';
-import { ReceiveFilledIcon } from '@ui/primitives/Icons/ReceiveFilledIcon';
-import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
+import { ContextAppLoaded } from '@app/context';
+import Text from '@ui/primitives/Text';
+import {
+  HomeTabIcon,
+  ReceiveTabIcon,
+  SendTabIcon,
+  SwapTabIcon,
+} from '@ui/primitives/Icons/TabIcons';
 
-const ICON_SIZE = 28;
-const SEND_SIZE = 25;
+const ICON_SIZE = 24;
 const BUBBLE_V_MARGIN = 4;
-const TAB_H_PADDING = 30;
-const TAB_V_PADDING = 10;
+const TAB_WIDTH = 80;
+const TAB_V_PADDING = 7;
 const PILL_BG = themeTokens.bgTabBar;
 const PILL_BORDER = themeTokens.bottomSheetBorder;
 const WRAPPER_PADDING_BOTTOM = 25;
 const FADE_COLORS = ['transparent', themeTokens.bgScrim];
 
-function renderNavIcon(
-  routeName: string,
-  isFocused: boolean,
-  color: string,
-): React.ReactElement {
+/** Each tab's mark and the catalog key of its name. */
+function tabOf(routeName: string): { icon: React.ReactElement; label: string } {
   if (routeName === Route.History) {
-    return isFocused ? (
-      <HouseFilledIcon size={ICON_SIZE} color={color} />
-    ) : (
-      <HouseOutlineIcon size={ICON_SIZE} color={color} />
-    );
+    return {
+      icon: <HomeTabIcon size={ICON_SIZE} />,
+      label: 'loadedapp.tab-home',
+    };
   }
   if (routeName === Route.Send) {
-    return isFocused ? (
-      <SendFilledIcon size={SEND_SIZE} color={color} />
-    ) : (
-      <SendOutlineIcon size={SEND_SIZE} color={color} />
-    );
+    return {
+      icon: <SendTabIcon size={ICON_SIZE} />,
+      label: 'loadedapp.tab-send',
+    };
   }
   if (routeName === Route.Swap) {
-    return <SwapIcon size={SEND_SIZE} color={color} />;
+    return {
+      icon: <SwapTabIcon size={ICON_SIZE} />,
+      label: 'loadedapp.tab-swap',
+    };
   }
-  return isFocused ? (
-    <ReceiveFilledIcon size={ICON_SIZE} color={color} />
-  ) : (
-    <ReceiveIcon size={ICON_SIZE} color={color} />
-  );
+  return {
+    icon: <ReceiveTabIcon size={ICON_SIZE} />,
+    label: 'loadedapp.tab-receive',
+  };
 }
 
 const CustomTabBar = ({
@@ -60,8 +57,9 @@ const CustomTabBar = ({
   navigation,
 }: BottomTabBarProps): React.ReactElement => {
   const reportHeight = useContext(BottomTabBarHeightCallbackContext);
-  // The active-tab bubble used to be hardcoded to #149D05. Pull from the
-  // theme's primary instead, so it stays on palette.
+  const { translate } = useContext(ContextAppLoaded);
+  // The marks carry the accent green themselves, so the active tab sits on
+  // a quiet bubble and only its name turns green.
   const { colors } = useTheme();
 
   const bubbleAnimsRef = useRef<Record<string, Animated.Value> | null>(null);
@@ -165,9 +163,8 @@ const CustomTabBar = ({
         <View style={styles.pill}>
           {state.routes.map((route, index) => {
             const isFocused = index === state.index;
-            const color = isFocused
-              ? themeTokens.fgOnAccent
-              : themeTokens.fgDefault;
+            const tab = tabOf(route.name);
+            const label = translate(tab.label) as string;
             return (
               <Pressable
                 key={route.key}
@@ -178,19 +175,34 @@ const CustomTabBar = ({
                 onPress={() => handlePress(route, isFocused)}
                 onLongPress={() => handleLongPress(route)}
                 accessibilityRole="tab"
+                accessibilityLabel={label}
                 accessibilityState={{ selected: isFocused }}
               >
                 <Animated.View
                   style={[
                     styles.bubble,
-                    { backgroundColor: colors.bgAccent },
+                    { backgroundColor: colors.bgMutedSubtle },
                     { transform: [{ scale: bubbleAnims[route.key] }] },
                   ]}
                 />
                 <Animated.View
-                  style={{ transform: [{ scale: pressAnims[route.key] }] }}
+                  style={[
+                    styles.tabContent,
+                    { transform: [{ scale: pressAnims[route.key] }] },
+                  ]}
                 >
-                  {renderNavIcon(route.name, isFocused, color)}
+                  {tab.icon}
+                  <Text
+                    numberOfLines={1}
+                    style={[
+                      styles.label,
+                      {
+                        color: isFocused ? colors.fgPriceUp : colors.fgDefault,
+                      },
+                    ]}
+                  >
+                    {label}
+                  </Text>
                 </Animated.View>
               </Pressable>
             );
@@ -222,10 +234,19 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   tabItem: {
-    paddingHorizontal: TAB_H_PADDING,
+    width: TAB_WIDTH,
     paddingVertical: TAB_V_PADDING,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  tabContent: {
+    alignItems: 'center',
+  },
+  label: {
+    marginTop: 3,
+    fontSize: 11,
+    lineHeight: 14,
+    fontWeight: '600',
   },
   bubble: {
     position: 'absolute',

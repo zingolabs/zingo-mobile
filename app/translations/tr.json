@@ -232,7 +232,11 @@
     "email-error-title": "Error E-posta istemcisi açılırken bir hata oluştu",
     "email-error-body": "Raporu gönderebilmek için cihazınızın Ayarlar bölümüne gidin ve varsayılan bir e-posta uygulaması belirleyin.",
     "migration-title": "Cüzdan geçişi",
-    "migration-body": "Cüzdanınızı yeni senkronizasyon sistemine taşıyoruz. Cihazınızı güç ve Wi-Fi'a bağlı tutun.\n\nBakiyeniz, taşıma işlemi ilerledikçe değişecektir. Endişelenmeyin, paranız güvende!"
+    "migration-body": "Cüzdanınızı yeni senkronizasyon sistemine taşıyoruz. Cihazınızı güç ve Wi-Fi'a bağlı tutun.\n\nBakiyeniz, taşıma işlemi ilerledikçe değişecektir. Endişelenmeyin, paranız güvende!",
+    "tab-home": "Ana sayfa",
+    "tab-send": "Gönder",
+    "tab-receive": "Al",
+    "tab-swap": "Takas"
   },
   "rpc": {
     "restorebackup-error": "Hata: Cüzdan yedeği geri yüklenemedi.",
