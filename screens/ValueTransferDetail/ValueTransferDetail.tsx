@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
+import { formatZecAmount } from '@app/utils/formatZecAmount';
 import Tag from '@ui/widgets/Tag';
 import { Linking, Pressable, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -173,7 +174,6 @@ const ValueTransferDetail: React.FunctionComponent<
       ? ''
       : '−';
   /** Four decimals cut, not rounded, and the rest smaller: never more than it was. */
-  const split = Utils.splitZecAmountIntoBigSmall(vt.amount);
 
   const rows: DetailRow[] = [
     {
@@ -204,7 +204,7 @@ const ValueTransferDetail: React.FunctionComponent<
       ? [
           {
             label: t('history.tx-fee'),
-            value: `${Utils.parseNumberFloatToStringLocale(vt.fee, 8)} ${info.currencyName}`,
+            value: `${formatZecAmount(vt.fee ?? 0)} ${info.currencyName}`,
           },
         ]
       : []),
@@ -335,12 +335,7 @@ const ValueTransferDetail: React.FunctionComponent<
           }
           style={{ marginTop: 12, fontVariant: ['tabular-nums'] }}
         >
-          {privacy ? MASK : `${sign}${split.bigPart}`}
-          {!privacy && split.smallPart !== '0000' && !!split.smallPart && (
-            <Text variant="screenTitle" tone="muted">
-              {split.smallPart}
-            </Text>
-          )}
+          {privacy ? MASK : `${sign}${formatZecAmount(vt.amount)}`}
           <Text variant="subtitle" tone="muted">
             {` ${info.currencyName}`}
           </Text>

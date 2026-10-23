@@ -280,7 +280,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                 }
               }
             >
-              sent-address-1-12345678901234567890
+              sent-a…567890
             </Text>
             <View
               style={
@@ -341,7 +341,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                 }
               }
             >
-              −0.1235 ZEC
+              −0.12345678 ZEC
             </Text>
             <Text
               maxFontSizeMultiplier={2}
@@ -646,7 +646,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                 }
               }
             >
-              sent-address-1-12345678901234567890
+              sent-a…567890
             </Text>
             <View
               style={
@@ -707,7 +707,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                 }
               }
             >
-              −0.1235 ZEC
+              −0.12345678 ZEC
             </Text>
             <Text
               maxFontSizeMultiplier={2}
@@ -1004,7 +1004,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                 }
               }
             >
-              +0.7765 ZEC
+              +0.77654321 ZEC
             </Text>
             <Text
               maxFontSizeMultiplier={2}
@@ -1309,7 +1309,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                 }
               }
             >
-              sent-address-1-12345678901234567890
+              sent-a…567890
             </Text>
             <View
               style={
@@ -1356,7 +1356,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                 }
               }
             >
-              −0.1235 ZEC
+              −0.12345678 ZEC
             </Text>
             <Text
               maxFontSizeMultiplier={2}

@@ -8,6 +8,7 @@ import {
   providerShortLabel,
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
+import { formatZecAmount } from '@app/utils/formatZecAmount';
 
 type Translate = (key: string) => string;
 
@@ -47,7 +48,10 @@ export function shortWhen(
 }
 
 /** Four decimals, the way the list writes ZEC. */
-const zec = (amount: number): string => amount.toFixed(4);
+const zec = formatZecAmount;
+/** A row names an address by its first and last 6 characters, as the prototype. */
+const shortAddress = (address: string): string =>
+  address.length > 15 ? `${address.slice(0, 6)}…${address.slice(-6)}` : address;
 
 /** A transfer's row: what it was, when, and the ZEC with its dollars. */
 export function transferRowText(args: {
@@ -56,8 +60,10 @@ export function transferRowText(args: {
   currency: string;
   usd: string;
   t: Translate;
+  /** The contact the address belongs to, which names the row instead of the address. */
+  contactName?: string;
 }): RowText {
-  const { vt, when, currency, usd, t } = args;
+  const { vt, when, currency, usd, t, contactName } = args;
   const failed = vt.status === RPCValueTransfersStatusEnum.failed;
   const pending = !failed && vt.confirmations === 0;
   const state: RowState | undefined = failed
@@ -71,8 +77,12 @@ export function transferRowText(args: {
     case ValueTransferKindEnum.Sent:
       return {
         ...base,
-        title: vt.address ? vt.address : t('history.sent'),
-        titleMono: !!vt.address,
+        title: contactName
+          ? contactName
+          : vt.address
+            ? shortAddress(vt.address)
+            : t('history.sent'),
+        titleMono: !contactName && !!vt.address,
         line: `${t('history.sent')} · ${when}`,
         top: `−${amount}`,
         topTone: failed ? 'muted' : 'default',

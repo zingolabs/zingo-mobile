@@ -260,20 +260,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
           }
           testID="valuetransferdetail.amount"
         >
-          +0.7765
-          <Text
-            maxFontSizeMultiplier={1.5}
-            style={
-              {
-                "color": "#888888",
-                "fontSize": 22,
-                "fontWeight": "700",
-                "lineHeight": 28,
-              }
-            }
-          >
-            4321
-          </Text>
+          +0.77654321
           <Text
             maxFontSizeMultiplier={1.5}
             style={
@@ -996,20 +983,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
           }
           testID="valuetransferdetail.amount"
         >
-          −0.1234
-          <Text
-            maxFontSizeMultiplier={1.5}
-            style={
-              {
-                "color": "#888888",
-                "fontSize": 22,
-                "fontWeight": "700",
-                "lineHeight": 28,
-              }
-            }
-          >
-            5678
-          </Text>
+          −0.12345678
           <Text
             maxFontSizeMultiplier={1.5}
             style={
@@ -1317,7 +1291,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                   }
                 }
               >
-                0.00010000 ZEC
+                0.0001 ZEC
               </Text>
             </View>
           </View>
