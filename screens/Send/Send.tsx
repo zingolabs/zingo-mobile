@@ -925,7 +925,20 @@ const Send: React.FunctionComponent<SendProps> = () => {
       return;
     }
 
-    navigation.navigate(Route.Computing);
+    // The sending screen says how much goes and to whom: the contact, the
+    // Zcash Name, or the short address.
+    const to = sendPageStatePar.toaddr;
+    const subject = {
+      amount: Utils.parseNumberFloatToStringLocale(
+        Utils.parseStringLocaleToNumberFloat(to.amount),
+        4,
+      ),
+      who:
+        addressBook.find(entry => entry.address === to.to)?.label ||
+        to.znsAlias ||
+        Utils.trimToSmall(to.to, 6),
+    };
+    navigation.navigate(Route.Computing, { subject });
 
     // The MAX send travels the send-all path all the way: quoted and sent by
     // the same proposal, so the amount confirmed is the amount broadcast.
@@ -947,7 +960,10 @@ const Send: React.FunctionComponent<SendProps> = () => {
       setScrollToTop(true);
       setScrollToBottom(true);
     }
-    navigation.navigate(Route.Computing, computingEnd(settlement));
+    navigation.navigate(Route.Computing, {
+      ...computingEnd(settlement),
+      subject,
+    });
   };
 
   const scanButton = useRef<View>(null);

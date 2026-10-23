@@ -1,52 +1,32 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import {
-  View,
-  ActivityIndicator,
-  Platform,
-  TouchableOpacity,
-} from 'react-native';
-import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
-import BottomSheet, {
-  BottomSheetFooter,
-  BottomSheetFooterProps,
-  BottomSheetScrollView,
-} from '@gorhom/bottom-sheet';
+import React, { useContext, useEffect, useMemo } from 'react';
+import { Platform, View } from 'react-native';
 
-import FadeText from '@ui/primitives/FadeText';
-import RegText from '@ui/primitives/RegText';
-import BoldText from '@ui/primitives/BoldText';
-import ZecAmount from '@ui/widgets/ZecAmount';
-import CurrencyAmount from '@ui/widgets/CurrencyAmount';
+import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
-import AppSheet from '@ui/primitives/AppSheet';
-import { space20, useTheme } from '@app/theme';
+import ButtonStack from '@ui/primitives/ButtonStack';
+import FullPanel from '@ui/widgets/FullPanel';
+import Banner from '@ui/widgets/Banner';
+import { ArrowUpIcon } from '@ui/primitives/Icons/ArrowUpIcon';
+import { space16, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import Header from '@ui/widgets/Header';
-import AddressItem from '@ui/widgets/AddressItem';
 import { useBiometricGate } from '@app/hooks/useBiometricGate';
-import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
+import DetailRows, { DetailRow } from '@screens/Swap/components/DetailRows';
+import NymNote from '@screens/Swap/components/NymNote';
+import ContactInitial from '@screens/Swap/components/ContactInitial';
+import { kindKey } from '@screens/Send/components/RecipientField';
 
 import { AppDrawerParamList } from '@app/types';
 import Utils from '@app/utils';
 import { deliver } from '@app/navigation/results';
-import { fiatQuote } from '@app/price/fiatQuote';
+import { fiatQuote, toFiatText } from '@app/price/fiatQuote';
 import { sendPermit } from '@app/walletBackend/transforms/sendPermit';
-import {
-  GlobalConst,
-  SendPageStateClass,
-  ProposalPoolsType,
-} from '@app/AppState';
+import { SendPageStateClass, ProposalPoolsType } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 
 type ConfirmProps = NativeStackScreenProps<AppDrawerParamList, 'Confirm'>;
+
+const MONO = Platform.select({ ios: 'Menlo', default: 'monospace' });
 
 const poolCrossingKey = ({
   source,
@@ -63,6 +43,15 @@ const poolCrossingKey = ({
     : 'send.amountrevealed';
 };
 
+/** ZEC with the four decimals the review reads in. */
+const zec4 = (value: number) => Utils.parseNumberFloatToStringLocale(value, 4);
+
+/**
+ * The review of a send, in the full panel: who it goes to with their avatar,
+ * the amount at 36 with its value, then privacy, memo, fee and total; a
+ * transparent recipient warns that it is public, and the Nym note says the
+ * send goes through the mixnet.
+ */
 const Confirm: React.FunctionComponent<ConfirmProps> = ({
   navigation,
   route,
@@ -76,8 +65,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     addLastSnackbar,
     server,
     biometrics,
+    addressBook,
   } = context;
   const { colors } = useTheme();
+  const t = (key: string) => translate(key) as string;
   const quote = fiatQuote(zecPrice, server, server.chainName);
   const permit = sendPermit(context);
 
@@ -95,391 +86,198 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   });
   const authPassed = screenGate.kind === 'passed';
 
-  const [sendingTotal, setSendingTotal] = useState<number>(0);
+  const calculatedFee = route.params?.calculatedFee ?? 0;
+  const proposalPools: ProposalPoolsType = route.params?.proposalPools ?? {
+    source: [],
+    destination: [],
+  };
+  const sendAllAmount = route.params?.sendAllAmount ?? false;
+  const sendPageState: SendPageStateClass =
+    route.params?.sendPageState ?? ({} as SendPageStateClass);
+  const to = sendPageState.toaddr;
 
-  const [calculatedFee, setCalculatedFee] = useState<number>(
-    !!route.params && route.params.calculatedFee !== undefined
-      ? route.params.calculatedFee
-      : 0,
+  const memoTotal = Utils.buildMemo(
+    to.memo,
+    to.includeUAMemo,
+    defaultUnifiedAddress,
   );
-  const [proposalPools, setProposalPools] = useState<ProposalPoolsType>(
-    !!route.params && route.params.proposalPools !== undefined
-      ? route.params.proposalPools
-      : { source: [], destination: [] },
-  );
-  const [sendAllAmount, setSendAllAmount] = useState<boolean>(
-    !!route.params && route.params.sendAllAmount !== undefined
-      ? route.params.sendAllAmount
-      : false,
-  );
-  const [sendPageState, setSendPageState] = useState<SendPageStateClass>(
-    !!route.params && route.params.sendPageState !== undefined
-      ? route.params.sendPageState
-      : ({} as SendPageStateClass),
-  );
-  // True when the send routes over the mixnet, so the confirm screen shows
-  // the NYM styling (green outline, processing title, enhanced-privacy tag,
-  // warning banner).
+  const amount = Utils.parseStringLocaleToNumberFloat(to.amount);
+  const total = amount + calculatedFee;
 
-  const [containerH, setContainerH] = useState<number>(0);
-  const [headerH, setHeaderH] = useState<number>(0);
-  const confirmSheetRef = useRef<BottomSheet>(null);
+  const contact = useMemo(
+    () => addressBook.find(entry => entry.address === to.to),
+    [addressBook, to.to],
+  );
+  const transparent = /^t/i.test(to.to);
+  const who = contact?.label ?? (to.znsAlias || '');
 
-  const closeScreen = useCallback(() => {
+  const close = () => {
     if (navigation.canGoBack()) {
       navigation.goBack();
     }
-  }, [navigation]);
-
-  const confirmSnapPoints = useFullSheetSnapPoints(containerH, headerH);
-
-  const confirmHeader = (
-    <View
-      style={{
-        paddingTop: 12,
-        paddingBottom: 8,
-        paddingHorizontal: 16,
-      }}
-    >
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <TouchableOpacity
-          onPress={closeScreen}
-          hitSlop={8}
-          style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-        >
-          <ChevronLeft size={20} color={colors.fgAccent} />
-        </TouchableOpacity>
-        <BoldText
-          numberOfLines={1}
-          style={{
-            flex: 1,
-            fontSize: 16,
-            lineHeight: 28,
-            textAlign: 'center',
-          }}
-        >
-          {translate('send.confirm-title') as string}
-        </BoldText>
-        <View style={{ width: 28 }} />
-      </View>
-    </View>
-  );
-
-  const [memoTotal, setMemoTotal] = useState<string>(
-    Utils.buildMemo(
-      sendPageState.toaddr.memo,
-      sendPageState.toaddr.includeUAMemo,
-      defaultUnifiedAddress,
-    ),
-  );
-
-  useEffect(() => {
-    const _calculatedFee =
-      !!route.params && route.params?.calculatedFee !== undefined
-        ? route.params.calculatedFee
-        : 0;
-    const _proposalPools =
-      !!route.params && route.params.proposalPools !== undefined
-        ? route.params.proposalPools
-        : { source: [], destination: [] };
-    const _sendAllAmount =
-      !!route.params && route.params.sendAllAmount !== undefined
-        ? route.params.sendAllAmount
-        : false;
-    const _sendPageState =
-      !!route.params && route.params.sendPageState !== undefined
-        ? route.params.sendPageState
-        : ({} as SendPageStateClass);
-    const _memoTotal = Utils.buildMemo(
-      sendPageState.toaddr.memo,
-      sendPageState.toaddr.includeUAMemo,
-      defaultUnifiedAddress,
-    );
-    setCalculatedFee(_calculatedFee);
-    setProposalPools(_proposalPools);
-    setSendAllAmount(_sendAllAmount);
-    setSendPageState(_sendPageState);
-    setMemoTotal(_memoTotal);
-  }, [
-    route,
-    route.params,
-    route.params?.calculatedFee,
-    route.params?.proposalPools,
-    route.params?.sendAllAmount,
-    sendPageState,
-    sendPageState.toaddr.memo,
-    sendPageState.toaddr.includeUAMemo,
-    defaultUnifiedAddress,
-  ]);
-
-  const privacyLevelKey = poolCrossingKey(proposalPools);
-  const privacyLevel = privacyLevelKey
-    ? (translate(privacyLevelKey) as string)
-    : '-';
-
-  useEffect(() => {
-    const sendingTot =
-      Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) +
-      calculatedFee;
-    setSendingTotal(sendingTot);
-  }, [calculatedFee, sendPageState.toaddr.amount]);
+  };
 
   // Send, beneath this screen, runs the proposal once more on entry.
   useEffect(() => {
     deliver('send.propose', '');
   }, []);
 
-  const renderConfirmFooter = useCallback(
-    (props: BottomSheetFooterProps) => (
-      <BottomSheetFooter {...props} bottomInset={0}>
-        <View
-          style={{
-            paddingHorizontal: space20,
-            backgroundColor: colors.bgSurface,
-            paddingTop: 10,
-            paddingBottom: 24,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          {permit.kind === 'error' && (
-            <View style={{ marginBottom: 10 }} testID="send.confirm.refusal">
-              <FadeText style={{ textAlign: 'center', fontSize: 12 }}>
-                {translate(permit.errorKey) as string}
-              </FadeText>
-            </View>
-          )}
-          <Button
-            testID="send.confirm.button"
-            variant="nym"
-            title={
-              sendAllAmount
-                ? (translate('send.confirm-button-all') as string)
-                : (translate('confirm') as string)
-            }
-            onPress={() => deliver('send.confirm', '')}
-            disabled={permit.kind === 'error'}
-          />
-        </View>
-      </BottomSheetFooter>
-    ),
-    [colors, sendAllAmount, translate, permit],
-  );
-
   if (!authPassed) {
     return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
   }
 
-  return (
-    <View style={{ flex: 1 }}>
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.bgCanvas,
-        }}
-        onLayout={e => setContainerH(e.nativeEvent.layout.height)}
-      >
-        <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
-          <Header
-            title={''}
-            noBalance={true}
-            noSyncingStatus={true}
-            noDrawMenu={true}
-            noPrivacy={true}
-            noUfvkIcon={true}
-          />
-        </View>
-        <AppSheet
-          ref={confirmSheetRef}
-          snapPoints={confirmSnapPoints}
-          header={confirmHeader}
-          renderFooter={renderConfirmFooter}
+  const privacyKey = poolCrossingKey(proposalPools);
+  const unit = info.currencyName || 'ZEC';
+  const rows: DetailRow[] = [
+    {
+      label: t('send.confirm-privacy-level'),
+      value: privacyKey ? t(privacyKey) : '-',
+      badge: t('send.nym-enhanced'),
+    },
+    ...(memoTotal
+      ? [{ label: t('send.memo'), value: memoTotal, wrap: true }]
+      : []),
+    { label: t('send.network-fee'), value: `${zec4(calculatedFee)} ${unit}` },
+    { label: t('send.total'), value: `${zec4(total)} ${unit}` },
+  ];
+
+  const avatar = contact ? (
+    <ContactInitial name={contact.label} color={contact.color} size={56} />
+  ) : (
+    <View
+      style={{
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: colors.bgMutedSubtle,
+      }}
+    >
+      {to.znsAlias ? (
+        <Text
+          style={{ fontSize: 21, fontWeight: '700', color: colors.fgMuted }}
         >
-          <BottomSheetScrollView
-            showsVerticalScrollIndicator={true}
-            persistentScrollbar={true}
-            indicatorStyle={'white'}
-            testID="send.confirm.scroll-view"
-            bounces={false}
-            alwaysBounceVertical={false}
-            style={{
-              flex: 1,
-            }}
-            contentContainerStyle={{
-              flexDirection: 'column',
-              alignItems: 'stretch',
-              justifyContent: 'flex-start',
-              paddingHorizontal: space20,
-              paddingBottom: 80,
-            }}
-          >
-            <View
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                marginVertical: 25,
-                padding: 10,
-                borderWidth: 1,
-                borderRadius: 10,
-                borderColor: colors.bgNym,
-              }}
-            >
-              <RegText
-                style={{ textAlign: 'center', textTransform: 'capitalize' }}
-              >
-                {translate('send.nym-processing-title') as string}
-              </RegText>
-
-              <ZecAmount
-                currencyName={info.currencyName}
-                amtZec={sendingTotal}
-                privacy={false}
-                size={22}
-                smallPrefix={true}
-              />
-              {quote.kind === 'quote' && (
-                <CurrencyAmount
-                  amtZec={sendingTotal}
-                  price={quote.price}
-                  priceDate={quote.date}
-                  privacy={false}
-                />
-              )}
-            </View>
-            <View
-              style={{ flexDirection: 'row', justifyContent: 'space-between' }}
-            >
-              <View style={{ marginVertical: 10 }}>
-                <FadeText>
-                  {translate('send.confirm-privacy-level') as string}
-                </FadeText>
-                <View
-                  style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
-                >
-                  {!privacyLevel ? (
-                    <ActivityIndicator
-                      size={
-                        Platform.OS === GlobalConst.platformOSios ? 'small' : 12
-                      }
-                      color={colors.fgAccent}
-                    />
-                  ) : (
-                    <RegText>{privacyLevel}</RegText>
-                  )}
-                  <RegText style={{ color: colors.bgNym }}>
-                    {translate('send.nym-enhanced') as string}
-                  </RegText>
-                </View>
-              </View>
-            </View>
-
-            <FadeText style={{ marginTop: 0 }}>
-              {translate('send.fee') as string}
-            </FadeText>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}
-            >
-              <ZecAmount
-                currencyName={info.currencyName}
-                size={15}
-                amtZec={calculatedFee}
-                privacy={false}
-              />
-              {quote.kind === 'quote' && (
-                <CurrencyAmount
-                  style={{ fontSize: 18 }}
-                  amtZec={calculatedFee}
-                  price={quote.price}
-                  priceDate={quote.date}
-                  privacy={false}
-                />
-              )}
-            </View>
-
-            {[sendPageState.toaddr].map(to => {
-              return (
-                <View key={`${to.id}-${to.to}`} style={{ marginVertical: 10 }}>
-                  <FadeText>{translate('send.to') as string}</FadeText>
-                  <AddressItem
-                    address={to.to}
-                    withIcon={true}
-                    znsAlias={to.znsAlias}
-                  />
-
-                  <FadeText style={{ marginTop: 10 }}>
-                    {translate('send.confirm-amount') as string}
-                  </FadeText>
-                  <View
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <ZecAmount
-                      currencyName={info.currencyName}
-                      size={15}
-                      amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
-                      privacy={false}
-                    />
-                    {quote.kind === 'quote' && (
-                      <CurrencyAmount
-                        style={{ fontSize: 18 }}
-                        amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
-                        price={quote.price}
-                        priceDate={quote.date}
-                        privacy={false}
-                      />
-                    )}
-                  </View>
-                  {!!memoTotal && (
-                    <>
-                      <FadeText style={{ marginTop: 10 }}>
-                        {translate('send.confirm-memo') as string}
-                      </FadeText>
-                      <RegText testID="send.confirm-memo" selectable={true}>
-                        {memoTotal}
-                      </RegText>
-                    </>
-                  )}
-                </View>
-              );
-            })}
-            <View
-              style={{
-                marginVertical: 10,
-                padding: 10,
-                borderWidth: 1,
-                borderRadius: 10,
-                borderColor: colors.bgNym,
-                backgroundColor: colors.bgNymSubtle,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}
-            >
-              <TriangleAlert
-                size={20}
-                color={colors.bgNym}
-                style={{ marginRight: 6 }}
-              />
-              <RegText style={{ flex: 1, fontSize: 13, color: colors.fgMuted }}>
-                {translate('send.nym-warning') as string}
-              </RegText>
-            </View>
-            <View style={{ marginBottom: 30 }} />
-          </BottomSheetScrollView>
-        </AppSheet>
-      </View>
+          {to.znsAlias.slice(0, 1).toUpperCase()}
+        </Text>
+      ) : (
+        <ArrowUpIcon size={24} color={colors.fgMuted} />
+      )}
     </View>
+  );
+
+  return (
+    <FullPanel
+      title={t('send.review')}
+      onBack={close}
+      testID="send.confirm.scroll-view"
+      footer={
+        <View>
+          {permit.kind === 'error' && (
+            <Text
+              testID="send.confirm.refusal"
+              variant="caption"
+              tone="muted"
+              style={{ textAlign: 'center', marginBottom: 10 }}
+            >
+              {t(permit.errorKey)}
+            </Text>
+          )}
+          <ButtonStack>
+            <Button variant="quiet" title={t('cancel')} onPress={close} />
+            <Button
+              testID="send.confirm.button"
+              variant="nym"
+              title={
+                sendAllAmount
+                  ? t('send.confirm-nym-all')
+                  : t('send.confirm-nym')
+              }
+              onPress={() => deliver('send.confirm', '')}
+              disabled={permit.kind === 'error'}
+            />
+          </ButtonStack>
+        </View>
+      }
+    >
+      <View style={{ alignItems: 'center', paddingTop: 8 }}>
+        <View style={{ marginBottom: 12 }}>{avatar}</View>
+        <Text
+          variant="caption"
+          style={{
+            color: colors.bgNym,
+            fontWeight: '600',
+            letterSpacing: 0.7,
+            textTransform: 'uppercase',
+            marginBottom: 6,
+          }}
+        >
+          {t('send.nym-processing-title')}
+        </Text>
+        <Text
+          variant="bodyStrong"
+          style={{ fontWeight: '600', textAlign: 'center' }}
+        >
+          {who ? (
+            t('send.sending-to').replace('{who}', who)
+          ) : (
+            <>
+              {t('send.sending-to').replace('{who}', '')}
+              <Text style={{ fontFamily: MONO, fontSize: 13 }}>
+                {Utils.trimToSmall(to.to, 6)}
+              </Text>
+            </>
+          )}
+        </Text>
+        <Text
+          variant="caption"
+          tone="muted"
+          style={{ marginTop: 2, textAlign: 'center' }}
+        >
+          <Text style={{ fontFamily: MONO, fontSize: 12 }}>
+            {Utils.trimToSmall(to.to, 8)}
+          </Text>
+          {` · ${t(kindKey(to.to))}`}
+        </Text>
+        <Text
+          testID="send.confirm.amount"
+          style={{
+            marginTop: 12,
+            fontSize: 36,
+            lineHeight: 40,
+            fontWeight: '700',
+            fontVariant: ['tabular-nums'],
+            color: colors.fgDefault,
+          }}
+        >
+          {zec4(amount)}
+          <Text
+            style={{ fontSize: 18, color: colors.fgMuted }}
+          >{` ${unit}`}</Text>
+        </Text>
+        {quote.kind === 'quote' && (
+          <Text
+            testID="send.confirm.fiat"
+            variant="bodySmall"
+            tone="muted"
+            style={{ marginTop: 2, fontVariant: ['tabular-nums'] }}
+          >
+            {'$' + toFiatText(to.amount, quote.price)}
+          </Text>
+        )}
+      </View>
+      <View style={{ marginTop: 24 }}>
+        <DetailRows rows={rows} />
+      </View>
+      {transparent && (
+        <View style={{ marginTop: space16 }}>
+          <Banner tone="warning" title={t('send.review-transparent')} />
+        </View>
+      )}
+      <View style={{ marginTop: space16 }}>
+        <NymNote text={t('send.nym-warning')} />
+      </View>
+    </FullPanel>
   );
 };
 

@@ -9,16 +9,30 @@ import {
 } from './sendFailureTransform';
 import type { SendOutcome } from './sendPermit';
 
-export type SendSettlement = { kind: 'sent' } | SendFailureText;
+/** A send that went out names its first txid, so its detail can be opened. */
+export type SendSettlement = { kind: 'sent'; txid?: string } | SendFailureText;
 
 /** The route parameters that put the Computing screen in its final phase. */
 export type ComputingEnd =
-  { phase: 'created' } | { phase: 'failed'; failure?: SendFailureText };
+  | { phase: 'created'; txid?: string }
+  | { phase: 'failed'; failure?: SendFailureText };
+
+/** What a send carries to the Computing screen: how much, and to whom. */
+export type ComputingSubject = { amount: string; who: string };
+
+/** The Computing screen's parameters: its phase, and what is being sent. */
+export type ComputingParams = { subject?: ComputingSubject } & (
+  { phase?: undefined } | ComputingEnd
+);
 
 type Attempted =
   SendSettlement | { kind: 'rejected'; failure: SendFailureClass };
 
-const SENT: SendSettlement = { kind: 'sent' };
+/** The receipt of a send lists its txids joined by commas. */
+const sentWith = (receipt: unknown): SendSettlement => {
+  const txid = typeof receipt === 'string' ? receipt.split(',')[0].trim() : '';
+  return txid ? { kind: 'sent', txid } : { kind: 'sent' };
+};
 const CREATED: ComputingEnd = { phase: 'created' };
 
 const attemptOnce = async (
@@ -26,7 +40,7 @@ const attemptOnce = async (
 ): Promise<Attempted> => {
   try {
     const outcome = await attempt();
-    return outcome.kind === 'error' ? outcome : SENT;
+    return outcome.kind === 'error' ? outcome : sentWith(outcome.receipt);
   } catch (thrown) {
     return { kind: 'rejected', failure: classifySendFailure(String(thrown)) };
   }
@@ -53,7 +67,9 @@ export async function settleSend(
 /** Maps the settlement of a send to the final phase of the Computing screen. */
 export const computingEnd = (settlement: SendSettlement): ComputingEnd =>
   settlement.kind === 'sent'
-    ? CREATED
+    ? settlement.txid
+      ? { phase: 'created', txid: settlement.txid }
+      : CREATED
     : { phase: 'failed', failure: settlement };
 
 /** Maps the result of a shield to the final phase of the Computing screen. */

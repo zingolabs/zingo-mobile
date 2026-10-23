@@ -568,7 +568,22 @@
     "memo-private": "Yalnızca alıcı okuyabilir",
     "memo-count": "{n} / {max} bayt",
     "memo-add": "Not ekle",
-    "review": "Gözden geçir"
+    "review": "Gözden geçir",
+    "network-fee": "Ağ ücreti",
+    "total": "Toplam",
+    "sending-to": "{who} kişisine gönderiliyor",
+    "confirm-nym": "NYM üzerinden gönder",
+    "confirm-nym-all": "Tümünü NYM üzerinden gönder",
+    "review-transparent": "Bu şeffaf bir adrese gidiyor, bu yüzden tutar ve adres herkese açık.",
+    "step-build": "İşleminiz hazırlanıyor",
+    "step-proof": "Gizli kanıt oluşturuluyor",
+    "step-nym": "NYM mixnet üzerinden yönlendiriliyor",
+    "sending-line": "{amount} ZEC → {who} · NYM ile",
+    "sent-title": "Gönderildi",
+    "sent-line": "{amount} ZEC → {who}",
+    "sent-body": "Yolda. Geçmişte görünür ve yaklaşık bir dakika içinde onaylanır.",
+    "done": "Tamam",
+    "view-transaction": "İşlemi görüntüle"
   },
   "receive": {
     "u-title": "Korumalı",

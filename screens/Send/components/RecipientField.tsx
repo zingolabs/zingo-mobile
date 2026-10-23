@@ -34,7 +34,7 @@ export type NameLookup =
   | { kind: 'missing'; name: string };
 
 /** The catalog key naming a Zcash address kind, from its prefix. */
-const kindKey = (address: string): string =>
+export const kindKey = (address: string): string =>
   /^tex/i.test(address)
     ? 'addressbook.kind-tex'
     : /^t/i.test(address)

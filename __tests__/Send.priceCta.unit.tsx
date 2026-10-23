@@ -116,7 +116,7 @@ test('P8: an absent price hides the in-form USD amounts and the ring', () => {
   expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
 });
 
-test('N7: the send-confirmation conversions dim on a stale price too', () => {
+test('N7: the send-confirmation conversion dims on a stale price too', () => {
   const state = { ...defaultAppContextLoaded };
   state.translate = mockTranslate;
   state.info = mockInfo;
@@ -145,11 +145,9 @@ test('N7: the send-confirmation conversions dim on a stale price too', () => {
   );
 
   const { StyleSheet } = require('react-native');
-  const conversions = view
-    .getAllByText(/^\$ /)
-    .map(t => StyleSheet.flatten(t.props.style));
-  expect(conversions.length).toBeGreaterThan(0);
-  conversions.forEach(s => expect(s.color).toBe('#888888'));
+  const fiat = view.getByTestId('send.confirm.fiat');
+  expect(fiat).toHaveTextContent(/^\$\d/);
+  expect(StyleSheet.flatten(fiat.props.style).color).toBe('#888888');
 });
 
 test('H3: the USD-entry derived ZEC amount dims on a stale price', () => {

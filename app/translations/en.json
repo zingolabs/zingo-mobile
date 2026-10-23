@@ -568,7 +568,22 @@
     "memo-private": "Only the recipient can read it",
     "memo-count": "{n} / {max} bytes",
     "memo-add": "Add a memo",
-    "review": "Review"
+    "review": "Review",
+    "network-fee": "Network fee",
+    "total": "Total",
+    "sending-to": "Sending to {who}",
+    "confirm-nym": "Send through NYM",
+    "confirm-nym-all": "Send all through NYM",
+    "review-transparent": "This goes to a transparent address, so the amount and address are public.",
+    "step-build": "Building your transaction",
+    "step-proof": "Creating the private proof",
+    "step-nym": "Routing it through the NYM mixnet",
+    "sending-line": "{amount} ZEC to {who} · via NYM",
+    "sent-title": "Sent",
+    "sent-line": "{amount} ZEC to {who}",
+    "sent-body": "It’s on its way. It shows in History and confirms in about a minute.",
+    "done": "Done",
+    "view-transaction": "View transaction"
   },
   "receive": {
     "u-title": "Shielded",

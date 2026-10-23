@@ -1,197 +1,245 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useTheme } from '@app/theme';
-import BottomSheet, {
-  BottomSheetFooter,
-  BottomSheetFooterProps,
-} from '@gorhom/bottom-sheet';
+import Animated, {
+  ReduceMotion,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
+import { space20, useTheme } from '@app/theme';
 import ProgressState from '@ui/widgets/ProgressState';
 import RegText from '@ui/primitives/RegText';
+import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
-import AppSheet from '@ui/primitives/AppSheet';
+import ButtonStack from '@ui/primitives/ButtonStack';
+import FullPanel from '@ui/widgets/FullPanel';
+import SendFlight from '@ui/widgets/Flight/SendFlight';
+import SentMark from '@ui/widgets/Flight/SentMark';
 import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import Header from '@ui/widgets/Header';
 import { Route } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
-// Time spent on phase 1 ("Computing Transaction...") before swapping the
-// copy to phase 2 ("Hang on tight..."). The actual `sendTransaction` runs
-// in parallel — whichever finishes first (timer or send) decides what the
-// user sees.
-const PHASE1_DURATION_MS = 4000;
+/** How long each step of the send is told before the next one. */
+const STEP_MS = 1100;
+/** The fade between one step's words and the next. */
+const STEP_FADE_MS = 160;
+const STEPS = ['send.step-build', 'send.step-proof', 'send.step-nym'];
 
 type ComputingTxContentProps = NativeStackScreenProps<
   AppDrawerParamList,
   'Computing'
 >;
 
+/**
+ * A send, a shield or a removal on its way out. While it works, a paper
+ * plane flies through the mix nodes and the steps are told one by one, the
+ * last one staying until the send settles; done, the check draws itself
+ * with a sprout on it; failed, it says so with the details behind a tap.
+ */
 const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
   route,
 }) => {
   const navigation = useNavigation<WalletNavigation>();
-  const context = useContext(ContextAppLoaded);
-  const { translate } = context;
+  const { translate, valueTransfers } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
+  const { width } = useWindowDimensions();
+  const t = (key: string) => translate(key) as string;
 
-  const [containerH, setContainerH] = useState<number>(0);
-  const [headerH, setHeaderH] = useState<number>(0);
-  const [timerPhase, setTimerPhase] = useState<0 | 1>(0);
+  const [step, setStep] = useState<number>(0);
   const [showErrorDetails, setShowErrorDetails] = useState<boolean>(false);
-  const computingSheetRef = useRef<BottomSheet>(null);
+  const fade = useSharedValue(1);
 
-  const computingSnapPoints = useFullSheetSnapPoints(containerH, headerH);
-  const end = route.params;
-  const phase = end?.phase ?? 'computing';
-  const failure = end?.phase === 'failed' ? end.failure : undefined;
+  const params = route.params;
+  const phase = params?.phase ?? 'computing';
+  const failure = params?.phase === 'failed' ? params.failure : undefined;
+  const txid = params?.phase === 'created' ? params.txid : undefined;
+  const subject = params?.subject;
   const isCreated = phase === 'created';
   const isFailed = phase === 'failed';
-  const isTerminal = isCreated || isFailed;
 
-  // Swap the copy after PHASE1_DURATION_MS — only while still in the
-  // computing phase. If a terminal `phase` arrives before the timer
-  // fires, we drop the timer altogether.
   useEffect(() => {
-    if (isTerminal) {
+    if (phase !== 'computing' || step >= STEPS.length - 1) {
       return;
     }
-    const t = setTimeout(() => setTimerPhase(1), PHASE1_DURATION_MS);
-    return () => clearTimeout(t);
-  }, [isTerminal]);
+    let swap: ReturnType<typeof setTimeout> | undefined;
+    const timer = setTimeout(() => {
+      fade.value = withSequence(
+        withTiming(0, {
+          duration: STEP_FADE_MS,
+          reduceMotion: ReduceMotion.System,
+        }),
+        withTiming(1, {
+          duration: STEP_FADE_MS,
+          reduceMotion: ReduceMotion.System,
+        }),
+      );
+      swap = setTimeout(() => setStep(s => s + 1), STEP_FADE_MS);
+    }, STEP_MS);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(swap);
+    };
+  }, [phase, step, fade]);
+  const stepStyle = useAnimatedStyle(() => ({ opacity: fade.value }));
 
-  const onContinue = useCallback(() => {
-    navigation.navigate(Route.Home, {
-      screen: Route.History,
-    });
-  }, [navigation]);
+  const toHistory = () =>
+    navigation.navigate(Route.Home, { screen: Route.History });
+  const sent = txid
+    ? (valueTransfers ?? []).find(vt => vt.txid === txid)
+    : undefined;
+  /** The new transaction may not be listed yet; then History shows it soon. */
+  const viewTransaction = () =>
+    sent
+      ? navigation.navigate(Route.ValueTransferDetail, {
+          index: 0,
+          vt: sent,
+          valueTransfersSliced: [sent],
+          totalLength: 1,
+        })
+      : toHistory();
 
-  // Footer is rendered in every phase (with the same reserved height) so
-  // the BottomSheetView above always shrinks by the same amount, keeping
-  // the centered content at the exact same vertical position regardless
-  // of whether the button is visible.
-  const renderComputingFooter = useCallback(
-    (props: BottomSheetFooterProps) => (
-      <BottomSheetFooter {...props} bottomInset={0}>
-        <View
-          style={{
-            paddingHorizontal: 24,
-            backgroundColor: colors.bgSurface,
-            paddingTop: 10,
-            paddingBottom: 24,
-            minHeight: 82,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          {isTerminal && (
-            <Button
-              variant="primary"
-              title={translate('loadedapp.continue') as string}
-              onPress={onContinue}
-            />
-          )}
-        </View>
-      </BottomSheetFooter>
-    ),
-    [colors, isTerminal, onContinue, translate],
+  const line = (key: string) =>
+    subject
+      ? t(key).replace('{amount}', subject.amount).replace('{who}', subject.who)
+      : '';
+
+  const footer = isCreated ? (
+    <ButtonStack>
+      <Button
+        testID="computing.view"
+        variant="text"
+        title={t('send.view-transaction')}
+        onPress={viewTransaction}
+      />
+      <Button
+        testID="computing.done"
+        variant="primary"
+        title={t('send.done')}
+        onPress={toHistory}
+      />
+    </ButtonStack>
+  ) : isFailed ? (
+    <Button
+      variant="primary"
+      title={t('loadedapp.continue')}
+      onPress={toHistory}
+    />
+  ) : undefined;
+
+  const heading = (text: string) => (
+    <Text
+      testID="computing.title"
+      variant="subtitle"
+      style={{
+        marginTop: 28,
+        fontSize: 18,
+        lineHeight: 24,
+        textAlign: 'center',
+      }}
+    >
+      {text}
+    </Text>
+  );
+  const subline = (text: string) => (
+    <Text
+      variant="bodySmall"
+      tone="muted"
+      style={{ marginTop: 4, fontVariant: ['tabular-nums'] }}
+    >
+      {text}
+    </Text>
   );
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: colors.bgCanvas,
-      }}
-      onLayout={e => setContainerH(e.nativeEvent.layout.height)}
-    >
-      <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
-        <Header
-          title={''}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noPrivacy={true}
-          noUfvkIcon={true}
-        />
-      </View>
-      <AppSheet
-        ref={computingSheetRef}
-        snapPoints={computingSnapPoints}
-        renderFooter={renderComputingFooter}
-        contentStyle={{
-          paddingHorizontal: 24,
-          paddingTop: 106,
-          paddingBottom: 106,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <ProgressState
-          state={isCreated ? 'done' : isFailed ? 'failed' : 'working'}
-          title={
-            translate(
-              isCreated
-                ? 'loadedapp.transactioncreated-title'
-                : isFailed
-                  ? 'loadedapp.transactionfailed-title'
-                  : 'send.sending-title',
-            ) as string
-          }
-          body={
-            translate(
-              isCreated
-                ? 'loadedapp.transactioncreated-body'
-                : isFailed
-                  ? 'loadedapp.transactionfailed-body'
-                  : timerPhase === 0
-                    ? 'loadedapp.computingtx'
-                    : 'loadedapp.computingtx-hangon',
-            ) as string
-          }
-        />
-        {isFailed && failure !== undefined && (
-          <View style={{ marginTop: 16, alignItems: 'center' }}>
-            <TouchableOpacity
-              onPress={() => setShowErrorDetails(v => !v)}
-              hitSlop={8}
-            >
-              <RegText
-                style={{
-                  color: colors.fgDanger,
-                  textDecorationLine: 'underline',
-                }}
-              >
-                {translate('loadedapp.transactionfailed-details') as string}
-              </RegText>
-            </TouchableOpacity>
-            {showErrorDetails && (
-              <RegText
-                style={{
-                  marginTop: 10,
-                  textAlign: 'center',
-                  color: colors.fgMuted,
-                  fontSize: 12,
-                }}
-              >
-                {failure.kind === 'error'
-                  ? (translate(failure.errorKey) as string)
-                  : failure.text}
-              </RegText>
+    <FullPanel title="" center footer={footer} testID="computing">
+      <View style={{ alignItems: 'center' }}>
+        {isFailed ? (
+          <>
+            <ProgressState
+              state="failed"
+              title={t('loadedapp.transactionfailed-title')}
+              body={t('loadedapp.transactionfailed-body')}
+            />
+            {failure !== undefined && (
+              <View style={{ marginTop: 16, alignItems: 'center' }}>
+                <TouchableOpacity
+                  onPress={() => setShowErrorDetails(v => !v)}
+                  hitSlop={8}
+                >
+                  <RegText
+                    style={{
+                      color: colors.fgDanger,
+                      textDecorationLine: 'underline',
+                    }}
+                  >
+                    {t('loadedapp.transactionfailed-details')}
+                  </RegText>
+                </TouchableOpacity>
+                {showErrorDetails && (
+                  <RegText
+                    style={{
+                      marginTop: 10,
+                      textAlign: 'center',
+                      color: colors.fgMuted,
+                      fontSize: 12,
+                    }}
+                  >
+                    {failure.kind === 'error'
+                      ? t(failure.errorKey)
+                      : failure.text}
+                  </RegText>
+                )}
+              </View>
             )}
-          </View>
+          </>
+        ) : isCreated ? (
+          <>
+            <SentMark />
+            {heading(
+              subject
+                ? t('send.sent-title')
+                : t('loadedapp.transactioncreated-title'),
+            )}
+            {!!subject && subline(line('send.sent-line'))}
+            <Text
+              variant="caption"
+              tone="muted"
+              style={{ marginTop: 8, maxWidth: 270, textAlign: 'center' }}
+            >
+              {subject
+                ? t('send.sent-body')
+                : t('loadedapp.transactioncreated-body')}
+            </Text>
+          </>
+        ) : (
+          <>
+            <SendFlight width={width - space20 * 2} />
+            <Animated.View style={stepStyle}>
+              {heading(t(STEPS[step]))}
+            </Animated.View>
+            {!!subject && subline(line('send.sending-line'))}
+            <View style={{ flexDirection: 'row', columnGap: 6, marginTop: 20 }}>
+              {STEPS.map((key, index) => (
+                <View
+                  key={key}
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: 3,
+                    backgroundColor:
+                      index <= step ? colors.fgPriceUp : colors.sheetHandle,
+                  }}
+                />
+              ))}
+            </View>
+          </>
         )}
-      </AppSheet>
-    </View>
+      </View>
+    </FullPanel>
   );
 };
 
