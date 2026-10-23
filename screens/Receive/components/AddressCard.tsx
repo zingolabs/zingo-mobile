@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect } from 'react';
-import { Platform, Pressable, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Animated, {
   ReduceMotion,
@@ -8,7 +8,17 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import { radiusMd, radiusPill, slopFor, useTheme } from '@app/theme';
+import {
+  iconSizeMd,
+  iconSizeSm,
+  radiusMd,
+  radiusPill,
+  space8,
+  space12,
+  space16,
+  touchTarget,
+  useTheme,
+} from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   AddressKindEnum,
@@ -19,6 +29,8 @@ import Utils from '@app/utils';
 import { getZingoLogo } from '@app/utils/ZingoAppData';
 import Text from '@ui/primitives/Text';
 import Banner from '@ui/widgets/Banner';
+import Card from '@ui/widgets/Card';
+import Button from '@ui/primitives/Button';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
 import { CheckCircleLineIcon } from '@ui/primitives/Icons/CheckCircleLineIcon';
 import { EyeIcon } from '@ui/primitives/Icons/EyeIcon';
@@ -26,10 +38,8 @@ import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
 import { PinIcon } from '@ui/primitives/Icons/PinIcon';
 import { addressKindKey } from '@screens/Receive/addressKind';
 
-const MONO = Platform.select({ ios: 'Menlo', default: 'monospace' });
-/** The QR's light plate, and the code inside its padding. */
-const PLATE = 196;
-const PLATE_PAD = 12;
+/** The QR at the size the app always draws it, on its light plate. */
+const QR_SIZE = 200;
 
 /** The pin, green and tilted while the address is pinned. */
 export function PinButton({
@@ -63,19 +73,19 @@ export function PinButton({
       accessibilityLabel={
         translate(pinned ? 'receive.unpin-acc' : 'receive.pin-acc') as string
       }
-      hitSlop={slopFor(40)}
+
       onPress={onPress}
       style={({ pressed }) => ({
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        width: touchTarget,
+        height: touchTarget,
+        borderRadius: radiusPill,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: pressed ? colors.bgMutedSubtle : 'transparent',
       })}
     >
       <Animated.View style={style}>
-        <PinIcon size={18} color={color} filled={pinned} />
+        <PinIcon size={iconSizeMd} color={color} filled={pinned} />
       </Animated.View>
     </Pressable>
   );
@@ -114,192 +124,126 @@ export default function AddressCard({
   const transparent = address.addressKind === AddressKindEnum.t;
   const kindColor = transparent ? colors.fgTransparent : colors.fgAccent;
 
-  const action = (
-    testID: string,
-    label: string,
-    icon: React.ReactNode,
-    onPress: () => void,
-  ) => (
-    <Pressable
-      testID={testID}
-      accessibilityRole="button"
-      onPress={onPress}
-      style={({ pressed }) => ({
-        flex: 1,
-        height: 41,
-        borderRadius: radiusPill,
-        borderWidth: 1,
-        borderColor: colors.bottomSheetBorder,
-        backgroundColor: colors.bgCanvas,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        columnGap: 9,
-        transform: [{ scale: pressed ? 0.97 : 1 }],
-      })}
-    >
-      {icon}
-      <Text style={{ fontSize: 13, fontWeight: '700' }}>{label}</Text>
-    </Pressable>
-  );
-
   return (
-    <View>
-      <View
-        testID="receive.card"
-        style={{
-          marginTop: 4,
-          paddingTop: 16,
-          paddingBottom: 14,
-          borderRadius: radiusMd,
-          borderWidth: 1,
-          borderColor: colors.bottomSheetBorder,
-          backgroundColor: colors.bgCanvas,
-          alignItems: 'center',
-        }}
-      >
-        <View style={{ position: 'absolute', right: 8, top: 8 }}>
-          <PinButton
-            testID="receive.pin"
-            pinned={pinned}
-            onPress={onTogglePin}
-          />
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            columnGap: 6,
-            marginBottom: 14,
-          }}
-        >
-          {transparent ? (
-            <EyeIcon size={16} color={kindColor} />
-          ) : (
-            <ShieldIcon size={16} color={kindColor} />
-          )}
-          <Text
-            testID="receive.kind"
-            style={{
-              fontSize: 13,
-              lineHeight: 18,
-              fontWeight: '600',
-              color: kindColor,
-            }}
-          >
-            {t(addressKindKey(address))}
-          </Text>
-        </View>
-        <View
-          style={{
-            width: PLATE,
-            height: PLATE,
-            padding: PLATE_PAD,
-            borderRadius: 14,
-            backgroundColor: colors.fgDefault,
-          }}
-        >
-          <QRCode
-            value={address.address}
-            size={PLATE - PLATE_PAD * 2}
-            ecl="L"
-            backgroundColor={colors.fgDefault}
-            logo={getZingoLogo()}
-            logoSize={30}
-            logoBackgroundColor={colors.fgDefault}
-            logoBorderRadius={7}
-            logoMargin={3}
-          />
-        </View>
-        {tag ? (
-          <Text
-            testID="receive.tag"
-            numberOfLines={1}
-            style={{
-              marginTop: 12,
-              minHeight: 36,
-              lineHeight: 36,
-              fontSize: 14,
-              fontWeight: '600',
-              paddingHorizontal: 16,
-            }}
-          >
-            {tag}
-          </Text>
-        ) : (
-          <Pressable
-            testID="receive.add-tag"
-            accessibilityRole="button"
-            onPress={onAddTag}
-            style={({ pressed }) => ({
-              marginTop: 12,
-              minHeight: 36,
-              paddingHorizontal: 14,
-              borderRadius: 8,
-              justifyContent: 'center',
-              backgroundColor: pressed ? colors.bgMutedSubtle : 'transparent',
-            })}
-          >
-            <Text
+    <View style={{ gap: space16 }}>
+      <View testID="receive.card">
+        <Card>
+          <View style={{ alignItems: 'center', gap: space12 }}>
+            <View
               style={{
-                fontSize: 13,
-                fontWeight: '600',
-                textDecorationLine: 'underline',
-                textDecorationColor: colors.fgMuted,
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: space8,
               }}
             >
-              {t('receive.add-tag')}
-            </Text>
-          </Pressable>
-        )}
-        <Pressable
-          testID={
-            transparent
-              ? 'receive.transparent-address'
-              : 'receive.unified-address'
-          }
-          accessibilityRole="button"
-          accessibilityLabel={t('receive.copy-address-button')}
-          onPress={onCopy}
-          style={({ pressed }) => ({
-            marginTop: 6,
-            paddingHorizontal: 8,
-            paddingVertical: 2,
-            borderRadius: 8,
-            backgroundColor: pressed ? colors.bgMutedSubtle : 'transparent',
-          })}
-        >
-          <Text
-            style={{
-              fontFamily: MONO,
-              fontSize: 14,
-              lineHeight: 20,
-              fontWeight: '500',
-              letterSpacing: 0.2,
-            }}
-          >
-            {Utils.trimToSmall(address.address, 10)}
-          </Text>
-        </Pressable>
+              {transparent ? (
+                <EyeIcon size={iconSizeSm} color={kindColor} />
+              ) : (
+                <ShieldIcon size={iconSizeSm} color={kindColor} />
+              )}
+              <Text
+                testID="receive.kind"
+                variant="bodySmall"
+                color={kindColor}
+                style={{ fontWeight: '600' }}
+              >
+                {t(addressKindKey(address))}
+              </Text>
+            </View>
+            <View
+              style={{
+                padding: space12,
+                borderRadius: radiusMd,
+                backgroundColor: colors.fgDefault,
+              }}
+            >
+              <QRCode
+                value={address.address}
+                size={QR_SIZE}
+                ecl="L"
+                backgroundColor={colors.fgDefault}
+                logo={getZingoLogo()}
+                logoSize={30}
+                logoBackgroundColor={colors.fgDefault}
+                logoBorderRadius={7}
+                logoMargin={3}
+              />
+            </View>
+            {tag ? (
+              <Text
+                testID="receive.tag"
+                variant="bodyStrong"
+                numberOfLines={1}
+                style={{ minHeight: touchTarget, textAlignVertical: 'center' }}
+              >
+                {tag}
+              </Text>
+            ) : (
+              <Pressable
+                testID="receive.add-tag"
+                accessibilityRole="button"
+                onPress={onAddTag}
+                style={{ minHeight: touchTarget, justifyContent: 'center' }}
+              >
+                <Text
+                  variant="bodySmall"
+                  style={{
+                    fontWeight: '600',
+                    textDecorationLine: 'underline',
+                    textDecorationColor: colors.fgMuted,
+                  }}
+                >
+                  {t('receive.add-tag')}
+                </Text>
+              </Pressable>
+            )}
+            <Pressable
+              testID={
+                transparent
+                  ? 'receive.transparent-address'
+                  : 'receive.unified-address'
+              }
+              accessibilityRole="button"
+              accessibilityLabel={t('receive.copy-address-button')}
+              onPress={onCopy}
+              style={{ minHeight: touchTarget, justifyContent: 'center' }}
+            >
+              <Text variant="address">
+                {Utils.trimToSmall(address.address, 10)}
+              </Text>
+            </Pressable>
+          </View>
+          <View style={{ position: 'absolute', right: space8, top: space8 }}>
+            <PinButton
+              testID="receive.pin"
+              pinned={pinned}
+              onPress={onTogglePin}
+            />
+          </View>
+        </Card>
       </View>
-      <View style={{ flexDirection: 'row', columnGap: 11, marginTop: 14 }}>
-        {action(
-          'receive.copy',
-          t('receive.copy'),
-          <CopyIcon size={16} color={colors.fgDefault} />,
-          onCopy,
-        )}
-        {action(
-          'receive.verify',
-          t('verify'),
-          <CheckCircleLineIcon size={16} color={colors.fgDefault} />,
-          onVerify,
-        )}
+      <View style={{ flexDirection: 'row', gap: space12 }}>
+        <View style={{ flex: 1 }}>
+          <Button
+            testID="receive.copy"
+            variant="secondary"
+            icon={CopyIcon}
+            title={t('receive.copy')}
+            onPress={onCopy}
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Button
+            testID="receive.verify"
+            variant="secondary"
+            icon={CheckCircleLineIcon}
+            title={t('verify')}
+            onPress={onVerify}
+          />
+        </View>
       </View>
       {transparent && (
-        <View style={{ marginTop: 14 }}>
-          <Banner tone="warning" title={t('receive.transparent-public')} />
-        </View>
+        <Banner tone="warning" title={t('receive.transparent-public')} />
       )}
     </View>
   );

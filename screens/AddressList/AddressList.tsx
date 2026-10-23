@@ -1,9 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useRef, useState } from 'react';
-import { Keyboard, Platform, Pressable, View } from 'react-native';
+import { Keyboard, Pressable, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { slopFor, useTheme } from '@app/theme';
+import {
+  useTheme,
+  iconSizeMd,
+  radiusPill,
+  space4,
+  space8,
+  space20,
+  touchTarget,
+} from '@app/theme';
 import { AddressKindEnum, SnackbarDurationEnum } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
@@ -21,7 +29,6 @@ import { PinButton } from '@screens/Receive/components/AddressCard';
 import { addressKindKey } from '@screens/Receive/addressKind';
 import { OwnAddress, useOwnAddresses } from '@screens/Receive/ownAddresses';
 
-const MONO = Platform.select({ ios: 'Menlo', default: 'monospace' });
 /** Long enough for the radio to show the pick before the panel leaves. */
 const PICK_LEAVE_MS = 260;
 
@@ -100,13 +107,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
         }
         sub={
           <>
-            <Text
-              style={{
-                fontFamily: MONO,
-                fontSize: 12,
-                color: colors.fgDefault,
-              }}
-            >
+            <Text variant="address">
               {Utils.trimToSmall(address.address, 8)}
             </Text>
             {tag ? ` · ${kind}` : ''}
@@ -125,21 +126,20 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
               accessibilityLabel={t(
                 tag ? 'receive.edit-tag' : 'addressbook.add-tag',
               )}
-              hitSlop={slopFor(40)}
               onPress={() => openTag(address.address)}
               style={({ pressed }) => ({
-                width: 40,
-                height: 40,
-                borderRadius: 10,
+                width: touchTarget,
+                height: touchTarget,
+                borderRadius: radiusPill,
                 alignItems: 'center',
                 justifyContent: 'center',
                 backgroundColor: pressed ? colors.bgMutedSubtle : 'transparent',
               })}
             >
               {tag ? (
-                <PencilIcon size={16} color={colors.fgMuted} />
+                <PencilIcon size={iconSizeMd} color={colors.fgMuted} />
               ) : (
-                <TagIcon size={16} color={colors.fgMuted} />
+                <TagIcon size={iconSizeMd} color={colors.fgMuted} />
               )}
             </Pressable>
           </>
@@ -160,12 +160,12 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
         flexDirection: 'row',
         alignItems: 'baseline',
         justifyContent: 'space-between',
-        marginTop: 20,
-        marginBottom: 8,
-        marginHorizontal: 4,
+        marginTop: space20,
+        marginBottom: space8,
+        marginHorizontal: space4,
       }}
     >
-      <Text style={{ fontSize: 13, lineHeight: 18, fontWeight: '700' }}>
+      <Text variant="bodySmall" style={{ fontWeight: '700' }}>
         {title}
       </Text>
       <Text variant="caption" tone="muted">
@@ -180,11 +180,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
       onBack={close}
       testID="addresslist"
     >
-      <Text
-        variant="bodySmall"
-        tone="muted"
-        style={{ marginHorizontal: 2, marginTop: 4, lineHeight: 18 }}
-      >
+      <Text variant="bodySmall" tone="muted" style={{ marginTop: space4 }}>
         {t('receive.addresses-lead')}
       </Text>
       {group(

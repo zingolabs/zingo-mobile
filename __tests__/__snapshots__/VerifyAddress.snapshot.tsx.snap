@@ -16,7 +16,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
         "fontSize": 12,
         "fontWeight": "400",
         "lineHeight": 16,
-        "marginBottom": 6,
+        "marginBottom": 8,
         "marginHorizontal": 20,
         "textAlign": "center",
       }

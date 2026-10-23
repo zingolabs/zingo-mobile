@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
 import { View, Keyboard } from 'react-native';
-import { useTheme } from '@app/theme';
+import { space8, space20, useTheme } from '@app/theme';
 
 import { GlobalConst, SnackbarDurationEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
@@ -12,6 +12,7 @@ import { parseZcashURI } from '@app/uris';
 import Utils from '@app/utils';
 import TextInputAddress from '@ui/widgets/TextInputAddress';
 import FadeText from '@ui/primitives/FadeText';
+import Text from '@ui/primitives/Text';
 import { RPCCheckAddressType } from '@app/walletBackend/types/RPCCheckAddressType';
 import { VerifyCheckIcon } from '@ui/primitives/Icons/VerifyCheckIcon';
 import { VerifyXIcon } from '@ui/primitives/Icons/VerifyXIcon';
@@ -93,17 +94,17 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
         backgroundColor: colors.bgSurface,
       }}
     >
-      <FadeText
+      <Text
+        variant="caption"
+        tone="muted"
         style={{
           textAlign: 'center',
-          fontSize: 12,
-          lineHeight: 16,
-          marginHorizontal: 20,
-          marginBottom: 6,
+          marginHorizontal: space20,
+          marginBottom: space8,
         }}
       >
         {translate('receive.verify-sub') as string}
-      </FadeText>
+      </Text>
       <TextInputAddress
         address={address}
         setAddress={updateAddress}

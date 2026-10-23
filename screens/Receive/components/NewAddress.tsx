@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View, TextInput, Keyboard, TouchableOpacity } from 'react-native';
-import { useTheme, slopFor } from '@app/theme';
+import { View, Keyboard } from 'react-native';
+import { space8, space16, space20 } from '@app/theme';
 import {
   AddressBookFileClass,
   ReceiverEnum,
@@ -20,8 +20,7 @@ import { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddres
 import { RPCTransparentAddressType } from '@app/walletBackend/types/RPCTransparentAddressType';
 import Utils from '@app/utils';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
-import { fieldBorder } from '@ui/primitives/fieldBorder';
-import { XIcon } from '@ui/primitives/Icons/XIcon';
+import TextField from '@ui/primitives/TextField';
 
 type NewKind = 'orchard' | 'orchardSapling' | 'sapling' | 'transparent';
 
@@ -77,11 +76,9 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar } = context;
-  const { colors } = useTheme();
   const t = (key: string) => translate(key) as string;
 
   const [label, setLabel] = useState<string>('');
-  const [focused, setFocused] = useState(false);
   const [kind, setKind] = useState<NewKind>('orchard');
   const [creating, setCreating] = useState(false);
 
@@ -121,17 +118,13 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
   };
 
   return (
-    <View testID="receive.new-sheet" style={{ paddingHorizontal: 20 }}>
-      <Text
-        variant="caption"
-        tone="muted"
-        style={{ textAlign: 'center', lineHeight: 16 }}
-      >
+    <View testID="receive.new-sheet" style={{ paddingHorizontal: space20 }}>
+      <Text variant="caption" tone="muted" style={{ textAlign: 'center' }}>
         {t('receive.new-sub')}
       </Text>
       <Text
         variant="caption"
-        style={{ fontWeight: '600', marginTop: 16, marginBottom: 8 }}
+        style={{ fontWeight: '600', marginTop: space16, marginBottom: space8 }}
       >
         {t('receive.new-type')}
       </Text>
@@ -155,61 +148,24 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
           />
         ))}
       </RadioList>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          marginTop: 16,
-          marginBottom: 8,
-        }}
-      >
-        <Text variant="caption" style={{ fontWeight: '600' }}>
-          {t('addressbook.tag')}
-        </Text>
-        <Text variant="caption" tone="muted">
-          {t('receive.optional')}
-        </Text>
-      </View>
-      <View
-        style={{
-          borderWidth: 1,
-          borderRadius: 12,
-          borderColor: fieldBorder(colors, focused),
-          backgroundColor: colors.bgSurface,
-          minHeight: 48,
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}
-      >
-        <TextInput
+      <View style={{ marginTop: space16 }}>
+        <TextField
           testID="receive.new-tag"
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          style={{
-            color: colors.fgDefault,
-            fontWeight: '600',
-            fontSize: 15,
-            flex: 1,
-            minHeight: 48,
-            paddingHorizontal: 12,
-          }}
+          label={t('addressbook.tag')}
+          labelRight={
+            <Text variant="caption" tone="muted">
+              {t('receive.optional')}
+            </Text>
+          }
           placeholder={t('receive.tag-placeholder')}
-          placeholderTextColor={colors.fgMuted}
           value={label}
           onChangeText={setLabel}
           maxLength={50}
+          clearable
+          clearLabel={t('clear')}
         />
-        {!!label && (
-          <TouchableOpacity hitSlop={slopFor(20)} onPress={() => setLabel('')}>
-            <XIcon
-              style={{ marginRight: 10 }}
-              size={20}
-              color={colors.fgMuted}
-            />
-          </TouchableOpacity>
-        )}
       </View>
-      <View style={{ marginTop: 20 }}>
+      <View style={{ marginTop: space20 }}>
         <ButtonStack>
           <Button
             variant="quiet"

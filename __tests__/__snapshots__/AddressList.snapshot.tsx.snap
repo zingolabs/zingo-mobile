@@ -201,7 +201,6 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
           "fontSize": 13,
           "fontWeight": "400",
           "lineHeight": 18,
-          "marginHorizontal": 2,
           "marginTop": 4,
         }
       }
@@ -305,13 +304,13 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             {
               "alignItems": "center",
               "backgroundColor": "transparent",
-              "columnGap": 13,
+              "columnGap": 12,
               "flex": 1,
               "flexDirection": "row",
               "minHeight": 56,
-              "paddingLeft": 14,
+              "paddingLeft": 16,
               "paddingRight": 0,
-              "paddingVertical": 10,
+              "paddingVertical": 12,
             }
           }
           testID="addresslist.row.UA-orchard-sapling12345678901234567890"
@@ -355,7 +354,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               style={
                 {
                   "alignItems": "center",
-                  "columnGap": 7,
+                  "columnGap": 8,
                   "flexDirection": "row",
                 }
               }
@@ -367,9 +366,9 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                   {
                     "color": "#c3c3c3",
                     "flexShrink": 1,
-                    "fontSize": 13,
+                    "fontSize": 15,
                     "fontWeight": "600",
-                    "lineHeight": 18,
+                    "lineHeight": 21,
                   }
                 }
               >
@@ -381,10 +380,9 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               style={
                 {
                   "color": "#888888",
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "400",
-                  "lineHeight": 16,
-                  "marginTop": 2,
+                  "lineHeight": 18,
                 }
               }
             >
@@ -394,8 +392,9 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                   {
                     "color": "#c3c3c3",
                     "fontFamily": "Menlo",
-                    "fontSize": 12,
+                    "fontSize": 13,
                     "fontWeight": "400",
+                    "lineHeight": 18,
                   }
                 }
               >
@@ -409,7 +408,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             {
               "alignItems": "center",
               "flexDirection": "row",
-              "paddingRight": 6,
+              "paddingRight": 4,
             }
           }
         >
@@ -436,14 +435,6 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
-            hitSlop={
-              {
-                "bottom": 2,
-                "left": 2,
-                "right": 2,
-                "top": 2,
-              }
-            }
             onBlur={[Function]}
             onClick={[Function]}
             onFocus={[Function]}
@@ -457,10 +448,10 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               {
                 "alignItems": "center",
                 "backgroundColor": "transparent",
-                "borderRadius": 20,
-                "height": 40,
+                "borderRadius": 999,
+                "height": 44,
                 "justifyContent": "center",
-                "width": 40,
+                "width": 44,
               }
             }
           >
@@ -491,14 +482,6 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
-            hitSlop={
-              {
-                "bottom": 2,
-                "left": 2,
-                "right": 2,
-                "top": 2,
-              }
-            }
             onBlur={[Function]}
             onClick={[Function]}
             onFocus={[Function]}
@@ -512,10 +495,10 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               {
                 "alignItems": "center",
                 "backgroundColor": "transparent",
-                "borderRadius": 10,
-                "height": 40,
+                "borderRadius": 999,
+                "height": 44,
                 "justifyContent": "center",
-                "width": 40,
+                "width": 44,
               }
             }
           />
@@ -566,13 +549,13 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             {
               "alignItems": "center",
               "backgroundColor": "transparent",
-              "columnGap": 13,
+              "columnGap": 12,
               "flex": 1,
               "flexDirection": "row",
               "minHeight": 56,
-              "paddingLeft": 14,
+              "paddingLeft": 16,
               "paddingRight": 0,
-              "paddingVertical": 10,
+              "paddingVertical": 12,
             }
           }
           testID="addresslist.row.UA-sapling-12345678901234567890"
@@ -616,7 +599,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               style={
                 {
                   "alignItems": "center",
-                  "columnGap": 7,
+                  "columnGap": 8,
                   "flexDirection": "row",
                 }
               }
@@ -628,9 +611,9 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                   {
                     "color": "#c3c3c3",
                     "flexShrink": 1,
-                    "fontSize": 13,
+                    "fontSize": 15,
                     "fontWeight": "600",
-                    "lineHeight": 18,
+                    "lineHeight": 21,
                   }
                 }
               >
@@ -642,10 +625,9 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               style={
                 {
                   "color": "#888888",
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "400",
-                  "lineHeight": 16,
-                  "marginTop": 2,
+                  "lineHeight": 18,
                 }
               }
             >
@@ -655,8 +637,9 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                   {
                     "color": "#c3c3c3",
                     "fontFamily": "Menlo",
-                    "fontSize": 12,
+                    "fontSize": 13,
                     "fontWeight": "400",
+                    "lineHeight": 18,
                   }
                 }
               >
@@ -670,7 +653,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             {
               "alignItems": "center",
               "flexDirection": "row",
-              "paddingRight": 6,
+              "paddingRight": 4,
             }
           }
         >
@@ -697,14 +680,6 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
-            hitSlop={
-              {
-                "bottom": 2,
-                "left": 2,
-                "right": 2,
-                "top": 2,
-              }
-            }
             onBlur={[Function]}
             onClick={[Function]}
             onFocus={[Function]}
@@ -718,10 +693,10 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               {
                 "alignItems": "center",
                 "backgroundColor": "transparent",
-                "borderRadius": 20,
-                "height": 40,
+                "borderRadius": 999,
+                "height": 44,
                 "justifyContent": "center",
-                "width": 40,
+                "width": 44,
               }
             }
           >
@@ -752,14 +727,6 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
-            hitSlop={
-              {
-                "bottom": 2,
-                "left": 2,
-                "right": 2,
-                "top": 2,
-              }
-            }
             onBlur={[Function]}
             onClick={[Function]}
             onFocus={[Function]}
@@ -773,10 +740,10 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               {
                 "alignItems": "center",
                 "backgroundColor": "transparent",
-                "borderRadius": 10,
-                "height": 40,
+                "borderRadius": 999,
+                "height": 44,
                 "justifyContent": "center",
-                "width": 40,
+                "width": 44,
               }
             }
           />
@@ -827,13 +794,13 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             {
               "alignItems": "center",
               "backgroundColor": "transparent",
-              "columnGap": 13,
+              "columnGap": 12,
               "flex": 1,
               "flexDirection": "row",
               "minHeight": 56,
-              "paddingLeft": 14,
+              "paddingLeft": 16,
               "paddingRight": 0,
-              "paddingVertical": 10,
+              "paddingVertical": 12,
             }
           }
           testID="addresslist.row.UA-orchard-12345678901234567890"
@@ -877,7 +844,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               style={
                 {
                   "alignItems": "center",
-                  "columnGap": 7,
+                  "columnGap": 8,
                   "flexDirection": "row",
                 }
               }
@@ -889,9 +856,9 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                   {
                     "color": "#c3c3c3",
                     "flexShrink": 1,
-                    "fontSize": 13,
+                    "fontSize": 15,
                     "fontWeight": "600",
-                    "lineHeight": 18,
+                    "lineHeight": 21,
                   }
                 }
               >
@@ -903,10 +870,9 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               style={
                 {
                   "color": "#888888",
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "400",
-                  "lineHeight": 16,
-                  "marginTop": 2,
+                  "lineHeight": 18,
                 }
               }
             >
@@ -916,8 +882,9 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                   {
                     "color": "#c3c3c3",
                     "fontFamily": "Menlo",
-                    "fontSize": 12,
+                    "fontSize": 13,
                     "fontWeight": "400",
+                    "lineHeight": 18,
                   }
                 }
               >
@@ -931,7 +898,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             {
               "alignItems": "center",
               "flexDirection": "row",
-              "paddingRight": 6,
+              "paddingRight": 4,
             }
           }
         >
@@ -958,14 +925,6 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
-            hitSlop={
-              {
-                "bottom": 2,
-                "left": 2,
-                "right": 2,
-                "top": 2,
-              }
-            }
             onBlur={[Function]}
             onClick={[Function]}
             onFocus={[Function]}
@@ -979,10 +938,10 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               {
                 "alignItems": "center",
                 "backgroundColor": "transparent",
-                "borderRadius": 20,
-                "height": 40,
+                "borderRadius": 999,
+                "height": 44,
                 "justifyContent": "center",
-                "width": 40,
+                "width": 44,
               }
             }
           >
@@ -1013,14 +972,6 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
-            hitSlop={
-              {
-                "bottom": 2,
-                "left": 2,
-                "right": 2,
-                "top": 2,
-              }
-            }
             onBlur={[Function]}
             onClick={[Function]}
             onFocus={[Function]}
@@ -1034,10 +985,10 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               {
                 "alignItems": "center",
                 "backgroundColor": "transparent",
-                "borderRadius": 10,
-                "height": 40,
+                "borderRadius": 999,
+                "height": 44,
                 "justifyContent": "center",
-                "width": 40,
+                "width": 44,
               }
             }
           />
@@ -1141,13 +1092,13 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             {
               "alignItems": "center",
               "backgroundColor": "transparent",
-              "columnGap": 13,
+              "columnGap": 12,
               "flex": 1,
               "flexDirection": "row",
               "minHeight": 56,
-              "paddingLeft": 14,
+              "paddingLeft": 16,
               "paddingRight": 0,
-              "paddingVertical": 10,
+              "paddingVertical": 12,
             }
           }
           testID="addresslist.row.transparent-1-12345678901234567890"
@@ -1191,7 +1142,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               style={
                 {
                   "alignItems": "center",
-                  "columnGap": 7,
+                  "columnGap": 8,
                   "flexDirection": "row",
                 }
               }
@@ -1203,9 +1154,9 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                   {
                     "color": "#c3c3c3",
                     "flexShrink": 1,
-                    "fontSize": 13,
+                    "fontSize": 15,
                     "fontWeight": "600",
-                    "lineHeight": 18,
+                    "lineHeight": 21,
                   }
                 }
               >
@@ -1242,10 +1193,9 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               style={
                 {
                   "color": "#888888",
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "400",
-                  "lineHeight": 16,
-                  "marginTop": 2,
+                  "lineHeight": 18,
                 }
               }
             >
@@ -1255,8 +1205,9 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                   {
                     "color": "#c3c3c3",
                     "fontFamily": "Menlo",
-                    "fontSize": 12,
+                    "fontSize": 13,
                     "fontWeight": "400",
+                    "lineHeight": 18,
                   }
                 }
               >
@@ -1270,7 +1221,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             {
               "alignItems": "center",
               "flexDirection": "row",
-              "paddingRight": 6,
+              "paddingRight": 4,
             }
           }
         >
@@ -1297,14 +1248,6 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
-            hitSlop={
-              {
-                "bottom": 2,
-                "left": 2,
-                "right": 2,
-                "top": 2,
-              }
-            }
             onBlur={[Function]}
             onClick={[Function]}
             onFocus={[Function]}
@@ -1318,10 +1261,10 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               {
                 "alignItems": "center",
                 "backgroundColor": "transparent",
-                "borderRadius": 20,
-                "height": 40,
+                "borderRadius": 999,
+                "height": 44,
                 "justifyContent": "center",
-                "width": 40,
+                "width": 44,
               }
             }
           >
@@ -1352,14 +1295,6 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
-            hitSlop={
-              {
-                "bottom": 2,
-                "left": 2,
-                "right": 2,
-                "top": 2,
-              }
-            }
             onBlur={[Function]}
             onClick={[Function]}
             onFocus={[Function]}
@@ -1373,10 +1308,10 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               {
                 "alignItems": "center",
                 "backgroundColor": "transparent",
-                "borderRadius": 10,
-                "height": 40,
+                "borderRadius": 999,
+                "height": 44,
                 "justifyContent": "center",
-                "width": 40,
+                "width": 44,
               }
             }
           />
@@ -1427,13 +1362,13 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             {
               "alignItems": "center",
               "backgroundColor": "transparent",
-              "columnGap": 13,
+              "columnGap": 12,
               "flex": 1,
               "flexDirection": "row",
               "minHeight": 56,
-              "paddingLeft": 14,
+              "paddingLeft": 16,
               "paddingRight": 0,
-              "paddingVertical": 10,
+              "paddingVertical": 12,
             }
           }
           testID="addresslist.row.transparent-2-12345678901234567890"
@@ -1477,7 +1412,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               style={
                 {
                   "alignItems": "center",
-                  "columnGap": 7,
+                  "columnGap": 8,
                   "flexDirection": "row",
                 }
               }
@@ -1489,9 +1424,9 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                   {
                     "color": "#c3c3c3",
                     "flexShrink": 1,
-                    "fontSize": 13,
+                    "fontSize": 15,
                     "fontWeight": "600",
-                    "lineHeight": 18,
+                    "lineHeight": 21,
                   }
                 }
               >
@@ -1528,10 +1463,9 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               style={
                 {
                   "color": "#888888",
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "400",
-                  "lineHeight": 16,
-                  "marginTop": 2,
+                  "lineHeight": 18,
                 }
               }
             >
@@ -1541,8 +1475,9 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                   {
                     "color": "#c3c3c3",
                     "fontFamily": "Menlo",
-                    "fontSize": 12,
+                    "fontSize": 13,
                     "fontWeight": "400",
+                    "lineHeight": 18,
                   }
                 }
               >
@@ -1556,7 +1491,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             {
               "alignItems": "center",
               "flexDirection": "row",
-              "paddingRight": 6,
+              "paddingRight": 4,
             }
           }
         >
@@ -1583,14 +1518,6 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
-            hitSlop={
-              {
-                "bottom": 2,
-                "left": 2,
-                "right": 2,
-                "top": 2,
-              }
-            }
             onBlur={[Function]}
             onClick={[Function]}
             onFocus={[Function]}
@@ -1604,10 +1531,10 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               {
                 "alignItems": "center",
                 "backgroundColor": "transparent",
-                "borderRadius": 20,
-                "height": 40,
+                "borderRadius": 999,
+                "height": 44,
                 "justifyContent": "center",
-                "width": 40,
+                "width": 44,
               }
             }
           >
@@ -1638,14 +1565,6 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
-            hitSlop={
-              {
-                "bottom": 2,
-                "left": 2,
-                "right": 2,
-                "top": 2,
-              }
-            }
             onBlur={[Function]}
             onClick={[Function]}
             onFocus={[Function]}
@@ -1659,10 +1578,10 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               {
                 "alignItems": "center",
                 "backgroundColor": "transparent",
-                "borderRadius": 10,
-                "height": 40,
+                "borderRadius": 999,
+                "height": 44,
                 "justifyContent": "center",
-                "width": 40,
+                "width": 44,
               }
             }
           />

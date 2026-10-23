@@ -5,6 +5,7 @@ import {
   fieldMinHeight,
   fontScaleBody,
   iconSize,
+  iconSizeMd,
   radiusMd,
   space12,
   space4,
@@ -17,6 +18,7 @@ import { useInsetFill } from './Surface';
 import Text from './Text';
 import { fieldBorder, FieldValidity } from './fieldBorder';
 import { Icon } from './Icons/Icon';
+import { XIcon } from './Icons/XIcon';
 
 type TextFieldProps = {
   /** Above the box; '' for a field whose label sits elsewhere. */
@@ -40,6 +42,9 @@ type TextFieldProps = {
   trailingIcon?: React.ComponentType<React.ComponentProps<typeof Icon>>;
   trailingLabel?: string;
   onTrailingPress?: () => void;
+  /** An X that empties the field while it holds something. */
+  clearable?: boolean;
+  clearLabel?: string;
   /** Several actions inside the box (paste, book, scan), each a 44 pt target. */
   trailing?: React.ReactNode;
   /** Shown in the box instead of the input: a picked contact's token. */
@@ -78,6 +83,8 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
   trailingLabel,
   onTrailingPress,
   trailing,
+  clearable = false,
+  clearLabel,
   replacement,
   footer,
   onFocus,
@@ -156,7 +163,7 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
             style={{
               flex: 1,
               paddingVertical: space8,
-              paddingRight: TrailingIcon || trailing ? 0 : space12,
+              paddingRight: TrailingIcon || trailing || clearable ? 0 : space12,
               color: colors.fgDefault,
               fontSize: valueStyle.fontSize,
               fontWeight: valueStyle.fontWeight,
@@ -178,6 +185,21 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
             }}
           >
             <TrailingIcon size={iconSize} color={colors.fgMuted} />
+          </Pressable>
+        )}
+        {clearable && !!value && !disabled && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={clearLabel}
+            onPress={() => onChangeText('')}
+            style={{
+              width: touchTarget,
+              height: touchTarget,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <XIcon size={iconSizeMd} color={colors.fgMuted} />
           </Pressable>
         )}
         {trailing}

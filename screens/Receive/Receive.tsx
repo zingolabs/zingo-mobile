@@ -270,7 +270,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
         numberOfLines={1}
         style={{
           flex: 1,
-          fontSize: 15,
+          fontSize: 16,
           lineHeight: 28,
           textAlign: 'center',
         }}
