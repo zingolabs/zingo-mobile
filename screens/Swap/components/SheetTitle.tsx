@@ -1,8 +1,5 @@
-/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { Pressable, View } from 'react-native';
-import { slopFor, space16, useTheme, iconSize, space8 } from '@app/theme';
-import Text from '@ui/primitives/Text';
+import TitleBar from '@ui/widgets/TitleBar';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 
@@ -15,7 +12,7 @@ type SheetTitleProps = {
   backLabel?: string;
 };
 
-/** The header of a swap sheet: an optional back, the title, a close. */
+/** The header of a swap sheet: the shared TitleBar with an optional back and a close. */
 export default function SheetTitle({
   title,
   onClose,
@@ -23,47 +20,20 @@ export default function SheetTitle({
   onBack,
   backLabel,
 }: SheetTitleProps) {
-  const { colors } = useTheme();
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingTop: space8,
-        paddingBottom: space8,
-        paddingHorizontal: space16,
-      }}
-    >
-      <View style={{ width: 44, alignItems: 'flex-start' }}>
-        {!!onBack && (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={backLabel}
-            hitSlop={slopFor(24)}
-            onPress={onBack}
-          >
-            <ChevronLeft size={iconSize} color={colors.fgAccent} />
-          </Pressable>
-        )}
-      </View>
-      <Text
-        variant="subtitle"
-        numberOfLines={1}
-        style={{ flex: 1, textAlign: 'center' }}
-      >
-        {title}
-      </Text>
-      <View style={{ width: 44, alignItems: 'flex-end' }}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={closeLabel}
-          hitSlop={slopFor(24)}
-          onPress={onClose}
-        >
-          <XIcon size={iconSize} color={colors.fgDefault} />
-        </Pressable>
-      </View>
-    </View>
+    <TitleBar
+      title={title}
+      left={
+        onBack
+          ? {
+              icon: ChevronLeft,
+              accent: true,
+              accessibilityLabel: backLabel ?? '',
+              onPress: onBack,
+            }
+          : undefined
+      }
+      right={{ icon: XIcon, accessibilityLabel: closeLabel, onPress: onClose }}
+    />
   );
 }

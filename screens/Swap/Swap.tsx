@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useMemo, useRef, useState } from 'react';
+import TitleBar from '@ui/widgets/TitleBar';
 import {
   Platform,
   Pressable,
@@ -10,14 +11,11 @@ import {
 import Animated from 'react-native-reanimated';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import {
-  slopFor,
   space12,
   space16,
-  space20,
   space4,
   space8,
   useTheme,
-  iconSize,
   iconSizeSm,
   radiusPill,
 } from '@app/theme';
@@ -325,51 +323,34 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
   };
 
   const sheetHeader = (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingTop: space16,
-        paddingBottom: space8,
-        paddingHorizontal: space20,
+    <TitleBar
+      title={translate('swap.title') as string}
+      left={{
+        icon: SlidersIcon,
+        testID: 'swap.settings',
+        accessibilityLabel: translate('swap.settings-acc') as string,
+        onPress: () => settingsSheetRef.current?.present(),
+        badge:
+          form.slippageBps !== DEFAULT_SLIPPAGE_BPS ? (
+            <View
+              style={{
+                width: 8,
+                height: 8,
+                marginLeft: -3,
+                marginTop: -8,
+                borderRadius: radiusPill,
+                backgroundColor: colors.bgAccent,
+              }}
+            />
+          ) : undefined,
       }}
-    >
-      <Pressable
-        testID="swap.settings"
-        accessibilityRole="button"
-        accessibilityLabel={translate('swap.settings-acc') as string}
-        hitSlop={slopFor(24)}
-        onPress={() => settingsSheetRef.current?.present()}
-      >
-        <SlidersIcon size={iconSize} color={colors.fgDefault} />
-        {form.slippageBps !== DEFAULT_SLIPPAGE_BPS && (
-          <View
-            style={{
-              position: 'absolute',
-              top: -2,
-              right: -4,
-              width: 8,
-              height: 8,
-              borderRadius: radiusPill,
-              backgroundColor: colors.bgAccent,
-            }}
-          />
-        )}
-      </Pressable>
-      <Text variant="subtitle" style={{ flex: 1, textAlign: 'center' }}>
-        {translate('swap.title') as string}
-      </Text>
-      <Pressable
-        testID="swap.history"
-        accessibilityRole="button"
-        accessibilityLabel={translate('swap.history-acc') as string}
-        hitSlop={slopFor(24)}
-        onPress={() => historySheetRef.current?.present()}
-      >
-        <HistoryIcon size={iconSize} color={colors.fgDefault} />
-      </Pressable>
-    </View>
+      right={{
+        icon: HistoryIcon,
+        testID: 'swap.history',
+        accessibilityLabel: translate('swap.history-acc') as string,
+        onPress: () => historySheetRef.current?.present(),
+      }}
+    />
   );
 
   return (

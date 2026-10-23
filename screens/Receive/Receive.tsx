@@ -7,22 +7,16 @@ import React, {
   useMemo,
   useCallback,
 } from 'react';
-import {
-  Keyboard,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
+import TitleBar from '@ui/widgets/TitleBar';
+import { Keyboard, ScrollView, StyleSheet, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
-import { slopFor, space20, useTheme, iconSizeMd } from '@app/theme';
+import { space20 } from '@app/theme';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import { HomeTabScreenProps, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
-import BoldText from '@ui/primitives/BoldText';
 import RegText from '@ui/primitives/RegText';
 import AppSheet from '@ui/primitives/AppSheet';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
@@ -68,7 +62,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
     addLastSnackbar,
     setPrivacyOption,
   } = context;
-  const { colors } = useTheme();
   const t = (key: string) => translate(key) as string;
 
   const [sheetType, setSheetType] = useState<SheetType | null>(null);
@@ -255,76 +248,29 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
         : '';
 
   const xHeader = (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingTop: 8,
-        paddingBottom: 8,
-        paddingHorizontal: 16,
-      }}
-    >
-      <View style={{ width: 48 }} />
-      <BoldText
-        numberOfLines={1}
-        style={{
-          flex: 1,
-          fontSize: 16,
-          lineHeight: 28,
-          textAlign: 'center',
-        }}
-      >
-        {modalTitle}
-      </BoldText>
-      <Pressable
-        onPress={hide}
-        hitSlop={8}
-        style={{ paddingHorizontal: 16, paddingVertical: 4 }}
-      >
-        <XIcon size={iconSizeMd} color={colors.fgMuted} />
-      </Pressable>
-    </View>
+    <TitleBar
+      title={modalTitle}
+      right={{ icon: XIcon, accessibilityLabel: t('close'), onPress: hide }}
+    />
   );
 
   const receiveHeader = (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingTop: 8,
-        paddingBottom: 8,
-        paddingHorizontal: 16,
+    <TitleBar
+      title={t('receive.title')}
+      left={{
+        icon: ListIcon,
+        testID: 'receive.addresses',
+        accessibilityLabel: t('receive.your-addresses'),
+        onPress: () =>
+          navigation.navigate(Route.AddressList, { current: current?.address }),
       }}
-    >
-      <Pressable
-        testID="receive.addresses"
-        accessibilityRole="button"
-        accessibilityLabel={t('receive.your-addresses')}
-        hitSlop={slopFor(24)}
-        onPress={() =>
-          navigation.navigate(Route.AddressList, { current: current?.address })
-        }
-        style={{ paddingHorizontal: 16, paddingVertical: 4 }}
-      >
-        <ListIcon size={iconSizeMd} color={colors.fgMuted} />
-      </Pressable>
-      <BoldText
-        style={{ flex: 1, textAlign: 'center', fontSize: 16, lineHeight: 28 }}
-      >
-        {t('receive.title')}
-      </BoldText>
-      <Pressable
-        testID="receive.new"
-        accessibilityRole="button"
-        accessibilityLabel={t('receive.new-title')}
-        onPress={() => show('NA')}
-        hitSlop={slopFor(24)}
-        style={{ paddingHorizontal: 16, paddingVertical: 4 }}
-      >
-        <PlusIcon size={iconSizeMd} color={colors.fgMuted} />
-      </Pressable>
-    </View>
+      right={{
+        icon: PlusIcon,
+        testID: 'receive.new',
+        accessibilityLabel: t('receive.new-title'),
+        onPress: () => show('NA'),
+      }}
+    />
   );
 
   return (

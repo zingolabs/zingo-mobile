@@ -7,6 +7,7 @@ import React, {
   useRef,
   useMemo,
 } from 'react';
+import TitleBar from '@ui/widgets/TitleBar';
 import {
   View,
   ScrollView,
@@ -35,7 +36,6 @@ import {
 import TextField from '@ui/primitives/TextField';
 import { getNumberFormatSettings } from 'react-native-localize';
 
-import BoldText from '@ui/primitives/BoldText';
 import {
   sendGateOpen,
   shownStatusKey,
@@ -334,37 +334,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
     );
   }, [priceRowH, sendSnapPoints]);
 
-  const sendHeader = (
-    <View
-      style={{
-        paddingTop: 8,
-        paddingBottom: 6,
-        paddingHorizontal: 16,
-      }}
-    >
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <View style={{ width: 28 }} />
-        <BoldText
-          numberOfLines={1}
-          style={{
-            flex: 1,
-            fontSize: 16,
-            lineHeight: 28,
-            textAlign: 'center',
-          }}
-        >
-          {translate('send.title') as string}
-        </BoldText>
-        <View style={{ width: 28 }} />
-      </View>
-    </View>
-  );
+  const sendHeader = <TitleBar title={translate('send.title') as string} />;
 
   const defaultValueFee = (): void => {
     setFee(0);
@@ -1045,36 +1015,14 @@ const Send: React.FunctionComponent<SendProps> = () => {
   };
 
   const memoHeader = (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingTop: 8,
-        paddingBottom: 6,
-        paddingHorizontal: 16,
+    <TitleBar
+      title={translate('send.memo') as string}
+      right={{
+        icon: XIcon,
+        accessibilityLabel: translate('close') as string,
+        onPress: () => memoBottomSheetRef.current?.dismiss(),
       }}
-    >
-      <View style={{ width: 48 }} />
-      <BoldText
-        numberOfLines={1}
-        style={{
-          flex: 1,
-          fontSize: 16,
-          lineHeight: 28,
-          textAlign: 'center',
-        }}
-      >
-        {translate('send.memo') as string}
-      </BoldText>
-      <Pressable
-        onPress={() => memoBottomSheetRef.current?.dismiss()}
-        hitSlop={8}
-        style={{ paddingHorizontal: 14, paddingVertical: 4 }}
-      >
-        <XIcon size={20} color={colors.fgMuted} />
-      </Pressable>
-    </View>
+    />
   );
 
   const setConfirmModalShow = async () => {

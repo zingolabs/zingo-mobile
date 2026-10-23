@@ -1,17 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useRef, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import TitleBar from '@ui/widgets/TitleBar';
+import { View } from 'react-native';
 import BottomSheet, {
   BottomSheetFooter,
   BottomSheetFooterProps,
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
-import { slopFor, space16, space20, useTheme, iconSize } from '@app/theme';
+import { space20, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import Header from '@ui/widgets/Header';
 import AppSheet from '@ui/primitives/AppSheet';
-import Text from '@ui/primitives/Text';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 
@@ -52,50 +52,30 @@ export default function FullPanel({
   const snapPoints = useFullSheetSnapPoints(containerH, headerH);
 
   const sheetHeader = (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingTop: 12,
-        paddingBottom: 8,
-        paddingHorizontal: space16,
-      }}
-    >
-      <View style={{ width: 44, alignItems: 'flex-start' }}>
-        {!!onBack && (
-          <Pressable
-            testID={`${testID ?? 'swap.flow'}.back`}
-            accessibilityRole="button"
-            accessibilityLabel={translate('swap.back') as string}
-            hitSlop={slopFor(24)}
-            onPress={onBack}
-          >
-            <ChevronLeft size={iconSize} color={colors.fgAccent} />
-          </Pressable>
-        )}
-      </View>
-      <Text
-        variant="subtitle"
-        numberOfLines={1}
-        style={{ flex: 1, textAlign: 'center' }}
-      >
-        {title}
-      </Text>
-      <View style={{ width: 44, alignItems: 'flex-end' }}>
-        {!!onClose && (
-          <Pressable
-            testID={`${testID ?? 'swap.flow'}.close`}
-            accessibilityRole="button"
-            accessibilityLabel={translate('swap.close') as string}
-            hitSlop={slopFor(24)}
-            onPress={onClose}
-          >
-            <XIcon size={iconSize} color={colors.fgDefault} />
-          </Pressable>
-        )}
-      </View>
-    </View>
+    <TitleBar
+      title={title}
+      left={
+        onBack
+          ? {
+              icon: ChevronLeft,
+              accent: true,
+              testID: `${testID ?? 'swap.flow'}.back`,
+              accessibilityLabel: translate('swap.back') as string,
+              onPress: onBack,
+            }
+          : undefined
+      }
+      right={
+        onClose
+          ? {
+              icon: XIcon,
+              testID: `${testID ?? 'swap.flow'}.close`,
+              accessibilityLabel: translate('swap.close') as string,
+              onPress: onClose,
+            }
+          : undefined
+      }
+    />
   );
 
   const renderFooter = useCallback(

@@ -7,6 +7,7 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
+import TitleBar from '@ui/widgets/TitleBar';
 import {
   View,
   RefreshControl,
@@ -32,7 +33,6 @@ import {
 } from '@app/AppState';
 import { HomeTabNavigation, HomeTabScreenProps } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
-import BoldText from '@ui/primitives/BoldText';
 import AppSheet from '@ui/primitives/AppSheet';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import RingBorder from '@ui/primitives/RingBorder';
@@ -764,48 +764,18 @@ const History: React.FunctionComponent<HistoryProps> = () => {
   };
 
   const historyHeader = (
-    <View
-      onLayout={e => setHandleH(e.nativeEvent.layout.height)}
-      style={{
-        paddingTop: 8,
-        paddingBottom: 6,
-        paddingHorizontal: 16,
-      }}
-    >
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <View style={{ width: 48 }} />
-        <BoldText
-          numberOfLines={1}
-          style={{
-            flex: 1,
-            fontSize: 16,
-            lineHeight: 28,
-            textAlign: 'center',
-          }}
-        >
-          {translate('history.title') as string}
-        </BoldText>
-        <Pressable
-          onPress={() => {
-            setShowFilters(true);
-            bottomSheetRef.current?.present();
-          }}
-          hitSlop={8}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            paddingHorizontal: 14,
-            paddingVertical: 4,
-          }}
-        >
-          <FiltersIcon color={colors.fgMuted} size={20} />
-          {(!!filterKind || filterFailed || filterMemos || filterWithFunds) && (
+    <TitleBar
+      title={translate('history.title') as string}
+      onLayout={setHandleH}
+      right={{
+        icon: FiltersIcon,
+        accessibilityLabel: translate('history.filters') as string,
+        onPress: () => {
+          setShowFilters(true);
+          bottomSheetRef.current?.present();
+        },
+        badge:
+          !!filterKind || filterFailed || filterMemos || filterWithFunds ? (
             <View
               testID="history.filter.dot"
               style={{
@@ -819,49 +789,23 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                 borderColor: colors.bgSurface,
               }}
             />
-          )}
-        </Pressable>
-      </View>
-    </View>
+          ) : undefined,
+      }}
+    />
   );
 
   /** The one filter on, for the bar over the list. */
   const activeFilter = filterOf(filterKind, filterFailed, filterMemos);
 
   const filtersXHeader = (
-    <View
-      style={{
-        paddingTop: 8,
-        paddingBottom: 6,
-        paddingHorizontal: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+    <TitleBar
+      title={translate('history.filters') as string}
+      right={{
+        icon: XIcon,
+        accessibilityLabel: translate('close') as string,
+        onPress: () => bottomSheetRef.current?.dismiss(),
       }}
-    >
-      <View style={{ width: 48 }} />
-      <BoldText
-        numberOfLines={1}
-        style={{
-          flex: 1,
-          fontSize: 16,
-          lineHeight: 28,
-          textAlign: 'center',
-        }}
-      >
-        {translate('history.filters') as string}
-      </BoldText>
-      <Pressable
-        onPress={() => bottomSheetRef.current?.dismiss()}
-        hitSlop={8}
-        style={{
-          paddingHorizontal: 14,
-          paddingVertical: 4,
-        }}
-      >
-        <XIcon size={20} color={colors.fgMuted} />
-      </Pressable>
-    </View>
+    />
   );
 
   const hide = useCallback(() => {
