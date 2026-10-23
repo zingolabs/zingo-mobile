@@ -78,6 +78,7 @@ import FreshGlow from './components/FreshGlow';
 import { useFreshRows } from './useFreshRows';
 import { FiltersIcon } from '@ui/primitives/Icons/FiltersIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { onTabScrollY } from '@app/navigation/tabBarScroll';
 import { ChevronUp } from '@ui/primitives/Icons/Chevron';
 
 /** How long a finished backup keeps its green pill before the card leaves. */
@@ -676,6 +677,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
   const handleScroll = useCallback(
     (_rawEvent: ScrollEvent, _offsetX: number, offsetY: number) => {
       setPinnedMonth(monthAt(historyItemsRef.current, offsetY));
+      onTabScrollY(offsetY);
       const isTop = offsetY <= 100;
 
       // If we're scrolling to top and we've reached the top, stop the scrolling state

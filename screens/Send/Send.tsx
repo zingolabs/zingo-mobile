@@ -89,6 +89,7 @@ import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendableba
 import { fieldBorder } from '@ui/primitives/fieldBorder';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
+import { onTabScroll } from '@app/navigation/tabBarScroll';
 import { ZoomInIcon } from '@ui/primitives/Icons/ZoomInIcon';
 
 type SendProps = HomeTabScreenProps<'Send'>;
@@ -1172,6 +1173,8 @@ const Send: React.FunctionComponent<SendProps> = () => {
           header={sendHeader}
         >
           <ScrollView
+            onScroll={onTabScroll}
+            scrollEventThrottle={16}
             ref={scrollViewRef}
             onContentSizeChange={(_, height) => setContentHeight(height)}
             keyboardShouldPersistTaps="handled"
@@ -1491,9 +1494,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                       style={{
                         textAlign: 'right',
                         marginTop: 4,
-                        color: memoTooLong
-                          ? colors.fgDanger
-                          : colors.fgMuted,
+                        color: memoTooLong ? colors.fgDanger : colors.fgMuted,
                       }}
                     >
                       {(translate('send.memo-count') as string)

@@ -44,6 +44,7 @@ import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { ListIcon } from '@ui/primitives/Icons/ListIcon';
 import { PlusIcon } from '@ui/primitives/Icons/PlusIcon';
 import { useOwnAddresses } from './ownAddresses';
+import { onTabScroll } from '@app/navigation/tabBarScroll';
 import { useReceiveSelection } from './useReceiveSelection';
 
 type ReceiveProps = HomeTabScreenProps<'Receive'>;
@@ -367,6 +368,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
             header={receiveHeader}
           >
             <ScrollView
+              onScroll={onTabScroll}
+              scrollEventThrottle={16}
               bounces={false}
               alwaysBounceVertical={false}
               contentContainerStyle={{

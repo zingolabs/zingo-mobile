@@ -1,155 +1,252 @@
-import React, { useContext, useEffect, useRef } from 'react';
-import { Animated, Easing, Pressable, StyleSheet, View } from 'react-native';
+import React, { useContext, useEffect } from 'react';
+import { Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import Animated, {
+  ReduceMotion,
+  interpolate,
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+  type SharedValue,
+} from 'react-native-reanimated';
 import {
   BottomTabBarHeightCallbackContext,
   BottomTabBarProps,
 } from '@react-navigation/bottom-tabs';
 import { TabActions } from '@react-navigation/native';
-import { useTheme, themeTokens } from '@app/theme';
+import { themeTokens } from '@app/theme';
+import { duration, ease } from '@app/theme/motion';
 import { Route } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
-import Text from '@ui/primitives/Text';
 import {
   HomeTabIcon,
   ReceiveTabIcon,
   SendTabIcon,
   SwapTabIcon,
 } from '@ui/primitives/Icons/TabIcons';
+import { expandTabBar, tabBarCompact } from './tabBarScroll';
 
-const ICON_SIZE = 24;
-const BUBBLE_V_MARGIN = 4;
-const TAB_WIDTH = 80;
-const TAB_V_PADDING = 7;
-const PILL_BG = themeTokens.bgTabBar;
-const PILL_BORDER = themeTokens.bottomSheetBorder;
-const WRAPPER_PADDING_BOTTOM = 25;
+/**
+ * The tab bar is the one place drawn at the prototype's own values (the
+ * designer's exception): its size, the 28 pt marks and the 11 pt names.
+ */
+const FULL = {
+  width: 366,
+  height: 66,
+  pad: 5,
+  radius: 33,
+  capsule: 28,
+  bottom: 22,
+};
+const SHRUNK = {
+  width: 250,
+  height: 50,
+  pad: 4,
+  radius: 25,
+  capsule: 21,
+  bottom: 26,
+};
+const ICON = 28;
+const NAME_H = 14;
+const NAME_GAP = 3;
+const PRESSED = 0.88;
+const SHRUNK_ICON = 0.86;
+/** The bar keeps this gutter on a narrow phone. */
+const GUTTER = 16;
 const FADE_COLORS = ['transparent', themeTokens.bgScrim];
 
-/** Each tab's mark and the catalog key of its name. */
-function tabOf(routeName: string): { icon: React.ReactElement; label: string } {
+const idle = {
+  color: themeTokens.fgTabIdle,
+  leaf: themeTokens.fgTabIdle,
+  vein: themeTokens.bgTabBar,
+};
+const selected = {
+  color: themeTokens.fgTabSelected,
+  leaf: themeTokens.fgAccent,
+  vein: themeTokens.bottomSheetBorder,
+};
+
+type Paint = typeof idle;
+
+/** Each tab's mark, drawn in the given colours, and the catalog key of its name. */
+function tabOf(routeName: string): {
+  icon: (paint: Paint) => React.ReactElement;
+  label: string;
+} {
   if (routeName === Route.History) {
     return {
-      icon: <HomeTabIcon size={ICON_SIZE} />,
+      icon: paint => <HomeTabIcon size={ICON} {...paint} />,
       label: 'loadedapp.tab-home',
     };
   }
   if (routeName === Route.Send) {
     return {
-      icon: <SendTabIcon size={ICON_SIZE} />,
+      icon: paint => <SendTabIcon size={ICON} {...paint} />,
       label: 'loadedapp.tab-send',
     };
   }
   if (routeName === Route.Swap) {
     return {
-      icon: <SwapTabIcon size={ICON_SIZE} />,
+      icon: paint => <SwapTabIcon size={ICON} {...paint} />,
       label: 'loadedapp.tab-swap',
     };
   }
   return {
-    icon: <ReceiveTabIcon size={ICON_SIZE} />,
+    icon: paint => <ReceiveTabIcon size={ICON} {...paint} />,
     label: 'loadedapp.tab-receive',
   };
 }
 
+const colorMotion = {
+  duration: duration.tabColor,
+  easing: ease.standard,
+  reduceMotion: ReduceMotion.System,
+};
+const barMotion = {
+  duration: duration.tabBar,
+  easing: ease.emphasized,
+  reduceMotion: ReduceMotion.System,
+};
+
+/** One tab: the mark over its name, its colours fading between the two states. */
+const Tab = ({
+  routeName,
+  focused,
+  label,
+  onPress,
+  onLongPress,
+  testID,
+}: {
+  routeName: string;
+  focused: boolean;
+  label: string;
+  onPress: () => void;
+  onLongPress: () => void;
+  testID: string;
+}) => {
+  const tab = tabOf(routeName);
+  const on = useSharedValue(focused ? 1 : 0);
+  const press = useSharedValue(1);
+  useEffect(() => {
+    on.value = withTiming(focused ? 1 : 0, colorMotion);
+  }, [focused, on]);
+
+  const icon = useAnimatedStyle(() => ({
+    transform: [
+      {
+        scale:
+          press.value *
+          interpolate(tabBarCompact.value, [0, 1], [1, SHRUNK_ICON]),
+      },
+    ],
+  }));
+  const onLayer = useAnimatedStyle(() => ({ opacity: on.value }));
+  const name = useAnimatedStyle(() => ({
+    color: interpolateColor(on.value, [0, 1], [idle.color, selected.leaf]),
+    opacity: 1 - tabBarCompact.value,
+    height: NAME_H * (1 - tabBarCompact.value),
+    marginTop: NAME_GAP * (1 - tabBarCompact.value),
+  }));
+
+  return (
+    <Pressable
+      testID={testID}
+      style={styles.tab}
+      onPressIn={() => {
+        press.value = withTiming(PRESSED, { duration: duration.fast });
+      }}
+      onPressOut={() => {
+        press.value = withTiming(1, { duration: duration.fast });
+      }}
+      onPress={onPress}
+      onLongPress={onLongPress}
+      accessibilityRole="tab"
+      accessibilityLabel={label}
+      accessibilityState={{ selected: focused }}
+    >
+      <Animated.View style={icon}>
+        {tab.icon(idle)}
+        <Animated.View style={[StyleSheet.absoluteFill, onLayer]}>
+          {tab.icon(selected)}
+        </Animated.View>
+      </Animated.View>
+      <Animated.Text numberOfLines={1} style={[styles.name, name]}>
+        {label}
+      </Animated.Text>
+    </Pressable>
+  );
+};
+
+/** The sliding capsule under the selected tab. */
+const Capsule = ({
+  index,
+  count,
+  widthFull,
+}: {
+  index: SharedValue<number>;
+  count: number;
+  widthFull: number;
+}) => {
+  const style = useAnimatedStyle(() => {
+    const c = tabBarCompact.value;
+    const width = interpolate(c, [0, 1], [widthFull, SHRUNK.width]);
+    const pad = interpolate(c, [0, 1], [FULL.pad, SHRUNK.pad]);
+    const height = interpolate(c, [0, 1], [FULL.height, SHRUNK.height]);
+    const tabW = (width - 2 - pad * 2) / count;
+    return {
+      left: pad + tabW * index.value,
+      top: pad,
+      width: tabW,
+      height: height - 2 - pad * 2,
+      borderRadius: interpolate(c, [0, 1], [FULL.capsule, SHRUNK.capsule]),
+    };
+  });
+  return <Animated.View pointerEvents="none" style={[styles.capsule, style]} />;
+};
+
+/**
+ * The floating tab bar: Home, Send, Receive and Swap, each mark over its
+ * name, with one capsule sliding to the selected tab. Scrolling a tab's
+ * list down shrinks it; scrolling up or changing tab brings it back.
+ */
 const CustomTabBar = ({
   state,
   navigation,
 }: BottomTabBarProps): React.ReactElement => {
   const reportHeight = useContext(BottomTabBarHeightCallbackContext);
   const { translate } = useContext(ContextAppLoaded);
-  // The marks carry the accent green themselves, so the active tab sits on
-  // a quiet bubble and only its name turns green.
-  const { colors } = useTheme();
+  const { width: screenW } = useWindowDimensions();
+  const widthFull = Math.min(FULL.width, screenW - GUTTER * 2);
+  const count = state.routes.length;
 
-  const bubbleAnimsRef = useRef<Record<string, Animated.Value> | null>(null);
-  if (!bubbleAnimsRef.current) {
-    bubbleAnimsRef.current = Object.fromEntries(
-      state.routes.map((r, i) => [
-        r.key,
-        new Animated.Value(i === state.index ? 1 : 0),
-      ]),
-    );
-  }
-  const bubbleAnims = bubbleAnimsRef.current;
+  const index = useSharedValue(state.index);
+  const selectedKey = state.routes[state.index]?.key;
+  useEffect(() => {
+    index.value = withTiming(state.index, barMotion);
+    expandTabBar();
+  }, [selectedKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const pressAnimsRef = useRef<Record<string, Animated.Value> | null>(null);
-  if (!pressAnimsRef.current) {
-    pressAnimsRef.current = Object.fromEntries(
-      state.routes.map(r => [r.key, new Animated.Value(1)]),
-    );
-  }
-  const pressAnims = pressAnimsRef.current;
-
-  // Backfill animation slots SYNCHRONOUSLY for any newly added route.key.
-  // This used to live in a useEffect, but useEffect runs after the render —
-  // so the first render after a mode toggle (which can produce a different
-  // set of Tab.Screen routes with new keys) tried to read
-  // bubbleAnims[route.key] before the effect populated it, crashing inside
-  // Animated.View with "Cannot read property 'getValue' of undefined".
-  state.routes.forEach(r => {
-    if (!bubbleAnims[r.key]) {
-      bubbleAnims[r.key] = new Animated.Value(
-        r.key === state.routes[state.index]?.key ? 1 : 0,
-      );
-    }
-    if (!pressAnims[r.key]) pressAnims[r.key] = new Animated.Value(1);
+  const bar = useAnimatedStyle(() => {
+    const c = tabBarCompact.value;
+    return {
+      width: interpolate(c, [0, 1], [widthFull, SHRUNK.width]),
+      height: interpolate(c, [0, 1], [FULL.height, SHRUNK.height]),
+      padding: interpolate(c, [0, 1], [FULL.pad, SHRUNK.pad]),
+      borderRadius: interpolate(c, [0, 1], [FULL.radius, SHRUNK.radius]),
+      marginBottom: interpolate(c, [0, 1], [FULL.bottom, SHRUNK.bottom]),
+    };
   });
 
-  // Track the currently-selected route by its KEY, not by index. When the
-  // tab list shrinks (e.g. mode toggle removes the Send tab while the
-  // active index stays 0), React Navigation reassigns index 0 to the next
-  // remaining route — but `state.index` stays equal to 0, so depending on
-  // it alone never re-fires the effect, leaving the new active tab with a
-  // bubble value of 0 and the removed-but-still-cached one at 1.
-  const selectedRouteKey = state.routes[state.index]?.key;
-  useEffect(() => {
-    Animated.parallel(
-      state.routes.map((r, i) =>
-        Animated.timing(bubbleAnims[r.key], {
-          toValue: i === state.index ? 1 : 0,
-          duration: 220,
-          easing: Easing.out(Easing.quad),
-          useNativeDriver: true,
-        }),
-      ),
-    ).start();
-  }, [selectedRouteKey]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handlePressIn = (key: string) => {
-    Animated.timing(pressAnims[key], {
-      toValue: 0.85,
-      duration: 100,
-      easing: Easing.out(Easing.quad),
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const handlePressOut = (key: string) => {
-    Animated.timing(pressAnims[key], {
-      toValue: 1,
-      duration: 150,
-      easing: Easing.out(Easing.quad),
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const handlePress = (
-    route: (typeof state.routes)[number],
-    isFocused: boolean,
-  ) => {
+  const press = (route: (typeof state.routes)[number], focused: boolean) => {
     const event = navigation.emit({
       type: 'tabPress',
       target: route.key,
       canPreventDefault: true,
     });
-    if (!isFocused && !event.defaultPrevented) {
+    if (!focused && !event.defaultPrevented) {
       navigation.dispatch(TabActions.jumpTo(route.name));
     }
-  };
-
-  const handleLongPress = (route: (typeof state.routes)[number]) => {
-    navigation.emit({ type: 'tabLongPress', target: route.key });
   };
 
   return (
@@ -159,55 +256,31 @@ const CustomTabBar = ({
         style={StyleSheet.absoluteFill}
         pointerEvents="none"
       />
-      <View onLayout={e => reportHeight?.(e.nativeEvent.layout.height)}>
-        <View style={styles.pill}>
-          {state.routes.map((route, index) => {
-            const isFocused = index === state.index;
-            const tab = tabOf(route.name);
-            const label = translate(tab.label) as string;
+      {/* The space the full bar takes, reported once; shrinking floats inside it. */}
+      <View
+        style={styles.slot}
+        pointerEvents="box-none"
+        onLayout={e => reportHeight?.(e.nativeEvent.layout.height)}
+      >
+        <Animated.View style={[styles.bar, bar]}>
+          <Capsule index={index} count={count} widthFull={widthFull} />
+          {state.routes.map((route, i) => {
+            const focused = i === state.index;
             return (
-              <Pressable
+              <Tab
                 key={route.key}
                 testID={`tab.${route.name.toLowerCase()}`}
-                style={styles.tabItem}
-                onPressIn={() => handlePressIn(route.key)}
-                onPressOut={() => handlePressOut(route.key)}
-                onPress={() => handlePress(route, isFocused)}
-                onLongPress={() => handleLongPress(route)}
-                accessibilityRole="tab"
-                accessibilityLabel={label}
-                accessibilityState={{ selected: isFocused }}
-              >
-                <Animated.View
-                  style={[
-                    styles.bubble,
-                    { backgroundColor: colors.bgMutedSubtle },
-                    { transform: [{ scale: bubbleAnims[route.key] }] },
-                  ]}
-                />
-                <Animated.View
-                  style={[
-                    styles.tabContent,
-                    { transform: [{ scale: pressAnims[route.key] }] },
-                  ]}
-                >
-                  {tab.icon}
-                  <Text
-                    numberOfLines={1}
-                    style={[
-                      styles.label,
-                      {
-                        color: isFocused ? colors.fgAccent : colors.fgDefault,
-                      },
-                    ]}
-                  >
-                    {label}
-                  </Text>
-                </Animated.View>
-              </Pressable>
+                routeName={route.name}
+                focused={focused}
+                label={translate(tabOf(route.name).label) as string}
+                onPress={() => press(route, focused)}
+                onLongPress={() =>
+                  navigation.emit({ type: 'tabLongPress', target: route.key })
+                }
+              />
             );
           })}
-        </View>
+        </Animated.View>
       </View>
     </View>
   );
@@ -220,41 +293,33 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     alignItems: 'center',
-    paddingBottom: WRAPPER_PADDING_BOTTOM,
   },
-  pill: {
+  slot: {
+    height: FULL.height + FULL.bottom,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  bar: {
     flexDirection: 'row',
-    alignSelf: 'center',
-    backgroundColor: PILL_BG,
-    borderRadius: 999,
+    backgroundColor: themeTokens.bgTabBar,
     borderWidth: 1,
-    borderColor: PILL_BORDER,
-    paddingVertical: BUBBLE_V_MARGIN,
-    paddingHorizontal: BUBBLE_V_MARGIN,
-    overflow: 'hidden',
+    borderColor: themeTokens.borderTabBar,
+    boxShadow: `0 10px 30px ${themeTokens.shadowTabBar}`,
   },
-  tabItem: {
-    width: TAB_WIDTH,
-    paddingVertical: TAB_V_PADDING,
+  capsule: {
+    position: 'absolute',
+    backgroundColor: themeTokens.bgTabCapsule,
+  },
+  tab: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  tabContent: {
-    alignItems: 'center',
-  },
-  label: {
-    marginTop: 3,
+  name: {
     fontSize: 11,
-    lineHeight: 14,
+    lineHeight: NAME_H,
     fontWeight: '600',
-  },
-  bubble: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    borderRadius: 999,
+    overflow: 'hidden',
   },
 });
 

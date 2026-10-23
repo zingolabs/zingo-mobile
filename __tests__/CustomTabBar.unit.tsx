@@ -16,7 +16,6 @@ import {
   defaultAppContextLoaded,
 } from '@app/context';
 import { Route } from '@app/AppState';
-import { themeTokens } from '@app/theme';
 import CustomTabBar from '@app/navigation/CustomTabBar';
 
 const routes = [Route.History, Route.Send, Route.Receive, Route.Swap].map(
@@ -50,13 +49,14 @@ describe('CustomTabBar', () => {
     );
   });
 
-  test('Tests that only the active tab name is green when a tab is selected', () => {
+  test('Tests that only the active tab is marked selected when a tab is selected', () => {
     const { view } = tabBar(3);
-    const { StyleSheet } = require('react-native');
-    const color = (key: string) =>
-      StyleSheet.flatten(view.getByText(key).props.style).color;
-    expect(color('loadedapp.tab-swap')).toBe(themeTokens.fgAccent);
-    expect(color('loadedapp.tab-home')).toBe(themeTokens.fgDefault);
+    expect(view.getByTestId('tab.swap').props.accessibilityState).toEqual({
+      selected: true,
+    });
+    expect(view.getByTestId('tab.history').props.accessibilityState).toEqual({
+      selected: false,
+    });
   });
 
   test('Tests that tapping another tab jumps to it when it is pressed', () => {

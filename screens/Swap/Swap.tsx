@@ -73,6 +73,7 @@ import SwapSettingsSheet from './components/SwapSettingsSheet';
 import SwapHistorySheet, { swapPairLabel } from './components/SwapHistorySheet';
 import { tokenToSwapAsset } from './swapAssets';
 import { useCoinPrice } from './useCoinPrice';
+import { onTabScroll } from '@app/navigation/tabBarScroll';
 import InsufficientFundsSheet from './components/InsufficientFundsSheet';
 
 type SwapProps = HomeTabScreenProps<'Swap'>;
@@ -389,6 +390,8 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
         >
           <AppSheet ref={sheetRef} snapPoints={snapPoints} header={sheetHeader}>
             <ScrollView
+              onScroll={onTabScroll}
+              scrollEventThrottle={16}
               keyboardShouldPersistTaps="handled"
               testID="swap.scroll-view"
               contentContainerStyle={{

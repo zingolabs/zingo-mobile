@@ -467,6 +467,8 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
         contentContainerStyle={{}}
         keyboardShouldPersistTaps="handled"
         onContentSizeChange={[Function]}
+        onScroll={[Function]}
+        scrollEventThrottle={16}
         testID="send.scroll-view"
       >
         <View>
@@ -1846,6 +1848,8 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
         contentContainerStyle={{}}
         keyboardShouldPersistTaps="handled"
         onContentSizeChange={[Function]}
+        onScroll={[Function]}
+        scrollEventThrottle={16}
         testID="send.scroll-view"
       >
         <View>
