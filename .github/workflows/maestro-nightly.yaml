@@ -99,10 +99,11 @@ jobs:
     runs-on: macos-15
 
     steps:
-      - name: Xcode 16.4
+      # Pinned to the Xcode of the release machine.
+      - name: Xcode 26.3
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.4'
+          xcode-version: '26.3'
 
       - name: Checkout repository
         uses: actions/checkout@v7
