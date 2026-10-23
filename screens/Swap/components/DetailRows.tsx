@@ -2,7 +2,7 @@
 import React, { useContext } from 'react';
 import { Pressable, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { radiusMd, space12, useTheme } from '@app/theme';
+import { radiusMd, space12, useTheme, iconSizeSm } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import Text from '@ui/primitives/Text';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
@@ -57,8 +57,8 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
             alignItems: 'center',
             columnGap: space12,
             minHeight: 44,
-            paddingVertical: 10,
-            paddingHorizontal: 14,
+            paddingVertical: 12,
+            paddingHorizontal: 16,
             borderTopWidth: index === 0 ? 0 : 1,
             borderTopColor: colors.borderSubtle,
           }}
@@ -92,7 +92,6 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
                 flexShrink: 1,
                 textAlign: 'right',
                 fontWeight: '600',
-                fontSize: 12,
                 color: toneColor(row.tone),
               }}
             >
@@ -101,7 +100,7 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
             {!!row.badge && (
               <Text
                 variant="bodySmall"
-                style={{ fontWeight: '600', fontSize: 12, color: colors.bgNym }}
+                style={{ fontWeight: '600', color: colors.bgNym }}
               >
                 {row.badge}
               </Text>
@@ -124,7 +123,7 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
                   justifyContent: 'center',
                 }}
               >
-                <CopyIcon size={16} color={colors.fgMuted} />
+                <CopyIcon size={iconSizeSm} color={colors.fgMuted} />
               </Pressable>
             )}
           </View>

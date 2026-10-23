@@ -13,6 +13,7 @@ import {
 import Text from '@ui/primitives/Text';
 import Radio from '@ui/primitives/Radio';
 import Tag from '@ui/widgets/Tag';
+import { useInsetFill } from '@ui/primitives/Surface';
 
 /** A pool or a recommendation beside a row's title. */
 export type PillTone = 'accent' | 'transparent';
@@ -26,6 +27,7 @@ export function RadioList({
   testID?: string;
 }) {
   const { colors } = useTheme();
+  const inset = useInsetFill();
   return (
     <View
       testID={testID}
@@ -34,7 +36,7 @@ export function RadioList({
         borderRadius: radiusMd,
         borderWidth: 1,
         borderColor: colors.bottomSheetBorder,
-        backgroundColor: colors.bgCanvas,
+        backgroundColor: inset,
         overflow: 'hidden',
       }}
     >
@@ -50,6 +52,8 @@ type RadioRowProps = {
   sub?: React.ReactNode;
   selected: boolean;
   onPress: () => void;
+  /** A coin's or a chain's logo, after the radio. */
+  leading?: React.ReactNode;
   /** Buttons at the end of the row, outside its own press. */
   trailing?: React.ReactNode;
   first?: boolean;
@@ -63,6 +67,7 @@ export default function RadioRow({
   sub,
   selected,
   onPress,
+  leading,
   trailing,
   first,
   testID,
@@ -95,6 +100,7 @@ export default function RadioRow({
         })}
       >
         <Radio selected={selected} />
+        {leading}
         <View style={{ flex: 1, minWidth: 0 }}>
           <View
             style={{

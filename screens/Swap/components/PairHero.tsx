@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { View } from 'react-native';
-import { useTheme } from '@app/theme';
+import { useTheme, iconSizeMd } from '@app/theme';
 import type { SwapAssetType } from '@app/swap';
 import Text from '@ui/primitives/Text';
 import { ChevronRight } from '@ui/primitives/Icons/Chevron';
@@ -40,7 +40,6 @@ export default function PairHero({
           style={{
             color: colors.bgNym,
             fontWeight: '600',
-            letterSpacing: 0.7,
             textTransform: 'uppercase',
             marginBottom: 12,
           }}
@@ -56,7 +55,7 @@ export default function PairHero({
           size={44}
           surfaceColor={colors.bgSurface}
         />
-        <ChevronRight size={18} color={colors.fgMuted} />
+        <ChevronRight size={iconSizeMd} color={colors.fgMuted} />
         <TokenLogo
           token={tokenEntryOf(to)}
           size={44}
@@ -71,24 +70,17 @@ export default function PairHero({
         {title}
       </Text>
       <Text
-        style={{
-          marginTop: 12,
-          fontSize: 36,
-          lineHeight: 40,
-          fontWeight: '700',
-          fontVariant: ['tabular-nums'],
-          color: colors.fgAccent,
-        }}
+        variant="balance"
+        color={colors.fgAccent}
+        style={{ marginTop: 12, fontVariant: ['tabular-nums'] }}
       >
         {amount}
-        <Text
-          style={{ fontSize: 18, color: colors.fgMuted }}
-        >{` ${unit}`}</Text>
+        <Text variant="subtitle" tone="muted">{` ${unit}`}</Text>
       </Text>
       <Text
         variant="bodySmall"
         tone="muted"
-        style={{ marginTop: 2, textAlign: 'center' }}
+        style={{ marginTop: 4, textAlign: 'center' }}
       >
         {line}
       </Text>

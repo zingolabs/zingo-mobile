@@ -2,7 +2,7 @@
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { space8, useTheme } from '@app/theme';
+import { space8, useTheme, iconSizeSm } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import { Route } from '@app/AppState';
 import { ContextAppLoaded, useSwapService } from '@app/context';
@@ -398,11 +398,11 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
-          columnGap: 6,
-          marginTop: 14,
+          columnGap: 8,
+          marginTop: 16,
         }}
       >
-        <ClockIcon size={14} color={colors.fgMuted} />
+        <ClockIcon size={iconSizeSm} color={colors.fgMuted} />
         <Text variant="caption" tone="muted">
           {translate('swap.review-price-fixed') as string}
         </Text>

@@ -3,7 +3,15 @@ import React, { useCallback, useContext, useState } from 'react';
 import { View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { radiusMd, space12, space16, space8, useTheme } from '@app/theme';
+import {
+  radiusMd,
+  space12,
+  space16,
+  space8,
+  useTheme,
+  radiusPill,
+  iconSize,
+} from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import { Route } from '@app/AppState';
 import { ContextAppLoaded, useSwapService } from '@app/context';
@@ -29,6 +37,9 @@ import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
 import { swapOutcome } from '@screens/Swap/swapProgress';
+
+/** The result's mark: a 48 circle with a 24 icon, as a large Avatar. */
+const HEAD = 48;
 
 type SwapResultProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -111,9 +122,9 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
       <View style={{ alignItems: 'center', rowGap: space16 }}>
         <View
           style={{
-            width: 84,
-            height: 84,
-            borderRadius: 42,
+            width: HEAD,
+            height: HEAD,
+            borderRadius: radiusPill,
             backgroundColor: paint.bg,
             borderWidth: 1,
             borderColor: paint.edge,
@@ -156,7 +167,7 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
             flexDirection: 'row',
             justifyContent: 'space-between',
             columnGap: space12,
-            paddingVertical: 11,
+            paddingVertical: 12,
             borderTopWidth: index === 0 ? 0 : 1,
             borderTopColor: colors.bottomSheetBorder,
           }}
@@ -267,7 +278,7 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
       >
         {head(
           'accent',
-          <CheckIcon size={38} color={colors.fgAccent} />,
+          <CheckIcon size={iconSize} color={colors.fgAccent} />,
           title,
           isOutbound
             ? (translate('swap.result-at-your-address') as string).replace(
@@ -311,7 +322,7 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
       >
         {head(
           'warning',
-          <RefreshIcon size={34} color={colors.fgWarning} />,
+          <RefreshIcon size={iconSize} color={colors.fgWarning} />,
           (translate('swap.result-refunded-title') as string).replace(
             '{coin}',
             sellSymbol,
@@ -443,7 +454,7 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
       >
         {head(
           'muted',
-          <ClockIcon size={34} color={colors.fgMuted} />,
+          <ClockIcon size={iconSize} color={colors.fgMuted} />,
           translate('swap.result-expired-title') as string,
           translate('swap.result-expired-line') as string,
         )}
@@ -495,7 +506,7 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
       >
         {head(
           'danger',
-          <XIcon size={34} color={colors.fgDanger} />,
+          <XIcon size={iconSize} color={colors.fgDanger} />,
           translate('swap.result-failed-title') as string,
           record.failureReason ??
             (isOutbound
@@ -521,7 +532,7 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
     >
       {head(
         'accent',
-        <ShieldIcon size={34} color={colors.fgAccent} />,
+        <ShieldIcon size={iconSize} color={colors.fgAccent} />,
         translate('swap.pending-swapping') as string,
         `${info.currencyName}`,
       )}

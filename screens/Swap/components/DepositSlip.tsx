@@ -3,7 +3,14 @@ import React, { useContext } from 'react';
 import { Pressable, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { radiusMd, radiusPill, space12, space4, useTheme } from '@app/theme';
+import {
+  radiusMd,
+  radiusPill,
+  space12,
+  space4,
+  useTheme,
+  iconSizeSm,
+} from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   buildDepositQr,
@@ -92,14 +99,14 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'center',
-          columnGap: 9,
+          columnGap: 8,
           transform: [{ scale: pressed ? 0.97 : 1 }],
         })}
       >
         {done ? (
-          <CheckIcon size={16} color={colors.fgAccent} />
+          <CheckIcon size={iconSizeSm} color={colors.fgAccent} />
         ) : (
-          <CopyIcon size={16} color={colors.fgDefault} />
+          <CopyIcon size={iconSizeSm} color={colors.fgDefault} />
         )}
         <Text variant="caption" style={{ fontWeight: '700' }}>
           {done ? t('swap.copied') : label}
@@ -120,8 +127,8 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
         alignItems: 'center',
         columnGap: space12,
         minHeight: 44,
-        paddingVertical: 10,
-        paddingHorizontal: 14,
+        paddingVertical: 12,
+        paddingHorizontal: 16,
         borderTopWidth: first ? 0 : 1,
         borderTopColor: colors.borderSubtle,
       }}
@@ -149,8 +156,8 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
           <>
             <View
               style={{
-                padding: 10,
-                borderRadius: 12,
+                padding: 12,
+                borderRadius: radiusMd,
                 backgroundColor: colors.bgQrPaper,
               }}
             >
@@ -159,7 +166,7 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
             <Text
               variant="caption"
               tone="muted"
-              style={{ textAlign: 'center', marginTop: 10 }}
+              style={{ textAlign: 'center', marginTop: 12 }}
             >
               {t(memo ? 'swap.qr-carries-memo' : 'swap.qr-carries-amount')}
             </Text>
@@ -177,8 +184,8 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
         <View
           style={{
             flexDirection: 'row',
-            columnGap: 11,
-            marginTop: 14,
+            columnGap: 12,
+            marginTop: 16,
             alignSelf: 'stretch',
           }}
         >
@@ -236,8 +243,8 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
           <View
             style={{
               rowGap: space4,
-              paddingVertical: 10,
-              paddingHorizontal: 14,
+              paddingVertical: 12,
+              paddingHorizontal: 16,
               borderTopWidth: 1,
               borderTopColor: colors.borderSubtle,
             }}

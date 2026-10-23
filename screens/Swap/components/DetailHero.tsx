@@ -43,7 +43,7 @@ export default function DetailHero({
   }[pillTone];
   return (
     <View style={{ alignItems: 'center', rowGap: space8, marginVertical: 12 }}>
-      <View style={{ transform: [{ scale: 1.33 }], marginBottom: 6 }}>
+      <View style={{ transform: [{ scale: 1.33 }], marginBottom: space8 }}>
         <HistoryAvatar icon={icon} badge={badge} />
       </View>
       <Text variant="bodyStrong" style={{ textAlign: 'center' }}>
@@ -51,10 +51,7 @@ export default function DetailHero({
       </Text>
       <Text
         variant="balance"
-        style={{
-          fontSize: 36,
-          color: tone === 'positive' ? colors.fgAccent : colors.fgDefault,
-        }}
+        color={tone === 'positive' ? colors.fgAccent : colors.fgDefault}
       >
         {`${amount} `}
         <Text variant="subtitle" tone="muted">
@@ -70,9 +67,9 @@ export default function DetailHero({
         style={{
           backgroundColor: paint.bg,
           borderRadius: radiusPill,
-          paddingHorizontal: 10,
-          paddingVertical: 3,
-          marginTop: 2,
+          paddingHorizontal: 12,
+          paddingVertical: 4,
+          marginTop: 4,
         }}
       >
         <Text variant="caption" style={{ color: paint.fg, fontWeight: '700' }}>

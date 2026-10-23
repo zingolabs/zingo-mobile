@@ -2,7 +2,7 @@
 import React, { useCallback, useContext } from 'react';
 import { Linking, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { space12, useTheme } from '@app/theme';
+import { space12, useTheme, iconSizeMd } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import { Route, ValueTransferKindEnum } from '@app/AppState';
 import { ContextAppLoaded, useSwapRecords } from '@app/context';
@@ -143,9 +143,9 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
       <DetailHero
         icon={
           received ? (
-            <ArrowDownIcon size={18} color={colors.fgDefault} />
+            <ArrowDownIcon size={iconSizeMd} color={colors.fgDefault} />
           ) : (
-            <ArrowUpIcon size={18} color={colors.fgDefault} />
+            <ArrowUpIcon size={iconSizeMd} color={colors.fgDefault} />
           )
         }
         title={legName(leg, record, t)}

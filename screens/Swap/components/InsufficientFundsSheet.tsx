@@ -2,7 +2,7 @@
 import React, { forwardRef, useCallback, useContext } from 'react';
 import { View } from 'react-native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { space12, space16, space8, useTheme } from '@app/theme';
+import { space12, space16, space8, useTheme, iconSize } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
@@ -54,11 +54,11 @@ const InsufficientFundsSheet = forwardRef<
           closeLabel={translate('swap.close') as string}
         />
       }
-      contentStyle={{ paddingBottom: 30 }}
+      contentStyle={{ paddingBottom: 32 }}
     >
       <View style={{ paddingHorizontal: space16 }}>
         <View style={{ alignItems: 'center', marginBottom: space12 }}>
-          <WalletIcon size={40} color={colors.fgWarning} />
+          <WalletIcon size={iconSize} color={colors.fgWarning} />
         </View>
         <Text variant="body" style={{ textAlign: 'center' }}>
           {translate('swap.insufficient-body') as string}

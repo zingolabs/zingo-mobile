@@ -2,7 +2,7 @@
 import React, { forwardRef, useCallback, useContext } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { space16, useTheme } from '@app/theme';
+import { space16, useTheme, iconSizeMd, radiusPill } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   SwapStatusEnum,
@@ -80,7 +80,7 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
         style={{
           width: 36,
           height: 36,
-          borderRadius: 18,
+          borderRadius: radiusPill,
           backgroundColor: background,
           alignItems: 'center',
           justifyContent: 'center',
@@ -98,7 +98,7 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
           return {
             label: t('swap.history-done'),
             icon: tile(
-              <CheckIcon size={20} color={colors.fgAccent} />,
+              <CheckIcon size={iconSizeMd} color={colors.fgAccent} />,
               colors.bgAccentSubtle,
             ),
             live: false,
@@ -107,7 +107,7 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
           return {
             label: t('swap.history-refunded'),
             icon: tile(
-              <RefreshIcon size={20} color={colors.fgWarning} />,
+              <RefreshIcon size={iconSizeMd} color={colors.fgWarning} />,
               colors.bgWarningSubtle,
             ),
             live: false,
@@ -117,7 +117,7 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
           return {
             label: t('swap.history-failed'),
             icon: tile(
-              <XIcon size={20} color={colors.fgDanger} />,
+              <XIcon size={iconSizeMd} color={colors.fgDanger} />,
               colors.bgDangerSubtle,
             ),
             live: false,
@@ -153,7 +153,7 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
         <BottomSheetScrollView
           contentContainerStyle={{
             paddingHorizontal: space16,
-            paddingBottom: 30,
+            paddingBottom: 32,
           }}
         >
           {sorted.length === 0 && (

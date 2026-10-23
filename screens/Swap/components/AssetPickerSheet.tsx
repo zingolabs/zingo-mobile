@@ -8,15 +8,22 @@ import React, {
 } from 'react';
 import { View } from 'react-native';
 import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { space12, space16, space8, useTheme } from '@app/theme';
+import {
+  space12,
+  space16,
+  space8,
+  useTheme,
+  iconSizeMd,
+  radiusSm,
+} from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import type { TokenEntryType } from '@app/swap';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
-import ListRow from '@ui/primitives/ListRow';
 import SearchField from '@ui/widgets/SearchField';
 import Banner from '@ui/widgets/Banner';
-import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
+import RadioRow, { RadioList } from '@ui/widgets/RadioRow';
+import { ChevronRight } from '@ui/primitives/Icons/Chevron';
 import { ChainLogo } from '@ui/widgets/ChainSelect';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import TokenLogo from './TokenLogo';
@@ -136,8 +143,6 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
       dismiss();
     };
 
-    const check = <CheckIcon size={18} color={colors.fgAccent} />;
-
     const badgeStack = (group: TickerGroup) => (
       <View style={{ flexDirection: 'row' }}>
         {group.tokens.slice(0, BADGES).map((token, index) => (
@@ -145,7 +150,7 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
             key={token.identifier}
             style={{
               marginLeft: index === 0 ? 0 : -5,
-              borderRadius: 9,
+              borderRadius: radiusSm,
               borderWidth: 2,
               borderColor: colors.bgSurface,
             }}
@@ -156,14 +161,17 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
       </View>
     );
 
-    const row = (group: TickerGroup) => {
+    const row = (group: TickerGroup, index: number) => {
       const multi = group.tokens.length > 1;
-      const isSelected =
-        !multi && group.tokens[0].identifier === selected?.identifier;
+      const isSelected = group.tokens.some(
+        token => token.identifier === selected?.identifier,
+      );
       return (
-        <ListRow
+        <RadioRow
           key={group.ticker}
           testID={`swap.asset.${group.ticker}`}
+          first={index === 0}
+          selected={isSelected}
           leading={
             <TokenLogo
               token={group.tokens[0]}
@@ -173,14 +181,15 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
             />
           }
           title={group.ticker}
-          subtitle={group.name}
+          sub={group.name}
           trailing={
             multi ? (
               <View
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
-                  columnGap: 6,
+                  columnGap: space8,
+                  paddingRight: space12,
                 }}
               >
                 {badgeStack(group)}
@@ -190,21 +199,21 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
                     String(group.tokens.length),
                   )}
                 </Text>
+                <ChevronRight size={iconSizeMd} color={colors.fgMuted} />
               </View>
-            ) : isSelected ? (
-              check
             ) : undefined
           }
-          chevron={multi}
           onPress={() => (multi ? setNetworksOf(group) : pick(group.tokens[0]))}
         />
       );
     };
 
-    const networkRow = (token: TokenEntryType) => (
-      <ListRow
+    const networkRow = (token: TokenEntryType, index: number) => (
+      <RadioRow
         key={token.identifier}
         testID={`swap.asset.${token.identifier}`}
+        first={index === 0}
+        selected={token.identifier === selected?.identifier}
         leading={
           <TokenLogo
             token={token}
@@ -214,10 +223,9 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
           />
         }
         title={(token.ticker || token.symbol || '').toUpperCase()}
-        subtitle={t('swap.asset-on')
+        sub={t('swap.asset-on')
           .replace('{asset}', token.name ?? token.ticker ?? '')
           .replace('{network}', networkName(token))}
-        trailing={token.identifier === selected?.identifier ? check : undefined}
         onPress={() => pick(token)}
       />
     );
@@ -272,7 +280,7 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
           <BottomSheetScrollView
             contentContainerStyle={{
               paddingHorizontal: space16,
-              paddingBottom: 30,
+              paddingBottom: 32,
             }}
           >
             <Banner
@@ -283,25 +291,26 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
               )}
             />
             <View style={{ height: space12 }} />
-            {networksOf.tokens.map(token => (
-              <ListRow
-                key={token.identifier}
-                testID={`swap.network.${token.chain}`}
-                leading={<ChainLogo chain={token.chain} size={32} />}
-                title={networkName(token)}
-                trailing={
-                  token.identifier === selected?.identifier ? check : undefined
-                }
-                onPress={() => pick(token)}
-              />
-            ))}
+            <RadioList>
+              {networksOf.tokens.map((token, index) => (
+                <RadioRow
+                  key={token.identifier}
+                  testID={`swap.network.${token.chain}`}
+                  first={index === 0}
+                  leading={<ChainLogo chain={token.chain} size={32} />}
+                  title={networkName(token)}
+                  selected={token.identifier === selected?.identifier}
+                  onPress={() => pick(token)}
+                />
+              ))}
+            </RadioList>
           </BottomSheetScrollView>
         ) : (
           <BottomSheetScrollView
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{
               paddingHorizontal: space16,
-              paddingBottom: 30,
+              paddingBottom: 32,
             }}
           >
             <SearchField
@@ -312,20 +321,26 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
             />
             {matches.popular.length > 0 &&
               groupLabel(t('swap.assets-popular'), true)}
-            {matches.popular.map(row)}
+            {matches.popular.length > 0 && (
+              <RadioList>{matches.popular.map(row)}</RadioList>
+            )}
             {matches.popular.length > 0 &&
               matches.rest.length > 0 &&
               groupLabel(t('swap.assets-more'), false)}
             {matches.popular.length === 0 && matches.rest.length > 0 && (
               <View style={{ height: space12 }} />
             )}
-            {matches.rest.map(row)}
+            {matches.rest.length > 0 && (
+              <RadioList>{matches.rest.map(row)}</RadioList>
+            )}
             {matches.onNetwork.length > 0 &&
               groupLabel(
                 t('swap.assets-on-network'),
                 matches.rest.length === 0,
               )}
-            {matches.onNetwork.map(networkRow)}
+            {matches.onNetwork.length > 0 && (
+              <RadioList>{matches.onNetwork.map(networkRow)}</RadioList>
+            )}
             {nothing && (
               <View style={{ alignItems: 'center', paddingVertical: 48 }}>
                 <Text variant="body" tone="muted">

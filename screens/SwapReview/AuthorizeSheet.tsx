@@ -2,7 +2,7 @@
 import React, { forwardRef, useCallback, useContext } from 'react';
 import { View } from 'react-native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { space16, space8, useTheme } from '@app/theme';
+import { space16, space8, useTheme, radiusPill, iconSize } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import { askGate, enactGateAnswer } from '@app/services/gateController';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
@@ -56,27 +56,27 @@ const AuthorizeSheet = forwardRef<BottomSheetModal, AuthorizeSheetProps>(
         >
           <View
             style={{
-              width: 72,
-              height: 72,
-              borderRadius: 36,
+              width: 48,
+              height: 48,
+              borderRadius: radiusPill,
               backgroundColor: colors.bgAccentSubtle,
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <FingerprintIcon size={38} color={colors.fgAccent} />
+            <FingerprintIcon size={iconSize} color={colors.fgAccent} />
           </View>
-          <Text variant="subtitle" style={{ marginTop: 14 }}>
+          <Text variant="subtitle" style={{ marginTop: space16 }}>
             {translate('swap.auth-title') as string}
           </Text>
           <Text
             variant="bodySmall"
             tone="muted"
-            style={{ marginTop: 6, textAlign: 'center' }}
+            style={{ marginTop: 8, textAlign: 'center' }}
           >
             {summary}
           </Text>
-          <View style={{ alignSelf: 'stretch', marginTop: 18 }}>
+          <View style={{ alignSelf: 'stretch', marginTop: 16 }}>
             <ButtonStack>
               <Button
                 variant="quiet"

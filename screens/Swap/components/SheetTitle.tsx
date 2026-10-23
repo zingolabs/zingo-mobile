@@ -1,10 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import { slopFor, space16, useTheme } from '@app/theme';
+import { slopFor, space16, useTheme, iconSize, space8 } from '@app/theme';
 import Text from '@ui/primitives/Text';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
-import { ArrowLeftIcon } from '@ui/primitives/Icons/ArrowLeftIcon';
+import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 
 type SheetTitleProps = {
   title: string;
@@ -30,8 +30,8 @@ export default function SheetTitle({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingTop: 8,
-        paddingBottom: 6,
+        paddingTop: space8,
+        paddingBottom: space8,
         paddingHorizontal: space16,
       }}
     >
@@ -43,7 +43,7 @@ export default function SheetTitle({
             hitSlop={slopFor(24)}
             onPress={onBack}
           >
-            <ArrowLeftIcon size={22} color={colors.fgDefault} />
+            <ChevronLeft size={iconSize} color={colors.fgAccent} />
           </Pressable>
         )}
       </View>
@@ -61,7 +61,7 @@ export default function SheetTitle({
           hitSlop={slopFor(24)}
           onPress={onClose}
         >
-          <XIcon size={22} color={colors.fgDefault} />
+          <XIcon size={iconSize} color={colors.fgDefault} />
         </Pressable>
       </View>
     </View>

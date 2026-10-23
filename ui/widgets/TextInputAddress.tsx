@@ -1,8 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
+import { useInsetFill } from '@ui/primitives/Surface';
 import { View, TouchableOpacity, TextInput } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useTheme, slopFor } from '@app/theme';
+import { useTheme, slopFor, radiusMd, space4 } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
@@ -64,6 +65,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate, server } = context;
   const { colors } = useTheme();
+  const inset = useInsetFill();
 
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [focused, setFocused] = useState(false);
@@ -163,8 +165,9 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
         )}
         <View
           style={{
+            backgroundColor: inset,
             borderWidth: 1,
-            borderRadius: 12,
+            borderRadius: radiusMd,
             borderColor: fieldBorder(
               colors,
               focused,
@@ -174,7 +177,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                   ? 'invalid'
                   : 'unknown',
             ),
-            marginTop: flush ? 0 : 5,
+            marginTop: flush ? 0 : space4,
           }}
         >
           <View

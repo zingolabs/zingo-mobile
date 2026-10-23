@@ -45,7 +45,7 @@ export default function SwapSummaryCard({
               alignItems: 'center',
               justifyContent: 'space-between',
               columnGap: space12,
-              paddingVertical: 13,
+              paddingVertical: 12,
               borderTopWidth: index === 0 ? 0 : 1,
               borderTopColor: colors.bottomSheetBorder,
             }}
@@ -57,7 +57,7 @@ export default function SwapSummaryCard({
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                columnGap: 10,
+                columnGap: 12,
               }}
             >
               <TokenLogo
@@ -67,7 +67,7 @@ export default function SwapSummaryCard({
                 forceBadge
               />
               <View style={{ alignItems: 'flex-end' }}>
-                <Text variant="bodyStrong" style={{ fontSize: 18 }}>
+                <Text variant="subtitle">
                   {`${formatAmountForDisplay(side.amount)} ${side.asset.ticker ?? side.asset.symbol}`}
                 </Text>
                 {side.usdUnitPrice > 0 && Number.isFinite(usd) && (

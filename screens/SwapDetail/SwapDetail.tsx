@@ -11,7 +11,14 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Linking, Pressable, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { radiusMd, space12, space8, useTheme } from '@app/theme';
+import {
+  radiusMd,
+  space12,
+  space8,
+  useTheme,
+  iconSizeMd,
+  radiusSm,
+} from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import {
   Route,
@@ -332,9 +339,9 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
       <DetailHero
         icon={
           isTerminalStatus(record.status) ? (
-            <SwapIcon size={18} color={colors.fgDefault} />
+            <SwapIcon size={iconSizeMd} color={colors.fgDefault} />
           ) : (
-            <ClockIcon size={18} color={colors.fgDefault} />
+            <ClockIcon size={iconSizeMd} color={colors.fgDefault} />
           )
         }
         badge={other}
@@ -400,7 +407,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
             marginTop: space8,
           }}
         >
-          <UserPlusIcon size={18} color={colors.fgAccent} />
+          <UserPlusIcon size={iconSizeMd} color={colors.fgAccent} />
           <Text
             variant="caption"
             style={{ fontWeight: '700', color: colors.fgAccent }}
@@ -421,7 +428,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'space-between',
-              paddingVertical: 11,
+              paddingVertical: 12,
             }}
           >
             <View
@@ -437,8 +444,8 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
               <View
                 style={{
                   minWidth: 20,
-                  paddingHorizontal: 6,
-                  borderRadius: 10,
+                  paddingHorizontal: 8,
+                  borderRadius: radiusSm,
                   backgroundColor: colors.bgMutedSubtle,
                   alignItems: 'center',
                 }}
@@ -472,14 +479,14 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
                       justifyContent: 'space-between',
                       columnGap: space12,
                       minHeight: 44,
-                      paddingVertical: 10,
-                      paddingHorizontal: 14,
+                      paddingVertical: 12,
+                      paddingHorizontal: 16,
                       borderTopWidth: index === 0 ? 0 : 1,
                       borderTopColor: colors.borderSubtle,
                     }}
                   >
                     <View style={{ flexShrink: 1 }}>
-                      <Text variant="bodyStrong" style={{ fontSize: 13 }}>
+                      <Text variant="bodySmall" style={{ fontWeight: '700' }}>
                         {legName(leg, record, t)}
                       </Text>
                       <Text variant="caption" tone="muted">

@@ -3,7 +3,7 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { space12, space16, space8, useTheme } from '@app/theme';
+import { space12, space16, space8, useTheme, iconSizeSm } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import { Route } from '@app/AppState';
 import { ContextAppLoaded, useSwapService } from '@app/context';
@@ -261,11 +261,11 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
-          columnGap: 6,
-          marginTop: 14,
+          columnGap: 8,
+          marginTop: 16,
         }}
       >
-        <ClockIcon size={14} color={colors.fgMuted} />
+        <ClockIcon size={iconSizeSm} color={colors.fgMuted} />
         <Text variant="caption" tone="muted">
           {(translate('swap.deposit-time-left') as string).replace(
             '{time}',

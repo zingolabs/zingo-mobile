@@ -44,10 +44,11 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
       <View
         style={
           {
+            "backgroundColor": "#031124",
             "borderColor": "#05234C",
             "borderRadius": 12,
             "borderWidth": 1,
-            "marginTop": 5,
+            "marginTop": 4,
           }
         }
       >

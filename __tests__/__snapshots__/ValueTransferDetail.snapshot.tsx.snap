@@ -331,8 +331,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
               "flexDirection": "row",
               "justifyContent": "space-between",
               "minHeight": 44,
-              "paddingHorizontal": 14,
-              "paddingVertical": 10,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -377,8 +377,9 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                 {
                   "color": "#c3c3c3",
                   "flexShrink": 1,
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "600",
+                  "lineHeight": 18,
                   "textAlign": "right",
                 }
               }
@@ -397,8 +398,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
               "flexDirection": "row",
               "justifyContent": "space-between",
               "minHeight": 44,
-              "paddingHorizontal": 14,
-              "paddingVertical": 10,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -443,8 +444,9 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                 {
                   "color": "#c3c3c3",
                   "flexShrink": 1,
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "600",
+                  "lineHeight": 18,
                   "textAlign": "right",
                 }
               }
@@ -463,8 +465,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
               "flexDirection": "row",
               "justifyContent": "space-between",
               "minHeight": 44,
-              "paddingHorizontal": 14,
-              "paddingVertical": 10,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -509,8 +511,9 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                 {
                   "color": "#c3c3c3",
                   "flexShrink": 1,
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "600",
+                  "lineHeight": 18,
                   "textAlign": "right",
                 }
               }
@@ -529,8 +532,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
               "flexDirection": "row",
               "justifyContent": "space-between",
               "minHeight": 44,
-              "paddingHorizontal": 14,
-              "paddingVertical": 10,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -576,8 +579,9 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                   "color": "#c3c3c3",
                   "flexShrink": 1,
                   "fontFamily": "Menlo",
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "600",
+                  "lineHeight": 18,
                   "textAlign": "right",
                 }
               }
@@ -1044,8 +1048,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
               "flexDirection": "row",
               "justifyContent": "space-between",
               "minHeight": 44,
-              "paddingHorizontal": 14,
-              "paddingVertical": 10,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -1090,8 +1094,9 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                 {
                   "color": "#c3c3c3",
                   "flexShrink": 1,
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "600",
+                  "lineHeight": 18,
                   "textAlign": "right",
                 }
               }
@@ -1110,8 +1115,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
               "flexDirection": "row",
               "justifyContent": "space-between",
               "minHeight": 44,
-              "paddingHorizontal": 14,
-              "paddingVertical": 10,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -1157,8 +1162,9 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                   "color": "#c3c3c3",
                   "flexShrink": 1,
                   "fontFamily": "Menlo",
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "600",
+                  "lineHeight": 18,
                   "textAlign": "right",
                 }
               }
@@ -1221,8 +1227,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
               "flexDirection": "row",
               "justifyContent": "space-between",
               "minHeight": 44,
-              "paddingHorizontal": 14,
-              "paddingVertical": 10,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -1267,8 +1273,9 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                 {
                   "color": "#c3c3c3",
                   "flexShrink": 1,
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "600",
+                  "lineHeight": 18,
                   "textAlign": "right",
                 }
               }
@@ -1287,8 +1294,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
               "flexDirection": "row",
               "justifyContent": "space-between",
               "minHeight": 44,
-              "paddingHorizontal": 14,
-              "paddingVertical": 10,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -1333,8 +1340,9 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                 {
                   "color": "#c3c3c3",
                   "flexShrink": 1,
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "600",
+                  "lineHeight": 18,
                   "textAlign": "right",
                 }
               }
@@ -1353,8 +1361,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
               "flexDirection": "row",
               "justifyContent": "space-between",
               "minHeight": 44,
-              "paddingHorizontal": 14,
-              "paddingVertical": 10,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -1400,8 +1408,9 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                   "color": "#c3c3c3",
                   "flexShrink": 1,
                   "fontFamily": "Menlo",
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "600",
+                  "lineHeight": 18,
                   "textAlign": "right",
                 }
               }

@@ -17,6 +17,9 @@ import {
   space4,
   space8,
   useTheme,
+  iconSize,
+  iconSizeSm,
+  radiusPill,
 } from '@app/theme';
 import { GlobalConst, Route, SnackbarDurationEnum } from '@app/AppState';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
@@ -339,7 +342,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
         hitSlop={slopFor(24)}
         onPress={() => settingsSheetRef.current?.present()}
       >
-        <SlidersIcon size={22} color={colors.fgDefault} />
+        <SlidersIcon size={iconSize} color={colors.fgDefault} />
         {form.slippageBps !== DEFAULT_SLIPPAGE_BPS && (
           <View
             style={{
@@ -348,7 +351,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
               right: -4,
               width: 8,
               height: 8,
-              borderRadius: 4,
+              borderRadius: radiusPill,
               backgroundColor: colors.bgAccent,
             }}
           />
@@ -364,7 +367,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
         hitSlop={slopFor(24)}
         onPress={() => historySheetRef.current?.present()}
       >
-        <HistoryIcon size={22} color={colors.fgDefault} />
+        <HistoryIcon size={iconSize} color={colors.fgDefault} />
       </Pressable>
     </View>
   );
@@ -418,7 +421,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                       style={{
                         width: 8,
                         height: 8,
-                        borderRadius: 4,
+                        borderRadius: radiusPill,
                         backgroundColor: colors.bgAccent,
                       }}
                     />
@@ -531,7 +534,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    columnGap: 6,
+                    columnGap: 8,
                   }}
                 >
                   <TriangleAlert size={14} color={colors.fgDanger} />
@@ -548,7 +551,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                     alignItems: 'center',
                     columnGap: space8,
                     minHeight: 44,
-                    paddingHorizontal: 2,
+                    paddingHorizontal: 4,
                   }}
                 >
                   <Text variant="caption" tone="muted" style={{ flex: 1 }}>
@@ -618,7 +621,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                       justifyContent: 'space-between',
                       columnGap: space8,
                       marginBottom: space8,
-                      paddingHorizontal: 2,
+                      paddingHorizontal: 4,
                     }}
                   >
                     <Text
@@ -638,7 +641,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                       style={{
                         flexDirection: 'row',
                         alignItems: 'center',
-                        columnGap: 2,
+                        columnGap: 4,
                         flexShrink: 1,
                       }}
                     >
@@ -684,9 +687,9 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                       style={{
                         flexDirection: 'row',
                         alignItems: 'center',
-                        columnGap: 6,
-                        marginTop: 6,
-                        paddingHorizontal: 2,
+                        columnGap: 8,
+                        marginTop: 8,
+                        paddingHorizontal: 4,
                       }}
                     >
                       <TriangleAlert size={14} color={colors.fgDanger} />
@@ -708,12 +711,12 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                       style={{
                         flexDirection: 'row',
                         alignItems: 'center',
-                        columnGap: 6,
-                        marginTop: 6,
-                        paddingHorizontal: 2,
+                        columnGap: 8,
+                        marginTop: 8,
+                        paddingHorizontal: 4,
                       }}
                     >
-                      <CheckIcon size={14} color={colors.fgAccent} />
+                      <CheckIcon size={iconSizeSm} color={colors.fgAccent} />
                       {savedContact ? (
                         <Text
                           testID="swap.address.contact"
@@ -775,7 +778,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                       (translate('swap.no-routes-body') as string)}
                   </Text>
                   {form.unavailable.length > 0 && (
-                    <View style={{ marginTop: 6, rowGap: 6 }}>
+                    <View style={{ marginTop: 8, rowGap: 8 }}>
                       <Pressable
                         testID="swap.see-why"
                         accessibilityRole="button"

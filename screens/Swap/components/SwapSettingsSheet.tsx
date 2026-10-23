@@ -115,7 +115,7 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                columnGap: 2,
+                columnGap: 4,
               }}
             >
               <Text variant="bodyStrong">

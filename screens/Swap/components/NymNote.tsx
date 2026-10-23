@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { View } from 'react-native';
-import { useTheme } from '@app/theme';
+import { useTheme, radiusMd } from '@app/theme';
 import Text from '@ui/primitives/Text';
 import NymOn from '../../../assets/img/nym-on.svg';
 
@@ -13,19 +13,19 @@ export default function NymNote({ text }: { text: string }) {
       style={{
         flexDirection: 'row',
         alignItems: 'flex-start',
-        columnGap: 10,
+        columnGap: 12,
         paddingVertical: 12,
-        paddingHorizontal: 14,
-        borderRadius: 12,
+        paddingHorizontal: 16,
+        borderRadius: radiusMd,
         borderWidth: 1,
         borderColor: colors.bgNym,
         backgroundColor: colors.bgNymSubtle,
       }}
     >
-      <View style={{ marginTop: 1 }}>
+      <View style={{ marginTop: 4 }}>
         <NymOn width={18} height={18} />
       </View>
-      <Text variant="caption" tone="muted" style={{ flex: 1, lineHeight: 17 }}>
+      <Text variant="caption" tone="muted" style={{ flex: 1 }}>
         {text}
       </Text>
     </View>

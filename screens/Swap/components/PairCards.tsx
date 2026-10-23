@@ -8,7 +8,19 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { radiusMd, space4, space8, useTheme } from '@app/theme';
+import {
+  iconSizeMd,
+  iconSizeSm,
+  radiusMd,
+  radiusPill,
+  space4,
+  space8,
+  space12,
+  space16,
+  textVariants,
+  touchTarget,
+  useTheme,
+} from '@app/theme';
 import type { TokenEntryType } from '@app/swap';
 import Text from '@ui/primitives/Text';
 import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
@@ -21,6 +33,8 @@ import { ZEC_TOKEN_ENTRY } from '@screens/Swap/swapAssets';
 const FLIP_MS = 360;
 /** The cards sit this close, with the flip button over the seam. */
 const SEAM = 4;
+/** The flip button: 40 visible, a 44 pt target. */
+const FLIP_SIZE = 40;
 /** A fresh price flashes green, at its strongest 30% of the way. */
 const FLASH_MS = 1100;
 
@@ -193,28 +207,25 @@ export default function PairCards({
     borderColor: colors.bottomSheetBorder,
     borderWidth: 1,
     borderRadius: radiusMd,
-    paddingTop: 12,
-    paddingHorizontal: 14,
-    paddingBottom: 6,
+    padding: space16,
   });
   const header = {
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
     justifyContent: 'space-between' as const,
-    minHeight: 24,
   };
   const coinRow = {
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
-    columnGap: 10,
-    marginTop: 6,
+    columnGap: space12,
+    marginTop: space8,
     zIndex: 3,
   };
   const underRow = {
     flexDirection: 'row' as const,
     justifyContent: 'flex-end' as const,
     alignItems: 'center' as const,
-    minHeight: 30,
+    marginTop: space4,
   };
 
   return (
@@ -267,11 +278,7 @@ export default function PairCards({
             }}
           >
             {unit === 'usd' && (
-              <Text
-                variant="bodyStrong"
-                tone="muted"
-                style={{ fontSize: 28, lineHeight: 40, fontWeight: '600' }}
-              >
+              <Text variant="balance" tone="muted">
                 $
               </Text>
             )}
@@ -286,9 +293,9 @@ export default function PairCards({
                 flex: 1,
                 minWidth: 0,
                 textAlign: 'right',
-                fontSize: 32,
-                lineHeight: 40,
-                fontWeight: '600',
+                fontSize: textVariants.balance.fontSize,
+                lineHeight: textVariants.balance.lineHeight,
+                fontWeight: textVariants.balance.fontWeight,
                 fontVariant: ['tabular-nums'],
                 color: invalid ? colors.fgDanger : colors.fgDefault,
                 padding: 0,
@@ -306,14 +313,14 @@ export default function PairCards({
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                columnGap: 6,
+                columnGap: space8,
               }}
             >
               <Text variant="caption" tone="muted">
                 {altText}
               </Text>
               <View style={{ transform: [{ rotate: '90deg' }] }}>
-                <SwapIcon size={14} color={colors.fgMuted} />
+                <SwapIcon size={iconSizeSm} color={colors.fgMuted} />
               </View>
             </Pressable>
           ) : (
@@ -330,12 +337,13 @@ export default function PairCards({
           accessibilityRole="button"
           accessibilityLabel={texts.flip}
           onPress={onFlip}
+          hitSlop={(touchTarget - FLIP_SIZE) / 2}
           style={({ pressed }) => ({
             position: 'absolute',
-            top: -20 + SEAM / 2,
-            width: 40,
-            height: 40,
-            borderRadius: 20,
+            top: -FLIP_SIZE / 2 + SEAM / 2,
+            width: FLIP_SIZE,
+            height: FLIP_SIZE,
+            borderRadius: radiusPill,
             backgroundColor: pressed ? colors.bgCanvas : colors.bgSurface,
             borderWidth: 1,
             borderColor: colors.bottomSheetBorder,
@@ -345,7 +353,7 @@ export default function PairCards({
         >
           <Animated.View style={{ transform: [{ rotate: spin }] }}>
             <View style={{ transform: [{ rotate: '90deg' }] }}>
-              <SwapIcon size={18} color={colors.fgAccent} />
+              <SwapIcon size={iconSizeMd} color={colors.fgAccent} />
             </View>
           </Animated.View>
         </Pressable>
@@ -354,7 +362,11 @@ export default function PairCards({
       <View style={[card(receiveSurface), { marginTop: SEAM }]}>
         <Animated.View style={[header, { opacity: words }]}>
           <View
-            style={{ flexDirection: 'row', alignItems: 'center', columnGap: 2 }}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              columnGap: space4,
+            }}
           >
             <Text variant="caption" tone="muted" style={{ fontWeight: '600' }}>
               {texts.youReceive}
@@ -392,14 +404,14 @@ export default function PairCards({
                 disabled={ring.disabled}
                 hitSlop={8}
                 style={{
-                  width: 28,
-                  height: 28,
+                  width: touchTarget,
+                  height: touchTarget,
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
                 <QuoteRefreshRing
-                  size={16}
+                  size={iconSizeSm}
                   color={colors.fgMuted}
                   fetchColor={colors.fgAccent}
                   trackColor={colors.sheetHandle}
@@ -415,9 +427,9 @@ export default function PairCards({
               numberOfLines={1}
               style={{
                 flexShrink: 1,
-                fontSize: 24,
-                lineHeight: 40,
-                fontWeight: '600',
+                fontSize: textVariants.screenTitle.fontSize,
+                lineHeight: textVariants.screenTitle.lineHeight,
+                fontWeight: textVariants.screenTitle.fontWeight,
                 fontVariant: ['tabular-nums'],
                 color: receiveText ? receiveColor : colors.borderFocus,
               }}

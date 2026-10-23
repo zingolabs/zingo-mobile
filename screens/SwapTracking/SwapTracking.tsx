@@ -2,7 +2,7 @@
 import React, { useContext, useEffect } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { space16, space20, useTheme } from '@app/theme';
+import { space16, space20, useTheme, radiusPill } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import { Route } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
@@ -100,9 +100,7 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
           testID="swap.tracking.step"
           variant="subtitle"
           style={{
-            marginTop: 28,
-            fontSize: 18,
-            lineHeight: 24,
+            marginTop: 32,
             textAlign: 'center',
           }}
         >
@@ -121,7 +119,7 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
         </Text>
         <View
           testID="swap.tracking.steps"
-          style={{ flexDirection: 'row', columnGap: 6, marginTop: 20 }}
+          style={{ flexDirection: 'row', columnGap: 8, marginTop: 20 }}
         >
           {steps.map((key, index) => (
             <View
@@ -129,7 +127,7 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
               style={{
                 width: 6,
                 height: 6,
-                borderRadius: 3,
+                borderRadius: radiusPill,
                 backgroundColor:
                   index <= current ? colors.fgAccent : colors.sheetHandle,
               }}

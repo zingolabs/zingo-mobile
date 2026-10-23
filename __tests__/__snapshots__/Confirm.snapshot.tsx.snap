@@ -350,8 +350,8 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
               "flexDirection": "row",
               "justifyContent": "space-between",
               "minHeight": 44,
-              "paddingHorizontal": 14,
-              "paddingVertical": 10,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -396,8 +396,9 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
                 {
                   "color": "#c3c3c3",
                   "flexShrink": 1,
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "600",
+                  "lineHeight": 18,
                   "textAlign": "right",
                 }
               }
@@ -409,8 +410,9 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
               style={
                 {
                   "color": "#07FF94",
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "600",
+                  "lineHeight": 18,
                 }
               }
             >
@@ -428,8 +430,8 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
               "flexDirection": "row",
               "justifyContent": "space-between",
               "minHeight": 44,
-              "paddingHorizontal": 14,
-              "paddingVertical": 10,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -473,8 +475,9 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
                 {
                   "color": "#c3c3c3",
                   "flexShrink": 1,
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "600",
+                  "lineHeight": 18,
                   "textAlign": "right",
                 }
               }
@@ -502,8 +505,8 @@ memo10
               "flexDirection": "row",
               "justifyContent": "space-between",
               "minHeight": 44,
-              "paddingHorizontal": 14,
-              "paddingVertical": 10,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -548,8 +551,9 @@ memo10
                 {
                   "color": "#c3c3c3",
                   "flexShrink": 1,
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "600",
+                  "lineHeight": 18,
                   "textAlign": "right",
                 }
               }
@@ -568,8 +572,8 @@ memo10
               "flexDirection": "row",
               "justifyContent": "space-between",
               "minHeight": 44,
-              "paddingHorizontal": 14,
-              "paddingVertical": 10,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -614,8 +618,9 @@ memo10
                 {
                   "color": "#c3c3c3",
                   "flexShrink": 1,
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "600",
+                  "lineHeight": 18,
                   "textAlign": "right",
                 }
               }
@@ -641,9 +646,9 @@ memo10
             "borderColor": "#07FF94",
             "borderRadius": 12,
             "borderWidth": 1,
-            "columnGap": 10,
+            "columnGap": 12,
             "flexDirection": "row",
-            "paddingHorizontal": 14,
+            "paddingHorizontal": 16,
             "paddingVertical": 12,
           }
         }
@@ -651,7 +656,7 @@ memo10
         <View
           style={
             {
-              "marginTop": 1,
+              "marginTop": 4,
             }
           }
         >
@@ -668,7 +673,7 @@ memo10
               "flex": 1,
               "fontSize": 12,
               "fontWeight": "400",
-              "lineHeight": 17,
+              "lineHeight": 16,
             }
           }
         >
@@ -1030,8 +1035,8 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
               "flexDirection": "row",
               "justifyContent": "space-between",
               "minHeight": 44,
-              "paddingHorizontal": 14,
-              "paddingVertical": 10,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -1076,8 +1081,9 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
                 {
                   "color": "#c3c3c3",
                   "flexShrink": 1,
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "600",
+                  "lineHeight": 18,
                   "textAlign": "right",
                 }
               }
@@ -1089,8 +1095,9 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
               style={
                 {
                   "color": "#07FF94",
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "600",
+                  "lineHeight": 18,
                 }
               }
             >
@@ -1108,8 +1115,8 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
               "flexDirection": "row",
               "justifyContent": "space-between",
               "minHeight": 44,
-              "paddingHorizontal": 14,
-              "paddingVertical": 10,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -1153,8 +1160,9 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
                 {
                   "color": "#c3c3c3",
                   "flexShrink": 1,
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "600",
+                  "lineHeight": 18,
                   "textAlign": "right",
                 }
               }
@@ -1182,8 +1190,8 @@ memo10
               "flexDirection": "row",
               "justifyContent": "space-between",
               "minHeight": 44,
-              "paddingHorizontal": 14,
-              "paddingVertical": 10,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -1228,8 +1236,9 @@ memo10
                 {
                   "color": "#c3c3c3",
                   "flexShrink": 1,
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "600",
+                  "lineHeight": 18,
                   "textAlign": "right",
                 }
               }
@@ -1248,8 +1257,8 @@ memo10
               "flexDirection": "row",
               "justifyContent": "space-between",
               "minHeight": 44,
-              "paddingHorizontal": 14,
-              "paddingVertical": 10,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -1294,8 +1303,9 @@ memo10
                 {
                   "color": "#c3c3c3",
                   "flexShrink": 1,
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "600",
+                  "lineHeight": 18,
                   "textAlign": "right",
                 }
               }
@@ -1321,9 +1331,9 @@ memo10
             "borderColor": "#07FF94",
             "borderRadius": 12,
             "borderWidth": 1,
-            "columnGap": 10,
+            "columnGap": 12,
             "flexDirection": "row",
-            "paddingHorizontal": 14,
+            "paddingHorizontal": 16,
             "paddingVertical": 12,
           }
         }
@@ -1331,7 +1341,7 @@ memo10
         <View
           style={
             {
-              "marginTop": 1,
+              "marginTop": 4,
             }
           }
         >
@@ -1348,7 +1358,7 @@ memo10
               "flex": 1,
               "fontSize": 12,
               "fontWeight": "400",
-              "lineHeight": 17,
+              "lineHeight": 16,
             }
           }
         >

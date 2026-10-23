@@ -42,7 +42,7 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
     accessibilityRole="radiogroup"
     style={
       {
-        "backgroundColor": "#011401",
+        "backgroundColor": "#031124",
         "borderColor": "#05234C",
         "borderRadius": 12,
         "borderWidth": 1,
