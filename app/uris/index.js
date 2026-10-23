@@ -1,15 +1,14 @@
 import parseServerURI from './parseServerURI';
 import parseZcashURI from './parseZcashURI';
-import serverUris from './serverUris';
 import ZcashURITargetClass from './classes/ZcashURITargetClass';
 import checkServerURI from './checkServerURI';
-import fetchServerList from './fetchServerList';
+import { defaultIndexer, loadDefaultIndexer } from './defaultIndexer';
 
 export {
   parseServerURI,
   parseZcashURI,
-  serverUris,
   ZcashURITargetClass,
   checkServerURI,
-  fetchServerList,
+  defaultIndexer,
+  loadDefaultIndexer,
 };

@@ -7,7 +7,6 @@ import React, {
   useState,
 } from 'react';
 import { View } from 'react-native';
-import Animated from 'react-native-reanimated';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { useTheme } from '@app/theme';
@@ -17,21 +16,12 @@ import {
   Route,
   SelectServerEnum,
   ServerType,
-  ServerUrisType,
-  SnackbarDurationEnum,
 } from '@app/AppState';
 import { offlineServer, remoteServer } from '@app/AppState/types/ServerType';
 import { ServerStatus } from '@app/AppState/types/ServerStatus';
 import { AppDrawerParamList } from '@app/types';
-import { serverUris } from '@app/uris';
-import {
-  otherServersFor,
-  pickAutomatic,
-  probeUri,
-  recommendedServers,
-} from '@app/services/serverPicking';
-import { AXIS_PT, axisEnter, axisExit } from '@ui/widgets/OnboardingStage';
-import ServerList from '@screens/ServerList';
+import { loadDefaultIndexer } from '@app/uris/defaultIndexer';
+import { pickAutomatic, probeUri } from '@app/services/serverPicking';
 import Server from './Server';
 import Header from '@ui/widgets/Header';
 
@@ -56,17 +46,11 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
   const [blockHeight, setBlockHeight] = useState('');
   const [busy, setBusy] = useState(false);
   const [latencies, setLatencies] = useState<Record<string, number | null>>({});
-  const [lists, setLists] = useState<Record<string, ServerUrisType[]>>({});
-  const [other, setOther] = useState<ChainNameEnum | null>(null);
+  const [defaults, setDefaults] = useState<Record<string, string | null>>({});
   const backGuard = useRef<(() => boolean) | null>(null);
   const leaving = useRef(false);
   const mounted = useRef(true);
-  const known = useRef(new Set<string>());
-  // The first page shows without a transition; the stack push moves it.
-  const moved = useRef(false);
-  useEffect(() => {
-    moved.current = true;
-  }, [other]);
+  const timed = useRef(new Set<string>());
 
   useEffect(
     () => () => {
@@ -94,32 +78,25 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
     probeCurrent(server);
   }, [server, probeCurrent]);
 
-  const probeChain = useCallback(
-    async (chain: ChainNameEnum) => {
-      if (chain === ChainNameEnum.regtestChainName) {
-        return;
-      }
-      const list =
-        lists[chain] ?? (await otherServersFor(translate, chain, online));
-      if (!mounted.current) {
-        return;
-      }
-      setLists(l => (l[chain] ? l : { ...l, [chain]: list }));
-      const pending = [...recommendedServers(translate, chain), ...list].filter(
-        s => !known.current.has(s.uri),
-      );
-      pending.forEach(s => known.current.add(s.uri));
-      await Promise.all(
-        pending.map(async s => {
-          const probe = await probeUri(s.uri);
-          if (mounted.current) {
-            setLatencies(l => ({ ...l, [s.uri]: probe.latency }));
-          }
-        }),
-      );
-    },
-    [lists, translate, online],
-  );
+  // Asks the Binding Layer for a chain's Default Indexer and times it once.
+  const probeChain = useCallback(async (chain: ChainNameEnum) => {
+    if (chain === ChainNameEnum.regtestChainName) {
+      return;
+    }
+    const uri = await loadDefaultIndexer(chain);
+    if (!mounted.current) {
+      return;
+    }
+    setDefaults(d => (chain in d ? d : { ...d, [chain]: uri }));
+    if (!uri || timed.current.has(uri)) {
+      return;
+    }
+    timed.current.add(uri);
+    const probe = await probeUri(uri);
+    if (mounted.current) {
+      setLatencies(l => ({ ...l, [uri]: probe.latency }));
+    }
+  }, []);
 
   // Reconnects the wallet to `target`; true once it uses it.
   const apply = async (
@@ -153,24 +130,22 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
     return result.kind === 'ok';
   };
 
+  // Automatic is the chain's Default Indexer; a chain without one has no
+  // Automatic row, so this only runs for a chain that has one.
   const chooseAutomatic = async (chain: ChainNameEnum) => {
     setBusy(true);
     setStatus('wait');
-    const pick = await pickAutomatic(translate, chain, online);
+    const picked = await pickAutomatic(chain);
     if (!mounted.current) {
       return;
     }
-    if (!pick) {
+    if (!picked) {
       setBusy(false);
       addLastSnackbar(translate('loadedapp.connection-error') as string);
       probeCurrent(server);
       return;
     }
-    // No server answered: Automatic still settles on the chain's default.
-    if (pick.tier === 'default') {
-      addLastSnackbar(translate('loadedapp.connection-error') as string);
-    }
-    await apply(remoteServer(pick.server.uri, chain), SelectServerEnum.auto);
+    await apply(picked, SelectServerEnum.auto);
   };
 
   const close = () => {
@@ -188,23 +163,12 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
         if (leaving.current) {
           return;
         }
-        if (other !== null) {
-          e.preventDefault();
-          setOther(null);
-          return;
-        }
         if (busy || backGuard.current?.()) {
           e.preventDefault();
         }
       }),
-    [navigation, other, busy],
+    [navigation, busy],
   );
-
-  const unreachable = () =>
-    addLastSnackbar(
-      translate('server.server-unreachable') as string,
-      SnackbarDurationEnum.short,
-    );
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}>
@@ -216,76 +180,34 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
         noPrivacy={true}
         noUfvkIcon={true}
       />
-      {other === null ? (
-        <Animated.View
-          key="server"
-          entering={moved.current ? axisEnter(-AXIS_PT) : undefined}
-          exiting={axisExit(-AXIS_PT)}
-          style={{ flex: 1 }}
-        >
-          <Server
-            placement="belowHeader"
-            translate={translate}
-            server={server}
-            selectServer={selectServer}
-            status={status}
-            blockHeight={blockHeight}
-            busy={busy}
-            online={online}
-            recommended={serverUris(translate).filter(s => s.recommended)}
-            latencies={latencies}
-            onAuto={chooseAutomatic}
-            onPick={s =>
-              apply(remoteServer(s.uri, s.chainName), SelectServerEnum.list)
-            }
-            onSaveCustom={(chain, uri) =>
-              apply(remoteServer(uri, chain), SelectServerEnum.custom)
-            }
-            onOffline={(on, chain) =>
-              on
-                ? apply(offlineServer(walletChainName), selectServer)
-                : chooseAutomatic(
-                    chain === ChainNameEnum.regtestChainName
-                      ? ChainNameEnum.mainChainName
-                      : chain,
-                  )
-            }
-            onOther={setOther}
-            onProbe={probeChain}
-            onUnreachable={unreachable}
-            onBack={close}
-            backGuard={backGuard}
-          />
-        </Animated.View>
-      ) : (
-        <Animated.View
-          key="other"
-          entering={axisEnter(AXIS_PT)}
-          exiting={axisExit(AXIS_PT)}
-          style={{ flex: 1 }}
-        >
-          <ServerList
-            placement="belowHeader"
-            translate={translate}
-            servers={lists[other] ?? []}
-            loading={!lists[other]}
-            latencies={latencies}
-            selectedUri={
-              server.kind === 'remote' &&
-              server.chainName === other &&
-              selectServer === SelectServerEnum.list
-                ? server.uri
-                : null
-            }
-            busy={busy}
-            onPick={s =>
-              apply(remoteServer(s.uri, s.chainName), SelectServerEnum.list)
-            }
-            onUnreachable={unreachable}
-            onBack={() => setOther(null)}
-          />
-        </Animated.View>
-      )}
+      <Server
+        placement="belowHeader"
+        translate={translate}
+        server={server}
+        selectServer={selectServer}
+        status={status}
+        blockHeight={blockHeight}
+        busy={busy}
+        online={online}
+        defaults={defaults}
+        latencies={latencies}
+        onAuto={chooseAutomatic}
+        onSaveCustom={(chain, uri) =>
+          apply(remoteServer(uri, chain), SelectServerEnum.custom)
+        }
+        onOffline={(on, chain) =>
+          on
+            ? apply(offlineServer(walletChainName), selectServer)
+            : chooseAutomatic(
+                chain === ChainNameEnum.regtestChainName
+                  ? ChainNameEnum.mainChainName
+                  : chain,
+              )
+        }
+        onProbe={probeChain}
+        onBack={close}
+        backGuard={backGuard}
+      />
     </View>
   );
 };

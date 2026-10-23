@@ -1,9 +1,8 @@
 import React, { useContext } from 'react';
 
-import { Route, SelectServerEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import { ContextAppLoading } from '@app/context';
 import { OnboardingParamList } from '@app/types';
-import { serverUris } from '@app/uris';
 import { goBack, navigateOnboarding } from '@app/navigation/navigate';
 import type { OnboardingScreenProps } from './OnboardingNavigator';
 
@@ -13,7 +12,6 @@ import ImportUfvk from '@screens/ImportUfvk';
 import WalletProgress from '@screens/WalletProgress';
 import WalletError from '@screens/WalletError';
 import Server from '@screens/Server';
-import ServerList from '@screens/ServerList';
 
 // The onboarding routes: each one dresses its screen from the loading
 // context and the route's params.
@@ -109,12 +107,11 @@ export function ServerScreen({
     busy,
     netInfo,
     serverLatencies,
+    serverDefaults,
     chooseAutomatic,
-    pickServer,
     saveCustomServer,
     setOffline,
     probeServers,
-    serverUnreachable,
     closeServer,
     serverBackGuard,
   } = useContext(ContextAppLoading);
@@ -128,53 +125,14 @@ export function ServerScreen({
       blockHeight={serverBlockHeight}
       busy={busy}
       online={!!netInfo.isConnected}
-      recommended={serverUris(translate).filter(s => s.recommended)}
+      defaults={serverDefaults}
       latencies={serverLatencies}
       onAuto={chooseAutomatic}
-      onPick={pickServer}
       onSaveCustom={saveCustomServer}
       onOffline={setOffline}
-      onOther={chain =>
-        navigateOnboarding({ screen: Route.ServerList, params: { chain } })
-      }
       onProbe={probeServers}
-      onUnreachable={serverUnreachable}
       onBack={closeServer}
       backGuard={serverBackGuard}
-    />
-  );
-}
-
-export function ServerListScreen({
-  route,
-}: OnboardingScreenProps<OnboardingParamList, 'ServerList'>) {
-  const {
-    translate,
-    server,
-    selectServer,
-    serverLists,
-    serverLatencies,
-    busy,
-    serversFor,
-    pickServer,
-    serverUnreachable,
-  } = useContext(ContextAppLoading);
-  const { chain } = route.params;
-  return (
-    <ServerList
-      translate={translate}
-      servers={serversFor(chain)}
-      loading={!serverLists[chain]}
-      latencies={serverLatencies}
-      selectedUri={
-        server.kind === 'remote' && selectServer === SelectServerEnum.list
-          ? server.uri
-          : null
-      }
-      busy={busy}
-      onPick={pickServer}
-      onUnreachable={serverUnreachable}
-      onBack={goBack}
     />
   );
 }

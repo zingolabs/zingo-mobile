@@ -4,7 +4,7 @@ import { ChainNameEnum } from '@app/AppState';
 // Zcash Name Service (ZNS) resolution for the Send recipient field.
 //
 // The lookup is a clearnet request to the ZNS indexer, on the same footing as
-// the server registry in `fetchServerList`: it does not go through the mixnet,
+// a plain HTTPS registry: it does not go through the mixnet,
 // so it discloses to that indexer which name this IP is about to pay. That is
 // an accepted trade-off, taken deliberately and matching zingo-pc.
 //

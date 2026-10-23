@@ -20,7 +20,6 @@ import {
   ChainNameEnum,
   SelectServerEnum,
   ServerType,
-  ServerUrisType,
   TranslateType,
 } from '@app/AppState';
 import RegText from '@ui/primitives/RegText';
@@ -52,17 +51,15 @@ export type ServerProps = {
   // True while the host applies a choice.
   busy: boolean;
   online: boolean;
-  // The recommended (Zaino) servers of every network.
-  recommended: ServerUrisType[];
+  // chain → its Default Indexer; absent until asked, null for a chain
+  // without one.
+  defaults: Record<string, string | null>;
   latencies: Record<string, number | null>;
   onAuto: (chain: ChainNameEnum) => void;
-  onPick: (server: ServerUrisType) => void;
   // Uses a custom server that passed a test; true once Zingo uses it.
   onSaveCustom: (chain: ChainNameEnum, uri: string) => Promise<boolean>;
   onOffline: (on: boolean, chain: ChainNameEnum) => void;
-  onOther: (chain: ChainNameEnum) => void;
   onProbe: (chain: ChainNameEnum) => void;
-  onUnreachable: () => void;
   onBack: () => void;
   // Set to a guard the host calls on a system back; true when the screen
   // handled it (an unsaved custom server asks first).
@@ -202,15 +199,12 @@ const Server: React.FunctionComponent<ServerProps> = ({
   blockHeight,
   busy,
   online,
-  recommended,
+  defaults,
   latencies,
   onAuto,
-  onPick,
   onSaveCustom,
   onOffline,
-  onOther,
   onProbe,
-  onUnreachable,
   onBack,
   backGuard,
   placement = 'screen',
@@ -227,7 +221,6 @@ const Server: React.FunctionComponent<ServerProps> = ({
   // The network whose Custom row is open without being the saved choice.
   const [customOpen, setCustomOpen] = useState<ChainNameEnum | null>(null);
   const [asking, setAsking] = useState(false);
-  const [shakes, setShakes] = useState<Record<string, number>>({});
 
   const netName = (chain: ChainNameEnum) =>
     translate(
@@ -263,20 +256,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
     (onTab && customOpen === null && selectServer === SelectServerEnum.custom);
   const isAuto =
     onTab && customOpen !== tab && selectServer === SelectServerEnum.auto;
-  const pickedUri =
-    onTab &&
-    customOpen !== tab &&
-    server.kind === 'remote' &&
-    selectServer === SelectServerEnum.list
-      ? server.uri
-      : null;
-  const rows = recommended.filter(s => s.chainName === tab && !s.obsolete);
-  const otherPicked = !!pickedUri && !rows.some(s => s.uri === pickedUri);
-  const fastest = rows
-    .filter(s => typeof latencies[s.uri] === 'number')
-    .sort(
-      (a, b) => (latencies[a.uri] as number) - (latencies[b.uri] as number),
-    )[0];
+  const defaultUri = defaults[tab] ?? null;
 
   const draft = custom.draft(tab);
   const saved = custom.savedSame(tab);
@@ -372,18 +352,6 @@ const Server: React.FunctionComponent<ServerProps> = ({
     custom.test(chain);
   };
 
-  const pickRecommended = (s: ServerUrisType) => {
-    if (latencies[s.uri] === null) {
-      setShakes(k => ({ ...k, [s.uri]: (k[s.uri] ?? 0) + 1 }));
-      onUnreachable();
-      return;
-    }
-    setCustomOpen(null);
-    if (pickedUri !== s.uri) {
-      onPick(s);
-    }
-  };
-
   const customBlock = (
     <CustomServerBox
       chain={tab}
@@ -431,56 +399,40 @@ const Server: React.FunctionComponent<ServerProps> = ({
     </>
   ) : (
     <>
-      <RowCard>
-        <ServerRow
-          testID="server.auto"
-          first
-          title={t('automatic')}
-          sub={
-            fastest ? t('fastest', { host: hostOf(fastest.uri) }) : undefined
-          }
-          selected={isAuto}
-          disabled={locked}
-          onPress={() => {
-            setCustomOpen(null);
-            if (!isAuto) {
-              onAuto(tab);
-            }
-          }}
-        />
-        {rows.map(s => (
+      {defaultUri !== null && (
+        <RowCard>
           <ServerRow
-            key={s.uri}
-            testID={`server.pick.${hostOf(s.uri)}`}
-            title={hostOf(s.uri)}
-            sub={s.region}
-            selected={pickedUri === s.uri}
+            testID="server.auto"
+            first
+            title={t('automatic')}
+            sub={hostOf(defaultUri)}
+            selected={isAuto}
             disabled={locked}
-            shake={shakes[s.uri] ?? 0}
             right={
               <Latency
-                ms={latencies[s.uri]}
+                ms={latencies[defaultUri]}
                 notResponding={t('not-responding')}
               />
             }
-            onPress={() => pickRecommended(s)}
+            onPress={() => {
+              setCustomOpen(null);
+              if (!isAuto) {
+                onAuto(tab);
+              }
+            }}
           />
-        ))}
-      </RowCard>
-      <Animated.View layout={layout()} style={{ marginTop: 14 }}>
+        </RowCard>
+      )}
+      <Animated.View
+        layout={layout()}
+        style={{ marginTop: defaultUri !== null ? 14 : 0 }}
+      >
         <RowCard>
           <ServerRow
-            testID="server.other"
-            first
-            title={t('other')}
-            selected={otherPicked}
-            disabled={locked}
-            chevron
-            onPress={() => onOther(tab)}
-          />
-          <ServerRow
             testID="server.custom"
+            first
             title={t('custom')}
+
             selected={customSelected}
             disabled={locked}
             onPress={() => {

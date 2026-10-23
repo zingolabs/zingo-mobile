@@ -54,7 +54,7 @@ const bootApp = (selectServer: SelectServerEnum) => {
   const applyServer = jest
     .spyOn(app, 'applyServer')
     .mockResolvedValue(undefined);
-  jest.spyOn(app, 'selectServerOnBoot').mockResolvedValue(true);
+  jest.spyOn(app, 'selectServerOnBoot').mockResolvedValue(undefined);
   const showChainError = jest.spyOn(app, 'showChainError');
   return { app, applyServer, showChainError };
 };
@@ -63,6 +63,7 @@ describe('A wallet on another network than its server', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     bridge.walletExists.mockResolvedValue('true');
+    bridge.defaultIndexerInfo.mockResolvedValue('https://mainnet.example:443');
   });
 
   test.each([SelectServerEnum.auto, SelectServerEnum.custom])(

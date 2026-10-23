@@ -46,7 +46,6 @@ export type OnboardingParamList = {
   // `chain`: the network the screen opens on, when the wallet's network is
   // not the server's.
   [Route.Server]: { chain?: ChainNameEnum } | undefined;
-  [Route.ServerList]: { chain: ChainNameEnum };
   [Route.Progress]: { kind: 'import' | 'create' };
   [Route.OpenError]: undefined;
 };

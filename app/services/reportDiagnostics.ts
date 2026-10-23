@@ -3,13 +3,8 @@ import DeviceInfo from 'react-native-device-info';
 import Url from 'url-parse';
 import { defaultTo, isBoolean, sortedLastIndex, sumBy } from 'lodash';
 
-import {
-  ChainNameEnum,
-  SelectServerEnum,
-  ServerType,
-  TranslateType,
-} from '@app/AppState';
-import { serverUris } from '@app/uris';
+import { ChainNameEnum, SelectServerEnum, ServerType } from '@app/AppState';
+import { defaultIndexer } from '@app/uris/defaultIndexer';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCSyncScanRangePriorityStatusEnum } from '@app/walletBackend/enums/RPCSyncScanRangePriorityStatusEnum';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
@@ -31,8 +26,6 @@ export type Session =
     };
 
 export type ReportState = { served: Served; session: Session };
-
-type Translate = (key: string) => TranslateType;
 
 type Named =
   | { kind: 'unknown' }
@@ -78,7 +71,7 @@ export const memoryBucket: (bytes: number) => string = bucket(
   ['unknown', '< 256 MB', '256-512 MB', '> 512 MB'],
 );
 
-export const named = (served: Served, translate: Translate): Named => {
+export const named = (served: Served): Named => {
   if (served.kind === 'unknown') {
     return served;
   }
@@ -87,22 +80,19 @@ export const named = (served: Served, translate: Translate): Named => {
     return server;
   }
   const { uri, chainName } = server;
-  const listed: boolean = serverUris(translate).some(s => s.uri === uri);
+  const listed: boolean = uri === defaultIndexer(chainName);
   return mode === SelectServerEnum.custom && !listed
     ? { kind: 'hidden', uri, url: new Url(uri), chainName }
     : { kind: 'shown', uri, chainName, mode };
 };
 
-export const privateHosts = (
-  served: Served,
-  translate: Translate,
-): string[] => {
-  const name: Named = named(served, translate);
+export const privateHosts = (served: Served): string[] => {
+  const name: Named = named(served);
   return name.kind === 'hidden' ? [name.uri, name.url.hostname] : [];
 };
 
-export const serverLine = (served: Served, translate: Translate): string => {
-  const name: Named = named(served, translate);
+export const serverLine = (served: Served): string => {
+  const name: Named = named(served);
   switch (name.kind) {
     case 'unknown':
       return 'unknown';
@@ -164,9 +154,7 @@ const settle = <T>(
     .then(render)
     .catch(() => fallback);
 
-export const reportDiagnostics = async (
-  translate: Translate,
-): Promise<string> => {
+export const reportDiagnostics = async (): Promise<string> => {
   const [network, power, disk, memory]: string[] = await Promise.all([
     settle(
       () => NetInfo.fetch(),
@@ -184,7 +172,7 @@ export const reportDiagnostics = async (
   return [
     '--- Diagnostics ---',
     `Time (UTC): ${new Date().toISOString()}`,
-    `Server: ${serverLine(state.served, translate)}`,
+    `Server: ${serverLine(state.served)}`,
     ...sessionLines(state),
     `Network: ${network}`,
     `Price: ${priceFetcherStore.snapshot().failed ? 'last fetch failed' : 'ok'}`,

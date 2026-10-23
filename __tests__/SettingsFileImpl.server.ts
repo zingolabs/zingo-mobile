@@ -9,15 +9,11 @@ jest.mock('react-native-fs', () => ({
   }),
 }));
 
-jest.mock('@app/uris', () => ({
-  serverUris: () => [
-    {
-      uri: 'https://mainnet.example:9067',
-      chainName: 'main',
-      default: true,
-      obsolete: false,
-    },
-  ],
+jest.mock('@app/uris/defaultIndexer', () => ({
+  loadDefaultIndexer: jest.fn(async () => 'https://mainnet.example:9067'),
+  defaultIndexer: jest.fn((chain: string) =>
+    chain === 'main' ? 'https://mainnet.example:9067' : null,
+  ),
 }));
 
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
@@ -37,7 +33,7 @@ beforeEach(() => {
 test('Tests that settings.json stores an empty uri and the offline selection when the app writes an offline server. The native background sync reads the empty uri as offline.', async () => {
   await SettingsFileImpl.writeServer(
     offlineServer(ChainNameEnum.testChainName),
-    SelectServerEnum.list,
+    SelectServerEnum.auto,
   );
 
   expect(stored().server).toEqual({ uri: '', chainName: 'test' });

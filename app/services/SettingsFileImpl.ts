@@ -5,7 +5,6 @@ import {
   GlobalConst,
   SelectServerEnum,
   ServerType,
-  ServerUrisType,
   SettingsFileClass,
   SettingsNameEnum,
   BlockExplorerEnum,
@@ -13,29 +12,28 @@ import {
   offlineServer,
   remoteServer,
 } from '@app/AppState';
-import { serverUris } from '@app/uris';
-import { isEqual } from 'lodash';
+import { defaultIndexer, loadDefaultIndexer } from '@app/uris/defaultIndexer';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 
 type ServerWire = { uri: string; chainName: ChainNameEnum };
-type SelectServerWire = SelectServerEnum | 'offline';
+// 'list' is the retired mode of a server picked from the list this app no
+// longer offers.
+type SelectServerWire = SelectServerEnum | 'offline' | 'list';
 type SettingsWire = Omit<SettingsFileClass, 'server' | 'selectServer'> & {
   server: ServerWire;
   selectServer: SelectServerWire;
 };
 type ServerSettings = Pick<SettingsFileClass, 'server' | 'selectServer'>;
 
-const defaultWire = (): ServerWire => ({
-  uri: serverUris(() => {})[0].uri,
-  chainName: serverUris(() => {})[0].chainName,
-});
+// Mainnet's Default Indexer as the Binding Layer answered it; null until
+// `loadDefaultIndexer` has run, which `readSettings` does first.
+const defaultWire = (): ServerWire | null => {
+  const uri = defaultIndexer(ChainNameEnum.mainChainName);
+  return uri ? { uri, chainName: ChainNameEnum.mainChainName } : null;
+};
 
-const listed = (wire: ServerWire, filter: (s: ServerUrisType) => boolean) =>
-  serverUris(() => {})
-    .filter(filter)
-    .some((s: ServerUrisType) =>
-      isEqual({ uri: s.uri, chainName: s.chainName }, wire),
-    );
+const isDefault = (wire: ServerWire) =>
+  !!wire.uri && wire.uri === defaultIndexer(wire.chainName);
 
 /** Encodes a server choice as the empty-uri form the native background sync reads. */
 const encodeServer = (
@@ -58,11 +56,23 @@ const decodeServer = (
     };
   }
   const remote = server.uri ? server : defaultWire();
+  if (!remote) {
+    return {
+      server: offlineServer(server.chainName),
+      selectServer: SelectServerEnum.auto,
+    };
+  }
+  const mode: SelectServerEnum =
+    selectServer === 'list'
+      ? isDefault(remote)
+        ? SelectServerEnum.auto
+        : SelectServerEnum.custom
+      : Object.values(SelectServerEnum).includes(selectServer)
+        ? selectServer
+        : SelectServerEnum.auto;
   return {
     server: remoteServer(remote.uri, remote.chainName),
-    selectServer: Object.values(SelectServerEnum).includes(selectServer)
-      ? selectServer
-      : SelectServerEnum.auto,
+    selectServer: mode,
   };
 };
 
@@ -120,6 +130,7 @@ export default class SettingsFileImpl {
   }
 
   static async readSettings(): Promise<SettingsFileClass> {
+    await loadDefaultIndexer(ChainNameEnum.mainChainName);
     const { server, selectServer, ...rest } = await this.readWire();
     return server
       ? { ...rest, ...decodeServer(server, selectServer) }
@@ -145,16 +156,18 @@ export default class SettingsFileImpl {
       // If server as string is found, I need to convert to: ServerWire
       // if not, I'm losing the value
       if (!settings.hasOwnProperty(SettingsNameEnum.server)) {
-        settings.server = defaultWire();
+        settings.server = defaultWire() ?? {
+          uri: '',
+          chainName: ChainNameEnum.mainChainName,
+        };
       } else {
         if (typeof settings.server === 'string') {
           const ss: ServerWire = {
             uri: settings.server,
             chainName: ChainNameEnum.mainChainName,
           };
-          // here probably the user have a cumtom server, but we don't know
-          // what is the chainName -> we assign the default server.
-          settings.server = listed(ss, () => true) ? ss : defaultWire();
+          // A server stored as a bare string predates chains; it was mainnet.
+          settings.server = ss;
         } else {
           if (settings.server.uri && !settings.server.chainName) {
             // Only repair a REAL server (non-empty uri) that is missing its
@@ -185,40 +198,14 @@ export default class SettingsFileImpl {
             : true;
       }
       if (!settings.hasOwnProperty(SettingsNameEnum.selectServer)) {
-        // First launch with server selection. Inference is chain-aware: every
-        // match below compares BOTH uri and chainName (isEqual on ServerType),
-        // so a testnet server is evaluated against the testnet entries exactly
-        // like a mainnet one is against the mainnet entries. Cases:
-        // - server empty -> offline
-        // - obsolete server (any chain) -> auto
-        // - default server (mainnet or testnet) -> auto
-        // - non-default listed server (any chain) -> list
-        // - server not in the list (any chain) -> custom
-        if (!settings.server.uri) {
-          settings.selectServer = 'offline';
-        } else if (listed(settings.server, s => s.obsolete)) {
-          // obsolete servers -> auto - to make easier and faster UX to the user
-          settings.selectServer = SelectServerEnum.auto;
-        } else if (listed(settings.server, s => s.default)) {
-          // default servers -> auto - to make easier and faster UX to the user
-          settings.selectServer = SelectServerEnum.auto;
-        } else if (listed(settings.server, () => true)) {
-          // new servers (not default & not obsolete) -> in the list - the user changed the default server in some point
-          settings.selectServer = SelectServerEnum.list;
-        } else {
-          // not in the list (any chain) -> the user set some other server → custom.
-          settings.selectServer = SelectServerEnum.custom;
-        }
-      } else {
-        // this is not the first time, but I have to change the obsolete servers to `auto`.
-        // do nothing if the user select a obsolte one as a custom server, this is user's choice.
-        if (
-          listed(settings.server, s => s.obsolete) &&
-          settings.selectServer !== SelectServerEnum.custom
-        ) {
-          // obsolete servers -> auto - to make easier and faster UX to the user
-          settings.selectServer = SelectServerEnum.auto;
-        }
+        // First launch with server selection: no server is offline, the
+        // Default Indexer is Automatic, and any other server is the user's
+        // custom one.
+        settings.selectServer = !settings.server.uri
+          ? 'offline'
+          : isDefault(settings.server)
+            ? SelectServerEnum.auto
+            : SelectServerEnum.custom;
       }
       // Settings the App no longer asks about are dropped from the file the
       // first time an older settings.json loads: the donation flags of the

@@ -57,7 +57,7 @@ export const defaultAppContextLoading: AppContextLoading = {
   serverStatus: 'ok',
   serverBlockHeight: '',
   serverLatencies: {},
-  serverLists: {},
+  serverDefaults: {},
   serverBackGuard: { current: null },
   importRecoveryWallet: () => {},
   viewRecoveryWallet: () => {},
@@ -71,12 +71,10 @@ export const defaultAppContextLoading: AppContextLoading = {
   deleteThenCreate: () => {},
   switchToWalletChain: () => {},
   chooseAutomatic: async () => {},
-  pickServer: async () => {},
   saveCustomServer: async () => true,
   setOffline: async () => {},
   probeServers: async () => {},
   serverUnreachable: () => {},
-  serversFor: () => [],
   doRestore: async () => {},
 };
 

@@ -14,7 +14,6 @@ import { ChainNameEnum } from './enums/ChainNameEnum';
 import WalletType from './types/WalletType';
 import { WalletErrorInfo } from './types/WalletErrorInfo';
 import { ServerStatus } from './types/ServerStatus';
-import ServerUrisType from './types/ServerUrisType';
 import type { BiometricGateOutcome } from './AppStateLoading';
 
 // Asks the Server screen whether leaving it needs a confirmation first.
@@ -69,8 +68,9 @@ export interface OnboardingContext {
   serverBlockHeight: string;
   // uri → latency in ms, null when the server did not answer the probe.
   serverLatencies: Record<string, number | null>;
-  // chain → servers under Other servers; absent until its list has loaded.
-  serverLists: Record<string, ServerUrisType[]>;
+  // chain → its Default Indexer; absent until asked, null for a chain
+  // without one.
+  serverDefaults: Record<string, string | null>;
   serverBackGuard: BackGuard;
   // `origin` is the screen the import started from; a failure returns there.
   importRecoveryWallet: (origin: 'Welcome' | 'ImportChooser') => void;
@@ -86,11 +86,9 @@ export interface OnboardingContext {
   deleteThenCreate: () => void;
   switchToWalletChain: (chain: ChainNameEnum) => void;
   chooseAutomatic: (chain: ChainNameEnum) => Promise<void>;
-  pickServer: (server: ServerUrisType) => Promise<void>;
   saveCustomServer: (chain: ChainNameEnum, uri: string) => Promise<boolean>;
   setOffline: (on: boolean, chain: ChainNameEnum) => Promise<void>;
   probeServers: (chain: ChainNameEnum) => Promise<void>;
   serverUnreachable: () => void;
-  serversFor: (chain: ChainNameEnum) => ServerUrisType[];
   doRestore: (seedUfvk: string, birthday: number) => Promise<void>;
 }

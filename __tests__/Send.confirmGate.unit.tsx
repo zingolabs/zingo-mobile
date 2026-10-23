@@ -28,16 +28,6 @@ jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
 );
 
-jest.mock('@app/uris', () => ({
-  ...jest.requireActual('@app/uris'),
-  fetchServerList: jest.fn(),
-}));
-
-jest.mock('@app/services/selectingServer', () => ({
-  __esModule: true,
-  default: jest.fn(),
-}));
-
 /**
  * The Confirm screen holds the confirm handler of the render that opened it.
  * These tests change the app state after that render and then confirm.
@@ -60,12 +50,9 @@ import {
   SendPageStateClass,
   ToAddrClass,
   offlineServer,
-  remoteServer,
 } from '@app/AppState';
 import type { TranslateType } from '@app/AppState';
-import { errorKeyed } from '@app/AppState/types/Result';
 import { HomeTabScreenProps } from '@app/types';
-import { fetchServerList } from '@app/uris';
 import Utils from '@app/utils';
 import RPCModule from '@app/RPCModule';
 import {
@@ -232,44 +219,6 @@ describe('Send confirm send permit', () => {
 
     expect(sendTransaction).not.toHaveBeenCalled();
     expect(addLastSnackbar).toHaveBeenCalledWith('loadedapp.connection-error');
-  });
-
-  test('Tests that the Computing screen receives the refusal when the retry on another server is refused. The first attempt fails with a server error, and the live list holds one other server.', async () => {
-    const other = {
-      uri: 'https://other.example:443',
-      chainName: ChainNameEnum.mainChainName,
-      region: '',
-      default: false,
-      latency: 1,
-      obsolete: false,
-    };
-    (fetchServerList as jest.Mock).mockResolvedValue([other]);
-    const sendTransaction = jest
-      .fn()
-      .mockRejectedValueOnce('Error: server unreachable')
-      .mockResolvedValueOnce(errorKeyed('send.nym-blocked'));
-    const setServerOption = jest.fn();
-    const view = render(
-      sendUi(online, sendTransaction, jest.fn(), setServerOption),
-    );
-    const confirmSend = await openConfirmScreen(view);
-
-    await confirmSend();
-
-    expect(setServerOption).toHaveBeenCalledWith(
-      remoteServer(other.uri, other.chainName),
-      defaultAppContextLoaded.selectServer,
-      false,
-      true,
-    );
-    expect(sendTransaction).toHaveBeenCalledTimes(2);
-    expect(setServerOption.mock.invocationCallOrder[0]).toBeLessThan(
-      sendTransaction.mock.invocationCallOrder[1],
-    );
-    expect(navigate).toHaveBeenLastCalledWith(Route.Computing, {
-      phase: 'failed',
-      failure: errorKeyed('send.nym-blocked'),
-    });
   });
 
   test('Tests that confirming sends when the permit is granted.', async () => {

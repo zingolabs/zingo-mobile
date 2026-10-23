@@ -18,7 +18,6 @@ export const Route = {
   Progress: 'Progress',
   OpenError: 'OpenError',
   Server: 'Server',
-  ServerList: 'ServerList',
 
   // Drawer no params
   Home: 'Home',

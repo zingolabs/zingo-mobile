@@ -16,7 +16,6 @@ import type BackgroundType from './types/BackgroundType';
 import type BackgroundErrorType from './types/BackgroundErrorType';
 import type ServerType from './types/ServerType';
 import type ZecPriceType from './types/ZecPriceType';
-import type ServerUrisType from './types/ServerUrisType';
 import type { SetServerResult } from './types/SetServerResult';
 import type { ErrorKeyed, Done } from './types/Result';
 import type { GateFailure, GateFailureKey } from './types/GateFailure';
@@ -130,7 +129,6 @@ export type {
   TranslateType,
   NetInfoType,
   ServerType,
-  ServerUrisType,
   SetServerResult,
   ErrorKeyed,
   Done,

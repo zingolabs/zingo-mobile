@@ -20,7 +20,7 @@ export const sendEmail = async (
   // Everything the mail carries is redacted: user folders in paths (Hermes
   // embeds compile-time absolute paths into release stacks), keys,
   // addresses, hashes, IPs and a custom server.
-  const hosts: string[] = privateHosts(reportState().served, translate);
+  const hosts: string[] = privateHosts(reportState().served);
   const subjectEmail: string = redactReport(
     subject || (translate('subject') as string),
     hosts,
@@ -31,7 +31,7 @@ export const sendEmail = async (
   );
   // Diagnostics help, but a report must open without them.
   const diagnostics: string = redactReport(
-    await reportDiagnostics(translate).catch(
+    await reportDiagnostics().catch(
       (): string => '--- Diagnostics ---\nunavailable',
     ),
     hosts,

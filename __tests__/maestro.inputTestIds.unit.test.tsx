@@ -117,15 +117,12 @@ describe('Maestro reaches each typed field on iOS', () => {
         blockHeight="1"
         busy={false}
         online={true}
-        recommended={[]}
+        defaults={{}}
         latencies={{}}
         onAuto={onFunction}
-        onPick={onFunction}
         onSaveCustom={async () => true}
         onOffline={onFunction}
-        onOther={onFunction}
         onProbe={onFunction}
-        onUnreachable={onFunction}
         onBack={onFunction}
       />,
     );
@@ -135,7 +132,6 @@ describe('Maestro reaches each typed field on iOS', () => {
       'server.custom.test',
       'server.custom.save',
       'server.custom.log.final.ok',
-      'server.other',
       'server.custom',
     ]) {
       expect(accessibleAncestor(server.getByTestId(id))).toBeUndefined();

@@ -38,8 +38,6 @@ import {
   INITIAL_MIXNET_VIEW,
 } from '@app/walletBackend/transforms/mixnetView';
 
-const translate = (k: string) => k;
-
 const chosen = (
   uri: string,
   selectServer: SelectServerEnum,
@@ -77,7 +75,7 @@ test('Tests that the report names the server, the wallet and the sync when a wal
       },
     },
   });
-  const out = await reportDiagnostics(translate);
+  const out = await reportDiagnostics();
   expect(out).toContain(
     `Server: https://zec.rocks:443 (${ChainNameEnum.mainChainName}, auto)`,
   );
@@ -97,19 +95,20 @@ test('Tests that the report describes the server without its name when a custom 
   const uri = 'https://node.alice.home:9067';
   const served = chosen(uri, SelectServerEnum.custom);
   publishReport({ served });
-  const out = await reportDiagnostics(translate);
+  const out = await reportDiagnostics();
   expect(out).not.toContain('alice');
   expect(out).toContain(
     `Server: custom, https, onion: no (${ChainNameEnum.mainChainName})`,
   );
-  expect(privateHosts(served, translate)).toEqual([uri, 'node.alice.home']);
+  expect(privateHosts(served)).toEqual([uri, 'node.alice.home']);
 });
 
 test('Tests that the hosts carry the bracketed literal when a custom server is an IPv6 address', () => {
   const uri = 'http://[::1]:9067';
-  expect(privateHosts(chosen(uri, SelectServerEnum.custom), translate)).toEqual(
-    [uri, '[::1]'],
-  );
+  expect(privateHosts(chosen(uri, SelectServerEnum.custom))).toEqual([
+    uri,
+    '[::1]',
+  ]);
 });
 
 test('Tests that the report reads offline and not open when the server is offline and no wallet is open', async () => {
@@ -120,7 +119,7 @@ test('Tests that the report reads offline and not open when the server is offlin
       selectServer: SelectServerEnum.custom,
     },
   });
-  const out = await reportDiagnostics(translate);
+  const out = await reportDiagnostics();
   expect(out).toContain(`Server: offline (${ChainNameEnum.testChainName})`);
   expect(out).toContain('Wallet: not open');
   expect(out).not.toContain('Mixnet:');
@@ -137,7 +136,7 @@ test('Tests that the mixnet reads absent when a session is open without a transp
       sync: {},
     },
   });
-  const out = await reportDiagnostics(translate);
+  const out = await reportDiagnostics();
   expect(out).toContain(
     `Wallet: seed, ${ChainNameEnum.mainChainName}, matches server: unknown`,
   );
@@ -176,7 +175,7 @@ test('Tests that the report still renders when a native call throws before it re
   DeviceInfo.getPowerState.mockImplementationOnce(() => {
     throw new Error('native module missing');
   });
-  const out: string = await reportDiagnostics(translate);
+  const out: string = await reportDiagnostics();
   expect(out).toContain('Power saving: unknown');
   expect(out).toContain('Free disk: 1-5 GB');
 });

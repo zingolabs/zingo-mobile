@@ -44,7 +44,6 @@ import {
   nativeUri,
   offlineServer,
   remoteServer,
-  ServerUrisType,
   SetServerResult,
   AddressBookFileClass,
   LanguageEnum,
@@ -75,9 +74,8 @@ import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
 import { ContextAppLoadedProvider } from '@app/context';
-import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
-import { otherServers, staticAlternatives } from '@app/uris/serverChoice';
-import selectingServer from '@app/services/selectingServer';
+import { parseZcashURI } from '@app/uris';
+import { loadDefaultIndexer } from '@app/uris/defaultIndexer';
 import BackgroundFileImpl from '@app/services/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '@app/services/createAlert';
@@ -162,16 +160,14 @@ type LoadedAppProps = NativeStackScreenProps<RootParamList, 'Wallet'> & {
 // The wallet fades in over the loading screen as it opens.
 const HOME_FADE_MS = 300;
 
-const SERVER_DEFAULT_0: ServerType = remoteServer(
-  serverUris(() => {})[0].uri,
-  serverUris(() => {})[0].chainName,
-);
+// No server until the settings file and the Binding Layer have answered.
+const SERVER_UNSET: ServerType = remoteServer('', ChainNameEnum.noneChainName);
 
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme();
   const { setSession, pendingLink, clearLink } = useSession();
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
+  const [server, setServer] = useState<ServerType>(SERVER_UNSET);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [backgroundSyncInfo, setBackgroundSyncInfo] = useState<BackgroundType>({
     batches: 0,
@@ -591,7 +587,6 @@ export class LoadedAppClass extends Component<
   LoadedAppClassState
 > {
   rpc: WalletBackend;
-  recoveringServer: boolean = false;
   appstate: NativeEventSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
   addTagModalRef: React.RefObject<React.ComponentRef<
@@ -713,7 +708,6 @@ export class LoadedAppClass extends Component<
       onBirthdayChanged: this.setBirthday,
       onBirthdayAdjusted: this.noticeBirthdayAdjusted,
       onError: this.setLastError,
-      onPersistentSyncFailure: this.recoverServer,
       onMixnetViewChanged: this.setMixnetView,
       startMixnetTransport: startMixnetTransport,
       stopMixnetTransport: stopMixnetTransport,
@@ -1581,74 +1575,6 @@ export class LoadedAppClass extends Component<
     };
   };
 
-  // Dials each candidate in order and activates the first that connects.
-  activateReachableServer = async (
-    candidates: ServerUrisType[],
-  ): Promise<boolean> => {
-    for (const candidate of candidates) {
-      if (!candidate.uri) {
-        continue;
-      }
-      const next = remoteServer(candidate.uri, candidate.chainName);
-      // Cap each dial: a dead candidate's changeServer can otherwise block for
-      // minutes (see checkServerURI), stalling the whole rotation.
-      const changed = await Promise.race([
-        changeServer(candidate.uri).then(result => result.ok),
-        new Promise<boolean>(resolve =>
-          setTimeout(() => resolve(false), 15_000),
-        ),
-      ]);
-      if (!changed) {
-        continue;
-      }
-      await SettingsFileImpl.writeServer(next, this.state.selectServer);
-      this.setState({ server: next });
-      this.rpc.setServer(next);
-      this.addLastSnackbar(
-        `${this.state.translate('loadedapp.selectingserverbest') as string} ${candidate.uri}`,
-        SnackbarDurationEnum.long,
-      );
-      return true;
-    }
-    return false;
-  };
-
-  // The runtime half of the old boot-time server rescue: after repeated
-  // sync-launch failures, silently activate a working server (live registry
-  // first, then the static list by latency) and reattach the client to it.
-  // Custom and offline modes are exempt: custom users opted out of automatic
-  // selection (Audit Issue S) and offline has no server at all.
-  recoverServer = async (): Promise<void> => {
-    const current = this.state.server;
-    if (
-      this.recoveringServer ||
-      !this.state.netInfo.isConnected ||
-      current.kind === 'offline' ||
-      (this.state.selectServer !== SelectServerEnum.auto &&
-        this.state.selectServer !== SelectServerEnum.list)
-    ) {
-      return;
-    }
-    this.recoveringServer = true;
-    try {
-      const live = otherServers(
-        await fetchServerList(current.chainName),
-        current,
-      );
-      if (await this.activateReachableServer(live)) {
-        return;
-      }
-      const fallback = await selectingServer(
-        staticAlternatives(serverUris(this.state.translate), current),
-      );
-      if (fallback) {
-        await this.activateReachableServer([fallback]);
-      }
-    } finally {
-      this.recoveringServer = false;
-    }
-  };
-
   setLanguageOption = async (value: string): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.language, value);
     this.setState({
@@ -1813,12 +1739,10 @@ export class LoadedAppClass extends Component<
       server.kind !== 'offline' &&
       server.chainName !== ChainNameEnum.mainChainName
     ) {
-      const mainnet = serverUris(this.state.translate).find(
-        s => s.chainName === ChainNameEnum.mainChainName && s.default,
-      );
+      const mainnet = await loadDefaultIndexer(ChainNameEnum.mainChainName);
       if (mainnet) {
         await SettingsFileImpl.writeServer(
-          remoteServer(mainnet.uri, mainnet.chainName),
+          remoteServer(mainnet, ChainNameEnum.mainChainName),
           SelectServerEnum.auto,
         );
       }

@@ -46,7 +46,6 @@ import {
   SendPageStateClass,
   ToAddrClass,
   GlobalConst,
-  SelectServerEnum,
   Route,
   ProposalPoolsType,
 } from '@app/AppState';
@@ -88,7 +87,6 @@ import ShowAddressAlertAsync from '@app/services/showAddressAlertAsync';
 import Memo from './components/Memo';
 import SendErrorSheet from './components/SendErrorSheet';
 import { sendEmail } from '@app/services/sendEmail';
-import { retryServer } from '@app/services/retryServer';
 import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
@@ -108,7 +106,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
     clearToAddr,
     setScrollToTop,
     setScrollToBottom,
-    setServerOption,
     setShieldingAmount,
     translate,
     info,
@@ -125,7 +122,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
     launchAddTagModal,
     defaultUnifiedAddress,
     shieldingAmount,
-    selectServer,
     zingolibVersion,
     setPrivacyOption,
     mixnetView,
@@ -949,14 +945,9 @@ const Send: React.FunctionComponent<SendProps> = () => {
     const sendAllSend = isSendAllAmount(sendPageStatePar.toaddr.amount);
     const settlement = await settleSend(
       () => sendTransaction(sendPageStatePar, sendAllSend),
-      async () => {
-        const target = await retryServer(server, translate);
-        if (target !== server) {
-          await setServerOption(target, selectServer, false, true);
-        }
-      },
-      // A `custom` server is the user's own choice, and the retry keeps it.
-      selectServer !== SelectServerEnum.custom && server.kind !== 'offline',
+      // Zingo offers one server, so a refused send has no other to retry on.
+      async () => {},
+      false,
     );
 
     if (settlement.kind === 'sent') {
