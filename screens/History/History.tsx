@@ -72,7 +72,10 @@ import { RecyclerListViewState } from 'recyclerlistview/dist/reactnative/core/Re
 import { Swipeable } from 'react-native-gesture-handler';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
-import Filters from './components/Filters';
+import Filters, { HISTORY_FILTERS, filterOf } from './components/Filters';
+import Text from '@ui/primitives/Text';
+import FreshGlow from './components/FreshGlow';
+import { useFreshRows } from './useFreshRows';
 import { FiltersIcon } from '@ui/primitives/Icons/FiltersIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { ChevronUp } from '@ui/primitives/Icons/Chevron';
@@ -707,6 +710,9 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     [navigation, valueTransfersSliced, valueTransfersFiltered],
   );
 
+  /** Transactions that turned up while History is open, lit for a moment. */
+  const freshRows = useFreshRows(valueTransfers);
+
   const rowRenderer = (
     _type: string | number,
     item: HistoryItem,
@@ -740,15 +746,17 @@ const History: React.FunctionComponent<HistoryProps> = () => {
         );
       default:
         return (
-          <ValueTransferLine
-            index={index}
-            vt={item.vt}
-            hairline={!item.first}
-            setValueTransferDetailModalShow={setValueTransferDetailModalShow}
-            registerSwipeable={registerSwipeable(index)}
-            closeAllSwipeables={() => closeAllSwipeables()}
-            closeOtherSwipeables={() => closeAllSwipeables(index)}
-          />
+          <FreshGlow fresh={freshRows.has(item.vt.txid)}>
+            <ValueTransferLine
+              index={index}
+              vt={item.vt}
+              hairline={!item.first}
+              setValueTransferDetailModalShow={setValueTransferDetailModalShow}
+              registerSwipeable={registerSwipeable(index)}
+              closeAllSwipeables={() => closeAllSwipeables()}
+              closeOtherSwipeables={() => closeAllSwipeables(index)}
+            />
+          </FreshGlow>
         );
     }
   };
@@ -797,13 +805,16 @@ const History: React.FunctionComponent<HistoryProps> = () => {
           <FiltersIcon color={colors.fgMuted} size={20} />
           {(!!filterKind || filterFailed || filterMemos || filterWithFunds) && (
             <View
+              testID="history.filter.dot"
               style={{
-                backgroundColor: colors.fgDefault,
-                width: 7,
-                height: 7,
-                borderRadius: 7,
+                backgroundColor: colors.fgPriceUp,
+                width: 8,
+                height: 8,
+                borderRadius: 4,
                 marginLeft: -3,
                 marginTop: -8,
+                borderWidth: 2,
+                borderColor: colors.bgSurface,
               }}
             />
           )}
@@ -811,6 +822,9 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       </View>
     </View>
   );
+
+  /** The one filter on, for the bar over the list. */
+  const activeFilter = filterOf(filterKind, filterFailed, filterMemos);
 
   const filtersXHeader = (
     <View
@@ -920,6 +934,58 @@ const History: React.FunctionComponent<HistoryProps> = () => {
               />
             ) : (
               <View style={{ flex: 1, width: '100%' }}>
+                {activeFilter !== 'all' && (
+                  <View
+                    testID="history.filter.bar"
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginHorizontal: 20,
+                      marginTop: 4,
+                      marginBottom: 4,
+                      paddingVertical: 8,
+                      paddingLeft: 16,
+                      paddingRight: 8,
+                      borderRadius: 12,
+                      borderWidth: 1,
+                      borderColor: colors.borderAccent,
+                      backgroundColor: colors.bgAccentSubtle,
+                    }}
+                  >
+                    <Text variant="caption" tone="muted">
+                      {`${translate('history.filter-showing') as string} `}
+                      <Text variant="caption" style={{ fontWeight: '700' }}>
+                        {(
+                          translate(
+                            HISTORY_FILTERS.find(
+                              ([key]) => key === activeFilter,
+                            )?.[1] ?? 'history.filter-all',
+                          ) as string
+                        ).trim()}
+                      </Text>
+                    </Text>
+                    <Pressable
+                      testID="history.filter.clear"
+                      accessibilityRole="button"
+                      hitSlop={8}
+                      onPress={() => {
+                        setFilterKind(null);
+                        setFilterFailed(false);
+                        setFilterMemos(false);
+                        setFilterWithFunds(false);
+                      }}
+                      style={{ paddingHorizontal: 8, paddingVertical: 4 }}
+                    >
+                      <Text
+                        variant="caption"
+                        style={{ fontWeight: '700', color: colors.fgPriceUp }}
+                      >
+                        {translate('clear') as string}
+                      </Text>
+                    </Pressable>
+                  </View>
+                )}
                 {valueTransfersSliced && valueTransfersSliced.length > 0 ? (
                   <RecyclerListView
                     ref={scrollViewRef}
@@ -943,6 +1009,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                     layoutProvider={layoutProvider}
                     dataProvider={dataProvider}
                     rowRenderer={rowRenderer}
+                    extendedState={{ freshRows }}
                     onEndReached={onEndReached}
                     onEndReachedThreshold={0.5}
                     renderFooter={() =>

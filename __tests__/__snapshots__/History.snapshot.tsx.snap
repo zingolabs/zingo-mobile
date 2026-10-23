@@ -841,6 +841,11 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
               }
             }
             disableRecycling={false}
+            extendedState={
+              {
+                "freshRows": Set {},
+              }
+            }
             externalScrollView={[Function]}
             horizontal={false}
             initialOffset={0}
@@ -1593,7 +1598,7 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
               }
               testID="header.balance"
             >
-              1.6235
+              1.6234
             </Text>
             <Text
               maxFontSizeMultiplier={2}
@@ -2276,6 +2281,11 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
               }
             }
             disableRecycling={false}
+            extendedState={
+              {
+                "freshRows": Set {},
+              }
+            }
             externalScrollView={[Function]}
             horizontal={false}
             initialOffset={0}
