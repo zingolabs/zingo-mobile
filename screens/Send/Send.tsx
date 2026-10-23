@@ -11,8 +11,6 @@ import {
   View,
   ScrollView,
   Keyboard,
-  TextInput,
-  TouchableOpacity,
   Platform,
   Pressable,
   StyleSheet,
@@ -22,7 +20,19 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useNavigation, useScrollToTop } from '@react-navigation/native';
-import { useTheme, space20, slopFor } from '@app/theme';
+import {
+  useTheme,
+  iconSize,
+  iconSizeMd,
+  iconSizeSm,
+  slopFor,
+  space4,
+  space8,
+  space16,
+  space20,
+  touchTarget,
+} from '@app/theme';
+import TextField from '@ui/primitives/TextField';
 import { getNumberFormatSettings } from 'react-native-localize';
 
 import BoldText from '@ui/primitives/BoldText';
@@ -86,7 +96,6 @@ import SendErrorSheet from './components/SendErrorSheet';
 import { sendEmail } from '@app/services/sendEmail';
 import { retryServer } from '@app/services/retryServer';
 import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
-import { fieldBorder } from '@ui/primitives/fieldBorder';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import { onTabScroll } from '@app/navigation/tabBarScroll';
@@ -238,12 +247,12 @@ const Send: React.FunctionComponent<SendProps> = () => {
   const showCalcError = !!(spendableBalanceLastError || proposeSendLastError);
   // Nothing to spend or a failed read turn Available red.
   const spendableError = negativeMaxAmount || !!spendableBalanceLastError;
-  const memoTooLong =
-    Utils.countMemoBytes(
-      memoText,
-      includeUAMemoBoolean,
-      defaultUnifiedAddress,
-    ) > GlobalConst.memoMaxLength;
+  const memoBytes = Utils.countMemoBytes(
+    memoText,
+    includeUAMemoBoolean,
+    defaultUnifiedAddress,
+  );
+  const memoTooLong = memoBytes > GlobalConst.memoMaxLength;
   const feeCalculationGenRef = useRef<number>(0);
   const { decimalSeparator } = getNumberFormatSettings();
   const keyboardHeight = useKeyboardHeight();
@@ -1188,7 +1197,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                 marginBottom:
                   Platform.OS === GlobalConst.platformOSandroid ? 30 : 250,
                 paddingHorizontal: space20,
-                paddingTop: 5,
+                paddingTop: space8,
               }}
             >
               <RecipientField
@@ -1321,15 +1330,16 @@ const Send: React.FunctionComponent<SendProps> = () => {
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    columnGap: 6,
-                    marginTop: 6,
+                    gap: space8,
+                    marginTop: space8,
                   }}
                 >
-                  <InfoIcon size={14} color={colors.fgDanger} />
+                  <InfoIcon size={iconSizeSm} color={colors.fgDanger} />
                   <Text
                     testID="send.amount.error"
-                    variant="caption"
-                    style={{ color: colors.fgDanger, flexShrink: 1 }}
+                    variant="bodySmall"
+                    tone="danger"
+                    style={{ flexShrink: 1 }}
                   >
                     {validAmount === -1
                       ? (translate('send.amount-zero') as string)
@@ -1350,188 +1360,158 @@ const Send: React.FunctionComponent<SendProps> = () => {
 
               {memoEnabled === true &&
                 (memoOpen || !!memoText ? (
-                  <View style={{ marginTop: 14 }}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        marginBottom: 8,
+                  <View style={{ marginTop: space16 }}>
+                    <TextField
+                      testID="send.memo-field"
+                      label={translate('send.memo') as string}
+                      labelRight={
+                        <Text variant="caption" tone="muted">
+                          {translate('send.memo-private') as string}
+                        </Text>
+                      }
+                      accessibilityLabel={translate('send.memo-acc') as string}
+                      placeholder={translate('send.memo-placeholder') as string}
+                      multiline
+                      value={memoText}
+                      error={
+                        memoTooLong
+                          ? (translate('send.memo-count') as string)
+                              .replace('{n}', String(memoBytes))
+                              .replace(
+                                '{max}',
+                                String(GlobalConst.memoMaxLength),
+                              )
+                          : undefined
+                      }
+                      footer={
+                        <Text
+                          testID="send.memo-count"
+                          variant="caption"
+                          tone="muted"
+                          style={{ textAlign: 'right' }}
+                        >
+                          {(translate('send.memo-count') as string)
+                            .replace('{n}', String(memoBytes))
+                            .replace(
+                              '{max}',
+                              String(GlobalConst.memoMaxLength),
+                            )}
+                        </Text>
+                      }
+                      onChangeText={(text: string) => {
+                        updateToField(
+                          null,
+                          !amountText && !!text ? '0' : null,
+                          null,
+                          text,
+                          null,
+                        );
                       }}
-                    >
-                      <Text
-                        variant="caption"
-                        tone="muted"
-                        style={{ fontWeight: '600' }}
-                      >
-                        {translate('send.memo') as string}
-                      </Text>
-                      <Text variant="caption" tone="muted">
-                        {translate('send.memo-private') as string}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        borderWidth: 1,
-                        borderRadius: 12,
-                        borderColor: fieldBorder(
-                          colors,
-                          focusedField === 'memo',
-                          memoTooLong ? 'invalid' : 'unknown',
-                        ),
-                        backgroundColor: colors.bgCanvas,
-                        minHeight: 48,
-                        maxHeight: 130,
-                        paddingVertical: 10,
-                        paddingHorizontal: 12,
+                      onEndEditing={(
+                        e: NativeSyntheticEvent<TextInputEndEditingEventData>,
+                      ) => {
+                        updateToField(
+                          null,
+                          !amountText && !!e.nativeEvent.text ? '0' : null,
+                          null,
+                          e.nativeEvent.text,
+                          null,
+                        );
+                        calculateFeeWithPropose(
+                          amountText,
+                          addressText,
+                          e.nativeEvent.text,
+                          includeUAMemoBoolean,
+                        );
                       }}
-                    >
-                      <TextInput
-                        testID="send.memo-field"
-                        accessibilityLabel={
-                          translate('send.memo-acc') as string
-                        }
-                        placeholder={
-                          translate('send.memo-placeholder') as string
-                        }
-                        placeholderTextColor={colors.fgMuted}
-                        multiline
-                        style={{
-                          flex: 1,
-                          color:
-                            validMemo === -1
-                              ? colors.fgDanger
-                              : colors.fgDefault,
-                          fontSize: 15,
-                          minHeight: 28,
-                          padding: 0,
-                          textAlignVertical: 'top',
-                        }}
-                        value={memoText}
-                        onChangeText={(text: string) => {
-                          updateToField(
-                            null,
-                            !amountText && !!text ? '0' : null,
-                            null,
-                            text,
-                            null,
-                          );
-                        }}
-                        onEndEditing={(
-                          e: NativeSyntheticEvent<TextInputEndEditingEventData>,
-                        ) => {
-                          updateToField(
-                            null,
-                            !amountText && !!e.nativeEvent.text ? '0' : null,
-                            null,
-                            e.nativeEvent.text,
-                            null,
-                          );
-                          calculateFeeWithPropose(
-                            amountText,
-                            addressText,
-                            e.nativeEvent.text,
-                            includeUAMemoBoolean,
-                          );
-                        }}
-                        onContentSizeChange={(
-                          e: NativeSyntheticEvent<TextInputContentSizeChangeEventData>,
-                        ) => {
-                          const tall =
-                            e.nativeEvent.contentSize.height >
-                            (Platform.OS === GlobalConst.platformOSandroid
-                              ? 70
-                              : 35);
-                          if (tall !== memoIcon) {
-                            setMemoIcon(tall);
-                            if (tall) {
-                              scrollToEnd();
-                            }
-                          }
-                        }}
-                        maxLength={GlobalConst.memoMaxLength}
-                        onBlur={() => setFocusedField('none')}
-                        onFocus={() => {
-                          setFocusedField('memo');
-                          // The sheet opens to its top stop so the memo and
-                          // the rest of the form stay above the keyboard.
-                          safeSnapToIndex(
-                            sendSheetRef,
-                            sendSnapPoints.length - 1,
-                            sendSnapPoints.length,
-                          );
-                          if (keyboardVisible) {
+                      onContentSizeChange={(
+                        e: NativeSyntheticEvent<TextInputContentSizeChangeEventData>,
+                      ) => {
+                        const tall =
+                          e.nativeEvent.contentSize.height >
+                          (Platform.OS === GlobalConst.platformOSandroid
+                            ? 70
+                            : 35);
+                        if (tall !== memoIcon) {
+                          setMemoIcon(tall);
+                          if (tall) {
                             scrollToEnd();
-                          } else {
-                            setTimeout(() => scrollToEnd(), 1000);
                           }
-                        }}
-                      />
-                      {!!memoText && (
-                        <TouchableOpacity
-                          hitSlop={slopFor(20)}
-                          onPress={() =>
-                            updateToField(null, null, null, '', null)
-                          }
-                        >
-                          <XIcon size={18} color={colors.fgMuted} />
-                        </TouchableOpacity>
-                      )}
-                      {memoIcon && (
-                        <TouchableOpacity
-                          hitSlop={slopFor(24)}
-                          onPress={() => setMemoModalShow()}
-                          style={{ marginLeft: 6 }}
-                        >
-                          <ZoomInIcon size={22} color={colors.fgMuted} />
-                        </TouchableOpacity>
-                      )}
-                    </View>
-                    <Text
-                      testID="send.memo-count"
-                      variant="caption"
-                      style={{
-                        textAlign: 'right',
-                        marginTop: 4,
-                        color: memoTooLong ? colors.fgDanger : colors.fgMuted,
+                        }
                       }}
-                    >
-                      {(translate('send.memo-count') as string)
-                        .replace(
-                          '{n}',
-                          String(
-                            Utils.countMemoBytes(
-                              memoText,
-                              includeUAMemoBoolean,
-                              defaultUnifiedAddress,
-                            ),
-                          ),
-                        )
-                        .replace('{max}', String(GlobalConst.memoMaxLength))}
-                    </Text>
+                      maxLength={GlobalConst.memoMaxLength}
+                      onBlur={() => setFocusedField('none')}
+                      onFocus={() => {
+                        setFocusedField('memo');
+                        // The sheet opens to its top stop so the memo and
+                        // the rest of the form stay above the keyboard.
+                        safeSnapToIndex(
+                          sendSheetRef,
+                          sendSnapPoints.length - 1,
+                          sendSnapPoints.length,
+                        );
+                        if (keyboardVisible) {
+                          scrollToEnd();
+                        } else {
+                          setTimeout(() => scrollToEnd(), 1000);
+                        }
+                      }}
+                      trailing={
+                        <>
+                          {!!memoText && (
+                            <Pressable
+                              accessibilityRole="button"
+                              accessibilityLabel={translate('clear') as string}
+                              hitSlop={slopFor(touchTarget)}
+                              onPress={() =>
+                                updateToField(null, null, null, '', null)
+                              }
+                              style={{
+                                width: touchTarget,
+                                height: touchTarget,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}
+                            >
+                              <XIcon size={iconSizeMd} color={colors.fgMuted} />
+                            </Pressable>
+                          )}
+                          {memoIcon && (
+                            <Pressable
+                              accessibilityRole="button"
+                              hitSlop={slopFor(touchTarget)}
+                              onPress={() => setMemoModalShow()}
+                              style={{
+                                width: touchTarget,
+                                height: touchTarget,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}
+                            >
+                              <ZoomInIcon
+                                size={iconSize}
+                                color={colors.fgMuted}
+                              />
+                            </Pressable>
+                          )}
+                        </>
+                      }
+                    />
                   </View>
                 ) : (
-                  <Pressable
-                    testID="send.memo-open"
-                    accessibilityRole="button"
-                    onPress={() => setMemoOpen(true)}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      columnGap: 6,
-                      marginTop: 14,
-                      minHeight: 40,
-                    }}
+                  <View
+                    style={{ marginTop: space16, alignItems: 'flex-start' }}
                   >
-                    <PlusIcon size={16} color={colors.fgAccent} />
-                    <Text
-                      variant="caption"
-                      style={{ fontWeight: '700', color: colors.fgAccent }}
-                    >
-                      {translate('send.memo-add') as string}
-                    </Text>
-                  </Pressable>
+                    <Button
+                      testID="send.memo-open"
+                      variant="text"
+                      size="small"
+                      inline
+                      icon={PlusIcon}
+                      title={translate('send.memo-add') as string}
+                      onPress={() => setMemoOpen(true)}
+                    />
+                  </View>
                 ))}
 
               {/* The button waits while the mixnet cannot carry a send, and says
@@ -1539,7 +1519,11 @@ const Send: React.FunctionComponent<SendProps> = () => {
               {mixnetView.kind === 'transport' && mixnetView.sendBlocked && (
                 <View
                   testID="send.mixnet-blocked"
-                  style={{ alignItems: 'center', rowGap: 4, marginTop: 16 }}
+                  style={{
+                    alignItems: 'center',
+                    rowGap: space4,
+                    marginTop: space16,
+                  }}
                 >
                   <Text
                     variant="bodySmall"
@@ -1556,7 +1540,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                   </Text>
                 </View>
               )}
-              <View style={{ marginTop: 14, marginBottom: 20 }}>
+              <View style={{ marginTop: space16, marginBottom: space20 }}>
                 {showCalcError ? (
                   <Button
                     variant="text"

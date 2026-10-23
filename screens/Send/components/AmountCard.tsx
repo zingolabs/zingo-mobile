@@ -1,9 +1,22 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
-import { radiusMd, radiusPill, useTheme } from '@app/theme';
+import {
+  chipMinHeight,
+  fontScaleDisplay,
+  iconSizeSm,
+  radiusMd,
+  radiusPill,
+  space4,
+  space8,
+  space12,
+  space16,
+  textVariants,
+  useTheme,
+} from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import Text from '@ui/primitives/Text';
+import { useInsetFill } from '@ui/primitives/Surface';
 import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
 
 type AmountCardProps = {
@@ -28,9 +41,10 @@ type AmountCardProps = {
 };
 
 /**
- * Send's amount: the number at 36 with its unit pill (ZEC or USD), the
- * converted value under it, and "Available" (tap it to send the most you
- * can) with the network fee on the right.
+ * Send's amount (the designer's exception C): a dark card with the number
+ * in the balance style and its unit pill (ZEC or USD), the converted value
+ * under it, and a bottom row with "Available" (tap it to send the most you
+ * can) and the network fee.
  */
 export default function AmountCard({
   value,
@@ -49,14 +63,12 @@ export default function AmountCard({
 }: AmountCardProps) {
   const { translate } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
+  const inset = useInsetFill();
   const t = (key: string) => (translate(key) as string).trim();
+  const amountStyle = textVariants.balance;
   return (
-    <View>
-      <Text
-        variant="caption"
-        tone="muted"
-        style={{ fontWeight: '600', marginBottom: 8, marginTop: 14 }}
-      >
+    <View style={{ gap: space8, marginTop: space16 }}>
+      <Text variant="bodySmall" tone="muted" style={{ fontWeight: '600' }}>
         {t('send.amount')}
       </Text>
       <View
@@ -68,14 +80,14 @@ export default function AmountCard({
             : focused
               ? colors.borderFocus
               : colors.bottomSheetBorder,
-          backgroundColor: colors.bgCanvas,
-          paddingTop: 14,
-          paddingHorizontal: 14,
-          paddingBottom: 4,
+          backgroundColor: inset,
+          paddingTop: space16,
+          paddingHorizontal: space16,
+          paddingBottom: space4,
         }}
       >
         <View
-          style={{ flexDirection: 'row', alignItems: 'center', columnGap: 10 }}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: space12 }}
         >
           <TextInput
             testID="send.amount"
@@ -87,15 +99,16 @@ export default function AmountCard({
             placeholderTextColor={colors.borderFocus}
             keyboardType="decimal-pad"
             maxLength={20}
+            maxFontSizeMultiplier={fontScaleDisplay}
             accessibilityLabel={t(
               unit === 'USD' ? 'send.usd-acc' : 'send.zec-acc',
             )}
             style={{
               flex: 1,
               minWidth: 0,
-              fontSize: 36,
-              lineHeight: 40,
-              fontWeight: '600',
+              fontSize: amountStyle.fontSize,
+              lineHeight: amountStyle.lineHeight,
+              fontWeight: amountStyle.fontWeight,
               fontVariant: ['tabular-nums'],
               color: invalid ? colors.fgDanger : colors.fgDefault,
               padding: 0,
@@ -110,26 +123,29 @@ export default function AmountCard({
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              columnGap: 4,
-              height: 32,
-              paddingHorizontal: 10,
+              gap: space4,
+              minHeight: chipMinHeight,
+              paddingHorizontal: space12,
               borderRadius: radiusPill,
-              backgroundColor: colors.borderSubtle,
+              borderWidth: 1,
+              borderColor: colors.bottomSheetBorder,
             }}
           >
-            <Text variant="bodyStrong">{unit}</Text>
+            <Text variant="bodySmall" style={{ fontWeight: '700' }}>
+              {unit}
+            </Text>
             {!!onToggleUnit && (
               <View style={{ transform: [{ rotate: '90deg' }] }}>
-                <SwapIcon size={16} color={colors.fgMuted} />
+                <SwapIcon size={iconSizeSm} color={colors.fgMuted} />
               </View>
             )}
           </Pressable>
         </View>
         <Text
           testID="send.zec-derived"
-          variant="body"
+          variant="bodySmall"
           tone="muted"
-          style={{ marginTop: 4 }}
+          style={{ marginTop: space4 }}
         >
           {converted}
         </Text>
@@ -138,31 +154,29 @@ export default function AmountCard({
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            minHeight: 40,
+            minHeight: chipMinHeight,
+            marginTop: space8,
+            borderTopWidth: 1,
+            borderTopColor: colors.borderSubtle,
           }}
         >
           <Pressable
             testID="send.max"
             accessibilityRole="button"
             onPress={onMax}
-            hitSlop={8}
-            style={{ flexDirection: 'row', columnGap: 4, paddingVertical: 6 }}
+            hitSlop={space8}
+            style={{ flexDirection: 'row', gap: space4 }}
           >
             <Text
               variant="caption"
-              style={{
-                color: availableError ? colors.fgDanger : colors.fgMuted,
-              }}
+              color={availableError ? colors.fgDanger : colors.fgMuted}
             >
               {t('send.available')}
             </Text>
             <Text
               variant="caption"
-              style={{
-                fontWeight: '700',
-                textDecorationLine: 'underline',
-                color: availableError ? colors.fgDanger : colors.fgDefault,
-              }}
+              color={availableError ? colors.fgDanger : colors.fgDefault}
+              style={{ fontWeight: '700', textDecorationLine: 'underline' }}
             >
               {available}
             </Text>
