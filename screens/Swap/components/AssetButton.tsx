@@ -1,4 +1,3 @@
- 
 import React from 'react';
 import { Pressable, View } from 'react-native';
 import { radiusPill, space8, useTheme } from '@app/theme';

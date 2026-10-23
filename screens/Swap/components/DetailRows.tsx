@@ -5,6 +5,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import { radiusMd, space12, useTheme, iconSizeSm } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import Text from '@ui/primitives/Text';
+import { useInsetFill } from '@ui/primitives/Surface';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
 
@@ -31,6 +32,7 @@ export type DetailRow = {
 export default function DetailRows({ rows }: { rows: DetailRow[] }) {
   const { translate, addLastSnackbar } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
+  const inset = useInsetFill();
   const toneColor = (tone: DetailRow['tone']) =>
     tone === 'positive'
       ? colors.fgAccent
@@ -45,7 +47,7 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
         borderWidth: 1,
         borderColor: colors.bottomSheetBorder,
         borderRadius: radiusMd,
-        backgroundColor: colors.bgCanvas,
+        backgroundColor: inset,
       }}
     >
       {rows.map((row, index) => (

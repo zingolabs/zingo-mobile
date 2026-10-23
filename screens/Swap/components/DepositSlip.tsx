@@ -3,14 +3,7 @@ import React, { useContext } from 'react';
 import { Pressable, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Clipboard from '@react-native-clipboard/clipboard';
-import {
-  radiusMd,
-  radiusPill,
-  space12,
-  space4,
-  useTheme,
-  iconSizeSm,
-} from '@app/theme';
+import { radiusMd, space12, space4, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   buildDepositQr,
@@ -23,6 +16,8 @@ import {
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
 import Text from '@ui/primitives/Text';
+import { useInsetFill } from '@ui/primitives/Surface';
+import Button from '@ui/primitives/Button';
 import Banner from '@ui/widgets/Banner';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
@@ -50,6 +45,7 @@ type DepositSlipProps = {
 export default function DepositSlip({ record, paid }: DepositSlipProps) {
   const { translate, info } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
+  const inset = useInsetFill();
   const t = (key: string) => translate(key) as string;
   const [copiedKey, setCopiedKey] = React.useState<string>('');
   const copy = (key: string, value: string) => {
@@ -85,33 +81,16 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
   const pill = (key: string, label: string, value: string) => {
     const done = copiedKey === key;
     return (
-      <Pressable
-        testID={`swap.deposit.${key}`}
-        accessibilityRole="button"
-        onPress={() => copy(key, value)}
-        style={({ pressed }) => ({
-          flex: 1,
-          height: 41,
-          borderRadius: radiusPill,
-          backgroundColor: colors.bgSurface,
-          borderWidth: 1,
-          borderColor: colors.bottomSheetBorder,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
-          columnGap: 8,
-          transform: [{ scale: pressed ? 0.97 : 1 }],
-        })}
-      >
-        {done ? (
-          <CheckIcon size={iconSizeSm} color={colors.fgAccent} />
-        ) : (
-          <CopyIcon size={iconSizeSm} color={colors.fgDefault} />
-        )}
-        <Text variant="caption" style={{ fontWeight: '700' }}>
-          {done ? t('swap.copied') : label}
-        </Text>
-      </Pressable>
+      <View style={{ flex: 1 }}>
+        <Button
+          testID={`swap.deposit.${key}`}
+          variant="secondary"
+          size="small"
+          icon={done ? CheckIcon : CopyIcon}
+          title={done ? t('swap.copied') : label}
+          onPress={() => copy(key, value)}
+        />
+      </View>
     );
   };
 
@@ -147,7 +126,7 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
           paddingHorizontal: 16,
           paddingBottom: 16,
           borderRadius: radiusMd,
-          backgroundColor: colors.bgCanvas,
+          backgroundColor: inset,
           borderWidth: 1,
           borderColor: colors.bottomSheetBorder,
         }}
@@ -208,7 +187,7 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
           borderWidth: 1,
           borderColor: colors.bottomSheetBorder,
           borderRadius: radiusMd,
-          backgroundColor: colors.bgCanvas,
+          backgroundColor: inset,
         }}
       >
         {row(
@@ -259,38 +238,27 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
               {memoHint}
             </Text>
             <View style={{ flexDirection: 'row', columnGap: 16 }}>
-              <Pressable
-                accessibilityRole="button"
+              <Button
+                variant="text"
+                size="small"
+                inline
+                title={
+                  copiedKey === 'memo' ? t('swap.copied') : t('swap.copy-memo')
+                }
                 onPress={() => copy('memo', memo)}
-                style={{ minHeight: 28, justifyContent: 'center' }}
-              >
-                <Text
-                  variant="caption"
-                  style={{ fontWeight: '700', textDecorationLine: 'underline' }}
-                >
-                  {copiedKey === 'memo'
-                    ? t('swap.copied')
-                    : t('swap.copy-memo')}
-                </Text>
-              </Pressable>
+              />
               {isEvmSourceChain(asset.chain) && (
-                <Pressable
-                  accessibilityRole="button"
-                  onPress={() => copy('memo-hex', memoToHexCalldata(memo))}
-                  style={{ minHeight: 28, justifyContent: 'center' }}
-                >
-                  <Text
-                    variant="caption"
-                    style={{
-                      fontWeight: '700',
-                      textDecorationLine: 'underline',
-                    }}
-                  >
-                    {copiedKey === 'memo-hex'
+                <Button
+                  variant="text"
+                  size="small"
+                  inline
+                  title={
+                    copiedKey === 'memo-hex'
                       ? t('swap.copied')
-                      : t('swap.memo-hex')}
-                  </Text>
-                </Pressable>
+                      : t('swap.memo-hex')
+                  }
+                  onPress={() => copy('memo-hex', memoToHexCalldata(memo))}
+                />
               )}
             </View>
           </View>
