@@ -32,13 +32,9 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
-            "display": "flex",
-            "flexDirection": "row",
-            "flexWrap": "wrap",
-            "gap": 8,
+            "height": 57,
             "justifyContent": "center",
-            "marginHorizontal": 5,
-            "marginTop": 12,
+            "paddingTop": 12,
           }
         }
       />

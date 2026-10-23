@@ -430,7 +430,20 @@
     "nonetwork": "The mixnet is off because your device has no network connection. It connects again by itself as soon as the network is back."
   },
   "header": {
-    "lastupdate": "Last update:"
+    "lastupdate": "Last update:",
+    "total-balance": "Total balance",
+    "hide-amounts": "Hide amounts",
+    "show-amounts": "Show amounts",
+    "sync-synced": "Synced",
+    "sync-just-now": "just now",
+    "sync-minutes-ago": "{n} min ago",
+    "sync-balance-from": "balance from {ago}",
+    "sync-no-internet": "No internet",
+    "sync-offline": "Offline",
+    "sync-connecting": "Connecting to {host}…",
+    "sync-syncing": "Syncing {n}%",
+    "sync-mobile-data": "Mobile data",
+    "sync-open-report": "Open the Sync report"
   },
   "info": {
     "error-price-fetch": "The ZEC price could not be fetched.",
@@ -1382,7 +1395,21 @@
     "title": "Seed phrase",
     "pending": "not backed up",
     "body-pending": "If you lose your phone, this is the only way to recover your funds.",
-    "button": "Back up"
+    "button": "Back up",
+    "done": "backed up"
+  },
+  "shield": {
+    "title": "Shield transparent funds",
+    "sub": "Moves your public balance into your shielded balance, so nobody can see it.",
+    "from": "From",
+    "transparent": "Transparent",
+    "amount": "Amount",
+    "fee": "Network fee",
+    "you-get": "You get in Orchard",
+    "button": "Shield",
+    "notice-title": "Transparent funds",
+    "notice-public": "public",
+    "notice-body": "{amount} can be seen by anyone. Shield it to keep it private."
   },
   "seedbackup": {
     "close": "Close",

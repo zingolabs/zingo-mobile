@@ -34,13 +34,9 @@ exports[`Component Unified Address List - test Address Transparent List - snapsh
           style={
             {
               "alignItems": "center",
-              "display": "flex",
-              "flexDirection": "row",
-              "flexWrap": "wrap",
-              "gap": 8,
+              "height": 57,
               "justifyContent": "center",
-              "marginHorizontal": 5,
-              "marginTop": 12,
+              "paddingTop": 12,
             }
           }
         />
@@ -183,13 +179,9 @@ exports[`Component Unified Address List - test Address Unified List - snapshot 1
           style={
             {
               "alignItems": "center",
-              "display": "flex",
-              "flexDirection": "row",
-              "flexWrap": "wrap",
-              "gap": 8,
+              "height": 57,
               "justifyContent": "center",
-              "marginHorizontal": 5,
-              "marginTop": 12,
+              "paddingTop": 12,
             }
           }
         />

@@ -430,7 +430,20 @@
     "nonetwork": "A mixnet está desativada porque o seu dispositivo não tem conexão de rede. Ela se reconecta sozinha assim que a rede voltar."
   },
   "header": {
-    "lastupdate": "Última atualização:"
+    "lastupdate": "Última atualização:",
+    "total-balance": "Saldo total",
+    "hide-amounts": "Ocultar valores",
+    "show-amounts": "Mostrar valores",
+    "sync-synced": "Sincronizado",
+    "sync-just-now": "agora mesmo",
+    "sync-minutes-ago": "há {n} min",
+    "sync-balance-from": "saldo de {ago}",
+    "sync-no-internet": "Sem internet",
+    "sync-offline": "Offline",
+    "sync-connecting": "Conectando a {host}…",
+    "sync-syncing": "Sincronizando {n}%",
+    "sync-mobile-data": "Dados móveis",
+    "sync-open-report": "Abrir o relatório de sincronização"
   },
   "info": {
     "error-price-fetch": "Não foi possível obter o preço do ZEC.",
@@ -1382,7 +1395,21 @@
     "title": "Frase semente",
     "pending": "sem backup",
     "body-pending": "Se você perder o celular, esta é a única forma de recuperar seus fundos.",
-    "button": "Fazer backup"
+    "button": "Fazer backup",
+    "done": "backup feito"
+  },
+  "shield": {
+    "title": "Proteger fundos transparentes",
+    "sub": "Move seu saldo público para o saldo protegido, para que ninguém possa vê-lo.",
+    "from": "De",
+    "transparent": "Transparente",
+    "amount": "Valor",
+    "fee": "Taxa de rede",
+    "you-get": "Você recebe no Orchard",
+    "button": "Proteger",
+    "notice-title": "Fundos transparentes",
+    "notice-public": "público",
+    "notice-body": "Qualquer pessoa pode ver {amount}. Proteja para mantê-lo privado."
   },
   "seedbackup": {
     "close": "Fechar",
