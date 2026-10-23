@@ -20,6 +20,6 @@ appId: org.ZingoLabs.Zingo
 
 # Verify the add-new-contact button is present
 - assertVisible:
-    id: "addressbook.button.new"
+    id: "addressbook.new"
 
 - back

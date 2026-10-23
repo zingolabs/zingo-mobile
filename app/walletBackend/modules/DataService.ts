@@ -393,6 +393,9 @@ export class DataService {
       if (wallet) {
         this.walletBirthday = wallet.birthday;
         this.config.onBirthdayChanged(wallet.birthday || 0);
+        if (wallet.birthdayAdjustedFrom) {
+          this.config.onBirthdayAdjusted(wallet.birthday);
+        }
       }
     } catch (error) {
       console.log(`Critical Error wallet birthday ${error}`);
