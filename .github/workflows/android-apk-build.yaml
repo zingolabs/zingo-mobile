@@ -20,9 +20,9 @@ on:
         required: false
         type: boolean
         default: false
-      # When true, this job saves the Gradle cache that every Gradle job
-      # restores. One caller passes true, the CI run of a push to the
-      # default branch.
+      # When true, this job saves the Gradle cache and the NDK cache that
+      # every Gradle job restores. One caller passes true, the CI run of a
+      # push to the default branch.
       gradle-cache-writer:
         required: false
         type: boolean
@@ -61,11 +61,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Gradle cache
-        uses: ./.github/actions/gradle-cache
-        with:
-          writer: ${{ inputs.gradle-cache-writer }}
-
       # The unit tests of the cache fill read the proxy crate's Kotlin
       # wire-contract test from the submodule.
       - name: Check out zingolib
@@ -102,6 +97,13 @@ jobs:
 
           echo "Disk space after cleanup:"
           df -h
+
+      # The cleanup above removes the image's NDK directory, so the NDK
+      # cache restores after it.
+      - name: Gradle cache
+        uses: ./.github/actions/gradle-cache
+        with:
+          writer: ${{ inputs.gradle-cache-writer }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
