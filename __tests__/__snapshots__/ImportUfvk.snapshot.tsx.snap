@@ -298,12 +298,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           }
         />
         <View
-          style={
-            {
-              "elevation": 10,
-              "zIndex": 10,
-            }
-          }
+          style={null}
         >
           <View
             accessibilityLabel=""

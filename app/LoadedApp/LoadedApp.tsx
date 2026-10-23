@@ -105,6 +105,7 @@ import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
 import FadeInOnMount from '@ui/widgets/FadeInOnMount';
 import { showConfirm } from '@app/services/showConfirm';
 import { WalletNavigator } from '@app/navigation/WalletNavigator';
+import TooltipHost from '@ui/widgets/TooltipHost';
 import {
   closeOptionsPanel,
   OptionsPanelProvider,
@@ -2067,7 +2068,10 @@ export class LoadedAppClass extends Component<
                 <ConfirmBottomSheet />
                 <OptionsPanelProvider>
                   <FadeInOnMount duration={HOME_FADE_MS}>
-                    <WalletNavigator />
+                    {/* The tooltip layer for screens outside any sheet or panel. */}
+                    <TooltipHost>
+                      <WalletNavigator />
+                    </TooltipHost>
                   </FadeInOnMount>
                 </OptionsPanelProvider>
                 <AddTagModalHost

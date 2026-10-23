@@ -3,6 +3,7 @@ import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import BottomSheet, { BottomSheetFooterProps } from '@gorhom/bottom-sheet';
 import { radiusSheet, useTheme } from '@app/theme';
 import { SurfaceContext } from './Surface';
+import TooltipHost from '@ui/widgets/TooltipHost';
 import { duration, ease } from '@app/theme/motion';
 
 /** The panel moves between its stops like every sheet: 420 ms, (.2,0,0,1). */
@@ -89,7 +90,7 @@ const AppSheet = React.forwardRef<BottomSheet, AppSheetProps>(
             ]}
           >
             <SurfaceContext.Provider value="surface">
-              {children}
+              <TooltipHost>{children}</TooltipHost>
             </SurfaceContext.Provider>
           </View>
         </BottomSheet>

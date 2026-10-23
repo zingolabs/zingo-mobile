@@ -108,22 +108,12 @@ exports[`Component About - test About - snapshot 1`] = `
       ]
     }
   >
-    <Text
-      maxFontSizeMultiplier={2}
-      style={
-        {
-          "color": "#888888",
-          "fontSize": 15,
-          "fontWeight": "400",
-          "lineHeight": 21,
-        }
-      }
-    />
     <View
+      collapsable={false}
+      onLayout={[Function]}
       style={
         {
-          "display": "flex",
-          "marginTop": 20,
+          "flexGrow": 1,
         }
       }
     >
@@ -137,17 +127,37 @@ exports[`Component About - test About - snapshot 1`] = `
             "lineHeight": 21,
           }
         }
-      >
-        text translated
-      </Text>
-    </View>
-    <View
-      style={
-        {
-          "marginTop": 20,
+      />
+      <View
+        style={
+          {
+            "display": "flex",
+            "marginTop": 20,
+          }
         }
-      }
-    />
+      >
+        <Text
+          maxFontSizeMultiplier={2}
+          style={
+            {
+              "color": "#888888",
+              "fontSize": 15,
+              "fontWeight": "400",
+              "lineHeight": 21,
+            }
+          }
+        >
+          text translated
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "marginTop": 20,
+          }
+        }
+      />
+    </View>
   </View>
 </View>
 `;

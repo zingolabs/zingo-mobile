@@ -198,12 +198,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         >
           <View />
           <View
-            style={
-              {
-                "elevation": 10,
-                "zIndex": 10,
-              }
-            }
+            style={null}
           >
             <View
               accessibilityLabel="text translated"
