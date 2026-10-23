@@ -19,6 +19,10 @@ type AppSheetProps = {
   renderFooter?: (props: BottomSheetFooterProps) => React.ReactElement;
   onChange?: (index: number) => void;
   enableContentPanningGesture?: boolean;
+  /** Its own rise and fall; a full panel moves at the panel's pace. */
+  animationConfigs?: { duration: number; easing: typeof ease.emphasized };
+  /** False to appear at its snap at once, for a step inside a panel. */
+  animateOnMount?: boolean;
   // The sheet container is an accessibility element by default, which on
   // iOS collapses everything inside it into a single node: the content is
   // simply not in the accessibility tree any more. Off unless a caller has
@@ -54,6 +58,8 @@ const AppSheet = React.forwardRef<BottomSheet, AppSheetProps>(
       onChange,
       enableContentPanningGesture = false,
       accessible = false,
+      animationConfigs = SHEET_MOTION,
+      animateOnMount = true,
     },
     ref,
   ) => {
@@ -79,7 +85,8 @@ const AppSheet = React.forwardRef<BottomSheet, AppSheetProps>(
             borderTopRightRadius: radiusSheet,
           }}
           handleComponent={SheetHandle}
-          animationConfigs={SHEET_MOTION}
+          animationConfigs={animationConfigs}
+          animateOnMount={animateOnMount}
           footerComponent={renderFooter}
         >
           <View

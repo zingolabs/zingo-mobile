@@ -153,7 +153,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
   );
 
   return (
-    <FullPanel title="" center footer={footer} testID="computing">
+    <FullPanel title="" center motion="step" footer={footer} testID="computing">
       <View style={{ alignItems: 'center' }}>
         {isFailed ? (
           <>
