@@ -83,7 +83,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
       <BottomSheetFooter {...props} bottomInset={0}>
         <View
           style={{
-            paddingHorizontal: 24,
+            paddingHorizontal: 20,
             backgroundColor: colors.bgSurface,
             paddingTop: 10,
             paddingBottom: 24,
@@ -129,7 +129,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
         snapPoints={computingSnapPoints}
         renderFooter={renderComputingFooter}
         contentStyle={{
-          paddingHorizontal: 24,
+          paddingHorizontal: 20,
           paddingTop: 106,
           paddingBottom: 106,
           alignItems: 'center',

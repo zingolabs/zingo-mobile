@@ -134,7 +134,7 @@ exports[`Component Unified Address List - test Address Transparent List - snapsh
     >
       <View>
         <ActivityIndicator
-          color="#5a8c5a"
+          color="#888888"
           size={20}
           style={
             {
@@ -283,7 +283,7 @@ exports[`Component Unified Address List - test Address Unified List - snapshot 1
     >
       <View>
         <ActivityIndicator
-          color="#5a8c5a"
+          color="#888888"
           size={20}
           style={
             {

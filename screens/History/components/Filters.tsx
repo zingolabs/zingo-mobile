@@ -60,7 +60,14 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
         backgroundColor: colors.bgSurface,
       }}
     >
-      <View style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          marginVertical: 10,
+          marginHorizontal: 20,
+        }}
+      >
         <ScrollView
           contentContainerStyle={{
             width: '100%',
@@ -70,7 +77,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
         >
           <View
             style={{
-              width: '90%',
+              width: '100%',
               flexDirection: 'row',
               flexWrap: 'wrap',
               marginTop: 10,

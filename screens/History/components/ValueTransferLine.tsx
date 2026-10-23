@@ -8,7 +8,7 @@ import {
   iconSizeSm,
   slopFor,
   space12,
-  space16,
+  space20,
   space4,
   space8,
   useTheme,
@@ -85,7 +85,7 @@ const labelKey = (
   KIND_LABEL[kind][confirmations === 0 ? 0 : 1];
 
 /** The status line lines up with the row's text: padding, icon and gap. */
-const STATUS_INDENT = space16 + iconSize + space12;
+const STATUS_INDENT = space20 + iconSize + space12;
 
 const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   index,
@@ -133,7 +133,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     vt.status === RPCValueTransfersStatusEnum.failed
       ? colors.fgMuted
       : vt.confirmations >= 0 && vt.confirmations < GlobalConst.minConfirmations
-        ? colors.fgAccentDisabled
+        ? colors.fgWarning
         : vt.kind === ValueTransferKindEnum.Received ||
             vt.kind === ValueTransferKindEnum.Shield
           ? colors.fgAccent
@@ -189,7 +189,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               justifyContent: 'center',
               alignItems: 'center',
               transform: [{ translateX: trans }],
-              backgroundColor: colors.bgChrome,
+              backgroundColor: colors.bgSurface,
             }}
           >
             <View
@@ -207,11 +207,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   closeAllSwipeables();
                 }}
               >
-                <FileTextIcon
-                  style={{ opacity: 0.8 }}
-                  size={24}
-                  color={colors.fgDefault}
-                />
+                <FileTextIcon size={24} color={colors.fgDefault} />
               </TouchableOpacity>
             </View>
             {!!vt.address && !readOnly && server.kind !== 'offline' && (
@@ -281,14 +277,14 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     <View
       testID={`vt-${index + 1}`}
       style={{
-        display: 'flex',
+        flex: 1,
         flexDirection: 'column',
       }}
     >
       {month !== '' && (
         <View
           style={{
-            paddingLeft: 15,
+            paddingLeft: space20,
             paddingTop: 10,
             paddingBottom: 0,
             backgroundColor: colors.bgSurface,
@@ -298,7 +294,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
         </View>
       )}
       <TouchableOpacity
-        style={{ zIndex: 999 }}
+        style={{ zIndex: 999, flex: 1, justifyContent: 'center' }}
         onPress={async () => {
           closeAllSwipeables();
           await new Promise(r => requestAnimationFrame(r));
@@ -318,7 +314,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               leading={
                 <KindIcon
                   size={iconSize}
-                  color={inFlight ? colors.fgSyncing : amountColor}
+                  color={inFlight ? colors.fgWarning : amountColor}
                 />
               }
               title={
@@ -357,9 +353,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                       <MessagesIcon
                         style={{ marginLeft: space8 }}
                         size={iconSizeSm}
-                        color={
-                          failed ? colors.fgMuted : colors.fgAccentDisabled
-                        }
+                        color={failed ? colors.fgMuted : colors.fgMuted}
                       />
                     )}
                   </View>
@@ -367,7 +361,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               }
               trailing={
                 <ZecAmount
-                  style={{ opacity: failed ? 0.7 : 1 }}
                   size={15}
                   currencyName={info.currencyName}
                   color={failed ? colors.fgMuted : amountColor}
@@ -388,7 +381,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 {inFlight && (
                   <TriangleAlert
                     style={{ marginRight: space4 }}
-                    color={colors.fgSyncing}
+                    color={colors.fgWarning}
                     size={iconSizeSm}
                   />
                 )}
@@ -399,7 +392,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                       ? colors.fgDanger
                       : inFlight
                         ? colors.fgAccent
-                        : colors.fgAccentDisabled
+                        : colors.fgWarning
                   }
                   style={{
                     fontWeight: '700',
@@ -410,21 +403,25 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 </Text>
               </View>
             )}
-            {/* Lines of the same TXID render flush against each other; the
-                separator only marks the boundary between transactions, and
-                stops at the row's gutter like its content. */}
-            {!nextLineWithSameTxid && (
-              <View
-                style={{
-                  height: 1,
-                  marginHorizontal: space16,
-                  backgroundColor: colors.borderSubtle,
-                }}
-              />
-            )}
           </View>
         </Swipeable>
       </TouchableOpacity>
+      {/* Lines of the same TXID render flush against each other; the
+          separator only marks the boundary between transactions. It sits
+          at the bottom of the list's fixed-height cell, not under the
+          content, so the cell's spare height never gathers below it. */}
+      {!nextLineWithSameTxid && (
+        <View
+          style={{
+            position: 'absolute',
+            left: space20,
+            right: space20,
+            bottom: 0,
+            height: 1,
+            backgroundColor: colors.borderSubtle,
+          }}
+        />
+      )}
     </View>
   );
 };

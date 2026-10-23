@@ -234,14 +234,38 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                 <View
                   style={
                     {
-                      "alignItems": "flex-end",
+                      "alignItems": "baseline",
                       "flexDirection": "row",
                       "margin": 0,
                       "padding": 0,
                     }
                   }
                 >
+                  <View
+                    style={
+                      {
+                        "height": 42.47458712015612,
+                        "marginRight": 4.818419849456371,
+                        "width": 29.27298132143853,
+                      }
+                    }
+                  />
                   <Text
+                    maxFontSizeMultiplier={2}
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "fontSize": 25.2,
+                        "fontWeight": "700",
+                        "margin": 0,
+                        "padding": 0,
+                      }
+                    }
+                  >
+                    EC
+                  </Text>
+                  <Text
+                    maxFontSizeMultiplier={2}
                     style={
                       {
                         "color": "#c3c3c3",
@@ -1008,14 +1032,38 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                             <View
                               style={
                                 {
-                                  "alignItems": "flex-end",
+                                  "alignItems": "baseline",
                                   "flexDirection": "row",
                                   "margin": 0,
                                   "padding": 0,
                                 }
                               }
                             >
+                              <View
+                                style={
+                                  {
+                                    "height": 25.28249233342626,
+                                    "marginRight": 2.868107053247839,
+                                    "width": 17.424393643713408,
+                                  }
+                                }
+                              />
                               <Text
+                                maxFontSizeMultiplier={2}
+                                style={
+                                  {
+                                    "color": "#F99D00",
+                                    "fontSize": 15,
+                                    "fontWeight": "700",
+                                    "margin": 0,
+                                    "padding": 0,
+                                  }
+                                }
+                              >
+                                EC
+                              </Text>
+                              <Text
+                                maxFontSizeMultiplier={2}
                                 style={
                                   {
                                     "color": "#F99D00",
@@ -1216,7 +1264,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
           "flexDirection": "row",
           "justifyContent": "space-between",
           "paddingBottom": 6,
-          "paddingHorizontal": 16,
+          "paddingHorizontal": 0,
           "paddingTop": 8,
         }
       }
@@ -1840,14 +1888,38 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                 <View
                   style={
                     {
-                      "alignItems": "flex-end",
+                      "alignItems": "baseline",
                       "flexDirection": "row",
                       "margin": 0,
                       "padding": 0,
                     }
                   }
                 >
+                  <View
+                    style={
+                      {
+                        "height": 42.47458712015612,
+                        "marginRight": 4.818419849456371,
+                        "width": 29.27298132143853,
+                      }
+                    }
+                  />
                   <Text
+                    maxFontSizeMultiplier={2}
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "fontSize": 25.2,
+                        "fontWeight": "700",
+                        "margin": 0,
+                        "padding": 0,
+                      }
+                    }
+                  >
+                    EC
+                  </Text>
+                  <Text
+                    maxFontSizeMultiplier={2}
                     style={
                       {
                         "color": "#c3c3c3",
@@ -1862,12 +1934,12 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                      1.6234
                   </Text>
                   <Text
+                    maxFontSizeMultiplier={2}
                     style={
                       {
                         "color": "#c3c3c3",
                         "fontSize": 25.2,
                         "margin": 0,
-                        "marginBottom": 2.4,
                         "padding": 0,
                       }
                     }
@@ -2629,14 +2701,38 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                             <View
                               style={
                                 {
-                                  "alignItems": "flex-end",
+                                  "alignItems": "baseline",
                                   "flexDirection": "row",
                                   "margin": 0,
                                   "padding": 0,
                                 }
                               }
                             >
+                              <View
+                                style={
+                                  {
+                                    "height": 25.28249233342626,
+                                    "marginRight": 2.868107053247839,
+                                    "width": 17.424393643713408,
+                                  }
+                                }
+                              />
                               <Text
+                                maxFontSizeMultiplier={2}
+                                style={
+                                  {
+                                    "color": "#F99D00",
+                                    "fontSize": 15,
+                                    "fontWeight": "700",
+                                    "margin": 0,
+                                    "padding": 0,
+                                  }
+                                }
+                              >
+                                EC
+                              </Text>
+                              <Text
+                                maxFontSizeMultiplier={2}
                                 style={
                                   {
                                     "color": "#F99D00",
@@ -2651,12 +2747,12 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                                  1.1234
                               </Text>
                               <Text
+                                maxFontSizeMultiplier={2}
                                 style={
                                   {
                                     "color": "#F99D00",
                                     "fontSize": 10.5,
                                     "margin": 0,
-                                    "marginBottom": 1,
                                     "padding": 0,
                                   }
                                 }
@@ -2852,7 +2948,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
           "flexDirection": "row",
           "justifyContent": "space-between",
           "paddingBottom": 6,
-          "paddingHorizontal": 16,
+          "paddingHorizontal": 0,
           "paddingTop": 8,
         }
       }

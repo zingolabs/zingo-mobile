@@ -269,7 +269,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
               <View
                 style={
                   {
-                    "alignItems": "flex-end",
+                    "alignItems": "baseline",
                     "flexDirection": "row",
                     "margin": 0,
                     "padding": 0,
@@ -277,7 +277,31 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                 }
                 testID="ironwood-total-balance"
               >
+                <View
+                  style={
+                    {
+                      "height": 25.28249233342626,
+                      "marginRight": 2.868107053247839,
+                      "width": 17.424393643713408,
+                    }
+                  }
+                />
                 <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 15,
+                      "fontWeight": "700",
+                      "margin": 0,
+                      "padding": 0,
+                    }
+                  }
+                >
+                  EC
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
@@ -361,7 +385,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
               <View
                 style={
                   {
-                    "alignItems": "flex-end",
+                    "alignItems": "baseline",
                     "flexDirection": "row",
                     "margin": 0,
                     "padding": 0,
@@ -369,7 +393,31 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                 }
                 testID="ironwood-confirmed-balance"
               >
+                <View
+                  style={
+                    {
+                      "height": 25.28249233342626,
+                      "marginRight": 2.868107053247839,
+                      "width": 17.424393643713408,
+                    }
+                  }
+                />
                 <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#18bd18",
+                      "fontSize": 15,
+                      "fontWeight": "700",
+                      "margin": 0,
+                      "padding": 0,
+                    }
+                  }
+                >
+                  EC
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#18bd18",
@@ -487,7 +535,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
               <View
                 style={
                   {
-                    "alignItems": "flex-end",
+                    "alignItems": "baseline",
                     "flexDirection": "row",
                     "margin": 0,
                     "padding": 0,
@@ -495,7 +543,31 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                 }
                 testID="orchard-total-balance"
               >
+                <View
+                  style={
+                    {
+                      "height": 25.28249233342626,
+                      "marginRight": 2.868107053247839,
+                      "width": 17.424393643713408,
+                    }
+                  }
+                />
                 <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 15,
+                      "fontWeight": "700",
+                      "margin": 0,
+                      "padding": 0,
+                    }
+                  }
+                >
+                  EC
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
@@ -579,7 +651,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
               <View
                 style={
                   {
-                    "alignItems": "flex-end",
+                    "alignItems": "baseline",
                     "flexDirection": "row",
                     "margin": 0,
                     "padding": 0,
@@ -587,7 +659,31 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                 }
                 testID="orchard-confirmed-balance"
               >
+                <View
+                  style={
+                    {
+                      "height": 25.28249233342626,
+                      "marginRight": 2.868107053247839,
+                      "width": 17.424393643713408,
+                    }
+                  }
+                />
                 <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#F99D00",
+                      "fontSize": 15,
+                      "fontWeight": "700",
+                      "margin": 0,
+                      "padding": 0,
+                    }
+                  }
+                >
+                  EC
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#F99D00",
@@ -705,7 +801,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
               <View
                 style={
                   {
-                    "alignItems": "flex-end",
+                    "alignItems": "baseline",
                     "flexDirection": "row",
                     "margin": 0,
                     "padding": 0,
@@ -713,7 +809,31 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                 }
                 testID="sapling-total-balance"
               >
+                <View
+                  style={
+                    {
+                      "height": 25.28249233342626,
+                      "marginRight": 2.868107053247839,
+                      "width": 17.424393643713408,
+                    }
+                  }
+                />
                 <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 15,
+                      "fontWeight": "700",
+                      "margin": 0,
+                      "padding": 0,
+                    }
+                  }
+                >
+                  EC
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
@@ -797,7 +917,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
               <View
                 style={
                   {
-                    "alignItems": "flex-end",
+                    "alignItems": "baseline",
                     "flexDirection": "row",
                     "margin": 0,
                     "padding": 0,
@@ -805,7 +925,31 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                 }
                 testID="sapling-confirmed-balance"
               >
+                <View
+                  style={
+                    {
+                      "height": 25.28249233342626,
+                      "marginRight": 2.868107053247839,
+                      "width": 17.424393643713408,
+                    }
+                  }
+                />
                 <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#F99D00",
+                      "fontSize": 15,
+                      "fontWeight": "700",
+                      "margin": 0,
+                      "padding": 0,
+                    }
+                  }
+                >
+                  EC
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#F99D00",
@@ -922,7 +1066,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
               <View
                 style={
                   {
-                    "alignItems": "flex-end",
+                    "alignItems": "baseline",
                     "flexDirection": "row",
                     "margin": 0,
                     "padding": 0,
@@ -930,7 +1074,31 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                 }
                 testID="transparent-balance"
               >
+                <View
+                  style={
+                    {
+                      "height": 25.28249233342626,
+                      "marginRight": 2.868107053247839,
+                      "width": 17.424393643713408,
+                    }
+                  }
+                />
                 <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#F99D00",
+                      "fontSize": 15,
+                      "fontWeight": "700",
+                      "margin": 0,
+                      "padding": 0,
+                    }
+                  }
+                >
+                  EC
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#F99D00",
@@ -945,12 +1113,12 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                    0.1234
                 </Text>
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#F99D00",
                       "fontSize": 10.5,
                       "margin": 0,
-                      "marginBottom": 1,
                       "padding": 0,
                     }
                   }
@@ -1028,7 +1196,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
               <View
                 style={
                   {
-                    "alignItems": "flex-end",
+                    "alignItems": "baseline",
                     "flexDirection": "row",
                     "margin": 0,
                     "padding": 0,
@@ -1036,7 +1204,31 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                 }
                 testID="transparent-confirmed-balance"
               >
+                <View
+                  style={
+                    {
+                      "height": 25.28249233342626,
+                      "marginRight": 2.868107053247839,
+                      "width": 17.424393643713408,
+                    }
+                  }
+                />
                 <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#F99D00",
+                      "fontSize": 15,
+                      "fontWeight": "700",
+                      "margin": 0,
+                      "padding": 0,
+                    }
+                  }
+                >
+                  EC
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#F99D00",
@@ -1051,12 +1243,12 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                    0.1234
                 </Text>
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#F99D00",
                       "fontSize": 10.5,
                       "margin": 0,
-                      "marginBottom": 1,
                       "padding": 0,
                     }
                   }

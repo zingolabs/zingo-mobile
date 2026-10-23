@@ -305,11 +305,13 @@ library matters most.
 
 ## Build identity
 
-**Build descriptor** — the string `get_version()` reports: a zingolib
-part and a zingo-mobile part (`zl_…-zm_…`), each derived from git
-describe against that repo's release tags. The commit count and
-5-character hash fields are elided when a part sits exactly on its
-release tag, and `_dirty` marks a part built from an uncommitted tree.
+**Build descriptor** — the string the About screen shows: a zingolib
+part and a zingo-mobile part (`zl_…-zm_…`). The zingolib part is the
+crate version and the first sixteen characters of the zingolib commit,
+on a release as on any other commit, and `get_version()` returns it. The
+zingo-mobile part derives from git describe against this repo's release
+tags, and its 5-character hash is elided when the app sits exactly on its
+release tag. `_dirty` marks a part built from an uncommitted tree.
 
 ## Mixnet Mode
 

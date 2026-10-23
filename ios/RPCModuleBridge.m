@@ -89,10 +89,6 @@ RCT_EXTERN_METHOD(getZenniesDonationAddress:
 RCT_EXTERN_METHOD(getValueTransfersList:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(setBroadcastCandidates:
-    (NSString)candidatesJson
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(attachMixnet:
     (NSString)socks5Addr
                   exitNode:(NSString)exitNode

@@ -513,7 +513,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         uniffi.zingo.SyncSettings(performanceLevel = performancelevel, minConfirmations = minconfirmations.toUInt())
 
     private fun connection(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String) =
-        uniffi.zingo.IndexerConnection(serverUri = serveruri, chainHint = chainhint, sync = syncSettings(performancelevel, minconfirmations))
+        uniffi.zingo.IndexerConnection(indexer = indexerChoice(serveruri), chainHint = chainhint, sync = syncSettings(performancelevel, minconfirmations))
 
     @ReactMethod
     fun createNewWallet(serveruri: String, birthday: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
@@ -821,7 +821,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun changeServerProcess(serveruri: String, promise: Promise) {
         FfiOutcome.settling(promise, "change_server") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.changeServer(serveruri = serveruri)
+            uniffi.zingo.changeServer(choice = indexerChoice(serveruri))
         }
     }
 
@@ -917,13 +917,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // FfiOutcome (zingo-mobile#1151, audit Issues Q and R): the resolved
     // value is always data, a typed ZingolibException rejects, and nothing
     // is ever encoded as error prose inside the success channel.
-
-    @ReactMethod
-    fun setBroadcastCandidates(candidatesJson: String, promise: Promise) {
-        FfiOutcome.settling(promise, "set_broadcast_candidates") {
-            uniffi.zingo.setBroadcastCandidates(candidatesJson = candidatesJson)
-        }
-    }
 
     @ReactMethod
     fun attachMixnet(socks5Addr: String, exitNode: String, promise: Promise) {
@@ -1242,3 +1235,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
 }
+
+internal fun indexerChoice(serveruri: String): uniffi.zingo.IndexerChoice =
+    if (serveruri.isEmpty()) uniffi.zingo.IndexerChoice.Offline else uniffi.zingo.IndexerChoice.Named(uri = serveruri)

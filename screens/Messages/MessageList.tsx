@@ -273,7 +273,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
             {loading ? (
               <ActivityIndicator
                 size="large"
-                color={colors.fgAccent}
+                color={colors.fgMuted}
                 style={{ marginVertical: 20 }}
               />
             ) : messagesData.length === 0 ? (
@@ -286,9 +286,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
                   marginTop: 30,
                 }}
               >
-                <FadeText style={{ color: colors.fgAccent }}>
-                  {translate('messages.empty') as string}
-                </FadeText>
+                <FadeText>{translate('messages.empty') as string}</FadeText>
               </View>
             ) : (
               <>
@@ -298,7 +296,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'flex-start',
-                      paddingHorizontal: 16,
+                      paddingHorizontal: 20,
                       marginTop: 20,
                       marginBottom: 10,
                     }}
@@ -319,9 +317,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
                       marginBottom: 10,
                     }}
                   >
-                    <FadeText style={{ color: colors.fgAccent }}>
-                      {translate('history.end') as string}
-                    </FadeText>
+                    <FadeText>{translate('history.end') as string}</FadeText>
                   </View>
                 )}
                 {messagesData.map((vt, index) => (
@@ -352,7 +348,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
               right: 10,
               paddingHorizontal: 5,
               paddingVertical: 10,
-              backgroundColor: colors.bgChrome,
+              backgroundColor: colors.bgSurface,
               borderRadius: 50,
               transform: [{ scale: pressed ? 0.9 : 1 }],
               borderWidth: 1,

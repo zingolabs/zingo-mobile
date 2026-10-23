@@ -14,10 +14,10 @@ module.exports = {
     '<rootDir>/visual/',
     '<rootDir>/zingolib/',
   ],
-  // @noble/hashes and @react-navigation ship ESM only, so babel transforms
-  // them like React Native's own packages.
+  // @noble/hashes, @react-navigation and zingolib-bundle-pin ship ESM only,
+  // so babel transforms them like React Native's own packages.
   transformIgnorePatterns: [
-    'node_modules/(?!((jest-)?react-native|@react-native(-community)?|@react-navigation|@noble/hashes)/)',
+    'node_modules/(?!((jest-)?react-native|@react-native(-community)?|@react-navigation|@noble/hashes|zingolib-bundle-pin)/)',
   ],
   transform: {
     '\\.(mjs|[jt]sx?)$': 'babel-jest',

@@ -10293,6 +10293,11 @@ zcashname-sdk@^0.12.0:
     "@noble/hashes" "^2.2.0"
     bech32 "^2.0.0"
 
+zingolib-bundle-pin@0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/zingolib-bundle-pin/-/zingolib-bundle-pin-0.4.0.tgz#9c875dab5c068b8ba2eff76a03e34f997ef18034"
+  integrity sha512-6Hqu/1hQ+NA7tj6Ny/9+7e38JmcOxYzrntxHDc2MCv1jT82GSD/YlrOU31faAb+6RdaJLqs+fOfs+6cG+zrAjA==
+
 "zod-validation-error@^3.5.0 || ^4.0.0":
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/zod-validation-error/-/zod-validation-error-4.0.2.tgz#bc605eba49ce0fcd598c127fee1c236be3f22918"

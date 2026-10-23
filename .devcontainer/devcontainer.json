@@ -18,9 +18,9 @@
 		},
 		"ghcr.io/devcontainers/features/node:1": {
 			"nodeGypDependencies": true,
-			"installYarnUsingApt": true,
-			"version": "lts",
-			"pnpmVersion": "latest",
+			"installYarnUsingApt": false,
+			"version": "none",
+			"pnpmVersion": "none",
 			"nvmVersion": "latest"
 		},
 		"ghcr.io/devcontainers/features/rust:1": {
@@ -30,6 +30,8 @@
 		},
 		"ghcr.io/nordcominc/devcontainer-features/android-sdk:1": {},
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
-
-	}
+	},
+	// Node comes from .nvmrc, the one pin: nvm install reads it, and corepack
+	// provides the yarn named in package.json packageManager.
+	"postCreateCommand": "bash -c '. \"$NVM_DIR/nvm.sh\" && nvm install && corepack enable'"
 }

@@ -111,12 +111,12 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
   return (
     <View
       testID={`m-${index + 1}`}
-      style={{ display: 'flex', flexDirection: 'column', marginHorizontal: 10 }}
+      style={{ display: 'flex', flexDirection: 'column', marginHorizontal: 20 }}
     >
       {month !== '' && (
         <View
           style={{
-            paddingLeft: 15,
+            paddingLeft: 0,
             paddingTop: 5,
             paddingBottom: 5,
             borderTopWidth: 1,
@@ -151,7 +151,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
               vt.kind === ValueTransferKindEnum.Received ? 0 : 20,
             backgroundColor:
               vt.kind === ValueTransferKindEnum.Received
-                ? colors.bgAccentDisabled
+                ? colors.bgAccentSubtle
                 : colors.bgAccentSubtle,
             opacity: vt.status === RPCValueTransfersStatusEnum.failed ? 0.5 : 1,
           }}
@@ -197,10 +197,10 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                   {!thisWalletAddress(memoUA) && memoUA !== messageAddress && (
                     <>
                       <RegText>{GlobalConst.replyTo}</RegText>
-                      <TriangleAlert color={'red'} size={16} />
+                      <TriangleAlert color={colors.fgWarning} size={16} />
                       <RegText
                         style={{
-                          opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4,
+                          color: colors.fgMuted,
                         }}
                       >
                         {memoUA}
@@ -208,7 +208,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                       {contactFound(memoUA).found && (
                         <View style={{ flexDirection: 'row' }}>
                           {!thisWalletAddress(memoUA) && (
-                            <RegText style={{ opacity: 0.6 }}>
+                            <RegText style={{ color: colors.fgMuted }}>
                               {translate('addressbook.likely') as string}
                             </RegText>
                           )}

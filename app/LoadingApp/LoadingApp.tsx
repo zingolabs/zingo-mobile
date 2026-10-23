@@ -10,7 +10,11 @@ import { useTheme } from '@app/theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { LoadingSession, useSession } from '@app/navigation/session';
+import {
+  GateDeclined,
+  LoadingSession,
+  useSession,
+} from '@app/navigation/session';
 import { LoadingNavigator } from '@app/navigation/LoadingNavigator';
 import {
   currentRoute,
@@ -332,6 +336,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         openBoot={() =>
           setSession({ kind: 'boot', startingApp: true, newWallet: false })
         }
+        openLock={gate => setSession({ kind: 'locked', gate })}
         theme={theme}
         translate={translate}
         language={language}
@@ -353,6 +358,7 @@ type LoadingAppClassProps = {
   openWallet: (params: LoadedAppNavigationState) => void;
   openOnboarding: (start: 'Welcome' | 'OpenError') => void;
   openBoot: () => void;
+  openLock: (gate: GateDeclined) => void;
   translate: (key: string) => TranslateType;
   theme: AppTheme;
   language: LanguageEnum;
@@ -517,8 +523,14 @@ export class LoadingAppClass extends Component<
       const proceed = enactGateAnswer(
         startGate,
         {
-          // The narrowed answer is the gate outcome, whole.
-          lock: declined => this.setState({ biometricGate: declined }),
+          // The narrowed answer is the gate outcome, whole. The session
+          // picks the lock screen and the state feeds it: this class stays
+          // mounted across the switch, so its constructor never reads the
+          // session's gate.
+          lock: declined => {
+            this.setState({ biometricGate: declined });
+            this.props.openLock(declined);
+          },
           notice: this.addLastSnackbar,
         },
         this.state.translate,

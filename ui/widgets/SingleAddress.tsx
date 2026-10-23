@@ -89,6 +89,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         style={{ width: '100%' }}
         contentContainerStyle={{
           alignItems: 'center',
+          paddingHorizontal: 20,
           paddingBottom: 100,
         }}
       >
@@ -155,14 +156,13 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     }}
                   >
                     <ShieldIcon
-                      color={colors.fgAccent}
+                      color={colors.fgMuted}
                       size={20}
                       style={{ marginRight: 10 }}
                     />
                     <RegText
                       style={{
-                        fontWeight: 'bold',
-                        opacity: 0.9,
+                        fontWeight: '700',
                         marginRight: 10,
                       }}
                     >
@@ -208,8 +208,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     />
                     <RegText
                       style={{
-                        fontWeight: 'bold',
-                        opacity: 0.9,
+                        fontWeight: '700',
                         marginRight: 10,
                       }}
                     >
@@ -243,7 +242,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
             <View
               style={{
                 marginTop: 10,
-                marginHorizontal: 20,
                 padding: 10,
                 backgroundColor: colors.fgDefault,
               }}
@@ -333,7 +331,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     <CopyIcon
                       color={colors.fgDefault}
                       size={20}
-                      opacity={0.9}
                       style={{ margin: 3 }}
                     />
                   </View>
@@ -354,7 +351,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         }}
                       >
                         <CheckCircleLineIcon
-                          style={{ margin: 5, opacity: 0.9 }}
+                          style={{ margin: 5 }}
                           size={20}
                           color={colors.fgDefault}
                         />
@@ -377,7 +374,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                           <ListIcon
                             color={colors.fgDefault}
                             size={20}
-                            opacity={0.9}
                             style={{ margin: 3 }}
                           />
                         </View>
@@ -390,7 +386,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
             {ufvk && (
               <Address
                 address={ufvk}
-                style={{ color: colors.fgDefault, fontSize: 18, opacity: 0.8 }}
+                style={{ color: colors.fgDefault, fontSize: 18 }}
                 onPress={() => show('EA')}
               />
             )}
@@ -431,7 +427,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   style={{
                     color: colors.fgDefault,
                     fontSize: 18,
-                    opacity: 0.8,
                   }}
                   onPress={() => show('EA')}
                   testID={

@@ -433,7 +433,7 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
                     justifyContent: 'center',
                   }}
                 >
-                  <CheckIcon size={13} color={colors.bgCanvas} />
+                  <CheckIcon size={13} color={colors.fgOnAccent} />
                 </View>
               </Animated.View>
             )}

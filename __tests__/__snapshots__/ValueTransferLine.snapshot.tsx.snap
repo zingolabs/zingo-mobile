@@ -4,7 +4,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
 <View
   style={
     {
-      "display": "flex",
+      "flex": 1,
       "flexDirection": "column",
     }
   }
@@ -40,6 +40,8 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
     onStartShouldSetResponder={[Function]}
     style={
       {
+        "flex": 1,
+        "justifyContent": "center",
         "opacity": 1,
         "zIndex": 999,
       }
@@ -81,7 +83,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "#040C17",
+              "backgroundColor": "#031124",
               "flexDirection": "row",
               "justifyContent": "center",
               "transform": [
@@ -239,7 +241,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                 "flexDirection": "row",
                 "gap": 12,
                 "minHeight": 56,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 20,
                 "paddingVertical": 12,
               }
             }
@@ -411,7 +413,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                     {
                       "flexDirection": "row",
                       "marginHorizontal": 5,
-                      "opacity": 0.7,
                     }
                   }
                 >
@@ -452,14 +453,38 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                     <View
                       style={
                         {
-                          "alignItems": "flex-end",
+                          "alignItems": "baseline",
                           "flexDirection": "row",
                           "margin": 0,
                           "padding": 0,
                         }
                       }
                     >
+                      <View
+                        style={
+                          {
+                            "height": 25.28249233342626,
+                            "marginRight": 2.868107053247839,
+                            "width": 17.424393643713408,
+                          }
+                        }
+                      />
                       <Text
+                        maxFontSizeMultiplier={2}
+                        style={
+                          {
+                            "color": "#888888",
+                            "fontSize": 15,
+                            "fontWeight": "700",
+                            "margin": 0,
+                            "padding": 0,
+                          }
+                        }
+                      >
+                        EC
+                      </Text>
+                      <Text
+                        maxFontSizeMultiplier={2}
                         style={
                           {
                             "color": "#888888",
@@ -474,12 +499,12 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                          0.1234
                       </Text>
                       <Text
+                        maxFontSizeMultiplier={2}
                         style={
                           {
                             "color": "#888888",
                             "fontSize": 10.5,
                             "margin": 0,
-                            "marginBottom": 1,
                             "padding": 0,
                           }
                         }
@@ -493,19 +518,22 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
               </View>
             </View>
           </View>
-          <View
-            style={
-              {
-                "backgroundColor": "#FFFFFF0F",
-                "height": 1,
-                "marginHorizontal": 16,
-              }
-            }
-          />
         </View>
       </View>
     </View>
   </View>
+  <View
+    style={
+      {
+        "backgroundColor": "#FFFFFF0F",
+        "bottom": 0,
+        "height": 1,
+        "left": 20,
+        "position": "absolute",
+        "right": 20,
+      }
+    }
+  />
 </View>
 `;
 
@@ -513,7 +541,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
 <View
   style={
     {
-      "display": "flex",
+      "flex": 1,
       "flexDirection": "column",
     }
   }
@@ -549,6 +577,8 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
     onStartShouldSetResponder={[Function]}
     style={
       {
+        "flex": 1,
+        "justifyContent": "center",
         "opacity": 1,
         "zIndex": 999,
       }
@@ -590,7 +620,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "#040C17",
+              "backgroundColor": "#031124",
               "flexDirection": "row",
               "justifyContent": "center",
               "transform": [
@@ -748,7 +778,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                 "flexDirection": "row",
                 "gap": 12,
                 "minHeight": 56,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 20,
                 "paddingVertical": 12,
               }
             }
@@ -832,7 +862,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                     {
                       "flexDirection": "row",
                       "marginHorizontal": 5,
-                      "opacity": 1,
                     }
                   }
                 >
@@ -873,17 +902,41 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                     <View
                       style={
                         {
-                          "alignItems": "flex-end",
+                          "alignItems": "baseline",
                           "flexDirection": "row",
                           "margin": 0,
                           "padding": 0,
                         }
                       }
                     >
-                      <Text
+                      <View
                         style={
                           {
-                            "color": "#5a8c5a",
+                            "height": 25.28249233342626,
+                            "marginRight": 2.868107053247839,
+                            "width": 17.424393643713408,
+                          }
+                        }
+                      />
+                      <Text
+                        maxFontSizeMultiplier={2}
+                        style={
+                          {
+                            "color": "#F99D00",
+                            "fontSize": 15,
+                            "fontWeight": "700",
+                            "margin": 0,
+                            "padding": 0,
+                          }
+                        }
+                      >
+                        EC
+                      </Text>
+                      <Text
+                        maxFontSizeMultiplier={2}
+                        style={
+                          {
+                            "color": "#F99D00",
                             "fontSize": 15,
                             "fontWeight": "700",
                             "margin": 0,
@@ -895,12 +948,12 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                          0.1234
                       </Text>
                       <Text
+                        maxFontSizeMultiplier={2}
                         style={
                           {
-                            "color": "#5a8c5a",
+                            "color": "#F99D00",
                             "fontSize": 10.5,
                             "margin": 0,
-                            "marginBottom": 1,
                             "padding": 0,
                           }
                         }
@@ -920,7 +973,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                 "alignItems": "center",
                 "flexDirection": "row",
                 "justifyContent": "flex-start",
-                "paddingLeft": 52,
+                "paddingLeft": 56,
               }
             }
           >
@@ -928,7 +981,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
               maxFontSizeMultiplier={2}
               style={
                 {
-                  "color": "#5a8c5a",
+                  "color": "#F99D00",
                   "fontSize": 12,
                   "fontWeight": "700",
                   "lineHeight": 16,
@@ -939,19 +992,22 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
               text translated
             </Text>
           </View>
-          <View
-            style={
-              {
-                "backgroundColor": "#FFFFFF0F",
-                "height": 1,
-                "marginHorizontal": 16,
-              }
-            }
-          />
         </View>
       </View>
     </View>
   </View>
+  <View
+    style={
+      {
+        "backgroundColor": "#FFFFFF0F",
+        "bottom": 0,
+        "height": 1,
+        "left": 20,
+        "position": "absolute",
+        "right": 20,
+      }
+    }
+  />
 </View>
 `;
 
@@ -959,7 +1015,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
 <View
   style={
     {
-      "display": "flex",
+      "flex": 1,
       "flexDirection": "column",
     }
   }
@@ -995,6 +1051,8 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
     onStartShouldSetResponder={[Function]}
     style={
       {
+        "flex": 1,
+        "justifyContent": "center",
         "opacity": 1,
         "zIndex": 999,
       }
@@ -1036,7 +1094,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "#040C17",
+              "backgroundColor": "#031124",
               "flexDirection": "row",
               "justifyContent": "center",
               "transform": [
@@ -1140,7 +1198,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                 "flexDirection": "row",
                 "gap": 12,
                 "minHeight": 56,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 20,
                 "paddingVertical": 12,
               }
             }
@@ -1224,7 +1282,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                     {
                       "flexDirection": "row",
                       "marginHorizontal": 5,
-                      "opacity": 1,
                     }
                   }
                 >
@@ -1265,14 +1322,38 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                     <View
                       style={
                         {
-                          "alignItems": "flex-end",
+                          "alignItems": "baseline",
                           "flexDirection": "row",
                           "margin": 0,
                           "padding": 0,
                         }
                       }
                     >
+                      <View
+                        style={
+                          {
+                            "height": 25.28249233342626,
+                            "marginRight": 2.868107053247839,
+                            "width": 17.424393643713408,
+                          }
+                        }
+                      />
                       <Text
+                        maxFontSizeMultiplier={2}
+                        style={
+                          {
+                            "color": "#18bd18",
+                            "fontSize": 15,
+                            "fontWeight": "700",
+                            "margin": 0,
+                            "padding": 0,
+                          }
+                        }
+                      >
+                        EC
+                      </Text>
+                      <Text
+                        maxFontSizeMultiplier={2}
                         style={
                           {
                             "color": "#18bd18",
@@ -1287,12 +1368,12 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                          0.7765
                       </Text>
                       <Text
+                        maxFontSizeMultiplier={2}
                         style={
                           {
                             "color": "#18bd18",
                             "fontSize": 10.5,
                             "margin": 0,
-                            "marginBottom": 1,
                             "padding": 0,
                           }
                         }
@@ -1317,7 +1398,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
 <View
   style={
     {
-      "display": "flex",
+      "flex": 1,
       "flexDirection": "column",
     }
   }
@@ -1328,7 +1409,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
       {
         "backgroundColor": "#031124",
         "paddingBottom": 0,
-        "paddingLeft": 15,
+        "paddingLeft": 20,
         "paddingTop": 10,
       }
     }
@@ -1377,6 +1458,8 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
     onStartShouldSetResponder={[Function]}
     style={
       {
+        "flex": 1,
+        "justifyContent": "center",
         "opacity": 1,
         "zIndex": 999,
       }
@@ -1418,7 +1501,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "#040C17",
+              "backgroundColor": "#031124",
               "flexDirection": "row",
               "justifyContent": "center",
               "transform": [
@@ -1576,7 +1659,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                 "flexDirection": "row",
                 "gap": 12,
                 "minHeight": 56,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 20,
                 "paddingVertical": 12,
               }
             }
@@ -1748,7 +1831,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                     {
                       "flexDirection": "row",
                       "marginHorizontal": 5,
-                      "opacity": 1,
                     }
                   }
                 >
@@ -1789,14 +1871,38 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                     <View
                       style={
                         {
-                          "alignItems": "flex-end",
+                          "alignItems": "baseline",
                           "flexDirection": "row",
                           "margin": 0,
                           "padding": 0,
                         }
                       }
                     >
+                      <View
+                        style={
+                          {
+                            "height": 25.28249233342626,
+                            "marginRight": 2.868107053247839,
+                            "width": 17.424393643713408,
+                          }
+                        }
+                      />
                       <Text
+                        maxFontSizeMultiplier={2}
+                        style={
+                          {
+                            "color": "#c3c3c3",
+                            "fontSize": 15,
+                            "fontWeight": "700",
+                            "margin": 0,
+                            "padding": 0,
+                          }
+                        }
+                      >
+                        EC
+                      </Text>
+                      <Text
+                        maxFontSizeMultiplier={2}
                         style={
                           {
                             "color": "#c3c3c3",
@@ -1811,12 +1917,12 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                          0.1234
                       </Text>
                       <Text
+                        maxFontSizeMultiplier={2}
                         style={
                           {
                             "color": "#c3c3c3",
                             "fontSize": 10.5,
                             "margin": 0,
-                            "marginBottom": 1,
                             "padding": 0,
                           }
                         }
@@ -1830,18 +1936,21 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
               </View>
             </View>
           </View>
-          <View
-            style={
-              {
-                "backgroundColor": "#FFFFFF0F",
-                "height": 1,
-                "marginHorizontal": 16,
-              }
-            }
-          />
         </View>
       </View>
     </View>
   </View>
+  <View
+    style={
+      {
+        "backgroundColor": "#FFFFFF0F",
+        "bottom": 0,
+        "height": 1,
+        "left": 20,
+        "position": "absolute",
+        "right": 20,
+      }
+    }
+  />
 </View>
 `;

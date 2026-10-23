@@ -64,6 +64,7 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
       <View
         style={{
           display: 'flex',
+          paddingHorizontal: 10,
           flexDirection: 'row',
           marginTop: 15,
           paddingBottom: 15,
@@ -90,7 +91,7 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
                 style={{
                   fontSize: 18,
                   marginHorizontal: 10,
-                  color: colors.fgAccent,
+                  color: colors.fgDefault,
                   opacity: 1,
                   fontWeight: 'bold',
                 }}
@@ -127,19 +128,19 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
               doCopy();
             }}
           >
-            <CopyIcon
-              style={{ opacity: 0.8 }}
-              size={20}
-              color={colors.fgDefault}
-            />
+            <CopyIcon size={20} color={colors.fgDefault} />
           </TouchableOpacity>
         </View>
         <View
-          style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}
+          style={{
+            width: 50,
+            justifyContent: 'center',
+            alignItems: 'flex-end',
+          }}
         >
           <TouchableOpacity
             hitSlop={slopFor(24)}
-            style={{ zIndex: 999, padding: 10 }}
+            style={{ zIndex: 999, paddingVertical: 10, paddingLeft: 10 }}
             onPress={() => {
               doQr();
             }}

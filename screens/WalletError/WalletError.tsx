@@ -63,7 +63,7 @@ const NET_AMBER = {
 };
 const NET_GREEN = {
   bg: themeTokens.bgAccentSubtle,
-  border: themeTokens.bgAccentDisabled,
+  border: themeTokens.borderAccent,
   ink: themeTokens.fgAccent,
 };
 const CHIP_LABEL = themeTokens.fgMuted;
@@ -426,7 +426,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
                 width: BADGE,
                 height: BADGE,
                 borderRadius: BADGE / 2,
-                backgroundColor: colors.fgDanger,
+                backgroundColor: colors.bgDanger,
                 borderWidth: 2,
                 borderColor: colors.bgCanvas,
                 alignItems: 'center',
@@ -584,7 +584,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
             <LoadingDots
               size={6}
               gap={5}
-              color={colors.bgCanvas}
+              color={colors.fgOnAccent}
               testID="walleterror.open.dots"
             />
           </Animated.View>
@@ -597,7 +597,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
             <RegText
               style={{
                 fontSize: 16,
-                color: colors.bgCanvas,
+                color: colors.fgOnAccent,
                 fontWeight: '700',
               }}
             >

@@ -328,7 +328,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
     },
     creating: {
       key: 'migrationsplitting.status-creating',
-      color: colors.fgAccent,
+      color: colors.fgWarning,
     },
     sent: {
       key: 'migrationsplitting.status-sent',
@@ -468,7 +468,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
                 )}
               </Text>
               <Text
-                style={{ color: colors.fgAccent, fontSize: 14, flexShrink: 1 }}
+                style={{ color: colors.fgDefault, fontSize: 14, flexShrink: 1 }}
                 numberOfLines={1}
               >
                 {row.label}
@@ -560,7 +560,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
             marginBottom: 20,
           }}
         >
-          <ActivityIndicator size="small" color={colors.fgAccent} />
+          <ActivityIndicator size="small" color={colors.fgMuted} />
           <Text
             style={{
               color: colors.fgDefault,
@@ -617,7 +617,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
                 )}
               </Text>
               <Text
-                style={{ color: colors.fgAccent, fontSize: 14, flexShrink: 1 }}
+                style={{ color: colors.fgDefault, fontSize: 14, flexShrink: 1 }}
                 numberOfLines={1}
               >
                 {row.label}

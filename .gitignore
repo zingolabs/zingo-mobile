@@ -37,10 +37,11 @@ android/app/beta/release/
 *.aab
 *.apk
 ios/Zingolib.xcframework/
-ios/ZingoNymProxyFFI.xcframework/
 ios/NymHost.xcframework/
 ios/zingo.swift
 ios/zingo_nym_proxy_ffi.swift
+# The extracted iOS Prebuilt Bundle, which fetch-binding-layer places
+ios/binding-layer/
 
 # Android/IntelliJ
 #

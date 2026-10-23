@@ -300,22 +300,22 @@ const History: React.FunctionComponent<HistoryProps> = () => {
             // two lines
             dim.width = Dimensions.get('window').width;
             dim.height =
-              Platform.OS === GlobalConst.platformOSandroid ? 70 : 60;
+              Platform.OS === GlobalConst.platformOSandroid ? 70 : 64;
           } else if (type === ViewTypes.WITHOUT_MONTH_REFRESH) {
             // three lines
             dim.width = Dimensions.get('window').width;
             dim.height =
-              (Platform.OS === GlobalConst.platformOSandroid ? 70 : 55) + 15;
+              (Platform.OS === GlobalConst.platformOSandroid ? 70 : 64) + 24;
           } else if (type === ViewTypes.WITH_MONTH) {
             // two lines with month
             dim.width = Dimensions.get('window').width;
             dim.height =
-              Platform.OS === GlobalConst.platformOSandroid ? 105 : 90;
+              Platform.OS === GlobalConst.platformOSandroid ? 105 : 95;
           } else if (type === ViewTypes.WITH_MONTH_REFRESH) {
             // three lines with month
             dim.width = Dimensions.get('window').width;
             dim.height =
-              (Platform.OS === GlobalConst.platformOSandroid ? 105 : 85) + 15;
+              (Platform.OS === GlobalConst.platformOSandroid ? 105 : 95) + 24;
           }
         },
       ),
@@ -723,7 +723,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       style={{
         paddingTop: 8,
         paddingBottom: 6,
-        paddingHorizontal: 16,
+        paddingHorizontal: 20,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -821,7 +821,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
             {loading ? (
               <ActivityIndicator
                 size="large"
-                color={colors.fgAccent}
+                color={colors.fgMuted}
                 style={{ marginVertical: 20 }}
               />
             ) : (
@@ -869,7 +869,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                         >
                           <ActivityIndicator
                             size="small"
-                            color={colors.fgAccent}
+                            color={colors.fgMuted}
                           />
                         </View>
                       ) : !!valueTransfersSliced &&
@@ -883,7 +883,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                             marginBottom: 200,
                           }}
                         >
-                          <FadeText style={{ color: colors.fgAccent }}>
+                          <FadeText>
                             {translate('history.end') as string}
                           </FadeText>
                         </View>
@@ -899,9 +899,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                       marginTop: 30,
                     }}
                   >
-                    <FadeText style={{ color: colors.fgAccent }}>
-                      {translate('history.empty') as string}
-                    </FadeText>
+                    <FadeText>{translate('history.empty') as string}</FadeText>
                   </View>
                 )}
               </View>
@@ -930,7 +928,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
               height: 36,
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: colors.bgChrome,
+              backgroundColor: colors.bgSurface,
               borderRadius: 50,
               transform: [{ scale: pressed ? 0.9 : 1 }],
               opacity: isScrollingToTop ? 0.5 : 1,
