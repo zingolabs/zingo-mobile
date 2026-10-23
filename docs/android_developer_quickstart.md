@@ -52,19 +52,17 @@ And append to `Path`:
 - `%ANDROID_HOME%\emulator`
 
 ## Building
-1. Clone the repository with its submodules:
-   `git clone --recurse-submodules https://github.com/zingolabs/zingo-mobile.git`.
-   In an existing clone, run `git submodule update --init zingolib`.
+1. Clone the repository:
+   `git clone https://github.com/zingolabs/zingo-mobile.git`.
 2. Go to the cloned repo `cd zingo-mobile`.
 3. From the root of the project, install JS deps: `yarn`
-4. Build the Rust libraries for the 4 Android ABIs: `yarn rust:android` — may
-   take a long time on first run. The app's Gradle build also runs this step
-   whenever the libraries are missing or stale.
 
-The Rust libraries come from the Binding Layer in the `zingolib` submodule
-(`zingolib/bindings/android`). To build one ABI only, pass
-`-PbindingLayerAbi=<abi>` to Gradle, for example `-PbindingLayerAbi=x86_64`.
-To use libraries built elsewhere, pass `-PbindingLayerPrebuilt=<directory>`.
+The Binding Layer comes from the Android Prebuilt Bundle that
+`binding-layer.json` pins. The Gradle build fetches it the first time
+through `yarn --silent fetch:binding-layer --platform android`, which needs
+network access to `ghcr.io`, and resolves the AAR from the fetched Maven
+repository. The Android unit tests also read the `zingolib` submodule:
+`git submodule update --init zingolib`.
 
 ## Launching the app
 ### Android Studio

@@ -1,9 +1,9 @@
 name: Android APK build
 
-# Assembles the app and androidTest APKs once per ABI, downstream of the
-# native android-build. Extracted from the integration-test workflow so the
-# ~14-minute Gradle assembly runs once per ABI instead of once per test
-# matrix configuration.
+# Assembles the app and androidTest APKs once per ABI. Gradle fetches the
+# Binding Layer AAR by the Bundle Pin. Extracted from the integration-test
+# workflow so the ~14-minute Gradle assembly runs once per ABI instead of
+# once per test matrix configuration.
 
 on:
   workflow_call:
@@ -66,14 +66,10 @@ jobs:
         with:
           writer: ${{ inputs.gradle-cache-writer }}
 
+      # The unit tests of the cache fill read the proxy crate's Kotlin
+      # wire-contract test from the submodule.
       - name: Check out zingolib
         uses: ./.github/actions/zingolib-submodule
-
-      - name: Restore the Binding Layer
-        uses: ./.github/actions/binding-layer-android
-        with:
-          abi: ${{ env.ABI }}
-          cache-key: ${{ env.CACHE-KEY }}
 
       - name: Remove unnecessary directories to free up space
         run: |

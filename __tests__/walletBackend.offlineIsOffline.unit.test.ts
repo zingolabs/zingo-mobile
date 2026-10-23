@@ -136,7 +136,6 @@ const WALLET_LOCAL = new Set([
   'splitStatusProcess',
   'executeDuePartsStatusProcess',
   'windowTimelineProcess',
-  'setBroadcastCandidates',
   'initLogging',
 ]);
 
