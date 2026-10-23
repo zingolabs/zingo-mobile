@@ -128,3 +128,6 @@ playwright-report/
 
 # Local env
 .env
+
+# SwapKit API key, written by scripts/generate-swapkit-secrets.js
+app/swap/swapKitSecrets.ts

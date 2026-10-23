@@ -68,10 +68,12 @@ const KIND_LABEL: Record<ValueTransferKindEnum, [string, string]> = {
   [ValueTransferKindEnum.Shield]: ['history.shielding', 'history.shield'],
   [ValueTransferKindEnum.Rejection]: ['history.sending', 'history.rejection'],
   [ValueTransferKindEnum.Migration]: ['history.migrating', 'history.migration'],
+  [ValueTransferKindEnum.Swap]: ['history.swapping', 'history.swap'],
 };
 
 const FAILED_LABEL: Partial<Record<ValueTransferKindEnum, string>> = {
   [ValueTransferKindEnum.Sent]: 'history.sent-failed',
+  [ValueTransferKindEnum.Swap]: 'history.swap-failed',
   [ValueTransferKindEnum.Shield]: 'history.shield-failed',
   [ValueTransferKindEnum.Received]: 'history.received-failed',
 };

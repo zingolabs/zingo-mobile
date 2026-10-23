@@ -2,7 +2,7 @@ import * as RNFS from 'react-native-fs';
 
 import { isWalletAddress } from '@app/walletBackend';
 import Utils from '@app/utils';
-import { normalizeChainAddress } from '@app/swap';
+import { canonicalChainAddress } from '@app/swap';
 
 import {
   AddressBookFileClass,
@@ -59,7 +59,7 @@ export default class AddressBookFileImpl {
     chain: ChainNameEnum = ChainNameEnum.mainChainName,
     swapChain: string = GlobalConst.zecSwapChain,
   ): Promise<AddressBookFileClass[]> {
-    const address = normalizeChainAddress(swapChain, typedAddress);
+    const address = canonicalChainAddress(swapChain, typedAddress);
     const addressBook = await this.readAddressBook();
     if (
       addressBook.filter(

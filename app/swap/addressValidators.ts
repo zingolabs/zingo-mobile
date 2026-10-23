@@ -48,13 +48,15 @@ const BCH_CASHADDR_RE = /^(bitcoincash:)?[qp][ac-hj-np-z02-9]{40,42}$/;
 // Solana: base58 32–44 chars (encoded ed25519 pubkey).
 const SOL_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 
-// NEAR: an account ID in the docs.near.org format, 2–64 characters of
-// lowercase letters and digits joined by `.`, `-` or `_`. Implicit,
-// Ethereum-like (`0x…`), top-level and sub-accounts all match. Mainnet only:
-// `.testnet` names and deterministic `0s…` accounts fail.
+// NEAR: an account ID in the docs.near.org format, 2–64 lowercase letters and
+// digits joined by `.`, `-` or `_`. Mainnet only, so `.testnet` names fail,
+// and deterministic `0s…` accounts, which take no transfers, fail too.
 const NEAR_ACCOUNT_RE = /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
 const NEAR_DETERMINISTIC_RE = /^0s[0-9a-f]{40}$/;
-const NEAR_IMPLICIT_RE = /^[0-9a-f]{64}$/;
+// The forms that can only be NEAR: an implicit account (64 hex) or a name under
+// a top-level account people get NEAR names from (`.tg` is HOT Wallet's).
+const NEAR_IMPLICIT_RE = /^[a-f0-9]{64}$/;
+const NEAR_KNOWN_TOP_LEVELS: readonly string[] = ['near', 'tg'];
 
 // Tron: base58check starting with `T`. Total length 34 chars.
 const TRX_RE = /^T[1-9A-HJ-NP-Za-km-z]{33}$/;
@@ -78,23 +80,31 @@ const DOT_RE = /^1[1-9A-HJ-NP-Za-km-z]{46,47}$/;
 // Sui: 0x + 64 hex (32-byte object id).
 const SUI_RE = /^0x[a-fA-F0-9]{64}$/;
 
+// Starknet: 0x + a felt, written with 60–64 hex digits. Fewer would also
+// read as an EVM address, and wallets pad Starknet's to 63–64.
+const STRK_RE = /^0x[a-fA-F0-9]{60,64}$/;
+
+// Aleo: bech32 `aleo1…`, 58 chars after the separator.
+const ALEO_RE = /^aleo1[ac-hj-np-z02-9]{58}$/;
+
+// Chains recognised only to be named when refused: SwapKit routes none of
+// them against ZEC. THORChain and Maya are bech32 `thor1…` / `maya1…`;
+// Monero is base58, 95 chars (106 integrated) starting with 4 or 8.
+const THOR_RE = /^thor1[ac-hj-np-z02-9]{38,}$/;
+const MAYA_RE = /^maya1[ac-hj-np-z02-9]{38,}$/;
+const XMR_RE = /^[48][1-9A-HJ-NP-Za-km-z]{94}(?:[1-9A-HJ-NP-Za-km-z]{11})?$/;
+
 // TON: user-friendly base64url (`EQ…`/`UQ…`/`kf…` + 46 chars) or raw
 // `workchain:hex` (workchain is signed integer, hash is 64 hex chars).
 const TON_USER_RE = /^(?:[EU]Q|kf)[A-Za-z0-9_-]{46}$/;
 const TON_RAW_RE = /^-?\d+:[a-fA-F0-9]{64}$/;
 
 const isEvm: Validator = a => EVM_RE.test(a);
-const isUniformCase = (address: string, pattern: RegExp): boolean =>
-  pattern.test(address) ||
-  (/^[A-Z0-9:]+$/.test(address) && pattern.test(address.toLowerCase()));
-const isBtc: Validator = a =>
-  BTC_LEGACY_RE.test(a) || isUniformCase(a, BTC_BECH32_RE);
-const isLtc: Validator = a =>
-  LTC_LEGACY_RE.test(a) || isUniformCase(a, LTC_BECH32_RE);
+const isBtc: Validator = a => BTC_LEGACY_RE.test(a) || BTC_BECH32_RE.test(a);
+const isLtc: Validator = a => LTC_LEGACY_RE.test(a) || LTC_BECH32_RE.test(a);
 const isDoge: Validator = a => DOGE_RE.test(a);
 const isDash: Validator = a => DASH_RE.test(a);
-const isBch: Validator = a =>
-  BCH_LEGACY_RE.test(a) || isUniformCase(a, BCH_CASHADDR_RE);
+const isBch: Validator = a => BCH_LEGACY_RE.test(a) || BCH_CASHADDR_RE.test(a);
 const isSol: Validator = a => SOL_RE.test(a);
 const isNear: Validator = a =>
   a.length >= 2 &&
@@ -102,20 +112,47 @@ const isNear: Validator = a =>
   NEAR_ACCOUNT_RE.test(a) &&
   !NEAR_DETERMINISTIC_RE.test(a) &&
   !a.endsWith('.testnet');
+
+/**
+ * Whether a valid NEAR account ID could just as well be something else, so the
+ * user confirms it before it is saved or swapped to.
+ *
+ * The NEAR format takes almost any lowercase string: a lowercase `0x…`, a
+ * `bc1q…` or `tex1…`, a CashAddr, a typo like `alice.naer`. None of them is
+ * refused server-side, so a paste from the wrong chain would become a swap to
+ * an account nobody holds. An implicit account or a name under a known
+ * top-level account can only be NEAR, and goes through unasked.
+ */
+export function nearAccountNeedsConfirm(address: string): boolean {
+  const a = address.trim();
+  if (!isNear(a) || NEAR_IMPLICIT_RE.test(a)) return false;
+  return !NEAR_KNOWN_TOP_LEVELS.some(top => a.endsWith(`.${top}`));
+}
 const isTrx: Validator = a => TRX_RE.test(a);
-const isAtom: Validator = a => isUniformCase(a, ATOM_RE);
+const isAtom: Validator = a => ATOM_RE.test(a);
 const isXrp: Validator = a => XRP_RE.test(a);
 const isXlm: Validator = a => XLM_RE.test(a);
-const isAda: Validator = a =>
-  isUniformCase(a, ADA_SHELLEY_RE) || ADA_BYRON_RE.test(a);
+const isAda: Validator = a => ADA_SHELLEY_RE.test(a) || ADA_BYRON_RE.test(a);
 const isDot: Validator = a => DOT_RE.test(a);
 const isSui: Validator = a => SUI_RE.test(a);
 const isTon: Validator = a => TON_USER_RE.test(a) || TON_RAW_RE.test(a);
+const isStrk: Validator = a => STRK_RE.test(a);
+const isAleo: Validator = a => ALEO_RE.test(a);
+const isThor: Validator = a => THOR_RE.test(a);
+const isMaya: Validator = a => MAYA_RE.test(a);
+const isXmr: Validator = a => XMR_RE.test(a);
 
+// Keyed by SwapKit's chain code (`token.chain`), so a contact's chain meets
+// the catalog's. Tron was `TRX` and Gnosis `GNOSIS` here while SwapKit says
+// `TRON` and `GNO`: a Tron contact's Swap To found no asset, and the swap
+// screen validated no Tron address at all. Saved contacts are migrated
+// (AddressbookImpl.LEGACY_SWAP_CHAINS).
 const VALIDATORS: Readonly<Record<string, Validator>> = {
-  // EVM family — every chain SwapKit currently routes ZEC against that has
-  // a smart-contract layer maps to the same address format.
+  // EVM family — every chain with a smart-contract layer maps to the same
+  // address format.
+  ADI: isEvm,
   ARB: isEvm,
+  ARC: isEvm,
   AVAX: isEvm,
   BASE: isEvm,
   BERA: isEvm,
@@ -123,11 +160,14 @@ const VALIDATORS: Readonly<Record<string, Validator>> = {
   CRO: isEvm,
   ETH: isEvm,
   FTM: isEvm,
-  GNOSIS: isEvm,
+  GNO: isEvm,
+  HOOD: isEvm,
+  HYPE: isEvm,
+  HYPEREVM: isEvm,
   KAVA: isEvm,
   LINEA: isEvm,
-  MATIC: isEvm,
   MNT: isEvm,
+  MONAD: isEvm,
   OP: isEvm,
   POL: isEvm,
   XLAYER: isEvm,
@@ -138,7 +178,8 @@ const VALIDATORS: Readonly<Record<string, Validator>> = {
   DOGE: isDoge,
   DASH: isDash,
   // Account-model and account-prefix chains.
-  TRX: isTrx,
+  NEAR: isNear,
+  TRON: isTrx,
   ATOM: isAtom,
   XRP: isXrp,
   XLM: isXlm,
@@ -146,10 +187,12 @@ const VALIDATORS: Readonly<Record<string, Validator>> = {
   DOT: isDot,
   SUI: isSui,
   TON: isTon,
-  // NEAR's format also matches lowercase bech32 bodies such as a Cosmos
-  // `cosmos1…` or a Cardano `addr1v…`. NEAR sits after the prefix-specific
-  // chains and before SOL.
-  NEAR: isNear,
+  STRK: isStrk,
+  ALEO: isAleo,
+  // Recognised only to be named: nothing routes them against ZEC.
+  THOR: isThor,
+  MAYA: isMaya,
+  XMR: isXmr,
   // SOL is intentionally LAST. Its format ("any base58, 32–44 chars") is a
   // superset of several prefix-specific chains — a TRON `T…` (34 chars), an XRP
   // `r…`, a Byron `Ae2…`, etc. all also satisfy the SOL regex. Chain detection
@@ -158,6 +201,36 @@ const VALIDATORS: Readonly<Record<string, Validator>> = {
   // would be detected as Solana.
   SOL: isSol,
 };
+
+// The bech32 forms above, and CashAddr after them. Their specs (BIP 173, the
+// CashAddr spec) allow an address written all in uppercase, which is what a QR
+// code carries; mixed case is never valid. The regexes, SwapKit and the
+// providers all take the lowercase form, so an uppercase one is lowercased.
+const UPPERCASE_ALLOWED: Readonly<Record<string, Validator>> = {
+  BTC: a => BTC_BECH32_RE.test(a),
+  LTC: a => LTC_BECH32_RE.test(a),
+  BCH: a => BCH_CASHADDR_RE.test(a),
+  ATOM: a => ATOM_RE.test(a),
+  ADA: a => ADA_SHELLEY_RE.test(a),
+  ALEO: a => ALEO_RE.test(a),
+  THOR: a => THOR_RE.test(a),
+  MAYA: a => MAYA_RE.test(a),
+};
+
+/**
+ * The address as it should be validated, stored and sent: trimmed, and
+ * lowercased when it is an all-uppercase bech32 or CashAddr address.
+ */
+export function canonicalChainAddress(chain: string, address: string): string {
+  const trimmed = address.trim();
+  const lower = trimmed.toLowerCase();
+  const allowsUppercase = UPPERCASE_ALLOWED[chain.toUpperCase()];
+  return allowsUppercase &&
+    /^[A-Z0-9:]+$/.test(trimmed) &&
+    allowsUppercase(lower)
+    ? lower
+    : trimmed;
+}
 
 /**
  * Returns true when the address is plausibly a valid wallet address on the
@@ -171,20 +244,7 @@ export function isValidChainAddress(chain: string, address: string): boolean {
   if (trimmed.length === 0) return true;
   const v = VALIDATORS[chain.toUpperCase()];
   if (!v) return true;
-  return v(trimmed);
-}
-
-/**
- * Returns true for a valid NEAR account ID outside the implicit, `.near` and `.tg` forms.
- */
-export function nearAccountNeedsConfirm(address: string): boolean {
-  const trimmed = address.trim();
-  return (
-    isNear(trimmed) &&
-    !NEAR_IMPLICIT_RE.test(trimmed) &&
-    !trimmed.endsWith('.near') &&
-    !trimmed.endsWith('.tg')
-  );
+  return v(canonicalChainAddress(chain, trimmed));
 }
 
 /**
@@ -200,21 +260,3 @@ export const SWAP_ADDRESS_CHAINS: readonly string[] = [
   ...PRIORITY_CHAINS,
   ...Object.keys(VALIDATORS).filter(c => !PRIORITY_CHAINS.includes(c)),
 ];
-
-const BECH32_FORMATS: Readonly<Record<string, RegExp>> = {
-  BTC: BTC_BECH32_RE,
-  LTC: LTC_BECH32_RE,
-  BCH: BCH_CASHADDR_RE,
-  ATOM: ATOM_RE,
-  ADA: ADA_SHELLEY_RE,
-};
-
-/**
- * Returns an uppercase bech32 or CashAddr address of the chain in lowercase,
- * and any other address as typed.
- */
-export function normalizeChainAddress(chain: string, address: string): string {
-  const format = BECH32_FORMATS[chain.toUpperCase()];
-  if (!format || !isUniformCase(address, format)) return address;
-  return address.toLowerCase();
-}

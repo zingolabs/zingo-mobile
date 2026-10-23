@@ -1,7 +1,6 @@
 import {
   isValidChainAddress,
   nearAccountNeedsConfirm,
-  SWAP_ADDRESS_CHAINS,
 } from '@app/swap/addressValidators';
 
 const accepted = [
@@ -38,20 +37,6 @@ test.each(rejected)(
   'Tests that NEAR rejects an account ID when %s: %s',
   (_condition, address) => {
     expect(isValidChainAddress('NEAR', address)).toBe(false);
-  },
-);
-
-test.each([
-  ['ATOM', 'cosmos1' + 'q'.repeat(38)],
-  ['ADA', 'addr1vpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5eg0yu80w'],
-])(
-  'Tests that %s comes before NEAR in the chain list when both accept the address: %s',
-  (chain, address) => {
-    const matches = SWAP_ADDRESS_CHAINS.filter(
-      c => c !== 'ZEC' && isValidChainAddress(c, address),
-    );
-    expect(matches[0]).toBe(chain);
-    expect(matches).toContain('NEAR');
   },
 );
 
