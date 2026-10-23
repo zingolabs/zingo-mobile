@@ -1,8 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext } from 'react';
+import { formatZecAmount } from '@app/utils/formatZecAmount';
 import { Linking, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { space12, useTheme } from '@app/theme';
+import { space12, useTheme, iconSizeMd } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import { Route, ValueTransferKindEnum } from '@app/AppState';
 import { ContextAppLoaded, useSwapRecords } from '@app/context';
@@ -143,13 +144,13 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
       <DetailHero
         icon={
           received ? (
-            <ArrowDownIcon size={18} color={colors.fgDefault} />
+            <ArrowDownIcon size={iconSizeMd} color={colors.fgDefault} />
           ) : (
-            <ArrowUpIcon size={18} color={colors.fgDefault} />
+            <ArrowUpIcon size={iconSizeMd} color={colors.fgDefault} />
           )
         }
         title={legName(leg, record, t)}
-        amount={`${received ? '+' : '−'}${leg.amount.toFixed(4)}`}
+        amount={`${received ? '+' : '−'}${formatZecAmount(leg.amount)}`}
         unit={info.currencyName}
         tone={received ? 'positive' : 'default'}
         line={price > 0 ? `≈ $${(leg.amount * price).toFixed(2)}` : ''}
@@ -157,7 +158,7 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
         pillTone={confirmed ? 'accent' : 'neutral'}
       />
       <DetailRows rows={rows} />
-      <Text variant="bodySmall" tone="muted" style={{ marginTop: space12 }}>
+      <Text variant="caption" tone="muted" style={{ marginTop: space12 }}>
         {role.note}
       </Text>
       {role.warn && (

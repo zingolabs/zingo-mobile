@@ -1,36 +1,22 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import { radiusLg, useTheme } from '@app/theme';
+import {
+  radiusMd,
+  useTheme,
+  rowMinHeight,
+  space4,
+  space8,
+  space12,
+  space16,
+} from '@app/theme';
 import Text from '@ui/primitives/Text';
 import Radio from '@ui/primitives/Radio';
+import Tag from '@ui/widgets/Tag';
+import { useInsetFill } from '@ui/primitives/Surface';
 
-export type PillTone = 'positive' | 'warning';
-
-/** A short uppercase mark beside a title: Best in green, Public in amber. */
-export function Pill({ text, tone }: { text: string; tone: PillTone }) {
-  const { colors } = useTheme();
-  const color = tone === 'positive' ? colors.fgPriceUp : colors.fgWarning;
-  return (
-    <Text
-      style={{
-        fontSize: 12,
-        lineHeight: 16,
-        fontWeight: '600',
-        letterSpacing: 0.5,
-        textTransform: 'uppercase',
-        paddingHorizontal: 6,
-        borderRadius: 5,
-        overflow: 'hidden',
-        color,
-        backgroundColor:
-          tone === 'positive' ? colors.bgAccentSubtle : colors.bgWarningSubtle,
-      }}
-    >
-      {text}
-    </Text>
-  );
-}
+/** A pool or a recommendation beside a row's title. */
+export type PillTone = 'accent' | 'transparent';
 
 /** The card a group of radio rows sits in. */
 export function RadioList({
@@ -41,15 +27,16 @@ export function RadioList({
   testID?: string;
 }) {
   const { colors } = useTheme();
+  const inset = useInsetFill();
   return (
     <View
       testID={testID}
       accessibilityRole="radiogroup"
       style={{
-        borderRadius: radiusLg,
+        borderRadius: radiusMd,
         borderWidth: 1,
         borderColor: colors.bottomSheetBorder,
-        backgroundColor: colors.bgCanvas,
+        backgroundColor: inset,
         overflow: 'hidden',
       }}
     >
@@ -65,6 +52,8 @@ type RadioRowProps = {
   sub?: React.ReactNode;
   selected: boolean;
   onPress: () => void;
+  /** A coin's or a chain's logo, after the radio. */
+  leading?: React.ReactNode;
   /** Buttons at the end of the row, outside its own press. */
   trailing?: React.ReactNode;
   first?: boolean;
@@ -78,6 +67,7 @@ export default function RadioRow({
   sub,
   selected,
   onPress,
+  leading,
   trailing,
   first,
   testID,
@@ -101,38 +91,35 @@ export default function RadioRow({
           flex: 1,
           flexDirection: 'row',
           alignItems: 'center',
-          columnGap: 13,
-          minHeight: 56,
-          paddingVertical: 10,
-          paddingLeft: 14,
-          paddingRight: trailing ? 0 : 14,
+          columnGap: space12,
+          minHeight: rowMinHeight,
+          paddingVertical: space12,
+          paddingLeft: space16,
+          paddingRight: trailing ? 0 : space16,
           backgroundColor: pressed ? colors.bgMutedSubtle : 'transparent',
         })}
       >
         <Radio selected={selected} />
+        {leading}
         <View style={{ flex: 1, minWidth: 0 }}>
           <View
-            style={{ flexDirection: 'row', alignItems: 'center', columnGap: 7 }}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              columnGap: space8,
+            }}
           >
             <Text
+              variant="bodyStrong"
               numberOfLines={1}
-              style={{
-                flexShrink: 1,
-                fontSize: 13,
-                lineHeight: 18,
-                fontWeight: '600',
-              }}
+              style={{ flexShrink: 1 }}
             >
               {title}
             </Text>
-            {!!pill && <Pill text={pill.text} tone={pill.tone} />}
+            {!!pill && <Tag tone={pill.tone}>{pill.text}</Tag>}
           </View>
           {!!sub && (
-            <Text
-              variant="caption"
-              tone="muted"
-              style={{ marginTop: 2, lineHeight: 16 }}
-            >
+            <Text variant="bodySmall" tone="muted">
               {sub}
             </Text>
           )}
@@ -143,7 +130,7 @@ export default function RadioRow({
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            paddingRight: 6,
+            paddingRight: space4,
           }}
         >
           {trailing}

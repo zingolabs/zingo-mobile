@@ -1,7 +1,6 @@
-/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import { radiusPill, space8, useTheme } from '@app/theme';
+import { radiusPill, space8, useTheme, iconSizeSm } from '@app/theme';
 import type { TokenEntryType } from '@app/swap';
 import Text from '@ui/primitives/Text';
 import { ChevronDown } from '@ui/primitives/Icons/Chevron';
@@ -61,20 +60,14 @@ export default function AssetButton({
         forceBadge={!!onPress}
       />
       <View>
-        <Text variant="bodyStrong" style={{ lineHeight: 18 }}>
-          {ticker}
-        </Text>
+        <Text variant="bodyStrong">{ticker}</Text>
         {!!network && (
-          <Text
-            variant="caption"
-            tone="muted"
-            style={{ fontSize: 11, lineHeight: 14 }}
-          >
+          <Text variant="caption" tone="muted">
             {network}
           </Text>
         )}
       </View>
-      {!!onPress && <ChevronDown size={16} color={colors.fgMuted} />}
+      {!!onPress && <ChevronDown size={iconSizeSm} color={colors.fgMuted} />}
     </Pressable>
   );
 }

@@ -3,7 +3,7 @@ import React, { useCallback, useContext, useEffect, useRef } from 'react';
 import { Animated, View, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
-import { slopFor, useTheme } from '@app/theme';
+import { slopFor, useTheme, iconSizeMd, iconSize } from '@app/theme';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import {
   ValueTransferType,
@@ -11,6 +11,7 @@ import {
   SendPageStateClass,
   ToAddrClass,
   Route,
+  GlobalConst,
 } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { fiatQuote } from '@app/price/fiatQuote';
@@ -23,6 +24,7 @@ import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
 import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
 import { shortWhen, transferRowText } from '@screens/History/historyRowText';
 import HistoryAvatar from './HistoryAvatar';
+import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import HistoryRowBody from './HistoryRowBody';
 
 type ValueTransferLineProps = {
@@ -71,6 +73,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     server,
     setSendPageState,
     zecPrice,
+    addressBook,
   } = context;
   const { colors } = useTheme();
   const t = (key: string) => (translate(key) as string).trim();
@@ -95,6 +98,14 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
       : quote.kind === 'quote'
         ? quote.price
         : 0;
+  /** The Zcash contact the row's address belongs to. */
+  const contact = vt.address
+    ? addressBook.find(
+        entry =>
+          entry.address === vt.address &&
+          entry.swapChain === GlobalConst.zecSwapChain,
+      )
+    : undefined;
   const text = transferRowText({
     vt,
     when: shortWhen(vt.time * 1000, Date.now(), t, ms =>
@@ -103,17 +114,18 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     currency: info.currencyName,
     usd: usdText(vt.amount, price),
     t,
+    contactName: contact?.label,
   });
   const iconColor = colors.fgDefault;
   const icon =
     vt.kind === ValueTransferKindEnum.Received ? (
-      <ArrowDownIcon size={18} color={iconColor} />
+      <ArrowDownIcon size={iconSizeMd} color={iconColor} />
     ) : vt.kind === ValueTransferKindEnum.Shield ? (
-      <ShieldIcon size={18} color={iconColor} />
+      <ShieldIcon size={iconSizeMd} color={iconColor} />
     ) : vt.kind === ValueTransferKindEnum.Migration ? (
-      <SwapIcon size={18} color={iconColor} />
+      <SwapIcon size={iconSizeMd} color={iconColor} />
     ) : (
-      <ArrowUpIcon size={18} color={iconColor} />
+      <ArrowUpIcon size={iconSizeMd} color={iconColor} />
     );
   const haveMemo = !!vt.memos && vt.memos.length > 0 && !!vt.memos.join('');
 
@@ -154,7 +166,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               >
                 <FileTextIcon
                   style={{ opacity: 0.8 }}
-                  size={24}
+                  size={iconSize}
                   color={colors.fgDefault}
                 />
               </TouchableOpacity>
@@ -180,7 +192,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     closeAllSwipeables();
                   }}
                 >
-                  <PlaneIcon size={24} color={colors.fgAccent} />
+                  <PlaneIcon size={iconSize} color={colors.fgAccent} />
                 </TouchableOpacity>
               </View>
             )}
@@ -212,7 +224,18 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
           renderLeftActions={handleRenderLeftActions}
         >
           <HistoryRowBody
-            leading={<HistoryAvatar icon={icon} />}
+            leading={
+              contact ? (
+                <Avatar
+                  kind="contact"
+                  name={contact.label}
+                  category={avatarCategoryOf(contact.color)}
+                  size="md"
+                />
+              ) : (
+                <HistoryAvatar icon={icon} />
+              )
+            }
             text={text}
             privacy={privacy}
             hairline={hairline}

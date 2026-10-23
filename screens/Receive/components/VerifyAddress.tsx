@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
 import { View, Keyboard } from 'react-native';
-import { useTheme } from '@app/theme';
+import { space8, space20, useTheme } from '@app/theme';
 
 import { GlobalConst, SnackbarDurationEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
@@ -11,7 +11,7 @@ import { checkMyAddress } from '@app/walletBackend';
 import { parseZcashURI } from '@app/uris';
 import Utils from '@app/utils';
 import TextInputAddress from '@ui/widgets/TextInputAddress';
-import FadeText from '@ui/primitives/FadeText';
+import Text from '@ui/primitives/Text';
 import { RPCCheckAddressType } from '@app/walletBackend/types/RPCCheckAddressType';
 import { VerifyCheckIcon } from '@ui/primitives/Icons/VerifyCheckIcon';
 import { VerifyXIcon } from '@ui/primitives/Icons/VerifyXIcon';
@@ -93,17 +93,17 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
         backgroundColor: colors.bgSurface,
       }}
     >
-      <FadeText
+      <Text
+        variant="caption"
+        tone="muted"
         style={{
           textAlign: 'center',
-          fontSize: 12,
-          lineHeight: 16,
-          marginHorizontal: 20,
-          marginBottom: 6,
+          marginHorizontal: space20,
+          marginBottom: space8,
         }}
       >
         {translate('receive.verify-sub') as string}
-      </FadeText>
+      </Text>
       <TextInputAddress
         address={address}
         setAddress={updateAddress}
@@ -113,17 +113,13 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
         scanRequest="receive.address"
       />
       {!!errorAddress && (
-        <View
-          style={{
-            flexGrow: 1,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginVertical: 5,
-          }}
+        <Text
+          variant="bodySmall"
+          tone="danger"
+          style={{ marginTop: space8, marginHorizontal: space20 }}
         >
-          <FadeText style={{ color: colors.fgDanger }}>{errorAddress}</FadeText>
-        </View>
+          {errorAddress}
+        </Text>
       )}
       {verifyOK !== null && (
         <View
@@ -145,15 +141,17 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
               }}
             >
               <VerifyCheckIcon
-                color={colors.fgPriceUp}
+                color={colors.fgAccent}
                 style={{ marginRight: 10 }}
               />
-              <FadeText
+              <Text
                 testID="receive.verify-mine"
-                style={{ color: colors.fgPriceUp, flexShrink: 1 }}
+                variant="bodySmall"
+                tone="accent"
+                style={{ flexShrink: 1 }}
               >
                 {translate('receive.verification-success') as string}
-              </FadeText>
+              </Text>
             </View>
           ) : (
             <View
@@ -165,15 +163,17 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
               }}
             >
               <VerifyXIcon
-                color={colors.fgPriceDown}
+                color={colors.fgDanger}
                 style={{ marginRight: 10 }}
               />
-              <FadeText
+              <Text
                 testID="receive.verify-not-mine"
-                style={{ color: colors.fgPriceDown, flexShrink: 1 }}
+                variant="bodySmall"
+                tone="danger"
+                style={{ flexShrink: 1 }}
               >
                 {translate('receive.verification-failure') as string}
-              </FadeText>
+              </Text>
             </View>
           )}
         </View>

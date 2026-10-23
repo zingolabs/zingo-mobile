@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { Pressable, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
-import { slopFor, useTheme } from '@app/theme';
+import { slopFor, useTheme, iconSizeMd, iconSizeSm } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   SwapDirectionEnum,
@@ -21,8 +21,8 @@ import {
   swapInFlight,
   swapRowText,
 } from '@screens/History/historyRowText';
-import HistoryAvatar, { AVATAR_SIZE } from './HistoryAvatar';
-import ContactInitial from '@screens/Swap/components/ContactInitial';
+import HistoryAvatar from './HistoryAvatar';
+import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import HistoryRowBody from './HistoryRowBody';
 
 type SwapLineProps = {
@@ -80,9 +80,9 @@ function SwapLine({
       ? record.receiveAsset
       : record.sellAsset;
   const icon = swapInFlight(record) ? (
-    <ClockIcon size={18} color={colors.fgDefault} />
+    <ClockIcon size={iconSizeMd} color={colors.fgDefault} />
   ) : (
-    <SwapIcon size={18} color={colors.fgDefault} />
+    <SwapIcon size={iconSizeMd} color={colors.fgDefault} />
   );
   const Chevron = open ? ChevronUp : ChevronDown;
 
@@ -102,11 +102,12 @@ function SwapLine({
       <HistoryRowBody
         leading={
           contact ? (
-            <ContactInitial
+            <Avatar
+              kind="contact"
               name={contact.label}
-              color={contact.color}
-              size={AVATAR_SIZE}
-              badge={other.ticker ?? other.symbol}
+              category={avatarCategoryOf(contact.color)}
+              chain={other.ticker ?? other.symbol}
+              size="md"
             />
           ) : (
             <HistoryAvatar icon={icon} badge={other} />
@@ -126,7 +127,7 @@ function SwapLine({
               onPress={onToggle}
               style={{ marginRight: -8, width: 28, alignItems: 'center' }}
             >
-              <Chevron size={16} color={colors.fgMuted} />
+              <Chevron size={iconSizeSm} color={colors.fgMuted} />
             </Pressable>
           ) : (
             <View style={{ width: 20 }} />

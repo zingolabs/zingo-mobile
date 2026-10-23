@@ -267,12 +267,14 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
     }
   >
     <View
-      onLayout={[Function]}
       style={
-        {
-          "alignItems": "center",
-          "alignSelf": "stretch",
-        }
+        [
+          {
+            "alignItems": "center",
+            "alignSelf": "stretch",
+          },
+          null,
+        ]
       }
     >
       <View
@@ -280,7 +282,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           {
             "alignItems": "center",
             "flexDirection": "row",
-            "gap": 6,
+            "gap": 8,
           }
         }
       >
@@ -290,49 +292,53 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
             {
               "color": "#c3c3c3",
               "fontSize": 13,
-              "fontWeight": "600",
+              "fontWeight": "700",
               "lineHeight": 18,
             }
           }
         />
         <View
-          accessibilityLabel=""
-          accessibilityRole="button"
-          accessibilityState={
-            {
-              "busy": undefined,
-              "checked": undefined,
-              "disabled": undefined,
-              "expanded": false,
-              "selected": undefined,
-            }
-          }
-          accessibilityValue={
-            {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
-            }
-          }
-          accessible={true}
-          collapsable={false}
-          focusable={true}
-          hitSlop={10}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onFocus={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          testID="import.birthdayinfo"
+          style={null}
         >
           <View
-            style={{}}
-          />
+            accessibilityLabel=""
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": false,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            hitSlop={14}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            testID="import.birthdayinfo"
+          >
+            <View
+              style={{}}
+            />
+          </View>
         </View>
       </View>
     </View>

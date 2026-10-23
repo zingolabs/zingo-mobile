@@ -188,7 +188,7 @@ test('Tests that a sent transfer is titled by its address and signed negative', 
 
   expect(text.title).toBe('u1abc');
   expect(text.titleMono).toBe(true);
-  expect(text.top).toBe('−1.5000 ZEC');
+  expect(text.top).toBe('−1.5 ZEC');
   expect(text.bottom).toBe('$924.36');
 });
 

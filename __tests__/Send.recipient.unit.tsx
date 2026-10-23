@@ -79,7 +79,7 @@ describe('RecipientField', () => {
     expect(view.getByTestId('send.results')).toHaveTextContent(
       /send\.name-nobody/,
     );
-    expect(view.queryByTestId('send.address.error')).toBeNull();
+    expect(view.queryByTestId('send.addressplaceholder.error')).toBeNull();
   });
 
   test('Tests that a found name not in the book is picked with its address', () => {
@@ -107,7 +107,7 @@ describe('RecipientField', () => {
 
   test('Tests that text that is no address, contact or name says what is wrong', () => {
     const { view } = field({ text: '!!', valid: -1 });
-    expect(view.getByTestId('send.address.error')).toHaveTextContent(
+    expect(view.getByTestId('send.addressplaceholder.error')).toHaveTextContent(
       'send.to-invalid',
     );
   });

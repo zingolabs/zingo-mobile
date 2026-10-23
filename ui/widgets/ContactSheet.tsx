@@ -2,7 +2,7 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
 
-import { useTheme, slopFor } from '@app/theme';
+import { useTheme, slopFor, iconSizeMd } from '@app/theme';
 import { AddressBookFileClass, ChainNameEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { openScanner } from '@app/navigation/navigate';
@@ -375,7 +375,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             <TouchableOpacity hitSlop={slopFor(20)} onPress={() => setName('')}>
               <XIcon
                 style={{ marginRight: 10 }}
-                size={20}
+                size={iconSizeMd}
                 color={colors.fgMuted}
               />
             </TouchableOpacity>
@@ -464,7 +464,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
               >
                 <XIcon
                   style={{ marginRight: 5 }}
-                  size={20}
+                  size={iconSizeMd}
                   color={colors.fgMuted}
                 />
               </TouchableOpacity>

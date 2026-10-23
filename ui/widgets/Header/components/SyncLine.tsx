@@ -13,14 +13,17 @@ import Animated, {
 import { useNavigation } from '@react-navigation/native';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import { WalletNavigation } from '@app/types';
-import { radiusPill, useTheme } from '@app/theme';
+import { radiusPill, useTheme, iconSizeSm } from '@app/theme';
 import { Route, ServerType, TranslateType } from '@app/AppState';
 import NetInfoType from '@app/AppState/types/NetInfoType';
-import { markSynced, useLastSynced } from '@app/hooks/lastSynced';
+import { useSyncFreshness } from '@app/hooks/lastSynced';
+import { isFallingBehind } from '@app/walletBackend/utils/syncFreshness';
 import Text from '@ui/primitives/Text';
+import { CARD_MARGIN_TOP } from './PriceRow';
 import { CloudDownloadIcon } from '@ui/primitives/Icons/CloudDownloadIcon';
 
-type SyncState = 'noInternet' | 'offline' | 'starting' | 'syncing' | 'synced';
+type SyncState =
+  'noInternet' | 'offline' | 'starting' | 'syncing' | 'behind' | 'synced';
 
 const MINUTE_MS = 60 * 1000;
 
@@ -65,7 +68,7 @@ function Spinner({ track, arc }: { track: string; arc: string }) {
         {
           width: 12,
           height: 12,
-          borderRadius: 6,
+          borderRadius: radiusPill,
           borderWidth: 2,
           borderColor: track,
           borderTopColor: arc,
@@ -78,9 +81,10 @@ function Spinner({ track, arc }: { track: string; arc: string }) {
 
 /**
  * The line under the balance that says whether that number is final: synced
- * with a green dot, connecting with a spinner, syncing with a yellow bar,
- * and how old the balance is when offline or without internet. Mobile data
- * is added at the end. Tapping it opens the Sync report.
+ * with a green dot, connecting with a spinner, syncing with a yellow bar.
+ * How old the balance is shows only when the wallet stopped keeping up: no
+ * internet, Offline, or a sync that falls behind the tip. Mobile data is
+ * added at the end. Tapping it opens the Sync report.
  */
 export default function SyncLine({
   server,
@@ -99,7 +103,7 @@ export default function SyncLine({
   const navigation = useNavigation<WalletNavigation>();
   const { colors } = useTheme();
   const t = (key: string) => translate(key) as string;
-  const lastSynced = useLastSynced();
+  const freshness = useSyncFreshness();
   const [nowMs, setNowMs] = useState<number>(Date.now());
 
   const state: SyncState = !netInfo.isConnected
@@ -110,22 +114,21 @@ export default function SyncLine({
         ? 'starting'
         : syncInProgress
           ? 'syncing'
-          : 'synced';
+          : isFallingBehind(freshness, nowMs)
+            ? 'behind'
+            : 'synced';
   const metered =
     !!netInfo.isConnected &&
     (netInfo.type === NetInfoStateType.cellular ||
       !!netInfo.isConnectionExpensive);
 
   useEffect(() => {
-    if (state === 'synced') {
-      markSynced(Date.now());
-    }
-  }, [state, percentage]);
-  useEffect(() => {
     const timer = setInterval(() => setNowMs(Date.now()), 30 * 1000);
     return () => clearInterval(timer);
   }, []);
 
+  /** The last moment the wallet was at the tip, which only stops moving when it falls behind. */
+  const lastSynced = freshness.caughtUpAtMs;
   const balanceAge =
     lastSynced > 0
       ? t('header.sync-balance-from').replace(
@@ -150,8 +153,8 @@ export default function SyncLine({
     case 'noInternet':
       body = (
         <>
-          <CloudDownloadIcon size={14} color={colors.fgPriceDown} />
-          {strong(t('header.sync-no-internet'), colors.fgPriceDown)}
+          <CloudDownloadIcon size={iconSizeSm} color={colors.fgWarning} />
+          {strong(t('header.sync-no-internet'), colors.fgWarning)}
           {!!balanceAge && sep}
           {!!balanceAge && (
             <Text variant="caption" tone="muted">
@@ -171,11 +174,11 @@ export default function SyncLine({
             style={{
               width: 7,
               height: 7,
-              borderRadius: 4,
+              borderRadius: radiusPill,
               backgroundColor: colors.borderMuted,
             }}
           />
-          {strong(t('header.sync-offline'), colors.fgPriceDown)}
+          {strong(t('header.sync-offline'), colors.fgWarning)}
           {!!balanceAge && sep}
           {!!balanceAge && (
             <Text variant="caption" tone="muted">
@@ -185,6 +188,29 @@ export default function SyncLine({
         </>
       );
       label = [t('header.sync-offline'), balanceAge].filter(Boolean).join('. ');
+      break;
+    case 'behind':
+      body = (
+        <>
+          <View
+            testID="header.sync-behind"
+            style={{
+              width: 7,
+              height: 7,
+              borderRadius: radiusPill,
+              backgroundColor: colors.fgWarning,
+            }}
+          />
+          {strong(t('header.sync-behind'), colors.fgWarning)}
+          {!!balanceAge && sep}
+          {!!balanceAge && (
+            <Text variant="caption" tone="muted">
+              {balanceAge}
+            </Text>
+          )}
+        </>
+      );
+      label = [t('header.sync-behind'), balanceAge].filter(Boolean).join('. ');
       break;
     case 'starting':
       body = (
@@ -204,7 +230,7 @@ export default function SyncLine({
             style={{
               width: 56,
               height: 4,
-              borderRadius: 2,
+              borderRadius: radiusPill,
               backgroundColor: colors.sheetHandle,
               overflow: 'hidden',
             }}
@@ -213,7 +239,7 @@ export default function SyncLine({
               style={{
                 width: `${Math.min(100, Math.max(0, percentage))}%`,
                 height: 4,
-                borderRadius: 2,
+                borderRadius: radiusPill,
                 backgroundColor: colors.fgSyncing,
               }}
             />
@@ -240,16 +266,12 @@ export default function SyncLine({
             style={{
               width: 7,
               height: 7,
-              borderRadius: 4,
-              backgroundColor: colors.fgPriceUp,
+              borderRadius: radiusPill,
+              backgroundColor: colors.fgAccent,
             }}
           />
           <Text variant="caption" tone="muted">
             {t('header.sync-synced')}
-          </Text>
-          {sep}
-          <Text variant="caption" tone="muted">
-            {ago(lastSynced || nowMs, nowMs, t)}
           </Text>
         </>
       );
@@ -265,10 +287,11 @@ export default function SyncLine({
       style={({ pressed }) => ({
         flexDirection: 'row',
         alignItems: 'center',
-        columnGap: 6,
+        columnGap: 8,
         height: 28,
-        marginTop: 6,
-        paddingHorizontal: 10,
+        /** The price card sits this far below; the same above centres the line. */
+        marginTop: CARD_MARGIN_TOP,
+        paddingHorizontal: 12,
         borderRadius: radiusPill,
         backgroundColor: pressed ? colors.bgMutedSubtle : 'transparent',
       })}
@@ -277,7 +300,7 @@ export default function SyncLine({
       {metered && (
         <>
           {sep}
-          <CloudDownloadIcon size={14} color={colors.fgWarning} />
+          <CloudDownloadIcon size={iconSizeSm} color={colors.fgWarning} />
           {strong(t('header.sync-mobile-data'), colors.fgWarning)}
         </>
       )}

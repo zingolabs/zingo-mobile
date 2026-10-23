@@ -81,17 +81,20 @@ const TAB_FADE = {
 } as const;
 
 /**
- * A screen opened in depth (a transaction, a review, your addresses) rises
- * from the bottom as a full panel. The native stack takes a duration (iOS
- * honours it) but not the design's curve, (.32,.72,0,1).
+ * A screen opened in depth (a transaction, a review, your addresses) is a
+ * full panel over the screen it was opened from, which stays behind it: a
+ * transparent modal the stack does not move. FullPanel rises, fades its
+ * content in and lowers on its own, at the design's pace (560 / 460 ms,
+ * (.32,.72,0,1)), so exactly one thing moves.
  */
 const PANEL = {
-  animation: 'slide_from_bottom',
-  animationDuration: duration.panelIn,
+  presentation: 'transparentModal',
+  animation: 'none',
+  contentStyle: { backgroundColor: 'transparent' },
 } as const;
 
-/** A step inside a full panel (review, sending, sent) cross-fades. */
-const STEP = { animation: 'fade', animationDuration: duration.step } as const;
+/** A step inside a full panel (sending, sent): the panel is up already. */
+const STEP = PANEL;
 const Tab = createBottomTabNavigator<HomeTabParamList>();
 
 const renderTabBar = (props: BottomTabBarProps) => <CustomTabBar {...props} />;

@@ -6,9 +6,17 @@ export type ThemeColors = {
   bgChrome: string;
   /** The floating tab bar, a step darker than the panel. */
   bgTabBar: string;
+  /** The tab bar's edge. */
+  borderTabBar: string;
+  /** The capsule under the selected tab. */
+  bgTabCapsule: string;
+  /** An unselected tab: its strokes, leaf and name. */
+  fgTabIdle: string;
+  /** The selected tab's strokes. */
+  fgTabSelected: string;
+  /** The shadow the floating tab bar casts. */
+  shadowTabBar: string;
   bottomSheetBorder: string;
-  /** The upward shadow the front notice casts onto the balance. */
-  shadowNotice: string;
   /** Fields: blue at rest and in focus, accent when valid, danger when not. */
   borderFocus: string;
   /** Hairline between rows inside a card. */
@@ -105,10 +113,14 @@ export const themeTokens: ThemeColors = {
   bgSurface: surface,
   bgChrome: surface,
   bgTabBar: '#040C17',
+  borderTabBar: '#0B1D36',
+  bgTabCapsule: '#D3E2F81A',
+  fgTabIdle: '#BABBBE',
+  fgTabSelected: '#F7F8FA',
+  shadowTabBar: '#00000073',
   bottomSheetBorder: '#05234C',
-  shadowNotice: '#02050A8C',
   borderFocus: '#0B3A75',
-  borderSubtle: '#0A1F3D',
+  borderSubtle: '#FFFFFF0F',
   sheetHandle: '#1B3C6B',
   bgScrim: '#02060C9E',
 

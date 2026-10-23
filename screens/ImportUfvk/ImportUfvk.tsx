@@ -16,7 +16,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { useTheme } from '@app/theme';
+import { useTheme, iconSizeMd } from '@app/theme';
 
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
@@ -336,7 +336,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
             {!!seedufvkText && (
               <TouchableOpacity onPress={() => setSeedufvkText('')} hitSlop={8}>
-                <XIcon size={16} color={colors.fgMuted} />
+                <XIcon size={iconSizeMd} color={colors.fgMuted} />
               </TouchableOpacity>
             )}
             <Pressable
@@ -441,7 +441,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 hitSlop={8}
                 style={{ paddingRight: 12 }}
               >
-                <XIcon size={16} color={colors.fgMuted} />
+                <XIcon size={iconSizeMd} color={colors.fgMuted} />
               </TouchableOpacity>
             )}
           </Animated.View>

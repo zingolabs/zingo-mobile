@@ -8,7 +8,10 @@ import { act, render } from '@testing-library/react-native';
 import { NetInfoStateType } from '@react-native-community/netinfo';
 import { ChainNameEnum, remoteServer } from '@app/AppState';
 import { offlineServer } from '@app/AppState/types/ServerType';
-import { markSynced } from '@app/hooks/lastSynced';
+import {
+  noteHeights,
+  resetFreshness,
+} from '@app/walletBackend/utils/syncFreshness';
 import SyncLine from '@ui/widgets/Header/components/SyncLine';
 
 jest.mock('@react-navigation/native', () => ({
@@ -40,6 +43,12 @@ const line = (props: Partial<React.ComponentProps<typeof SyncLine>>) =>
     />,
   );
 
+const MIN = 60 * 1000;
+
+beforeEach(() => {
+  act(() => resetFreshness());
+});
+
 describe('SyncLine', () => {
   test('Tests that a synced wallet shows the green dot the end-to-end flows wait for', () => {
     const screen = line({});
@@ -47,6 +56,35 @@ describe('SyncLine', () => {
     expect(screen.getByTestId('header.syncline')).toHaveTextContent(
       /header\.sync-synced/,
     );
+  });
+
+  test('Tests that a synced wallet shows no age when it keeps up with the tip', () => {
+    act(() => noteHeights(100, 100, Date.now() - 26 * MIN));
+    const screen = line({});
+    const text = screen.getByTestId('header.syncline');
+    expect(text).toHaveTextContent(/header\.sync-synced/);
+    expect(text).not.toHaveTextContent(/header\.sync-minutes-ago/);
+  });
+
+  test('Tests that a wallet trailing the tip for minutes says it falls behind and how old the balance is', () => {
+    act(() => {
+      noteHeights(100, 100, Date.now() - 8 * MIN);
+      noteHeights(100, 104, Date.now());
+    });
+    const screen = line({});
+    const text = screen.getByTestId('header.syncline');
+    expect(screen.getByTestId('header.sync-behind')).toBeTruthy();
+    expect(text).toHaveTextContent(/header\.sync-behind/);
+    expect(text).toHaveTextContent(/header\.sync-balance-from/);
+  });
+
+  test('Tests that a block mid-scan is still synced when the wallet trails the tip by one', () => {
+    act(() => {
+      noteHeights(100, 100, Date.now() - 8 * MIN);
+      noteHeights(100, 101, Date.now());
+    });
+    const screen = line({});
+    expect(screen.queryByTestId('header.sync-behind')).toBeNull();
   });
 
   test('Tests that the first connection names the server it is reaching', () => {
@@ -64,7 +102,7 @@ describe('SyncLine', () => {
   });
 
   test('Tests that offline mode says how old the balance is once a sync was seen', () => {
-    act(() => markSynced(Date.now() - 18 * 60 * 1000));
+    act(() => noteHeights(100, 100, Date.now() - 18 * MIN));
     const screen = line({
       server: offlineServer(ChainNameEnum.mainChainName),
     });

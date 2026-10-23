@@ -10,7 +10,13 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
-import { useTheme, slopFor } from '@app/theme';
+import {
+  useTheme,
+  slopFor,
+  iconSizeMd,
+  radiusSm,
+  textVariants,
+} from '@app/theme';
 import { Route, ServerType, TranslateType } from '@app/AppState';
 import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
 import InfoType from '@app/AppState/types/InfoType';
@@ -132,7 +138,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              columnGap: 6,
+              columnGap: 8,
               height: 22,
               marginTop: 4,
             }}
@@ -156,30 +162,22 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               alignItems: 'baseline',
               justifyContent: 'center',
               columnGap: 8,
-              marginTop: 2,
+              marginTop: 4,
               // Without the fiat row the balance keeps the same air below as above.
               marginBottom: showFiat ? 0 : BALANCE_BOTTOM_GAP,
             }}
           >
             <Text
               testID="header.balance"
-              style={{
-                fontSize: 36,
-                lineHeight: 40,
-                fontWeight: '700',
-                letterSpacing: -0.8,
-                fontVariant: ['tabular-nums'],
-                color: colors.fgDefault,
-              }}
+              variant="balance"
+              style={{ fontVariant: ['tabular-nums'] }}
             >
               {privacy
                 ? MASK
                 : /** Cut to four decimals, never rounded up. */
                   Utils.splitZecAmountIntoBigSmall(fiatTotal).bigPart}
             </Text>
-            <Text
-              style={{ fontSize: 18, fontWeight: '700', color: colors.fgMuted }}
-            >
+            <Text variant="subtitle" tone="muted">
               {info.currencyName}
             </Text>
             {totalBalance && poolsWorthALook(totalBalance) && (
@@ -196,15 +194,15 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                     alignItems: 'center',
                     justifyContent: 'center',
                     backgroundColor: colors.bgCanvas,
-                    borderRadius: 10,
+                    borderRadius: radiusSm,
                     margin: 0,
-                    marginLeft: 5,
+                    marginLeft: 4,
                     padding: 0,
                     minWidth: 25,
                     minHeight: 25,
                   }}
                 >
-                  <InfoIcon size={20} color={colors.fgAccent} />
+                  <InfoIcon size={iconSizeMd} color={colors.fgAccent} />
                 </View>
               </TouchableOpacity>
             )}
@@ -255,9 +253,9 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               style={{
                 marginTop: 0,
                 marginBottom: 0,
-                fontSize: 15,
-                lineHeight: 21,
-                fontWeight: '600',
+                fontSize: textVariants.bodyStrong.fontSize,
+                lineHeight: textVariants.bodyStrong.lineHeight,
+                fontWeight: textVariants.bodyStrong.fontWeight,
               }}
               priceDate={quote.date}
               price={quote.price}

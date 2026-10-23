@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { Pressable } from 'react-native';
-import { slopFor, useTheme } from '@app/theme';
+import { slopFor, useTheme, radiusSm, iconSizeMd } from '@app/theme';
 import { TranslateType } from '@app/AppState';
 import { EyeIcon } from '@ui/primitives/Icons/EyeIcon';
 import { EyeOffIcon } from '@ui/primitives/Icons/EyeOffIcon';
@@ -37,12 +37,12 @@ const PrivacyToggle: React.FC<PrivacyToggleProps> = React.memo(
           marginVertical: -4,
           marginLeft: -2,
           marginRight: -6,
-          borderRadius: 8,
+          borderRadius: radiusSm,
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <Icon size={18} color={colors.fgMuted} />
+        <Icon size={iconSizeMd} color={colors.fgMuted} />
       </Pressable>
     );
   },

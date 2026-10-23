@@ -7,6 +7,7 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
+import TitleBar from '@ui/widgets/TitleBar';
 import {
   View,
   RefreshControl,
@@ -32,7 +33,6 @@ import {
 } from '@app/AppState';
 import { HomeTabNavigation, HomeTabScreenProps } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
-import BoldText from '@ui/primitives/BoldText';
 import AppSheet from '@ui/primitives/AppSheet';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import RingBorder from '@ui/primitives/RingBorder';
@@ -78,6 +78,7 @@ import FreshGlow from './components/FreshGlow';
 import { useFreshRows } from './useFreshRows';
 import { FiltersIcon } from '@ui/primitives/Icons/FiltersIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { onTabScrollY } from '@app/navigation/tabBarScroll';
 import { ChevronUp } from '@ui/primitives/Icons/Chevron';
 
 /** How long a finished backup keeps its green pill before the card leaves. */
@@ -676,6 +677,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
   const handleScroll = useCallback(
     (_rawEvent: ScrollEvent, _offsetX: number, offsetY: number) => {
       setPinnedMonth(monthAt(historyItemsRef.current, offsetY));
+      onTabScrollY(offsetY);
       const isTop = offsetY <= 100;
 
       // If we're scrolling to top and we've reached the top, stop the scrolling state
@@ -762,52 +764,22 @@ const History: React.FunctionComponent<HistoryProps> = () => {
   };
 
   const historyHeader = (
-    <View
-      onLayout={e => setHandleH(e.nativeEvent.layout.height)}
-      style={{
-        paddingTop: 8,
-        paddingBottom: 6,
-        paddingHorizontal: 16,
-      }}
-    >
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <View style={{ width: 48 }} />
-        <BoldText
-          numberOfLines={1}
-          style={{
-            flex: 1,
-            fontSize: 16,
-            lineHeight: 28,
-            textAlign: 'center',
-          }}
-        >
-          {translate('history.title') as string}
-        </BoldText>
-        <Pressable
-          onPress={() => {
-            setShowFilters(true);
-            bottomSheetRef.current?.present();
-          }}
-          hitSlop={8}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            paddingHorizontal: 14,
-            paddingVertical: 4,
-          }}
-        >
-          <FiltersIcon color={colors.fgMuted} size={20} />
-          {(!!filterKind || filterFailed || filterMemos || filterWithFunds) && (
+    <TitleBar
+      title={translate('history.title') as string}
+      onLayout={setHandleH}
+      right={{
+        icon: FiltersIcon,
+        accessibilityLabel: translate('history.filters') as string,
+        onPress: () => {
+          setShowFilters(true);
+          bottomSheetRef.current?.present();
+        },
+        badge:
+          !!filterKind || filterFailed || filterMemos || filterWithFunds ? (
             <View
               testID="history.filter.dot"
               style={{
-                backgroundColor: colors.fgPriceUp,
+                backgroundColor: colors.fgAccent,
                 width: 8,
                 height: 8,
                 borderRadius: 4,
@@ -817,49 +789,23 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                 borderColor: colors.bgSurface,
               }}
             />
-          )}
-        </Pressable>
-      </View>
-    </View>
+          ) : undefined,
+      }}
+    />
   );
 
   /** The one filter on, for the bar over the list. */
   const activeFilter = filterOf(filterKind, filterFailed, filterMemos);
 
   const filtersXHeader = (
-    <View
-      style={{
-        paddingTop: 8,
-        paddingBottom: 6,
-        paddingHorizontal: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+    <TitleBar
+      title={translate('history.filters') as string}
+      right={{
+        icon: XIcon,
+        accessibilityLabel: translate('close') as string,
+        onPress: () => bottomSheetRef.current?.dismiss(),
       }}
-    >
-      <View style={{ width: 48 }} />
-      <BoldText
-        numberOfLines={1}
-        style={{
-          flex: 1,
-          fontSize: 16,
-          lineHeight: 28,
-          textAlign: 'center',
-        }}
-      >
-        {translate('history.filters') as string}
-      </BoldText>
-      <Pressable
-        onPress={() => bottomSheetRef.current?.dismiss()}
-        hitSlop={8}
-        style={{
-          paddingHorizontal: 14,
-          paddingVertical: 4,
-        }}
-      >
-        <XIcon size={20} color={colors.fgMuted} />
-      </Pressable>
-    </View>
+    />
   );
 
   const hide = useCallback(() => {
@@ -979,7 +925,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                     >
                       <Text
                         variant="caption"
-                        style={{ fontWeight: '700', color: colors.fgPriceUp }}
+                        style={{ fontWeight: '700', color: colors.fgAccent }}
                       >
                         {translate('clear') as string}
                       </Text>

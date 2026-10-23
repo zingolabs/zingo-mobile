@@ -1,10 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
+import { formatZecAmount } from '@app/utils/formatZecAmount';
+import Tag from '@ui/widgets/Tag';
 import { Linking, Pressable, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { radiusLg, useTheme } from '@app/theme';
+import { radiusMd, useTheme, iconSizeSm } from '@app/theme';
 import {
   BlockExplorerEnum,
   ChainNameEnum,
@@ -36,7 +38,7 @@ import { RefreshIcon } from '@ui/primitives/Icons/RefreshIcon';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import DetailRows from '@screens/Swap/components/DetailRows';
 import type { DetailRow } from '@screens/Swap/components/DetailRows';
-import ContactInitial from '@screens/Swap/components/ContactInitial';
+import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 
 type ValueTransferDetailProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -119,62 +121,46 @@ const ValueTransferDetail: React.FunctionComponent<
   const avatar = (() => {
     if (contact && sent) {
       return (
-        <ContactInitial name={contact.label} color={contact.color} size={56} />
+        <Avatar
+          kind="contact"
+          name={contact.label}
+          category={avatarCategoryOf(contact.color)}
+          size="lg"
+        />
       );
     }
-    const icon = pending ? (
-      <ClockIcon size={24} color={colors.fgDefault} />
-    ) : received ? (
-      <ArrowDownIcon size={24} color={colors.fgDefault} />
-    ) : vt.kind === ValueTransferKindEnum.Shield ? (
-      <ShieldIcon size={24} color={colors.fgDefault} />
-    ) : vt.kind === ValueTransferKindEnum.SendToSelf ? (
-      <RefreshIcon size={24} color={colors.fgDefault} />
-    ) : (
-      <ArrowUpIcon size={24} color={colors.fgDefault} />
-    );
-    return (
-      <View
-        style={{
-          width: 56,
-          height: 56,
-          borderRadius: 28,
-          backgroundColor: failed
-            ? colors.bgDangerSubtle
-            : colors.bgMutedSubtle,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        {icon}
-      </View>
-    );
+    const icon = pending
+      ? ClockIcon
+      : received
+        ? ArrowDownIcon
+        : vt.kind === ValueTransferKindEnum.Shield
+          ? ShieldIcon
+          : vt.kind === ValueTransferKindEnum.SendToSelf
+            ? RefreshIcon
+            : ArrowUpIcon;
+    return <Avatar kind="icon" icon={icon} danger={failed} size="lg" />;
   })();
 
   const status = failed
     ? {
         text: t('history.state-failed'),
-        fg: colors.fgDanger,
-        bg: colors.bgDangerSubtle,
+        tone: 'danger' as const,
       }
     : vt.confirmations === 0
       ? {
           text: t('history.in-mempool'),
-          fg: colors.fgTransparent,
-          bg: colors.bgTransparent,
+          tone: 'warning' as const,
         }
       : pending
         ? {
             text: t('history.confirming')
               .replace('{n}', String(vt.confirmations))
               .replace('{of}', String(GlobalConst.minConfirmations)),
-            fg: colors.fgTransparent,
-            bg: colors.bgTransparent,
+            tone: 'warning' as const,
           }
         : {
             text: t('swap.tx-confirmed'),
-            fg: colors.fgPriceUp,
-            bg: colors.bgAccentSubtle,
+            tone: 'accent' as const,
           };
 
   const quote = fiatQuote(zecPrice, server, info.chainName);
@@ -188,7 +174,6 @@ const ValueTransferDetail: React.FunctionComponent<
       ? ''
       : '−';
   /** Four decimals cut, not rounded, and the rest smaller: never more than it was. */
-  const split = Utils.splitZecAmountIntoBigSmall(vt.amount);
 
   const rows: DetailRow[] = [
     {
@@ -204,10 +189,11 @@ const ValueTransferDetail: React.FunctionComponent<
             value: Utils.trimToSmall(vt.address, 6),
             copy: vt.address,
             leading: contact ? (
-              <ContactInitial
+              <Avatar
+                kind="contact"
                 name={contact.label}
-                color={contact.color}
-                size={24}
+                category={avatarCategoryOf(contact.color)}
+                size="md"
               />
             ) : undefined,
           },
@@ -218,7 +204,7 @@ const ValueTransferDetail: React.FunctionComponent<
       ? [
           {
             label: t('history.tx-fee'),
-            value: `${Utils.parseNumberFloatToStringLocale(vt.fee, 8)} ${info.currencyName}`,
+            value: `${formatZecAmount(vt.fee ?? 0)} ${info.currencyName}`,
           },
         ]
       : []),
@@ -339,55 +325,30 @@ const ValueTransferDetail: React.FunctionComponent<
         </Text>
         <Text
           testID="valuetransferdetail.amount"
-          style={{
-            marginTop: 12,
-            fontSize: 36,
-            lineHeight: 40,
-            fontWeight: '700',
-            fontVariant: ['tabular-nums'],
-            color: failed
+          variant="balance"
+          color={
+            failed
               ? colors.fgMuted
               : received
-                ? colors.fgPriceUp
-                : colors.fgDefault,
-          }}
+                ? colors.fgAccent
+                : colors.fgDefault
+          }
+          style={{ marginTop: 12, fontVariant: ['tabular-nums'] }}
         >
-          {privacy ? MASK : `${sign}${split.bigPart}`}
-          {!privacy && split.smallPart !== '0000' && !!split.smallPart && (
-            <Text style={{ fontSize: 24, color: colors.fgMuted }}>
-              {split.smallPart}
-            </Text>
-          )}
-          <Text style={{ fontSize: 18, color: colors.fgMuted }}>
+          {privacy ? MASK : `${sign}${formatZecAmount(vt.amount)}`}
+          <Text variant="subtitle" tone="muted">
             {` ${info.currencyName}`}
           </Text>
         </Text>
         {!!todayUsd && (
-          <Text variant="bodySmall" tone="muted" style={{ marginTop: 2 }}>
+          <Text variant="bodySmall" tone="muted" style={{ marginTop: 4 }}>
             {privacy
               ? MASK
               : t('history.today-price').replace('{usd}', todayUsd)}
           </Text>
         )}
-        <View
-          style={{
-            marginTop: 12,
-            paddingHorizontal: 6,
-            borderRadius: 5,
-            backgroundColor: status.bg,
-          }}
-        >
-          <Text
-            variant="caption"
-            style={{
-              color: status.fg,
-              fontWeight: '600',
-              letterSpacing: 0.5,
-              textTransform: 'uppercase',
-            }}
-          >
-            {status.text}
-          </Text>
+        <View style={{ marginTop: 12 }}>
+          <Tag tone={status.tone}>{status.text}</Tag>
         </View>
       </View>
 
@@ -399,10 +360,10 @@ const ValueTransferDetail: React.FunctionComponent<
         <View
           style={{
             marginTop: 12,
-            paddingVertical: 10,
-            paddingHorizontal: 14,
+            paddingVertical: 12,
+            paddingHorizontal: 16,
             rowGap: 4,
-            borderRadius: radiusLg,
+            borderRadius: radiusMd,
             borderWidth: 1,
             borderColor: colors.bottomSheetBorder,
             backgroundColor: colors.bgCanvas,
@@ -442,7 +403,7 @@ const ValueTransferDetail: React.FunctionComponent<
                   SnackbarDurationEnum.short,
                 );
               }}
-              style={{ rowGap: 2 }}
+              style={{ rowGap: 4 }}
             >
               <View
                 style={{
@@ -455,7 +416,7 @@ const ValueTransferDetail: React.FunctionComponent<
                   {GlobalConst.replyTo}
                 </Text>
                 {!ownAddress(memoUA) && (
-                  <TriangleAlert size={14} color={colors.fgWarning} />
+                  <TriangleAlert size={iconSizeSm} color={colors.fgWarning} />
                 )}
               </View>
               <Text variant="address">{memoUA}</Text>

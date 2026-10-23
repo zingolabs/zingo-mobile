@@ -18,6 +18,10 @@ export const duration = {
   step: 150,
   /** Switching home tabs. */
   tabFade: 240,
+  /** The tab bar: its capsule sliding, and the bar shrinking and growing back. */
+  tabBar: 360,
+  /** A tab's colours turning selected or idle. */
+  tabColor: 220,
   leavesPart: 640,
   leavesReturn: 720,
   hero: 1100,

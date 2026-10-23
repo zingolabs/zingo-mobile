@@ -23,7 +23,6 @@ export default function MonthHeader({ label }: { label: string }) {
         tone="muted"
         style={{
           fontWeight: '600',
-          letterSpacing: 0.7,
           textTransform: 'uppercase',
         }}
       >

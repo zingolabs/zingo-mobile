@@ -177,12 +177,14 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
       }
     >
       <View
-        onLayout={[Function]}
         style={
-          {
-            "alignItems": "flex-end",
-            "alignSelf": "stretch",
-          }
+          [
+            {
+              "alignItems": "flex-end",
+              "alignSelf": "stretch",
+            },
+            null,
+          ]
         }
       >
         <View
@@ -190,49 +192,53 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             {
               "alignItems": "center",
               "flexDirection": "row",
-              "gap": 6,
+              "gap": 8,
             }
           }
         >
           <View />
           <View
-            accessibilityLabel="text translated"
-            accessibilityRole="button"
-            accessibilityState={
-              {
-                "busy": undefined,
-                "checked": undefined,
-                "disabled": undefined,
-                "expanded": false,
-                "selected": undefined,
-              }
-            }
-            accessibilityValue={
-              {
-                "max": undefined,
-                "min": undefined,
-                "now": undefined,
-                "text": undefined,
-              }
-            }
-            accessible={true}
-            collapsable={false}
-            focusable={true}
-            hitSlop={10}
-            onBlur={[Function]}
-            onClick={[Function]}
-            onFocus={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            testID="syncreport.info"
+            style={null}
           >
             <View
-              style={{}}
-            />
+              accessibilityLabel="text translated"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": false,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              hitSlop={14}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              testID="syncreport.info"
+            >
+              <View
+                style={{}}
+              />
+            </View>
           </View>
         </View>
       </View>

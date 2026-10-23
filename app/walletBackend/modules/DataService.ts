@@ -22,6 +22,10 @@ import {
   TransparentAddressClass,
   foldBlockSpacing,
 } from '@app/AppState';
+import {
+  noteHeights,
+  resetFreshness,
+} from '@app/walletBackend/utils/syncFreshness';
 import RPCModule from '@app/RPCModule';
 import { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddressType';
 import { RPCBalancesType } from '@app/walletBackend/types/RPCBalancesType';
@@ -80,6 +84,8 @@ export class DataService {
 
   constructor(config: WalletBackendConfig) {
     this.config = config;
+    // The freshness store is module state: a new wallet starts from nothing.
+    resetFreshness();
   }
 
   async fetchTotalBalance() {
@@ -246,6 +252,11 @@ export class DataService {
       }
       const heightJSON: RPCWalletHeight = await JSON.parse(heightStr);
       this.lastWalletBlockHeight = heightJSON.height;
+      noteHeights(
+        this.lastWalletBlockHeight,
+        this.lastServerBlockHeight,
+        Date.now(),
+      );
     } catch (error) {
       console.log(`Critical Error wallet height ${error}`);
       this.config.onError(`Error wallet height: ${error}`);
@@ -317,6 +328,11 @@ export class DataService {
 
       this.config.onInfoChanged(info);
       this.lastServerBlockHeight = info.latestBlock;
+      noteHeights(
+        this.lastWalletBlockHeight,
+        this.lastServerBlockHeight,
+        Date.now(),
+      );
     } catch (error) {
       console.log(`Critical Error info & server block height ${error}`);
       this.config.onError(`Error info: ${error}`);

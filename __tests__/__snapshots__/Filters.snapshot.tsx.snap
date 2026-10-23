@@ -30,7 +30,7 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
         "flexWrap": "wrap",
         "gap": 8,
         "justifyContent": "center",
-        "marginTop": 18,
+        "marginTop": 16,
       }
     }
   >
@@ -660,7 +660,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
         "flexWrap": "wrap",
         "gap": 8,
         "justifyContent": "center",
-        "marginTop": 18,
+        "marginTop": 16,
       }
     }
   >

@@ -1,9 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { Pressable, View } from 'react-native';
+import DetailRows from './DetailRows';
+import { View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { radiusLg, radiusPill, space12, space4, useTheme } from '@app/theme';
+import { radiusMd, space12, space4, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   buildDepositQr,
@@ -16,10 +17,11 @@ import {
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
 import Text from '@ui/primitives/Text';
+import { useInsetFill } from '@ui/primitives/Surface';
+import Button from '@ui/primitives/Button';
 import Banner from '@ui/widgets/Banner';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
-import { InfoTipButton } from '@ui/widgets/InfoTip';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 
 /** The memo a provider's order carries, when its data names one. */
@@ -43,6 +45,7 @@ type DepositSlipProps = {
 export default function DepositSlip({ record, paid }: DepositSlipProps) {
   const { translate, info } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
+  const inset = useInsetFill();
   const t = (key: string) => translate(key) as string;
   const [copiedKey, setCopiedKey] = React.useState<string>('');
   const copy = (key: string, value: string) => {
@@ -78,58 +81,18 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
   const pill = (key: string, label: string, value: string) => {
     const done = copiedKey === key;
     return (
-      <Pressable
-        testID={`swap.deposit.${key}`}
-        accessibilityRole="button"
-        onPress={() => copy(key, value)}
-        style={({ pressed }) => ({
-          flex: 1,
-          height: 41,
-          borderRadius: radiusPill,
-          backgroundColor: colors.bgSurface,
-          borderWidth: 1,
-          borderColor: colors.bottomSheetBorder,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
-          columnGap: 9,
-          transform: [{ scale: pressed ? 0.97 : 1 }],
-        })}
-      >
-        {done ? (
-          <CheckIcon size={16} color={colors.fgAccent} />
-        ) : (
-          <CopyIcon size={16} color={colors.fgDefault} />
-        )}
-        <Text variant="caption" style={{ fontWeight: '700' }}>
-          {done ? t('swap.copied') : label}
-        </Text>
-      </Pressable>
+      <View style={{ flex: 1 }}>
+        <Button
+          testID={`swap.deposit.${key}`}
+          variant="secondary"
+          size="small"
+          icon={done ? CheckIcon : CopyIcon}
+          title={done ? t('swap.copied') : label}
+          onPress={() => copy(key, value)}
+        />
+      </View>
     );
   };
-
-  const row = (
-    label: React.ReactNode,
-    value: React.ReactNode,
-    first = false,
-  ) => (
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        columnGap: space12,
-        minHeight: 44,
-        paddingVertical: 10,
-        paddingHorizontal: 14,
-        borderTopWidth: first ? 0 : 1,
-        borderTopColor: colors.borderSubtle,
-      }}
-    >
-      {label}
-      {value}
-    </View>
-  );
 
   return (
     <View style={{ rowGap: space12 }}>
@@ -139,8 +102,8 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
           paddingTop: 20,
           paddingHorizontal: 16,
           paddingBottom: 16,
-          borderRadius: radiusLg,
-          backgroundColor: colors.bgCanvas,
+          borderRadius: radiusMd,
+          backgroundColor: inset,
           borderWidth: 1,
           borderColor: colors.bottomSheetBorder,
         }}
@@ -149,8 +112,8 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
           <>
             <View
               style={{
-                padding: 10,
-                borderRadius: 12,
+                padding: 12,
+                borderRadius: radiusMd,
                 backgroundColor: colors.bgQrPaper,
               }}
             >
@@ -159,7 +122,7 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
             <Text
               variant="caption"
               tone="muted"
-              style={{ textAlign: 'center', marginTop: 10 }}
+              style={{ textAlign: 'center', marginTop: 12 }}
             >
               {t(memo ? 'swap.qr-carries-memo' : 'swap.qr-carries-amount')}
             </Text>
@@ -177,8 +140,8 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
         <View
           style={{
             flexDirection: 'row',
-            columnGap: 11,
-            marginTop: 14,
+            columnGap: 12,
+            marginTop: 16,
             alignSelf: 'stretch',
           }}
         >
@@ -196,113 +159,71 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
         />
       )}
 
-      <View
-        style={{
-          borderWidth: 1,
-          borderColor: colors.bottomSheetBorder,
-          borderRadius: radiusLg,
-          backgroundColor: colors.bgCanvas,
-        }}
-      >
-        {row(
-          <View
-            style={{ flexDirection: 'row', alignItems: 'center', columnGap: 4 }}
-          >
-            <Text variant="caption" tone="muted">
-              {t(memo ? 'swap.amount' : 'swap.send-exactly')}
-            </Text>
-            {!memo && (
-              <InfoTipButton
-                label={t('swap.send-exactly')}
-                text={t('swap.tip-exact')}
-              />
-            )}
-          </View>,
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('swap.copy')}
-            onPress={() => copy('amount', record.sellAmountHumanDecimal)}
-            hitSlop={8}
-          >
-            <Text variant="bodySmall" style={{ fontWeight: '600' }}>
-              {`${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${ticker}`}
-            </Text>
-          </Pressable>,
-          true,
-        )}
-        {!!memo && (
-          <View
-            style={{
-              rowGap: space4,
-              paddingVertical: 10,
-              paddingHorizontal: 14,
-              borderTopWidth: 1,
-              borderTopColor: colors.borderSubtle,
-            }}
-          >
-            <Text variant="caption" tone="muted">
-              {t('swap.memo')}
-            </Text>
-            <Text variant="address" selectable>
-              {memo}
-            </Text>
-            <Text variant="caption" tone="muted">
-              {memoHint}
-            </Text>
-            <View style={{ flexDirection: 'row', columnGap: 16 }}>
-              <Pressable
-                accessibilityRole="button"
-                onPress={() => copy('memo', memo)}
-                style={{ minHeight: 28, justifyContent: 'center' }}
-              >
-                <Text
-                  variant="caption"
-                  style={{ fontWeight: '700', textDecorationLine: 'underline' }}
-                >
-                  {copiedKey === 'memo'
-                    ? t('swap.copied')
-                    : t('swap.copy-memo')}
-                </Text>
-              </Pressable>
-              {isEvmSourceChain(asset.chain) && (
-                <Pressable
-                  accessibilityRole="button"
-                  onPress={() => copy('memo-hex', memoToHexCalldata(memo))}
-                  style={{ minHeight: 28, justifyContent: 'center' }}
-                >
-                  <Text
-                    variant="caption"
-                    style={{
-                      fontWeight: '700',
-                      textDecorationLine: 'underline',
-                    }}
-                  >
-                    {copiedKey === 'memo-hex'
-                      ? t('swap.copied')
-                      : t('swap.memo-hex')}
-                  </Text>
-                </Pressable>
-              )}
-            </View>
-          </View>
-        )}
-        {row(
-          <Text variant="caption" tone="muted">
-            {t('swap.deposit-you-get')}
-          </Text>,
-          <Text variant="bodySmall" style={{ fontWeight: '600' }}>
-            {`≈ ${formatAmountForDisplay(record.expectedReceiveAmount)} ${info.currencyName}`}
-          </Text>,
-        )}
-        {row(
-          <Text variant="caption" tone="muted">
-            {t('swap.provider')}
-          </Text>,
-          <Text variant="bodySmall" style={{ fontWeight: '600' }}>
-            {providerShortLabel(record.provider)}
-          </Text>,
-        )}
-      </View>
+      <DetailRows
+        rows={[
+          {
+            label: t(memo ? 'swap.amount' : 'swap.send-exactly'),
+            value: `${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${ticker}`,
+            tip: memo ? undefined : t('swap.tip-exact'),
+            copy: record.sellAmountHumanDecimal,
+            mono: false,
+          },
+          ...(memo
+            ? [
+                {
+                  label: t('swap.memo'),
+                  value: '',
+                  block: (
+                    <View style={{ rowGap: space4 }}>
+                      <Text variant="address" selectable>
+                        {memo}
+                      </Text>
+                      <Text variant="caption" tone="muted">
+                        {memoHint}
+                      </Text>
+                      <View style={{ flexDirection: 'row', columnGap: 16 }}>
+                        <Button
+                          variant="text"
+                          size="small"
+                          inline
+                          title={
+                            copiedKey === 'memo'
+                              ? t('swap.copied')
+                              : t('swap.copy-memo')
+                          }
+                          onPress={() => copy('memo', memo)}
+                        />
+                        {isEvmSourceChain(asset.chain) && (
+                          <Button
+                            variant="text"
+                            size="small"
+                            inline
+                            title={
+                              copiedKey === 'memo-hex'
+                                ? t('swap.copied')
+                                : t('swap.memo-hex')
+                            }
+                            onPress={() =>
+                              copy('memo-hex', memoToHexCalldata(memo))
+                            }
+                          />
+                        )}
+                      </View>
+                    </View>
+                  ),
+                },
+              ]
+            : []),
+          {
+            label: t('swap.deposit-you-get'),
+            value: `≈ ${formatAmountForDisplay(record.expectedReceiveAmount)} ${info.currencyName}`,
+          },
+          {
+            label: t('swap.provider'),
+            value: providerShortLabel(record.provider),
+          },
+        ]}
+      />
 
       {showExactAmount && !memo && (
         <Banner

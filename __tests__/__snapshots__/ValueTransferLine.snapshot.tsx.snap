@@ -280,15 +280,15 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                 }
               }
             >
-              sent-address-1-12345678901234567890
+              sent-a…567890
             </Text>
             <View
               style={
                 {
                   "alignItems": "center",
-                  "columnGap": 6,
+                  "columnGap": 8,
                   "flexDirection": "row",
-                  "marginTop": 2,
+                  "marginTop": 4,
                 }
               }
             >
@@ -341,7 +341,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                 }
               }
             >
-              −0.1235 ZEC
+              −0.12345678 ZEC
             </Text>
             <Text
               maxFontSizeMultiplier={2}
@@ -352,7 +352,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                   "fontSize": 12,
                   "fontWeight": "400",
                   "lineHeight": 16,
-                  "marginTop": 2,
+                  "marginTop": 4,
                 }
               }
             >
@@ -646,15 +646,15 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                 }
               }
             >
-              sent-address-1-12345678901234567890
+              sent-a…567890
             </Text>
             <View
               style={
                 {
                   "alignItems": "center",
-                  "columnGap": 6,
+                  "columnGap": 8,
                   "flexDirection": "row",
-                  "marginTop": 2,
+                  "marginTop": 4,
                 }
               }
             >
@@ -707,7 +707,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                 }
               }
             >
-              −0.1235 ZEC
+              −0.12345678 ZEC
             </Text>
             <Text
               maxFontSizeMultiplier={2}
@@ -718,7 +718,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                   "fontSize": 12,
                   "fontWeight": "400",
                   "lineHeight": 16,
-                  "marginTop": 2,
+                  "marginTop": 4,
                 }
               }
             >
@@ -963,9 +963,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
               style={
                 {
                   "alignItems": "center",
-                  "columnGap": 6,
+                  "columnGap": 8,
                   "flexDirection": "row",
-                  "marginTop": 2,
+                  "marginTop": 4,
                 }
               }
             >
@@ -998,13 +998,13 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
               numberOfLines={1}
               style={
                 {
-                  "color": "#3CC52A",
+                  "color": "#18bd18",
                   "fontSize": 15,
                   "fontWeight": "600",
                 }
               }
             >
-              +0.7765 ZEC
+              +0.77654321 ZEC
             </Text>
             <Text
               maxFontSizeMultiplier={2}
@@ -1015,7 +1015,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                   "fontSize": 12,
                   "fontWeight": "400",
                   "lineHeight": 16,
-                  "marginTop": 2,
+                  "marginTop": 4,
                 }
               }
             >
@@ -1309,15 +1309,15 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                 }
               }
             >
-              sent-address-1-12345678901234567890
+              sent-a…567890
             </Text>
             <View
               style={
                 {
                   "alignItems": "center",
-                  "columnGap": 6,
+                  "columnGap": 8,
                   "flexDirection": "row",
-                  "marginTop": 2,
+                  "marginTop": 4,
                 }
               }
             >
@@ -1356,7 +1356,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                 }
               }
             >
-              −0.1235 ZEC
+              −0.12345678 ZEC
             </Text>
             <Text
               maxFontSizeMultiplier={2}
@@ -1367,7 +1367,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                   "fontSize": 12,
                   "fontWeight": "400",
                   "lineHeight": 16,
-                  "marginTop": 2,
+                  "marginTop": 4,
                 }
               }
             >

@@ -9,9 +9,8 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { space20, useTheme } from '@app/theme';
+import { space20, useTheme, radiusPill } from '@app/theme';
 import ProgressState from '@ui/widgets/ProgressState';
-import RegText from '@ui/primitives/RegText';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
@@ -135,9 +134,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
       testID="computing.title"
       variant="subtitle"
       style={{
-        marginTop: 28,
-        fontSize: 18,
-        lineHeight: 24,
+        marginTop: 32,
         textAlign: 'center',
       }}
     >
@@ -155,7 +152,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
   );
 
   return (
-    <FullPanel title="" center footer={footer} testID="computing">
+    <FullPanel title="" center motion="step" footer={footer} testID="computing">
       <View style={{ alignItems: 'center' }}>
         {isFailed ? (
           <>
@@ -170,28 +167,27 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
                   onPress={() => setShowErrorDetails(v => !v)}
                   hitSlop={8}
                 >
-                  <RegText
+                  <Text
+                    variant="caption"
+                    tone="danger"
                     style={{
-                      color: colors.fgDanger,
+                      fontWeight: '700',
                       textDecorationLine: 'underline',
                     }}
                   >
                     {t('loadedapp.transactionfailed-details')}
-                  </RegText>
+                  </Text>
                 </TouchableOpacity>
                 {showErrorDetails && (
-                  <RegText
-                    style={{
-                      marginTop: 10,
-                      textAlign: 'center',
-                      color: colors.fgMuted,
-                      fontSize: 12,
-                    }}
+                  <Text
+                    variant="caption"
+                    tone="muted"
+                    style={{ marginTop: 12, textAlign: 'center' }}
                   >
                     {failure.kind === 'error'
                       ? t(failure.errorKey)
                       : failure.text}
-                  </RegText>
+                  </Text>
                 )}
               </View>
             )}
@@ -222,16 +218,16 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
               {heading(t(STEPS[step]))}
             </Animated.View>
             {!!subject && subline(line('send.sending-line'))}
-            <View style={{ flexDirection: 'row', columnGap: 6, marginTop: 20 }}>
+            <View style={{ flexDirection: 'row', columnGap: 8, marginTop: 20 }}>
               {STEPS.map((key, index) => (
                 <View
                   key={key}
                   style={{
                     width: 6,
                     height: 6,
-                    borderRadius: 3,
+                    borderRadius: radiusPill,
                     backgroundColor:
-                      index <= step ? colors.fgPriceUp : colors.sheetHandle,
+                      index <= step ? colors.fgAccent : colors.sheetHandle,
                   }}
                 />
               ))}

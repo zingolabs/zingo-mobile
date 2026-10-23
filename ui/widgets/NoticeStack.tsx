@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
+import { BannerPlainContext } from '@ui/widgets/Banner';
 import { Pressable, View } from 'react-native';
 import Text from '@ui/primitives/Text';
 import Animated, {
@@ -12,7 +13,7 @@ import Animated, {
   WithTimingConfig,
 } from 'react-native-reanimated';
 
-import { useTheme, space20 } from '@app/theme';
+import { useTheme, radiusMd, space20 } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { ChevronDown } from '@ui/primitives/Icons/Chevron';
@@ -36,7 +37,7 @@ const SCALE_STEP = 0.06;
 const OPACITY_STEP = 0.1;
 // Every card is clipped to this radius; a card that draws its own border
 // uses the same one, or the clip cuts the border at the corners.
-export const NOTICE_RADIUS = 14;
+export const NOTICE_RADIUS = radiusMd;
 const RADIUS = NOTICE_RADIUS;
 
 // As the wallet opens, the stack drops in 8 pt once its cards are measured.
@@ -161,39 +162,36 @@ const Card: React.FunctionComponent<{
           left: 0,
           right: 0,
           zIndex: 3 - depth,
+          overflow: 'hidden',
           borderRadius: RADIUS,
-          // The shadow is cast upward, onto the balance, by the front card
-          // only; it sits outside the clip below, which would cut it.
-          boxShadow:
-            depth === 0 ? `0 -6px 18px ${colors.shadowNotice}` : undefined,
         },
         frame,
       ]}
     >
-      <View style={{ flexGrow: 1, overflow: 'hidden', borderRadius: RADIUS }}>
-        <Animated.View style={content}>
-          <View onLayout={e => onMeasure(e.nativeEvent.layout.height)}>
+      <Animated.View style={content}>
+        <View onLayout={e => onMeasure(e.nativeEvent.layout.height)}>
+          <BannerPlainContext.Provider value={true}>
             {children}
-          </View>
-        </Animated.View>
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            {
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              top: 0,
-              bottom: 0,
-              borderRadius: RADIUS,
-              borderWidth: 1,
-              borderColor: colors.bottomSheetBorder,
-              backgroundColor: colors.bgSurface,
-            },
-            deck,
-          ]}
-        />
-      </View>
+          </BannerPlainContext.Provider>
+        </View>
+      </Animated.View>
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          {
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0,
+            borderRadius: RADIUS,
+            borderWidth: 1,
+            borderColor: colors.bottomSheetBorder,
+            backgroundColor: colors.bgSurface,
+          },
+          deck,
+        ]}
+      />
     </Animated.View>
   );
 };

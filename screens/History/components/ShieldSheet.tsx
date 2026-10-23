@@ -1,16 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useContext, useState } from 'react';
+import DetailRows from '@screens/Swap/components/DetailRows';
+import { formatZecAmount } from '@app/utils/formatZecAmount';
 import { View } from 'react-native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { radiusLg, useTheme } from '@app/theme';
+import { useTheme, iconSize, radiusPill, space20 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   MixnetView,
   sendGateOpen,
   shownStatusKey,
 } from '@app/walletBackend/transforms/mixnetView';
-import Utils from '@app/utils';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
@@ -39,40 +40,11 @@ const ShieldSheet = forwardRef<BottomSheetModal, ShieldSheetProps>(
     const open = sendGateOpen(mixnetView);
     const blocked = mixnetView.kind === 'transport' && mixnetView.sendBlocked;
     const zec = (value: number) =>
-      `${Utils.parseNumberFloatToStringLocale(value, 4)} ${info.currencyName}`;
+      `${formatZecAmount(value)} ${info.currencyName}`;
 
     const dismiss = useCallback(() => {
       (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss();
     }, [ref]);
-
-    const row = (
-      label: string,
-      value: string,
-      first = false,
-      total = false,
-    ) => (
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          minHeight: 44,
-          paddingHorizontal: 14,
-          borderTopWidth: first ? 0 : 1,
-          borderTopColor: colors.borderSubtle,
-        }}
-      >
-        <Text variant="caption" tone="muted">
-          {label}
-        </Text>
-        <Text
-          variant="bodySmall"
-          style={{ fontWeight: total ? '700' : '600', fontSize: 12 }}
-        >
-          {value}
-        </Text>
-      </View>
-    );
 
     return (
       <AppSheetModal
@@ -82,19 +54,19 @@ const ShieldSheet = forwardRef<BottomSheetModal, ShieldSheetProps>(
         contentStyle={{ paddingBottom: insets.bottom + 24 }}
       >
         <View testID="shield.sheet" style={{ paddingHorizontal: 20 }}>
-          <View style={{ alignItems: 'center', marginTop: 2 }}>
+          <View style={{ alignItems: 'center', marginTop: 4 }}>
             <View
               style={{
                 width: 52,
                 height: 52,
-                borderRadius: 26,
+                borderRadius: radiusPill,
                 backgroundColor: colors.bgAccentSubtle,
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginBottom: 10,
+                marginBottom: 12,
               }}
             >
-              <ShieldIcon size={24} color={colors.fgPriceUp} />
+              <ShieldIcon size={iconSize} color={colors.fgAccent} />
             </View>
           </View>
           <Text
@@ -106,28 +78,23 @@ const ShieldSheet = forwardRef<BottomSheetModal, ShieldSheetProps>(
           <Text
             variant="caption"
             tone="muted"
-            style={{ textAlign: 'center', marginTop: 6 }}
+            style={{ textAlign: 'center', marginTop: 8 }}
           >
             {t('shield.sub')}
           </Text>
-          <View
-            style={{
-              marginTop: 20,
-              borderRadius: radiusLg,
-              borderWidth: 1,
-              borderColor: colors.bottomSheetBorder,
-              backgroundColor: colors.bgCanvas,
-            }}
-          >
-            {row(t('shield.from'), t('shield.transparent'), true)}
-            {row(t('shield.amount'), zec(amount))}
-            {row(t('shield.fee'), zec(fee))}
-            {row(
-              t('shield.you-get'),
-              zec(Math.max(0, amount - fee)),
-              false,
-              true,
-            )}
+          <View style={{ marginTop: space20 }}>
+            <DetailRows
+              rows={[
+                { label: t('shield.from'), value: t('shield.transparent') },
+                { label: t('shield.amount'), value: zec(amount) },
+                { label: t('shield.fee'), value: zec(fee) },
+                {
+                  label: t('shield.you-get'),
+                  value: zec(Math.max(0, amount - fee)),
+                  strong: true,
+                },
+              ]}
+            />
           </View>
           {blocked && (
             <View
@@ -135,13 +102,16 @@ const ShieldSheet = forwardRef<BottomSheetModal, ShieldSheetProps>(
               style={{ alignItems: 'center', rowGap: 4, marginTop: 16 }}
             >
               <Text
-                variant="caption"
+                variant="bodySmall"
                 tone="muted"
                 style={{ textAlign: 'center' }}
               >
                 {t('send.nym-blocked')}
               </Text>
-              <Text variant="bodySmall" style={{ textAlign: 'center' }}>
+              <Text
+                variant="body"
+                style={{ textAlign: 'center', fontWeight: '500' }}
+              >
                 {t(shownStatusKey(mixnetView))}
               </Text>
             </View>

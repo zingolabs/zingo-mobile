@@ -22,6 +22,12 @@ import { useOptionsPanel } from '@app/context/optionsPanel';
 
 // Mirror the panel host's fade duration so the header dissolves in lockstep
 // with the panel that's appearing over it.
+/** The bar with the menu, the mixnet and Messages: its row and the space under it. */
+const BAR_ROW = 57;
+const BAR_BOTTOM = 10;
+/** The Header's height without the balance: where a full panel starts. */
+export const HEADER_BAR_HEIGHT = BAR_ROW + BAR_BOTTOM;
+
 const HEADER_FADE_MS = 320;
 import {
   NetInfoType,
@@ -191,7 +197,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               alignItems: 'center',
               backgroundColor: colors.bgCanvas,
               paddingTop: 0,
-              paddingBottom: 10,
+              paddingBottom: BAR_BOTTOM,
               minHeight: 50,
             },
           ]}
@@ -199,7 +205,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           {/* The mixnet icon alone in the middle of the bar, level with the menu. */}
           <View
             style={{
-              height: 57,
+              height: BAR_ROW,
               alignItems: 'center',
               justifyContent: 'center',
               paddingTop: 12,

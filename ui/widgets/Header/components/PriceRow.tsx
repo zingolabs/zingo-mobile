@@ -27,7 +27,7 @@ type PriceRowProps = Omit<PriceCardProps, 'style'>;
 // Vertical margins on the card. Reported back via onLayout so the parent
 // can size its bottom-sheet snap points to cover the whole price block
 // (margins included), not just the card itself.
-const CARD_MARGIN_TOP = 10;
+export const CARD_MARGIN_TOP = 10;
 const CARD_MARGIN_BOTTOM = 12;
 const CARD_VERTICAL_MARGINS = CARD_MARGIN_TOP + CARD_MARGIN_BOTTOM;
 
