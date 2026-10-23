@@ -22,6 +22,7 @@ import RPCModule from '@app/RPCModule';
 import { callFfi, FfiResult } from '@app/walletBackend/ffi';
 import { RPCZecPriceType } from '@app/walletBackend/types/RPCZecPriceType';
 import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
+import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
 
 export type ZecPriceErrorKey =
   'info.error-price-fetch' | 'info.error-price-payload';
@@ -671,6 +672,10 @@ export async function shieldConfirm(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.confirmProcess());
 }
 
+// The keys and birthday a wallet reports, with the height zingolib was given
+// when it raised the birthday to Sapling activation in this process.
+export type FetchedWallet = WalletType & { birthdayAdjustedFrom?: number };
+
 /**
  * Returns the wallet's secret material for the backup/seed display screens.
  *
@@ -680,7 +685,7 @@ export async function shieldConfirm(): Promise<FfiResult<string>> {
  */
 export async function fetchWallet(
   readOnly: boolean,
-): Promise<WalletType | null> {
+): Promise<FetchedWallet | null> {
   if (readOnly) {
     // only viewing key & birthday
     const result = await callFfi(RPCModule.getUfvkInfo());
@@ -688,11 +693,14 @@ export async function fetchWallet(
       return null;
     }
     try {
-      const RPCufvk: WalletType = JSON.parse(result.value);
+      const RPCufvk: RPCUfvkType = JSON.parse(result.value);
 
-      const wallet: WalletType = {} as WalletType;
+      const wallet: FetchedWallet = {} as FetchedWallet;
       if (isNumber(RPCufvk.birthday)) {
         wallet.birthday = RPCufvk.birthday;
+      }
+      if (isNumber(RPCufvk.birthday_adjusted_from)) {
+        wallet.birthdayAdjustedFrom = RPCufvk.birthday_adjusted_from;
       }
       if (RPCufvk.ufvk) {
         wallet.ufvk = RPCufvk.ufvk;
@@ -711,12 +719,15 @@ export async function fetchWallet(
     try {
       const RPCseed: RPCSeedType = JSON.parse(result.value);
 
-      const wallet: WalletType = {} as WalletType;
+      const wallet: FetchedWallet = {} as FetchedWallet;
       if (RPCseed.seed_phrase) {
         wallet.seed = RPCseed.seed_phrase;
       }
       if (isNumber(RPCseed.birthday)) {
         wallet.birthday = RPCseed.birthday;
+      }
+      if (isNumber(RPCseed.birthday_adjusted_from)) {
+        wallet.birthdayAdjustedFrom = RPCseed.birthday_adjusted_from;
       }
 
       return wallet;

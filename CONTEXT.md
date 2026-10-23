@@ -210,6 +210,25 @@ _Avoid_: shell
 A module that renders nothing and is called by the runtime or screens: file
 IO, alerts, email, biometrics. Home: `app/services`.
 
+## Wallet birthday
+
+**Birthday**:
+The block height a wallet scans from. zingolib owns the chain's Sapling
+activation height and raises a lower birthday to it. The app passes the
+height it was given and shows the height zingolib reports.
+_Avoid_: activation height (the chain parameter), floor (an app copy of it)
+
+**Empty birthday**:
+A call with no height given, sent as 0. A restore starts at Sapling
+activation. A new wallet starts at the chain tip, or at the Library
+Birthday offline.
+
+**Adjusted birthday**:
+A birthday zingolib raised to the Sapling activation height. zingolib
+reports the height it was given beside the one it uses. The app tells the
+user once, and never for an empty birthday it sent.
+_Avoid_: clamped, floored
+
 ## CI
 
 **Blocking check** — a PR CI job that runs under fail-all and that

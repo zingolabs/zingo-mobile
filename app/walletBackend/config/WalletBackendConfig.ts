@@ -26,6 +26,9 @@ export type WalletBackendConfig = {
   onSyncStatusChanged: (status: RPCSyncStatusType) => void;
   onZingolibVersionChanged: (version: string) => void;
   onBirthdayChanged: (birthday: number) => void;
+  // Called once, with the height in use, when zingolib raised a birthday it
+  // was given above 0 to Sapling activation.
+  onBirthdayAdjusted: (height: number) => void;
   onError: (error: string) => void;
   // Called after several consecutive sync-launch failures.
   onPersistentSyncFailure?: () => void;

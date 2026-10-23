@@ -218,6 +218,7 @@
     "messages-menu": "Mensajes",
     "syncing": "Deteniendo la Sincronización para poder resetear la billetera... Puede llevar varios segundos.",
     "connection-error": "Esta opción necesita conexión a internet para ser ejecutada.",
+    "birthday-adjusted": "Tu monedero es anterior a Sapling. El escaneo empieza en el bloque {height}.",
     "tryingnewserver": "Intentando conectar con el nuevo Servidor... Puede llevar varios segundos.",
     "tryingnewserver-error": "Después de 15 segundos el nuevo Servidor no responde.",
     "readingwallet": "Leyendo satisfactoriamente el monedero activo usando el Servidor:",
@@ -716,7 +717,7 @@
     "port": "Puerto",
     "need-host": "Escribe primero el host del servidor.",
     "host-only": "Escribe aquí solo el host, como tu-nodo.example.",
-    "log-testing": "Probando {host}:{port}…",
+    "log-testing": "Probando {address}…",
     "log-dns": "DNS resuelto a {ip}",
     "log-literal": "Usando la dirección {ip}",
     "log-info": "GetLightdInfo respondió en {ms} ms",
@@ -780,7 +781,6 @@
     "seed-checksum": "Estas 24 palabras no forman una frase semilla válida. Revísalas, sobre todo la última.",
     "key-wrong-chain": "Esta clave de visualización es de {key}, y la red seleccionada es {server}.",
     "need-words": "Introduce las 24 palabras, o una clave de visualización.",
-    "need-birthday": "Introduce una altura de bloque dentro del rango, o déjala vacía.",
     "importing-title": "Importando tu monedero",
     "screen-title": "Importar monedero",
     "chooser-sub": "Elige desde dónde restaurar",
@@ -793,8 +793,7 @@
     "submit": "Importar",
     "birthday-placeholder": "Introduce la altura de bloque",
     "birthday-tip-title": "Altura de bloque de tu primera transacción.",
-    "birthday-tip-body": "No pasa nada si no la sabes.",
-    "birthday-tip-range": "Rango: {from} – {to}"
+    "birthday-tip-body": "No pasa nada si no la sabes."
   },
   "about": {
     "copyright": [

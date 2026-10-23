@@ -170,6 +170,25 @@ describe('fetchWallet returns null on any failure', () => {
     });
   });
 
+  it('Tests that the height zingolib was given is read when it raised the birthday', async () => {
+    bridge.getSeedInfo.mockResolvedValueOnce(
+      '{"seed_phrase":"a b c","birthday":419200,"birthday_adjusted_from":1000}',
+    );
+    bridge.getUfvkInfo.mockResolvedValueOnce(
+      '{"ufvk":"uview1...","birthday":419200,"birthday_adjusted_from":0}',
+    );
+    await expect(fetchWallet(false)).resolves.toEqual({
+      seed: 'a b c',
+      birthday: 419200,
+      birthdayAdjustedFrom: 1000,
+    });
+    await expect(fetchWallet(true)).resolves.toEqual({
+      ufvk: 'uview1...',
+      birthday: 419200,
+      birthdayAdjustedFrom: 0,
+    });
+  });
+
   it.each([
     ['a typed rejection', typedRejection('Read', 'boom')],
     ['an unparseable body', Promise.resolve('not json')],

@@ -218,6 +218,7 @@
     "messages-menu": "Mesajlar",
     "syncing": "Cüzdanı sıfırlayabilmek için senkronizasyon durduruluyor... Bu işlem birkaç saniye sürebilir.",
     "connection-error": "Bu seçenek yalnızca internet bağlantısı olduğunda çalıştırılabilir.",
+    "birthday-adjusted": "Cüzdanınız Sapling'den eski. Tarama {height} bloğundan başlıyor.",
     "tryingnewserver": "Yeni sunucuya bağlanılmaya çalışılıyor... Bu işlem birkaç saniye sürebilir.",
     "tryingnewserver-error": "Yeni sunucu 15 saniye içinde yanıt vermedi.",
     "readingwallet": "Cüzdan sunucuyla başarıyla okundu:",
@@ -716,7 +717,7 @@
     "port": "Port",
     "need-host": "Önce sunucu adresini girin.",
     "host-only": "Buraya yalnızca adresi yazın, örneğin your-node.example.",
-    "log-testing": "{host}:{port} test ediliyor…",
+    "log-testing": "{address} test ediliyor…",
     "log-dns": "DNS çözümlendi: {ip}",
     "log-literal": "Adres kullanılıyor: {ip}",
     "log-info": "GetLightdInfo {ms} ms içinde yanıt verdi",
@@ -780,7 +781,6 @@
     "seed-checksum": "Bu 24 kelime geçerli bir tohum ifadesi oluşturmuyor. Her birini, özellikle sonuncusunu kontrol edin.",
     "key-wrong-chain": "Bu görüntüleme anahtarı {key} için, seçili ağ ise {server}.",
     "need-words": "24 kelimenin tamamını veya bir görüntüleme anahtarı girin.",
-    "need-birthday": "Aralık içinde bir blok yüksekliği girin veya boş bırakın.",
     "importing-title": "Cüzdanınız içe aktarılıyor",
     "screen-title": "Cüzdanı içe aktar",
     "chooser-sub": "Nereden geri yükleneceğini seçin",
@@ -793,8 +793,7 @@
     "submit": "İçe aktar",
     "birthday-placeholder": "Blok yüksekliğini girin",
     "birthday-tip-title": "İlk işleminizin blok yüksekliği.",
-    "birthday-tip-body": "Bilmiyorsanız sorun değil.",
-    "birthday-tip-range": "Aralık: {from} – {to}"
+    "birthday-tip-body": "Bilmiyorsanız sorun değil."
   },
   "about": {
     "copyright": [

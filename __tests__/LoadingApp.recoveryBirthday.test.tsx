@@ -121,19 +121,22 @@ test.each([
   ['a birthday of 0, as an empty field or an old saved entry gives', 0],
   ['a height below Sapling activation', 1000],
 ])(
-  'Tests that the restore starts at Sapling activation when it gets %s',
+  'Tests that the restore passes the height it was given to zingolib when it gets %s',
   async (_case, birthday) => {
     jest.useFakeTimers();
-    const { app } = appWithSaved(birthday);
-    jest.mocked(app.doRestore).mockRestore();
-    jest.spyOn(app, 'setState').mockImplementation(() => {});
-    const restore = jest.mocked(RPCModule.restoreWalletFromSeed);
-    restore.mockRejectedValue(new Error('stop here'));
+    try {
+      const { app } = appWithSaved(birthday);
+      jest.mocked(app.doRestore).mockRestore();
+      jest.spyOn(app, 'setState').mockImplementation(() => {});
+      const restore = jest.mocked(RPCModule.restoreWalletFromSeed);
+      restore.mockRejectedValue(new Error('stop here'));
 
-    await app.doRestore('abandon ability able', birthday);
+      await app.doRestore('abandon ability able', birthday);
 
-    expect(restore.mock.calls[0][1]).toBe('419200');
-    jest.clearAllTimers();
-    jest.useRealTimers();
+      expect(restore.mock.calls[0][1]).toBe(String(birthday));
+    } finally {
+      jest.clearAllTimers();
+      jest.useRealTimers();
+    }
   },
 );

@@ -711,6 +711,7 @@ export class LoadedAppClass extends Component<
       keepAwake: this.keepAwake,
       onZingolibVersionChanged: this.setZingolibVersion,
       onBirthdayChanged: this.setBirthday,
+      onBirthdayAdjusted: this.noticeBirthdayAdjusted,
       onError: this.setLastError,
       onPersistentSyncFailure: this.recoverServer,
       onMixnetViewChanged: this.setMixnetView,
@@ -1466,6 +1467,16 @@ export class LoadedAppClass extends Component<
       //const start = Date.now();
       this.setState({ birthday });
     }
+  };
+
+  noticeBirthdayAdjusted = (height: number) => {
+    this.addLastSnackbar(
+      (this.state.translate('loadedapp.birthday-adjusted') as string).replace(
+        '{height}',
+        height.toLocaleString(),
+      ),
+      SnackbarDurationEnum.longer,
+    );
   };
 
   setServerOption = async (
