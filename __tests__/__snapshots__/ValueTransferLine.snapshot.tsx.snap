@@ -39,6 +39,8 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
     onStartShouldSetResponder={[Function]}
     style={
       {
+        "flex": 1,
+        "justifyContent": "center",
         "opacity": 1,
         "zIndex": 999,
       }
@@ -80,7 +82,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "#040C17",
+              "backgroundColor": "#031124",
               "flexDirection": "row",
               "justifyContent": "center",
               "transform": [
@@ -405,6 +407,8 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
     onStartShouldSetResponder={[Function]}
     style={
       {
+        "flex": 1,
+        "justifyContent": "center",
         "opacity": 1,
         "zIndex": 999,
       }
@@ -446,7 +450,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "#040C17",
+              "backgroundColor": "#031124",
               "flexDirection": "row",
               "justifyContent": "center",
               "transform": [
@@ -771,6 +775,8 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
     onStartShouldSetResponder={[Function]}
     style={
       {
+        "flex": 1,
+        "justifyContent": "center",
         "opacity": 1,
         "zIndex": 999,
       }
@@ -812,7 +818,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "#040C17",
+              "backgroundColor": "#031124",
               "flexDirection": "row",
               "justifyContent": "center",
               "transform": [
@@ -1068,6 +1074,8 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
     onStartShouldSetResponder={[Function]}
     style={
       {
+        "flex": 1,
+        "justifyContent": "center",
         "opacity": 1,
         "zIndex": 999,
       }
@@ -1109,7 +1117,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "#040C17",
+              "backgroundColor": "#031124",
               "flexDirection": "row",
               "justifyContent": "center",
               "transform": [

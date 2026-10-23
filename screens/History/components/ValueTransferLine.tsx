@@ -146,7 +146,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               justifyContent: 'center',
               alignItems: 'center',
               transform: [{ translateX: trans }],
-              backgroundColor: colors.bgChrome,
+              backgroundColor: colors.bgSurface,
             }}
           >
             <View
@@ -208,7 +208,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
       style={{ backgroundColor: colors.bgSurface }}
     >
       <TouchableOpacity
-        style={{ zIndex: 999 }}
+        style={{ zIndex: 999, flex: 1, justifyContent: 'center' }}
         onPress={async () => {
           closeAllSwipeables();
           await new Promise(r => requestAnimationFrame(r));

@@ -316,7 +316,7 @@ const MigrationBatchSending: React.FunctionComponent<
             segments={total}
             progress={total > 0 ? done / total : 0}
             active={done < total ? done : undefined}
-            activeColor={colors.fgSyncing}
+            activeColor={colors.fgWarning}
           />
         </View>
 
@@ -327,7 +327,7 @@ const MigrationBatchSending: React.FunctionComponent<
             justifyContent: 'center',
           }}
         >
-          <ActivityIndicator size="small" color={colors.fgAccent} />
+          <ActivityIndicator size="small" color={colors.fgMuted} />
           <Text
             style={{ color: colors.fgDefault, fontSize: 15, marginLeft: 10 }}
           >

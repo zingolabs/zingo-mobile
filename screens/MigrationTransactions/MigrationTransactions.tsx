@@ -179,7 +179,7 @@ const MigrationTransactions: React.FunctionComponent<
           padding: 24,
         }}
       >
-        <ActivityIndicator size="large" color={colors.fgAccent} />
+        <ActivityIndicator size="large" color={colors.fgMuted} />
         <Text
           style={{
             color: colors.fgMuted,

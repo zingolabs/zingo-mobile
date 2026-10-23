@@ -473,6 +473,10 @@ class RPCModule: NSObject {
     SyncSettings(performanceLevel: performancelevel, minConfirmations: UInt32(minconfirmations) ?? 0)
   }
 
+  private func indexerChoice(_ serveruri: String) -> IndexerChoice {
+    serveruri.isEmpty ? .offline : .named(uri: serveruri)
+  }
+
   private func connection(
     serveruri: String,
     chainhint: String,
@@ -480,7 +484,7 @@ class RPCModule: NSObject {
     minconfirmations: String
   ) -> IndexerConnection {
     IndexerConnection(
-      serverUri: serveruri,
+      indexer: indexerChoice(serveruri),
       chainHint: chainhint,
       sync: syncSettings(performancelevel: performancelevel, minconfirmations: minconfirmations))
   }
@@ -860,17 +864,6 @@ class RPCModule: NSObject {
       }
   }
 
-  // The app-supplied migration broadcast candidate pool (its indexer
-  // registry); zingolib embeds no default set.
-  @objc(setBroadcastCandidates:resolve:reject:)
-  func setBroadcastCandidatesProcess(_ candidatesJson: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try setBroadcastCandidates(candidatesJson: candidatesJson)
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
   // Mixnet Mode (send-over-nym). The wallet-side FFI seam, bridged on both
   // platforms; the local proxy is hosted separately by NymTransportModule.
   @objc(attachMixnet:exitNode:resolve:reject:)
@@ -999,7 +992,7 @@ class RPCModule: NSObject {
   func changeServerProcess(_ serveruri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try changeServer(serveruri: serveruri)
+          try changeServer(choice: self.indexerChoice(serveruri))
         }.settle(resolve: resolve, reject: reject)
       }
   }

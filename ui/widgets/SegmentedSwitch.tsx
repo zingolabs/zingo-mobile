@@ -109,7 +109,7 @@ function SegmentedSwitch<K extends string>({
           <RegText
             style={{
               fontSize: 12.5,
-              fontWeight: '500',
+              fontWeight: '600',
               color: option.key === value ? colors.fgDefault : colors.fgMuted,
             }}
           >

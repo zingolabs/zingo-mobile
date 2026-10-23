@@ -11,7 +11,7 @@ import Animated, {
 import Svg, { Circle, Path, Text as SvgText } from 'react-native-svg';
 
 import { ease } from '@app/theme/motion';
-import { themeTokens } from '@app/theme';
+import { themeTokens, useTheme } from '@app/theme';
 
 const BASE_R = 86;
 const SW = 28;
@@ -97,6 +97,7 @@ const SliceLayer: React.FunctionComponent<SliceLayerProps> = ({
   selected,
   geometry,
 }) => {
+  const { colors } = useTheme();
   const { size: SIZE, c: C, r: R } = geometry;
   const mid = (arc.a0 + arc.a1) / 2;
   const pop = useSharedValue(0);
@@ -158,7 +159,7 @@ const SliceLayer: React.FunctionComponent<SliceLayerProps> = ({
           y={C + Math.sin(mid) * R + 4}
           fontSize={10}
           fontWeight="700"
-          fill={light(arc.color) ? DARK_INK : themeTokens.fgDefault}
+          fill={light(arc.color) ? DARK_INK : colors.fgDefault}
           textAnchor="middle"
         >
           {label}

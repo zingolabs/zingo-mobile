@@ -560,7 +560,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
         <Animated.View style={[{ flex: 1, minWidth: 0 }, cardFade]}>
           <RegText
             numberOfLines={1}
-            style={{ fontSize: 15, lineHeight: 19, fontWeight: '500' }}
+            style={{ fontSize: 15, lineHeight: 19, fontWeight: '600' }}
           >
             {cardName}
           </RegText>

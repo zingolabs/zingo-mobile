@@ -80,7 +80,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
           {!!message && (
             <Text
               style={{
-                color: colors.fgAccentDisabled,
+                color: colors.fgMuted,
                 fontSize: 15,
                 marginTop: 10,
               }}
@@ -139,7 +139,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                 size="large"
                 color={
                   props.firstLaunchingMessage === LaunchingModeEnum.updating
-                    ? colors.fgAccent
+                    ? colors.fgMuted
                     : 'transparent'
                 }
               />

@@ -203,7 +203,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
       }}
     >
       {icon}
-      <RegText style={{ fontSize: 12, fontWeight: '500' }}>{label}</RegText>
+      <RegText style={{ fontSize: 12, fontWeight: '600' }}>{label}</RegText>
     </View>
   );
 
