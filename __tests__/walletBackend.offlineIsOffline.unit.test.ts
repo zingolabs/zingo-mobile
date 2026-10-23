@@ -123,6 +123,8 @@ const WALLET_LOCAL = new Set([
   // it are local.
   'statusSyncInfo',
   'pauseSyncProcess',
+  'stopSyncProcess',
+  'syncCaughtUpInfo',
   // The wallet's transport bookkeeping. `disableMixnet` only vacates the slot,
   // and the two reads answer from state the wallet already holds.
   'disableMixnet',

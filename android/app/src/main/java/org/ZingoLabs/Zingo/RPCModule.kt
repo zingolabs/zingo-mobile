@@ -778,6 +778,22 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
+    fun stopSyncProcess(promise: Promise) {
+        FfiOutcome.settling(promise, "stop_sync") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.stopSync()
+        }
+    }
+
+    @ReactMethod
+    fun syncCaughtUpInfo(promise: Promise) {
+        FfiOutcome.settling(promise, "sync_caught_up") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.syncCaughtUp()
+        }
+    }
+
+    @ReactMethod
     fun statusSyncInfo(promise: Promise) {
         FfiOutcome.settling(promise, "status_sync") {
             uniffi.zingo.initLogging()

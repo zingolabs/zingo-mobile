@@ -9,7 +9,7 @@ const bridge = RPCModule as unknown as Record<string, jest.Mock>;
 
 const service = () =>
   new WalletLifecycleService({
-    pauseSyncProcess: jest.fn(async () => {}),
+    stopSyncProcess: jest.fn(async () => {}),
   } as never);
 
 beforeEach(() => {

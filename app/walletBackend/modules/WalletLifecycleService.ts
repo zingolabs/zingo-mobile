@@ -1,7 +1,7 @@
 /**
  * Handles wallet file operations: change wallet, restore from backup.
  *
- * Every method calls syncCoordinator.pauseSyncProcess() first to ensure no
+ * Every method calls syncCoordinator.stopSyncProcess() first to ensure no
  * sync task is running while the wallet file is being replaced. All methods
  * return DONE on success or an ErrorKeyed failure the display edge
  * translates (zingo-adrs zingo-mobile/0009).
@@ -22,6 +22,8 @@ const err = (
   errorKey: WalletLifecycleErrorKey,
 ): ErrorKeyed<WalletLifecycleErrorKey> => errorKeyed(errorKey);
 
+const STOP_WAIT_MS = 5 * 1000;
+
 export class WalletLifecycleService {
   syncCoordinator: SyncCoordinator;
 
@@ -35,7 +37,7 @@ export class WalletLifecycleService {
     if (!(exists && exists !== GlobalConst.false)) {
       return err('rpc.walletnotfound-error');
     }
-    await this.syncCoordinator.pauseSyncProcess();
+    await this.syncCoordinator.stopSyncProcess(STOP_WAIT_MS);
     const result = await RPCModule.deleteExistingWallet();
 
     if (!(result && result !== GlobalConst.false)) {
@@ -59,7 +61,7 @@ export class WalletLifecycleService {
     if (!(existsWallet && existsWallet !== GlobalConst.false)) {
       return err('rpc.walletnotfound-error');
     }
-    await this.syncCoordinator.pauseSyncProcess();
+    await this.syncCoordinator.stopSyncProcess(STOP_WAIT_MS);
     // Android answers a boolean, iOS "true"/"false"; a throw (a bridge
     // without the method) is a failure too.
     let result: string | boolean;

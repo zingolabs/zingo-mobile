@@ -926,6 +926,24 @@ class RPCModule: NSObject {
       }
   }
 
+  @objc(stopSyncProcess:reject:)
+  func stopSyncProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try stopSync()
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  @objc(syncCaughtUpInfo:reject:)
+  func syncCaughtUpInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try syncCaughtUp()
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
   @objc(statusSyncInfo:reject:)
   func statusSyncInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {

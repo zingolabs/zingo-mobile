@@ -162,6 +162,9 @@ type LoadedAppProps = NativeStackScreenProps<RootParamList, 'Wallet'> & {
 // The wallet fades in over the loading screen as it opens.
 const HOME_FADE_MS = 300;
 
+/** iOS gives a backgrounded app a few seconds; the save still has to fit. */
+const BACKGROUND_STOP_WAIT_MS = 3 * 1000;
+
 const SERVER_DEFAULT_0: ServerType = remoteServer(
   serverUris(() => {})[0].uri,
   serverUris(() => {})[0].chainName,
@@ -795,6 +798,9 @@ export class LoadedAppClass extends Component<
             // setting value for background task Android
             await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
             await this.rpc.clearTimers();
+            // A suspended app's connection dies, so the engine is stopped rather
+            // than paused; the foreground tick launches a fresh session.
+            await this.rpc.stopSyncProcess(BACKGROUND_STOP_WAIT_MS);
             this.setSyncingStatus({} as RPCSyncStatusType);
             // We need to save the wallet file here because
             // sometimes the App can lose the last synced chunk
@@ -836,6 +842,9 @@ export class LoadedAppClass extends Component<
           // setting value for background task Android
           await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
           await this.rpc.clearTimers();
+          // A suspended app's connection dies, so the engine is stopped rather
+          // than paused; the foreground tick launches a fresh session.
+          await this.rpc.stopSyncProcess(BACKGROUND_STOP_WAIT_MS);
           this.setSyncingStatus({} as RPCSyncStatusType);
           // We need to save the wallet file here because
           // sometimes the App can lose the last synced chunk

@@ -20,6 +20,7 @@ import {
 import { isNumber } from 'lodash';
 import RPCModule from '@app/RPCModule';
 import { callFfi, FfiResult } from '@app/walletBackend/ffi';
+import { withSyncStopped } from './syncBracket';
 import { RPCZecPriceType } from '@app/walletBackend/types/RPCZecPriceType';
 import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
 
@@ -267,7 +268,7 @@ export async function planOrchardDrain(): Promise<FfiResult<string>> {
 // drain transaction at once. Mirrors the native `drainOrchardProcess`. The
 // success value is raw JSON (parseable as RPCDrainType).
 export async function drainOrchard(): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.drainOrchardProcess());
+  return withSyncStopped(() => callFfi(RPCModule.drainOrchardProcess()));
 }
 
 // Snapshot of the in-flight drain's progress, for rendering "Building i/N" then

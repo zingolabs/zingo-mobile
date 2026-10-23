@@ -66,6 +66,8 @@ interface RPCModuleAPI {
   pollSyncInfo(): Promise<string>;
   runSyncProcess(): Promise<string>;
   pauseSyncProcess(): Promise<string>;
+  stopSyncProcess(): Promise<string>;
+  syncCaughtUpInfo(): Promise<string>;
   statusSyncInfo(): Promise<string>;
   runRescanProcess(): Promise<string>;
 

@@ -125,14 +125,14 @@ describe('sync family rejections are contained and reported, never sniffed', () 
     );
   });
 
-  it('pause_sync', async () => {
+  it('stop_sync', async () => {
     const { coordinator, onError } = makeCoordinator();
-    bridge.pauseSyncProcess.mockRejectedValueOnce(new Error('bridge exploded'));
+    bridge.stopSyncProcess.mockRejectedValueOnce(new Error('bridge exploded'));
 
-    await coordinator.pauseSyncProcess();
+    await coordinator.stopSyncProcess(0);
 
     expect(onError).toHaveBeenCalledWith(
-      expect.stringContaining('Error sync pause'),
+      expect.stringContaining('Error sync stop'),
     );
   });
 

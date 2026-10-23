@@ -79,8 +79,8 @@ export default class WalletBackend {
   async clearTimers() {
     return this.syncCoordinator.clearTimers();
   }
-  async pauseSyncProcess() {
-    return this.syncCoordinator.pauseSyncProcess();
+  async stopSyncProcess(waitMs: number) {
+    return this.syncCoordinator.stopSyncProcess(waitMs);
   }
   async refreshSync(fullRescan?: boolean) {
     return this.syncCoordinator.refreshSync(fullRescan);
