@@ -278,7 +278,6 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <View
-                onLayout={[Function]}
                 style={
                   {
                     "alignItems": "flex-start",
@@ -290,7 +289,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                     {
                       "alignItems": "center",
                       "flexDirection": "row",
-                      "gap": 6,
+                      "gap": 8,
                     }
                   }
                 >
@@ -365,7 +364,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                     accessible={true}
                     collapsable={false}
                     focusable={true}
-                    hitSlop={10}
+                    hitSlop={14}
                     onBlur={[Function]}
                     onClick={[Function]}
                     onFocus={[Function]}

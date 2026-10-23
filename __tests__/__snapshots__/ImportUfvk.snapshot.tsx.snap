@@ -267,7 +267,6 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
     }
   >
     <View
-      onLayout={[Function]}
       style={
         {
           "alignItems": "center",
@@ -280,7 +279,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           {
             "alignItems": "center",
             "flexDirection": "row",
-            "gap": 6,
+            "gap": 8,
           }
         }
       >
@@ -290,7 +289,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
             {
               "color": "#c3c3c3",
               "fontSize": 13,
-              "fontWeight": "600",
+              "fontWeight": "700",
               "lineHeight": 18,
             }
           }
@@ -318,7 +317,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           accessible={true}
           collapsable={false}
           focusable={true}
-          hitSlop={10}
+          hitSlop={14}
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
