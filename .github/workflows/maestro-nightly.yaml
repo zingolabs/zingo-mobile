@@ -99,10 +99,15 @@ jobs:
     runs-on: macos-15
 
     steps:
-      - name: Xcode 16.4
+      # The Xcode of the release machine, which zingolib's iOS workflow pins
+      # as well, so the app links under the same linker. Xcode 16.4 accepted
+      # an app link that holds two Rust personality routines, which the
+      # linker of Xcode 26 refuses, so a bundle that fails a release build
+      # passed here. A floating choice would let a 16.x runner pass it again.
+      - name: Xcode 26.3
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.4'
+          xcode-version: '26.3'
 
       - name: Checkout repository
         uses: actions/checkout@v7
