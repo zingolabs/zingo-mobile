@@ -29,7 +29,6 @@ import React from 'react';
 import { fireEvent, render } from '@testing-library/react-native';
 import Send from '@screens/Send';
 import Confirm from '@screens/Confirm';
-import ZecAmount from '@ui/widgets/ZecAmount';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
@@ -99,33 +98,21 @@ beforeEach(() => {
   );
 });
 
-test('F8: the in-form USD amounts dim when the price is stale', () => {
+test('F8: the in-form USD amount dims when the price is stale', () => {
   const view = render(
     sendUi({ zecPrice: 33.33, date: Date.now() - 11 * 60_000 }),
   );
 
   const { StyleSheet } = require('react-native');
-  const formAmounts = view
-    .getAllByText(/^\$ /)
-    .map(t => StyleSheet.flatten(t.props.style))
-    .filter(
-      (s: { fontSize?: number }) => s.fontSize === 16 || s.fontSize === 14,
-    );
-  expect(formAmounts.length).toBeGreaterThan(0);
-  formAmounts.forEach(s => expect(s.color).toBe('#888888'));
+  const line = view.getByTestId('send.zec-derived');
+  expect(line).toHaveTextContent(/≈ \$/);
+  expect(StyleSheet.flatten(line.props.style).color).toBe('#888888');
 });
 
 test('P8: an absent price hides the in-form USD amounts and the ring', () => {
   const view = render(sendUi({ zecPrice: 0, date: 0 }));
 
-  const { StyleSheet } = require('react-native');
-  const formAmounts = view
-    .queryAllByText(/^\$ /)
-    .map(t => StyleSheet.flatten(t.props.style))
-    .filter(
-      (s: { fontSize?: number }) => s.fontSize === 16 || s.fontSize === 14,
-    );
-  expect(formAmounts).toHaveLength(0);
+  expect(view.getByTestId('send.zec-derived')).not.toHaveTextContent(/\$/);
   expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
 });
 
@@ -171,11 +158,10 @@ test('H3: the USD-entry derived ZEC amount dims on a stale price', () => {
   );
 
   fireEvent.press(view.getByTestId('send.swap-entry'));
-  const derived = view
-    .UNSAFE_getAllByType(ZecAmount)
-    .find(z => z.props.testID === 'send.zec-derived');
-  expect(derived).toBeTruthy();
-  expect(derived?.props.color).toBe('#888888');
+  const { StyleSheet } = require('react-native');
+  const derived = view.getByTestId('send.zec-derived');
+  expect(derived).toHaveTextContent(/≈ .* ZEC/);
+  expect(StyleSheet.flatten(derived.props.style).color).toBe('#888888');
 });
 
 test('the amount being typed shows in both currencies with privacy on', () => {
@@ -186,11 +172,6 @@ test('the amount being typed shows in both currencies with privacy on', () => {
     </ContextAppLoadedProvider>,
   );
 
-  const { StyleSheet } = require('react-native');
-  // A masked amount reads "$ -.--"; a shown one starts with a digit.
-  const derived = view
-    .queryAllByText(/^\$ \d/)
-    .map(t => StyleSheet.flatten(t.props.style))
-    .filter((s: { fontSize?: number }) => s.fontSize === 16);
-  expect(derived.length).toBeGreaterThan(0);
+  // A masked amount would read "•••••"; the typed one shows its digits.
+  expect(view.getByTestId('send.zec-derived')).toHaveTextContent(/≈ \$\d/);
 });
