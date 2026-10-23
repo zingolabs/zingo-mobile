@@ -14,7 +14,7 @@ import { ease } from '@app/theme/motion';
 import { ChainNameEnum } from '@app/AppState';
 import RegText from '@ui/primitives/RegText';
 import ServerLog, { LogLine } from './ServerLog';
-import { DEFAULT_PORT, schemeFor } from './useCustomServer';
+import { schemeFor } from './useCustomServer';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
 import Button from '@ui/primitives/Button';
 
@@ -220,8 +220,6 @@ const CustomServerBox: React.FC<CustomServerBoxProps> = ({
               onTest();
             }}
             editable={!disabled && !busy}
-            placeholder={DEFAULT_PORT}
-            placeholderTextColor={colors.fgMuted}
             keyboardType="number-pad"
             maxLength={5}
             returnKeyType="go"

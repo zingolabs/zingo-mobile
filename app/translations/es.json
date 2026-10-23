@@ -716,7 +716,7 @@
     "port": "Puerto",
     "need-host": "Escribe primero el host del servidor.",
     "host-only": "Escribe aquí solo el host, como tu-nodo.example.",
-    "log-testing": "Probando {host}:{port}…",
+    "log-testing": "Probando {address}…",
     "log-dns": "DNS resuelto a {ip}",
     "log-literal": "Usando la dirección {ip}",
     "log-info": "GetLightdInfo respondió en {ms} ms",
