@@ -469,7 +469,7 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
           "alignItems": "center",
           "flexDirection": "row",
           "justifyContent": "space-between",
-          "paddingBottom": 6,
+          "paddingBottom": 8,
           "paddingHorizontal": 16,
           "paddingTop": 8,
         }
@@ -529,7 +529,7 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
         onStartShouldSetResponder={[Function]}
         style={
           {
-            "paddingHorizontal": 14,
+            "paddingHorizontal": 16,
             "paddingVertical": 4,
           }
         }

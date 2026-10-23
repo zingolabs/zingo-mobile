@@ -799,9 +799,15 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                           {translate('swap.see-why') as string}
                         </Text>
                         {whyOpen ? (
-                          <ChevronUp size={14} color={colors.fgWarning} />
+                          <ChevronUp
+                            size={iconSizeSm}
+                            color={colors.fgWarning}
+                          />
                         ) : (
-                          <ChevronDown size={14} color={colors.fgWarning} />
+                          <ChevronDown
+                            size={iconSizeSm}
+                            color={colors.fgWarning}
+                          />
                         )}
                       </Pressable>
                       {whyOpen &&

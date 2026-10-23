@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import { radiusPill, space8, useTheme } from '@app/theme';
+import { radiusPill, space8, useTheme, iconSizeSm } from '@app/theme';
 import type { TokenEntryType } from '@app/swap';
 import Text from '@ui/primitives/Text';
 import { ChevronDown } from '@ui/primitives/Icons/Chevron';
@@ -67,7 +67,7 @@ export default function AssetButton({
           </Text>
         )}
       </View>
-      {!!onPress && <ChevronDown size={16} color={colors.fgMuted} />}
+      {!!onPress && <ChevronDown size={iconSizeSm} color={colors.fgMuted} />}
     </Pressable>
   );
 }

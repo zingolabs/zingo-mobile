@@ -18,6 +18,7 @@ import {
   useTheme,
   iconSizeMd,
   radiusSm,
+  iconSizeSm,
 } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import {
@@ -455,7 +456,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
                 </Text>
               </View>
             </View>
-            <LegsChevron size={15} color={colors.fgMuted} />
+            <LegsChevron size={iconSizeSm} color={colors.fgMuted} />
           </Pressable>
           {legsOpen && (
             <LegsCard>
@@ -512,7 +513,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
                       >
                         {`${received ? '+' : '−'}${leg.amount.toFixed(4)} ${info.currencyName}`}
                       </Text>
-                      <ChevronRight size={16} color={colors.fgMuted} />
+                      <ChevronRight size={iconSizeSm} color={colors.fgMuted} />
                     </View>
                   </Pressable>
                 );

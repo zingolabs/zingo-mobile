@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
-import { slopFor, space20, useTheme } from '@app/theme';
+import { slopFor, space20, useTheme, iconSizeMd } from '@app/theme';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import { HomeTabScreenProps, WalletNavigation } from '@app/types';
@@ -261,7 +261,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingTop: 8,
-        paddingBottom: 6,
+        paddingBottom: 8,
         paddingHorizontal: 16,
       }}
     >
@@ -280,9 +280,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
       <Pressable
         onPress={hide}
         hitSlop={8}
-        style={{ paddingHorizontal: 14, paddingVertical: 4 }}
+        style={{ paddingHorizontal: 16, paddingVertical: 4 }}
       >
-        <XIcon size={20} color={colors.fgMuted} />
+        <XIcon size={iconSizeMd} color={colors.fgMuted} />
       </Pressable>
     </View>
   );
@@ -293,7 +293,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
         flexDirection: 'row',
         alignItems: 'center',
         paddingTop: 8,
-        paddingBottom: 6,
+        paddingBottom: 8,
         paddingHorizontal: 16,
       }}
     >
@@ -305,9 +305,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
         onPress={() =>
           navigation.navigate(Route.AddressList, { current: current?.address })
         }
-        style={{ paddingHorizontal: 14, paddingVertical: 4 }}
+        style={{ paddingHorizontal: 16, paddingVertical: 4 }}
       >
-        <ListIcon size={20} color={colors.fgMuted} />
+        <ListIcon size={iconSizeMd} color={colors.fgMuted} />
       </Pressable>
       <BoldText
         style={{ flex: 1, textAlign: 'center', fontSize: 16, lineHeight: 28 }}
@@ -320,9 +320,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
         accessibilityLabel={t('receive.new-title')}
         onPress={() => show('NA')}
         hitSlop={slopFor(24)}
-        style={{ paddingHorizontal: 14, paddingVertical: 4 }}
+        style={{ paddingHorizontal: 16, paddingVertical: 4 }}
       >
-        <PlusIcon size={20} color={colors.fgMuted} />
+        <PlusIcon size={iconSizeMd} color={colors.fgMuted} />
       </Pressable>
     </View>
   );
