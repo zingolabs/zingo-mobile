@@ -77,7 +77,7 @@ export default function PairHero({
           lineHeight: 40,
           fontWeight: '700',
           fontVariant: ['tabular-nums'],
-          color: colors.fgPriceUp,
+          color: colors.fgAccent,
         }}
       >
         {amount}

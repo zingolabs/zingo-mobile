@@ -197,7 +197,7 @@ const CustomTabBar = ({
                     style={[
                       styles.label,
                       {
-                        color: isFocused ? colors.fgPriceUp : colors.fgDefault,
+                        color: isFocused ? colors.fgAccent : colors.fgDefault,
                       },
                     ]}
                   >

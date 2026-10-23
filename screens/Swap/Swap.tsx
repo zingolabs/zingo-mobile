@@ -531,8 +531,8 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                     columnGap: 6,
                   }}
                 >
-                  <TriangleAlert size={14} color={colors.fgPriceDown} />
-                  <Text variant="caption" style={{ color: colors.fgPriceDown }}>
+                  <TriangleAlert size={14} color={colors.fgDanger} />
+                  <Text variant="caption" style={{ color: colors.fgDanger }}>
                     {translate('swap.over-balance') as string}
                   </Text>
                 </View>
@@ -686,10 +686,10 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                         paddingHorizontal: 2,
                       }}
                     >
-                      <TriangleAlert size={14} color={colors.fgPriceDown} />
+                      <TriangleAlert size={14} color={colors.fgDanger} />
                       <Text
                         variant="caption"
-                        style={{ color: colors.fgPriceDown, flexShrink: 1 }}
+                        style={{ color: colors.fgDanger, flexShrink: 1 }}
                       >
                         {form.addressIsZcash
                           ? (translate('swap.address-zcash') as string)
@@ -710,7 +710,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                         paddingHorizontal: 2,
                       }}
                     >
-                      <CheckIcon size={14} color={colors.fgPriceUp} />
+                      <CheckIcon size={14} color={colors.fgAccent} />
                       {savedContact ? (
                         <Text
                           testID="swap.address.contact"
@@ -749,7 +749,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                               variant="caption"
                               style={{
                                 fontWeight: '700',
-                                color: colors.fgPriceUp,
+                                color: colors.fgAccent,
                               }}
                             >
                               {translate('swap.save-contact') as string}

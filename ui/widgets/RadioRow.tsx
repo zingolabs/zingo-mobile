@@ -4,33 +4,10 @@ import { Pressable, View } from 'react-native';
 import { radiusMd, useTheme } from '@app/theme';
 import Text from '@ui/primitives/Text';
 import Radio from '@ui/primitives/Radio';
+import Tag from '@ui/widgets/Tag';
 
-export type PillTone = 'positive' | 'warning';
-
-/** A short uppercase mark beside a title: Best in green, Public in amber. */
-export function Pill({ text, tone }: { text: string; tone: PillTone }) {
-  const { colors } = useTheme();
-  const color = tone === 'positive' ? colors.fgPriceUp : colors.fgWarning;
-  return (
-    <Text
-      style={{
-        fontSize: 12,
-        lineHeight: 16,
-        fontWeight: '600',
-        letterSpacing: 0.5,
-        textTransform: 'uppercase',
-        paddingHorizontal: 6,
-        borderRadius: 5,
-        overflow: 'hidden',
-        color,
-        backgroundColor:
-          tone === 'positive' ? colors.bgAccentSubtle : colors.bgWarningSubtle,
-      }}
-    >
-      {text}
-    </Text>
-  );
-}
+/** A pool or a recommendation beside a row's title. */
+export type PillTone = 'accent' | 'transparent';
 
 /** The card a group of radio rows sits in. */
 export function RadioList({
@@ -125,7 +102,7 @@ export default function RadioRow({
             >
               {title}
             </Text>
-            {!!pill && <Pill text={pill.text} tone={pill.tone} />}
+            {!!pill && <Tag tone={pill.tone}>{pill.text}</Tag>}
           </View>
           {!!sub && (
             <Text

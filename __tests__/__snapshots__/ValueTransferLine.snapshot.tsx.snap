@@ -998,7 +998,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
               numberOfLines={1}
               style={
                 {
-                  "color": "#3CC52A",
+                  "color": "#18bd18",
                   "fontSize": 15,
                   "fontWeight": "600",
                 }

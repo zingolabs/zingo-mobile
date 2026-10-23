@@ -231,7 +231,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
                     height: 6,
                     borderRadius: 3,
                     backgroundColor:
-                      index <= step ? colors.fgPriceUp : colors.sheetHandle,
+                      index <= step ? colors.fgAccent : colors.sheetHandle,
                   }}
                 />
               ))}

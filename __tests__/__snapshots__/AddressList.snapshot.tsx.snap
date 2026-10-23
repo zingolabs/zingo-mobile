@@ -1211,25 +1211,31 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               >
                 text translated
               </Text>
-              <Text
-                maxFontSizeMultiplier={2}
+              <View
                 style={
                   {
-                    "backgroundColor": "#F99D001F",
-                    "borderRadius": 5,
-                    "color": "#F99D00",
-                    "fontSize": 12,
-                    "fontWeight": "600",
-                    "letterSpacing": 0.5,
-                    "lineHeight": 16,
-                    "overflow": "hidden",
-                    "paddingHorizontal": 6,
-                    "textTransform": "uppercase",
+                    "alignSelf": "flex-start",
+                    "backgroundColor": "#E6C46A1F",
+                    "borderRadius": 8,
+                    "paddingHorizontal": 8,
+                    "paddingVertical": 2,
                   }
                 }
               >
-                text translated
-              </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#E6C46A",
+                      "fontSize": 12,
+                      "fontWeight": "600",
+                      "lineHeight": 16,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+              </View>
             </View>
             <Text
               maxFontSizeMultiplier={2}
@@ -1491,25 +1497,31 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               >
                 text translated
               </Text>
-              <Text
-                maxFontSizeMultiplier={2}
+              <View
                 style={
                   {
-                    "backgroundColor": "#F99D001F",
-                    "borderRadius": 5,
-                    "color": "#F99D00",
-                    "fontSize": 12,
-                    "fontWeight": "600",
-                    "letterSpacing": 0.5,
-                    "lineHeight": 16,
-                    "overflow": "hidden",
-                    "paddingHorizontal": 6,
-                    "textTransform": "uppercase",
+                    "alignSelf": "flex-start",
+                    "backgroundColor": "#E6C46A1F",
+                    "borderRadius": 8,
+                    "paddingHorizontal": 8,
+                    "paddingVertical": 2,
                   }
                 }
               >
-                text translated
-              </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#E6C46A",
+                      "fontSize": 12,
+                      "fontWeight": "600",
+                      "lineHeight": 16,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+              </View>
             </View>
             <Text
               maxFontSizeMultiplier={2}

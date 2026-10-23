@@ -76,7 +76,7 @@ export default function SentMark() {
           cy={48}
           r={44}
           fill={colors.bgAccentSubtle}
-          stroke={colors.fgPriceUp}
+          stroke={colors.fgAccent}
           strokeWidth={3}
           strokeDasharray={[RING, RING]}
           rotation={-90}
@@ -86,7 +86,7 @@ export default function SentMark() {
         <AnimatedPath
           d="M30 49 l12 12 24-26"
           fill="none"
-          stroke={colors.fgPriceUp}
+          stroke={colors.fgAccent}
           strokeWidth={4}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -105,7 +105,7 @@ export default function SentMark() {
           sproutStyle,
         ]}
       >
-        <SproutIcon size={28} color={colors.fgPriceUp} />
+        <SproutIcon size={28} color={colors.fgAccent} />
       </Animated.View>
     </View>
   );

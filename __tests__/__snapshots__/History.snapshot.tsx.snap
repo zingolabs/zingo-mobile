@@ -283,7 +283,7 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
               maxFontSizeMultiplier={2}
               style={
                 {
-                  "color": "#F2878A",
+                  "color": "#F99D00",
                   "fontSize": 12,
                   "fontWeight": "600",
                   "lineHeight": 16,
@@ -1723,7 +1723,7 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
               maxFontSizeMultiplier={2}
               style={
                 {
-                  "color": "#F2878A",
+                  "color": "#F99D00",
                   "fontSize": 12,
                   "fontWeight": "600",
                   "lineHeight": 16,

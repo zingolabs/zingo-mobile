@@ -150,8 +150,8 @@ export default function SyncLine({
     case 'noInternet':
       body = (
         <>
-          <CloudDownloadIcon size={14} color={colors.fgPriceDown} />
-          {strong(t('header.sync-no-internet'), colors.fgPriceDown)}
+          <CloudDownloadIcon size={14} color={colors.fgWarning} />
+          {strong(t('header.sync-no-internet'), colors.fgWarning)}
           {!!balanceAge && sep}
           {!!balanceAge && (
             <Text variant="caption" tone="muted">
@@ -175,7 +175,7 @@ export default function SyncLine({
               backgroundColor: colors.borderMuted,
             }}
           />
-          {strong(t('header.sync-offline'), colors.fgPriceDown)}
+          {strong(t('header.sync-offline'), colors.fgWarning)}
           {!!balanceAge && sep}
           {!!balanceAge && (
             <Text variant="caption" tone="muted">
@@ -241,7 +241,7 @@ export default function SyncLine({
               width: 7,
               height: 7,
               borderRadius: 4,
-              backgroundColor: colors.fgPriceUp,
+              backgroundColor: colors.fgAccent,
             }}
           />
           <Text variant="caption" tone="muted">

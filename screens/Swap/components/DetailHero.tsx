@@ -36,7 +36,7 @@ export default function DetailHero({
 }) {
   const { colors } = useTheme();
   const paint = {
-    accent: { bg: colors.bgAccentSubtle, fg: colors.fgPriceUp },
+    accent: { bg: colors.bgAccentSubtle, fg: colors.fgAccent },
     warning: { bg: colors.bgWarningSubtle, fg: colors.fgWarning },
     danger: { bg: colors.bgDangerSubtle, fg: colors.fgDanger },
     neutral: { bg: colors.bgMutedSubtle, fg: colors.fgMuted },
@@ -53,7 +53,7 @@ export default function DetailHero({
         variant="balance"
         style={{
           fontSize: 36,
-          color: tone === 'positive' ? colors.fgPriceUp : colors.fgDefault,
+          color: tone === 'positive' ? colors.fgAccent : colors.fgDefault,
         }}
       >
         {`${amount} `}

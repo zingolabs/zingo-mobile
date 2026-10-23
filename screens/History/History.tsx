@@ -807,7 +807,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
             <View
               testID="history.filter.dot"
               style={{
-                backgroundColor: colors.fgPriceUp,
+                backgroundColor: colors.fgAccent,
                 width: 8,
                 height: 8,
                 borderRadius: 4,
@@ -979,7 +979,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                     >
                       <Text
                         variant="caption"
-                        style={{ fontWeight: '700', color: colors.fgPriceUp }}
+                        style={{ fontWeight: '700', color: colors.fgAccent }}
                       >
                         {translate('clear') as string}
                       </Text>

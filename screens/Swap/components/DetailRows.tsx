@@ -33,9 +33,9 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
   const { colors } = useTheme();
   const toneColor = (tone: DetailRow['tone']) =>
     tone === 'positive'
-      ? colors.fgPriceUp
+      ? colors.fgAccent
       : tone === 'warning'
-        ? colors.fgTransparent
+        ? colors.fgWarning
         : tone === 'nym'
           ? colors.bgNym
           : colors.fgDefault;

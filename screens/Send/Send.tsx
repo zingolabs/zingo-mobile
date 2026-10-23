@@ -1322,11 +1322,11 @@ const Send: React.FunctionComponent<SendProps> = () => {
                     marginTop: 6,
                   }}
                 >
-                  <InfoIcon size={14} color={colors.fgPriceDown} />
+                  <InfoIcon size={14} color={colors.fgDanger} />
                   <Text
                     testID="send.amount.error"
                     variant="caption"
-                    style={{ color: colors.fgPriceDown, flexShrink: 1 }}
+                    style={{ color: colors.fgDanger, flexShrink: 1 }}
                   >
                     {validAmount === -1
                       ? (translate('send.amount-zero') as string)
@@ -1492,7 +1492,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                         textAlign: 'right',
                         marginTop: 4,
                         color: memoTooLong
-                          ? colors.fgPriceDown
+                          ? colors.fgDanger
                           : colors.fgMuted,
                       }}
                     >
@@ -1523,10 +1523,10 @@ const Send: React.FunctionComponent<SendProps> = () => {
                       minHeight: 40,
                     }}
                   >
-                    <PlusIcon size={16} color={colors.fgPriceUp} />
+                    <PlusIcon size={16} color={colors.fgAccent} />
                     <Text
                       variant="caption"
-                      style={{ fontWeight: '700', color: colors.fgPriceUp }}
+                      style={{ fontWeight: '700', color: colors.fgAccent }}
                     >
                       {translate('send.memo-add') as string}
                     </Text>

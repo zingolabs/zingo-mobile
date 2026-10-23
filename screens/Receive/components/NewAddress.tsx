@@ -145,9 +145,9 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
             sub={t(k.sub)}
             pill={
               k.pill === 'best'
-                ? { text: t('receive.best'), tone: 'positive' }
+                ? { text: t('receive.best'), tone: 'accent' }
                 : k.pill === 'public'
-                  ? { text: t('receive.public'), tone: 'warning' }
+                  ? { text: t('receive.public'), tone: 'transparent' }
                   : undefined
             }
             selected={kind === k.kind}

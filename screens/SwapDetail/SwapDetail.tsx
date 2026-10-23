@@ -400,10 +400,10 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
             marginTop: space8,
           }}
         >
-          <UserPlusIcon size={18} color={colors.fgPriceUp} />
+          <UserPlusIcon size={18} color={colors.fgAccent} />
           <Text
             variant="caption"
-            style={{ fontWeight: '700', color: colors.fgPriceUp }}
+            style={{ fontWeight: '700', color: colors.fgAccent }}
           >
             {t('swap.detail-save-contact').replace('{coin}', getSym)}
           </Text>
@@ -500,7 +500,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
                       <Text
                         variant="bodyStrong"
                         style={{
-                          color: received ? colors.fgPriceUp : colors.fgDefault,
+                          color: received ? colors.fgAccent : colors.fgDefault,
                         }}
                       >
                         {`${received ? '+' : '−'}${leg.amount.toFixed(4)} ${info.currencyName}`}

@@ -131,7 +131,7 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
                 height: 6,
                 borderRadius: 3,
                 backgroundColor:
-                  index <= current ? colors.fgPriceUp : colors.sheetHandle,
+                  index <= current ? colors.fgAccent : colors.sheetHandle,
               }}
             />
           ))}

@@ -37,13 +37,13 @@ export default function HistoryRowBody({
   const { colors } = useTheme();
   const topColor =
     text.topTone === 'positive'
-      ? colors.fgPriceUp
+      ? colors.fgAccent
       : text.topTone === 'muted'
         ? colors.fgMuted
         : colors.fgDefault;
   const stateColor =
     text.state?.tone === 'warning'
-      ? colors.fgTransparent
+      ? colors.fgWarning
       : text.state?.tone === 'danger'
         ? colors.fgDanger
         : colors.fgDefault;

@@ -148,20 +148,20 @@ const ValueTransferDetail: React.FunctionComponent<
     : vt.confirmations === 0
       ? {
           text: t('history.in-mempool'),
-          fg: colors.fgTransparent,
-          bg: colors.bgTransparent,
+          fg: colors.fgWarning,
+          bg: colors.bgWarningSubtle,
         }
       : pending
         ? {
             text: t('history.confirming')
               .replace('{n}', String(vt.confirmations))
               .replace('{of}', String(GlobalConst.minConfirmations)),
-            fg: colors.fgTransparent,
-            bg: colors.bgTransparent,
+            fg: colors.fgWarning,
+            bg: colors.bgWarningSubtle,
           }
         : {
             text: t('swap.tx-confirmed'),
-            fg: colors.fgPriceUp,
+            fg: colors.fgAccent,
             bg: colors.bgAccentSubtle,
           };
 
@@ -337,7 +337,7 @@ const ValueTransferDetail: React.FunctionComponent<
             color: failed
               ? colors.fgMuted
               : received
-                ? colors.fgPriceUp
+                ? colors.fgAccent
                 : colors.fgDefault,
           }}
         >

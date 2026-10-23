@@ -239,7 +239,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
         maxFontSizeMultiplier={2}
         style={
           {
-            "color": "#3CC52A",
+            "color": "#18bd18",
             "fontSize": 36,
             "fontVariant": [
               "tabular-nums",
@@ -291,7 +291,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
           maxFontSizeMultiplier={2}
           style={
             {
-              "color": "#3CC52A",
+              "color": "#18bd18",
               "fontSize": 12,
               "fontWeight": "600",
               "letterSpacing": 0.5,
@@ -1004,7 +1004,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
           maxFontSizeMultiplier={2}
           style={
             {
-              "color": "#3CC52A",
+              "color": "#18bd18",
               "fontSize": 12,
               "fontWeight": "600",
               "letterSpacing": 0.5,

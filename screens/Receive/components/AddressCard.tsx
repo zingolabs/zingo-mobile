@@ -54,7 +54,7 @@ export function PinButton({
   const style = useAnimatedStyle(() => ({
     transform: [{ rotate: `${-30 * tilt.value}deg` }],
   }));
-  const color = pinned ? colors.fgPriceUp : colors.fgMuted;
+  const color = pinned ? colors.fgAccent : colors.fgMuted;
   return (
     <Pressable
       testID={testID}
@@ -112,7 +112,7 @@ export default function AddressCard({
   const { colors } = useTheme();
   const t = (key: string) => translate(key) as string;
   const transparent = address.addressKind === AddressKindEnum.t;
-  const kindColor = transparent ? colors.fgWarning : colors.fgPriceUp;
+  const kindColor = transparent ? colors.fgTransparent : colors.fgAccent;
 
   const action = (
     testID: string,

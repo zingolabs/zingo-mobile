@@ -183,11 +183,11 @@ export default function RecipientField({
         <View
           style={{ flexDirection: 'row', alignItems: 'center', columnGap: 6 }}
         >
-          <InfoIcon size={14} color={colors.fgPriceDown} />
+          <InfoIcon size={14} color={colors.fgDanger} />
           <Text
             testID="send.address.error"
             variant="caption"
-            style={{ color: colors.fgPriceDown, flexShrink: 1 }}
+            style={{ color: colors.fgDanger, flexShrink: 1 }}
           >
             {t('send.to-invalid')}
           </Text>
@@ -213,7 +213,7 @@ export default function RecipientField({
       <View
         style={{ flexDirection: 'row', alignItems: 'center', columnGap: 6 }}
       >
-        <CheckIcon size={14} color={colors.fgPriceUp} />
+        <CheckIcon size={14} color={colors.fgAccent} />
         <Text
           testID="send.address.check"
           variant="caption"
@@ -231,7 +231,7 @@ export default function RecipientField({
         >
           <Text
             variant="caption"
-            style={{ fontWeight: '700', color: colors.fgPriceUp }}
+            style={{ fontWeight: '700', color: colors.fgAccent }}
           >
             {t('swap.save-contact')}
           </Text>

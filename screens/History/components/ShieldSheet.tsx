@@ -94,7 +94,7 @@ const ShieldSheet = forwardRef<BottomSheetModal, ShieldSheetProps>(
                 marginBottom: 10,
               }}
             >
-              <ShieldIcon size={24} color={colors.fgPriceUp} />
+              <ShieldIcon size={24} color={colors.fgAccent} />
             </View>
           </View>
           <Text

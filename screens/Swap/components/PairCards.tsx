@@ -185,7 +185,7 @@ export default function PairCards({
   }, [ring?.resetKey, receiveText, flash]);
   const receiveColor = flash.interpolate({
     inputRange: [0, 1],
-    outputRange: [colors.fgDefault, colors.fgPriceUp],
+    outputRange: [colors.fgDefault, colors.fgAccent],
   });
 
   const card = (surface: string) => ({
@@ -345,7 +345,7 @@ export default function PairCards({
         >
           <Animated.View style={{ transform: [{ rotate: spin }] }}>
             <View style={{ transform: [{ rotate: '90deg' }] }}>
-              <SwapIcon size={18} color={colors.fgPriceUp} />
+              <SwapIcon size={18} color={colors.fgAccent} />
             </View>
           </Animated.View>
         </Pressable>

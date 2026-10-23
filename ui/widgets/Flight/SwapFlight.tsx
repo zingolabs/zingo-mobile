@@ -76,9 +76,9 @@ export default function SwapFlight({
   const { colors } = useTheme();
   const clock = useSharedValue(0);
   const trip = useSharedValue(0);
-  /** ZEC travels in its gold; the other coin in the plain text colour. */
+  /** ZEC travels in the accent green; the other coin in the text colour. */
   const coinColor = (asset: SwapAssetType) =>
-    asset.chain.toUpperCase() === 'ZEC' ? colors.fgWarning : colors.fgDefault;
+    asset.chain.toUpperCase() === 'ZEC' ? colors.fgAccent : colors.fgDefault;
   const startColor = coinColor(from);
   const endColor = coinColor(to);
 

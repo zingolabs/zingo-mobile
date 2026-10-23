@@ -64,7 +64,7 @@ const AuthorizeSheet = forwardRef<BottomSheetModal, AuthorizeSheetProps>(
               justifyContent: 'center',
             }}
           >
-            <FingerprintIcon size={38} color={colors.fgPriceUp} />
+            <FingerprintIcon size={38} color={colors.fgAccent} />
           </View>
           <Text variant="subtitle" style={{ marginTop: 14 }}>
             {translate('swap.auth-title') as string}

@@ -55,7 +55,7 @@ describe('CustomTabBar', () => {
     const { StyleSheet } = require('react-native');
     const color = (key: string) =>
       StyleSheet.flatten(view.getByText(key).props.style).color;
-    expect(color('loadedapp.tab-swap')).toBe(themeTokens.fgPriceUp);
+    expect(color('loadedapp.tab-swap')).toBe(themeTokens.fgAccent);
     expect(color('loadedapp.tab-home')).toBe(themeTokens.fgDefault);
   });
 
