@@ -52,7 +52,6 @@ import {
   ChevronUp,
 } from '@ui/primitives/Icons/Chevron';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
-import { themeTokens } from '@app/theme';
 // this is for https. (primary)
 //
 type ValueTransferDetailProps = NativeStackScreenProps<
@@ -101,7 +100,7 @@ const ValueTransferDetail: React.FunctionComponent<
       ? route.params.totalLength
       : 0,
   );
-  const [spendColor, setSpendColor] = useState<string>(colors.fgAccentDisabled);
+  const [spendColor, setSpendColor] = useState<string>(colors.fgWarning);
   const [expandTxid, setExpandTxid] = useState<boolean>(false);
   const [showNavigator, setShowNavigator] = useState<boolean>(true);
   const [containerH, setContainerH] = useState<number>(0);
@@ -196,7 +195,7 @@ const ValueTransferDetail: React.FunctionComponent<
         ? colors.fgMuted
         : valueTransfer.confirmations >= 0 &&
             valueTransfer.confirmations < GlobalConst.minConfirmations
-          ? colors.fgAccentDisabled
+          ? colors.fgWarning
           : valueTransfer.kind === ValueTransferKindEnum.Received ||
               valueTransfer.kind === ValueTransferKindEnum.Shield
             ? colors.fgAccent
@@ -204,7 +203,7 @@ const ValueTransferDetail: React.FunctionComponent<
     setSpendColor(spendCo);
   }, [
     colors.fgAccent,
-    colors.fgAccentDisabled,
+    colors.fgWarning,
     colors.fgDefault,
     colors.fgMuted,
     valueTransfer.confirmations,
@@ -360,7 +359,7 @@ const ValueTransferDetail: React.FunctionComponent<
               flexDirection: 'row',
               justifyContent: 'flex-end',
               alignItems: 'center',
-              marginRight: 30,
+              marginRight: 20,
               marginTop: 5,
               backgroundColor: colors.bgSurface,
             }}
@@ -418,14 +417,15 @@ const ValueTransferDetail: React.FunctionComponent<
             style={{
               display: 'flex',
               alignItems: 'center',
-              margin: 25,
+              marginHorizontal: 20,
+              marginBottom: 25,
               marginTop: showNavigator ? 5 : 25,
               padding: 10,
               borderWidth: 1,
               borderRadius: 10,
               borderColor:
                 valueTransfer.status === RPCValueTransfersStatusEnum.failed
-                  ? themeTokens.fgDanger
+                  ? colors.borderDanger
                   : colors.borderMuted,
             }}
           >
@@ -551,7 +551,7 @@ const ValueTransferDetail: React.FunctionComponent<
                 <>
                   <View
                     style={{
-                      paddingHorizontal: 16,
+                      paddingHorizontal: 20,
                       flexGrow: 1,
                       flexDirection: 'row',
                       justifyContent: 'center',
@@ -588,7 +588,7 @@ const ValueTransferDetail: React.FunctionComponent<
                     RPCValueTransfersStatusEnum.calculated) && (
                   <TriangleAlert
                     style={{ marginRight: 5 }}
-                    color={colors.fgSyncing}
+                    color={colors.fgWarning}
                     size={16}
                   />
                 )}
@@ -605,13 +605,13 @@ const ValueTransferDetail: React.FunctionComponent<
                       color:
                         valueTransfer.status ===
                         RPCValueTransfersStatusEnum.failed
-                          ? themeTokens.fgDanger
+                          ? colors.fgDanger
                           : valueTransfer.status ===
                                 RPCValueTransfersStatusEnum.transmitted ||
                               valueTransfer.status ===
                                 RPCValueTransfersStatusEnum.calculated
                             ? colors.fgAccent
-                            : colors.fgAccentDisabled,
+                            : colors.fgWarning,
                       fontSize: 12,
                       opacity: 1,
                       fontWeight: '700',
@@ -643,7 +643,7 @@ const ValueTransferDetail: React.FunctionComponent<
                     GlobalConst.minConfirmations && (
                     <FadeText
                       style={{
-                        color: colors.fgAccentDisabled,
+                        color: colors.fgWarning,
                         fontSize: 12,
                         opacity: 1,
                         fontWeight: '700',
@@ -664,7 +664,7 @@ const ValueTransferDetail: React.FunctionComponent<
               </View>
             )}
 
-          <View style={{ margin: 10 }}>
+          <View style={{ marginHorizontal: 20, marginVertical: 10 }}>
             <View
               style={{
                 display: 'flex',
@@ -933,17 +933,15 @@ const ValueTransferDetail: React.FunctionComponent<
                   >
                     <RegText>{GlobalConst.replyTo}</RegText>
                     {!thisWalletAddress(memoUA) && (
-                      <TriangleAlert color={'red'} size={16} />
+                      <TriangleAlert color={colors.fgWarning} size={16} />
                     )}
-                    <RegText
-                      style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}
-                    >
+                    <RegText style={{ color: colors.fgMuted }}>
                       {memoUA}
                     </RegText>
                     {contactFound(memoUA) && (
                       <View style={{ flexDirection: 'row' }}>
                         {!thisWalletAddress(memoUA) && (
-                          <RegText style={{ opacity: 0.6 }}>
+                          <RegText style={{ color: colors.fgMuted }}>
                             {translate('addressbook.likely') as string}
                           </RegText>
                         )}
@@ -952,7 +950,7 @@ const ValueTransferDetail: React.FunctionComponent<
                     )}
                     {!contactFound(memoUA) && thisWalletAddress(memoUA) && (
                       <View style={{ flexDirection: 'row' }}>
-                        <RegText color={colors.fgAccentDisabled}>
+                        <RegText color={colors.fgMuted}>
                           {translate('addressbook.thiswalletaddress') as string}
                         </RegText>
                       </View>

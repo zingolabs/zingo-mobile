@@ -460,11 +460,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             gap: 11,
           }}
         >
-          <InfoIcon
-            size={16}
-            color={colors.fgAccent}
-            style={{ marginTop: 1 }}
-          />
+          <InfoIcon size={16} color={colors.fgMuted} style={{ marginTop: 1 }} />
           <RegText style={{ flex: 1, fontSize: 12, lineHeight: 13 }}>
             {translate('import.text') as string}
           </RegText>

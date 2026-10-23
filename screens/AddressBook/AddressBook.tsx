@@ -19,6 +19,7 @@ import {
 } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
+import { useOptionsPanel } from '@app/context/optionsPanel';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { showConfirm } from '@app/services/showConfirm';
@@ -143,6 +144,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     addLastSnackbar,
     setSendPageState,
   } = useContext(ContextAppLoaded);
+  const optionsPanel = useOptionsPanel();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const keyboardHeight = useKeyboardHeight();
@@ -229,6 +231,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
     sendPageState.toaddr.to = contact.address;
     setSendPageState(sendPageState);
+    // The book was opened from the options panel, which waits under it for
+    // the pop. Sending leaves for the Send tab, not back to the panel.
+    optionsPanel.close();
     navigation.navigate(Route.Home, { screen: Route.Send });
   };
 

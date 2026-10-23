@@ -767,7 +767,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <View
               style={
                 {
-                  "backgroundColor": "#F99D00",
+                  "backgroundColor": "#ebff5a",
                   "borderRadius": 3,
                   "height": 8,
                   "width": 8,

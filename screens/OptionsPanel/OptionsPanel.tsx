@@ -20,7 +20,6 @@ import { MessagesIcon as BoltIcon } from '@ui/primitives/Icons/BoltIcon';
 import XSocial from '../../assets/img/options/x.svg';
 import Github from '../../assets/img/options/github.svg';
 import Mail from '../../assets/img/options/mail.svg';
-import { themeTokens } from '@app/theme';
 
 export type OptionsPanelAction = {
   /** Unique key for the action (typically a MenuItemEnum value). */
@@ -157,7 +156,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
               onPress={onSettings}
               hitSlop={12}
             >
-              <BoltIcon size={24} color={themeTokens.fgMuted} />
+              <BoltIcon size={24} color={colors.fgMuted} />
             </Pressable>
           )}
         </View>
@@ -194,7 +193,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
                   width: 56,
                   height: 56,
                   borderRadius: 12,
-                  backgroundColor: themeTokens.bgSurface,
+                  backgroundColor: colors.bgSurface,
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginBottom: 6,

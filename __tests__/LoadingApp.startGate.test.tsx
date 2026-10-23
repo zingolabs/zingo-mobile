@@ -45,6 +45,7 @@ const bootApp = () =>
     openWallet: jest.fn(),
     openOnboarding: jest.fn(),
     openBoot: jest.fn(),
+    openLock: jest.fn(),
     translate: (key: string) => key,
     language: LanguageEnum.en,
     server: remoteServer(
@@ -105,17 +106,22 @@ describe('LoadingApp start gate', () => {
     expect(restore).toHaveBeenCalledTimes(1);
   });
 
-  test('is still asked when a wallet exists, and a decline stops the boot', async () => {
+  test('is still asked when a wallet exists, and a decline locks the session instead of booting', async () => {
     walletExists.mockResolvedValue('true');
     hasRecovery.mockResolvedValue(false);
-    (resolveTriggerGate as jest.Mock).mockResolvedValueOnce({
+    const declined = {
       kind: 'declined',
       failure: { errorKey: 'biometrics-failure-declined' },
-    });
+    };
+    (resolveTriggerGate as jest.Mock).mockResolvedValueOnce(declined);
+    const app = bootApp();
 
-    await bootApp().componentDidMount();
+    await app.componentDidMount();
 
     expect(resolveTriggerGate).toHaveBeenCalledTimes(1);
     expect(RPCModule.loadExistingWallet).not.toHaveBeenCalled();
+    // The boot screen draws the gate as passed; only the locked session
+    // shows the reason and the retry.
+    expect(app.props.openLock).toHaveBeenCalledWith(declined);
   });
 });

@@ -179,7 +179,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
           "backgroundColor": "#031124",
           "flexDirection": "row",
           "justifyContent": "flex-end",
-          "marginRight": 30,
+          "marginRight": 20,
           "marginTop": 5,
         }
       }
@@ -292,7 +292,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
           "borderRadius": 10,
           "borderWidth": 1,
           "display": "flex",
-          "margin": 25,
+          "marginBottom": 25,
+          "marginHorizontal": 20,
           "marginTop": 5,
           "padding": 10,
         }
@@ -359,14 +360,38 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
           <View
             style={
               {
-                "alignItems": "flex-end",
+                "alignItems": "baseline",
                 "flexDirection": "row",
                 "margin": 0,
                 "padding": 0,
               }
             }
           >
+            <View
+              style={
+                {
+                  "height": 25.956692128984294,
+                  "marginRight": 2.9445899080011153,
+                  "width": 17.8890441408791,
+                }
+              }
+            />
             <Text
+              maxFontSizeMultiplier={2}
+              style={
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 15.399999999999999,
+                  "fontWeight": "700",
+                  "margin": 0,
+                  "padding": 0,
+                }
+              }
+            >
+              EC
+            </Text>
+            <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#c3c3c3",
@@ -381,12 +406,12 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                0.7765
             </Text>
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#c3c3c3",
                   "fontSize": 15.399999999999999,
                   "margin": 0,
-                  "marginBottom": 1.4666666666666666,
                   "padding": 0,
                 }
               }
@@ -448,6 +473,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
             }
           >
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#c3c3c3",
@@ -465,7 +491,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
     <View
       style={
         {
-          "margin": 10,
+          "marginHorizontal": 20,
+          "marginVertical": 10,
         }
       }
     >
@@ -737,14 +764,38 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
               <View
                 style={
                   {
-                    "alignItems": "flex-end",
+                    "alignItems": "baseline",
                     "flexDirection": "row",
                     "margin": 0,
                     "padding": 0,
                   }
                 }
               >
+                <View
+                  style={
+                    {
+                      "height": 25.28249233342626,
+                      "marginRight": 2.868107053247839,
+                      "width": 17.424393643713408,
+                    }
+                  }
+                />
                 <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 15,
+                      "fontWeight": "700",
+                      "margin": 0,
+                      "padding": 0,
+                    }
+                  }
+                >
+                  EC
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
@@ -759,12 +810,12 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                    0.7765
                 </Text>
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
                       "fontSize": 10.5,
                       "margin": 0,
-                      "marginBottom": 1,
                       "padding": 0,
                     }
                   }
@@ -826,6 +877,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                 }
               >
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
@@ -1097,7 +1149,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
           "backgroundColor": "#031124",
           "flexDirection": "row",
           "justifyContent": "flex-end",
-          "marginRight": 30,
+          "marginRight": 20,
           "marginTop": 5,
         }
       }
@@ -1210,7 +1262,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
           "borderRadius": 10,
           "borderWidth": 1,
           "display": "flex",
-          "margin": 25,
+          "marginBottom": 25,
+          "marginHorizontal": 20,
           "marginTop": 5,
           "padding": 10,
         }
@@ -1277,14 +1330,38 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
           <View
             style={
               {
-                "alignItems": "flex-end",
+                "alignItems": "baseline",
                 "flexDirection": "row",
                 "margin": 0,
                 "padding": 0,
               }
             }
           >
+            <View
+              style={
+                {
+                  "height": 25.956692128984294,
+                  "marginRight": 2.9445899080011153,
+                  "width": 17.8890441408791,
+                }
+              }
+            />
             <Text
+              maxFontSizeMultiplier={2}
+              style={
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 15.399999999999999,
+                  "fontWeight": "700",
+                  "margin": 0,
+                  "padding": 0,
+                }
+              }
+            >
+              EC
+            </Text>
+            <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#c3c3c3",
@@ -1299,12 +1376,12 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                0.1234
             </Text>
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#c3c3c3",
                   "fontSize": 15.399999999999999,
                   "margin": 0,
-                  "marginBottom": 1.4666666666666666,
                   "padding": 0,
                 }
               }
@@ -1366,6 +1443,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
             }
           >
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#c3c3c3",
@@ -1383,7 +1461,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
     <View
       style={
         {
-          "margin": 10,
+          "marginHorizontal": 20,
+          "marginVertical": 10,
         }
       }
     >
@@ -1618,14 +1697,38 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
               <View
                 style={
                   {
-                    "alignItems": "flex-end",
+                    "alignItems": "baseline",
                     "flexDirection": "row",
                     "margin": 0,
                     "padding": 0,
                   }
                 }
               >
+                <View
+                  style={
+                    {
+                      "height": 25.28249233342626,
+                      "marginRight": 2.868107053247839,
+                      "width": 17.424393643713408,
+                    }
+                  }
+                />
                 <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 15,
+                      "fontWeight": "700",
+                      "margin": 0,
+                      "padding": 0,
+                    }
+                  }
+                >
+                  EC
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
@@ -1865,14 +1968,38 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
               <View
                 style={
                   {
-                    "alignItems": "flex-end",
+                    "alignItems": "baseline",
                     "flexDirection": "row",
                     "margin": 0,
                     "padding": 0,
                   }
                 }
               >
+                <View
+                  style={
+                    {
+                      "height": 25.28249233342626,
+                      "marginRight": 2.868107053247839,
+                      "width": 17.424393643713408,
+                    }
+                  }
+                />
                 <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 15,
+                      "fontWeight": "700",
+                      "margin": 0,
+                      "padding": 0,
+                    }
+                  }
+                >
+                  EC
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
@@ -1887,12 +2014,12 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                    0.1234
                 </Text>
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
                       "fontSize": 10.5,
                       "margin": 0,
-                      "marginBottom": 1,
                       "padding": 0,
                     }
                   }
@@ -1954,6 +2081,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                 }
               >
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",

@@ -1043,7 +1043,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
         justifyContent: 'space-between',
         paddingTop: 8,
         paddingBottom: 6,
-        paddingHorizontal: 16,
+        paddingHorizontal: 0,
       }}
     >
       <View style={{ width: 48 }} />
@@ -1287,7 +1287,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                           <XIcon
                             style={{ marginRight: 5 }}
                             size={20}
-                            color={colors.fgAccentDisabled}
+                            color={colors.fgMuted}
                           />
                         </TouchableOpacity>
                       )}
@@ -1542,7 +1542,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                           <XIcon
                             style={{ marginRight: 5 }}
                             size={20}
-                            color={colors.fgAccentDisabled}
+                            color={colors.fgMuted}
                           />
                         </TouchableOpacity>
                       ) : null}
@@ -1706,7 +1706,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                         >
                           <InfoIcon
                             size={16}
-                            color={colors.fgAccent}
+                            color={colors.fgMuted}
                             style={{ marginRight: 5 }}
                           />
                           <FadeText style={{ fontSize: 12.5 }}>
@@ -1734,7 +1734,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                         >
                           <InfoIcon
                             size={16}
-                            color={colors.fgAccent}
+                            color={colors.fgMuted}
                             style={{ marginRight: 5 }}
                           />
                           <FadeText>
@@ -1892,7 +1892,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                                 marginRight: memoIcon ? 0 : 7,
                               }}
                               size={20}
-                              color={colors.fgAccentDisabled}
+                              color={colors.fgMuted}
                             />
                           </TouchableOpacity>
                         )}

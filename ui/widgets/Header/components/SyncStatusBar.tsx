@@ -183,7 +183,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                       alignItems: 'center',
                       justifyContent: 'center',
                       padding: 1,
-                      borderColor: colors.borderAccentDisabled,
+                      borderColor: colors.borderAccent,
                       borderWidth: 1,
                       borderRadius: 10,
                       minWidth: 25,
@@ -205,7 +205,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                           padding: 3,
                         }}
                       >
-                        <WifiIcon color={colors.fgAccentDisabled} size={16} />
+                        <WifiIcon color={colors.fgAccent} size={16} />
                       </View>
                     </TouchableOpacity>
                   </View>
@@ -230,7 +230,9 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                   }}
                 >
                   <CloudDownloadIcon
-                    color={!netInfo.isConnected ? 'red' : 'yellow'}
+                    color={
+                      !netInfo.isConnected ? colors.fgDanger : colors.fgSyncing
+                    }
                     size={16}
                   />
                 </TouchableOpacity>
@@ -264,7 +266,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                 paddingHorizontal: 3,
               }}
             >
-              <WifiIcon color={'red'} size={16} />
+              <WifiIcon color={colors.fgDanger} size={16} />
               <FadeText style={{ fontSize: 12, marginLeft: 2 }}>
                 {translate('settings.server-offline') as string}
               </FadeText>

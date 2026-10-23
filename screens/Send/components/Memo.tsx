@@ -115,11 +115,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({
         />
         {memo ? (
           <TouchableOpacity hitSlop={slopFor(20)} onPress={() => setMemo('')}>
-            <XIcon
-              style={{ margin: 10 }}
-              size={20}
-              color={colors.fgAccentDisabled}
-            />
+            <XIcon style={{ margin: 10 }} size={20} color={colors.fgMuted} />
           </TouchableOpacity>
         ) : null}
       </View>

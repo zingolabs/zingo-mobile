@@ -24,7 +24,7 @@ const val OFFLINE_CHAIN_HINT = "regtest"
 /** The connection the instrumented tests open a wallet with. */
 fun testConnection(serverUri: String, chainHint: String): uniffi.zingo.IndexerConnection =
     uniffi.zingo.IndexerConnection(
-        serverUri = serverUri,
+        indexer = indexerChoice(serverUri),
         chainHint = chainHint,
         sync = uniffi.zingo.SyncSettings(performanceLevel = "Medium", minConfirmations = 1u),
     )
@@ -378,9 +378,10 @@ class BuildDescriptorTest {
             .targetContext.getString(R.string.zm_descriptor)
         println("\nBuild descriptor:")
         println("$zingolib-$mobile")
-        val part = """[0-9A-Za-z.+-]+(_[0-9a-f]{5})?(_dirty)?"""
-        assertThat(zingolib).matches("zl_$part")
-        assertThat(mobile).matches("zm_$part")
+        val zingolibPart = """[0-9A-Za-z.+-]+_[0-9a-f]{16}(_dirty)?"""
+        val mobilePart = """[0-9A-Za-z.+-]+(_[0-9a-f]{5})?(_dirty)?"""
+        assertThat(zingolib).matches("zl_$zingolibPart")
+        assertThat(mobile).matches("zm_$mobilePart")
         assertThat(mobile).isNotEqualTo(UNDESCRIBED_BUILD)
     }
 }

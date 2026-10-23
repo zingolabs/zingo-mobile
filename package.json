@@ -1,6 +1,6 @@
 {
   "name": "zingo-mobile",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "private": true,
   "scripts": {
     "android:prod": "react-native run-android --mode prodDebug",
@@ -41,8 +41,10 @@
     "build:beta:release:split": "cd android && ./gradlew assembleBetaRelease -PsplitApk=true && cd ..",
     "build:beta:debug": "cd android && ./gradlew assembleBetaDebug && cd ..",
     "build:beta:debug:split": "cd android && ./gradlew assembleBetaDebug -PsplitApk=true && cd ..",
-    "rust:android": "cd android && ./gradlew :zingo-binding-layer:buildBindingLayer && cd ..",
-    "rust:ios": "cargo run --quiet --manifest-path zingolib/tools/workbench/Cargo.toml --bin build-binding-layer -- ios --out zingolib/bindings/swift/build",
+    "fetch:binding-layer": "node scripts/fetch_binding_layer.mjs",
+    "pin": "node --permission --allow-fs-read=node_modules/zingolib-bundle-pin --allow-fs-read=binding-layer.json --allow-fs-read=binding-layer.json.partial --allow-fs-write=binding-layer.json --allow-fs-write=binding-layer.json.partial node_modules/zingolib-bundle-pin/bin/pin_binding_layer.mjs",
+    "check:fetch-lazy": "node scripts/binding_layer_fetch_lazy.mjs",
+    "check:repositories": "node scripts/repositories_audit.mjs",
     "release:prod:prep": "node scripts/release/release-prep.mjs prod",
     "release:beta:prep": "node scripts/release/release-prep.mjs beta",
     "pods": "cd ios && pod install && cd .."
@@ -131,10 +133,11 @@
     "storybook": "^9.1.21",
     "tsx": "^4.23.15",
     "typescript": "5.5.4",
-    "vite": "^8.3.4"
+    "vite": "^8.3.4",
+    "zingolib-bundle-pin": "0.4.0"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.13.0"
   },
   "transformIgnorePatterns": [
     "node_modules/(?!((jest-)?react-native|react-navigation|@react-navigation/.*))"

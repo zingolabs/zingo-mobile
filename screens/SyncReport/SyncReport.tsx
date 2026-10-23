@@ -62,12 +62,12 @@ const GREEN = themeTokens.fgAccent;
 const AMBER = themeTokens.fgWarning;
 const BLUE = themeTokens.fgCategory2;
 const TRACK = themeTokens.bgMutedSubtle;
-const TILE_BG = themeTokens.bgAccentSubtle;
+const TILE_BG = themeTokens.bgMutedSubtle;
 
 const CELL_COLOR: Record<CellState, string> = {
   scanned: GREEN,
   scanning: AMBER,
-  refetching: themeTokens.fgWarning,
+  refetching: themeTokens.fgSyncing,
   high: themeTokens.fgCategory2,
   low: themeTokens.borderMuted,
 };
@@ -339,7 +339,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     <View style={{ marginTop: 10 }}>
       {[
         {
-          icon: <BlocksIcon color={colors.fgAccent} />,
+          icon: <BlocksIcon color={colors.fgMuted} />,
           text: (
             <Text>
               {startBefore}
@@ -349,11 +349,11 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           ),
         },
         {
-          icon: <ClockIcon color={colors.fgAccent} />,
+          icon: <ClockIcon color={colors.fgMuted} />,
           text: translate('sync.sheet-time') as string,
         },
         {
-          icon: <HalfCircleIcon color={colors.fgAccent} />,
+          icon: <HalfCircleIcon color={colors.fgMuted} />,
           text: translate('sync.sheet-incomplete') as string,
         },
       ].map((row, i) => (
@@ -432,7 +432,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             borderRadius: 12,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: pressed ? themeTokens.bgMutedSubtle : undefined,
+            backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
           })}
         >
           <ChevronLeft size={24} color={colors.fgAccent} />
@@ -481,7 +481,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             borderRadius: 12,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: pressed ? themeTokens.bgMutedSubtle : undefined,
+            backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
           })}
         >
           <Animated.View

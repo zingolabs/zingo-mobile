@@ -18,7 +18,7 @@ import {
   Metric,
   niceTop,
 } from '@screens/Insight/insightModel';
-import { themeTokens } from '@app/theme';
+import { themeTokens, useTheme } from '@app/theme';
 
 const H = 168;
 const TOP = 18;
@@ -140,6 +140,7 @@ const ActivityChart: React.FunctionComponent<ActivityChartProps> = ({
   totalLabel,
   noneLabel,
 }) => {
+  const { colors } = useTheme();
   const [width, setWidth] = useState(0);
   const [tipW, setTipW] = useState(160);
   const n = to - from + 1;
@@ -218,7 +219,7 @@ const ActivityChart: React.FunctionComponent<ActivityChartProps> = ({
             width: slot,
             height: plotH + 4,
             borderRadius: 6,
-            backgroundColor: themeTokens.bgMutedSubtle,
+            backgroundColor: colors.bgMutedSubtle,
           }}
         />
       )}
@@ -334,7 +335,7 @@ const ActivityChart: React.FunctionComponent<ActivityChartProps> = ({
               <Text
                 style={{
                   flex: 1,
-                  color: themeTokens.fgDefault,
+                  color: colors.fgDefault,
                   fontSize: 12,
                   lineHeight: 18,
                 }}
@@ -343,7 +344,7 @@ const ActivityChart: React.FunctionComponent<ActivityChartProps> = ({
               </Text>
               <Text
                 style={{
-                  color: themeTokens.fgDefault,
+                  color: colors.fgDefault,
                   fontSize: 12,
                   fontWeight: '600',
                 }}

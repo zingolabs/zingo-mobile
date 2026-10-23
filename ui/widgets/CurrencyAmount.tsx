@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect } from 'react';
 import { Text, View, TextStyle, TouchableOpacity } from 'react-native';
-import { useTheme } from '@app/theme';
+import { useTheme, fontScaleBody } from '@app/theme';
 import { getNumberFormatSettings } from 'react-native-localize';
 import Animated, {
   ReduceMotion,
@@ -51,6 +51,7 @@ const TintedText: React.FunctionComponent<{
   }));
   return (
     <Animated.Text
+      maxFontSizeMultiplier={fontScaleBody}
       style={[
         {
           color: base,
@@ -116,6 +117,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
         <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
           {privacyHigh ? (
             <Text
+              maxFontSizeMultiplier={fontScaleBody}
               style={{
                 color: baseColor,
                 fontSize: 20,
@@ -136,6 +138,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
             </TintedText>
           ) : (
             <Text
+              maxFontSizeMultiplier={fontScaleBody}
               style={{
                 color: baseColor,
                 fontSize: 20,
