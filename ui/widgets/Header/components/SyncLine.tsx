@@ -19,6 +19,7 @@ import NetInfoType from '@app/AppState/types/NetInfoType';
 import { useSyncFreshness } from '@app/hooks/lastSynced';
 import { isFallingBehind } from '@app/walletBackend/utils/syncFreshness';
 import Text from '@ui/primitives/Text';
+import { CARD_MARGIN_TOP } from './PriceRow';
 import { CloudDownloadIcon } from '@ui/primitives/Icons/CloudDownloadIcon';
 
 type SyncState =
@@ -288,7 +289,8 @@ export default function SyncLine({
         alignItems: 'center',
         columnGap: 8,
         height: 28,
-        marginTop: 8,
+        /** The price card sits this far below; the same above centres the line. */
+        marginTop: CARD_MARGIN_TOP,
         paddingHorizontal: 12,
         borderRadius: radiusPill,
         backgroundColor: pressed ? colors.bgMutedSubtle : 'transparent',

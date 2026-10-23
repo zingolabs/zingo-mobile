@@ -197,7 +197,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
             "columnGap": 8,
             "flexDirection": "row",
             "height": 28,
-            "marginTop": 8,
+            "marginTop": 10,
             "paddingHorizontal": 12,
           }
         }

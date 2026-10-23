@@ -271,7 +271,7 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
               "columnGap": 8,
               "flexDirection": "row",
               "height": 28,
-              "marginTop": 8,
+              "marginTop": 10,
               "paddingHorizontal": 12,
             }
           }
