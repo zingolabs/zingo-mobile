@@ -268,10 +268,13 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
   >
     <View
       style={
-        {
-          "alignItems": "center",
-          "alignSelf": "stretch",
-        }
+        [
+          {
+            "alignItems": "center",
+            "alignSelf": "stretch",
+          },
+          null,
+        ]
       }
     >
       <View
@@ -295,43 +298,52 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           }
         />
         <View
-          accessibilityLabel=""
-          accessibilityRole="button"
-          accessibilityState={
+          style={
             {
-              "busy": undefined,
-              "checked": undefined,
-              "disabled": undefined,
-              "expanded": false,
-              "selected": undefined,
+              "elevation": 10,
+              "zIndex": 10,
             }
           }
-          accessibilityValue={
-            {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
-            }
-          }
-          accessible={true}
-          collapsable={false}
-          focusable={true}
-          hitSlop={14}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onFocus={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          testID="import.birthdayinfo"
         >
           <View
-            style={{}}
-          />
+            accessibilityLabel=""
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": false,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            hitSlop={14}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            testID="import.birthdayinfo"
+          >
+            <View
+              style={{}}
+            />
+          </View>
         </View>
       </View>
     </View>
