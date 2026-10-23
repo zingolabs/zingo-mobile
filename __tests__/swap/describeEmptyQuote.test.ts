@@ -1,4 +1,12 @@
-import { describeEmptyQuote } from '@app/swap/describeEmptyQuote';
+import { describeEmptyQuote as describeEmptyQuoteText } from '@app/swap/describeEmptyQuote';
+import { swapRaw } from '@app/swap/swapText';
+import { english } from '../../__mocks__/dataMocks/swap/englishText';
+
+/** The sentence as the English app shows it. */
+const describeEmptyQuote = (
+  ...args: Parameters<typeof describeEmptyQuoteText>
+) => english(describeEmptyQuoteText(...args));
+
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
 import type { QuoteResponseType } from '@app/swap/types/QuoteResponseType';
 
@@ -141,11 +149,11 @@ describe("describeEmptyQuote — with each provider's reason", () => {
     const unavailable = [
       {
         provider: SwapKitProviderEnum.Near,
-        reason: 'Needs at least $1,000 for this swap right now.',
+        reason: swapRaw('Needs at least $1,000 for this swap right now.'),
       },
       {
         provider: SwapKitProviderEnum.Flashnet,
-        reason: 'Could not price this swap right now.',
+        reason: swapRaw('Could not price this swap right now.'),
       },
     ];
     expect(describeEmptyQuote(response, 'ZEC', unavailable)).toBe(

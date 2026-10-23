@@ -14,18 +14,22 @@ import {
   slopFor,
   space12,
   space16,
+  space20,
   space4,
   space8,
   useTheme,
 } from '@app/theme';
-import { GlobalConst, Route } from '@app/AppState';
+import { GlobalConst, Route, SnackbarDurationEnum } from '@app/AppState';
+import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import { HomeTabScreenProps } from '@app/types';
 import { ContextAppLoaded, useSwapRecords, useSwapService } from '@app/context';
 import {
+  canonicalChainAddress,
   formatAmountForDisplay,
   isTerminalStatus,
   providerShortLabel,
   rateLimitedNotice,
+  renderSwapText,
 } from '@app/swap';
 import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
@@ -46,11 +50,12 @@ import Button from '@ui/primitives/Button';
 import Card from '@ui/widgets/Card';
 import Banner from '@ui/widgets/Banner';
 import TextInputAddress from '@ui/widgets/TextInputAddress';
+import SaveContactSheet from './components/SaveContactSheet';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import { SlidersIcon } from '@ui/primitives/Icons/SlidersIcon';
 import { HistoryIcon } from '@ui/primitives/Icons/HistoryIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
-import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
+import InfoTooltip from '@ui/widgets/InfoTooltip';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import {
   DEFAULT_SLIPPAGE_BPS,
@@ -89,6 +94,8 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     mixnetView,
     setPrivacyOption,
     addLastSnackbar,
+    addressBook,
+    setAddressBook,
     setShieldingAmount,
     setBackgroundError,
   } = context;
@@ -114,6 +121,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
   const settingsSheetRef = useRef<BottomSheetModal>(null);
   const historySheetRef = useRef<BottomSheetModal>(null);
   const insufficientSheetRef = useRef<BottomSheetModal>(null);
+  const saveContactSheetRef = useRef<BottomSheetModal>(null);
 
   // Fixed under the header's icons: the form needs the height, and the
   // balance it would reveal is already on the card.
@@ -130,6 +138,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     quote.kind === 'quote' &&
     info.currencyName === GlobalConst.zecSwapChain;
   const [unit, setUnit] = useState<'coin' | 'usd'>('coin');
+  const [privacyTipOpen, setPrivacyTipOpen] = useState<boolean>(false);
   const [usdText, setUsdText] = useState<string>('');
   const usdMode = usdAvailable && unit === 'usd';
   const price = quote.kind === 'quote' ? quote.price : 0;
@@ -177,6 +186,14 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
       ? (translate('swap.pending-waiting') as string)
       : (translate('swap.pending-swapping') as string);
 
+  /** The address book's contact for the address in the field, on its chain. */
+  const savedContact = addressBook.find(
+    c =>
+      c.swapChain.toUpperCase() === form.counterpartyChain.toUpperCase() &&
+      c.address ===
+        canonicalChainAddress(form.counterpartyChain, form.activeAddress),
+  );
+
   const chainLabel = form.selectedToken
     ? form.selectedToken.chain === form.selectedToken.symbol
       ? counterpartyTicker
@@ -187,6 +204,8 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
   const ctaEnabled = form.cta === 'ready' || form.cta === 'insufficient';
   // The review answers under one request: cancelled, done, or a refusal
   // with its provider and reason, which takes the route off the list.
+  useResult('swap.contact', address => form.setActiveAddress(address));
+
   useResult('swap.review', answer => {
     if (answer === 'done') {
       form.finish();
@@ -258,9 +277,9 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingTop: 8,
-        paddingBottom: 6,
-        paddingHorizontal: space16,
+        paddingTop: space16,
+        paddingBottom: space8,
+        paddingHorizontal: space20,
       }}
     >
       <Pressable
@@ -509,7 +528,10 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                     tone="warning"
                     style={{ paddingBottom: space8 }}
                   >
-                    {rateLimitedNotice(form.rateLimitedUntilMs - form.nowMs)}
+                    {renderSwapText(
+                      rateLimitedNotice(form.rateLimitedUntilMs - form.nowMs),
+                      key => (translate(key) as string).trim(),
+                    )}
                   </Text>
                 )}
                 {!!form.quoteNotice && (
@@ -526,9 +548,34 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
 
             {!!form.selectedToken && (
               <View>
-                <Text variant="caption" tone="muted">
-                  {`${translate(form.isOutbound ? 'swap.dest-address' : 'swap.refund-address') as string} (${chainLabel})`}
-                </Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    columnGap: space8,
+                    marginBottom: space4,
+                  }}
+                >
+                  <Text
+                    variant="caption"
+                    tone="muted"
+                    numberOfLines={1}
+                    style={{ flexShrink: 1 }}
+                  >
+                    {`${translate(form.isOutbound ? 'swap.dest-address' : 'swap.refund-address') as string} (${chainLabel})`}
+                  </Text>
+                  {!!savedContact && form.addressValid && (
+                    <Text
+                      testID="swap.address.contact"
+                      variant="caption"
+                      tone="accent"
+                      numberOfLines={1}
+                      style={{ fontWeight: '600', flexShrink: 1 }}
+                    >
+                      {savedContact.label}
+                    </Text>
+                  )}
+                </View>
                 <TextInputAddress
                   address={form.activeAddress}
                   setAddress={form.setActiveAddress}
@@ -537,6 +584,32 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                   showLabel={false}
                   swapChain={form.counterpartyChain}
                   scanRequest="swap.address"
+                  flush
+                  pasteLabel={translate('swap.paste') as string}
+                  onSaveContact={
+                    savedContact
+                      ? undefined
+                      : () => saveContactSheetRef.current?.present()
+                  }
+                  onPickContact={() =>
+                    navigation.navigate(Route.AddressBook, {
+                      pick: 'swap.contact',
+                      chain: form.counterpartyChain,
+                    })
+                  }
+                  pickContactLabel={
+                    translate('addressbook.pick-title') as string
+                  }
+                  saveContactLabel={
+                    translate('addressbook.new-contact') as string
+                  }
+                  placeholder={(
+                    translate('swap.address-placeholder') as string
+                  ).replace(
+                    '{chain}',
+                    chainDisplayName(form.counterpartyChain) ||
+                      form.counterpartyChain,
+                  )}
                 />
                 {form.addressShowError ? (
                   <View
@@ -544,6 +617,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                       flexDirection: 'row',
                       alignItems: 'center',
                       columnGap: space4,
+                      marginTop: space8,
                     }}
                   >
                     <TriangleAlert size={14} color={colors.fgDanger} />
@@ -557,6 +631,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                       flexDirection: 'row',
                       alignItems: 'center',
                       columnGap: space4,
+                      marginTop: space8,
                     }}
                   >
                     <CheckIcon size={14} color={colors.fgMuted} />
@@ -589,19 +664,19 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                 <Banner tone="warning" title={form.quoteError} />
               )}
 
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                columnGap: space4,
-                marginTop: space4,
-              }}
-            >
-              <Text variant="caption" tone="muted">
-                {translate('swap.privacy-note') as string}
-              </Text>
-              <InfoIcon size={16} color={colors.fgMuted} />
+            <View style={{ marginTop: space4 }}>
+              <InfoTooltip
+                testID="swap.privacy-info"
+                label={translate('swap.privacy-note') as string}
+                title={translate('swap.privacy-tip-title') as string}
+                text={translate('swap.privacy-tip') as string}
+                open={privacyTipOpen}
+                onToggle={setPrivacyTipOpen}
+              >
+                <Text variant="caption" tone="muted">
+                  {translate('swap.privacy-note') as string}
+                </Text>
+              </InfoTooltip>
             </View>
 
             <View style={{ marginTop: space8 }}>
@@ -640,6 +715,28 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
         receiveSymbol={receiveSymbol}
         receiveUsdUnitPrice={receiveUsdUnitPrice}
         onSelect={form.pickRoute}
+      />
+      <SaveContactSheet
+        ref={saveContactSheetRef}
+        address={canonicalChainAddress(
+          form.counterpartyChain,
+          form.activeAddress,
+        )}
+        chain={form.counterpartyChain}
+        book={addressBook}
+        onSave={async name => {
+          setAddressBook(
+            await AddressBookFileImpl.saveChainContact(
+              name,
+              form.activeAddress,
+              form.counterpartyChain,
+            ),
+          );
+          addLastSnackbar(
+            (translate('addressbook.added') as string).replace('{name}', name),
+            SnackbarDurationEnum.short,
+          );
+        }}
       />
       <SwapSettingsSheet
         ref={settingsSheetRef}

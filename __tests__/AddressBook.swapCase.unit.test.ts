@@ -24,3 +24,30 @@ test('Tests that the address book stores a Bitcoin address in lowercase when it 
     'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4',
   ]);
 });
+
+test('Tests that a swap address is saved under its chain and in name order when it comes from the swap form', async () => {
+  jest.spyOn(AddressBookFileImpl, 'readAddressBook').mockResolvedValue([
+    {
+      label: 'Zoe',
+      address: 'u1zoe',
+      color: '#111111',
+      own: false,
+      chain: ChainNameEnum.mainChainName,
+      swapChain: 'ZEC',
+    },
+  ]);
+  jest
+    .spyOn(AddressBookFileImpl, 'writeAddressBook')
+    .mockImplementation(async book => book);
+
+  const book = await AddressBookFileImpl.saveChainContact(
+    'Bob',
+    '0x1111111111111111111111111111111111111111',
+    'BASE',
+  );
+
+  expect(book.map(c => [c.label, c.swapChain, c.own, c.chain])).toEqual([
+    ['Bob', 'BASE', false, ChainNameEnum.mainChainName],
+    ['Zoe', 'ZEC', false, ChainNameEnum.mainChainName],
+  ]);
+});

@@ -154,6 +154,8 @@ export {
   zecNetworkFeeReserve,
 } from './depositRouting';
 export { quoteAddressPair, quoteBindsAddress } from './quoteAddressBinding';
+export { renderSwapText, swapKey, swapRaw } from './swapText';
+export type { SwapTextType } from './swapText';
 export { unavailableProviders } from './unavailableProviders';
 export type { UnavailableProviderType } from './unavailableProviders';
 export {
@@ -174,7 +176,10 @@ export {
 export { validateAddressForChain } from './validateAddressForChain';
 export { possibleChainsForAddress } from './possibleChainsForAddress';
 export { extractPlainAddress } from './extractPlainAddress';
-export { chainFromPaymentUri } from './chainFromPaymentUri';
+export {
+  addressFromPaymentUri,
+  chainFromPaymentUri,
+} from './chainFromPaymentUri';
 
 export type {
   ExtractDepositInstructionsContext,

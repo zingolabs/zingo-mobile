@@ -1,16 +1,21 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
 import { View, TouchableOpacity, TextInput } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme, slopFor } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
+import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
+import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
+import { ContactIcon } from '@ui/primitives/Icons/ContactIcon';
 
 import { ContextAppLoaded } from '@app/context';
 import { Request, useResult } from '@app/navigation/results';
 import { openScanner } from '@app/navigation/navigate';
 import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
-import { validateAddressForChain } from '@app/swap';
+import { addressFromPaymentUri, validateAddressForChain } from '@app/swap';
 import { GlobalConst } from '@app/AppState';
+import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
@@ -27,6 +32,18 @@ type TextInputAddressProps = {
   swapChain?: string;
   // The request the scanner answers with the code it read.
   scanRequest: Request;
+  /** Names the paste button the empty field shows; no label, no button. */
+  pasteLabel?: string;
+  /** Replaces the Zcash hint (address or ZNS name) for another chain's field. */
+  placeholder?: string;
+  /** Saves a valid address to the address book; no handler, no button. */
+  onSaveContact?: () => void;
+  saveContactLabel?: string;
+  /** Opens the address book to choose a contact; no handler, no button. */
+  onPickContact?: () => void;
+  pickContactLabel?: string;
+  /** Sits flush under a label of its own: no outer padding, 48 pt tall. */
+  flush?: boolean;
 };
 const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   address,
@@ -36,6 +53,13 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   showLabel,
   swapChain,
   scanRequest,
+  pasteLabel,
+  placeholder,
+  onSaveContact,
+  saveContactLabel,
+  onPickContact,
+  pickContactLabel,
+  flush,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server } = context;
@@ -68,21 +92,38 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
     };
   }, [address, server.chainName, swapChain, setError, translate]);
 
-  useResult(scanRequest, a => setAddress(a));
+  /** A swap chain's field keeps the address out of a payment URI for it. */
+  const take = (text: string) =>
+    setAddress(
+      swapChain && swapChain !== GlobalConst.zecSwapChain
+        ? addressFromPaymentUri(swapChain, text)
+        : text,
+    );
+
+  useResult(scanRequest, take);
   // A swap chain's address is checked by its own format.
   const setQrcodeModalShow = () => {
     const chain = swapChain ?? GlobalConst.zecSwapChain;
+    const zcash = chain === GlobalConst.zecSwapChain;
+    const named = (key: string) =>
+      (translate(key) as string).replace(
+        '{chain}',
+        chainDisplayName(chain) || chain,
+      );
     openScanner({
       request: scanRequest,
       // A Zcash field takes an address or a payment URI, as when pasted.
-      accepts:
-        chain === GlobalConst.zecSwapChain
-          ? { kind: 'zcash', chain: server.chainName }
-          : { kind: 'chain', chain, network: server.chainName },
+      accepts: zcash
+        ? { kind: 'zcash', chain: server.chainName }
+        : { kind: 'chain', chain, network: server.chainName },
       texts: {
         title: translate('scanner.title') as string,
-        hint: translate('scanner.hint-address') as string,
-        miss: translate('scanner.miss-address') as string,
+        hint: zcash
+          ? (translate('scanner.hint-address') as string)
+          : named('scanner.hint-chain'),
+        miss: zcash
+          ? (translate('scanner.miss-address') as string)
+          : named('scanner.miss-chain'),
         found: translate('scanner.found') as string,
         back: translate('scanner.back') as string,
         torch: translate('scanner.torch') as string,
@@ -94,7 +135,13 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
 
   return (
     <View style={{ display: 'flex', flexDirection: 'column' }}>
-      <View style={{ display: 'flex', padding: 10, marginTop: 10 }}>
+      <View
+        style={{
+          display: 'flex',
+          padding: flush ? 0 : 10,
+          marginTop: flush ? 0 : 10,
+        }}
+      >
         {showLabel && (
           <View
             style={{
@@ -127,10 +174,15 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                   ? 'invalid'
                   : 'unknown',
             ),
-            marginTop: 5,
+            marginTop: flush ? 0 : 5,
           }}
         >
-          <View style={{ flexDirection: 'row' }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              ...(flush && { minHeight: 48 }),
+            }}
+          >
             <View
               accessible={true}
               accessibilityLabel={translate('send.address-acc') as string}
@@ -143,7 +195,10 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                 testID="send.addressplaceholder"
                 onFocus={() => setFocused(true)}
                 onBlur={() => setFocused(false)}
-                placeholder={translate('send.addressplaceholder') as string}
+                placeholder={
+                  placeholder ??
+                  (translate('send.addressplaceholder') as string)
+                }
                 placeholderTextColor={colors.fgMuted}
                 style={{
                   color: colors.fgDefault,
@@ -152,7 +207,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                   padding: 10,
                 }}
                 value={address}
-                onChangeText={(text: string) => setAddress(text)}
+                onChangeText={take}
                 editable={!disabled}
               />
             </View>
@@ -176,6 +231,42 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                     size={20}
                     color={colors.fgAccentDisabled}
                   />
+                </TouchableOpacity>
+              )}
+              {validAddress === 1 && !disabled && !!onSaveContact && (
+                <TouchableOpacity
+                  testID="send.save-contact-button"
+                  accessibilityRole="button"
+                  accessibilityLabel={saveContactLabel}
+                  hitSlop={8}
+                  onPress={onSaveContact}
+                  style={{ marginRight: 12 }}
+                >
+                  <UserPlusIcon size={22} color={colors.fgMuted} />
+                </TouchableOpacity>
+              )}
+              {!address && !disabled && !!pasteLabel && (
+                <TouchableOpacity
+                  testID="send.paste-button"
+                  accessibilityRole="button"
+                  accessibilityLabel={pasteLabel}
+                  hitSlop={8}
+                  onPress={async () => take(await Clipboard.getString())}
+                  style={{ marginRight: 12 }}
+                >
+                  <ClipboardPasteIcon size={22} color={colors.fgMuted} />
+                </TouchableOpacity>
+              )}
+              {!disabled && !!onPickContact && (
+                <TouchableOpacity
+                  testID="send.address-book"
+                  accessibilityRole="button"
+                  accessibilityLabel={pickContactLabel}
+                  hitSlop={8}
+                  onPress={onPickContact}
+                  style={{ marginRight: 12 }}
+                >
+                  <ContactIcon size={24} color={colors.fgAccent} />
                 </TouchableOpacity>
               )}
               <TouchableOpacity

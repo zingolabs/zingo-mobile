@@ -239,6 +239,11 @@ export function canonicalChainAddress(chain: string, address: string): string {
  * orthogonal — surface validity in the UI only when the user has actually
  * typed something.
  */
+/** Whether the chain takes an EVM address, so an EVM payment URI fits it. */
+export function isEvmChain(chain: string): boolean {
+  return VALIDATORS[chain.toUpperCase()] === isEvm;
+}
+
 export function isValidChainAddress(chain: string, address: string): boolean {
   const trimmed = address.trim();
   if (trimmed.length === 0) return true;

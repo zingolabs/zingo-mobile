@@ -2,6 +2,8 @@ import { SwapKitHttpError } from './errors';
 import { RATE_LIMITED_MESSAGE, isRateLimited } from './rateLimited';
 import { providerShortLabel } from './providerLabels';
 import type { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
+import { swapKey, swapRaw } from './swapText';
+import type { SwapTextType } from './swapText';
 
 /**
  * Why starting a swap failed, in the user's terms.
@@ -17,11 +19,13 @@ import type { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
 export function describeCommitFailure(
   error: unknown,
   provider?: SwapKitProviderEnum,
-): string {
+): SwapTextType {
   // Before the provider's name is put on anything: a 429 is the app's quota,
   // and blaming whichever provider the route went through misleads.
   if (isRateLimited(error)) return RATE_LIMITED_MESSAGE;
-  const who = provider ? providerShortLabel(provider) : 'The provider';
+  const who: string | SwapTextType = provider
+    ? providerShortLabel(provider)
+    : swapKey('swap.msg-the-provider');
   const raw =
     `${error instanceof SwapKitHttpError ? `${error.message} ${error.body}` : String(error)}`.toLowerCase();
 
@@ -30,29 +34,29 @@ export function describeCommitFailure(
     raw.includes('noroutesfound') ||
     raw.includes('no route')
   ) {
-    return `${who} could not price this swap just now. Refresh the quote and try again, or take another route.`;
+    return swapKey('swap.msg-cannot-price', { who });
   }
   // The provider priced the swap a moment ago and now says it has no way
   // out of the asset being sold. It is the same kind of refusal as the one
   // above, but with its own code, and it is about the leg rather than the
   // price, so it gets its own sentence.
   if (raw.includes('xchain_source_route_unavailable')) {
-    return `${who} has no route out of the asset you are selling just now. Take another route, or try again later.`;
+    return swapKey('swap.msg-no-source-route', { who });
   }
   if (raw.includes('insufficientliquidity') || raw.includes('liquidity')) {
-    return `${who} does not have the liquidity for this swap right now. Try a smaller amount, or another route.`;
+    return swapKey('swap.msg-no-liquidity', { who });
   }
   if (
     raw.includes('expired') ||
     raw.includes('quote not found') ||
     raw.includes('route not found')
   ) {
-    return 'That quote is no longer good. Refresh it and start the swap again.';
+    return swapKey('swap.msg-quote-expired');
   }
   if (raw.includes('ratelimit') || raw.includes('rate limit')) {
-    return `${who} is refusing requests for the moment. Try again in a minute.`;
+    return swapKey('swap.msg-provider-busy', { who });
   }
-  return `Could not start the swap: ${error}`;
+  return swapKey('swap.msg-could-not-start', { error: swapRaw(`${error}`) });
 }
 
 /**

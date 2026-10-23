@@ -1,5 +1,16 @@
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import { unavailableProviders } from '@app/swap/unavailableProviders';
+import { unavailableProviders as unavailableProvidersText } from '@app/swap/unavailableProviders';
+import { english } from '../../__mocks__/dataMocks/swap/englishText';
+
+/** The rows with their reasons as the English app shows them. */
+const unavailableProviders = (
+  ...args: Parameters<typeof unavailableProvidersText>
+) =>
+  unavailableProvidersText(...args).map(row => ({
+    ...row,
+    reason: english(row.reason),
+  }));
+
 import type { QuoteResponseType } from '@app/swap/types/QuoteResponseType';
 import type { RouteOptionType } from '@app/swap/types/RouteOptionType';
 

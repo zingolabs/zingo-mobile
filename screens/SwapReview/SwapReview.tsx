@@ -21,6 +21,7 @@ import {
   describeCommitFailure,
   formatAmountForDisplay,
   providerShortLabel,
+  renderSwapText,
   zecNetworkFeeReserve,
 } from '@app/swap';
 import type { DepositInstructionsType } from '@app/swap';
@@ -134,7 +135,10 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
         fiatValueBasis,
       });
     } catch (e) {
-      const reason = describeCommitFailure(e, chosen.provider);
+      const reason = renderSwapText(
+        describeCommitFailure(e, chosen.provider),
+        key => (translate(key) as string).trim(),
+      );
       setCommitting(false);
       if (commitRefusalCondemnsRoute(e)) {
         leave(`refused:${chosen.provider}:${reason}`);
@@ -193,6 +197,7 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
     sendSwapDeposit,
     navigation,
     leave,
+    translate,
   ]);
 
   const onConfirm = () => {

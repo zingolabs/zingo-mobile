@@ -8,6 +8,9 @@
  * had been asked for.
  */
 
+import { swapKey, swapRaw } from './swapText';
+import type { SwapTextType } from './swapText';
+
 /** A basis-point figure as a percentage, to at most two decimals: 100 → "1". */
 function percent(bps: number): string {
   return String(Number((Math.abs(bps) / 100).toFixed(2)));
@@ -27,7 +30,7 @@ const usable = (bps: number | undefined): bps is number =>
 export function describeSlippageTolerance(
   requestedBps?: number,
   appliedBps?: number,
-): string | undefined {
+): SwapTextType | undefined {
   const requested = usable(requestedBps) ? requestedBps : undefined;
   const applied = usable(appliedBps) ? appliedBps : undefined;
   if (
@@ -35,10 +38,13 @@ export function describeSlippageTolerance(
     requested !== undefined &&
     applied !== requested
   ) {
-    return `${percent(applied)}% (${percent(requested)}% requested)`;
+    return swapKey('swap.msg-tolerance-requested', {
+      applied: percent(applied),
+      requested: percent(requested),
+    });
   }
   const shown = applied ?? requested;
-  return shown === undefined ? undefined : `${percent(shown)}%`;
+  return shown === undefined ? undefined : swapRaw(`${percent(shown)}%`);
 }
 
 /** Below this many basis points either way, the swap settled as quoted. */
@@ -59,8 +65,12 @@ const AS_QUOTED_BPS = 0.5;
  */
 export function describeRealizedSlippage(
   bps: number | undefined,
-): string | undefined {
+): SwapTextType | undefined {
   if (!usable(bps)) return undefined;
-  if (Math.abs(bps) < AS_QUOTED_BPS) return 'Received as expected';
-  return `Received ${(Math.abs(bps) / 100).toFixed(2)}% ${bps > 0 ? 'less' : 'more'} than expected`;
+  if (Math.abs(bps) < AS_QUOTED_BPS)
+    return swapKey('swap.msg-received-expected');
+  return swapKey(
+    bps > 0 ? 'swap.msg-received-less' : 'swap.msg-received-more',
+    { percent: (Math.abs(bps) / 100).toFixed(2) },
+  );
 }

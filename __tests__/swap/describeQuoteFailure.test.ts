@@ -1,6 +1,12 @@
 import { SwapOperationEnum } from '@app/swap/enums/SwapErrorCategoryEnum';
 import { SwapKitHttpError } from '@app/swap/errors';
-import { describeQuoteFailure } from '@app/swap/describeQuoteFailure';
+import { describeQuoteFailure as describeQuoteFailureText } from '@app/swap/describeQuoteFailure';
+import { english } from '../../__mocks__/dataMocks/swap/englishText';
+
+/** The sentence as the English app shows it. */
+const describeQuoteFailure = (
+  ...args: Parameters<typeof describeQuoteFailureText>
+) => english(describeQuoteFailureText(...args));
 
 describe('describeQuoteFailure', () => {
   // Measured against the live API: 0.735 ZEC, a little over $1,000, was

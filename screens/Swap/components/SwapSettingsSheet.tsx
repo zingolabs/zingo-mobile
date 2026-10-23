@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useContext, useState } from 'react';
 import { View } from 'react-native';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { space12, space16, space8 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
@@ -97,42 +97,41 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
           paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
         }}
       >
-        <BottomSheetView style={{ paddingHorizontal: space16 }}>
+        <View style={{ paddingHorizontal: space16 }}>
+          <Text variant="bodyStrong" style={{ marginTop: space8 }}>
+            {translate('swap.slippage') as string}
+          </Text>
           <View
             style={{
               flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
+              flexWrap: 'wrap',
               columnGap: space8,
+              rowGap: space8,
+              marginTop: space12,
             }}
           >
-            <Text variant="bodyStrong">
-              {translate('swap.slippage') as string}
-            </Text>
-            <View style={{ flexDirection: 'row', columnGap: space8 }}>
-              {PRESETS_BPS.map(bps => (
-                <Chip
-                  key={bps}
-                  testID={`swap.slippage.${bps}`}
-                  selected={!editing && preset === bps}
-                  onPress={() => {
-                    setEditing(false);
-                    setPreset(bps);
-                  }}
-                >
-                  {`${formatSlippagePercent(bps)}%`}
-                </Chip>
-              ))}
+            {PRESETS_BPS.map(bps => (
               <Chip
-                testID="swap.slippage.custom"
-                selected={editing}
-                onPress={() => setEditing(true)}
+                key={bps}
+                testID={`swap.slippage.${bps}`}
+                selected={!editing && preset === bps}
+                onPress={() => {
+                  setEditing(false);
+                  setPreset(bps);
+                }}
               >
-                {editing && customValid
-                  ? `${formatSlippagePercent(parsedCustom)}%`
-                  : (translate('swap.slippage-other') as string)}
+                {`${formatSlippagePercent(bps)}%`}
               </Chip>
-            </View>
+            ))}
+            <Chip
+              testID="swap.slippage.custom"
+              selected={editing}
+              onPress={() => setEditing(true)}
+            >
+              {editing && customValid
+                ? `${formatSlippagePercent(parsedCustom)}%`
+                : (translate('swap.slippage-other') as string)}
+            </Chip>
           </View>
           <Text variant="bodySmall" tone="muted" style={{ marginTop: space12 }}>
             {editing
@@ -173,7 +172,7 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
               }}
             />
           </View>
-        </BottomSheetView>
+        </View>
       </AppSheetModal>
     );
   },

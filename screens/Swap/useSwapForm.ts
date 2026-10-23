@@ -1,7 +1,15 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { AppState } from 'react-native';
 
 import { ChainNameEnum } from '@app/AppState';
+import { ContextAppLoaded } from '@app/context';
 import {
   FAILED_REFRESH_RETRY_MS,
   SwapDirectionEnum,
@@ -18,6 +26,8 @@ import {
   quoteBindsAddress,
   quoteQuestionKey,
   rateLimitWaitMs,
+  renderSwapText,
+  swapRaw,
   validateAddressForChain,
   zecNetworkFeeReserve,
 } from '@app/swap';
@@ -27,6 +37,7 @@ import type {
   QuoteInput,
   RouteOptionType,
   SwapService,
+  SwapTextType,
   TokenEntryType,
   UnavailableProviderType,
 } from '@app/swap';
@@ -109,6 +120,12 @@ export function useSwapForm({
     spendable > 0 ? SwapDirectionEnum.Outbound : SwapDirectionEnum.Inbound,
   );
   const isOutbound = direction === SwapDirectionEnum.Outbound;
+  const { translate } = useContext(ContextAppLoaded);
+  const say = useCallback(
+    (text: SwapTextType) =>
+      renderSwapText(text, key => (translate(key) as string).trim()),
+    [translate],
+  );
 
   const [tokens, setTokens] = useState<TokenEntryType[] | null>(null);
   // The catalog differs by direction and reloads on a flip, so a catalog
@@ -222,14 +239,14 @@ export function useSwapForm({
       setCatalogEdgeBlocked(edgeBlocked);
       setCatalogUnreachable(unreachable);
       setCatalogError(
-        edgeBlocked || unreachable ? '' : describeQuoteFailure(error),
+        edgeBlocked || unreachable ? '' : say(describeQuoteFailure(error)),
       );
     } finally {
       if (!token.cancelled) {
         setCatalogRetrying(false);
       }
     }
-  }, [swapService, isOutbound]);
+  }, [swapService, isOutbound, say]);
 
   useEffect(() => {
     loadCatalog();
@@ -477,10 +494,12 @@ export function useSwapForm({
       // provider's minimum, or the liquidity is gone.
       setQuoteError(
         routesNow.length === 0
-          ? describeEmptyQuote(
-              result.rawResponse,
-              quoteInput.sellAsset.ticker,
-              result.unavailable,
+          ? say(
+              describeEmptyQuote(
+                result.rawResponse,
+                quoteInput.sellAsset.ticker,
+                result.unavailable,
+              ),
             )
           : '',
       );
@@ -540,7 +559,7 @@ export function useSwapForm({
         return;
       }
       setQuoteNotice(null);
-      setQuoteError(describeQuoteFailure(error));
+      setQuoteError(say(describeQuoteFailure(error)));
       setRoutes(null);
       setUnavailable([]);
       setQuoteContext(null);
@@ -556,6 +575,7 @@ export function useSwapForm({
     slippageBps,
     boundAddress,
     deriveEphemeral,
+    say,
   ]);
 
   // Quote as soon as there is something to quote. `requestQuote` is left out
@@ -744,14 +764,14 @@ export function useSwapForm({
     (provider: SwapKitProviderEnum, reason: string) => {
       setRefused(previous => [
         ...previous.filter(row => row.provider !== provider),
-        { provider, reason },
+        { provider, reason: swapRaw(reason) },
       ]);
       setRoutes(
         previous => previous?.filter(r => r.provider !== provider) ?? previous,
       );
       setUnavailable(previous => [
         ...previous.filter(row => row.provider !== provider),
-        { provider, reason },
+        { provider, reason: swapRaw(reason) },
       ]);
       setChosenRouteId('');
       setRoutePickedByUser(false);

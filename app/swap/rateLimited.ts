@@ -1,4 +1,6 @@
 import { SwapKitHttpError } from './errors';
+import { swapKey } from './swapText';
+import type { SwapTextType } from './swapText';
 
 /**
  * Whether SwapKit turned the request away for the app's request quota.
@@ -11,8 +13,7 @@ export const isRateLimited = (error: unknown): boolean =>
   error instanceof SwapKitHttpError && error.httpStatus === 429;
 
 /** What the user is told about a 429, wherever it lands. */
-export const RATE_LIMITED_MESSAGE =
-  'The swap service is busy right now. Try again in a minute.';
+export const RATE_LIMITED_MESSAGE: SwapTextType = swapKey('swap.msg-busy');
 
 // The quota is counted per minute, so a minute is what a 429 that does not say
 // how long to wait is given. The bounds keep a header that says too little or
@@ -45,5 +46,5 @@ const minutesAndSeconds = (ms: number): string => {
 };
 
 /** What the swap screen says while it holds off. */
-export const rateLimitedNotice = (remainingMs: number): string =>
-  `The swap service is busy right now. Quotes resume in ${minutesAndSeconds(remainingMs)}.`;
+export const rateLimitedNotice = (remainingMs: number): SwapTextType =>
+  swapKey('swap.msg-busy-resume', { time: minutesAndSeconds(remainingMs) });

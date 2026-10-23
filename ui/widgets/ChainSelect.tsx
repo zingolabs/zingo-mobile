@@ -30,9 +30,6 @@ import { ChevronDown } from '@ui/primitives/Icons/Chevron';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 
-// Zcash has no entry in the bundled `chainIcons` map; use the app's own logo.
-const ZCASH_LOGO = require('../../assets/img/zcash-yellow.png');
-
 /**
  * Fixed snap point kept at module scope so the array identity is stable across
  * renders (gorhom re-measures when `snapPoints` changes identity). A fixed tall
@@ -51,7 +48,7 @@ export const ChainLogo: React.FunctionComponent<{
   size: number;
 }> = ({ chain, size }) => {
   const upper = (chain || '').toUpperCase();
-  const src = upper === 'ZEC' ? ZCASH_LOGO : getChainIcon(upper);
+  const src = getChainIcon(upper);
   if (src) {
     return (
       <Image

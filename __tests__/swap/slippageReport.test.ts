@@ -1,7 +1,18 @@
 import {
-  describeRealizedSlippage,
-  describeSlippageTolerance,
+  describeRealizedSlippage as describeRealizedSlippageText,
+  describeSlippageTolerance as describeSlippageToleranceText,
 } from '@app/swap/slippageReport';
+import { english } from '../../__mocks__/dataMocks/swap/englishText';
+
+/** The sentence as the English app shows it. */
+const describeRealizedSlippage = (
+  ...args: Parameters<typeof describeRealizedSlippageText>
+) => english(describeRealizedSlippageText(...args));
+
+/** The sentence as the English app shows it. */
+const describeSlippageTolerance = (
+  ...args: Parameters<typeof describeSlippageToleranceText>
+) => english(describeSlippageToleranceText(...args));
 
 describe('describeSlippageTolerance', () => {
   it('states the tolerance when only one figure is known', () => {

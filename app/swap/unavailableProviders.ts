@@ -5,11 +5,13 @@ import type {
   QuoteResponseType,
 } from './types/QuoteResponseType';
 import type { RouteOptionType } from './types/RouteOptionType';
+import { swapKey, swapRaw } from './swapText';
+import type { SwapTextType } from './swapText';
 
 /** A provider that returned no route, and what it said about why. */
 export type UnavailableProviderType = {
   provider: SwapKitProviderEnum;
-  reason: string;
+  reason: SwapTextType;
 };
 
 /**
@@ -74,7 +76,7 @@ export function unavailableProviders({
     if (rows.some(row => row.provider === route.provider)) continue;
     rows.push({
       provider: route.provider,
-      reason: 'This wallet cannot swap through this provider yet.',
+      reason: swapKey('swap.msg-wallet-cannot'),
     });
   }
 
@@ -90,19 +92,17 @@ export function unavailableProviders({
  * makes an entry earnable is knowing what the user should take from it, and
  * for a code nobody has seen that is a guess.
  */
-const KNOWN_REFUSALS: Readonly<Record<string, string>> = {
+const KNOWN_REFUSALS: Readonly<Record<string, SwapTextType>> = {
   // Not about this swap at all: the provider is turning requests away for the
   // moment, and the quote refreshes on its own.
-  ratelimited:
-    'The provider is refusing requests for the moment. The next quote may reach it.',
+  ratelimited: swapKey('swap.msg-refusal-rate-limited'),
   // Flashnet's answer whenever it cannot price the pair at that moment. Seen
   // coming and going on the same pair from one quote to the next.
-  estimateunavailable:
-    'Could not price this swap right now. It may be back on the next quote.',
-  insufficientliquidity: 'Not enough liquidity for this swap right now.',
+  estimateunavailable: swapKey('swap.msg-refusal-estimate'),
+  insufficientliquidity: swapKey('swap.msg-refusal-liquidity'),
   // The asset is listed but the provider rejects it; nothing the user can change.
-  invalidbuyassetaddress: 'Does not support this asset.',
-  invalidsellassetaddress: 'Does not support this asset.',
+  invalidbuyassetaddress: swapKey('swap.msg-refusal-asset'),
+  invalidsellassetaddress: swapKey('swap.msg-refusal-asset'),
 };
 
 /**
@@ -115,9 +115,9 @@ const KNOWN_REFUSALS: Readonly<Record<string, string>> = {
 function describeRefusal(
   error: QuoteProviderErrorType | undefined,
   sellAssetTicker?: string,
-): string {
+): SwapTextType {
   const unit = sellAssetTicker ? ` ${sellAssetTicker}` : '';
-  if (!error) return 'Does not trade this pair.';
+  if (!error) return swapKey('swap.msg-not-trade');
 
   const code = normaliseCode(error.errorCode) || normaliseCode(error.message);
 
@@ -126,8 +126,8 @@ function describeRefusal(
     // A minimum of zero is the formatter saying it could not read one, not a
     // provider that accepts nothing.
     return minimum === '0'
-      ? "The amount is below this provider's minimum."
-      : `Needs at least ${minimum}${unit}.`;
+      ? swapKey('swap.msg-below-provider-minimum')
+      : swapKey('swap.msg-needs-at-least', { amount: `${minimum}${unit}` });
   }
 
   // NEAR states some minimums in dollars, in prose, under a generic code
@@ -138,7 +138,7 @@ function describeRefusal(
     /minimum swap amount is \$\s?([\d.,]+)/i,
   )?.[1];
   if (usdMinimum)
-    return `Needs at least $${usdMinimum} for this swap right now.`;
+    return swapKey('swap.msg-needs-usd', { amount: `$${usdMinimum}` });
 
   // The code first, then the message: Flashnet sends its reason
   // (`estimate_unavailable`) as the message under a generic `quoteError` code.
@@ -155,8 +155,8 @@ function describeRefusal(
   // sentence beats a vague one even when it reads like a developer wrote it.
   // A single run-together token is not prose, it is an identifier: printing
   // `rate_limited` on screen tells the user nothing they can read.
-  if (message && message.includes(' ')) return message;
-  return 'Not available for this swap right now.';
+  if (message && message.includes(' ')) return swapRaw(message);
+  return swapKey('swap.msg-not-available');
 }
 
 /** A code with its casing and separators removed, so the two spellings SwapKit uses compare equal. */
