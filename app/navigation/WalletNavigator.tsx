@@ -54,6 +54,11 @@ const MigrationBatchSending = React.lazy(
 );
 const Insight = React.lazy(() => import('@screens/Insight'));
 const ComputingTxContent = React.lazy(() => import('@screens/Computing'));
+const SwapReview = React.lazy(() => import('@screens/SwapReview'));
+const SwapDeposit = React.lazy(() => import('@screens/SwapDeposit'));
+const SwapTracking = React.lazy(() => import('@screens/SwapTracking'));
+const SwapResult = React.lazy(() => import('@screens/SwapResult'));
+const SwapDetail = React.lazy(() => import('@screens/SwapDetail'));
 
 const Stack = createNativeStackNavigator<AppDrawerParamList>();
 const Tab = createBottomTabNavigator<HomeTabParamList>();
@@ -136,6 +141,7 @@ export function WalletNavigator() {
         <Stack.Screen name={Route.Messages} component={MessageList} />
         <Stack.Screen name={Route.Confirm} component={Confirm} />
         <Stack.Screen name={Route.Computing} component={ComputingTxContent} />
+        <Stack.Screen name={Route.SwapDetail} component={SwapDetail} />
       </Stack.Group>
       {/* One-way flows: no swipe back; each screen closes itself, and the
         ones that broadcast block hardware back while they run. */}
@@ -177,6 +183,10 @@ export function WalletNavigator() {
           name={Route.MigrationBatchSending}
           component={MigrationBatchSending}
         />
+        <Stack.Screen name={Route.SwapReview} component={SwapReview} />
+        <Stack.Screen name={Route.SwapDeposit} component={SwapDeposit} />
+        <Stack.Screen name={Route.SwapTracking} component={SwapTracking} />
+        <Stack.Screen name={Route.SwapResult} component={SwapResult} />
       </Stack.Group>
       {/* Overlays draw their own container transform over the screen
         behind them. */}

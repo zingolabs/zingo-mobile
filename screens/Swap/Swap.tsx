@@ -18,7 +18,8 @@ import {
   space8,
   useTheme,
 } from '@app/theme';
-import { GlobalConst } from '@app/AppState';
+import { GlobalConst, Route } from '@app/AppState';
+import { HomeTabScreenProps } from '@app/types';
 import { ContextAppLoaded, useSwapRecords, useSwapService } from '@app/context';
 import {
   formatAmountForDisplay,
@@ -27,12 +28,16 @@ import {
   rateLimitedNotice,
 } from '@app/swap';
 import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
+import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
 import { sendGateOpen } from '@app/walletBackend/transforms/mixnetView';
 import { fiatQuote, toFiatText, toZecText } from '@app/price/fiatQuote';
 import { showConfirm } from '@app/services/showConfirm';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
+import { useNavigation } from '@react-navigation/native';
+import { useResult } from '@app/navigation/results';
+import { WalletNavigation } from '@app/types';
+import { swapScreenFor } from './swapRoute';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
-import { HomeTabScreenProps } from '@app/types';
 import Utils from '@app/utils';
 import Header from '@ui/widgets/Header';
 import AppSheet from '@ui/primitives/AppSheet';
@@ -89,6 +94,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     setBackgroundError,
   } = context;
   const { colors } = useTheme();
+  const navigation = useNavigation<WalletNavigation>();
   const swapService = useSwapService();
   const records = useSwapRecords();
   const sheetSlideStyle = useOptionsPanelSheetSlide();
@@ -180,13 +186,35 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
 
   const ctaLabel = translate(`swap.cta-${form.cta}`) as string;
   const ctaEnabled = form.cta === 'ready' || form.cta === 'insufficient';
+  // The review answers under one request: cancelled, done, or a refusal
+  // with its provider and reason, which takes the route off the list.
+  useResult('swap.review', answer => {
+    if (answer === 'done') {
+      form.finish();
+      return;
+    }
+    if (answer.startsWith('refused:')) {
+      const [, provider, ...reason] = answer.split(':');
+      form.refuseRoute(provider as SwapKitProviderEnum, reason.join(':'));
+    }
+    form.cancelReview();
+  });
+  const openRecord = (recordId: string, status: SwapStatusEnum) =>
+    navigation.navigate(swapScreenFor(status), { recordId });
   const onContinue = () => {
     if (form.cta === 'insufficient') {
       insufficientSheetRef.current?.present();
       return;
     }
-    // The review screen takes it from here in the next step of the stack.
-    const proceed = () => form.review();
+    const proceed = () => {
+      const review = form.review();
+      if (review) {
+        navigation.navigate(Route.SwapReview, {
+          review,
+          direction: form.direction,
+        });
+      }
+    };
     if (form.nearNeedsConfirm) {
       showConfirm({
         title: translate('swap.near-confirm-title') as string,
@@ -320,7 +348,11 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
             }}
           >
             {!!pending && (
-              <Card tone="selected" testID="swap.pending">
+              <Card
+                tone="selected"
+                testID="swap.pending"
+                onPress={() => openRecord(pending.recordId, pending.status)}
+              >
                 <View
                   style={{
                     flexDirection: 'row',
@@ -640,7 +672,14 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
         slippageBps={form.slippageBps}
         onChange={form.setSlippageBps}
       />
-      <SwapHistorySheet ref={historySheetRef} records={records} />
+      <SwapHistorySheet
+        ref={historySheetRef}
+        records={records}
+        onOpen={record => {
+          historySheetRef.current?.dismiss();
+          openRecord(record.recordId, record.status);
+        }}
+      />
       <InsufficientFundsSheet
         ref={insufficientSheetRef}
         spendable={spendable}

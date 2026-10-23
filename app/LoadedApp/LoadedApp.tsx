@@ -109,6 +109,7 @@ import {
   closeOptionsPanel,
   OptionsPanelProvider,
 } from '@app/context/optionsPanel';
+import type { SwapDepositArgs } from '@app/walletBackend';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { rescanStep } from '@app/walletBackend/utils/syncProgress';
 import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
@@ -649,6 +650,8 @@ export class LoadedAppClass extends Component<
       setScrollToBottom: this.setScrollToBottom,
       setShieldingAmount: this.setShieldingAmount,
       sendTransaction: this.sendTransaction,
+      sendSwapDeposit: this.sendSwapDeposit,
+      resumeSwapDeposit: this.resumeSwapDeposit,
       setServerOption: this.setServerOption,
       clearToAddr: this.clearToAddr,
       doRescan: this.doRescan,
@@ -1443,6 +1446,11 @@ export class LoadedAppClass extends Component<
       return this.rpc.sendTransaction(sendJson, sendAll);
     });
 
+  sendSwapDeposit = (args: SwapDepositArgs): Promise<string[]> =>
+    this.rpc.sendSwapDeposit(args);
+
+  resumeSwapDeposit = (): Promise<string[]> => this.rpc.resumeSwapDeposit();
+
   doRefresh = (what: 'valueTransfers' | 'messages') => {
     if (what === 'valueTransfers') {
       // Value Transfers
@@ -2032,6 +2040,8 @@ export class LoadedAppClass extends Component<
       setScrollToBottom: this.setScrollToBottom,
       setShieldingAmount: this.setShieldingAmount,
       sendTransaction: this.sendTransaction,
+      sendSwapDeposit: this.sendSwapDeposit,
+      resumeSwapDeposit: this.resumeSwapDeposit,
       setServerOption: this.setServerOption,
       clearToAddr: this.clearToAddr,
       doRescan: this.doRescan,

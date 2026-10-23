@@ -14,6 +14,16 @@ import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConf
 import { depositSpendsSourceAddress } from '@app/swap/depositRouting';
 import { SyncCoordinator } from './SyncCoordinator';
 
+// What a swap deposit needs: where, how much, and the memo or source address
+// rule that decides its shape.
+export type SwapDepositArgs = {
+  depositAddress: string;
+  amountAtomic: number;
+  memoBytes?: Uint8Array;
+  viaSourceAddress?: boolean;
+  shieldedMemoAddress?: string;
+};
+
 export class TransactionService {
   config: WalletBackendConfig;
   syncCoordinator: SyncCoordinator;
@@ -115,13 +125,7 @@ export class TransactionService {
   // point. The same pair, carrying no memo, serves a provider that checks the
   // deposit came from the declared source address. Otherwise it is one
   // ordinary send, with Maya's shielded memo as a 0 ZEC note beside it.
-  async sendSwapDeposit(args: {
-    depositAddress: string;
-    amountAtomic: number;
-    memoBytes?: Uint8Array;
-    viaSourceAddress?: boolean;
-    shieldedMemoAddress?: string;
-  }): Promise<string[]> {
+  async sendSwapDeposit(args: SwapDepositArgs): Promise<string[]> {
     const carriesMemo = !!args.memoBytes && args.memoBytes.length > 0;
     if (!depositSpendsSourceAddress(args)) {
       const sendJson: Array<SendJsonToTypeType> = [
@@ -151,6 +155,26 @@ export class TransactionService {
         args.memoBytes && carriesMemo ? bytesToHex(args.memoBytes) : '',
       );
       const parsed: RPCSendType = JSON.parse(answer);
+      if (parsed.error) {
+        throw new Error(parsed.error);
+      }
+      return parsed.txids ?? [];
+    } finally {
+      await this.syncCoordinator.refreshSync();
+      await this.syncCoordinator.configure();
+      this.setInSend(false);
+    }
+  }
+
+  // Transmits the stored OP_RETURN step of a deposit whose deshield already
+  // went out, which zingolib keeps until this is called. Answers the vault
+  // payment's txid alone.
+  async resumeSwapDeposit(): Promise<string[]> {
+    await this.syncCoordinator.clearTimers();
+    this.setInSend(true);
+    this.config.keepAwake(true);
+    try {
+      const parsed: RPCSendType = JSON.parse(await RPCModule.confirmProcess());
       if (parsed.error) {
         throw new Error(parsed.error);
       }
