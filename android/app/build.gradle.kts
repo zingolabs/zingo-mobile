@@ -366,22 +366,25 @@ androidComponents {
 }
 
 
-// The React Native plugin registers the Sonatype snapshot repository first
-// on every project, so each uncached lookup asks it before Maven Central.
-// Only a nightly (-SNAPSHOT) react-native resolves there, and package.json
-// pins a release. The plugin offers no switch for it, so this hook removes
-// it. The plugins block applies the plugin before this script body runs,
-// so the plugin's afterEvaluate registers first and this hook runs after it.
-// Reading the url of the Binding Layer repository runs the fetch, and the
-// hook skips that repository by name.
-val snapshotRepositoryHost = "central.sonatype.com"
+// The React Native plugin registers a snapshot repository first on every
+// project, for its nightly builds, so each uncached lookup asks it before
+// Maven Central. package.json pins a release, which never resolves from a
+// snapshot repository. The plugin offers no switch for it, so this hook
+// removes every remote repository whose path names snapshots. The plugin
+// adds its repositories to every project from the afterEvaluate of :app,
+// registered when the plugins block applied it, before this script body,
+// so this hook runs after that. Reading the url of the Binding Layer
+// repository runs the fetch, and the hook skips that repository by name.
+// `yarn check:repositories` audits the result.
+val remoteSchemes = setOf("http", "https")
 val bindingLayerRepositoryName = "bindingLayer"
 afterEvaluate {
     rootProject.allprojects {
         repositories.removeAll { repository ->
             repository is MavenArtifactRepository &&
                 repository.name != bindingLayerRepositoryName &&
-                repository.url.host == snapshotRepositoryHost
+                repository.url.scheme in remoteSchemes &&
+                repository.url.path.contains("snapshot", ignoreCase = true)
         }
     }
 }
