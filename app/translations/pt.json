@@ -232,7 +232,11 @@
     "email-error-title": "Error ao abrir o cliente de e-mail",
     "email-error-body": "Acesse as configurações do seu dispositivo e defina um aplicativo de e-mail padrão para enviar o relatório.",
     "migration-title": "Migração de carteira",
-    "migration-body": "Estamos migrando sua carteira para o novo sistema de sincronização. Mantenha seu dispositivo conectado à energia e ao Wi-Fi.\n\nSeu saldo mudará conforme a migração avança. Não se preocupe, seus fundos estão seguros!"
+    "migration-body": "Estamos migrando sua carteira para o novo sistema de sincronização. Mantenha seu dispositivo conectado à energia e ao Wi-Fi.\n\nSeu saldo mudará conforme a migração avança. Não se preocupe, seus fundos estão seguros!",
+    "tab-home": "Início",
+    "tab-send": "Enviar",
+    "tab-receive": "Receber",
+    "tab-swap": "Swap"
   },
   "rpc": {
     "restorebackup-error": "Erro: Não foi possível restaurar o backup da carteira.",

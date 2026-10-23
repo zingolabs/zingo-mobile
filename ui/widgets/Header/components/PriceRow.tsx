@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { Image, View, ViewStyle } from 'react-native';
-import { useTheme } from '@app/theme';
+import { radiusMd, useTheme } from '@app/theme';
 
 import { ServerType, TranslateType } from '@app/AppState';
 import { fiatQuote } from '@app/price/fiatQuote';
@@ -61,7 +61,7 @@ export const PriceCard: React.FC<PriceCardProps> = React.memo(
           alignItems: 'center',
           paddingHorizontal: 12,
           paddingVertical: 6,
-          borderRadius: 10,
+          borderRadius: radiusMd,
           backgroundColor: colors.bgSurface,
           borderWidth: 1,
           borderColor: colors.bottomSheetBorder,

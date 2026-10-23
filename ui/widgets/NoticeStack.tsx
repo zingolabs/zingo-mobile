@@ -161,34 +161,39 @@ const Card: React.FunctionComponent<{
           left: 0,
           right: 0,
           zIndex: 3 - depth,
-          overflow: 'hidden',
           borderRadius: RADIUS,
+          // The shadow is cast upward, onto the balance, by the front card
+          // only; it sits outside the clip below, which would cut it.
+          boxShadow:
+            depth === 0 ? `0 -6px 18px ${colors.shadowNotice}` : undefined,
         },
         frame,
       ]}
     >
-      <Animated.View style={content}>
-        <View onLayout={e => onMeasure(e.nativeEvent.layout.height)}>
-          {children}
-        </View>
-      </Animated.View>
-      <Animated.View
-        pointerEvents="none"
-        style={[
-          {
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-            borderRadius: RADIUS,
-            borderWidth: 1,
-            borderColor: colors.bottomSheetBorder,
-            backgroundColor: colors.bgSurface,
-          },
-          deck,
-        ]}
-      />
+      <View style={{ flexGrow: 1, overflow: 'hidden', borderRadius: RADIUS }}>
+        <Animated.View style={content}>
+          <View onLayout={e => onMeasure(e.nativeEvent.layout.height)}>
+            {children}
+          </View>
+        </Animated.View>
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            {
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              borderRadius: RADIUS,
+              borderWidth: 1,
+              borderColor: colors.bottomSheetBorder,
+              backgroundColor: colors.bgSurface,
+            },
+            deck,
+          ]}
+        />
+      </View>
     </Animated.View>
   );
 };

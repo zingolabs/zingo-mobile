@@ -232,7 +232,11 @@
     "email-error-title": "Error al abrir el cliente de correo electrónico",
     "email-error-body": "Ingresa a los Ajustes de tu dispositivo y configura una aplicación de correo predeterminada para enviar el reporte.",
     "migration-title": "Migración de la billetera",
-    "migration-body": "Estamos migrando tu billetera al nuevo sistema de sincronización. Mantén tu dispositivo conectado a la corriente y al wifi.\n\nTu saldo cambiará a medida que avance la migración. ¡No te preocupes, tus fondos están seguros!"
+    "migration-body": "Estamos migrando tu billetera al nuevo sistema de sincronización. Mantén tu dispositivo conectado a la corriente y al wifi.\n\nTu saldo cambiará a medida que avance la migración. ¡No te preocupes, tus fondos están seguros!",
+    "tab-home": "Inicio",
+    "tab-send": "Enviar",
+    "tab-receive": "Recibir",
+    "tab-swap": "Swap"
   },
   "rpc": {
     "restorebackup-error": "Error: No se pudo restaurar la copia de seguridad del monedero.",
