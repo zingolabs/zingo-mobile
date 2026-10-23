@@ -85,6 +85,33 @@ const fadeIn = () =>
   FadeIn.duration(duration.base).reduceMotion(ReduceMotion.System);
 const fadeOut = () =>
   FadeOut.duration(duration.fast).reduceMotion(ReduceMotion.System);
+/**
+ * Fades its content back in whenever `key` changes, without remounting it.
+ * Keyed views with entering and exiting animations piled up when the
+ * networks were tapped quickly (each tap left one copy leaving while the next
+ * came in), which flickered; here a new tap just restarts the one fade.
+ */
+function useSwapFade(key: string, delay = 0) {
+  const opacity = useSharedValue(1);
+  const first = React.useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    opacity.value = withSequence(
+      withTiming(0, { duration: 0 }),
+      withTiming(0, { duration: delay }),
+      withTiming(1, {
+        duration: duration.base,
+        easing: ease.standard,
+        reduceMotion: ReduceMotion.System,
+      }),
+    );
+  }, [key, delay, opacity]);
+  return useAnimatedStyle(() => ({ opacity: opacity.value }));
+}
+
 const layout = () =>
   LinearTransition.duration(240)
     .easing(ease.emphasized)
@@ -503,6 +530,9 @@ const Server: React.FunctionComponent<ServerProps> = ({
     </>
   );
 
+  const cardFade = useSwapFade(`${cardName}|${cardSub}`);
+  const bodyFade = useSwapFade(tab, duration.fast);
+
   return (
     <View style={{ flex: 1 }} onLayout={onLayout}>
       <View
@@ -527,12 +557,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
         }}
       >
         <StatusDot status={cardStatus} offline={offline} />
-        <Animated.View
-          key={`${cardName}|${cardSub}`}
-          entering={fadeIn()}
-          exiting={fadeOut()}
-          style={{ flex: 1, minWidth: 0 }}
-        >
+        <Animated.View style={[{ flex: 1, minWidth: 0 }, cardFade]}>
           <RegText
             numberOfLines={1}
             style={{ fontSize: 15, lineHeight: 19, fontWeight: '500' }}
@@ -599,12 +624,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
           showsVerticalScrollIndicator={false}
         >
           <Animated.View
-            key={tab}
-            entering={FadeIn.duration(200)
-              .delay(120)
-              .reduceMotion(ReduceMotion.System)}
-            exiting={FadeOut.duration(120).reduceMotion(ReduceMotion.System)}
-            style={lockStyle}
+            style={[lockStyle, bodyFade]}
             pointerEvents={offline ? 'none' : 'auto'}
           >
             {body}
