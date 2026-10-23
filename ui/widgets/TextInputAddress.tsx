@@ -1,9 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
 import { useInsetFill } from '@ui/primitives/Surface';
-import { View, TouchableOpacity, TextInput } from 'react-native';
+import { View, Pressable, TextInput } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useTheme, slopFor, radiusMd, space4 } from '@app/theme';
+import {
+  useTheme,
+  radiusMd,
+  space4,
+  iconSize,
+  iconSizeMd,
+  touchTarget,
+} from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
@@ -65,6 +72,30 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate, server } = context;
   const { colors } = useTheme();
+  /** An action inside the field, as in Send's recipient field: 44 pt, muted. */
+  const action = (
+    testID: string | undefined,
+    label: string,
+    icon: React.ReactNode,
+    onPress: () => void,
+    off?: boolean,
+  ) => (
+    <Pressable
+      testID={testID}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      disabled={off}
+      onPress={onPress}
+      style={{
+        width: touchTarget,
+        height: touchTarget,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      {icon}
+    </Pressable>
+  );
   const inset = useInsetFill();
 
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
@@ -222,72 +253,50 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                 justifyContent: 'center',
               }}
             >
-              {!!address && !disabled && (
-                <TouchableOpacity
-                  hitSlop={slopFor(20)}
-                  onPress={() => {
-                    setAddress('');
-                  }}
-                >
-                  <XIcon
-                    style={{ marginRight: 5 }}
-                    size={20}
-                    color={colors.fgAccentDisabled}
-                  />
-                </TouchableOpacity>
+              {!!address &&
+                !disabled &&
+                action(
+                  undefined,
+                  translate('clear') as string,
+                  <XIcon size={iconSizeMd} color={colors.fgMuted} />,
+                  () => setAddress(''),
+                )}
+              {validAddress === 1 &&
+                !disabled &&
+                !!onSaveContact &&
+                action(
+                  'send.save-contact-button',
+                  saveContactLabel ?? '',
+                  <UserPlusIcon size={iconSizeMd} color={colors.fgMuted} />,
+                  onSaveContact,
+                )}
+              {!address &&
+                !disabled &&
+                !!pasteLabel &&
+                action(
+                  'send.paste-button',
+                  pasteLabel,
+                  <ClipboardPasteIcon
+                    size={iconSizeMd}
+                    color={colors.fgMuted}
+                  />,
+                  async () => take(await Clipboard.getString()),
+                )}
+              {!disabled &&
+                !!onPickContact &&
+                action(
+                  'send.address-book',
+                  pickContactLabel ?? '',
+                  <ContactIcon size={iconSize} color={colors.fgMuted} />,
+                  onPickContact,
+                )}
+              {action(
+                'send.scan-button',
+                translate('send.scan-acc') as string,
+                <ScanIcon size={iconSize} color={colors.fgMuted} />,
+                () => setQrcodeModalShow(),
+                disabled,
               )}
-              {validAddress === 1 && !disabled && !!onSaveContact && (
-                <TouchableOpacity
-                  testID="send.save-contact-button"
-                  accessibilityRole="button"
-                  accessibilityLabel={saveContactLabel}
-                  hitSlop={8}
-                  onPress={onSaveContact}
-                  style={{ marginRight: 12 }}
-                >
-                  <UserPlusIcon size={22} color={colors.fgMuted} />
-                </TouchableOpacity>
-              )}
-              {!address && !disabled && !!pasteLabel && (
-                <TouchableOpacity
-                  testID="send.paste-button"
-                  accessibilityRole="button"
-                  accessibilityLabel={pasteLabel}
-                  hitSlop={8}
-                  onPress={async () => take(await Clipboard.getString())}
-                  style={{ marginRight: 12 }}
-                >
-                  <ClipboardPasteIcon size={22} color={colors.fgMuted} />
-                </TouchableOpacity>
-              )}
-              {!disabled && !!onPickContact && (
-                <TouchableOpacity
-                  testID="send.address-book"
-                  accessibilityRole="button"
-                  accessibilityLabel={pickContactLabel}
-                  hitSlop={8}
-                  onPress={onPickContact}
-                  style={{ marginRight: 12 }}
-                >
-                  <ContactIcon size={24} color={colors.fgAccent} />
-                </TouchableOpacity>
-              )}
-              <TouchableOpacity
-                testID="send.scan-button"
-                disabled={disabled}
-                accessible={true}
-                accessibilityLabel={translate('send.scan-acc') as string}
-                hitSlop={8}
-                onPress={() => {
-                  setQrcodeModalShow();
-                }}
-              >
-                <ScanIcon
-                  style={{ marginRight: 5 }}
-                  size={24}
-                  color={colors.fgMuted}
-                />
-              </TouchableOpacity>
             </View>
           </View>
         </View>

@@ -77,6 +77,7 @@ exports[`TextInputAddress - snapshots TextInputAddress disabled without label 1`
         >
           <View
             accessibilityLabel="text translated"
+            accessibilityRole="button"
             accessibilityState={
               {
                 "busy": undefined,
@@ -96,9 +97,10 @@ exports[`TextInputAddress - snapshots TextInputAddress disabled without label 1`
             }
             accessible={true}
             collapsable={false}
-            focusable={false}
-            hitSlop={8}
+            focusable={true}
+            onBlur={[Function]}
             onClick={[Function]}
+            onFocus={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -107,7 +109,10 @@ exports[`TextInputAddress - snapshots TextInputAddress disabled without label 1`
             onStartShouldSetResponder={[Function]}
             style={
               {
-                "opacity": 1,
+                "alignItems": "center",
+                "height": 44,
+                "justifyContent": "center",
+                "width": 44,
               }
             }
             testID="send.scan-button"
@@ -219,6 +224,7 @@ exports[`TextInputAddress - snapshots TextInputAddress empty, enabled, with labe
         >
           <View
             accessibilityLabel="text translated"
+            accessibilityRole="button"
             accessibilityState={
               {
                 "busy": undefined,
@@ -239,8 +245,9 @@ exports[`TextInputAddress - snapshots TextInputAddress empty, enabled, with labe
             accessible={true}
             collapsable={false}
             focusable={true}
-            hitSlop={8}
+            onBlur={[Function]}
             onClick={[Function]}
+            onFocus={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -249,7 +256,10 @@ exports[`TextInputAddress - snapshots TextInputAddress empty, enabled, with labe
             onStartShouldSetResponder={[Function]}
             style={
               {
-                "opacity": 1,
+                "alignItems": "center",
+                "height": 44,
+                "justifyContent": "center",
+                "width": 44,
               }
             }
             testID="send.scan-button"

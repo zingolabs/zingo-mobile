@@ -100,6 +100,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
           >
             <View
               accessibilityLabel="text translated"
+              accessibilityRole="button"
               accessibilityState={
                 {
                   "busy": undefined,
@@ -120,8 +121,9 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
               accessible={true}
               collapsable={false}
               focusable={true}
-              hitSlop={8}
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -130,7 +132,10 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
               onStartShouldSetResponder={[Function]}
               style={
                 {
-                  "opacity": 1,
+                  "alignItems": "center",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "width": 44,
                 }
               }
               testID="send.scan-button"
