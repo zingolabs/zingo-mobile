@@ -447,7 +447,8 @@
     "sync-connecting": "{host} sunucusuna bağlanılıyor…",
     "sync-syncing": "Senkronize ediliyor %{n}",
     "sync-mobile-data": "Mobil veri",
-    "sync-open-report": "Senkronizasyon raporunu aç"
+    "sync-open-report": "Senkronizasyon raporunu aç",
+    "sync-behind": "Geride kalıyor"
   },
   "info": {
     "error-price-fetch": "ZEC fiyatı alınamadı.",

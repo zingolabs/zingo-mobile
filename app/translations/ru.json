@@ -447,7 +447,8 @@
     "sync-connecting": "Подключение к {host}…",
     "sync-syncing": "Синхронизация {n}%",
     "sync-mobile-data": "Мобильные данные",
-    "sync-open-report": "Открыть отчёт о синхронизации"
+    "sync-open-report": "Открыть отчёт о синхронизации",
+    "sync-behind": "Отстаёт"
   },
   "info": {
     "error-price-fetch": "Не удалось получить цену ZEC.",
