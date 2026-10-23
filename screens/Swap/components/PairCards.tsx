@@ -13,7 +13,7 @@ import type { TokenEntryType } from '@app/swap';
 import Text from '@ui/primitives/Text';
 import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
 import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
-import { InfoTipButton } from '@ui/widgets/InfoTip';
+import InfoTooltip from '@ui/widgets/InfoTooltip';
 import AssetButton from './AssetButton';
 import { ZEC_TOKEN_ENTRY } from '@screens/Swap/swapAssets';
 
@@ -360,11 +360,13 @@ export default function PairCards({
               {texts.youReceive}
             </Text>
             {!isOutbound && !!texts.receiveTip && (
-              <InfoTipButton
+              <InfoTooltip
                 testID="swap.receive-info"
                 label={texts.youReceive}
                 text={texts.receiveTip}
-              />
+              >
+                <></>
+              </InfoTooltip>
             )}
           </View>
         </Animated.View>

@@ -19,8 +19,9 @@ type InfoTooltipProps = {
   label: string;
   title?: string;
   text: string;
-  open: boolean;
-  onToggle: (open: boolean) => void;
+  /** Controlled from outside, to keep one bubble open at a time; absent, it keeps its own state. */
+  open?: boolean;
+  onToggle?: (open: boolean) => void;
   testID?: string;
   // Label and icon sit at the start of the row instead of centred.
   alignStart?: boolean;
@@ -56,8 +57,8 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
   label,
   title,
   text,
-  open,
-  onToggle,
+  open: openProp,
+  onToggle: onToggleProp,
   testID,
   alignStart,
   alignEnd,
@@ -66,6 +67,9 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
   children,
 }) => {
   const { colors } = useTheme();
+  const [openOwn, setOpenOwn] = useState(false);
+  const open = openProp ?? openOwn;
+  const onToggle = onToggleProp ?? setOpenOwn;
   const containerRef = useRef<View>(null);
   const iconRef = useRef<View>(null);
   const [containerW, setContainerW] = useState(0);

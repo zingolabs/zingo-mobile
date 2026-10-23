@@ -21,7 +21,7 @@ import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import { SearchIcon } from '@ui/primitives/Icons/SearchIcon';
-import ContactInitial from '@screens/Swap/components/ContactInitial';
+import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 
 /** A pasted address reads in the monospace face, as everywhere else. */
 const MONO = Platform.select({ ios: 'Menlo', default: 'monospace' });
@@ -103,25 +103,15 @@ export default function RecipientField({
   const transparent = valid === 1 && /^t/i.test(text);
   const searching = matches.length > 0 || lookup.kind !== 'none';
 
-  const avatarFor = (name: string, color?: string) =>
-    color ? (
-      <ContactInitial name={name} color={color} size={32} />
-    ) : (
-      <View
-        style={{
-          width: 32,
-          height: 32,
-          borderRadius: 16,
-          backgroundColor: colors.bgMutedSubtle,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Text style={{ color: colors.fgMuted, fontWeight: '700' }}>
-          {name.slice(0, 1).toUpperCase()}
-        </Text>
-      </View>
-    );
+  /** A Zcash Name not in the book draws its avatar from the name. */
+  const avatarFor = (name: string, color?: string) => (
+    <Avatar
+      kind="contact"
+      name={name}
+      category={avatarCategoryOf(color ?? name)}
+      size="md"
+    />
+  );
 
   const resultRow = (
     key: string,

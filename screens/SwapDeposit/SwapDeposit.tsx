@@ -16,7 +16,6 @@ import TextField from '@ui/primitives/TextField';
 import Banner from '@ui/widgets/Banner';
 import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
-import { InfoTipHost } from '@ui/widgets/InfoTip';
 import DepositSlip from '@screens/Swap/components/DepositSlip';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
 import { countdownText, depositDeadlineMs } from '@screens/Swap/swapProgress';
@@ -239,50 +238,42 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   }
 
   return (
-    <InfoTipHost>
-      <SwapFlowScreen
-        testID="swap.deposit"
-        title={translate('swap.deposit-title') as string}
-        footer={
-          <View style={{ rowGap: space8 }}>
-            <Button
-              testID="swap.deposit.sent"
-              variant="primary"
-              title={translate('swap.deposit-sent') as string}
-              onPress={() =>
-                navigation.replace(Route.SwapTracking, { recordId })
-              }
-            />
-            <Text
-              variant="caption"
-              tone="muted"
-              style={{ textAlign: 'center' }}
-            >
-              {translate('swap.deposit-leave-note') as string}
-            </Text>
-          </View>
-        }
-      >
-        <DepositSlip record={record} />
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            columnGap: 6,
-            marginTop: 14,
-          }}
-        >
-          <ClockIcon size={14} color={colors.fgMuted} />
-          <Text variant="caption" tone="muted">
-            {(translate('swap.deposit-time-left') as string).replace(
-              '{time}',
-              countdownText(remainingMs),
-            )}
+    <SwapFlowScreen
+      testID="swap.deposit"
+      title={translate('swap.deposit-title') as string}
+      footer={
+        <View style={{ rowGap: space8 }}>
+          <Button
+            testID="swap.deposit.sent"
+            variant="primary"
+            title={translate('swap.deposit-sent') as string}
+            onPress={() => navigation.replace(Route.SwapTracking, { recordId })}
+          />
+          <Text variant="caption" tone="muted" style={{ textAlign: 'center' }}>
+            {translate('swap.deposit-leave-note') as string}
           </Text>
         </View>
-      </SwapFlowScreen>
-    </InfoTipHost>
+      }
+    >
+      <DepositSlip record={record} />
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          columnGap: 6,
+          marginTop: 14,
+        }}
+      >
+        <ClockIcon size={14} color={colors.fgMuted} />
+        <Text variant="caption" tone="muted">
+          {(translate('swap.deposit-time-left') as string).replace(
+            '{time}',
+            countdownText(remainingMs),
+          )}
+        </Text>
+      </View>
+    </SwapFlowScreen>
   );
 };
 

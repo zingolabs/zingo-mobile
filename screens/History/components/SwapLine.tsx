@@ -21,8 +21,8 @@ import {
   swapInFlight,
   swapRowText,
 } from '@screens/History/historyRowText';
-import HistoryAvatar, { AVATAR_SIZE } from './HistoryAvatar';
-import ContactInitial from '@screens/Swap/components/ContactInitial';
+import HistoryAvatar from './HistoryAvatar';
+import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import HistoryRowBody from './HistoryRowBody';
 
 type SwapLineProps = {
@@ -102,11 +102,12 @@ function SwapLine({
       <HistoryRowBody
         leading={
           contact ? (
-            <ContactInitial
+            <Avatar
+              kind="contact"
               name={contact.label}
-              color={contact.color}
-              size={AVATAR_SIZE}
-              badge={other.ticker ?? other.symbol}
+              category={avatarCategoryOf(contact.color)}
+              chain={other.ticker ?? other.symbol}
+              size="md"
             />
           ) : (
             <HistoryAvatar icon={icon} badge={other} />

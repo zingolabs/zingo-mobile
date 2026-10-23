@@ -6,7 +6,7 @@ import { radiusMd, space12, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import Text from '@ui/primitives/Text';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
-import { InfoTipButton } from '@ui/widgets/InfoTip';
+import InfoTooltip from '@ui/widgets/InfoTooltip';
 
 export type DetailRow = {
   label: string;
@@ -15,7 +15,7 @@ export type DetailRow = {
   copy?: string;
   /** Long words that wrap instead of sitting on one line. */
   wrap?: boolean;
-  /** What the label means, behind an info icon; needs an InfoTipHost above. */
+  /** What the label means, behind an info icon. */
   tip?: string;
   /** Green for what you get, amber for what came back, Nym green for the mixnet. */
   tone?: 'positive' | 'warning' | 'nym';
@@ -69,7 +69,11 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
             <Text variant="caption" tone="muted">
               {row.label}
             </Text>
-            {!!row.tip && <InfoTipButton label={row.label} text={row.tip} />}
+            {!!row.tip && (
+              <InfoTooltip label={row.label} text={row.tip}>
+                <></>
+              </InfoTooltip>
+            )}
           </View>
           <View
             style={{

@@ -213,10 +213,10 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
             {
               "alignItems": "center",
               "backgroundColor": "#8888881F",
-              "borderRadius": 28,
-              "height": 56,
+              "borderRadius": 999,
+              "height": 48,
               "justifyContent": "center",
-              "width": 56,
+              "width": 48,
             }
           }
         />
@@ -893,10 +893,10 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
             {
               "alignItems": "center",
               "backgroundColor": "#8888881F",
-              "borderRadius": 28,
-              "height": 56,
+              "borderRadius": 999,
+              "height": 48,
               "justifyContent": "center",
-              "width": 56,
+              "width": 48,
             }
           }
         />

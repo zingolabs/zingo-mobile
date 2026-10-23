@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
 import { radiusMd, space12, space16, touchTarget, useTheme } from '@app/theme';
+import { SurfaceContext, useInsetFill } from '@ui/primitives/Surface';
 
 export type CardTone =
   'default' | 'selected' | 'orchard' | 'ironwood' | 'sapling';
@@ -16,7 +17,8 @@ type CardProps = {
 };
 
 /**
- * The raised surface that groups content on the canvas. `selected` marks the
+ * The raised surface that groups content: one step from what it sits on
+ * (`bgSurface` on the canvas, `bgCanvas` in a sheet or panel). `selected` marks the
  * chosen option among cards; pair it with a radio or check so the state does
  * not rest on color alone. A pool tone always carries the pool's `Tag`.
  */
@@ -28,8 +30,14 @@ const Card: React.FunctionComponent<CardProps> = ({
   testID,
 }) => {
   const { colors } = useTheme();
+  const inset = useInsetFill();
+  /** What sits inside paints one step from the card itself. */
+  const inner = inset === colors.bgCanvas ? 'canvas' : 'surface';
+  const body = (
+    <SurfaceContext.Provider value={inner}>{children}</SurfaceContext.Provider>
+  );
   const paint = {
-    default: { bg: colors.bgSurface, edge: colors.bottomSheetBorder },
+    default: { bg: inset, edge: colors.bottomSheetBorder },
     selected: { bg: colors.bgAccentSubtle, edge: colors.borderAccent },
     orchard: { bg: colors.bgOrchard, edge: colors.borderOrchard },
     ironwood: { bg: colors.bgIronwood, edge: colors.borderIronwood },
@@ -55,11 +63,11 @@ const Card: React.FunctionComponent<CardProps> = ({
         opacity: pressed ? 0.8 : 1,
       })}
     >
-      {children}
+      {body}
     </Pressable>
   ) : (
     <View testID={testID} style={style}>
-      {children}
+      {body}
     </View>
   );
 };

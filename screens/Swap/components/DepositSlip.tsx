@@ -19,7 +19,7 @@ import Text from '@ui/primitives/Text';
 import Banner from '@ui/widgets/Banner';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
-import { InfoTipButton } from '@ui/widgets/InfoTip';
+import InfoTooltip from '@ui/widgets/InfoTooltip';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 
 /** The memo a provider's order carries, when its data names one. */
@@ -212,10 +212,12 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
               {t(memo ? 'swap.amount' : 'swap.send-exactly')}
             </Text>
             {!memo && (
-              <InfoTipButton
+              <InfoTooltip
                 label={t('swap.send-exactly')}
                 text={t('swap.tip-exact')}
-              />
+              >
+                <></>
+              </InfoTooltip>
             )}
           </View>,
           <Pressable

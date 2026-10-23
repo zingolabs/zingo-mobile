@@ -9,6 +9,7 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { radiusSheet, useTheme } from '@app/theme';
+import { SurfaceContext } from './Surface';
 import { duration, ease } from '@app/theme/motion';
 
 /** Every sheet opens and closes in 420 ms on (.2,0,0,1). */
@@ -95,8 +96,10 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
             contentStyle,
           ]}
         >
-          {header}
-          {children}
+          <SurfaceContext.Provider value="surface">
+            {header}
+            {children}
+          </SurfaceContext.Provider>
         </View>
         {!handle && <SheetRim />}
       </>

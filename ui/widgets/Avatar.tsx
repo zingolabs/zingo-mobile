@@ -9,6 +9,19 @@ import { ChainLogo } from './ChainSelect';
 /** Stored with the contact and kept for its whole life. */
 export type AvatarCategory = 1 | 2 | 3 | 4 | 5;
 
+/**
+ * The category of a contact that does not store one yet: the same seed (its
+ * colour, or a Zcash Name) always gives the same category.
+ */
+export function avatarCategoryOf(seed: string): AvatarCategory {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) % 9973;
+  }
+  const categories: AvatarCategory[] = [1, 2, 3, 4, 5];
+  return categories[hash % categories.length];
+}
+
 type AvatarProps =
   | {
       kind: 'contact';
@@ -19,7 +32,15 @@ type AvatarProps =
       chain?: string;
       size?: 'md' | 'lg';
     }
-  | { kind: 'wallet'; size?: 'md' | 'lg' };
+  | { kind: 'wallet'; size?: 'md' | 'lg' }
+  /** No contact to show: what the transaction does, as an icon. */
+  | {
+      kind: 'icon';
+      icon: React.ComponentType<{ size?: number; color?: string }>;
+      /** A transaction that failed. */
+      danger?: boolean;
+      size?: 'md' | 'lg';
+    };
 
 const SIDE = { md: 36, lg: 48 };
 const RING = 2;
@@ -29,6 +50,29 @@ const Avatar: React.FunctionComponent<AvatarProps> = props => {
   const { colors } = useTheme();
   const side = SIDE[props.size ?? 'md'];
   const badge = Math.round(side * 0.42);
+
+  if (props.kind === 'icon') {
+    const Mark = props.icon;
+    return (
+      <View
+        style={{
+          width: side,
+          height: side,
+          borderRadius: radiusPill,
+          backgroundColor: props.danger
+            ? colors.bgDangerSubtle
+            : colors.bgMutedSubtle,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Mark
+          size={props.size === 'lg' ? iconSize : iconSizeMd}
+          color={colors.fgDefault}
+        />
+      </View>
+    );
+  }
 
   if (props.kind === 'wallet') {
     return (

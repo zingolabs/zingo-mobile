@@ -13,7 +13,7 @@ import { ContextAppLoaded } from '@app/context';
 import { useBiometricGate } from '@app/hooks/useBiometricGate';
 import DetailRows, { DetailRow } from '@screens/Swap/components/DetailRows';
 import NymNote from '@screens/Swap/components/NymNote';
-import ContactInitial from '@screens/Swap/components/ContactInitial';
+import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import { kindKey } from '@screens/Send/components/RecipientField';
 
 import { AppDrawerParamList } from '@app/types';
@@ -142,28 +142,21 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   ];
 
   const avatar = contact ? (
-    <ContactInitial name={contact.label} color={contact.color} size={56} />
+    <Avatar
+      kind="contact"
+      name={contact.label}
+      category={avatarCategoryOf(contact.color)}
+      size="lg"
+    />
+  ) : to.znsAlias ? (
+    <Avatar
+      kind="contact"
+      name={to.znsAlias}
+      category={avatarCategoryOf(to.znsAlias)}
+      size="lg"
+    />
   ) : (
-    <View
-      style={{
-        width: 56,
-        height: 56,
-        borderRadius: 28,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: colors.bgMutedSubtle,
-      }}
-    >
-      {to.znsAlias ? (
-        <Text
-          style={{ fontSize: 21, fontWeight: '700', color: colors.fgMuted }}
-        >
-          {to.znsAlias.slice(0, 1).toUpperCase()}
-        </Text>
-      ) : (
-        <ArrowUpIcon size={24} color={colors.fgMuted} />
-      )}
-    </View>
+    <Avatar kind="icon" icon={ArrowUpIcon} size="lg" />
   );
 
   return (

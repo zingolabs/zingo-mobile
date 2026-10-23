@@ -13,6 +13,7 @@ import {
   touchTarget,
   useTheme,
 } from '@app/theme';
+import { useInsetFill } from './Surface';
 import Text from './Text';
 import { fieldBorder, FieldValidity } from './fieldBorder';
 import { Icon } from './Icons/Icon';
@@ -59,6 +60,7 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
   testID,
 }) => {
   const { colors } = useTheme();
+  const inset = useInsetFill();
   const [focused, setFocused] = useState(false);
   const validity: FieldValidity =
     error !== undefined ? 'invalid' : valid ? 'valid' : 'unknown';
@@ -74,7 +76,7 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
           minHeight: fieldMinHeight,
           flexDirection: 'row',
           alignItems: 'center',
-          backgroundColor: colors.bgSurface,
+          backgroundColor: inset,
           borderRadius: radiusMd,
           borderWidth: 1,
           borderColor: fieldBorder(colors, focused, validity),

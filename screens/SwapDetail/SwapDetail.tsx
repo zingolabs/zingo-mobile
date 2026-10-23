@@ -53,8 +53,7 @@ import DetailRows from '@screens/Swap/components/DetailRows';
 import type { DetailRow } from '@screens/Swap/components/DetailRows';
 import ShieldNote from '@screens/Swap/components/ShieldNote';
 import SaveContactSheet from '@screens/Swap/components/SaveContactSheet';
-import ContactInitial from '@screens/Swap/components/ContactInitial';
-import { InfoTipHost } from '@ui/widgets/InfoTip';
+import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
 import { swapOutcome } from '@screens/Swap/swapProgress';
@@ -256,10 +255,11 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
               : Utils.trimToSmall(record.destinationAddress, 6),
             copy: record.destinationAddress,
             leading: contact ? (
-              <ContactInitial
+              <Avatar
+                kind="contact"
                 name={contact.label}
-                color={contact.color}
-                size={24}
+                category={avatarCategoryOf(contact.color)}
+                size="md"
               />
             ) : undefined,
           },
@@ -304,251 +304,247 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
   const LegsChevron = legsOpen ? ChevronUp : ChevronDown;
 
   return (
-    <InfoTipHost>
-      <SwapFlowScreen
-        testID="swap.detail"
-        title={t('swap.detail-title')}
-        onBack={close}
-        footer={
-          <ButtonStack>
-            {canRemoveSwap(record.status) && (
-              <Button
-                testID="swap.detail.remove"
-                variant="quiet"
-                title={t('swap.detail-remove')}
-                onPress={remove}
-              />
-            )}
-            {!!explorerUrl && (
-              <Button
-                testID="swap.detail.explorer"
-                variant="text"
-                title={t('swap.detail-explorer')}
-                onPress={() => Linking.openURL(explorerUrl)}
-              />
-            )}
-          </ButtonStack>
-        }
-      >
-        <DetailHero
-          icon={
-            isTerminalStatus(record.status) ? (
-              <SwapIcon size={18} color={colors.fgDefault} />
-            ) : (
-              <ClockIcon size={18} color={colors.fgDefault} />
-            )
-          }
-          badge={other}
-          title={title}
-          amount={hero.amount}
-          unit={hero.unit}
-          tone={hero.tone}
-          line={hero.line}
-          pill={pill.text}
-          pillTone={pill.tone}
-        />
-
-        {awaitingDeposit && (
-          <View style={{ marginVertical: space12, rowGap: space12 }}>
-            <Text variant="bodyStrong">
-              {t(sell ? 'swap.deposit-unsent-title' : 'swap.deposit-title')}
-            </Text>
-            <DepositSlip record={record} paid={sell} />
-            <Text variant="bodySmall" tone="muted">
-              {t(
-                sell
-                  ? 'swap.deposit-paid-elsewhere'
-                  : 'swap.deposit-already-paid',
-              )}
-            </Text>
-            <TextField
-              testID="swap.detail.hash"
-              label={t('swap.deposit-hash')}
-              value={hash}
-              onChangeText={setHash}
-              placeholder={t('swap.deposit-hash-placeholder')}
-              mono
-              error={attachError || undefined}
-              trailingLabel={t('swap.paste')}
-              onTrailingPress={async () =>
-                setHash((await Clipboard.getString()).trim())
-              }
-            />
+    <SwapFlowScreen
+      testID="swap.detail"
+      title={t('swap.detail-title')}
+      onBack={close}
+      footer={
+        <ButtonStack>
+          {canRemoveSwap(record.status) && (
             <Button
-              inline
-              variant="text"
-              title={t('swap.deposit-follow')}
-              disabled={attaching || hash.trim().length === 0}
-              busy={attaching}
-              onPress={attach}
+              testID="swap.detail.remove"
+              variant="quiet"
+              title={t('swap.detail-remove')}
+              onPress={remove}
             />
-          </View>
-        )}
+          )}
+          {!!explorerUrl && (
+            <Button
+              testID="swap.detail.explorer"
+              variant="text"
+              title={t('swap.detail-explorer')}
+              onPress={() => Linking.openURL(explorerUrl)}
+            />
+          )}
+        </ButtonStack>
+      }
+    >
+      <DetailHero
+        icon={
+          isTerminalStatus(record.status) ? (
+            <SwapIcon size={18} color={colors.fgDefault} />
+          ) : (
+            <ClockIcon size={18} color={colors.fgDefault} />
+          )
+        }
+        badge={other}
+        title={title}
+        amount={hero.amount}
+        unit={hero.unit}
+        tone={hero.tone}
+        line={hero.line}
+        pill={pill.text}
+        pillTone={pill.tone}
+      />
 
-        <DetailRows rows={rows} />
+      {awaitingDeposit && (
+        <View style={{ marginVertical: space12, rowGap: space12 }}>
+          <Text variant="bodyStrong">
+            {t(sell ? 'swap.deposit-unsent-title' : 'swap.deposit-title')}
+          </Text>
+          <DepositSlip record={record} paid={sell} />
+          <Text variant="bodySmall" tone="muted">
+            {t(
+              sell
+                ? 'swap.deposit-paid-elsewhere'
+                : 'swap.deposit-already-paid',
+            )}
+          </Text>
+          <TextField
+            testID="swap.detail.hash"
+            label={t('swap.deposit-hash')}
+            value={hash}
+            onChangeText={setHash}
+            placeholder={t('swap.deposit-hash-placeholder')}
+            mono
+            error={attachError || undefined}
+            trailingLabel={t('swap.paste')}
+            onTrailingPress={async () =>
+              setHash((await Clipboard.getString()).trim())
+            }
+          />
+          <Button
+            inline
+            variant="text"
+            title={t('swap.deposit-follow')}
+            disabled={attaching || hash.trim().length === 0}
+            busy={attaching}
+            onPress={attach}
+          />
+        </View>
+      )}
 
-        {done && sell && !contact && (
+      <DetailRows rows={rows} />
+
+      {done && sell && !contact && (
+        <Pressable
+          testID="swap.detail.save-contact"
+          accessibilityRole="button"
+          onPress={() => saveSheetRef.current?.present()}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            columnGap: space8,
+            minHeight: 44,
+            marginTop: space8,
+          }}
+        >
+          <UserPlusIcon size={18} color={colors.fgPriceUp} />
+          <Text
+            variant="caption"
+            style={{ fontWeight: '700', color: colors.fgPriceUp }}
+          >
+            {t('swap.detail-save-contact').replace('{coin}', getSym)}
+          </Text>
+        </Pressable>
+      )}
+
+      {legs.length > 0 && (
+        <View style={{ marginTop: space12 }}>
           <Pressable
-            testID="swap.detail.save-contact"
+            testID="swap.detail.legs"
             accessibilityRole="button"
-            onPress={() => saveSheetRef.current?.present()}
+            accessibilityState={{ expanded: legsOpen }}
+            onPress={() => setLegsOpen(open => !open)}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              justifyContent: 'center',
-              columnGap: space8,
-              minHeight: 44,
-              marginTop: space8,
+              justifyContent: 'space-between',
+              paddingVertical: 11,
             }}
           >
-            <UserPlusIcon size={18} color={colors.fgPriceUp} />
-            <Text
-              variant="caption"
-              style={{ fontWeight: '700', color: colors.fgPriceUp }}
-            >
-              {t('swap.detail-save-contact').replace('{coin}', getSym)}
-            </Text>
-          </Pressable>
-        )}
-
-        {legs.length > 0 && (
-          <View style={{ marginTop: space12 }}>
-            <Pressable
-              testID="swap.detail.legs"
-              accessibilityRole="button"
-              accessibilityState={{ expanded: legsOpen }}
-              onPress={() => setLegsOpen(open => !open)}
+            <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingVertical: 11,
+                columnGap: 8,
               }}
             >
+              <Text variant="bodySmall" tone={legsOpen ? 'default' : 'muted'}>
+                {t('swap.detail-transactions')}
+              </Text>
               <View
                 style={{
-                  flexDirection: 'row',
+                  minWidth: 20,
+                  paddingHorizontal: 6,
+                  borderRadius: 10,
+                  backgroundColor: colors.bgMutedSubtle,
                   alignItems: 'center',
-                  columnGap: 8,
                 }}
               >
-                <Text variant="bodySmall" tone={legsOpen ? 'default' : 'muted'}>
-                  {t('swap.detail-transactions')}
+                <Text variant="caption" tone="muted">
+                  {String(legs.length)}
                 </Text>
-                <View
-                  style={{
-                    minWidth: 20,
-                    paddingHorizontal: 6,
-                    borderRadius: 10,
-                    backgroundColor: colors.bgMutedSubtle,
-                    alignItems: 'center',
-                  }}
-                >
-                  <Text variant="caption" tone="muted">
-                    {String(legs.length)}
-                  </Text>
-                </View>
               </View>
-              <LegsChevron size={15} color={colors.fgMuted} />
-            </Pressable>
-            {legsOpen && (
-              <LegsCard>
-                {legs.map((leg, index) => {
-                  const received = leg.kind === ValueTransferKindEnum.Received;
-                  return (
-                    <Pressable
-                      key={`${leg.txid}:${leg.kind}`}
-                      testID={`swap.detail.leg.${index}`}
-                      accessibilityRole="button"
-                      onPress={() =>
-                        navigation.navigate(Route.SwapTransaction, {
-                          recordId,
-                          txid: leg.txid,
-                          kind: leg.kind,
-                        })
-                      }
+            </View>
+            <LegsChevron size={15} color={colors.fgMuted} />
+          </Pressable>
+          {legsOpen && (
+            <LegsCard>
+              {legs.map((leg, index) => {
+                const received = leg.kind === ValueTransferKindEnum.Received;
+                return (
+                  <Pressable
+                    key={`${leg.txid}:${leg.kind}`}
+                    testID={`swap.detail.leg.${index}`}
+                    accessibilityRole="button"
+                    onPress={() =>
+                      navigation.navigate(Route.SwapTransaction, {
+                        recordId,
+                        txid: leg.txid,
+                        kind: leg.kind,
+                      })
+                    }
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      columnGap: space12,
+                      minHeight: 44,
+                      paddingVertical: 10,
+                      paddingHorizontal: 14,
+                      borderTopWidth: index === 0 ? 0 : 1,
+                      borderTopColor: colors.borderSubtle,
+                    }}
+                  >
+                    <View style={{ flexShrink: 1 }}>
+                      <Text variant="bodyStrong" style={{ fontSize: 13 }}>
+                        {legName(leg, record, t)}
+                      </Text>
+                      <Text variant="caption" tone="muted">
+                        {Utils.formatDate(
+                          leg.time * 1000,
+                          'MMM d, h:mm aaa',
+                          language,
+                        )}
+                      </Text>
+                    </View>
+                    <View
                       style={{
                         flexDirection: 'row',
                         alignItems: 'center',
-                        justifyContent: 'space-between',
-                        columnGap: space12,
-                        minHeight: 44,
-                        paddingVertical: 10,
-                        paddingHorizontal: 14,
-                        borderTopWidth: index === 0 ? 0 : 1,
-                        borderTopColor: colors.borderSubtle,
+                        columnGap: space8,
                       }}
                     >
-                      <View style={{ flexShrink: 1 }}>
-                        <Text variant="bodyStrong" style={{ fontSize: 13 }}>
-                          {legName(leg, record, t)}
-                        </Text>
-                        <Text variant="caption" tone="muted">
-                          {Utils.formatDate(
-                            leg.time * 1000,
-                            'MMM d, h:mm aaa',
-                            language,
-                          )}
-                        </Text>
-                      </View>
-                      <View
+                      <Text
+                        variant="bodyStrong"
                         style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          columnGap: space8,
+                          color: received ? colors.fgPriceUp : colors.fgDefault,
                         }}
                       >
-                        <Text
-                          variant="bodyStrong"
-                          style={{
-                            color: received
-                              ? colors.fgPriceUp
-                              : colors.fgDefault,
-                          }}
-                        >
-                          {`${received ? '+' : '−'}${leg.amount.toFixed(4)} ${info.currencyName}`}
-                        </Text>
-                        <ChevronRight size={16} color={colors.fgMuted} />
-                      </View>
-                    </Pressable>
-                  );
-                })}
-              </LegsCard>
-            )}
-          </View>
-        )}
+                        {`${received ? '+' : '−'}${leg.amount.toFixed(4)} ${info.currencyName}`}
+                      </Text>
+                      <ChevronRight size={16} color={colors.fgMuted} />
+                    </View>
+                  </Pressable>
+                );
+              })}
+            </LegsCard>
+          )}
+        </View>
+      )}
 
-        {receivedTransparent && (
-          <View style={{ marginTop: space12 }}>
-            <ShieldNote text={t('swap.shield-note')} />
-          </View>
-        )}
-        {done && sell && (
-          <SaveContactSheet
-            ref={saveSheetRef}
-            address={canonicalChainAddress(
-              record.receiveAsset.chain,
-              record.destinationAddress,
-            )}
-            chain={record.receiveAsset.chain}
-            book={addressBook}
-            onSave={async name => {
-              setAddressBook(
-                await AddressBookFileImpl.saveChainContact(
-                  name,
-                  record.destinationAddress,
-                  record.receiveAsset.chain,
-                ),
-              );
-              addLastSnackbar(
-                t('addressbook.added').replace('{name}', name),
-                SnackbarDurationEnum.short,
-              );
-            }}
-          />
-        )}
-      </SwapFlowScreen>
-    </InfoTipHost>
+      {receivedTransparent && (
+        <View style={{ marginTop: space12 }}>
+          <ShieldNote text={t('swap.shield-note')} />
+        </View>
+      )}
+      {done && sell && (
+        <SaveContactSheet
+          ref={saveSheetRef}
+          address={canonicalChainAddress(
+            record.receiveAsset.chain,
+            record.destinationAddress,
+          )}
+          chain={record.receiveAsset.chain}
+          book={addressBook}
+          onSave={async name => {
+            setAddressBook(
+              await AddressBookFileImpl.saveChainContact(
+                name,
+                record.destinationAddress,
+                record.receiveAsset.chain,
+              ),
+            );
+            addLastSnackbar(
+              t('addressbook.added').replace('{name}', name),
+              SnackbarDurationEnum.short,
+            );
+          }}
+        />
+      )}
+    </SwapFlowScreen>
   );
 };
 

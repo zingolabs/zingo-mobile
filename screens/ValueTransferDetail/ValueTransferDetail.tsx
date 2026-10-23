@@ -36,7 +36,7 @@ import { RefreshIcon } from '@ui/primitives/Icons/RefreshIcon';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import DetailRows from '@screens/Swap/components/DetailRows';
 import type { DetailRow } from '@screens/Swap/components/DetailRows';
-import ContactInitial from '@screens/Swap/components/ContactInitial';
+import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 
 type ValueTransferDetailProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -119,36 +119,24 @@ const ValueTransferDetail: React.FunctionComponent<
   const avatar = (() => {
     if (contact && sent) {
       return (
-        <ContactInitial name={contact.label} color={contact.color} size={56} />
+        <Avatar
+          kind="contact"
+          name={contact.label}
+          category={avatarCategoryOf(contact.color)}
+          size="lg"
+        />
       );
     }
-    const icon = pending ? (
-      <ClockIcon size={24} color={colors.fgDefault} />
-    ) : received ? (
-      <ArrowDownIcon size={24} color={colors.fgDefault} />
-    ) : vt.kind === ValueTransferKindEnum.Shield ? (
-      <ShieldIcon size={24} color={colors.fgDefault} />
-    ) : vt.kind === ValueTransferKindEnum.SendToSelf ? (
-      <RefreshIcon size={24} color={colors.fgDefault} />
-    ) : (
-      <ArrowUpIcon size={24} color={colors.fgDefault} />
-    );
-    return (
-      <View
-        style={{
-          width: 56,
-          height: 56,
-          borderRadius: 28,
-          backgroundColor: failed
-            ? colors.bgDangerSubtle
-            : colors.bgMutedSubtle,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        {icon}
-      </View>
-    );
+    const icon = pending
+      ? ClockIcon
+      : received
+        ? ArrowDownIcon
+        : vt.kind === ValueTransferKindEnum.Shield
+          ? ShieldIcon
+          : vt.kind === ValueTransferKindEnum.SendToSelf
+            ? RefreshIcon
+            : ArrowUpIcon;
+    return <Avatar kind="icon" icon={icon} danger={failed} size="lg" />;
   })();
 
   const status = failed
@@ -204,10 +192,11 @@ const ValueTransferDetail: React.FunctionComponent<
             value: Utils.trimToSmall(vt.address, 6),
             copy: vt.address,
             leading: contact ? (
-              <ContactInitial
+              <Avatar
+                kind="contact"
                 name={contact.label}
-                color={contact.color}
-                size={24}
+                category={avatarCategoryOf(contact.color)}
+                size="md"
               />
             ) : undefined,
           },
