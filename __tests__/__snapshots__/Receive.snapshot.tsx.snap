@@ -493,8 +493,8 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
     style={
       [
         {
-          "borderTopLeftRadius": 40,
-          "borderTopRightRadius": 40,
+          "borderTopLeftRadius": 28,
+          "borderTopRightRadius": 28,
           "overflow": "hidden",
         },
         {

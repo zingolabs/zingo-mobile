@@ -11,6 +11,13 @@ export const duration = {
   screen: 420,
   sheet: 420,
   sheetClose: 260,
+  /** A full panel (a transaction, a review) rising over the tabs, and lowering. */
+  panelIn: 560,
+  panelOut: 460,
+  /** Steps inside a full panel: review, sending, sent. */
+  step: 150,
+  /** Switching home tabs. */
+  tabFade: 240,
   leavesPart: 640,
   leavesReturn: 720,
   hero: 1100,
@@ -24,4 +31,6 @@ export const ease = {
   spring: Easing.bezier(0.34, 1.56, 0.64, 1),
   standard: Easing.bezier(0.4, 0, 0.2, 1),
   in: Easing.bezier(0.4, 0, 1, 1),
+  /** The long, soft deceleration of a full panel rising. */
+  panel: Easing.bezier(0.32, 0.72, 0, 1),
 } as const;
