@@ -57,7 +57,7 @@ export async function stopSyncAndWait(
       if (!poll.toLowerCase().startsWith('sync task is not complete')) {
         return;
       }
-    } catch (error) {
+    } catch {
       return;
     }
     await new Promise(resolve => setTimeout(resolve, STOP_POLL_MS));
