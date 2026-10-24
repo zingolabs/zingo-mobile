@@ -412,7 +412,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
           <UserPlusIcon size={iconSizeMd} color={colors.fgAccent} />
           <Text
             variant="caption"
-            style={{ fontWeight: '700', color: colors.fgAccent }}
+            style={{ flexShrink: 1, fontWeight: '700', color: colors.fgAccent }}
           >
             {t('swap.detail-save-contact').replace('{coin}', getSym)}
           </Text>

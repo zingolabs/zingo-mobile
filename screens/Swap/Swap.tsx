@@ -517,7 +517,11 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                   }}
                 >
                   <InfoIcon size={iconSizeSm} color={colors.fgDanger} />
-                  <Text variant="bodySmall" tone="danger">
+                  <Text
+                    variant="bodySmall"
+                    tone="danger"
+                    style={{ flexShrink: 1 }}
+                  >
                     {translate('swap.over-balance') as string}
                   </Text>
                 </View>

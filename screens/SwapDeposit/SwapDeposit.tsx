@@ -266,7 +266,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
         }}
       >
         <ClockIcon size={iconSizeSm} color={colors.fgMuted} />
-        <Text variant="caption" tone="muted">
+        <Text variant="caption" tone="muted" style={{ flexShrink: 1 }}>
           {(translate('swap.deposit-time-left') as string).replace(
             '{time}',
             countdownText(remainingMs),
