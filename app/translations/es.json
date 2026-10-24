@@ -922,7 +922,8 @@
     "result-missing": "Falta",
     "detail-save-contact": "Guardar esta dirección de {coin} como contacto",
     "tx-privacy": "Privacidad",
-    "tx-private": "Privado · NYM Enhanced"
+    "tx-private": "Privado · NYM Enhanced",
+    "no-route-now": "Ahora mismo no hay ninguna ruta disponible para este swap."
   },
   "history": {
     "shield-all": "Blindar Todos\nlos fondos",

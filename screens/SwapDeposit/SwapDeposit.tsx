@@ -222,7 +222,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
           tone="warning"
           title={translate('swap.deposit-unsent') as string}
         >
-          {!!retryError && <Text variant="bodySmall">{retryError}</Text>}
+          {retryError || undefined}
         </Banner>
         <View style={{ height: space12 }} />
         <DepositSlip record={record} paid />

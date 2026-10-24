@@ -922,7 +922,8 @@
     "result-missing": "Eksik",
     "detail-save-contact": "Bu {coin} adresini kişi olarak kaydet",
     "tx-privacy": "Gizlilik",
-    "tx-private": "Gizli · NYM Enhanced"
+    "tx-private": "Gizli · NYM Enhanced",
+    "no-route-now": "Şu anda bu takas için kullanılabilir bir rota yok."
   },
   "history": {
     "shield-all": "Tüm Fonları Koru",

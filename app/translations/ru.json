@@ -922,7 +922,8 @@
     "result-missing": "Не хватает",
     "detail-save-contact": "Сохранить этот адрес {coin} как контакт",
     "tx-privacy": "Приватность",
-    "tx-private": "Приватно · NYM Enhanced"
+    "tx-private": "Приватно · NYM Enhanced",
+    "no-route-now": "Сейчас для этого обмена нет доступного маршрута."
   },
   "history": {
     "shield-all": "Экранирование всех средств",

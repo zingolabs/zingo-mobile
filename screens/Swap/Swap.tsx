@@ -438,9 +438,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                   tone="warning"
                   title={translate('swap.edge-blocked-title') as string}
                 >
-                  <Text variant="bodySmall">
-                    {translate('swap.edge-blocked-body') as string}
-                  </Text>
+                  {translate('swap.edge-blocked-body') as string}
                 </Banner>
               )}
               {!!form.catalogError && (
@@ -753,20 +751,16 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
               {form.cta === 'noRoutes' && (
                 <Banner
                   tone="warning"
-                  title={translate('swap.no-routes-title') as string}
+                  title={translate('swap.no-route-now') as string}
                 >
-                  <Text variant="bodySmall">
-                    {form.quoteError ||
-                      (translate('swap.no-routes-body') as string)}
-                  </Text>
                   {form.unavailable.length > 0 && (
-                    <View style={{ marginTop: 8, rowGap: 8 }}>
+                    <View style={{ rowGap: space4 }}>
                       <Pressable
                         testID="swap.see-why"
                         accessibilityRole="button"
                         accessibilityState={{ expanded: whyOpen }}
                         onPress={() => setWhyOpen(open => !open)}
-                        hitSlop={8}
+                        hitSlop={space8}
                         style={{
                           flexDirection: 'row',
                           alignItems: 'center',
@@ -776,7 +770,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                         <Text
                           variant="caption"
                           tone="warning"
-                          style={{ fontWeight: '700' }}
+                          style={{ textDecorationLine: 'underline' }}
                         >
                           {translate('swap.see-why') as string}
                         </Text>
@@ -799,14 +793,9 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                             variant="caption"
                             tone="muted"
                           >
-                            <Text
-                              variant="caption"
-                              style={{ fontWeight: '600' }}
-                            >
-                              {providerShortLabel(row.provider)}
-                            </Text>
-                            {` · ${renderSwapText(row.reason, key =>
-                              (translate(key) as string).trim(),
+                            {`${providerShortLabel(row.provider)} · ${renderSwapText(
+                              row.reason,
+                              key => (translate(key) as string).trim(),
                             )}`}
                           </Text>
                         ))}
