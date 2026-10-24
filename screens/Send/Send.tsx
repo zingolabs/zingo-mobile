@@ -993,6 +993,9 @@ const Send: React.FunctionComponent<SendProps> = () => {
         >
           <Header
             title={''}
+            noBalance={true}
+            noSyncingStatus={true}
+            noPrivacy={true}
             setPrivacyOption={setPrivacyOption}
             addLastSnackbar={addLastSnackbar /* context */}
             setShieldingAmount={setShieldingAmount}
@@ -1008,6 +1011,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
         <AppSheet
           ref={sendSheetRef}
           snapPoints={sendSnapPoints}
+          animateOnMount={false}
           header={sendHeader}
         >
           <ScrollView

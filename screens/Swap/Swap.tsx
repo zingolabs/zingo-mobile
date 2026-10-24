@@ -360,8 +360,12 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
         style={{ flex: 1 }}
         onLayout={e => setContainerH(e.nativeEvent.layout.height)}
       >
+        {/* Only the top bar: the panel covers the rest, and nothing should show while it settles. */}
         <Header
           title={''}
+          noBalance={true}
+          noSyncingStatus={true}
+          noPrivacy={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
           setShieldingAmount={setShieldingAmount}
@@ -372,7 +376,12 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
           pointerEvents="box-none"
           style={[StyleSheet.absoluteFill, sheetSlideStyle]}
         >
-          <AppSheet ref={sheetRef} snapPoints={snapPoints} header={sheetHeader}>
+          <AppSheet
+            ref={sheetRef}
+            snapPoints={snapPoints}
+            header={sheetHeader}
+            animateOnMount={false}
+          >
             <ScrollView
               onScroll={onTabScroll}
               scrollEventThrottle={16}

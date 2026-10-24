@@ -181,6 +181,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
       >
         <Header
           title={''}
+          noBalance={true}
+          noSyncingStatus={true}
+          noPrivacy={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
           showMessagesIcon={true}
@@ -194,6 +197,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
           <AppSheet
             ref={receiveSheetRef}
             snapPoints={receiveSnapPoints}
+            animateOnMount={false}
             header={receiveHeader}
           >
             <ScrollView
