@@ -9,6 +9,7 @@ import React, {
 
 import { ChainNameEnum, ValueTransferType } from '@app/AppState';
 import { resetPinnedAddress } from '@app/hooks/usePinnedAddress';
+import { adoptWalletOnFile } from '@app/services/WalletLocalData';
 import {
   SwapService,
   SwapStore,
@@ -65,6 +66,7 @@ export function SwapServiceProvider({
           );
           return;
         }
+        await adoptWalletOnFile(fingerprint);
         await SwapStore.bindToWallet(fingerprint);
         if (cancelled || chainName !== ChainNameEnum.mainChainName) {
           return;

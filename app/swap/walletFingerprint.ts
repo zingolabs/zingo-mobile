@@ -1,7 +1,7 @@
 /**
  * Derive a stable, per-wallet fingerprint from the wallet's UFVK.
  *
- * Used as the namespace suffix for `SwapStore`'s EncryptedStorage key so each
+ * Used as the namespace suffix for `SwapStore`'s storage key so each
  * wallet on the same device sees only its own swap records. Without this,
  * a victim restoring their seed onto a device where a previous wallet had
  * been used would inherit the prior wallet's swap history (privacy leak),

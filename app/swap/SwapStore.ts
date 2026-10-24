@@ -41,8 +41,7 @@ async function markKeyAsCleared(
 /**
  * Parse a raw string as a JSON array of `SwapRecordType`. Returns `null` on
  * any failure so callers can distinguish "invalid data, discard" from
- * "empty array, keep". Used to validate the legacy-key contents and the
- * backup slot before we act on them.
+ * "empty array, keep". Used to validate a bucket before we act on it.
  */
 function tryParseRecordsArray(raw: string): SwapRecordType[] | null {
   try {
@@ -96,8 +95,10 @@ function tryParseRecordsArray(raw: string): SwapRecordType[] | null {
  * wallets on the same device write to different keys; that is the privacy
  * boundary.
  */
+export const SWAP_RECORDS_KEY_PREFIX = 'swap:records:';
+
 function storageKeyFor(fingerprint: string): string {
-  return `swap:records:${fingerprint}`;
+  return SWAP_RECORDS_KEY_PREFIX + fingerprint;
 }
 
 /**
@@ -285,9 +286,9 @@ export class SwapStore {
   }
 
   /**
-   * Wipe the records for a specific wallet's bucket. Invoked from the delete
-   * flow before the wallet file itself is deleted, so the swap records of a
-   * wallet the user is abandoning do not linger on disk.
+   * Wipe the records for a specific wallet's bucket. Called through
+   * `WalletLocalData` on every path that deletes or replaces the wallet
+   * file, so its swap records do not outlive it.
    */
   static async clearForWallet(fingerprint: string): Promise<void> {
     return this.enqueue(async () => {
