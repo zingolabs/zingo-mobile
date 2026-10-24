@@ -16,6 +16,8 @@ type TokenLogoProps = {
   surfaceColor: string;
   /** Badge the chain even on its native asset, so both swap chips match. */
   forceBadge?: boolean;
+  /** No chain badge: a coin on several networks whose network is not picked yet. */
+  hideBadge?: boolean;
 };
 
 /**
@@ -29,6 +31,7 @@ export default function TokenLogo({
   size,
   surfaceColor,
   forceBadge,
+  hideBadge,
 }: TokenLogoProps) {
   const { colors } = useTheme();
   // A light canvas behind the few near-black marks that vanish on the sheet.
@@ -52,7 +55,7 @@ export default function TokenLogo({
   }
   const isNative = token.chain === token.symbol;
   const chainIcon = getChainIcon(token.chain);
-  const showBadge = (forceBadge || !isNative) && !!chainIcon;
+  const showBadge = !hideBadge && (forceBadge || !isNative) && !!chainIcon;
   const badgeSize = Math.max(10, Math.round(size * 0.42));
   const ring = 2;
   const badgeWrap = badgeSize + ring * 2;

@@ -178,6 +178,7 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
               size={32}
               surfaceColor={colors.bgSurface}
               forceBadge={!multi}
+              hideBadge={multi}
             />
           }
           title={group.ticker}
