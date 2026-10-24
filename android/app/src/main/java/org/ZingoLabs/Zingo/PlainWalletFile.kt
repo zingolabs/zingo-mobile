@@ -4,6 +4,8 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.nio.channels.FileChannel
+import java.nio.file.StandardOpenOption
 import java.security.MessageDigest
 
 /**
@@ -22,7 +24,10 @@ object PlainWalletFile {
 
     // Writes to "$fileName.plain.tmp", verifies the synced read-back, then
     // renames onto the final path, which keeps its old content until then.
-    fun write(dir: File, fileName: String, bytes: ByteArray) {
+    fun write(dir: File, fileName: String, bytes: ByteArray) =
+        write(dir, fileName, bytes, ::syncDirectory)
+
+    internal fun write(dir: File, fileName: String, bytes: ByteArray, syncDirectory: (File) -> Unit) {
         if (!WalletFileEnvelope.looksLikePlainWallet(bytes)) {
             throw IOException("Error: refusing to write $fileName, the bytes are not a plain wallet")
         }
@@ -39,9 +44,16 @@ object PlainWalletFile {
                 if (!temp.renameTo(File(dir, fileName))) {
                     throw IOException("Error: could not rename ${temp.name} onto $fileName")
                 }
+                syncDirectory(dir)
             } finally {
                 temp.delete()
             }
+        }
+    }
+
+    private fun syncDirectory(dir: File) {
+        FileChannel.open(dir.toPath(), StandardOpenOption.READ).use { channel ->
+            channel.force(true)
         }
     }
 
