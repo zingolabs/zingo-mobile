@@ -8,6 +8,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import type { ReactTestInstance } from 'react-test-renderer';
 import Send from '@screens/Send';
+import Utils from '@app/utils';
 import ImportUfvk from '@screens/ImportUfvk';
 import Server from '@screens/Server';
 import {
@@ -69,7 +70,11 @@ function loadedState() {
 describe('Maestro reaches each typed field on iOS', () => {
   const onFunction = jest.fn();
 
-  test('the Send address and memo fields', () => {
+  test('the Send address and memo fields', async () => {
+    jest
+      .spyOn(Utils, 'isValidAddress')
+      .mockResolvedValue({ isValid: true, shieldedOnlyUA: '' });
+    jest.spyOn(Utils, 'isValidOrchardOrSaplingAddress').mockResolvedValue(true);
     const state = loadedState();
     state.valueTransfers = mockValueTransfers;
     state.addresses = mockAddresses;
@@ -80,6 +85,9 @@ describe('Maestro reaches each typed field on iOS', () => {
         <Send {...tabProps()} />
       </ContextAppLoadedProvider>,
     );
+    // The memo is inline in the form and shows once a shielded address is
+    // checked, which resolves after the first render.
+    await send.findByTestId('send.memo-field');
     for (const id of [
       'send.addressplaceholder',
       'send.address.clear',

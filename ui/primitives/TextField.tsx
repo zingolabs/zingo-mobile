@@ -4,7 +4,6 @@ import { Platform, Pressable, TextInput, View } from 'react-native';
 import {
   fieldMinHeight,
   fontScaleBody,
-  iconSize,
   iconSizeMd,
   radiusMd,
   space12,
@@ -19,6 +18,69 @@ import Text from './Text';
 import { fieldBorder, FieldValidity } from './fieldBorder';
 import { Icon } from './Icons/Icon';
 import { XIcon } from './Icons/XIcon';
+
+/** An action inside a field: 36 on screen, its tap area grown to 44. */
+const ACTION = 36;
+const ACTION_SLOP = (touchTarget - ACTION) / 2;
+
+/**
+ * An icon action inside a field (clear, paste, book, scan): the icon at 20
+ * in fgMuted, 36 wide with its tap area grown to 44. Fields line them up 4
+ * apart, 4 from the edge.
+ */
+export const FieldAction = React.forwardRef<
+  View,
+  {
+    icon: React.ComponentType<{ size?: number; color?: string }>;
+    label: string;
+    onPress: () => void;
+    disabled?: boolean;
+    testID?: string;
+  }
+>(function FieldActionButton(
+  { icon: ActionIcon, label, onPress, disabled, testID },
+  ref,
+) {
+  const { colors } = useTheme();
+  return (
+    <Pressable
+      ref={ref}
+      testID={testID}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      disabled={disabled}
+      onPress={onPress}
+      hitSlop={ACTION_SLOP}
+      style={{
+        width: ACTION,
+        height: ACTION,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <ActionIcon
+        size={iconSizeMd}
+        color={disabled ? colors.fgAccentDisabled : colors.fgMuted}
+      />
+    </Pressable>
+  );
+});
+
+/** The row of a field's actions: 4 apart and 4 from its right edge. */
+export function FieldActions({ children }: { children: React.ReactNode }) {
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: space4,
+        paddingRight: space4,
+      }}
+    >
+      {children}
+    </View>
+  );
+}
 
 type TextFieldProps = {
   /** Above the box; '' for a field whose label sits elsewhere. */
@@ -38,6 +100,11 @@ type TextFieldProps = {
   /** Addresses and keys: monospace, and the value wraps. */
   mono?: boolean;
   multiline?: boolean;
+  /** A multiline field grows to this many lines, then scrolls inside. */
+  maxLines?: number;
+  /** The input, to focus it from outside (a shortened address tapped). */
+  inputRef?: React.Ref<TextInput>;
+  autoFocus?: boolean;
   /** An action inside the box, such as scanning a QR code. */
   trailingIcon?: React.ComponentType<React.ComponentProps<typeof Icon>>;
   trailingLabel?: string;
@@ -79,6 +146,9 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
   disabled = false,
   mono = false,
   multiline = false,
+  maxLines,
+  inputRef,
+  autoFocus,
   trailingIcon: TrailingIcon,
   trailingLabel,
   onTrailingPress,
@@ -136,6 +206,8 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
       >
         {replacement ?? (
           <TextInput
+            ref={inputRef}
+            autoFocus={autoFocus}
             testID={testID}
             accessibilityLabel={accessibilityLabel}
             maxLength={maxLength}
@@ -150,7 +222,7 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
             placeholder={placeholder}
             placeholderTextColor={colors.fgMuted}
             editable={!disabled}
-            multiline={multiline || mono}
+            multiline={multiline}
             onFocus={() => {
               setFocused(true);
               onFocus?.();
@@ -163,6 +235,9 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
             style={{
               flex: 1,
               paddingVertical: space8,
+              ...(multiline && maxLines
+                ? { maxHeight: valueStyle.lineHeight * maxLines + space8 * 2 }
+                : {}),
               paddingRight: TrailingIcon || trailing || clearable ? 0 : space12,
               color: colors.fgDefault,
               fontSize: valueStyle.fontSize,
@@ -171,38 +246,28 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
             }}
           />
         )}
-        {TrailingIcon && (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={trailingLabel}
-            onPress={onTrailingPress}
-            disabled={disabled}
-            style={{
-              width: touchTarget,
-              height: touchTarget,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <TrailingIcon size={iconSize} color={colors.fgMuted} />
-          </Pressable>
+        {(!!TrailingIcon ||
+          (clearable && !!value && !disabled) ||
+          !!trailing) && (
+          <FieldActions>
+            {clearable && !!value && !disabled && (
+              <FieldAction
+                icon={XIcon}
+                label={clearLabel ?? ''}
+                onPress={() => onChangeText('')}
+              />
+            )}
+            {trailing}
+            {!!TrailingIcon && (
+              <FieldAction
+                icon={TrailingIcon}
+                label={trailingLabel ?? ''}
+                onPress={onTrailingPress ?? (() => {})}
+                disabled={disabled}
+              />
+            )}
+          </FieldActions>
         )}
-        {clearable && !!value && !disabled && (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={clearLabel}
-            onPress={() => onChangeText('')}
-            style={{
-              width: touchTarget,
-              height: touchTarget,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <XIcon size={iconSizeMd} color={colors.fgMuted} />
-          </Pressable>
-        )}
-        {trailing}
       </View>
       {error !== undefined ? (
         <Text

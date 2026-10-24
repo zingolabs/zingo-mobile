@@ -13,27 +13,21 @@ import {
   ScrollView,
   Keyboard,
   Platform,
-  Pressable,
   StyleSheet,
   NativeSyntheticEvent,
   TextInputEndEditingEventData,
-  TextInputContentSizeChangeEventData,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useNavigation, useScrollToTop } from '@react-navigation/native';
 import {
   useTheme,
-  iconSize,
-  iconSizeMd,
   iconSizeSm,
-  slopFor,
   space4,
   space8,
   space16,
   space20,
-  touchTarget,
 } from '@app/theme';
-import TextField from '@ui/primitives/TextField';
+import TextField, { FieldAction } from '@ui/primitives/TextField';
 import { getNumberFormatSettings } from 'react-native-localize';
 
 import {
@@ -42,7 +36,6 @@ import {
 } from '@app/walletBackend/transforms/mixnetView';
 import Button from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
-import AppSheetModal from '@ui/primitives/AppSheetModal';
 import {
   SendPageStateClass,
   ToAddrClass,
@@ -80,13 +73,11 @@ import { HomeTabScreenProps, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 import { usePriceSnapAutoClose } from '@app/hooks/usePriceSnapAutoClose';
 import { RPCSendProposeType } from '@app/walletBackend/types/RPCSendProposeType';
 import ShowAddressAlertAsync from '@app/services/showAddressAlertAsync';
-import Memo from './components/Memo';
 import RecipientField from './components/RecipientField';
 import type { NameLookup } from './components/RecipientField';
 import AmountCard from './components/AmountCard';
@@ -99,7 +90,6 @@ import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendableba
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import { onTabScroll } from '@app/navigation/tabBarScroll';
-import { ZoomInIcon } from '@ui/primitives/Icons/ZoomInIcon';
 
 type SendProps = HomeTabScreenProps<'Send'>;
 
@@ -166,7 +156,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
   >('none');
   const [validMemo, setValidMemo] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState<boolean>(false);
-  const [memoIcon, setMemoIcon] = useState<boolean>(false);
   const [maxAmount, setMaxAmount] = useState<number>(0);
   const [spendable, setSpendable] = useState<number>(0);
   const [fee, setFee] = useState<number>(0);
@@ -213,7 +202,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
     useState<boolean>(false);
   // Bumped when the memo sheet is presented so the child Memo component
   // remounts with the latest memoText as its initial draft.
-  const [memoSheetKey, setMemoSheetKey] = useState<number>(0);
   // measured dynamically to compute send sheet snap points
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
@@ -237,7 +225,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
   // PriceRow-appearance bump is defined further down — it depends on
   // `sendSnapPoints`, declared later in this component.
   const prevHasPriceSnapRef = useRef<boolean>(false);
-  const memoBottomSheetRef = useRef<BottomSheetModal>(null);
   const sendErrorSheetRef = useRef<BottomSheetModal>(null);
 
   // Fee (`sendPropose`) and/or spendable-balance RPC error → the CTA turns into
@@ -255,7 +242,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
   const memoTooLong = memoBytes > GlobalConst.memoMaxLength;
   const feeCalculationGenRef = useRef<number>(0);
   const { decimalSeparator } = getNumberFormatSettings();
-  const keyboardHeight = useKeyboardHeight();
   useDismissSheetsOnBlur();
   const sheetSlideStyle = useOptionsPanelSheetSlide();
 
@@ -1008,23 +994,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
     }
   };
 
-  const setMemoModalShow = () => {
-    // Bump key so the child Memo remounts and re-reads memoText as initial.
-    setMemoSheetKey(k => k + 1);
-    memoBottomSheetRef.current?.present();
-  };
-
-  const memoHeader = (
-    <TitleBar
-      title={translate('send.memo') as string}
-      right={{
-        icon: XIcon,
-        accessibilityLabel: translate('close') as string,
-        onPress: () => memoBottomSheetRef.current?.dismiss(),
-      }}
-    />
-  );
-
   const setConfirmModalShow = async () => {
     const shown = buildSendState();
     confirmedState.current = shown;
@@ -1372,21 +1341,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                           includeUAMemoBoolean,
                         );
                       }}
-                      onContentSizeChange={(
-                        e: NativeSyntheticEvent<TextInputContentSizeChangeEventData>,
-                      ) => {
-                        const tall =
-                          e.nativeEvent.contentSize.height >
-                          (Platform.OS === GlobalConst.platformOSandroid
-                            ? 70
-                            : 35);
-                        if (tall !== memoIcon) {
-                          setMemoIcon(tall);
-                          if (tall) {
-                            scrollToEnd();
-                          }
-                        }
-                      }}
+                      maxLines={4}
                       maxLength={GlobalConst.memoMaxLength}
                       onBlur={() => setFocusedField('none')}
                       onFocus={() => {
@@ -1405,44 +1360,15 @@ const Send: React.FunctionComponent<SendProps> = () => {
                         }
                       }}
                       trailing={
-                        <>
-                          {!!memoText && (
-                            <Pressable
-                              accessibilityRole="button"
-                              accessibilityLabel={translate('clear') as string}
-                              hitSlop={slopFor(touchTarget)}
-                              onPress={() =>
-                                updateToField(null, null, null, '', null)
-                              }
-                              style={{
-                                width: touchTarget,
-                                height: touchTarget,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                              }}
-                            >
-                              <XIcon size={iconSizeMd} color={colors.fgMuted} />
-                            </Pressable>
-                          )}
-                          {memoIcon && (
-                            <Pressable
-                              accessibilityRole="button"
-                              hitSlop={slopFor(touchTarget)}
-                              onPress={() => setMemoModalShow()}
-                              style={{
-                                width: touchTarget,
-                                height: touchTarget,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                              }}
-                            >
-                              <ZoomInIcon
-                                size={iconSize}
-                                color={colors.fgMuted}
-                              />
-                            </Pressable>
-                          )}
-                        </>
+                        memoText ? (
+                          <FieldAction
+                            icon={XIcon}
+                            label={translate('clear') as string}
+                            onPress={() =>
+                              updateToField(null, null, null, '', null)
+                            }
+                          />
+                        ) : undefined
                       }
                     />
                   </View>
@@ -1539,25 +1465,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
           </ScrollView>
         </AppSheet>
       </Animated.View>
-      <AppSheetModal
-        ref={memoBottomSheetRef}
-        header={memoHeader}
-        contentStyle={{
-          paddingHorizontal: 20,
-          paddingTop: 12,
-          paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
-        }}
-      >
-        <Memo
-          key={memoSheetKey}
-          closeSheet={() => memoBottomSheetRef.current?.dismiss()}
-          initialMemo={memoText}
-          includeUAMemoBoolean={includeUAMemoBoolean}
-          defaultUnifiedAddress={defaultUnifiedAddress}
-          setMemoText={setMemoText}
-          translate={translate}
-        />
-      </AppSheetModal>
       <SendErrorSheet
         ref={sendErrorSheetRef}
         title={translate('send.calc-error') as string}
