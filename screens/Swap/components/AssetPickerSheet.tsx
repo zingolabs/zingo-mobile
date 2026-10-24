@@ -182,14 +182,13 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
           }
           title={group.ticker}
           sub={group.name}
-          trailing={
+          aside={
             multi ? (
               <View
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
                   columnGap: space8,
-                  paddingRight: space12,
                 }}
               >
                 {badgeStack(group)}
