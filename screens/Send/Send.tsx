@@ -87,6 +87,7 @@ import { retryServer } from '@app/services/retryServer';
 import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
+import { PANEL_TOP } from '@ui/widgets/Header/Header';
 import { onTabScroll } from '@app/navigation/tabBarScroll';
 
 type SendProps = HomeTabScreenProps<'Send'>;
@@ -98,10 +99,6 @@ const ADDRESS_LIKE =
   /^(u1|utest1|uregtest1|zs1|ztestsapling|zregtestsapling|t1|t3|tm|tex|zcash:)/i;
 /** A name the protocol allows, typed without its suffix. */
 const BARE_NAME = /^[a-z0-9]{1,62}$/;
-
-/** The strip of icons at the top of the header the sheet stops under. */
-const TOP_ICONS_H = 55;
-const SNAP_GAP = 4;
 
 const Send: React.FunctionComponent<SendProps> = () => {
   const navigation = useNavigation<WalletNavigation>();
@@ -236,7 +233,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
 
   // Fixed under the header's icons, as Swap: no stops to drag between.
   const sendSnapPoints = useMemo(
-    () => [containerH > 0 ? containerH - TOP_ICONS_H - SNAP_GAP : '93%'],
+    () => [containerH > 0 ? containerH - PANEL_TOP : '93%'],
     [containerH],
   );
 

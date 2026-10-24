@@ -36,15 +36,12 @@ import { ListIcon } from '@ui/primitives/Icons/ListIcon';
 import { PlusIcon } from '@ui/primitives/Icons/PlusIcon';
 import { useOwnAddresses } from './ownAddresses';
 import { onTabScroll } from '@app/navigation/tabBarScroll';
+import { PANEL_TOP } from '@ui/widgets/Header/Header';
 import { useReceiveSelection } from './useReceiveSelection';
 
 type ReceiveProps = HomeTabScreenProps<'Receive'>;
 
 type SheetType = 'NA' | 'VA' | 'NAT';
-
-/** The strip of icons at the top of the header the sheet stops under. */
-const TOP_ICONS_H = 55;
-const SNAP_GAP = 4;
 
 /**
  * Receive: one of the wallet's addresses on a card with its QR. It opens on
@@ -84,7 +81,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
 
   // Fixed under the header's icons, as Swap: no stops to drag between.
   const receiveSnapPoints = useMemo(
-    () => [containerH > 0 ? containerH - TOP_ICONS_H - SNAP_GAP : '93%'],
+    () => [containerH > 0 ? containerH - PANEL_TOP : '93%'],
     [containerH],
   );
 

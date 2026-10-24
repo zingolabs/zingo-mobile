@@ -79,6 +79,7 @@ import { useFreshRows } from './useFreshRows';
 import { FiltersIcon } from '@ui/primitives/Icons/FiltersIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { onTabScrollY } from '@app/navigation/tabBarScroll';
+import { PANEL_TOP } from '@ui/widgets/Header/Header';
 import { ChevronUp } from '@ui/primitives/Icons/Chevron';
 
 /** How long a finished backup keeps its green pill before the card leaves. */
@@ -354,7 +355,6 @@ const History: React.FunctionComponent<HistoryProps> = () => {
   //   - With USD: 3 snaps -> [ZEC+USD visible, only ZEC visible, only top icons visible]
   //   - Without USD: 2 snaps -> [ZEC visible, only top icons visible]
   // Top icons strip height is a code-side constant (~55 px) — same on any phone.
-  const TOP_ICONS_H = 55;
   const SNAP_GAP = 4;
   // Bump applied to the snaps that sit just below a balance row (low + mid);
   // the max snap (just below the top icons strip) doesn't need it.
@@ -390,9 +390,9 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     const snapLow = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
     const snapMid = Math.min(
       Math.max(snapBase + usdRowH + BALANCE_SNAP_BUMP, snapLow + 1),
-      containerH - TOP_ICONS_H - SNAP_GAP,
+      containerH - PANEL_TOP,
     );
-    const snapMax = Math.max(containerH - TOP_ICONS_H - SNAP_GAP, snapLow + 1);
+    const snapMax = Math.max(containerH - PANEL_TOP, snapLow + 1);
 
     if (bannerH > 0) {
       // Three stops, as the redesign has them: under the notices, under the

@@ -75,13 +75,10 @@ import SwapHistorySheet, { swapPairLabel } from './components/SwapHistorySheet';
 import { tokenToSwapAsset } from './swapAssets';
 import { useCoinPrice } from './useCoinPrice';
 import { onTabScroll } from '@app/navigation/tabBarScroll';
+import { PANEL_TOP } from '@ui/widgets/Header/Header';
 import InsufficientFundsSheet from './components/InsufficientFundsSheet';
 
 type SwapProps = HomeTabScreenProps<'Swap'>;
-
-/** The strip of icons at the top of the header the sheet stops under. */
-const TOP_ICONS_H = 55;
-const SNAP_GAP = 4;
 
 /**
  * The swap tab: pick the other side, state an amount, and quote it. ZEC is
@@ -141,7 +138,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
   // Fixed under the header's icons: the form needs the height, and the
   // balance it would reveal is already on the card.
   const snapPoints = useMemo(
-    () => [containerH > 0 ? containerH - TOP_ICONS_H - SNAP_GAP : '93%'],
+    () => [containerH > 0 ? containerH - PANEL_TOP : '93%'],
     [containerH],
   );
 

@@ -20,14 +20,12 @@ import { ContextAppLoaded } from '@app/context';
 import { contentTopPad } from '@app/navigation/safeArea';
 import TitleBar from '@ui/widgets/TitleBar';
 import TooltipHost from '@ui/widgets/TooltipHost';
-import { HEADER_BAR_HEIGHT } from '@ui/widgets/Header/Header';
+import { PANEL_TOP } from '@ui/widgets/Header/Header';
 import SheetRim from '@ui/primitives/SheetRim';
 import { SurfaceContext } from '@ui/primitives/Surface';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 
-/** The panel stops this far under the top bar, as the sheets do. */
-const SNAP_GAP = 4;
 const MIN_PANEL = 200;
 /** The panel rising, and lowering when it leaves. */
 const PANEL_IN = {
@@ -98,7 +96,7 @@ export default function FullPanel({
 
   /** The screen under the app's top pad, less the top bar that stays above. */
   const full = Math.max(
-    frame.height - contentTopPad(insets.top) - HEADER_BAR_HEIGHT - SNAP_GAP,
+    frame.height - contentTopPad(insets.top) - PANEL_TOP,
     MIN_PANEL,
   );
   const [headerH, setHeaderH] = useState<number>(0);
