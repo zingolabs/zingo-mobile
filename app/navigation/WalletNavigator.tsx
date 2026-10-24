@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { Easing } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
   BottomTabBarProps,
@@ -6,15 +7,17 @@ import {
 } from '@react-navigation/bottom-tabs';
 
 import { Route } from '@app/AppState';
-import { ContextAppLoaded } from '@app/context';
+import { ContextAppLoaded, useSwapService } from '@app/context';
 import { AppDrawerParamList, HomeTabParamList } from '@app/types';
 import CustomTabBar from './CustomTabBar';
+import { duration } from '@app/theme/motion';
 import LoadedAppOptionsPanelHost from '@app/LoadedApp/LoadedAppOptionsPanelHost';
 
 import { AddressBook } from '@screens/AddressBook';
 import History from '@screens/History';
 import Send from '@screens/Send';
 import Receive from '@screens/Receive';
+import Swap from '@screens/Swap';
 import Settings from '@screens/Settings';
 import WalletServer from '@screens/Server/WalletServer';
 import { MessageList } from '@screens/Messages';
@@ -53,29 +56,71 @@ const MigrationBatchSending = React.lazy(
 );
 const Insight = React.lazy(() => import('@screens/Insight'));
 const ComputingTxContent = React.lazy(() => import('@screens/Computing'));
+const SwapReview = React.lazy(() => import('@screens/SwapReview'));
+const SwapDeposit = React.lazy(() => import('@screens/SwapDeposit'));
+const SwapTracking = React.lazy(() => import('@screens/SwapTracking'));
+const SwapResult = React.lazy(() => import('@screens/SwapResult'));
+const SwapDetail = React.lazy(() => import('@screens/SwapDetail'));
+const SwapTransaction = React.lazy(() => import('@screens/SwapTransaction'));
 
 const Stack = createNativeStackNavigator<AppDrawerParamList>();
+
+/**
+ * Switching home tabs cross-fades the content. The tab navigator animates
+ * with React Native's Animated, so the curve is its Easing.
+ */
+const TAB_FADE = {
+  animation: 'fade',
+  transitionSpec: {
+    animation: 'timing',
+    config: {
+      duration: duration.tabFade,
+      easing: Easing.bezier(0.2, 0, 0, 1),
+    },
+  },
+} as const;
+
+/**
+ * A screen opened in depth (a transaction, a review, your addresses) is a
+ * full panel over the screen it was opened from, which stays behind it: a
+ * transparent modal the stack does not move. FullPanel rises, fades its
+ * content in and lowers on its own, at the design's pace (560 / 460 ms,
+ * (.32,.72,0,1)), so exactly one thing moves.
+ */
+const PANEL = {
+  presentation: 'transparentModal',
+  animation: 'none',
+  contentStyle: { backgroundColor: 'transparent' },
+} as const;
+
+/** A step inside a full panel (sending, sent): the panel is up already. */
+const STEP = PANEL;
 const Tab = createBottomTabNavigator<HomeTabParamList>();
 
 const renderTabBar = (props: BottomTabBarProps) => <CustomTabBar {...props} />;
 
 // The home tabs. Send needs a wallet that can spend and a server to send
-// through; without either the tab is absent.
+// through; without either the tab is absent. Swap needs the same plus the
+// swap service, which exists on mainnet alone.
 function HomeTabs() {
   const { readOnly, server } = useContext(ContextAppLoaded);
+  const swapService = useSwapService();
   return (
     <Tab.Navigator
       detachInactiveScreens={true}
       initialRouteName={Route.History}
       backBehavior="initialRoute"
       tabBar={renderTabBar}
-      screenOptions={{ headerShown: false }}
+      screenOptions={{ headerShown: false, ...TAB_FADE }}
     >
       <Tab.Screen name={Route.History} component={History} />
       {!readOnly && server.kind === 'remote' && (
         <Tab.Screen name={Route.Send} component={Send} />
       )}
       <Tab.Screen name={Route.Receive} component={Receive} />
+      {!readOnly && server.kind === 'remote' && !!swapService && (
+        <Tab.Screen name={Route.Swap} component={Swap} />
+      )}
     </Tab.Navigator>
   );
 }
@@ -125,11 +170,34 @@ export function WalletNavigator() {
         <Stack.Screen
           name={Route.ValueTransferDetail}
           component={ValueTransferDetail}
+          options={PANEL}
         />
-        <Stack.Screen name={Route.AddressList} component={AddressList} />
+        <Stack.Screen
+          name={Route.AddressList}
+          component={AddressList}
+          options={PANEL}
+        />
         <Stack.Screen name={Route.Messages} component={MessageList} />
-        <Stack.Screen name={Route.Confirm} component={Confirm} />
-        <Stack.Screen name={Route.Computing} component={ComputingTxContent} />
+        <Stack.Screen
+          name={Route.Confirm}
+          component={Confirm}
+          options={PANEL}
+        />
+        <Stack.Screen
+          name={Route.Computing}
+          component={ComputingTxContent}
+          options={STEP}
+        />
+        <Stack.Screen
+          name={Route.SwapDetail}
+          component={SwapDetail}
+          options={PANEL}
+        />
+        <Stack.Screen
+          name={Route.SwapTransaction}
+          component={SwapTransaction}
+          options={PANEL}
+        />
       </Stack.Group>
       {/* One-way flows: no swipe back; each screen closes itself, and the
         ones that broadcast block hardware back while they run. */}
@@ -170,6 +238,26 @@ export function WalletNavigator() {
         <Stack.Screen
           name={Route.MigrationBatchSending}
           component={MigrationBatchSending}
+        />
+        <Stack.Screen
+          name={Route.SwapReview}
+          component={SwapReview}
+          options={PANEL}
+        />
+        <Stack.Screen
+          name={Route.SwapDeposit}
+          component={SwapDeposit}
+          options={PANEL}
+        />
+        <Stack.Screen
+          name={Route.SwapTracking}
+          component={SwapTracking}
+          options={PANEL}
+        />
+        <Stack.Screen
+          name={Route.SwapResult}
+          component={SwapResult}
+          options={PANEL}
         />
       </Stack.Group>
       {/* Overlays draw their own container transform over the screen

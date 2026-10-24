@@ -37,89 +37,58 @@ function makeDrawerProps(
     },
   };
 }
-// test suite
+
 describe('Component History ValueTransferDetail - test', () => {
-  //unit test
   const state = { ...defaultAppContextLoaded };
   state.translate = mockTranslate;
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;
   state.valueTransfers = mockValueTransfers;
-  const props_0 = makeDrawerProps(0);
-  test('History ValueTransferDetail - sent ValueTransfer with 2 addresses', () => {
-    render(
-      <ContextAppLoadedProvider value={state}>
-        <ValueTransferDetail {...props_0} />
-      </ContextAppLoadedProvider>,
-    ).toJSON();
-    const num = screen.getAllByText('0.1234');
-    expect(num.length).toBe(2);
-    screen.getByText('0.0001');
-    screen.getByText('hola & hello');
-    const txt = screen.queryByText('hola & hello\nhello & hola');
-    expect(txt).toBe(null);
-  });
 
-  const props_1 = makeDrawerProps(1);
-  test('History ValueTransferDetail - memo self sent ValueTransfer', () => {
+  const amountOf = () => screen.getByTestId('valuetransferdetail.amount');
+  const open = (i: number) =>
     render(
       <ContextAppLoadedProvider value={state}>
-        <ValueTransferDetail {...props_1} />
+        <ValueTransferDetail {...makeDrawerProps(i)} />
       </ContextAppLoadedProvider>,
     );
-    const num = screen.getAllByText('0');
-    expect(num.length).toBe(2);
-    screen.getByText('0.0001');
+
+  test('Tests that a sent transfer shows its amount, fee and memo once when it went to two addresses', () => {
+    open(0);
+    expect(amountOf()).toHaveTextContent(/0\.1234/);
+    screen.getByText(/0\.0001/);
+    screen.getByText('hola & hello');
+    expect(screen.queryByText('hola & hello\nhello & hola')).toBe(null);
+  });
+
+  test('Tests that a memo sent to oneself shows both memos when it carried two', () => {
+    open(1);
+    expect(amountOf()).toHaveTextContent(/0/);
+    screen.getByText(/0\.0001/);
     screen.getByText('orchard memo\nsapling memo');
   });
 
-  const props_2 = makeDrawerProps(2);
-  test('History ValueTransferDetail - self sent ValueTransfer', () => {
-    render(
-      <ContextAppLoadedProvider value={state}>
-        <ValueTransferDetail {...props_2} />
-      </ContextAppLoadedProvider>,
-    );
-    const num = screen.getAllByText('0');
-    expect(num.length).toBe(2);
-    screen.getByText('0.0001');
+  test('Tests that a send to oneself shows its fee when it paid one', () => {
+    open(2);
+    screen.getByText(/0\.0001/);
   });
 
-  const props_3 = makeDrawerProps(3);
-  test('History ValueTransferDetail - received ValueTransfer with 2 pools', () => {
-    render(
-      <ContextAppLoadedProvider value={state}>
-        <ValueTransferDetail {...props_3} />
-      </ContextAppLoadedProvider>,
-    );
-    const num = screen.getAllByText('0.7765');
-    expect(num.length).toBe(2);
+  test('Tests that a received transfer shows its amount and memo once when it came in two pools', () => {
+    open(3);
+    expect(amountOf()).toHaveTextContent(/0\.7765/);
     screen.getByText('hola & hello');
-    const txt = screen.queryByText('hola & hello\nhello & hola');
-    expect(txt).toBe(null);
+    expect(screen.queryByText('hola & hello\nhello & hola')).toBe(null);
   });
 
-  const props_4 = makeDrawerProps(4);
-  test('History ValueTransferDetail - shield ValueTransfer', () => {
-    render(
-      <ContextAppLoadedProvider value={state}>
-        <ValueTransferDetail {...props_4} />
-      </ContextAppLoadedProvider>,
-    );
-    const num = screen.getAllByText('0.0009');
-    expect(num.length).toBe(2);
-    screen.getByText('0.0001');
+  test('Tests that a shielding shows its amount and fee when it is open', () => {
+    open(4);
+    expect(amountOf()).toHaveTextContent(/0\.0009/);
+    screen.getByText(/0\.0001/);
   });
 
-  const props_5 = makeDrawerProps(5);
-  test('History ValueTransferDetail - Rejection ValueTransfer', () => {
-    render(
-      <ContextAppLoadedProvider value={state}>
-        <ValueTransferDetail {...props_5} />
-      </ContextAppLoadedProvider>,
-    );
-    const num = screen.getAllByText('0.0009');
-    expect(num.length).toBe(2);
-    screen.getByText('0.0001');
+  test('Tests that a rejection shows its amount and fee when it is open', () => {
+    open(5);
+    expect(amountOf()).toHaveTextContent(/0\.0009/);
+    screen.getByText(/0\.0001/);
   });
 });

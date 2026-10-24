@@ -4,8 +4,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
 <View
   style={
     {
-      "flex": 1,
-      "flexDirection": "column",
+      "backgroundColor": "#031124",
     }
   }
   testID="vt-3"
@@ -228,312 +227,144 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
         <View
           style={
             {
-              "paddingBottom": 0,
+              "alignItems": "center",
+              "columnGap": 12,
+              "flexDirection": "row",
+              "minHeight": 64,
+              "paddingLeft": 20,
+              "paddingRight": 20,
+              "paddingVertical": 12,
             }
           }
         >
           <View
             style={
               {
+                "backgroundColor": "#FFFFFF0F",
+                "height": 1,
+                "left": 68,
+                "position": "absolute",
+                "right": 20,
+                "top": 0,
+              }
+            }
+          />
+          <View
+            style={
+              {
                 "alignItems": "center",
-                "borderTopColor": "#FFFFFF0F",
-                "borderTopWidth": 0,
-                "flexDirection": "row",
-                "gap": 12,
-                "minHeight": 56,
-                "paddingHorizontal": 20,
-                "paddingVertical": 12,
+                "backgroundColor": "#8888881F",
+                "borderRadius": 18,
+                "height": 36,
+                "justifyContent": "center",
+                "width": 36,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flex": 1,
+                "minWidth": 0,
               }
             }
           >
+            <Text
+              ellipsizeMode="middle"
+              maxFontSizeMultiplier={2}
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#c3c3c3",
+                  "fontFamily": "Menlo",
+                  "fontSize": 13,
+                  "fontWeight": "400",
+                }
+              }
+            >
+              sent-a…567890
+            </Text>
             <View
               style={
                 {
                   "alignItems": "center",
-                  "columnGap": 12,
-                  "flex": 1,
+                  "columnGap": 8,
                   "flexDirection": "row",
-                  "flexWrap": "wrap",
+                  "marginTop": 4,
                 }
               }
             >
-              <View
+              <Text
+                maxFontSizeMultiplier={2}
+                numberOfLines={1}
                 style={
                   {
-                    "flexGrow": 1,
+                    "color": "#E5484D",
+                    "fontSize": 12,
+                    "fontWeight": "600",
+                    "lineHeight": 16,
+                  }
+                }
+              >
+                text translated ·
+              </Text>
+              <Text
+                maxFontSizeMultiplier={2}
+                numberOfLines={1}
+                style={
+                  {
+                    "color": "#888888",
                     "flexShrink": 1,
+                    "fontSize": 12,
+                    "fontWeight": "400",
+                    "lineHeight": 16,
                   }
                 }
               >
-                <View
-                  style={
-                    {
-                      "alignItems": "center",
-                      "columnGap": 8,
-                      "flexDirection": "row",
-                    }
-                  }
-                >
-                  <Text
-                    maxFontSizeMultiplier={2}
-                    style={
-                      {
-                        "color": "#888888",
-                        "fontSize": 15,
-                        "fontWeight": "600",
-                        "lineHeight": 21,
-                      }
-                    }
-                  >
-                    text translated
-                  </Text>
-                  <View
-                    style={
-                      {
-                        "flexShrink": 1,
-                        "overflow": "hidden",
-                      }
-                    }
-                  >
-                    <View
-                      style={
-                        {
-                          "alignItems": "flex-start",
-                          "display": "flex",
-                          "flexDirection": "row",
-                        }
-                      }
-                    >
-                      <View
-                        style={
-                          {
-                            "alignItems": "flex-start",
-                            "display": "flex",
-                            "flexDirection": "column",
-                            "marginRight": 10,
-                          }
-                        }
-                      >
-                        <View
-                          accessibilityState={
-                            {
-                              "busy": undefined,
-                              "checked": undefined,
-                              "disabled": undefined,
-                              "expanded": undefined,
-                              "selected": undefined,
-                            }
-                          }
-                          accessibilityValue={
-                            {
-                              "max": undefined,
-                              "min": undefined,
-                              "now": undefined,
-                              "text": undefined,
-                            }
-                          }
-                          accessible={true}
-                          collapsable={false}
-                          focusable={true}
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                          style={
-                            {
-                              "opacity": 1,
-                            }
-                          }
-                        >
-                          <View
-                            style={
-                              {
-                                "display": "flex",
-                                "flexDirection": "column",
-                                "flexWrap": "wrap",
-                              }
-                            }
-                          >
-                            <Text
-                              maxFontSizeMultiplier={2}
-                              style={
-                                {
-                                  "color": "#c3c3c3",
-                                  "fontSize": 15,
-                                  "fontWeight": "400",
-                                  "lineHeight": 21,
-                                }
-                              }
-                            >
-                              sent-ad...4567890
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-                <View>
-                  <View
-                    style={
-                      {
-                        "alignItems": "center",
-                        "flexDirection": "row",
-                      }
-                    }
-                  >
-                    <Text
-                      maxFontSizeMultiplier={2}
-                      style={
-                        {
-                          "color": "#888888",
-                          "fontSize": 13,
-                          "fontWeight": "400",
-                          "lineHeight": 18,
-                        }
-                      }
-                    >
-                      Jan 1, 12:00 am
-                    </Text>
-                  </View>
-                </View>
-              </View>
-              <View
-                style={
-                  {
-                    "marginLeft": "auto",
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "flexDirection": "row",
-                      "marginHorizontal": 5,
-                    }
-                  }
-                >
-                  <View
-                    accessibilityState={
-                      {
-                        "busy": undefined,
-                        "checked": undefined,
-                        "disabled": true,
-                        "expanded": undefined,
-                        "selected": undefined,
-                      }
-                    }
-                    accessibilityValue={
-                      {
-                        "max": undefined,
-                        "min": undefined,
-                        "now": undefined,
-                        "text": undefined,
-                      }
-                    }
-                    accessible={true}
-                    collapsable={false}
-                    focusable={false}
-                    onClick={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
-                    style={
-                      {
-                        "opacity": 1,
-                      }
-                    }
-                  >
-                    <View
-                      style={
-                        {
-                          "alignItems": "baseline",
-                          "flexDirection": "row",
-                          "margin": 0,
-                          "padding": 0,
-                        }
-                      }
-                    >
-                      <View
-                        style={
-                          {
-                            "height": 25.28249233342626,
-                            "marginRight": 2.868107053247839,
-                            "width": 17.424393643713408,
-                          }
-                        }
-                      />
-                      <Text
-                        maxFontSizeMultiplier={2}
-                        style={
-                          {
-                            "color": "#888888",
-                            "fontSize": 15,
-                            "fontWeight": "700",
-                            "margin": 0,
-                            "padding": 0,
-                          }
-                        }
-                      >
-                        EC
-                      </Text>
-                      <Text
-                        maxFontSizeMultiplier={2}
-                        style={
-                          {
-                            "color": "#888888",
-                            "fontSize": 15,
-                            "fontWeight": "700",
-                            "margin": 0,
-                            "padding": 0,
-                          }
-                        }
-                        testID="undefined.big-part"
-                      >
-                         0.1234
-                      </Text>
-                      <Text
-                        maxFontSizeMultiplier={2}
-                        style={
-                          {
-                            "color": "#888888",
-                            "fontSize": 10.5,
-                            "margin": 0,
-                            "padding": 0,
-                          }
-                        }
-                        testID="undefined.small-part"
-                      >
-                        5678
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
+                text translated · Jan 1
+              </Text>
             </View>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "flex-end",
+              }
+            }
+          >
+            <Text
+              maxFontSizeMultiplier={2}
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#888888",
+                  "fontSize": 15,
+                  "fontWeight": "600",
+                }
+              }
+            >
+              −0.12345678 ZEC
+            </Text>
+            <Text
+              maxFontSizeMultiplier={2}
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#888888",
+                  "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
+                  "marginTop": 4,
+                }
+              }
+            >
+              $4.11
+            </Text>
           </View>
         </View>
       </View>
     </View>
   </View>
-  <View
-    style={
-      {
-        "backgroundColor": "#FFFFFF0F",
-        "bottom": 0,
-        "height": 1,
-        "left": 20,
-        "position": "absolute",
-        "right": 20,
-      }
-    }
-  />
 </View>
 `;
 
@@ -541,8 +372,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
 <View
   style={
     {
-      "flex": 1,
-      "flexDirection": "column",
+      "backgroundColor": "#031124",
     }
   }
   testID="vt-2"
@@ -765,249 +595,144 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
         <View
           style={
             {
-              "paddingBottom": 8,
+              "alignItems": "center",
+              "columnGap": 12,
+              "flexDirection": "row",
+              "minHeight": 64,
+              "paddingLeft": 20,
+              "paddingRight": 20,
+              "paddingVertical": 12,
             }
           }
         >
           <View
             style={
               {
+                "backgroundColor": "#FFFFFF0F",
+                "height": 1,
+                "left": 68,
+                "position": "absolute",
+                "right": 20,
+                "top": 0,
+              }
+            }
+          />
+          <View
+            style={
+              {
                 "alignItems": "center",
-                "borderTopColor": "#FFFFFF0F",
-                "borderTopWidth": 0,
-                "flexDirection": "row",
-                "gap": 12,
-                "minHeight": 56,
-                "paddingHorizontal": 20,
-                "paddingVertical": 12,
+                "backgroundColor": "#8888881F",
+                "borderRadius": 18,
+                "height": 36,
+                "justifyContent": "center",
+                "width": 36,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flex": 1,
+                "minWidth": 0,
               }
             }
           >
+            <Text
+              ellipsizeMode="middle"
+              maxFontSizeMultiplier={2}
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#c3c3c3",
+                  "fontFamily": "Menlo",
+                  "fontSize": 13,
+                  "fontWeight": "400",
+                }
+              }
+            >
+              sent-a…567890
+            </Text>
             <View
               style={
                 {
                   "alignItems": "center",
-                  "columnGap": 12,
-                  "flex": 1,
+                  "columnGap": 8,
                   "flexDirection": "row",
-                  "flexWrap": "wrap",
+                  "marginTop": 4,
                 }
               }
             >
-              <View
+              <Text
+                maxFontSizeMultiplier={2}
+                numberOfLines={1}
                 style={
                   {
-                    "flexGrow": 1,
+                    "color": "#c3c3c3",
+                    "fontSize": 12,
+                    "fontWeight": "600",
+                    "lineHeight": 16,
+                  }
+                }
+              >
+                text translated ·
+              </Text>
+              <Text
+                maxFontSizeMultiplier={2}
+                numberOfLines={1}
+                style={
+                  {
+                    "color": "#888888",
                     "flexShrink": 1,
+                    "fontSize": 12,
+                    "fontWeight": "400",
+                    "lineHeight": 16,
                   }
                 }
               >
-                <View
-                  style={
-                    {
-                      "alignItems": "center",
-                      "columnGap": 8,
-                      "flexDirection": "row",
-                    }
-                  }
-                >
-                  <Text
-                    maxFontSizeMultiplier={2}
-                    style={
-                      {
-                        "color": "#c3c3c3",
-                        "fontSize": 15,
-                        "fontWeight": "600",
-                        "lineHeight": 21,
-                      }
-                    }
-                  >
-                    text translated
-                  </Text>
-                </View>
-                <View>
-                  <View
-                    style={
-                      {
-                        "alignItems": "center",
-                        "flexDirection": "row",
-                      }
-                    }
-                  >
-                    <Text
-                      maxFontSizeMultiplier={2}
-                      style={
-                        {
-                          "color": "#888888",
-                          "fontSize": 13,
-                          "fontWeight": "400",
-                          "lineHeight": 18,
-                        }
-                      }
-                    >
-                      Jan 1, 12:00 am
-                    </Text>
-                  </View>
-                </View>
-              </View>
-              <View
-                style={
-                  {
-                    "marginLeft": "auto",
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "flexDirection": "row",
-                      "marginHorizontal": 5,
-                    }
-                  }
-                >
-                  <View
-                    accessibilityState={
-                      {
-                        "busy": undefined,
-                        "checked": undefined,
-                        "disabled": true,
-                        "expanded": undefined,
-                        "selected": undefined,
-                      }
-                    }
-                    accessibilityValue={
-                      {
-                        "max": undefined,
-                        "min": undefined,
-                        "now": undefined,
-                        "text": undefined,
-                      }
-                    }
-                    accessible={true}
-                    collapsable={false}
-                    focusable={false}
-                    onClick={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
-                    style={
-                      {
-                        "opacity": 1,
-                      }
-                    }
-                  >
-                    <View
-                      style={
-                        {
-                          "alignItems": "baseline",
-                          "flexDirection": "row",
-                          "margin": 0,
-                          "padding": 0,
-                        }
-                      }
-                    >
-                      <View
-                        style={
-                          {
-                            "height": 25.28249233342626,
-                            "marginRight": 2.868107053247839,
-                            "width": 17.424393643713408,
-                          }
-                        }
-                      />
-                      <Text
-                        maxFontSizeMultiplier={2}
-                        style={
-                          {
-                            "color": "#F99D00",
-                            "fontSize": 15,
-                            "fontWeight": "700",
-                            "margin": 0,
-                            "padding": 0,
-                          }
-                        }
-                      >
-                        EC
-                      </Text>
-                      <Text
-                        maxFontSizeMultiplier={2}
-                        style={
-                          {
-                            "color": "#F99D00",
-                            "fontSize": 15,
-                            "fontWeight": "700",
-                            "margin": 0,
-                            "padding": 0,
-                          }
-                        }
-                        testID="undefined.big-part"
-                      >
-                         0.1234
-                      </Text>
-                      <Text
-                        maxFontSizeMultiplier={2}
-                        style={
-                          {
-                            "color": "#F99D00",
-                            "fontSize": 10.5,
-                            "margin": 0,
-                            "padding": 0,
-                          }
-                        }
-                        testID="undefined.small-part"
-                      >
-                        5678
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
+                text translated · Jan 1
+              </Text>
             </View>
           </View>
           <View
             style={
               {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "justifyContent": "flex-start",
-                "paddingLeft": 56,
+                "alignItems": "flex-end",
               }
             }
           >
             <Text
               maxFontSizeMultiplier={2}
+              numberOfLines={1}
               style={
                 {
-                  "color": "#F99D00",
-                  "fontSize": 12,
-                  "fontWeight": "700",
-                  "lineHeight": 16,
-                  "textDecorationLine": "none",
+                  "color": "#c3c3c3",
+                  "fontSize": 15,
+                  "fontWeight": "600",
                 }
               }
             >
-              text translated
+              −0.12345678 ZEC
+            </Text>
+            <Text
+              maxFontSizeMultiplier={2}
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#888888",
+                  "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
+                  "marginTop": 4,
+                }
+              }
+            >
+              $4.11
             </Text>
           </View>
         </View>
       </View>
     </View>
   </View>
-  <View
-    style={
-      {
-        "backgroundColor": "#FFFFFF0F",
-        "bottom": 0,
-        "height": 1,
-        "left": 20,
-        "position": "absolute",
-        "right": 20,
-      }
-    }
-  />
 </View>
 `;
 
@@ -1015,8 +740,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
 <View
   style={
     {
-      "flex": 1,
-      "flexDirection": "column",
+      "backgroundColor": "#031124",
     }
   }
   testID="vt-4"
@@ -1185,207 +909,124 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
         <View
           style={
             {
-              "paddingBottom": 0,
+              "alignItems": "center",
+              "columnGap": 12,
+              "flexDirection": "row",
+              "minHeight": 64,
+              "paddingLeft": 20,
+              "paddingRight": 20,
+              "paddingVertical": 12,
             }
           }
         >
           <View
             style={
               {
+                "backgroundColor": "#FFFFFF0F",
+                "height": 1,
+                "left": 68,
+                "position": "absolute",
+                "right": 20,
+                "top": 0,
+              }
+            }
+          />
+          <View
+            style={
+              {
                 "alignItems": "center",
-                "borderTopColor": "#FFFFFF0F",
-                "borderTopWidth": 0,
-                "flexDirection": "row",
-                "gap": 12,
-                "minHeight": 56,
-                "paddingHorizontal": 20,
-                "paddingVertical": 12,
+                "backgroundColor": "#8888881F",
+                "borderRadius": 18,
+                "height": 36,
+                "justifyContent": "center",
+                "width": 36,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flex": 1,
+                "minWidth": 0,
               }
             }
           >
+            <Text
+              ellipsizeMode="middle"
+              maxFontSizeMultiplier={2}
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 15,
+                  "fontWeight": "600",
+                }
+              }
+            >
+              text translated
+            </Text>
             <View
               style={
                 {
                   "alignItems": "center",
-                  "columnGap": 12,
-                  "flex": 1,
+                  "columnGap": 8,
                   "flexDirection": "row",
-                  "flexWrap": "wrap",
+                  "marginTop": 4,
                 }
               }
             >
-              <View
+              <Text
+                maxFontSizeMultiplier={2}
+                numberOfLines={1}
                 style={
                   {
-                    "flexGrow": 1,
+                    "color": "#888888",
                     "flexShrink": 1,
+                    "fontSize": 12,
+                    "fontWeight": "400",
+                    "lineHeight": 16,
                   }
                 }
               >
-                <View
-                  style={
-                    {
-                      "alignItems": "center",
-                      "columnGap": 8,
-                      "flexDirection": "row",
-                    }
-                  }
-                >
-                  <Text
-                    maxFontSizeMultiplier={2}
-                    style={
-                      {
-                        "color": "#18bd18",
-                        "fontSize": 15,
-                        "fontWeight": "600",
-                        "lineHeight": 21,
-                      }
-                    }
-                  >
-                    text translated
-                  </Text>
-                </View>
-                <View>
-                  <View
-                    style={
-                      {
-                        "alignItems": "center",
-                        "flexDirection": "row",
-                      }
-                    }
-                  >
-                    <Text
-                      maxFontSizeMultiplier={2}
-                      style={
-                        {
-                          "color": "#888888",
-                          "fontSize": 13,
-                          "fontWeight": "400",
-                          "lineHeight": 18,
-                        }
-                      }
-                    >
-                      Jan 1, 12:00 am
-                    </Text>
-                  </View>
-                </View>
-              </View>
-              <View
-                style={
-                  {
-                    "marginLeft": "auto",
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "flexDirection": "row",
-                      "marginHorizontal": 5,
-                    }
-                  }
-                >
-                  <View
-                    accessibilityState={
-                      {
-                        "busy": undefined,
-                        "checked": undefined,
-                        "disabled": true,
-                        "expanded": undefined,
-                        "selected": undefined,
-                      }
-                    }
-                    accessibilityValue={
-                      {
-                        "max": undefined,
-                        "min": undefined,
-                        "now": undefined,
-                        "text": undefined,
-                      }
-                    }
-                    accessible={true}
-                    collapsable={false}
-                    focusable={false}
-                    onClick={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
-                    style={
-                      {
-                        "opacity": 1,
-                      }
-                    }
-                  >
-                    <View
-                      style={
-                        {
-                          "alignItems": "baseline",
-                          "flexDirection": "row",
-                          "margin": 0,
-                          "padding": 0,
-                        }
-                      }
-                    >
-                      <View
-                        style={
-                          {
-                            "height": 25.28249233342626,
-                            "marginRight": 2.868107053247839,
-                            "width": 17.424393643713408,
-                          }
-                        }
-                      />
-                      <Text
-                        maxFontSizeMultiplier={2}
-                        style={
-                          {
-                            "color": "#18bd18",
-                            "fontSize": 15,
-                            "fontWeight": "700",
-                            "margin": 0,
-                            "padding": 0,
-                          }
-                        }
-                      >
-                        EC
-                      </Text>
-                      <Text
-                        maxFontSizeMultiplier={2}
-                        style={
-                          {
-                            "color": "#18bd18",
-                            "fontSize": 15,
-                            "fontWeight": "700",
-                            "margin": 0,
-                            "padding": 0,
-                          }
-                        }
-                        testID="undefined.big-part"
-                      >
-                         0.7765
-                      </Text>
-                      <Text
-                        maxFontSizeMultiplier={2}
-                        style={
-                          {
-                            "color": "#18bd18",
-                            "fontSize": 10.5,
-                            "margin": 0,
-                            "padding": 0,
-                          }
-                        }
-                        testID="undefined.small-part"
-                      >
-                        4321
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
+                Jan 1
+              </Text>
             </View>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "flex-end",
+              }
+            }
+          >
+            <Text
+              maxFontSizeMultiplier={2}
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#18bd18",
+                  "fontSize": 15,
+                  "fontWeight": "600",
+                }
+              }
+            >
+              +0.77654321 ZEC
+            </Text>
+            <Text
+              maxFontSizeMultiplier={2}
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#888888",
+                  "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
+                  "marginTop": 4,
+                }
+              }
+            >
+              $51.76
+            </Text>
           </View>
         </View>
       </View>
@@ -1398,36 +1039,11 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
 <View
   style={
     {
-      "flex": 1,
-      "flexDirection": "column",
+      "backgroundColor": "#031124",
     }
   }
   testID="vt-1"
 >
-  <View
-    style={
-      {
-        "backgroundColor": "#031124",
-        "paddingBottom": 0,
-        "paddingLeft": 20,
-        "paddingTop": 10,
-      }
-    }
-  >
-    <Text
-      maxFontSizeMultiplier={2}
-      style={
-        {
-          "color": "#888888",
-          "fontSize": 15,
-          "fontWeight": "400",
-          "lineHeight": 21,
-        }
-      }
-    >
-      January 2024
-    </Text>
-  </View>
   <View
     accessibilityState={
       {
@@ -1646,311 +1262,129 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
         <View
           style={
             {
-              "paddingBottom": 0,
+              "alignItems": "center",
+              "columnGap": 12,
+              "flexDirection": "row",
+              "minHeight": 64,
+              "paddingLeft": 20,
+              "paddingRight": 20,
+              "paddingVertical": 12,
             }
           }
         >
           <View
             style={
               {
+                "backgroundColor": "#FFFFFF0F",
+                "height": 1,
+                "left": 68,
+                "position": "absolute",
+                "right": 20,
+                "top": 0,
+              }
+            }
+          />
+          <View
+            style={
+              {
                 "alignItems": "center",
-                "borderTopColor": "#FFFFFF0F",
-                "borderTopWidth": 0,
-                "flexDirection": "row",
-                "gap": 12,
-                "minHeight": 56,
-                "paddingHorizontal": 20,
-                "paddingVertical": 12,
+                "backgroundColor": "#8888881F",
+                "borderRadius": 18,
+                "height": 36,
+                "justifyContent": "center",
+                "width": 36,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flex": 1,
+                "minWidth": 0,
               }
             }
           >
+            <Text
+              ellipsizeMode="middle"
+              maxFontSizeMultiplier={2}
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#c3c3c3",
+                  "fontFamily": "Menlo",
+                  "fontSize": 13,
+                  "fontWeight": "400",
+                }
+              }
+            >
+              sent-a…567890
+            </Text>
             <View
               style={
                 {
                   "alignItems": "center",
-                  "columnGap": 12,
-                  "flex": 1,
+                  "columnGap": 8,
                   "flexDirection": "row",
-                  "flexWrap": "wrap",
+                  "marginTop": 4,
                 }
               }
             >
-              <View
+              <Text
+                maxFontSizeMultiplier={2}
+                numberOfLines={1}
                 style={
                   {
-                    "flexGrow": 1,
+                    "color": "#888888",
                     "flexShrink": 1,
+                    "fontSize": 12,
+                    "fontWeight": "400",
+                    "lineHeight": 16,
                   }
                 }
               >
-                <View
-                  style={
-                    {
-                      "alignItems": "center",
-                      "columnGap": 8,
-                      "flexDirection": "row",
-                    }
-                  }
-                >
-                  <Text
-                    maxFontSizeMultiplier={2}
-                    style={
-                      {
-                        "color": "#c3c3c3",
-                        "fontSize": 15,
-                        "fontWeight": "600",
-                        "lineHeight": 21,
-                      }
-                    }
-                  >
-                    text translated
-                  </Text>
-                  <View
-                    style={
-                      {
-                        "flexShrink": 1,
-                        "overflow": "hidden",
-                      }
-                    }
-                  >
-                    <View
-                      style={
-                        {
-                          "alignItems": "flex-start",
-                          "display": "flex",
-                          "flexDirection": "row",
-                        }
-                      }
-                    >
-                      <View
-                        style={
-                          {
-                            "alignItems": "flex-start",
-                            "display": "flex",
-                            "flexDirection": "column",
-                            "marginRight": 10,
-                          }
-                        }
-                      >
-                        <View
-                          accessibilityState={
-                            {
-                              "busy": undefined,
-                              "checked": undefined,
-                              "disabled": undefined,
-                              "expanded": undefined,
-                              "selected": undefined,
-                            }
-                          }
-                          accessibilityValue={
-                            {
-                              "max": undefined,
-                              "min": undefined,
-                              "now": undefined,
-                              "text": undefined,
-                            }
-                          }
-                          accessible={true}
-                          collapsable={false}
-                          focusable={true}
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                          style={
-                            {
-                              "opacity": 1,
-                            }
-                          }
-                        >
-                          <View
-                            style={
-                              {
-                                "display": "flex",
-                                "flexDirection": "column",
-                                "flexWrap": "wrap",
-                              }
-                            }
-                          >
-                            <Text
-                              maxFontSizeMultiplier={2}
-                              style={
-                                {
-                                  "color": "#c3c3c3",
-                                  "fontSize": 15,
-                                  "fontWeight": "400",
-                                  "lineHeight": 21,
-                                }
-                              }
-                            >
-                              sent-ad...4567890
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-                <View>
-                  <View
-                    style={
-                      {
-                        "alignItems": "center",
-                        "flexDirection": "row",
-                      }
-                    }
-                  >
-                    <Text
-                      maxFontSizeMultiplier={2}
-                      style={
-                        {
-                          "color": "#888888",
-                          "fontSize": 13,
-                          "fontWeight": "400",
-                          "lineHeight": 18,
-                        }
-                      }
-                    >
-                      Jan 1, 12:00 am
-                    </Text>
-                  </View>
-                </View>
-              </View>
-              <View
-                style={
-                  {
-                    "marginLeft": "auto",
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "flexDirection": "row",
-                      "marginHorizontal": 5,
-                    }
-                  }
-                >
-                  <View
-                    accessibilityState={
-                      {
-                        "busy": undefined,
-                        "checked": undefined,
-                        "disabled": true,
-                        "expanded": undefined,
-                        "selected": undefined,
-                      }
-                    }
-                    accessibilityValue={
-                      {
-                        "max": undefined,
-                        "min": undefined,
-                        "now": undefined,
-                        "text": undefined,
-                      }
-                    }
-                    accessible={true}
-                    collapsable={false}
-                    focusable={false}
-                    onClick={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
-                    style={
-                      {
-                        "opacity": 1,
-                      }
-                    }
-                  >
-                    <View
-                      style={
-                        {
-                          "alignItems": "baseline",
-                          "flexDirection": "row",
-                          "margin": 0,
-                          "padding": 0,
-                        }
-                      }
-                    >
-                      <View
-                        style={
-                          {
-                            "height": 25.28249233342626,
-                            "marginRight": 2.868107053247839,
-                            "width": 17.424393643713408,
-                          }
-                        }
-                      />
-                      <Text
-                        maxFontSizeMultiplier={2}
-                        style={
-                          {
-                            "color": "#c3c3c3",
-                            "fontSize": 15,
-                            "fontWeight": "700",
-                            "margin": 0,
-                            "padding": 0,
-                          }
-                        }
-                      >
-                        EC
-                      </Text>
-                      <Text
-                        maxFontSizeMultiplier={2}
-                        style={
-                          {
-                            "color": "#c3c3c3",
-                            "fontSize": 15,
-                            "fontWeight": "700",
-                            "margin": 0,
-                            "padding": 0,
-                          }
-                        }
-                        testID="undefined.big-part"
-                      >
-                         0.1234
-                      </Text>
-                      <Text
-                        maxFontSizeMultiplier={2}
-                        style={
-                          {
-                            "color": "#c3c3c3",
-                            "fontSize": 10.5,
-                            "margin": 0,
-                            "padding": 0,
-                          }
-                        }
-                        testID="undefined.small-part"
-                      >
-                        5678
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
+                text translated · Jan 1
+              </Text>
             </View>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "flex-end",
+              }
+            }
+          >
+            <Text
+              maxFontSizeMultiplier={2}
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 15,
+                  "fontWeight": "600",
+                }
+              }
+            >
+              −0.12345678 ZEC
+            </Text>
+            <Text
+              maxFontSizeMultiplier={2}
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#888888",
+                  "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
+                  "marginTop": 4,
+                }
+              }
+            >
+              $4.11
+            </Text>
           </View>
         </View>
       </View>
     </View>
   </View>
-  <View
-    style={
-      {
-        "backgroundColor": "#FFFFFF0F",
-        "bottom": 0,
-        "height": 1,
-        "left": 20,
-        "position": "absolute",
-        "right": 20,
-      }
-    }
-  />
 </View>
 `;

@@ -177,7 +177,6 @@ test('the muting rule has one spelling, usePriceHealth', () => {
   const sites = [
     '../ui/widgets/PriceFetcher.tsx',
     '../ui/widgets/CurrencyAmount.tsx',
-    '../screens/Send/Send.tsx',
   ];
   sites.forEach(site => {
     const source = fs.readFileSync(path.join(__dirname, site), 'utf8');

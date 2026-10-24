@@ -37,6 +37,8 @@ type UseShieldFundsResult = {
   showShieldButton: boolean;
   shieldingFee: number;
   onPressShieldFunds: () => void;
+  /** Shields at once, for a caller that asked in its own sheet. */
+  shieldNow: () => Promise<void>;
   calculateAmountToShield: () => string;
   calculatePoolsToShield: () => string;
   calculateDisableButtonToShield: () => boolean;
@@ -212,6 +214,7 @@ export function useShieldFunds({
     showShieldButton,
     shieldingFee,
     onPressShieldFunds,
+    shieldNow: handleShieldFunds,
     calculateAmountToShield,
     calculatePoolsToShield,
     calculateDisableButtonToShield,

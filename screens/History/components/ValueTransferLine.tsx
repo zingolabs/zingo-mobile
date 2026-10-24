@@ -3,97 +3,60 @@ import React, { useCallback, useContext, useEffect, useRef } from 'react';
 import { Animated, View, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
-import {
-  iconSize,
-  iconSizeSm,
-  slopFor,
-  space12,
-  space20,
-  space4,
-  space8,
-  useTheme,
-} from '@app/theme';
-import ListRow from '@ui/primitives/ListRow';
-import Text from '@ui/primitives/Text';
+import { slopFor, useTheme, iconSizeMd, iconSize } from '@app/theme';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-
-import ZecAmount from '@ui/widgets/ZecAmount';
-import FadeText from '@ui/primitives/FadeText';
 import {
   ValueTransferType,
   ValueTransferKindEnum,
-  GlobalConst,
   SendPageStateClass,
   ToAddrClass,
   Route,
+  GlobalConst,
 } from '@app/AppState';
-
 import { ContextAppLoaded } from '@app/context';
-import AddressItem from '@ui/widgets/AddressItem';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { fiatQuote } from '@app/price/fiatQuote';
 import Utils from '@app/utils';
 import { FileTextIcon } from '@ui/primitives/Icons/FileTextIcon';
 import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
-import { MessagesIcon } from '@ui/primitives/Icons/MessagesIcon';
-import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import { ArrowDownIcon } from '@ui/primitives/Icons/ArrowDownIcon';
 import { ArrowUpIcon } from '@ui/primitives/Icons/ArrowUpIcon';
-import { RefreshIcon } from '@ui/primitives/Icons/RefreshIcon';
+import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
 import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
-//import Utils from '@app/utils';
+import { shortWhen, transferRowText } from '@screens/History/historyRowText';
+import HistoryAvatar from './HistoryAvatar';
+import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
+import HistoryRowBody from './HistoryRowBody';
 
 type ValueTransferLineProps = {
   index: number;
-  month: string;
   vt: ValueTransferType;
+  /** Draws the hairline above; the first row under a month has none. */
+  hairline: boolean;
   setValueTransferDetailModalShow: (i: number, vt: ValueTransferType) => void;
-  nextLineWithSameTxid: boolean;
-  //setMessagesAddressModalShow: (vt: ValueTransferType) => void;
   registerSwipeable: (r: Swipeable | null) => void;
   closeAllSwipeables: () => void;
   closeOtherSwipeables: () => void;
 };
-/** Each kind's label while it is on its way, and once it has landed. */
-const KIND_LABEL: Record<ValueTransferKindEnum, [string, string]> = {
-  [ValueTransferKindEnum.Sent]: ['history.sending', 'history.sent'],
-  [ValueTransferKindEnum.Received]: ['history.receiving', 'history.received'],
-  [ValueTransferKindEnum.MemoToSelf]: [
-    'history.sendingmemotoself',
-    'history.memotoself',
-  ],
-  [ValueTransferKindEnum.SendToSelf]: [
-    'history.sendingtoself',
-    'history.sendtoself',
-  ],
-  [ValueTransferKindEnum.Shield]: ['history.shielding', 'history.shield'],
-  [ValueTransferKindEnum.Rejection]: ['history.sending', 'history.rejection'],
-  [ValueTransferKindEnum.Migration]: ['history.migrating', 'history.migration'],
-};
 
-const FAILED_LABEL: Partial<Record<ValueTransferKindEnum, string>> = {
-  [ValueTransferKindEnum.Sent]: 'history.sent-failed',
-  [ValueTransferKindEnum.Shield]: 'history.shield-failed',
-  [ValueTransferKindEnum.Received]: 'history.received-failed',
-};
+/** USD for a ZEC amount, at the transfer's own price when it carries one. */
+export function usdText(amount: number, price: number): string {
+  return price > 0
+    ? `$${(amount * price).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`
+    : '';
+}
 
-const labelKey = (
-  kind: ValueTransferKindEnum,
-  confirmations: number,
-  failed: boolean,
-): string =>
-  (failed ? FAILED_LABEL[kind] : undefined) ??
-  KIND_LABEL[kind][confirmations === 0 ? 0 : 1];
-
-/** The status line lines up with the row's text: padding, icon and gap. */
-const STATUS_INDENT = space20 + iconSize + space12;
-
+/**
+ * A transfer in History: its icon, what it was, when, and the ZEC with its
+ * dollars. Swiping right offers the detail and, for an address, a send.
+ */
 const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   index,
   vt,
-  month,
+  hairline,
   setValueTransferDetailModalShow,
-  nextLineWithSameTxid,
-  //setMessagesAddressModalShow,
   registerSwipeable,
   closeAllSwipeables,
   closeOtherSwipeables,
@@ -109,14 +72,13 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     readOnly,
     server,
     setSendPageState,
+    zecPrice,
+    addressBook,
   } = context;
   const { colors } = useTheme();
+  const t = (key: string) => (translate(key) as string).trim();
 
-  // When RecyclerListView reuses this row for a different transfer, the
-  // Swipeable's internal open/closed state stays pinned to the recycled view
-  // unless we explicitly close it on rebind. We keep a local ref alongside
-  // the parent's registry callback so the parent can still iterate and close
-  // all rows.
+  // A recycled row keeps its Swipeable open unless it is closed on rebind.
   const swipeableRef = useRef<Swipeable | null>(null);
   const setSwipeableRef = useCallback(
     (r: Swipeable | null) => {
@@ -129,57 +91,52 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     swipeableRef.current?.close();
   }, [vt.txid]);
 
-  const amountColor =
-    vt.status === RPCValueTransfersStatusEnum.failed
-      ? colors.fgMuted
-      : vt.confirmations >= 0 && vt.confirmations < GlobalConst.minConfirmations
-        ? colors.fgWarning
-        : vt.kind === ValueTransferKindEnum.Received ||
-            vt.kind === ValueTransferKindEnum.Shield
-          ? colors.fgAccent
-          : colors.fgDefault;
-
-  const KindIcon =
-    vt.confirmations >= 0 &&
-    vt.confirmations < GlobalConst.minConfirmations &&
-    vt.status !== RPCValueTransfersStatusEnum.failed
-      ? RefreshIcon
-      : vt.kind === ValueTransferKindEnum.Migration
-        ? SwapIcon
-        : vt.kind === ValueTransferKindEnum.Received ||
-            vt.kind === ValueTransferKindEnum.Shield
-          ? ArrowDownIcon
-          : ArrowUpIcon;
-
-  const haveMemo = vt.memos && vt.memos.length > 0 && !!vt.memos.join('');
-  const failed = vt.status === RPCValueTransfersStatusEnum.failed;
-  const inFlight =
-    vt.status === RPCValueTransfersStatusEnum.transmitted ||
-    vt.status === RPCValueTransfersStatusEnum.calculated;
-  /** Still under the confirmations the app waits for. */
-  const pending =
-    vt.confirmations >= 0 && vt.confirmations < GlobalConst.minConfirmations;
-  const titleColor = failed
-    ? colors.fgMuted
-    : vt.kind === ValueTransferKindEnum.Received ||
-        vt.kind === ValueTransferKindEnum.Shield
-      ? colors.fgAccent
-      : colors.fgDefault;
-  const kindLabel = translate(
-    labelKey(vt.kind, vt.confirmations, failed),
-  ) as string;
+  const quote = fiatQuote(zecPrice, server, server.chainName);
+  const price =
+    vt.zecPrice && vt.zecPrice > 0
+      ? vt.zecPrice
+      : quote.kind === 'quote'
+        ? quote.price
+        : 0;
+  /** The Zcash contact the row's address belongs to. */
+  const contact = vt.address
+    ? addressBook.find(
+        entry =>
+          entry.address === vt.address &&
+          entry.swapChain === GlobalConst.zecSwapChain,
+      )
+    : undefined;
+  const text = transferRowText({
+    vt,
+    when: shortWhen(vt.time * 1000, Date.now(), t, ms =>
+      Utils.formatDate(ms, 'MMM d', language),
+    ),
+    currency: info.currencyName,
+    usd: usdText(vt.amount, price),
+    t,
+    contactName: contact?.label,
+  });
+  const iconColor = colors.fgDefault;
+  const icon =
+    vt.kind === ValueTransferKindEnum.Received ? (
+      <ArrowDownIcon size={iconSizeMd} color={iconColor} />
+    ) : vt.kind === ValueTransferKindEnum.Shield ? (
+      <ShieldIcon size={iconSizeMd} color={iconColor} />
+    ) : vt.kind === ValueTransferKindEnum.Migration ? (
+      <SwapIcon size={iconSizeMd} color={iconColor} />
+    ) : (
+      <ArrowUpIcon size={iconSizeMd} color={iconColor} />
+    );
+  const haveMemo = !!vt.memos && vt.memos.length > 0 && !!vt.memos.join('');
 
   const handleRenderLeftActions = (
     progress: Animated.AnimatedInterpolation<number>,
-    _dragX: Animated.AnimatedInterpolation<number>,
-    _swipeable: Swipeable,
   ) => {
     const trans = progress.interpolate({
       inputRange: [0, 1],
       outputRange: [-132, 0],
       extrapolate: 'clamp',
     });
-
     return (
       <>
         {showSwipeableIcons && (
@@ -207,7 +164,11 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   closeAllSwipeables();
                 }}
               >
-                <FileTextIcon size={24} color={colors.fgDefault} />
+                <FileTextIcon
+                  style={{ opacity: 0.8 }}
+                  size={iconSize}
+                  color={colors.fgDefault}
+                />
               </TouchableOpacity>
             </View>
             {!!vt.address && !readOnly && server.kind !== 'offline' && (
@@ -222,19 +183,16 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   hitSlop={slopFor(24)}
                   style={{ zIndex: 999, padding: 20 }}
                   onPress={() => {
-                    // enviar
                     const sendPageState = new SendPageStateClass(
                       new ToAddrClass(0),
                     );
                     sendPageState.toaddr.to = vt.address ? vt.address : '';
                     setSendPageState(sendPageState);
-                    navigation.navigate(Route.Home, {
-                      screen: Route.Send,
-                    });
+                    navigation.navigate(Route.Home, { screen: Route.Send });
                     closeAllSwipeables();
                   }}
                 >
-                  <PlaneIcon size={24} color={colors.fgAccent} />
+                  <PlaneIcon size={iconSize} color={colors.fgAccent} />
                 </TouchableOpacity>
               </View>
             )}
@@ -244,55 +202,11 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     );
   };
 
-  //console.log('render ValueTransferLine - 5', month, vt);
-
-  //if (index === 0) {
-  //  vt.confirmations = 0;
-  //  vt.status = RPCValueTransfersStatusEnum.failed;
-  //  vt.kind = ValueTransferKindEnum.Shield;
-  //}
-  //if (index === 1) {
-  //  vt.confirmations = 0;
-  //  vt.status = RPCValueTransfersStatusEnum.failed;
-  //  vt.kind = ValueTransferKindEnum.Sent;
-  //}
-  //if (index === 0) {
-  //  vt.confirmations = 0;
-  //  vt.status = RPCValueTransfersStatusEnum.mempool;
-  //}
-  //if (index === 1) {
-  //  vt.confirmations = 0;
-  //  vt.status = RPCValueTransfersStatusEnum.mempool;
-  //}
-  //if (index === 2 ) {
-  //  vt.confirmations = 0;
-  //  vt.status = RPCValueTransfersStatusEnum.mempool;
-  //}
-  //if (index === 3 ) {
-  //  vt.confirmations = 0;
-  //  vt.status = RPCValueTransfersStatusEnum.mempool;
-  //}
-
   return (
     <View
       testID={`vt-${index + 1}`}
-      style={{
-        flex: 1,
-        flexDirection: 'column',
-      }}
+      style={{ backgroundColor: colors.bgSurface }}
     >
-      {month !== '' && (
-        <View
-          style={{
-            paddingLeft: space20,
-            paddingTop: 10,
-            paddingBottom: 0,
-            backgroundColor: colors.bgSurface,
-          }}
-        >
-          <FadeText>{month}</FadeText>
-        </View>
-      )}
       <TouchableOpacity
         style={{ zIndex: 999, flex: 1, justifyContent: 'center' }}
         onPress={async () => {
@@ -309,119 +223,26 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
           overshootFriction={1}
           renderLeftActions={handleRenderLeftActions}
         >
-          <View style={{ paddingBottom: vt.confirmations === 0 ? space8 : 0 }}>
-            <ListRow
-              leading={
-                <KindIcon
-                  size={iconSize}
-                  color={inFlight ? colors.fgWarning : amountColor}
+          <HistoryRowBody
+            leading={
+              contact ? (
+                <Avatar
+                  kind="contact"
+                  name={contact.label}
+                  category={avatarCategoryOf(contact.color)}
+                  size="md"
                 />
-              }
-              title={
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    columnGap: space8,
-                  }}
-                >
-                  <Text variant="bodyStrong" color={titleColor}>
-                    {kindLabel}
-                  </Text>
-                  {/* One line in every row: the address takes what is
-                      left and is clipped, so no row grows a second line. */}
-                  {!!vt.address && !pending && (
-                    <View style={{ flexShrink: 1, overflow: 'hidden' }}>
-                      <AddressItem address={vt.address} oneLine={true} />
-                    </View>
-                  )}
-                </View>
-              }
-              subtitle={
-                <View>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Text variant="bodySmall" tone="muted">
-                      {vt.time
-                        ? Utils.formatDate(
-                            (vt.time || 0) * 1000,
-                            'MMM d, h:mm aaa',
-                            language,
-                          )
-                        : '--'}
-                    </Text>
-                    {haveMemo && (
-                      <MessagesIcon
-                        style={{ marginLeft: space8 }}
-                        size={iconSizeSm}
-                        color={failed ? colors.fgMuted : colors.fgMuted}
-                      />
-                    )}
-                  </View>
-                </View>
-              }
-              trailing={
-                <ZecAmount
-                  size={15}
-                  currencyName={info.currencyName}
-                  color={failed ? colors.fgMuted : amountColor}
-                  amtZec={vt.amount}
-                  privacy={privacy}
-                />
-              }
-            />
-            {vt.confirmations === 0 && (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: inFlight ? 'center' : 'flex-start',
-                  paddingLeft: inFlight ? 0 : STATUS_INDENT,
-                }}
-              >
-                {inFlight && (
-                  <TriangleAlert
-                    style={{ marginRight: space4 }}
-                    color={colors.fgWarning}
-                    size={iconSizeSm}
-                  />
-                )}
-                <Text
-                  variant="caption"
-                  color={
-                    failed
-                      ? colors.fgDanger
-                      : inFlight
-                        ? colors.fgAccent
-                        : colors.fgWarning
-                  }
-                  style={{
-                    fontWeight: '700',
-                    textDecorationLine: inFlight ? 'underline' : 'none',
-                  }}
-                >
-                  {translate(`history.${vt.status}`) as string}
-                </Text>
-              </View>
-            )}
-          </View>
+              ) : (
+                <HistoryAvatar icon={icon} />
+              )
+            }
+            text={text}
+            privacy={privacy}
+            hairline={hairline}
+            memo={haveMemo}
+          />
         </Swipeable>
       </TouchableOpacity>
-      {/* Lines of the same TXID render flush against each other; the
-          separator only marks the boundary between transactions. It sits
-          at the bottom of the list's fixed-height cell, not under the
-          content, so the cell's spare height never gathers below it. */}
-      {!nextLineWithSameTxid && (
-        <View
-          style={{
-            position: 'absolute',
-            left: space20,
-            right: space20,
-            bottom: 0,
-            height: 1,
-            backgroundColor: colors.borderSubtle,
-          }}
-        />
-      )}
     </View>
   );
 };

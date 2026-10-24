@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import Text from '@ui/primitives/Text';
 import {
   View,
   TextInput,
@@ -9,11 +10,10 @@ import {
   TextInputEndEditingEventData,
   NativeSyntheticEvent,
 } from 'react-native';
-import { useTheme, slopFor } from '@app/theme';
+import { useTheme, slopFor, iconSizeMd } from '@app/theme';
 
 import { GlobalConst, TranslateType } from '@app/AppState';
 import Utils from '@app/utils';
-import FadeText from '@ui/primitives/FadeText';
 import Button from '@ui/primitives/Button';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
@@ -115,7 +115,11 @@ const Memo: React.FunctionComponent<MemoProps> = ({
         />
         {memo ? (
           <TouchableOpacity hitSlop={slopFor(20)} onPress={() => setMemo('')}>
-            <XIcon style={{ margin: 10 }} size={20} color={colors.fgMuted} />
+            <XIcon
+              style={{ margin: 10 }}
+              size={iconSizeMd}
+              color={colors.fgMuted}
+            />
           </TouchableOpacity>
         ) : null}
       </View>
@@ -127,20 +131,20 @@ const Memo: React.FunctionComponent<MemoProps> = ({
           marginTop: 5,
         }}
       >
-        <FadeText
-          style={{
-            marginTop: 0,
-            fontWeight: 'bold',
-            color: memoDisabled ? colors.fgDanger : colors.fgDefault,
-            opacity: 1,
-          }}
-        >{`${Utils.countMemoBytes(memo, includeUAMemoBoolean, defaultUnifiedAddress)} `}</FadeText>
-        <FadeText style={{ marginTop: 0 }}>
-          {translate('loadedapp.of') as string}
-        </FadeText>
-        <FadeText style={{ marginTop: 0 }}>
-          {' ' + GlobalConst.memoMaxLength.toString() + ' '}
-        </FadeText>
+        <Text variant="caption" tone={memoDisabled ? 'danger' : 'muted'}>
+          {(translate('send.memo-count') as string)
+            .replace(
+              '{n}',
+              String(
+                Utils.countMemoBytes(
+                  memo,
+                  includeUAMemoBoolean,
+                  defaultUnifiedAddress,
+                ),
+              ),
+            )
+            .replace('{max}', String(GlobalConst.memoMaxLength))}
+        </Text>
       </View>
       <View style={{ display: 'flex', flexDirection: 'column', margin: 0 }}>
         <View

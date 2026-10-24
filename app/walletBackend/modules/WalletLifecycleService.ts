@@ -8,6 +8,7 @@
  */
 import { GlobalConst, Done, DONE, ErrorKeyed, errorKeyed } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
+import { SwapStore, readCurrentWalletFingerprint } from '@app/swap';
 import { SyncCoordinator } from './SyncCoordinator';
 
 export type WalletLifecycleErrorKey =
@@ -36,6 +37,14 @@ export class WalletLifecycleService {
       return err('rpc.walletnotfound-error');
     }
     await this.syncCoordinator.pauseSyncProcess();
+    // The swap records go before the wallet file: whoever restores another
+    // seed on this device must not find the previous wallet's swaps. An
+    // unreadable fingerprint skips the wipe, since a guessed one could name
+    // another wallet's bucket.
+    const fingerprint = await readCurrentWalletFingerprint();
+    if (fingerprint) {
+      await SwapStore.clearForWallet(fingerprint);
+    }
     const result = await RPCModule.deleteExistingWallet();
 
     if (!(result && result !== GlobalConst.false)) {

@@ -11,17 +11,19 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { RevealOrigin } from '@ui/widgets/CircularReveal';
 import type { Request } from '@app/navigation/results';
 import {
-  AddressKindEnum,
   ChainNameEnum,
+  ValueTransferKindEnum,
   LaunchingModeEnum,
   Route,
   SendPageStateClass,
   ValueTransferType,
   ProposalPoolsType,
 } from '@app/AppState';
-import type { ComputingEnd } from '@app/walletBackend/transforms/sendSettlement';
+import type { ComputingParams } from '@app/walletBackend/transforms/sendSettlement';
 import { RPCDrainTxType } from '@app/walletBackend/types/RPCDrainPlanType';
 import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanType';
+import type { SwapReview } from '@screens/Swap/useSwapForm';
+import type { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
 
 // The root stack: one section, chosen by the session, plus the scanner,
 // which sits above every section and its bottom-sheet portal.
@@ -57,6 +59,7 @@ export type HomeTabParamList = {
   [Route.History]: undefined;
   [Route.Send]: undefined;
   [Route.Receive]: undefined;
+  [Route.Swap]: undefined;
 };
 
 // What the loading section hands the wallet section when a wallet opens.
@@ -99,13 +102,14 @@ export type AppDrawerParamList = {
   [Route.History]: undefined;
   [Route.Send]: undefined;
   [Route.Receive]: undefined;
+  [Route.Swap]: undefined;
   [Route.Messages]: undefined;
   [Route.Settings]: undefined;
   [Route.Server]: undefined;
   [Route.About]: undefined;
   [Route.MixnetDoctor]: undefined;
   [Route.Insight]: undefined;
-  [Route.Computing]: ComputingEnd | undefined;
+  [Route.Computing]: ComputingParams | undefined;
   [Route.SyncReport]: undefined;
   [Route.Pools]: undefined;
   [Route.MeetIronwood]: undefined;
@@ -145,18 +149,25 @@ export type AppDrawerParamList = {
   [Route.AddressList]: AddressListNavigationState | undefined;
   [Route.ValueTransferDetail]: ValueTransferDetailNavigationState | undefined;
   [Route.Confirm]: ConfirmNavigationState | undefined;
+  [Route.SwapReview]: SwapReviewNavigationState;
+  [Route.SwapDeposit]: SwapRecordNavigationState;
+  [Route.SwapTracking]: SwapRecordNavigationState;
+  [Route.SwapResult]: SwapRecordNavigationState;
+  [Route.SwapDetail]: SwapRecordNavigationState;
+  [Route.SwapTransaction]: SwapTransactionNavigationState;
 };
 
 export type AddressBookNavigationState = {
   // Opens the book as a picker; the chosen address is delivered under this
   // request.
   pick: Request;
+  /** SwapKit chain code of the contacts offered; Zcash when absent. */
+  chain?: string;
 };
 
+/** The address Receive shows, marked in the list; the pick returns as 'receive.pick'. */
 export type AddressListNavigationState = {
-  addressKind: AddressKindEnum;
-  // The chosen index is delivered under this request.
-  request: Request;
+  current?: string;
 };
 
 // Which codes the scanner takes: any, a Zcash address or URI on a chain, or
@@ -198,6 +209,28 @@ export type ConfirmNavigationState = {
   proposalPools: ProposalPoolsType;
   sendAllAmount: boolean;
   sendPageState: SendPageStateClass;
+};
+
+// What the swap form agreed to, copied when Continue was pressed so a
+// refresh behind the review cannot move it.
+export type SwapReviewNavigationState = {
+  review: SwapReview;
+  direction: SwapDirectionEnum;
+};
+
+// One of a swap's Zcash transactions: its txid and kind, since a send to
+// self lists the same txid twice.
+export type SwapTransactionNavigationState = {
+  recordId: string;
+  txid: string;
+  kind: ValueTransferKindEnum;
+};
+
+// A swap by its local record id; the screen reads the live record.
+export type SwapRecordNavigationState = {
+  recordId: string;
+  // Why the wallet's own broadcast of an outbound deposit did not go out.
+  broadcastError?: string;
 };
 
 // What `useNavigation()` gives inside the wallet: the wallet stack and the

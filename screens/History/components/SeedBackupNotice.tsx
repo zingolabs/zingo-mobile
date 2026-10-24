@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useRef } from 'react';
 import { View } from 'react-native';
 import {
@@ -17,6 +16,8 @@ import Tag from '@ui/widgets/Tag';
 type SeedBackupNoticeProps = {
   // The flow is open over the card: its contents step aside for the container transform.
   covered: boolean;
+  /** The backup is done: the tag turns green before the card leaves the stack. */
+  backedUp?: boolean;
   onBackUp: (from: CardRect) => void;
 };
 
@@ -26,6 +27,7 @@ const UNCOVER_MS = 200;
 // The seed phrase notice on History. Back up opens the flow from this card.
 const SeedBackupNotice: React.FunctionComponent<SeedBackupNoticeProps> = ({
   covered,
+  backedUp,
   onBackUp,
 }) => {
   const { translate } = useContext(ContextAppLoaded);
@@ -51,7 +53,11 @@ const SeedBackupNotice: React.FunctionComponent<SeedBackupNoticeProps> = ({
       tone="seed"
       title={translate('seednotice.title') as string}
       tag={
-        <Tag tone="warning">{translate('seednotice.pending') as string}</Tag>
+        backedUp ? (
+          <Tag tone="accent">{translate('seednotice.done') as string}</Tag>
+        ) : (
+          <Tag tone="warning">{translate('seednotice.pending') as string}</Tag>
+        )
       }
       contentStyle={contents}
       actionBeside
@@ -61,8 +67,6 @@ const SeedBackupNotice: React.FunctionComponent<SeedBackupNoticeProps> = ({
           variant="primary"
           size="small"
           inline
-          /** The compact pill it had beside the notice text. */
-          style={{ minHeight: 0, paddingHorizontal: 16, paddingVertical: 7 }}
           title={translate('seednotice.button') as string}
           onPress={open}
         />

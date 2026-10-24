@@ -4,6 +4,7 @@ export type TextVariant =
   | 'balance'
   | 'screenTitle'
   | 'subtitle'
+  | 'barTitle'
   | 'button'
   | 'bodyStrong'
   | 'body'
@@ -40,6 +41,13 @@ export const textVariants: Record<TextVariant, VariantStyle> = {
   subtitle: {
     fontSize: 18,
     lineHeight: 24,
+    fontWeight: '700',
+    cap: fontScaleTitle,
+  },
+  /** The title of a panel's or a sheet's bar (TitleBar), as History's in dev. */
+  barTitle: {
+    fontSize: 16,
+    lineHeight: 28,
     fontWeight: '700',
     cap: fontScaleTitle,
   },

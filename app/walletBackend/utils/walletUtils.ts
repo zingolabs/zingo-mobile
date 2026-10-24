@@ -505,6 +505,18 @@ export async function createNewTransparentAddress(): Promise<
   return callFfi(RPCModule.createNewTransparentAddressProcess());
 }
 
+// Reserves the next refund-scope transparent address, the one a swap provider
+// refunds a deposit to. Same JSON shape as createNewTransparentAddress.
+export async function reserveRefundAddress(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.reserveRefundAddressProcess());
+}
+
+// The same address without reserving it, for a quote to name while the swap
+// is still being chosen.
+export async function deriveRefundAddress(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.deriveRefundAddressProcess());
+}
+
 // Requests zingolib to forget about a transaction. The success value is a
 // human-readable status message the caller is expected to surface in an
 // alert. zingolib does not return structured data here.
