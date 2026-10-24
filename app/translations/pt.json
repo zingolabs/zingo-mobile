@@ -656,7 +656,8 @@
     "group-shielded": "Protegidos",
     "group-transparent": "Transparentes",
     "group-count": "{n} endereços",
-    "public-note": "Públicos"
+    "public-note": "Públicos",
+    "group-count-one": "1 endereço"
   },
   "swap": {
     "title": "Swap",

@@ -656,7 +656,8 @@
     "group-shielded": "Korumalı",
     "group-transparent": "Şeffaf",
     "group-count": "{n} adres",
-    "public-note": "Herkese açık"
+    "public-note": "Herkese açık",
+    "group-count-one": "1 adres"
   },
   "swap": {
     "title": "Takas",

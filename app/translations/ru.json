@@ -656,7 +656,8 @@
     "group-shielded": "Защищённые",
     "group-transparent": "Прозрачные",
     "group-count": "Адресов: {n}",
-    "public-note": "Публичные"
+    "public-note": "Публичные",
+    "group-count-one": "1 адрес"
   },
   "swap": {
     "title": "Обмен",
