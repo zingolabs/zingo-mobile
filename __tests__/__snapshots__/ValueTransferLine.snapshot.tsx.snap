@@ -39,8 +39,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
     onStartShouldSetResponder={[Function]}
     style={
       {
-        "flex": 1,
-        "justifyContent": "center",
         "opacity": 1,
         "zIndex": 999,
       }
@@ -407,8 +405,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
     onStartShouldSetResponder={[Function]}
     style={
       {
-        "flex": 1,
-        "justifyContent": "center",
         "opacity": 1,
         "zIndex": 999,
       }
@@ -775,8 +771,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
     onStartShouldSetResponder={[Function]}
     style={
       {
-        "flex": 1,
-        "justifyContent": "center",
         "opacity": 1,
         "zIndex": 999,
       }
@@ -1074,8 +1068,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
     onStartShouldSetResponder={[Function]}
     style={
       {
-        "flex": 1,
-        "justifyContent": "center",
         "opacity": 1,
         "zIndex": 999,
       }
