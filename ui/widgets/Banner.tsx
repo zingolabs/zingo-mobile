@@ -227,6 +227,9 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
               flexWrap: 'wrap',
               alignItems: 'center',
               gap: space4,
+              /** Clear of the corner X when nothing sits beside the text. */
+              paddingRight:
+                onDismiss && !actionBeside ? touchTarget - space16 : 0,
             }}
           >
             <Text variant="bodyStrong">{title}</Text>
@@ -244,25 +247,27 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
         {action !== undefined && actionBeside && (
           <View style={{ alignSelf: 'center' }}>{action}</View>
         )}
-        {onDismiss && (
-          <Pressable
-            testID={dismissTestID}
-            accessibilityRole="button"
-            accessibilityLabel={dismissLabel}
-            onPress={onDismiss}
-            style={{
-              width: touchTarget,
-              height: touchTarget,
-              marginTop: -space12,
-              marginRight: -space12,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <XIcon size={iconSizeMd} color={colors.fgMuted} />
-          </Pressable>
-        )}
       </Animated.View>
+      {/* In the card's corner, outside the row, so the action keeps its place. */}
+      {onDismiss && (
+        <Pressable
+          testID={dismissTestID}
+          accessibilityRole="button"
+          accessibilityLabel={dismissLabel}
+          onPress={onDismiss}
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            width: touchTarget,
+            height: touchTarget,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <XIcon size={iconSizeMd} color={colors.fgMuted} />
+        </Pressable>
+      )}
     </View>
   );
 });
