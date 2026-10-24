@@ -635,7 +635,7 @@
     "pinned": "Fijada. Sale siempre la primera en Recibir.",
     "unpinned": "Ya no está fijada. Recibir muestra tu dirección más reciente.",
     "copy": "Copiar",
-    "transparent-public": "Las direcciones transparentes son públicas: cualquiera puede ver lo que reciben. Protege esos fondos desde Inicio para que sean privados.",
+    "transparent-public": "Las direcciones transparentes exponen tus datos.",
     "new-title": "Nueva dirección",
     "new-sub": "Usa una dirección distinta para cada persona y así no se podrán relacionar los pagos.",
     "new-type": "Tipo",
@@ -656,7 +656,8 @@
     "group-shielded": "Protegidas",
     "group-transparent": "Transparentes",
     "group-count": "{n} direcciones",
-    "public-note": "Públicas"
+    "public-note": "Públicas",
+    "group-count-one": "1 dirección"
   },
   "swap": {
     "title": "Swap",
@@ -920,9 +921,9 @@
     "deposit-you-get": "Recibirás",
     "result-refunded-buy": "El swap no se completó, así que el {coin} volvió a tu dirección de reembolso, menos la comisión de red.",
     "result-missing": "Falta",
-    "detail-save-contact": "Guardar esta dirección de {coin} como contacto",
     "tx-privacy": "Privacidad",
-    "tx-private": "Privado · NYM Enhanced"
+    "tx-private": "Privado · NYM Enhanced",
+    "no-route-now": "Ahora mismo no hay ninguna ruta disponible para este swap."
   },
   "history": {
     "shield-all": "Blindar Todos\nlos fondos",

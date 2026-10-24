@@ -6,7 +6,9 @@ import { readCurrentWalletFingerprint } from '@app/swap';
  * app's key-value store under the wallet's fingerprint, like the swap
  * records, so another wallet on the device never opens on it.
  */
-const keyFor = (fingerprint: string) => `receive:pin:${fingerprint}`;
+export const RECEIVE_PIN_KEY_PREFIX = 'receive:pin:';
+
+const keyFor = (fingerprint: string) => RECEIVE_PIN_KEY_PREFIX + fingerprint;
 
 /** The pinned address of the loaded wallet, or '' when none is pinned. */
 export async function readPinnedAddress(): Promise<string> {

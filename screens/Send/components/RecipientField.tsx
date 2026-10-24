@@ -1,22 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
-import {
-  iconSize,
-  iconSizeMd,
-  iconSizeSm,
-  slopFor,
-  space4,
-  space8,
-  space12,
-  touchTarget,
-  useTheme,
-} from '@app/theme';
+import { iconSizeSm, space4, space8, space12, useTheme } from '@app/theme';
 import { AddressBookFileClass } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils';
 import Text from '@ui/primitives/Text';
-import TextField from '@ui/primitives/TextField';
+import TextField, { FieldAction } from '@ui/primitives/TextField';
 import ListRow from '@ui/primitives/ListRow';
 import Button from '@ui/primitives/Button';
 import Card from '@ui/widgets/Card';
@@ -83,6 +73,7 @@ export default function RecipientField({
   onChangeText,
   onClear,
   valid,
+  focused,
   onFocus,
   onBlur,
   contact,
@@ -101,6 +92,27 @@ export default function RecipientField({
   const { colors } = useTheme();
   const t = (key: string) => (translate(key) as string).trim();
   const token = valid === 1 && (!!contact || !!pickedName);
+  /** Tapped while shortened: the input comes back and takes the focus. */
+  const [editing, setEditing] = useState(false);
+  /**
+   * A valid address not being edited reads in one line, shortened in the
+   * middle so its start and end show; a tap brings the input back.
+   */
+  const shortened =
+    valid === 1 && !token && !!text && !focused && !editing ? (
+      <Pressable
+        // The input's own id: Maestro taps it and types into the input it brings back.
+        testID="send.addressplaceholder"
+        accessibilityRole="button"
+        accessibilityLabel={t('send.address-acc')}
+        onPress={() => setEditing(true)}
+        style={{ flex: 1, paddingVertical: space12 }}
+      >
+        <Text variant="address" numberOfLines={1} ellipsizeMode="middle">
+          {text}
+        </Text>
+      </Pressable>
+    ) : undefined;
   const transparent = valid === 1 && /^t/i.test(text);
   const searching = matches.length > 0 || lookup.kind !== 'none';
 
@@ -114,33 +126,6 @@ export default function RecipientField({
     />
   );
   const searchAvatar = <Avatar kind="icon" icon={SearchIcon} size="md" />;
-
-  const action = (
-    testID: string,
-    label: string,
-    icon: React.ReactNode,
-    onPress: () => void,
-    disabled?: boolean,
-    ref?: React.RefObject<View | null>,
-  ) => (
-    <Pressable
-      ref={ref}
-      testID={testID}
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      hitSlop={slopFor(touchTarget)}
-      disabled={disabled}
-      onPress={onPress}
-      style={{
-        width: touchTarget,
-        height: touchTarget,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      {icon}
-    </Pressable>
-  );
 
   const line = (icon: React.ReactNode, words: React.ReactNode) => (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: space8 }}>
@@ -281,38 +266,41 @@ export default function RecipientField({
         valid={valid === 1}
         error={valid === -1 ? t('send.to-invalid') : undefined}
         onFocus={onFocus}
-        onBlur={onBlur}
-        replacement={tokenView}
+        onBlur={() => {
+          setEditing(false);
+          onBlur();
+        }}
+        autoFocus={editing}
+        replacement={tokenView ?? shortened}
         footer={footer}
         trailing={
           <>
-            {!!text &&
-              action(
-                'send.address.clear',
-                t('clear'),
-                <XIcon size={iconSizeMd} color={colors.fgMuted} />,
-                onClear,
-              )}
-            {!token &&
-              action(
-                'send.address-book',
-                t('addressbook.pick-title'),
-                <ContactIcon
-                  size={iconSize}
-                  color={busy ? colors.fgAccentDisabled : colors.fgMuted}
-                />,
-                onOpenBook,
-                busy,
-              )}
-            {!token &&
-              action(
-                'send.scan-button',
-                t('send.scan-acc'),
-                <ScanIcon size={iconSize} color={colors.fgMuted} />,
-                onScan,
-                false,
-                scanRef,
-              )}
+            {!!text && (
+              <FieldAction
+                testID="send.address.clear"
+                icon={XIcon}
+                label={t('clear')}
+                onPress={onClear}
+              />
+            )}
+            {!token && (
+              <FieldAction
+                testID="send.address-book"
+                icon={ContactIcon}
+                label={t('addressbook.pick-title')}
+                onPress={onOpenBook}
+                disabled={busy}
+              />
+            )}
+            {!token && (
+              <FieldAction
+                ref={scanRef}
+                testID="send.scan-button"
+                icon={ScanIcon}
+                label={t('send.scan-acc')}
+                onPress={onScan}
+              />
+            )}
           </>
         }
       />

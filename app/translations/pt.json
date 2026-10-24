@@ -635,7 +635,7 @@
     "pinned": "Fixado. Aparece sempre primeiro em Receber.",
     "unpinned": "Desafixado. Receber mostra seu endereço mais recente.",
     "copy": "Copiar",
-    "transparent-public": "Endereços transparentes são públicos: qualquer um pode ver o que recebem. Proteja esses fundos no Início para mantê-los privados.",
+    "transparent-public": "Endereços transparentes expõem seus dados.",
     "new-title": "Novo endereço",
     "new-sub": "Use um endereço diferente para cada pessoa, assim os pagamentos não podem ser ligados.",
     "new-type": "Tipo",
@@ -656,7 +656,8 @@
     "group-shielded": "Protegidos",
     "group-transparent": "Transparentes",
     "group-count": "{n} endereços",
-    "public-note": "Públicos"
+    "public-note": "Públicos",
+    "group-count-one": "1 endereço"
   },
   "swap": {
     "title": "Swap",
@@ -920,9 +921,9 @@
     "deposit-you-get": "Você vai receber",
     "result-refunded-buy": "O swap não foi concluído, então o {coin} voltou para seu endereço de reembolso, menos a taxa de rede.",
     "result-missing": "Falta",
-    "detail-save-contact": "Salvar este endereço de {coin} como contato",
     "tx-privacy": "Privacidade",
-    "tx-private": "Privado · NYM Enhanced"
+    "tx-private": "Privado · NYM Enhanced",
+    "no-route-now": "Nenhuma rota está disponível para este swap agora."
   },
   "history": {
     "shield-all": "Blindar Todos os Fundos",

@@ -1,15 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
+import { FieldAction, FieldActions } from '@ui/primitives/TextField';
 import { useInsetFill } from '@ui/primitives/Surface';
-import { View, Pressable, TextInput } from 'react-native';
+import { View, TextInput } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import {
   useTheme,
   radiusMd,
   space4,
-  iconSize,
-  iconSizeMd,
-  touchTarget,
 } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
@@ -73,29 +71,6 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   const { translate, server } = context;
   const { colors } = useTheme();
   /** An action inside the field, as in Send's recipient field: 44 pt, muted. */
-  const action = (
-    testID: string | undefined,
-    label: string,
-    icon: React.ReactNode,
-    onPress: () => void,
-    off?: boolean,
-  ) => (
-    <Pressable
-      testID={testID}
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      disabled={off}
-      onPress={onPress}
-      style={{
-        width: touchTarget,
-        height: touchTarget,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      {icon}
-    </Pressable>
-  );
   const inset = useInsetFill();
 
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
@@ -245,59 +220,46 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                 editable={!disabled}
               />
             </View>
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              {!!address &&
-                !disabled &&
-                action(
-                  undefined,
-                  translate('clear') as string,
-                  <XIcon size={iconSizeMd} color={colors.fgMuted} />,
-                  () => setAddress(''),
-                )}
-              {validAddress === 1 &&
-                !disabled &&
-                !!onSaveContact &&
-                action(
-                  'send.save-contact-button',
-                  saveContactLabel ?? '',
-                  <UserPlusIcon size={iconSizeMd} color={colors.fgMuted} />,
-                  onSaveContact,
-                )}
-              {!address &&
-                !disabled &&
-                !!pasteLabel &&
-                action(
-                  'send.paste-button',
-                  pasteLabel,
-                  <ClipboardPasteIcon
-                    size={iconSizeMd}
-                    color={colors.fgMuted}
-                  />,
-                  async () => take(await Clipboard.getString()),
-                )}
-              {!disabled &&
-                !!onPickContact &&
-                action(
-                  'send.address-book',
-                  pickContactLabel ?? '',
-                  <ContactIcon size={iconSize} color={colors.fgMuted} />,
-                  onPickContact,
-                )}
-              {action(
-                'send.scan-button',
-                translate('send.scan-acc') as string,
-                <ScanIcon size={iconSize} color={colors.fgMuted} />,
-                () => setQrcodeModalShow(),
-                disabled,
+            <FieldActions>
+              {!!address && !disabled && (
+                <FieldAction
+                  icon={XIcon}
+                  label={translate('clear') as string}
+                  onPress={() => setAddress('')}
+                />
               )}
-            </View>
+              {validAddress === 1 && !disabled && !!onSaveContact && (
+                <FieldAction
+                  testID="send.save-contact-button"
+                  icon={UserPlusIcon}
+                  label={saveContactLabel ?? ''}
+                  onPress={onSaveContact}
+                />
+              )}
+              {!address && !disabled && !!pasteLabel && (
+                <FieldAction
+                  testID="send.paste-button"
+                  icon={ClipboardPasteIcon}
+                  label={pasteLabel}
+                  onPress={async () => take(await Clipboard.getString())}
+                />
+              )}
+              {!disabled && !!onPickContact && (
+                <FieldAction
+                  testID="send.address-book"
+                  icon={ContactIcon}
+                  label={pickContactLabel ?? ''}
+                  onPress={onPickContact}
+                />
+              )}
+              <FieldAction
+                testID="send.scan-button"
+                icon={ScanIcon}
+                label={translate('send.scan-acc') as string}
+                onPress={() => setQrcodeModalShow()}
+                disabled={disabled}
+              />
+            </FieldActions>
           </View>
         </View>
       </View>

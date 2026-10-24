@@ -63,7 +63,7 @@ export type {
   SwapKitTrackParams,
 } from './SwapKitClient';
 
-export { SwapStore } from './SwapStore';
+export { SwapStore, SWAP_RECORDS_KEY_PREFIX } from './SwapStore';
 export {
   groupHistoryBySwap,
   sliceKeepingGroups,

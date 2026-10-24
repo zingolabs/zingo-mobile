@@ -11,6 +11,8 @@ import {
   space4,
   touchTarget,
   useTheme,
+  iconSizeSm,
+  space8,
 } from '@app/theme';
 import Text from '@ui/primitives/Text';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
@@ -22,7 +24,8 @@ import { XIcon } from '@ui/primitives/Icons/XIcon';
 /**
  * Set by the notice stack: every banner in it takes the plain card surface
  * and edge, so the stack reads as one deck whatever the notice; only the
- * icon, its tile, the text and the tag change.
+ * icon, its tile, the text and the tag change. Outside the stack a banner
+ * is a compact note (16 pt icon, caption text, no bold).
  */
 export const BannerPlainContext = createContext(false);
 
@@ -112,6 +115,84 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
     },
   }[tone];
 
+  if (!inStack) {
+    /**
+     * Outside Home's notice stack a banner is a compact note: whole
+     * sentences in caption, regular, beside a 16 pt icon with no tile.
+     */
+    const CompactIcon = {
+      seed: SproutIcon,
+      warning: TriangleAlert,
+      viewOnly: SnowflakeIcon,
+      info: InfoIcon,
+    }[tone];
+    const iconColor = {
+      seed: colors.fgAccent,
+      warning: colors.fgWarning,
+      viewOnly: colors.fgViewOnly,
+      info: colors.fgMuted,
+    }[tone];
+    return (
+      <View
+        ref={ref}
+        testID={testID}
+        style={{
+          padding: space12,
+          borderRadius: radiusMd,
+          borderWidth: 1,
+          borderColor: plain ? colors.bottomSheetBorder : paint.edge,
+          backgroundColor: plain ? colors.bgSurface : paint.bg,
+        }}
+      >
+        <Animated.View
+          style={[{ flexDirection: 'row', gap: space8 }, contentStyle]}
+        >
+          <View style={{ paddingTop: 0 }}>
+            <CompactIcon size={iconSizeSm} color={iconColor} />
+          </View>
+          <View style={{ flex: 1, gap: space4 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                gap: space4,
+              }}
+            >
+              <Text variant="caption" style={{ flexShrink: 1 }}>
+                {title}
+              </Text>
+              {tag}
+            </View>
+            {children !== undefined &&
+              (typeof children === 'string' ? (
+                <Text variant="caption" tone="muted">
+                  {children}
+                </Text>
+              ) : (
+                children
+              ))}
+            {action !== undefined && !actionBeside && <View>{action}</View>}
+          </View>
+          {action !== undefined && actionBeside && (
+            <View style={{ alignSelf: 'center' }}>{action}</View>
+          )}
+          {onDismiss && (
+            <Pressable
+              testID={dismissTestID}
+              accessibilityRole="button"
+              accessibilityLabel={dismissLabel}
+              onPress={onDismiss}
+              hitSlop={space8}
+            >
+              <XIcon size={iconSizeMd} color={colors.fgMuted} />
+            </Pressable>
+          )}
+        </Animated.View>
+      </View>
+    );
+  }
+
   return (
     <View
       ref={ref}
@@ -146,6 +227,9 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
               flexWrap: 'wrap',
               alignItems: 'center',
               gap: space4,
+              /** Clear of the corner X when nothing sits beside the text. */
+              paddingRight:
+                onDismiss && !actionBeside ? touchTarget - space16 : 0,
             }}
           >
             <Text variant="bodyStrong">{title}</Text>
@@ -163,25 +247,27 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
         {action !== undefined && actionBeside && (
           <View style={{ alignSelf: 'center' }}>{action}</View>
         )}
-        {onDismiss && (
-          <Pressable
-            testID={dismissTestID}
-            accessibilityRole="button"
-            accessibilityLabel={dismissLabel}
-            onPress={onDismiss}
-            style={{
-              width: touchTarget,
-              height: touchTarget,
-              marginTop: -space12,
-              marginRight: -space12,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <XIcon size={iconSizeMd} color={colors.fgMuted} />
-          </Pressable>
-        )}
       </Animated.View>
+      {/* In the card's corner, outside the row, so the action keeps its place. */}
+      {onDismiss && (
+        <Pressable
+          testID={dismissTestID}
+          accessibilityRole="button"
+          accessibilityLabel={dismissLabel}
+          onPress={onDismiss}
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            width: touchTarget,
+            height: touchTarget,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <XIcon size={iconSizeMd} color={colors.fgMuted} />
+        </Pressable>
+      )}
     </View>
   );
 });

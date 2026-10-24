@@ -635,7 +635,7 @@
     "pinned": "Pinned. It always shows first in Receive.",
     "unpinned": "Unpinned. Receive shows your newest address.",
     "copy": "Copy",
-    "transparent-public": "Transparent addresses are public: anyone can see what they receive. Shield those funds from Home to keep them private.",
+    "transparent-public": "Transparent addresses expose your data.",
     "new-title": "New address",
     "new-sub": "Use a different address for each person so payments can’t be linked.",
     "new-type": "Type",
@@ -656,7 +656,8 @@
     "group-shielded": "Shielded",
     "group-transparent": "Transparent",
     "group-count": "{n} addresses",
-    "public-note": "Public"
+    "public-note": "Public",
+    "group-count-one": "1 address"
   },
   "swap": {
     "title": "Swap",
@@ -920,9 +921,9 @@
     "deposit-you-get": "You’ll get",
     "result-refunded-buy": "The swap didn’t complete, so the {coin} went back to your refund address, minus the network fee.",
     "result-missing": "Missing",
-    "detail-save-contact": "Save this {coin} address as a contact",
     "tx-privacy": "Privacy",
-    "tx-private": "Private · NYM Enhanced"
+    "tx-private": "Private · NYM Enhanced",
+    "no-route-now": "No route is available for this swap right now."
   },
   "history": {
     "shield-all": "Shield All funds",

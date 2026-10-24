@@ -635,7 +635,7 @@
     "pinned": "Sabitlendi. Al ekranında hep ilk görünür.",
     "unpinned": "Sabitleme kaldırıldı. Al ekranı en yeni adresinizi gösterir.",
     "copy": "Kopyala",
-    "transparent-public": "Şeffaf adresler herkese açıktır: aldıklarını herkes görebilir. Gizli kalması için bu fonları Ana sayfadan koruyun.",
+    "transparent-public": "Şeffaf adresler verilerinizi açığa çıkarır.",
     "new-title": "Yeni adres",
     "new-sub": "Ödemeler ilişkilendirilemesin diye her kişi için farklı bir adres kullanın.",
     "new-type": "Tür",
@@ -656,7 +656,8 @@
     "group-shielded": "Korumalı",
     "group-transparent": "Şeffaf",
     "group-count": "{n} adres",
-    "public-note": "Herkese açık"
+    "public-note": "Herkese açık",
+    "group-count-one": "1 adres"
   },
   "swap": {
     "title": "Takas",
@@ -920,9 +921,9 @@
     "deposit-you-get": "Alacağınız",
     "result-refunded-buy": "Takas tamamlanmadı, bu yüzden {coin} ağ ücreti düşülerek iade adresinize döndü.",
     "result-missing": "Eksik",
-    "detail-save-contact": "Bu {coin} adresini kişi olarak kaydet",
     "tx-privacy": "Gizlilik",
-    "tx-private": "Gizli · NYM Enhanced"
+    "tx-private": "Gizli · NYM Enhanced",
+    "no-route-now": "Şu anda bu takas için kullanılabilir bir rota yok."
   },
   "history": {
     "shield-all": "Tüm Fonları Koru",
