@@ -11,7 +11,7 @@ import TitleBar from '@ui/widgets/TitleBar';
 import { Keyboard, ScrollView, StyleSheet, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
-import { space20, space32 } from '@app/theme';
+import { space8, space20, space32 } from '@app/theme';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import { HomeTabScreenProps, WalletNavigation } from '@app/types';
@@ -207,6 +207,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
               alwaysBounceVertical={false}
               contentContainerStyle={{
                 paddingHorizontal: space20,
+                paddingTop: space8,
                 paddingBottom: 100,
               }}
             >

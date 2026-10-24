@@ -13,9 +13,9 @@ import Animated from 'react-native-reanimated';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import {
   space12,
-  space16,
   space4,
   space8,
+  space20,
   useTheme,
   iconSizeSm,
   radiusPill,
@@ -388,7 +388,8 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
               keyboardShouldPersistTaps="handled"
               testID="swap.scroll-view"
               contentContainerStyle={{
-                paddingHorizontal: space16,
+                paddingHorizontal: space20,
+                paddingTop: space8,
                 paddingBottom:
                   Platform.OS === GlobalConst.platformOSandroid ? 120 : 160,
                 rowGap: space12,
