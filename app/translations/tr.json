@@ -635,7 +635,7 @@
     "pinned": "Sabitlendi. Al ekranında hep ilk görünür.",
     "unpinned": "Sabitleme kaldırıldı. Al ekranı en yeni adresinizi gösterir.",
     "copy": "Kopyala",
-    "transparent-public": "Şeffaf adresler herkese açıktır: aldıklarını herkes görebilir. Gizli kalması için bu fonları Ana sayfadan koruyun.",
+    "transparent-public": "Şeffaf adresler verilerinizi açığa çıkarır.",
     "new-title": "Yeni adres",
     "new-sub": "Ödemeler ilişkilendirilemesin diye her kişi için farklı bir adres kullanın.",
     "new-type": "Tür",

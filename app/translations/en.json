@@ -635,7 +635,7 @@
     "pinned": "Pinned. It always shows first in Receive.",
     "unpinned": "Unpinned. Receive shows your newest address.",
     "copy": "Copy",
-    "transparent-public": "Transparent addresses are public: anyone can see what they receive. Shield those funds from Home to keep them private.",
+    "transparent-public": "Transparent addresses expose your data.",
     "new-title": "New address",
     "new-sub": "Use a different address for each person so payments can’t be linked.",
     "new-type": "Type",

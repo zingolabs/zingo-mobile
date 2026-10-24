@@ -635,7 +635,7 @@
     "pinned": "Fixado. Aparece sempre primeiro em Receber.",
     "unpinned": "Desafixado. Receber mostra seu endereço mais recente.",
     "copy": "Copiar",
-    "transparent-public": "Endereços transparentes são públicos: qualquer um pode ver o que recebem. Proteja esses fundos no Início para mantê-los privados.",
+    "transparent-public": "Endereços transparentes expõem seus dados.",
     "new-title": "Novo endereço",
     "new-sub": "Use um endereço diferente para cada pessoa, assim os pagamentos não podem ser ligados.",
     "new-type": "Tipo",

@@ -635,7 +635,7 @@
     "pinned": "Fijada. Sale siempre la primera en Recibir.",
     "unpinned": "Ya no está fijada. Recibir muestra tu dirección más reciente.",
     "copy": "Copiar",
-    "transparent-public": "Las direcciones transparentes son públicas: cualquiera puede ver lo que reciben. Protege esos fondos desde Inicio para que sean privados.",
+    "transparent-public": "Las direcciones transparentes exponen tus datos.",
     "new-title": "Nueva dirección",
     "new-sub": "Usa una dirección distinta para cada persona y así no se podrán relacionar los pagos.",
     "new-type": "Tipo",
