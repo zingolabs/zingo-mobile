@@ -1,42 +1,15 @@
 import 'react-native';
 import React from 'react';
-import Text from '@ui/primitives/Text';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import FullPanel from '@ui/widgets/FullPanel';
 import TitleBar from '@ui/widgets/TitleBar';
+import Text from '@ui/primitives/Text';
 
-const mockSheet: { props: Record<string, unknown>; snapToIndex: jest.Mock } = {
-  props: {},
-  snapToIndex: jest.fn(),
-};
-
-jest.mock('@gorhom/bottom-sheet', () => {
-  const R = require('react');
-  const { View, ScrollView } = require('react-native');
-  const BottomSheet = R.forwardRef(
-    (props: Record<string, unknown>, ref: unknown) => {
-      mockSheet.props = props;
-      R.useImperativeHandle(ref, () => ({
-        snapToIndex: mockSheet.snapToIndex,
-        close: jest.fn(),
-      }));
-      const Handle = props.handleComponent as React.ComponentType;
-      return (
-        <View>
-          <Handle />
-          {props.children as React.ReactNode}
-        </View>
-      );
-    },
-  );
+jest.mock('react-native-keyboard-controller', () => {
+  const { ScrollView } = require('react-native');
   return {
-    ...jest.requireActual('../__mocks__/@gorhom/bottom-sheet'),
-    __esModule: true,
-    default: BottomSheet,
-    BottomSheetScrollView: (props: Record<string, unknown>) => (
-      <ScrollView {...props} />
-    ),
-    BottomSheetFooter: View,
+    ...jest.requireActual('../__mocks__/react-native-keyboard-controller'),
+    KeyboardAwareScrollView: ScrollView,
   };
 });
 jest.mock('@react-navigation/native', () => ({
@@ -44,45 +17,49 @@ jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({ addListener: jest.fn(() => jest.fn()) }),
 }));
 
-const snap = () => (mockSheet.props.snapPoints as number[])[0];
 const open = (fit: boolean) =>
   render(
     <FullPanel title="Your addresses" fit={fit} testID="panel">
       <Text>rows</Text>
     </FullPanel>,
   );
+/** The header's wrapper, the view around the title bar. */
+const bar = () => screen.UNSAFE_getByType(TitleBar).parent!;
+/** The panel's height: the nearest view above the header that sets one. */
+const panelHeight = () => {
+  const heightOf = (style: unknown) =>
+    ([style].flat(Infinity) as { height?: number }[]).reduce<
+      number | undefined
+    >((h, st) => (st && st.height !== undefined ? st.height : h), undefined);
+  let node = bar().parent;
+  while (node && heightOf(node.props.style) === undefined) {
+    node = node.parent;
+  }
+  return node ? heightOf(node.props.style) : undefined;
+};
 const measure = (header: number, content: number) => {
-  // The header's wrapper, the view around the title bar.
-  const bar = screen.UNSAFE_getByType(TitleBar).parent!;
-  fireEvent(bar, 'layout', { nativeEvent: { layout: { height: header } } });
+  fireEvent(bar(), 'layout', { nativeEvent: { layout: { height: header } } });
   fireEvent(screen.getByTestId('panel'), 'contentSizeChange', 0, content);
 };
 
-beforeEach(() => {
-  jest.clearAllMocks();
-  jest.spyOn(global, 'requestAnimationFrame').mockImplementation(cb => {
-    cb(0);
-    return 0;
-  });
-});
-
-test('Tests that a fitting panel waits closed and then rises to its header and content when they are shorter than the screen', () => {
+test('Tests that a fitting panel takes its header and content height when they are shorter than the screen', () => {
   open(true);
-  expect(mockSheet.props.index).toBe(-1);
   act(() => measure(50, 100));
-  expect(snap()).toBe(150);
-  expect(mockSheet.snapToIndex).toHaveBeenCalledWith(0);
+  expect(panelHeight()).toBe(150);
 });
 
 test('Tests that a fitting panel stops at the full height when its content is taller', () => {
-  const full = (open(false), snap());
+  open(false);
+  const full = panelHeight();
+  expect(full).toBeGreaterThan(0);
   open(true);
   act(() => measure(50, 5000));
-  expect(snap()).toBe(full);
+  expect(panelHeight()).toBe(full);
 });
 
-test('Tests that a panel not fitting opens at the full height at once', () => {
+test('Tests that a panel draws no bottom sheet when it opens', () => {
   open(false);
-  expect(mockSheet.props.index).toBe(0);
-  expect(mockSheet.snapToIndex).not.toHaveBeenCalled();
+  expect(
+    screen.UNSAFE_queryAllByProps({ snapPoints: expect.anything() }),
+  ).toEqual([]);
 });
