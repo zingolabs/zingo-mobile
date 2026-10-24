@@ -1,8 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
+import { Keyboard, View } from 'react-native';
 
-import { useTheme, slopFor } from '@app/theme';
+import { space8, space12, useTheme } from '@app/theme';
 import { AddressBookFileClass, GlobalConst } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
@@ -11,14 +11,16 @@ import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
 import RegText from '@ui/primitives/RegText';
 import ChainSelect from '@ui/widgets/ChainSelect';
-import { fieldBorder } from '@ui/primitives/fieldBorder';
-import { XIcon } from '@ui/primitives/Icons/XIcon';
+import Text from '@ui/primitives/Text';
+import TextField from '@ui/primitives/TextField';
 
 const NAME_MAX = 32;
 
 type NewAddressTagProps = {
   /** One of this wallet's own addresses. */
   address: string;
+  /** The tag being edited, from Your addresses; absent to add one. */
+  current?: AddressBookFileClass;
   closeSheet: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
 };
@@ -27,14 +29,14 @@ type NewAddressTagProps = {
 // contact sheet: the tag, the chain (Zcash) and the address it names.
 const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
   address,
+  current,
   closeSheet,
   setAddressBook,
 }) => {
   const { translate, server } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
-  const [label, setLabel] = useState('');
+  const [label, setLabel] = useState(current?.label ?? '');
   const [saving, setSaving] = useState(false);
-  const [focused, setFocused] = useState(false);
   const ready = label.trim().length > 0;
 
   const save = async () => {
@@ -44,7 +46,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
       await AddressBookFileImpl.writeAddressBookItem(
         label.trim(),
         address,
-        Utils.generateColorList(1)[0],
+        current?.color ?? Utils.generateColorList(1)[0],
         true,
         server.chainName,
         GlobalConst.zecSwapChain,
@@ -71,53 +73,32 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
           lineHeight: 21,
         }}
       >
-        {translate('addressbook.add-tag') as string}
+        {
+          translate(
+            current ? 'receive.edit-tag' : 'addressbook.add-tag',
+          ) as string
+        }
       </BoldText>
+      <Text
+        variant="caption"
+        tone="muted"
+        style={{ marginTop: space8, textAlign: 'center' }}
+      >
+        {translate('receive.tag-sub') as string}
+      </Text>
 
-      <View style={{ marginTop: 10 }}>
-        <RegText>{translate('addressbook.tag') as string}</RegText>
-        <View
-          style={[
-            box,
-            {
-              flexDirection: 'row',
-              alignItems: 'center',
-              minHeight: 48,
-              borderColor: fieldBorder(colors, focused),
-            },
-          ]}
-        >
-          <TextInput
-            testID="addresstag.label-field"
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-            value={label}
-            onChangeText={setLabel}
-            maxLength={NAME_MAX}
-            placeholder={translate('addressbook.label-placeholder') as string}
-            placeholderTextColor={colors.fgMuted}
-            autoCorrect={false}
-            style={{
-              flex: 1,
-              padding: 10,
-              color: colors.fgDefault,
-              fontWeight: '600',
-              fontSize: 15,
-            }}
-          />
-          {!!label && (
-            <TouchableOpacity
-              hitSlop={slopFor(20)}
-              onPress={() => setLabel('')}
-            >
-              <XIcon
-                style={{ marginRight: 10 }}
-                size={20}
-                color={colors.fgMuted}
-              />
-            </TouchableOpacity>
-          )}
-        </View>
+      <View style={{ marginTop: space12 }}>
+        <TextField
+          testID="addresstag.label-field"
+          label={translate('addressbook.tag') as string}
+          value={label}
+          onChangeText={setLabel}
+          maxLength={NAME_MAX}
+          placeholder={translate('addressbook.label-placeholder') as string}
+          autoCorrect={false}
+          clearable
+          clearLabel={translate('clear') as string}
+        />
       </View>
 
       <View style={{ marginTop: 18 }}>

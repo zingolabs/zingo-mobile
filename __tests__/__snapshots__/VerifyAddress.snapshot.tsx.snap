@@ -9,6 +9,22 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
     }
   }
 >
+  <Text
+    maxFontSizeMultiplier={2}
+    style={
+      {
+        "color": "#888888",
+        "fontSize": 12,
+        "fontWeight": "400",
+        "lineHeight": 16,
+        "marginBottom": 8,
+        "marginHorizontal": 20,
+        "textAlign": "center",
+      }
+    }
+  >
+    text translated
+  </Text>
   <View
     style={
       {
@@ -29,10 +45,11 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
       <View
         style={
           {
+            "backgroundColor": "#031124",
             "borderColor": "#05234C",
             "borderRadius": 12,
             "borderWidth": 1,
-            "marginTop": 5,
+            "marginTop": 4,
           }
         }
       >
@@ -84,6 +101,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
           >
             <View
               accessibilityLabel="text translated"
+              accessibilityRole="button"
               accessibilityState={
                 {
                   "busy": undefined,
@@ -104,8 +122,9 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
               accessible={true}
               collapsable={false}
               focusable={true}
-              hitSlop={8}
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -114,7 +133,10 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
               onStartShouldSetResponder={[Function]}
               style={
                 {
-                  "opacity": 1,
+                  "alignItems": "center",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "width": 44,
                 }
               }
               testID="send.scan-button"

@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useMemo, useState } from 'react';
 import { Keyboard, Pressable, View } from 'react-native';
-import { radiusSheet, useTheme } from '@app/theme';
+import { radiusSheet, useTheme, iconSizeMd } from '@app/theme';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -128,7 +128,7 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
               hitSlop={8}
               style={{ paddingHorizontal: 14, paddingVertical: 4 }}
             >
-              <XIcon size={20} color={colors.fgMuted} />
+              <XIcon size={iconSizeMd} color={colors.fgMuted} />
             </Pressable>
           </View>
         </View>
@@ -247,7 +247,7 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
                   hitSlop={8}
                   style={{ padding: 14 }}
                 >
-                  <XIcon size={20} color={colors.fgDefault} />
+                  <XIcon size={iconSizeMd} color={colors.fgMuted} />
                 </Pressable>
               </View>
 

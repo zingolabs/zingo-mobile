@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useRef } from 'react';
 import { Keyboard, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import {
   BottomSheetBackdrop,
@@ -9,7 +9,14 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { radiusSheet, useTheme } from '@app/theme';
+import { SurfaceContext } from './Surface';
+import TooltipHost from '@ui/widgets/TooltipHost';
+import { duration, ease } from '@app/theme/motion';
+
+/** Every sheet opens and closes in 420 ms on (.2,0,0,1). */
+const SHEET_MOTION = { duration: duration.sheet, easing: ease.emphasized };
 import SheetRim from './SheetRim';
+import { SheetPresence } from './SheetPresence';
 
 type AppSheetModalProps = {
   header?: React.ReactNode;
@@ -69,6 +76,37 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
   ) => {
     const { colors } = useTheme();
     const fixed = snapPoints !== undefined;
+    const presence = useContext(SheetPresence);
+    const wasOpen = useRef(false);
+    /** Reports opening and closing once each, not every snap in between. */
+    const changed = (index: number) => {
+      const open = index >= 0;
+      if (open !== wasOpen.current) {
+        wasOpen.current = open;
+        presence(open);
+      }
+      onChange?.(index);
+    };
+
+    const body = (
+      <>
+        <View
+          style={[
+            fixed ? styles.maskFill : styles.mask,
+            { backgroundColor: colors.bgSurface },
+            contentStyle,
+          ]}
+        >
+          <SurfaceContext.Provider value="surface">
+            <TooltipHost>
+              {header}
+              {children}
+            </TooltipHost>
+          </SurfaceContext.Provider>
+        </View>
+        {!handle && <SheetRim />}
+      </>
+    );
 
     const renderBackdrop = (props: BottomSheetBackdropProps) => (
       <BottomSheetBackdrop
@@ -85,6 +123,7 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
         accessible={accessible}
         enableDynamicSizing={!fixed}
         snapPoints={snapPoints}
+        animationConfigs={SHEET_MOTION}
         enablePanDownToClose={enablePanDownToClose}
         stackBehavior="push"
         keyboardBehavior="interactive"
@@ -95,7 +134,7 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
             Keyboard.dismiss();
           }
         }}
-        onChange={onChange}
+        onChange={changed}
         onDismiss={onDismiss}
         handleComponent={handle ? undefined : null}
         handleStyle={styles.handle}
@@ -112,19 +151,12 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
         backdropComponent={renderBackdrop}
         footerComponent={renderFooter}
       >
-        <BottomSheetView style={fixed ? styles.fill : undefined}>
-          <View
-            style={[
-              fixed ? styles.maskFill : styles.mask,
-              { backgroundColor: colors.bgSurface },
-              contentStyle,
-            ]}
-          >
-            {header}
-            {children}
-          </View>
-          {!handle && <SheetRim />}
-        </BottomSheetView>
+        {fixed ? (
+          /** A fixed sheet holds a list: BottomSheetView measures static content and stops a scroll view inside it. */
+          <View style={styles.fill}>{body}</View>
+        ) : (
+          <BottomSheetView>{body}</BottomSheetView>
+        )}
       </BottomSheetModal>
     );
   },

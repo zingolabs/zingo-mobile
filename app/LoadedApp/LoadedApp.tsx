@@ -74,7 +74,7 @@ import { AppTheme } from '@app/theme';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
-import { ContextAppLoadedProvider } from '@app/context';
+import { ContextAppLoadedProvider, SwapServiceProvider } from '@app/context';
 import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
 import { otherServers, staticAlternatives } from '@app/uris/serverChoice';
 import selectingServer from '@app/services/selectingServer';
@@ -105,10 +105,12 @@ import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
 import FadeInOnMount from '@ui/widgets/FadeInOnMount';
 import { showConfirm } from '@app/services/showConfirm';
 import { WalletNavigator } from '@app/navigation/WalletNavigator';
+import TooltipHost from '@ui/widgets/TooltipHost';
 import {
   closeOptionsPanel,
   OptionsPanelProvider,
 } from '@app/context/optionsPanel';
+import type { SwapDepositArgs } from '@app/walletBackend';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { rescanStep } from '@app/walletBackend/utils/syncProgress';
 import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
@@ -652,6 +654,8 @@ export class LoadedAppClass extends Component<
       setScrollToBottom: this.setScrollToBottom,
       setShieldingAmount: this.setShieldingAmount,
       sendTransaction: this.sendTransaction,
+      sendSwapDeposit: this.sendSwapDeposit,
+      resumeSwapDeposit: this.resumeSwapDeposit,
       setServerOption: this.setServerOption,
       clearToAddr: this.clearToAddr,
       doRescan: this.doRescan,
@@ -1453,6 +1457,11 @@ export class LoadedAppClass extends Component<
       return this.rpc.sendTransaction(sendJson, sendAll);
     });
 
+  sendSwapDeposit = (args: SwapDepositArgs): Promise<string[]> =>
+    this.rpc.sendSwapDeposit(args);
+
+  resumeSwapDeposit = (): Promise<string[]> => this.rpc.resumeSwapDeposit();
+
   doRefresh = (what: 'valueTransfers' | 'messages') => {
     if (what === 'valueTransfers') {
       // Value Transfers
@@ -2052,6 +2061,8 @@ export class LoadedAppClass extends Component<
       setScrollToBottom: this.setScrollToBottom,
       setShieldingAmount: this.setShieldingAmount,
       sendTransaction: this.sendTransaction,
+      sendSwapDeposit: this.sendSwapDeposit,
+      resumeSwapDeposit: this.resumeSwapDeposit,
       setServerOption: this.setServerOption,
       clearToAddr: this.clearToAddr,
       doRescan: this.doRescan,
@@ -2069,24 +2080,29 @@ export class LoadedAppClass extends Component<
     return (
       <>
         <ContextAppLoadedProvider value={context}>
-          <PriceTrafficDriver />
-          <GestureHandlerRootView>
-            <BottomSheetModalProvider>
-              <BottomSheetBackHandler />
-              <ConfirmBottomSheet />
-              <OptionsPanelProvider>
-                <FadeInOnMount duration={HOME_FADE_MS}>
-                  <WalletNavigator />
-                </FadeInOnMount>
-              </OptionsPanelProvider>
-              <AddTagModalHost
-                ref={this.addTagModalRef}
-                target={this.state.addTagModalTarget}
-                setAddressBook={this.setAddressBook}
-                translate={this.state.translate}
-              />
-            </BottomSheetModalProvider>
-          </GestureHandlerRootView>
+          <SwapServiceProvider chainName={this.state.walletChainName}>
+            <PriceTrafficDriver />
+            <GestureHandlerRootView>
+              <BottomSheetModalProvider>
+                <BottomSheetBackHandler />
+                <ConfirmBottomSheet />
+                <OptionsPanelProvider>
+                  <FadeInOnMount duration={HOME_FADE_MS}>
+                    {/* The tooltip layer for screens outside any sheet or panel. */}
+                    <TooltipHost>
+                      <WalletNavigator />
+                    </TooltipHost>
+                  </FadeInOnMount>
+                </OptionsPanelProvider>
+                <AddTagModalHost
+                  ref={this.addTagModalRef}
+                  target={this.state.addTagModalTarget}
+                  setAddressBook={this.setAddressBook}
+                  translate={this.state.translate}
+                />
+              </BottomSheetModalProvider>
+            </GestureHandlerRootView>
+          </SwapServiceProvider>
         </ContextAppLoadedProvider>
         <Toast config={toastConfig} />
       </>

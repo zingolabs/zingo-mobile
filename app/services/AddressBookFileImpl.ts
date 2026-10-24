@@ -2,7 +2,7 @@ import * as RNFS from 'react-native-fs';
 
 import { isWalletAddress } from '@app/walletBackend';
 import Utils from '@app/utils';
-import { normalizeChainAddress } from '@app/swap';
+import { canonicalChainAddress } from '@app/swap';
 
 import {
   AddressBookFileClass,
@@ -59,7 +59,7 @@ export default class AddressBookFileImpl {
     chain: ChainNameEnum = ChainNameEnum.mainChainName,
     swapChain: string = GlobalConst.zecSwapChain,
   ): Promise<AddressBookFileClass[]> {
-    const address = normalizeChainAddress(swapChain, typedAddress);
+    const address = canonicalChainAddress(swapChain, typedAddress);
     const addressBook = await this.readAddressBook();
     if (
       addressBook.filter(
@@ -115,24 +115,47 @@ export default class AddressBookFileImpl {
     return await this.writeAddressBook(newAddressBook);
   }
 
-  /** Saves a Zcash contact, replacing the one it edits, and returns the book in name order. */
+  /**
+   * Saves a contact on its chain, replacing the one it edits, and returns the
+   * book in name order. Only a Zcash address can be one of the wallet's own.
+   */
   static async saveContact(
     previous: AddressBookFileClass | undefined,
     label: string,
     address: string,
     chain: ChainNameEnum,
+    swapChain: string = GlobalConst.zecSwapChain,
   ): Promise<AddressBookFileClass[]> {
     if (previous) {
       await this.removeAddressBookItem(previous.label, previous.address);
     }
-    const own = await isWalletAddress(address);
+    const zcash = swapChain === GlobalConst.zecSwapChain;
+    const own = zcash && (await isWalletAddress(address));
     const book = await this.writeAddressBookItem(
       label,
       address,
       previous ? previous.color : Utils.generateColorList(1)[0],
       own,
-      chain,
-      GlobalConst.zecSwapChain,
+      zcash ? chain : ChainNameEnum.mainChainName,
+      swapChain,
+    );
+    const sorted = [...book].sort((a, b) => a.label.localeCompare(b.label));
+    return await this.writeAddressBook(sorted);
+  }
+
+  /** Saves another chain's address from a swap, and returns the book in name order. */
+  static async saveChainContact(
+    label: string,
+    address: string,
+    swapChain: string,
+  ): Promise<AddressBookFileClass[]> {
+    const book = await this.writeAddressBookItem(
+      label,
+      address,
+      Utils.generateColorList(1)[0],
+      false,
+      ChainNameEnum.mainChainName,
+      swapChain,
     );
     const sorted = [...book].sort((a, b) => a.label.localeCompare(b.label));
     return await this.writeAddressBook(sorted);

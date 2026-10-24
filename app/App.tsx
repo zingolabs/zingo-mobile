@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useMemo } from 'react';
+import { contentTopPad } from '@app/navigation/safeArea';
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
@@ -27,9 +28,6 @@ LogBox.ignoreLogs([
 
 const Root = createNativeStackNavigator<RootParamList>();
 
-/** Space kept under the system's top inset, which already leaves a little room. */
-const TOP_RECLAIM = 10;
-
 /**
  * Pads the app inside the system's safe area. The top keeps the inset minus
  * TOP_RECLAIM and never less than zero: a device that lays the app out below
@@ -46,7 +44,7 @@ const SafeArea: React.FunctionComponent<{
       style={{
         flex: 1,
         backgroundColor: background,
-        paddingTop: Math.max(0, insets.top - TOP_RECLAIM),
+        paddingTop: contentTopPad(insets.top),
         paddingLeft: insets.left,
         paddingRight: insets.right,
       }}

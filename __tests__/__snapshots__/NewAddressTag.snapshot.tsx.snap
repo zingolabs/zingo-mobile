@@ -24,65 +24,99 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
   >
     text translated
   </Text>
-  <View
+  <Text
+    maxFontSizeMultiplier={2}
     style={
       {
-        "marginTop": 10,
+        "color": "#888888",
+        "fontSize": 12,
+        "fontWeight": "400",
+        "lineHeight": 16,
+        "marginTop": 8,
+        "textAlign": "center",
       }
     }
   >
-    <Text
-      maxFontSizeMultiplier={2}
+    text translated
+  </Text>
+  <View
+    style={
+      {
+        "marginTop": 12,
+      }
+    }
+  >
+    <View
       style={
         {
-          "color": "#c3c3c3",
-          "fontSize": 15,
-          "fontWeight": "400",
-          "lineHeight": 21,
+          "gap": 8,
+          "opacity": 1,
         }
       }
     >
-      text translated
-    </Text>
-    <View
-      style={
-        [
+      <View
+        style={
           {
-            "backgroundColor": "#011401",
+            "alignItems": "center",
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          maxFontSizeMultiplier={2}
+          style={
+            {
+              "color": "#888888",
+              "fontSize": 13,
+              "fontWeight": "600",
+              "lineHeight": 18,
+            }
+          }
+        >
+          text translated
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#031124",
             "borderColor": "#05234C",
             "borderRadius": 12,
             "borderWidth": 1,
-            "marginTop": 5,
-          },
-          {
-            "alignItems": "center",
-            "borderColor": "#05234C",
             "flexDirection": "row",
             "minHeight": 48,
-          },
-        ]
-      }
-    >
-      <TextInput
-        autoCorrect={false}
-        maxLength={32}
-        onBlur={[Function]}
-        onChangeText={[Function]}
-        onFocus={[Function]}
-        placeholder="text translated"
-        placeholderTextColor="#888888"
-        style={
-          {
-            "color": "#c3c3c3",
-            "flex": 1,
-            "fontSize": 15,
-            "fontWeight": "600",
-            "padding": 10,
+            "paddingLeft": 12,
           }
         }
-        testID="addresstag.label-field"
-        value=""
-      />
+      >
+        <TextInput
+          autoCorrect={false}
+          editable={true}
+          maxFontSizeMultiplier={2}
+          maxLength={32}
+          multiline={false}
+          onBlur={[Function]}
+          onChangeText={[Function]}
+          onFocus={[Function]}
+          placeholder="text translated"
+          placeholderTextColor="#888888"
+          spellCheck={false}
+          style={
+            {
+              "color": "#c3c3c3",
+              "flex": 1,
+              "fontSize": 15,
+              "fontWeight": "600",
+              "paddingRight": 0,
+              "paddingVertical": 8,
+            }
+          }
+          testID="addresstag.label-field"
+          value=""
+        />
+      </View>
     </View>
   </View>
   <View
@@ -204,8 +238,8 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
           style={
             {
               "backgroundColor": "#031124",
-              "borderTopLeftRadius": 40,
-              "borderTopRightRadius": 40,
+              "borderTopLeftRadius": 28,
+              "borderTopRightRadius": 28,
               "paddingHorizontal": 16,
               "paddingTop": 8,
             }

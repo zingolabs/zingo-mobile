@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 
-import { useTheme } from '@app/theme';
+import { useTheme, iconSizeMd } from '@app/theme';
 import { SearchIcon } from '@ui/primitives/Icons/SearchIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
@@ -67,7 +67,7 @@ const SearchField: React.FunctionComponent<SearchFieldProps> = ({
           hitSlop={8}
           onPress={() => onChangeText('')}
         >
-          <XIcon size={16} color={colors.fgMuted} />
+          <XIcon size={iconSizeMd} color={colors.fgMuted} />
         </Pressable>
       )}
     </View>

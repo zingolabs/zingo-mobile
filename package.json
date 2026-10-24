@@ -32,7 +32,7 @@
     "prettier": "prettier './**/*.{js,jsx,ts,tsx}' -w",
     "prettier:check": "prettier --check './**/*.{js,jsx,ts,tsx}'",
     "coverage": "jest --coverage",
-    "postinstall": "patch-package",
+    "postinstall": "patch-package && node scripts/generate-swapkit-secrets.js",
     "build:prod:release": "cd android && ./gradlew assembleProdRelease && cd ..",
     "build:prod:release:split": "cd android && ./gradlew assembleProdRelease -PsplitApk=true && cd ..",
     "build:prod:debug": "cd android && ./gradlew assembleProdDebug && cd ..",
