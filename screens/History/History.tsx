@@ -18,7 +18,15 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { useTheme, slopFor } from '@app/theme';
+import {
+  useTheme,
+  slopFor,
+  radiusMd,
+  space4,
+  space8,
+  space16,
+  space20,
+} from '@app/theme';
 
 import {
   ChainNameEnum,
@@ -40,7 +48,7 @@ import ValueTransferLine from './components/ValueTransferLine';
 import SwapLine from './components/SwapLine';
 import LegLine from './components/LegLine';
 import MonthHeader from './components/MonthHeader';
-import { ITEM_HEIGHT, buildHistoryItems, monthAt } from './historyItems';
+import { ITEM_HEIGHT, buildHistoryItems } from './historyItems';
 import type { HistoryItem } from './historyItems';
 import IronwoodMigrationBanner from './components/IronwoodMigrationBanner';
 import SeedBackupNotice from './components/SeedBackupNotice';
@@ -572,10 +580,6 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       language,
     ],
   );
-  // The month pinned over the list while its rows scroll under it.
-  const [pinnedMonth, setPinnedMonth] = useState<string>('');
-  const historyItemsRef = useRef<HistoryItem[]>([]);
-  historyItemsRef.current = historyItems;
   useEffect(() => {
     setDataProvider(data => data.cloneWithRows(historyItems));
   }, [historyItems]);
@@ -676,7 +680,6 @@ const History: React.FunctionComponent<HistoryProps> = () => {
 
   const handleScroll = useCallback(
     (_rawEvent: ScrollEvent, _offsetX: number, offsetY: number) => {
-      setPinnedMonth(monthAt(historyItemsRef.current, offsetY));
       onTabScrollY(offsetY);
       const isTop = offsetY <= 100;
 
@@ -887,13 +890,12 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      marginHorizontal: 20,
-                      marginTop: 4,
-                      marginBottom: 4,
-                      paddingVertical: 8,
-                      paddingLeft: 16,
-                      paddingRight: 8,
-                      borderRadius: 12,
+                      marginHorizontal: space20,
+                      marginVertical: space4,
+                      paddingVertical: space8,
+                      paddingLeft: space16,
+                      paddingRight: space8,
+                      borderRadius: radiusMd,
                       borderWidth: 1,
                       borderColor: colors.borderAccent,
                       backgroundColor: colors.bgAccentSubtle,
@@ -914,14 +916,17 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                     <Pressable
                       testID="history.filter.clear"
                       accessibilityRole="button"
-                      hitSlop={8}
+                      hitSlop={space8}
                       onPress={() => {
                         setFilterKind(null);
                         setFilterFailed(false);
                         setFilterMemos(false);
                         setFilterWithFunds(false);
                       }}
-                      style={{ paddingHorizontal: 8, paddingVertical: 4 }}
+                      style={{
+                        paddingHorizontal: space8,
+                        paddingVertical: space4,
+                      }}
                     >
                       <Text
                         variant="caption"
@@ -1007,14 +1012,6 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                     }}
                   >
                     <FadeText>{translate('history.empty') as string}</FadeText>
-                  </View>
-                )}
-                {!!pinnedMonth && (
-                  <View
-                    pointerEvents="none"
-                    style={{ position: 'absolute', top: 0, left: 0, right: 0 }}
-                  >
-                    <MonthHeader label={pinnedMonth} />
                   </View>
                 )}
               </View>

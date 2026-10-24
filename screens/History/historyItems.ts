@@ -145,26 +145,3 @@ export const ITEM_HEIGHT: Record<HistoryItem['kind'], number> = {
   swap: 64,
   leg: 46,
 };
-
-/**
- * The month label to pin at the top of the list for a scroll offset: the
- * last month that starts at or above it. Empty at the very top, where the
- * list's own first label is in view.
- */
-export function monthAt(items: HistoryItem[], offsetY: number): string {
-  if (offsetY <= 0) {
-    return '';
-  }
-  let top = 0;
-  let label = '';
-  for (const item of items) {
-    if (top > offsetY) {
-      break;
-    }
-    if (item.kind === 'month') {
-      label = item.label;
-    }
-    top += ITEM_HEIGHT[item.kind];
-  }
-  return label;
-}

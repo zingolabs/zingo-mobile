@@ -7,11 +7,7 @@ import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
 import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
 import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
-import {
-  ITEM_HEIGHT,
-  buildHistoryItems,
-  monthAt,
-} from '@screens/History/historyItems';
+import { buildHistoryItems } from '@screens/History/historyItems';
 import {
   shortWhen,
   swapRowText,
@@ -128,24 +124,6 @@ test('Tests that an open swap shows its transactions under it, oldest first, whe
     HOP,
     DEPOSIT,
   ]);
-});
-
-test('Tests that a pinned month follows the scroll offset when rows pass under it', () => {
-  const r = record();
-  const rows = [swapRow(r), vt('c'.repeat(64), 1_000_000)];
-  const items = buildHistoryItems({
-    rows,
-    all: rows,
-    records: [r],
-    open: new Set(),
-    monthOf,
-  });
-
-  expect(monthAt(items, 0)).toBe('');
-  expect(monthAt(items, 10)).toBe('Oct 2026');
-  expect(monthAt(items, ITEM_HEIGHT.month + ITEM_HEIGHT.swap + 1)).toBe(
-    'Apr 2026',
-  );
 });
 
 const t = (key: string) => key;
