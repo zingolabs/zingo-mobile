@@ -49,14 +49,9 @@ const Code = React.memo<{
   <Svg width={px} height={px} viewBox={`0 0 ${units} ${units}`}>
     {blur && (
       <Defs>
-        <Filter
-          id="qrblur"
-          filterUnits="userSpaceOnUse"
-          x="0"
-          y="0"
-          width={units}
-          height={units}
-        >
+        {/* The region in fractions of the drawing: in user units the device
+            reads it as pixels and blurs only the top-left corner. */}
+        <Filter id="qrblur" x="0%" y="0%" width="100%" height="100%">
           <FeGaussianBlur stdDeviation={(BLUR_DEVIATION * units) / px} />
         </Filter>
       </Defs>
