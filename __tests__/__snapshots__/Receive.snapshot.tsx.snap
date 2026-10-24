@@ -13,7 +13,6 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
   <View
     accessibilityLabel="text translated"
     accessible={true}
-    onLayout={[Function]}
     style={
       {
         "display": "flex",

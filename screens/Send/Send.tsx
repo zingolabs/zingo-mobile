@@ -68,14 +68,12 @@ import {
   toFiatText,
   toZecText,
 } from '@app/price/fiatQuote';
-import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
 import { HomeTabScreenProps, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
-import { usePriceSnapAutoClose } from '@app/hooks/usePriceSnapAutoClose';
 import { RPCSendProposeType } from '@app/walletBackend/types/RPCSendProposeType';
 import ShowAddressAlertAsync from '@app/services/showAddressAlertAsync';
 import RecipientField from './components/RecipientField';
@@ -100,6 +98,10 @@ const ADDRESS_LIKE =
   /^(u1|utest1|uregtest1|zs1|ztestsapling|zregtestsapling|t1|t3|tm|tex|zcash:)/i;
 /** A name the protocol allows, typed without its suffix. */
 const BARE_NAME = /^[a-z0-9]{1,62}$/;
+
+/** The strip of icons at the top of the header the sheet stops under. */
+const TOP_ICONS_H = 55;
+const SNAP_GAP = 4;
 
 const Send: React.FunctionComponent<SendProps> = () => {
   const navigation = useNavigation<WalletNavigation>();
@@ -200,13 +202,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
   })();
   const [keyboardListenersDone, setKeyboardListenersDone] =
     useState<boolean>(false);
-  // Bumped when the memo sheet is presented so the child Memo component
-  // remounts with the latest memoText as its initial draft.
-  // measured dynamically to compute send sheet snap points
   const [containerH, setContainerH] = useState<number>(0);
-  const [headerH, setHeaderH] = useState<number>(0);
-  const [usdRowH, setUsdRowH] = useState<number>(0);
-  const [priceRowH, setPriceRowH] = useState<number>(0);
 
   const scrollViewRef = useRef<ScrollView>(null);
   // A press on the tab while it is open scrolls the form to the top.
@@ -218,13 +214,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
   // field, so the intent cannot be read back from the amount alone.
   const sendAllRef = useRef<boolean>(false);
   const sendSheetRef = useRef<BottomSheet>(null);
-  // Track internal snap index; when snapPoints shrinks (e.g., USD currency
-  // disabled, 3 → 2 snaps), clamp the index in an effect so the sheet
-  // doesn't throw "out of range" against the stale internal position.
-  const internalSnapIndexRef = useRef<number>(0);
-  // PriceRow-appearance bump is defined further down — it depends on
-  // `sendSnapPoints`, declared later in this component.
-  const prevHasPriceSnapRef = useRef<boolean>(false);
   const sendErrorSheetRef = useRef<BottomSheetModal>(null);
 
   // Fee (`sendPropose`) and/or spendable-balance RPC error → the CTA turns into
@@ -245,80 +234,11 @@ const Send: React.FunctionComponent<SendProps> = () => {
   useDismissSheetsOnBlur();
   const sheetSlideStyle = useOptionsPanelSheetSlide();
 
-  // Top icons strip height is a code-side constant (~55 px) — same on any phone.
-  const TOP_ICONS_H = 55;
-  const SNAP_GAP = 4;
-  // Bump applied to the snaps that sit just below a balance row (low + mid);
-  // the max snap (just below the top icons strip) doesn't need it.
-  const BALANCE_SNAP_BUMP = 10;
-
-  useEffect(() => {
-    if (!showFiat) {
-      setUsdRowH(0);
-    }
-  }, [showFiat]);
-
-  const sendSnapPoints = useMemo(() => {
-    if (containerH <= 0 || headerH <= 0) {
-      return showFiat ? ['85%', '89%', '93%'] : ['89%', '93%'];
-    }
-    const snapBase = containerH - headerH - SNAP_GAP;
-    const snapPrice = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
-    const snapLow = Math.max(snapBase + priceRowH + BALANCE_SNAP_BUMP, 100);
-    const snapMid = Math.min(
-      Math.max(snapBase + priceRowH + usdRowH + BALANCE_SNAP_BUMP, snapLow + 1),
-      containerH - TOP_ICONS_H - SNAP_GAP,
-    );
-    const snapMax = Math.max(containerH - TOP_ICONS_H - SNAP_GAP, snapLow + 1);
-    const points: number[] = [];
-    if (priceRowH > 0) {
-      points.push(snapPrice);
-    }
-    points.push(snapLow);
-    if (showFiat && usdRowH > 0) {
-      points.push(snapMid);
-    }
-    points.push(snapMax);
-    return points;
-  }, [showFiat, containerH, headerH, usdRowH, priceRowH]);
-
-  const priceSnapIndex = priceRowH > 0 ? 0 : null;
-  const onPriceSnapChange = usePriceSnapAutoClose(
-    sendSheetRef,
-    priceSnapIndex,
-    1,
-    sendSnapPoints.length,
+  // Fixed under the header's icons, as Swap: no stops to drag between.
+  const sendSnapPoints = useMemo(
+    () => [containerH > 0 ? containerH - TOP_ICONS_H - SNAP_GAP : '93%'],
+    [containerH],
   );
-
-  useEffect(() => {
-    if (internalSnapIndexRef.current >= sendSnapPoints.length) {
-      safeSnapToIndex(
-        sendSheetRef,
-        sendSnapPoints.length - 1,
-        sendSnapPoints.length,
-      );
-    }
-  }, [sendSnapPoints]);
-
-  // Bump the sheet up by one when the PriceRow first appears so the user
-  // stays at the same visual snap (balance still showing) instead of
-  // landing on the new price snap.
-  //
-  // `sendSnapPoints` is in the deps so the effect runs after React has
-  // propagated the grown array to BottomSheet; clamp is the belt-and-braces
-  // guard against any residual race that would otherwise crash with
-  // "index ... out of the provided snap points range".
-  useEffect(() => {
-    const hasPriceSnap = priceRowH > 0;
-    const justAppeared = !prevHasPriceSnapRef.current && hasPriceSnap;
-    prevHasPriceSnapRef.current = hasPriceSnap;
-    if (!justAppeared) return;
-    safeSnapToIndex(
-      sendSheetRef,
-      internalSnapIndexRef.current + 1,
-      sendSnapPoints.length,
-    );
-  }, [priceRowH, sendSnapPoints]);
 
   const sendHeader = <TitleBar title={translate('send.title') as string} />;
 
@@ -1068,9 +988,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
       >
         <View
           onLayout={e => {
-            const { height } = e.nativeEvent.layout;
-            setHeaderH(height);
-            keyboardListeners(height);
+            keyboardListeners(e.nativeEvent.layout.height);
           }}
         >
           <Header
@@ -1080,8 +998,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
             setShieldingAmount={setShieldingAmount}
             setBackgroundError={setBackgroundError /* context */}
             showMessagesIcon={true}
-            onUsdRowLayout={setUsdRowH}
-            onPriceRowLayout={setPriceRowH}
           />
         </View>
       </View>
@@ -1092,10 +1008,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
         <AppSheet
           ref={sendSheetRef}
           snapPoints={sendSnapPoints}
-          onChange={i => {
-            internalSnapIndexRef.current = i;
-            onPriceSnapChange(i);
-          }}
           header={sendHeader}
         >
           <ScrollView
@@ -1346,13 +1258,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
                       onBlur={() => setFocusedField('none')}
                       onFocus={() => {
                         setFocusedField('memo');
-                        // The sheet opens to its top stop so the memo and
-                        // the rest of the form stay above the keyboard.
-                        safeSnapToIndex(
-                          sendSheetRef,
-                          sendSnapPoints.length - 1,
-                          sendSnapPoints.length,
-                        );
                         if (keyboardVisible) {
                           scrollToEnd();
                         } else {
