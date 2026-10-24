@@ -280,6 +280,7 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
           <BottomSheetScrollView
             contentContainerStyle={{
               paddingHorizontal: space16,
+              paddingTop: space8,
               paddingBottom: 32,
             }}
           >
@@ -310,6 +311,7 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{
               paddingHorizontal: space16,
+              paddingTop: space8,
               paddingBottom: 32,
             }}
           >
