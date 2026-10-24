@@ -178,6 +178,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
     <FullPanel
       title={t('receive.your-addresses')}
       onBack={close}
+      fit
       testID="addresslist"
     >
       <Text variant="caption" tone="muted" style={{ marginTop: space4 }}>

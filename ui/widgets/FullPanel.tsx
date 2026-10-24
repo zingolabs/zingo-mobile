@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from 'react';
 import { View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -24,7 +25,7 @@ import BottomSheet, {
   BottomSheetFooterProps,
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
-import { space20, useTheme } from '@app/theme';
+import { radiusSheet, space20, useTheme } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { contentTopPad } from '@app/navigation/safeArea';
@@ -32,6 +33,7 @@ import TitleBar from '@ui/widgets/TitleBar';
 import { HEADER_BAR_HEIGHT } from '@ui/widgets/Header/Header';
 import AppSheet from '@ui/primitives/AppSheet';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
+import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 
 /** The panel stops this far under the top bar, as the sheets do. */
@@ -60,6 +62,11 @@ type FullPanelProps = {
    * content fades in.
    */
   motion?: 'rise' | 'step';
+  /**
+   * Sizes the panel to its content, up to the full height, and scrolls past
+   * that. It waits closed until the content is measured, then rises to it.
+   */
+  fit?: boolean;
   testID?: string;
   children: React.ReactNode;
 };
@@ -80,6 +87,7 @@ export default function FullPanel({
   footer,
   center,
   motion = 'rise',
+  fit = false,
   testID,
   children,
 }: FullPanelProps) {
@@ -91,16 +99,32 @@ export default function FullPanel({
   const sheetRef = useRef<BottomSheet>(null);
   const rises = motion === 'rise';
 
-  /** The screen under the app's top pad, less the top bar that stays above. */
-  const snapPoints = useMemo(
-    () => [
-      Math.max(
-        frame.height - contentTopPad(insets.top) - HEADER_BAR_HEIGHT - SNAP_GAP,
-        MIN_PANEL,
-      ),
-    ],
-    [frame.height, insets.top],
-  );
+  const [headerH, setHeaderH] = useState<number>(0);
+  const [contentH, setContentH] = useState<number>(0);
+  const fitted = fit && headerH > 0 && contentH > 0;
+
+  /**
+   * The screen under the app's top pad, less the top bar that stays above;
+   * fitting, the header and the content when they need less.
+   */
+  const snapPoints = useMemo(() => {
+    const full = Math.max(
+      frame.height - contentTopPad(insets.top) - HEADER_BAR_HEIGHT - SNAP_GAP,
+      MIN_PANEL,
+    );
+    return [
+      fitted ? Math.min(full, Math.max(headerH, radiusSheet) + contentH) : full,
+    ];
+  }, [frame.height, insets.top, fitted, headerH, contentH]);
+
+  /** Fitting, the rise starts once the height is known. */
+  const rose = useRef(false);
+  useEffect(() => {
+    if (fitted && !rose.current) {
+      rose.current = true;
+      safeSnapToIndex(sheetRef, 0, 1);
+    }
+  }, [fitted]);
 
   const fade = useSharedValue(0);
   useEffect(() => {
@@ -135,7 +159,7 @@ export default function FullPanel({
     });
   }, [navigation, rises]);
 
-  const sheetHeader = (
+  const titleBar = (
     <TitleBar
       title={title}
       left={
@@ -160,6 +184,13 @@ export default function FullPanel({
           : undefined
       }
     />
+  );
+  const sheetHeader = fit ? (
+    <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
+      {titleBar}
+    </View>
+  ) : (
+    titleBar
   );
 
   const renderFooter = useCallback(
@@ -192,9 +223,11 @@ export default function FullPanel({
         renderFooter={footer ? renderFooter : undefined}
         animationConfigs={PANEL_IN}
         animateOnMount={rises}
+        index={fit ? -1 : 0}
       >
         <BottomSheetScrollView
           testID={testID}
+          onContentSizeChange={fit ? (_, h) => setContentH(h) : undefined}
           bounces={false}
           alwaysBounceVertical={false}
           style={{ flex: 1 }}
