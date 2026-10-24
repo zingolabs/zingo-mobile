@@ -1,8 +1,7 @@
 import { ChainNameEnum, offlineServer, remoteServer } from '@app/AppState';
-import { serverUris } from '@app/uris';
 
 export const mockServer = remoteServer(
-  serverUris(() => '')[0].uri,
+  'https://indexer.example:443',
   ChainNameEnum.mainChainName,
 );
 

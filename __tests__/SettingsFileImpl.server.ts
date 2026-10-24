@@ -20,6 +20,11 @@ jest.mock('@app/uris', () => ({
   ],
 }));
 
+jest.mock('@app/uris/defaultIndexer', () => ({
+  loadDefaultIndexer: jest.fn(async () => 'https://mainnet.example:9067'),
+  defaultIndexer: jest.fn(() => 'https://mainnet.example:9067'),
+}));
+
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import {
   ChainNameEnum,

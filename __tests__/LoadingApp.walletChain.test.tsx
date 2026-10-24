@@ -63,6 +63,7 @@ describe('A wallet on another network than its server', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     bridge.walletExists.mockResolvedValue('true');
+    bridge.defaultIndexerInfo.mockResolvedValue('https://mainnet.example:443');
   });
 
   test.each([SelectServerEnum.auto, SelectServerEnum.custom])(

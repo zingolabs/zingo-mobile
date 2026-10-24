@@ -1,6 +1,8 @@
 import { ChainNameEnum } from '@app/AppState';
 import { pickAutomatic } from '@app/services/serverPicking';
 import { serverUris } from '@app/uris';
+import RPCModule from '@app/RPCModule';
+import { loadDefaultIndexer } from '@app/uris/defaultIndexer';
 
 const mockAnswering = new Set<string>();
 const mockRegistry: { uri: string; chainName: ChainNameEnum }[] = [];
@@ -12,6 +14,9 @@ jest.mock('@app/walletBackend', () => ({
       : { ok: false, error: { code: 'Unknown', message: 'down' } },
   ),
 }));
+jest.mock('@app/RPCModule', () =>
+  require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
+);
 jest.mock('@app/uris', () => ({
   ...jest.requireActual('@app/uris'),
   fetchServerList: jest.fn(async () =>
@@ -23,6 +28,11 @@ const translate = (k: string) => k;
 const ZAINO = 'https://mainnet.zainod.zingolabs.dev:443';
 const REGISTRY = 'https://registry.example:443';
 const STATIC = 'https://eu.zec.rocks:443';
+
+beforeAll(async () => {
+  (RPCModule.defaultIndexerInfo as jest.Mock).mockResolvedValue(ZAINO);
+  await loadDefaultIndexer(ChainNameEnum.mainChainName);
+});
 
 beforeEach(() => {
   mockAnswering.clear();

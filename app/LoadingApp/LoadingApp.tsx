@@ -84,6 +84,7 @@ import {
   BlockExplorerEnum,
 } from '@app/AppState';
 import { serverUris } from '@app/uris';
+import { loadDefaultIndexer } from '@app/uris/defaultIndexer';
 import { staticAlternatives, staticServers } from '@app/uris/serverChoice';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { fetchWallet } from '@app/walletBackend';
@@ -150,16 +151,14 @@ type LoadingAppProps = NativeStackScreenProps<RootParamList, 'Loading'> & {
   session: LoadingSession;
 };
 
-const SERVER_DEFAULT_0: ServerType = remoteServer(
-  serverUris(() => {})[0].uri,
-  serverUris(() => {})[0].chainName,
-);
+// No server until the settings file and the Binding Layer have answered.
+const SERVER_UNSET: ServerType = remoteServer('', ChainNameEnum.noneChainName);
 
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme();
   const { setSession } = useSession();
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
+  const [server, setServer] = useState<ServerType>(SERVER_UNSET);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [backgroundSyncInfo, setBackgroundSyncInfo] = useState<BackgroundType>({
     batches: 0,
@@ -676,11 +675,14 @@ export class LoadingAppClass extends Component<
   // Default server for a chain = the `default` entry for that chain in the
   // static `serverUris` list (mainnet and testnet both have one). Same lookup
   // for both chains, no per-chain special-casing.
-  defaultServerForChain = (chainName: ChainNameEnum): ServerType => {
+  defaultServerForChain = async (
+    chainName: ChainNameEnum,
+  ): Promise<ServerType> => {
+    await loadDefaultIndexer(chainName);
     const found = serverUris(this.state.translate).find(
       (s: ServerUrisType) => s.chainName === chainName && s.default,
     );
-    return found ? remoteServer(found.uri, found.chainName) : SERVER_DEFAULT_0;
+    return found ? remoteServer(found.uri, found.chainName) : SERVER_UNSET;
   };
 
   // Boot-time server selection driven by the persisted mode:
@@ -708,7 +710,7 @@ export class LoadingAppClass extends Component<
       );
       const best = pick
         ? remoteServer(pick.server.uri, pick.server.chainName)
-        : this.defaultServerForChain(chainName);
+        : await this.defaultServerForChain(chainName);
       this.setState({ server: best });
       await SettingsFileImpl.writeServer(best, mode);
       return !!pick && pick.tier !== 'default';
@@ -1048,7 +1050,7 @@ export class LoadingAppClass extends Component<
     this.retryStartedAt = Date.now();
     this.setState({ retrying: true, actionButtonsDisabled: true });
     await this.applyServer(
-      this.defaultServerForChain(chain),
+      await this.defaultServerForChain(chain),
       SelectServerEnum.auto,
     );
     await this.selectServerOnBoot(!!this.state.netInfo.isConnected);
@@ -1590,7 +1592,7 @@ export class LoadingAppClass extends Component<
   chooseAutomatic = async (chain: ChainNameEnum) => {
     this.setState({ actionButtonsDisabled: true, serverStatus: 'wait' });
     await this.applyServer(
-      this.defaultServerForChain(chain),
+      await this.defaultServerForChain(chain),
       SelectServerEnum.auto,
     );
     await this.selectServerOnBoot(!!this.state.netInfo.isConnected);

@@ -715,6 +715,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
+    fun defaultIndexerInfo(chainHint: String, promise: Promise) {
+        FfiOutcome.settling(promise, "default_indexer") {
+            uniffi.zingo.defaultIndexer(chainHint = chainHint) ?: ""
+        }
+    }
+
+    @ReactMethod
     fun getLatestBlockWalletInfo(promise: Promise) {
         FfiOutcome.settling(promise, "get_latest_block_wallet") {
             uniffi.zingo.initLogging()
