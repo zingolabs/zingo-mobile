@@ -164,16 +164,14 @@ type LoadedAppProps = NativeStackScreenProps<RootParamList, 'Wallet'> & {
 // The wallet fades in over the loading screen as it opens.
 const HOME_FADE_MS = 300;
 
-const SERVER_DEFAULT_0: ServerType = remoteServer(
-  serverUris(() => {})[0].uri,
-  serverUris(() => {})[0].chainName,
-);
+// No server until the settings file and the Binding Layer have answered.
+const SERVER_UNSET: ServerType = remoteServer('', ChainNameEnum.noneChainName);
 
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme();
   const { setSession, pendingLink, clearLink } = useSession();
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
+  const [server, setServer] = useState<ServerType>(SERVER_UNSET);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [backgroundSyncInfo, setBackgroundSyncInfo] = useState<BackgroundType>({
     batches: 0,

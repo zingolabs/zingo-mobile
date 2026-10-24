@@ -1,20 +1,28 @@
 import { ServerUrisType, TranslateType, ChainNameEnum } from '@app/AppState';
+import { defaultIndexer } from './defaultIndexer';
 
 const serverUris = (
   translate: (key: string) => TranslateType | void,
 ): ServerUrisType[] => {
+  // Zingo's own endpoint, the Default Indexer zingolib defines; the Binding
+  // Layer answers it at boot, and the list leaves it out until then. It
+  // stays first and is the one default and recommended entry of mainnet.
+  const mainnetDefault = defaultIndexer(ChainNameEnum.mainChainName);
+  const zingo: ServerUrisType[] = mainnetDefault
+    ? [
+        {
+          uri: mainnetDefault,
+          region: translate('settings.na') as string,
+          chainName: ChainNameEnum.mainChainName,
+          default: true,
+          latency: null,
+          obsolete: false,
+          recommended: true,
+        },
+      ]
+    : [];
   return [
-    // default server, and a recommended Zaino server. It stays first: the
-    // apps take entry 0 as the server before any setting is read.
-    {
-      uri: 'https://mainnet.zainod.zingolabs.dev:443',
-      region: translate('settings.na') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: true,
-      latency: null,
-      obsolete: false,
-      recommended: true,
-    },
+    ...zingo,
     // new servers (not default)
     {
       uri: 'https://zec.rocks:443',

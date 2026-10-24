@@ -14,6 +14,7 @@ import {
   remoteServer,
 } from '@app/AppState';
 import { serverUris } from '@app/uris';
+import { loadDefaultIndexer } from '@app/uris/defaultIndexer';
 import { isEqual } from 'lodash';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 
@@ -25,10 +26,17 @@ type SettingsWire = Omit<SettingsFileClass, 'server' | 'selectServer'> & {
 };
 type ServerSettings = Pick<SettingsFileClass, 'server' | 'selectServer'>;
 
-const defaultWire = (): ServerWire => ({
-  uri: serverUris(() => {})[0].uri,
-  chainName: serverUris(() => {})[0].chainName,
-});
+// Mainnet's default entry, which the Binding Layer fills once
+// `loadDefaultIndexer` has run; `readSettings` runs it first.
+const defaultWire = (): ServerWire => {
+  const found = serverUris(() => {}).find(
+    (s: ServerUrisType) =>
+      s.chainName === ChainNameEnum.mainChainName && s.default,
+  );
+  return found
+    ? { uri: found.uri, chainName: found.chainName }
+    : { uri: '', chainName: ChainNameEnum.mainChainName };
+};
 
 const listed = (wire: ServerWire, filter: (s: ServerUrisType) => boolean) =>
   serverUris(() => {})
@@ -120,6 +128,7 @@ export default class SettingsFileImpl {
   }
 
   static async readSettings(): Promise<SettingsFileClass> {
+    await loadDefaultIndexer(ChainNameEnum.mainChainName);
     const { server, selectServer, ...rest } = await this.readWire();
     return server
       ? { ...rest, ...decodeServer(server, selectServer) }
