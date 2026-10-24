@@ -218,19 +218,33 @@ private func syncStatusOrReason() -> String {
     }
 }
 
-/// Launches a sync of `what` and polls it each second to completion, failing with the elapsed time and the sync status at the deadline or on a sync error.
+/// Whether the running session has reached the chain tip it found.
+private func syncHasCaughtUp() throws -> Bool {
+    return try syncCaughtUp().range(of: "\"caught_up\":\\s*true", options: .regularExpression) != nil
+}
+
+/// Stops the session and polls each second until it has ended. Sync is continuous, so a session never ends on its own.
+private func stopSyncAndWait() throws {
+    _ = try stopSync()
+    while try pollSync().lowercased().hasPrefix("sync task is not complete") {
+        Thread.sleep(forTimeInterval: 1.0)
+    }
+}
+
+/// Launches a sync of `what`, polls it each second until it reaches the tip and stops it, failing with the elapsed time and the sync status at the deadline or on a sync error.
 private func syncToCompletion(_ what: String, deadlineSeconds: TimeInterval, start: Date) throws {
     let syncStart = Date()
     do {
         let syncJson = try runSync()
         print("\nSync:\n\(syncJson)")
-        while try !pollSync().contains("sync_complete") {
+        while try pollSync().lowercased().hasPrefix("sync task is not complete"), try !syncHasCaughtUp() {
             let elapsed = Date().timeIntervalSince(start)
             if elapsed > deadlineSeconds {
                 throw ChainFailure(description: "the test passed its \(Int(deadlineSeconds)) s deadline after \(elapsed) s while syncing \(what): \(syncStatusOrReason())")
             }
             Thread.sleep(forTimeInterval: 1.0)
         }
+        try stopSyncAndWait()
     } catch let error as ZingolibError {
         throw ChainFailure(description: "the sync of \(what) failed after \(Date().timeIntervalSince(start)) s: \(error): \(syncStatusOrReason())")
     }

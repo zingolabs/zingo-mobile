@@ -28,7 +28,7 @@ const keysOf = (fp: string) =>
 
 const service = () =>
   new WalletLifecycleService({
-    pauseSyncProcess: jest.fn(async () => {}),
+    stopSyncProcess: jest.fn(async () => {}),
   } as never);
 
 beforeEach(() => {
