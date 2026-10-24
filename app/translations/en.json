@@ -921,7 +921,6 @@
     "deposit-you-get": "You’ll get",
     "result-refunded-buy": "The swap didn’t complete, so the {coin} went back to your refund address, minus the network fee.",
     "result-missing": "Missing",
-    "detail-save-contact": "Save this {coin} address as a contact",
     "tx-privacy": "Privacy",
     "tx-private": "Private · NYM Enhanced",
     "no-route-now": "No route is available for this swap right now."

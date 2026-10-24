@@ -63,7 +63,7 @@ import type { DetailRow } from '@screens/Swap/components/DetailRows';
 import ShieldNote from '@screens/Swap/components/ShieldNote';
 import SaveContactSheet from '@screens/Swap/components/SaveContactSheet';
 import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
-import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
+import SaveContactButton from '@ui/widgets/SaveContactButton';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
 import { swapOutcome } from '@screens/Swap/swapProgress';
 import { legName, legsOf } from '@screens/Swap/swapLegs';
@@ -230,20 +230,21 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         ? `${formatAmountForDisplay(record.totalFeesInReceiveAsset)} ${getSym}`
         : '';
   const reason = record.refundInfo?.refundReason ?? record.failureReason;
-  /** The contact a finished sale reached, when its address is saved. */
-  const contact =
-    done && sell
-      ? addressBook.find(
-          c =>
-            c.swapChain.toUpperCase() ===
-              record.receiveAsset.chain.toUpperCase() &&
-            c.address ===
-              canonicalChainAddress(
-                record.receiveAsset.chain,
-                record.destinationAddress,
-              ),
-        )
-      : undefined;
+  /** The swap's address outside the wallet: where a sale went, or a buy's refund. */
+  const outside = sell
+    ? { chain: record.receiveAsset.chain, address: record.destinationAddress }
+    : { chain: record.sellAsset.chain, address: record.sourceAddress };
+  const outsideAddress = outside.address
+    ? canonicalChainAddress(outside.chain, outside.address)
+    : '';
+  /** That address's contact, when it is saved. */
+  const contact = outsideAddress
+    ? addressBook.find(
+        c =>
+          c.swapChain.toUpperCase() === outside.chain.toUpperCase() &&
+          c.address === outsideAddress,
+      )
+    : undefined;
   const rows: DetailRow[] = [
     {
       label: t('swap.detail-date'),
@@ -395,28 +396,12 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
 
       <DetailRows rows={rows} />
 
-      {done && sell && !contact && (
-        <Pressable
+      {!!outside.address && !contact && (
+        <SaveContactButton
           testID="swap.detail.save-contact"
-          accessibilityRole="button"
+          label={t('swap.save-contact')}
           onPress={() => saveSheetRef.current?.present()}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            columnGap: space8,
-            minHeight: 44,
-            marginTop: space8,
-          }}
-        >
-          <UserPlusIcon size={iconSizeMd} color={colors.fgAccent} />
-          <Text
-            variant="caption"
-            style={{ flexShrink: 1, fontWeight: '700', color: colors.fgAccent }}
-          >
-            {t('swap.detail-save-contact').replace('{coin}', getSym)}
-          </Text>
-        </Pressable>
+        />
       )}
 
       {legs.length > 0 && (
@@ -529,21 +514,18 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
           <ShieldNote text={t('swap.shield-note')} />
         </View>
       )}
-      {done && sell && (
+      {!!outside.address && (
         <SaveContactSheet
           ref={saveSheetRef}
-          address={canonicalChainAddress(
-            record.receiveAsset.chain,
-            record.destinationAddress,
-          )}
-          chain={record.receiveAsset.chain}
+          address={outsideAddress}
+          chain={outside.chain}
           book={addressBook}
           onSave={async name => {
             setAddressBook(
               await AddressBookFileImpl.saveChainContact(
                 name,
-                record.destinationAddress,
-                record.receiveAsset.chain,
+                outside.address,
+                outside.chain,
               ),
             );
             addLastSnackbar(

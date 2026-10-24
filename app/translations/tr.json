@@ -921,7 +921,6 @@
     "deposit-you-get": "Alacağınız",
     "result-refunded-buy": "Takas tamamlanmadı, bu yüzden {coin} ağ ücreti düşülerek iade adresinize döndü.",
     "result-missing": "Eksik",
-    "detail-save-contact": "Bu {coin} adresini kişi olarak kaydet",
     "tx-privacy": "Gizlilik",
     "tx-private": "Gizli · NYM Enhanced",
     "no-route-now": "Şu anda bu takas için kullanılabilir bir rota yok."
