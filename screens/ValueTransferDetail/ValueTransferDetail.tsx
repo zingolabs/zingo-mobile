@@ -6,7 +6,14 @@ import { Linking, Pressable, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { radiusMd, useTheme, iconSizeSm } from '@app/theme';
+import {
+  radiusMd,
+  useTheme,
+  iconSizeSm,
+  iconSizeMd,
+  space8,
+  touchTarget,
+} from '@app/theme';
 import {
   BlockExplorerEnum,
   ChainNameEnum,
@@ -36,6 +43,7 @@ import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
 import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
 import { RefreshIcon } from '@ui/primitives/Icons/RefreshIcon';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
+import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
 import DetailRows from '@screens/Swap/components/DetailRows';
 import type { DetailRow } from '@screens/Swap/components/DetailRows';
 import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
@@ -71,6 +79,7 @@ const ValueTransferDetail: React.FunctionComponent<
     blockExplorer,
     zecPrice,
     setSendPageState,
+    launchAddTagModal,
   } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const t = (key: string) => (translate(key) as string).trim();
@@ -355,6 +364,30 @@ const ValueTransferDetail: React.FunctionComponent<
       <View style={{ marginTop: 24 }}>
         <DetailRows rows={rows} />
       </View>
+
+      {sent && !!vt.address && !contact && !ownAddress(vt.address) && (
+        <Pressable
+          testID="valuetransferdetail.save-contact"
+          accessibilityRole="button"
+          onPress={() => launchAddTagModal(vt.address ?? '')}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            columnGap: space8,
+            minHeight: touchTarget,
+            marginTop: space8,
+          }}
+        >
+          <UserPlusIcon size={iconSizeMd} color={colors.fgAccent} />
+          <Text
+            variant="caption"
+            style={{ flexShrink: 1, fontWeight: '700', color: colors.fgAccent }}
+          >
+            {t('swap.detail-save-contact').replace('{coin}', info.currencyName)}
+          </Text>
+        </Pressable>
+      )}
 
       {(!!memo || !!memoUA) && (
         <View
