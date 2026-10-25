@@ -12,6 +12,7 @@ import Animated, {
 import { formatUsd } from '@app/utils/formatAmount';
 import { usePriceHealth } from './priceFetcherStore';
 import { useTimedReveal } from '@app/hooks/useTimedReveal';
+import { MASK } from '@ui/widgets/PrivateAmount';
 
 type CurrencyAmountProps = {
   price?: number;
@@ -123,7 +124,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
                 ...style,
               }}
             >
-              {'$ -' + decimalSeparator + '--'}
+              {`$${MASK}`}
             </Text>
           ) : tint ? (
             <TintedText

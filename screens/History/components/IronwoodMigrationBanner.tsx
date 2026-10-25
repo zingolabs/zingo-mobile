@@ -1,7 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useState } from 'react';
 import { Pressable, View, ViewStyle } from 'react-native';
-import { getNumberFormatSettings } from 'react-native-localize';
 import Animated, {
   Easing,
   FadeIn,
@@ -21,6 +20,7 @@ import {
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import Banner from '@ui/widgets/Banner';
+import PrivateAmount from '@ui/widgets/PrivateAmount';
 
 import SegmentedBar from '@ui/primitives/SegmentedBar';
 import { ContextAppLoaded } from '@app/context';
@@ -169,10 +169,8 @@ const IronwoodMigrationBanner: React.FunctionComponent<
   IronwoodMigrationBannerProps
 > = ({ amount, currencyName, onStart, onResume, onHide }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, info, privacy } = context;
+  const { translate, info } = context;
   const { colors } = useTheme();
-  const { decimalSeparator } = getNumberFormatSettings();
-  const masked = `-${decimalSeparator}----`;
 
   const [migration, setMigration] = useState<RPCMigrationStatusType | null>(
     null,
@@ -258,11 +256,9 @@ const IronwoodMigrationBanner: React.FunctionComponent<
     const perBucket = scheduled ? Math.max(1, migration.per_bucket ?? 1) : 1;
     const batchesConfirmed = Math.floor(migration.parts_confirmed / perBucket);
 
-    const orchardLeftStr = privacy
-      ? `${masked} ${currencyName}`
-      : `${formatAmount(
-          migration.orchard_confirmed_spendable / ZATS_PER_ZEC,
-        )} ${currencyName}`;
+    const orchardLeftStr = `${formatAmount(
+      migration.orchard_confirmed_spendable / ZATS_PER_ZEC,
+    )} ${currencyName}`;
 
     // A batch is ready to send exactly when the backend reports a due batch:
     // the window the chain is currently inside, which upcoming_windows cannot
@@ -444,7 +440,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
                   {statusLabel}
                 </Text>
               </View>
-              <Text variant="body">{orchardLeftStr}</Text>
+              <PrivateAmount variant="body" text={orchardLeftStr} />
             </View>
           </PressScale>
         </Animated.View>
@@ -498,9 +494,12 @@ const IronwoodMigrationBanner: React.FunctionComponent<
         dismissTestID="ironwoodbanner.hide"
       >
         {translate('ironwoodbanner.balance') as string}{' '}
-        <Text variant="bodySmall" style={{ fontWeight: '700' }}>
-          {privacy ? masked : formatAmount(amount)}
-        </Text>{' '}
+        <PrivateAmount
+          inline
+          variant="bodySmall"
+          style={{ fontWeight: '700' }}
+          text={formatAmount(amount)}
+        />{' '}
         {currencyName}
       </Banner>
     </Animated.View>

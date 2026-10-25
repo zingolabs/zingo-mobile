@@ -79,7 +79,7 @@ exports[`Component Components - test CurrencyAmount High Privacy - snapshot 1`] 
           }
         }
       >
-        $ -.--
+        $•••••
       </Text>
     </View>
   </View>
@@ -227,7 +227,7 @@ exports[`Component Components - test ZecAmount High Privacy - snapshot 1`] = `
           }
         }
       >
-         -.----
+         •••••
       </Text>
     </View>
   </View>

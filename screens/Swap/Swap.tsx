@@ -82,7 +82,6 @@ import { tokenToSwapAsset } from './swapAssets';
 import { useCoinPrice } from './useCoinPrice';
 import { onTabScroll } from '@app/navigation/tabBarScroll';
 import { PANEL_TOP } from '@ui/widgets/Header/Header';
-import { MASK } from '@screens/History/components/HistoryRowBody';
 import InsufficientFundsSheet from './components/InsufficientFundsSheet';
 
 type SwapProps = HomeTabScreenProps<'Swap'>;
@@ -103,7 +102,6 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     walletChainName,
     mixnetView,
     setPrivacyOption,
-    privacy,
     addLastSnackbar,
     addressBook,
     setAddressBook,
@@ -476,14 +474,10 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                 availableText={
                   !form.isOutbound
                     ? undefined
-                    : privacy
-                      ? usdMode
-                        ? MASK
-                        : `${MASK} ${info.currencyName}`
-                      : usdMode
-                        ? toFiatText(String(form.maxSpendableForSwap), price) ||
-                          Utils.parseNumberFloatToStringLocale(0, 2)
-                        : `${formatAmountForDisplay(String(form.maxSpendableForSwap))} ${info.currencyName}`
+                    : usdMode
+                      ? toFiatText(String(form.maxSpendableForSwap), price) ||
+                        Utils.parseNumberFloatToStringLocale(0, 2)
+                      : `${formatAmountForDisplay(String(form.maxSpendableForSwap))} ${info.currencyName}`
                 }
                 onUseMax={() =>
                   onChangeAmountText(

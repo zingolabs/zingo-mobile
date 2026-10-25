@@ -16,6 +16,7 @@ import {
 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import Text from '@ui/primitives/Text';
+import PrivateAmount from '@ui/widgets/PrivateAmount';
 import { useInsetFill } from '@ui/primitives/Surface';
 import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
 
@@ -173,13 +174,12 @@ export default function AmountCard({
             >
               {t('send.available')}
             </Text>
-            <Text
+            <PrivateAmount
+              text={available}
               variant="caption"
               color={availableError ? colors.fgDanger : colors.fgDefault}
               style={{ fontWeight: '700', textDecorationLine: 'underline' }}
-            >
-              {available}
-            </Text>
+            />
           </Pressable>
           {!!fee && (
             <Text variant="caption" tone="muted">

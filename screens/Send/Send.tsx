@@ -121,7 +121,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
     sendPageState,
     zecPrice,
     netInfo,
-    privacy,
     server,
     setBackgroundError,
     addLastSnackbar,
@@ -1116,11 +1115,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                         Utils.parseStringLocaleToNumberFloat(amountText) || 0,
                       )} ${info.currencyName}`
                 }
-                available={
-                  privacy
-                    ? `••••• ${info.currencyName}`
-                    : `${formatAmount(maxAmount)} ${info.currencyName}`
-                }
+                available={`${formatAmount(maxAmount)} ${info.currencyName}`}
                 availableError={spendableError}
                 onMax={() => {
                   if (spendableBalanceLastError || proposeSendLastError) {

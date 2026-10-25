@@ -62,7 +62,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   const {
     translate,
     language,
-    privacy,
     info,
     showSwipeableIcons,
     readOnly,
@@ -233,7 +232,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               )
             }
             text={text}
-            privacy={privacy}
             hairline={hairline}
             memo={haveMemo}
           />

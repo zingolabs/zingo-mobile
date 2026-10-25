@@ -8,6 +8,7 @@ import {
 } from '@app/utils/formatAmount';
 import Tag from '@ui/widgets/Tag';
 import { Linking, Pressable, View } from 'react-native';
+import { useAmountReveal } from '@ui/widgets/PrivateAmount';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -51,8 +52,6 @@ type ValueTransferDetailProps = NativeStackScreenProps<
   'ValueTransferDetail'
 >;
 
-const MASK = '•••••';
-
 /**
  * A transaction, opened from History in the static full panel: its avatar,
  * what happened, the amount at 36, today's dollars and its status, then a
@@ -63,11 +62,12 @@ const ValueTransferDetail: React.FunctionComponent<
   ValueTransferDetailProps
 > = ({ route }) => {
   const navigation = useNavigation<WalletNavigation>();
+  /** A tap on any amount shows them all. */
+  const amounts = useAmountReveal();
   const {
     info,
     translate,
     language,
-    privacy,
     addLastSnackbar,
     server,
     addressBook,
@@ -207,7 +207,9 @@ const ValueTransferDetail: React.FunctionComponent<
       ? [
           {
             label: t('history.tx-fee'),
-            value: `${formatAmount(vt.fee ?? 0)} ${info.currencyName}`,
+            value: amounts.show(
+              `${formatAmount(vt.fee ?? 0)} ${info.currencyName}`,
+            ),
           },
         ]
       : []),
@@ -324,30 +326,37 @@ const ValueTransferDetail: React.FunctionComponent<
         >
           {head}
         </Text>
-        <Text
-          testID="valuetransferdetail.amount"
-          variant="balance"
-          color={
-            failed
-              ? colors.fgMuted
-              : received
-                ? colors.fgAccent
-                : colors.fgDefault
-          }
-          style={{ marginTop: 12, fontVariant: ['tabular-nums'] }}
+        <Pressable
+          accessibilityRole="button"
+          disabled={!amounts.hidden}
+          onPress={amounts.reveal}
         >
-          {privacy ? MASK : `${sign}${formatAmount(vt.amount)}`}
-          <Text variant="subtitle" tone="muted">
-            {` ${info.currencyName}`}
+          <Text
+            testID="valuetransferdetail.amount"
+            variant="balance"
+            color={
+              failed
+                ? colors.fgMuted
+                : received
+                  ? colors.fgAccent
+                  : colors.fgDefault
+            }
+            style={{ marginTop: 12, fontVariant: ['tabular-nums'] }}
+          >
+            {amounts.show(`${sign}${formatAmount(vt.amount)}`)}
+            <Text variant="subtitle" tone="muted">
+              {` ${info.currencyName}`}
+            </Text>
           </Text>
-        </Text>
-        {!!todayUsd && (
-          <Text variant="bodySmall" tone="muted" style={{ marginTop: 4 }}>
-            {privacy
-              ? MASK
-              : t('history.today-price').replace('{usd}', todayUsd)}
-          </Text>
-        )}
+          {!!todayUsd && (
+            <Text variant="bodySmall" tone="muted" style={{ marginTop: 4 }}>
+              {t('history.today-price').replace(
+                '{usd}',
+                amounts.show(todayUsd),
+              )}
+            </Text>
+          )}
+        </Pressable>
         <View style={{ marginTop: 12 }}>
           <Tag tone={status.tone}>{status.text}</Tag>
         </View>

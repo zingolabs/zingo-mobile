@@ -27,7 +27,7 @@ function LegLine({
   recordId: string;
 }) {
   const navigation = useNavigation<WalletNavigation>();
-  const { translate, language, privacy, info, zecPrice, server } =
+  const { translate, language, info, zecPrice, server } =
     useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const t = (key: string) => (translate(key) as string).trim();
@@ -62,12 +62,7 @@ function LegLine({
           backgroundColor: pressed ? colors.bgMutedSubtle : colors.bgSurface,
         })}
       >
-        <HistoryRowBody
-          text={text}
-          privacy={privacy}
-          hairline={false}
-          compact
-        />
+        <HistoryRowBody text={text} hairline={false} compact />
       </Pressable>
     </Animated.View>
   );

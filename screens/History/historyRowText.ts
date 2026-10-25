@@ -23,6 +23,8 @@ export type RowText = {
   titleMono: boolean;
   state?: RowState;
   line: string;
+  /** An amount after the line, masked with the figures. */
+  lineAmount?: string;
   top: string;
   topTone: RowTone;
   bottom: string;
@@ -251,7 +253,8 @@ export function legRowText(args: {
   return {
     title: t(received ? 'history.received' : 'history.sent').trim(),
     titleMono: false,
-    line: `${time}${fee}`,
+    line: time,
+    lineAmount: fee,
     top: `${received ? '+' : '−'}${formatAmount(vt.amount)} ${currency}`,
     topTone: received ? 'positive' : 'default',
     bottom: usd,

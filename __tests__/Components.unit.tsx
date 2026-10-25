@@ -26,7 +26,7 @@ describe('Component Components - test', () => {
         privacy={true}
       />,
     );
-    expect(screen.getByText('$ -.--')).toBeTruthy();
+    expect(screen.getByText('$•••••')).toBeTruthy();
   });
 
   test('CurrencyAmount - price undefined should display placeholder', () => {
@@ -63,7 +63,7 @@ describe('Component Components - test', () => {
         privacy={true}
       />,
     );
-    expect(screen.getByText('-.----')).toBeTruthy();
+    expect(screen.getByText('•••••')).toBeTruthy();
   });
 
   test('ZecAmount - no props should display placeholder', () => {

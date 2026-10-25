@@ -23,6 +23,7 @@ import {
 } from '@app/theme';
 import type { TokenEntryType } from '@app/swap';
 import Text from '@ui/primitives/Text';
+import PrivateAmount from '@ui/widgets/PrivateAmount';
 import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
 import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
@@ -249,12 +250,11 @@ export default function PairCards({
               <Text variant="caption" tone="muted">
                 {texts.available}
               </Text>
-              <Text
+              <PrivateAmount
+                text={availableText}
                 variant="caption"
                 style={{ fontWeight: '700', textDecorationLine: 'underline' }}
-              >
-                {availableText}
-              </Text>
+              />
             </Pressable>
           )}
           {!isOutbound && (

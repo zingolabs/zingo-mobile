@@ -90,6 +90,7 @@ import { createAlert } from '@app/services/createAlert';
 import { sendEmail } from '@app/services/sendEmail';
 import Toast from 'react-native-toast-message';
 import { ACTION_SNACKBAR_MS, toastConfig } from '@ui/widgets/toastConfig';
+import { MASK } from '@ui/widgets/PrivateAmount';
 import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
 import Launching from '@screens/Launching';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
@@ -1202,6 +1203,8 @@ export class LoadedAppClass extends Component<
             );
             // the ValueTransfer is confirmed when the confirmations are > 0
             if (vtNew.length > 0 && vtNew[0].confirmations > 0) {
+              const amount = (zec: number) =>
+                this.state.privacy ? MASK : formatAmount(zec);
               let message: string = '';
               let title: string = '';
               if (
@@ -1212,7 +1215,7 @@ export class LoadedAppClass extends Component<
                   (this.state.translate('loadedapp.incoming-funds') as string) +
                   (this.state.translate('history.received') as string) +
                   ' ' +
-                  formatAmount(vtNew[0].amount) +
+                  amount(vtNew[0].amount) +
                   ' ' +
                   this.state.info.currencyName;
                 title = this.state.translate(
@@ -1231,7 +1234,7 @@ export class LoadedAppClass extends Component<
                   (vtNew[0].fee
                     ? ((' ' + this.state.translate('send.fee')) as string) +
                       ' ' +
-                      formatAmount(vtNew[0].fee) +
+                      amount(vtNew[0].fee) +
                       ' ' +
                       this.state.info.currencyName
                     : '');
@@ -1249,7 +1252,7 @@ export class LoadedAppClass extends Component<
                   (vtNew[0].fee
                     ? ((' ' + this.state.translate('send.fee')) as string) +
                       ' ' +
-                      formatAmount(vtNew[0].fee) +
+                      amount(vtNew[0].fee) +
                       ' ' +
                       this.state.info.currencyName
                     : '');
@@ -1264,14 +1267,14 @@ export class LoadedAppClass extends Component<
                   (this.state.translate('history.migration') as string) +
                   (vtNew[0].amount > 0
                     ? ' ' +
-                      formatAmount(vtNew[0].amount) +
+                      amount(vtNew[0].amount) +
                       ' ' +
                       this.state.info.currencyName
                     : '') +
                   (vtNew[0].fee
                     ? ((' ' + this.state.translate('send.fee')) as string) +
                       ' ' +
-                      formatAmount(vtNew[0].fee) +
+                      amount(vtNew[0].fee) +
                       ' ' +
                       this.state.info.currencyName
                     : '');
@@ -1286,7 +1289,7 @@ export class LoadedAppClass extends Component<
                   (this.state.translate('loadedapp.incoming-funds') as string) +
                   (this.state.translate('history.received') as string) +
                   ' ' +
-                  formatAmount(vtNew[0].amount) +
+                  amount(vtNew[0].amount) +
                   ' ' +
                   this.state.info.currencyName;
                 title = this.state.translate(
@@ -1300,7 +1303,7 @@ export class LoadedAppClass extends Component<
                   (this.state.translate('loadedapp.incoming-funds') as string) +
                   (this.state.translate('history.shield') as string) +
                   ' ' +
-                  formatAmount(vtNew[0].amount) +
+                  amount(vtNew[0].amount) +
                   ' ' +
                   this.state.info.currencyName;
                 title = this.state.translate(
@@ -1314,7 +1317,7 @@ export class LoadedAppClass extends Component<
                   (this.state.translate('loadedapp.payment-made') as string) +
                   (this.state.translate('history.sent') as string) +
                   ' ' +
-                  formatAmount(vtNew[0].amount) +
+                  amount(vtNew[0].amount) +
                   ' ' +
                   this.state.info.currencyName;
                 title = this.state.translate('loadedapp.send-menu') as string;
