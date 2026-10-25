@@ -741,7 +741,6 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                 }
               >
                 <View
-                  accessibilityLabel="title text translated"
                   accessibilityRole="button"
                   accessibilityState={
                     {
@@ -1589,7 +1588,6 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                 }
               >
                 <View
-                  accessibilityLabel="title text translated"
                   accessibilityRole="button"
                   accessibilityState={
                     {

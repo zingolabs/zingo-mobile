@@ -1319,7 +1319,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
                     testID={
                       sendButtonEnabled ? 'send.button' : 'send.button-disabled'
                     }
-                    accessibilityLabel={'title ' + translate('send.review')}
                     variant="primary"
                     title={translate('send.review') as string}
                     disabled={!sendButtonEnabled}

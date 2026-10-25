@@ -218,7 +218,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             {mixnetPhase !== 'absent' && (
               <TouchableOpacity
                 testID="header.mixnet-status"
-                hitSlop={slopFor(44)}
+                hitSlop={slopFor(22)}
                 accessibilityRole="button"
                 accessibilityLabel={
                   translate('settings.nym-diagnostics') as string
