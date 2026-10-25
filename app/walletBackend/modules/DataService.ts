@@ -73,6 +73,12 @@ export class DataService {
   fetchWalletBirthdaySeedUfvkLock: boolean = false;
   fetchInfoAndServerHeightLock: boolean = false;
   fetchTandZandOValueTransfersLock: boolean = false;
+  /**
+   * A fetch asked for while one ran. That one may have read the list before
+   * the change it is asked for (a send that just went out), so another
+   * follows it instead of the ask being dropped.
+   */
+  fetchTandZandOValueTransfersAgain: boolean = false;
   fetchTandZandOMessagesLock: boolean = false;
   fetchTotalBalanceLock: boolean = false;
   fetchAddressesLock: boolean = false;
@@ -452,8 +458,9 @@ export class DataService {
     }
   }
 
-  async fetchTandZandOValueTransfers() {
+  async fetchTandZandOValueTransfers(): Promise<void> {
     if (this.fetchTandZandOValueTransfersLock) {
+      this.fetchTandZandOValueTransfersAgain = true;
       return;
     }
     this.fetchTandZandOValueTransfersLock = true;
@@ -499,6 +506,10 @@ export class DataService {
       await this.onSyncError();
     } finally {
       this.fetchTandZandOValueTransfersLock = false;
+    }
+    if (this.fetchTandZandOValueTransfersAgain) {
+      this.fetchTandZandOValueTransfersAgain = false;
+      await this.fetchTandZandOValueTransfers();
     }
   }
 
