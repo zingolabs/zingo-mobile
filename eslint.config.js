@@ -35,7 +35,7 @@ const colorLock = [
 ];
 
 /**
- * The geometry lock (zingo-adrs zingo-mobile/0023): type, radii and icon
+ * The geometry lock (zingo-adrs zingo-mobile/0024): type, radii and icon
  * sizes come from app/theme and the Text variants, never from a number on
  * a screen. A number is a Literal, a negative one, or an arithmetic
  * expression; a token is an Identifier or a MemberExpression.
