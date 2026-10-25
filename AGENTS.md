@@ -36,6 +36,20 @@ ESLint enforces the zone.
 - Do not explain too much. State the point once.
 - Revise by deletion. When tightening prose, the default operation is removal, not substitution. A shorter draft that says the same thing is strictly better.
 
+## Design
+
+Read `DESIGN.md` before you change a screen or a component. It and the
+tokens and components in `app/theme`, `ui/primitives` and `ui/widgets`
+govern every UI change (zingo-adrs zingo-mobile/0023).
+
+- A prototype gives the layout, the content and the flow. Map each of its
+  values to the nearest token, text variant or component.
+- Use the shared component for its job; never draw a second one that looks
+  the same.
+- A value or a variant the system lacks goes into `app/theme` or the shared
+  component first, with the designer's approval and a Storybook story, and
+  `DESIGN.md` changes in the same commit.
+
 ## Code
 
 ### All languages
