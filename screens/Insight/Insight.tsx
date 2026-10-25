@@ -21,6 +21,8 @@ import ZecAmount from '@ui/widgets/ZecAmount';
 import Header from '@ui/widgets/Header';
 import ActivityChart from '@screens/Insight/components/ActivityChart';
 import Donut from '@screens/Insight/components/Donut';
+import { useTimedReveal } from '@app/hooks/useTimedReveal';
+import { mask } from '@app/utils/reveal';
 import {
   buildInsight,
   Group,
@@ -55,6 +57,33 @@ const PRESETS: { weeks: number | 'all'; key: string }[] = [
 ];
 
 type InsightProps = NativeStackScreenProps<AppDrawerParamList, 'Insight'>;
+
+/** The address of a row, masked in privacy mode until a tap reveals it for the reveal time. */
+function RowAddress({
+  address,
+  privacy,
+}: {
+  address: string;
+  privacy: boolean;
+}) {
+  const { colors } = useTheme();
+  const { visible, reveal } = useTimedReveal(privacy);
+  return (
+    <Text
+      numberOfLines={1}
+      onPress={visible ? undefined : reveal}
+      style={{
+        color: colors.fgDefault,
+        fontSize: 12.5,
+        lineHeight: 18,
+        fontWeight: '500',
+        fontFamily: MONO,
+      }}
+    >
+      {visible ? Utils.trimToSmall(address, 7) : mask(address)}
+    </Text>
+  );
+}
 
 // What the wallet sent and to whom: weekly activity, the share per recipient
 // and the ranked recipients, by amount or by number of sends.
@@ -106,7 +135,8 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
   const name = (group: Group): string =>
     group.kind === 'others'
       ? (translate('insight.others') as string)
-      : group.name || Utils.trimToSmall(group.address, 7);
+      : group.name ||
+        (privacy ? mask(group.address) : Utils.trimToSmall(group.address, 7));
 
   const pickMetric = (next: Metric) => {
     if (next === metric) {
@@ -526,27 +556,21 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                       </Text>
                     </View>
                     <View style={{ flex: 1, minWidth: 0 }}>
-                      <Text
-                        numberOfLines={1}
-                        style={{
-                          color: colors.fgDefault,
-                          fontSize:
-                            group.kind === 'recipient' && !group.name
-                              ? 12.5
-                              : 13.5,
-                          lineHeight: 18,
-                          fontWeight:
-                            group.kind === 'recipient' && !group.name
-                              ? '500'
-                              : '600',
-                          fontFamily:
-                            group.kind === 'recipient' && !group.name
-                              ? MONO
-                              : undefined,
-                        }}
-                      >
-                        {name(group)}
-                      </Text>
+                      {group.kind === 'recipient' && !group.name ? (
+                        <RowAddress address={group.address} privacy={privacy} />
+                      ) : (
+                        <Text
+                          numberOfLines={1}
+                          style={{
+                            color: colors.fgDefault,
+                            fontSize: 13.5,
+                            lineHeight: 18,
+                            fontWeight: '600',
+                          }}
+                        >
+                          {name(group)}
+                        </Text>
+                      )}
                       <View
                         style={{
                           height: 5,
