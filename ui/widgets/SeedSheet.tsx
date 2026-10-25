@@ -58,12 +58,13 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
           {...props}
           disappearsOnIndex={-1}
           appearsOnIndex={0}
-          opacity={0.62}
           pressBehavior="none"
           onPress={dismiss}
+          style={{ backgroundColor: colors.bgScrim }}
+          opacity={1}
         />
       ),
-      [dismiss],
+      [colors, dismiss],
     );
 
     return (

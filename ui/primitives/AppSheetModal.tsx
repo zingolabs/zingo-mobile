@@ -114,6 +114,8 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
         appearsOnIndex={0}
         disappearsOnIndex={-1}
         pressBehavior={dismissable ? 'close' : 'none'}
+        style={{ backgroundColor: colors.bgScrim }}
+        opacity={1}
       />
     );
 

@@ -59,9 +59,11 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
           disappearsOnIndex={-1}
           appearsOnIndex={0}
           pressBehavior="close"
+          style={{ backgroundColor: colors.bgScrim }}
+          opacity={1}
         />
       ),
-      [],
+      [colors],
     );
 
     // Reset the query on close (index -1), not on open, so the next open starts
