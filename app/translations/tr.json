@@ -1019,7 +1019,7 @@
     "state-expired": "Süresi doldu",
     "state-awaiting-deposit": "Depozito bekleniyor",
     "state-swapping": "Takas sürüyor",
-    "shield-line": "Şeffaf → Orchard",
+    "shield-line": "Şeffaf → {pool}",
     "swap-to": "Takas →",
     "swap-from": "Takas ←",
     "swapped-to": "Takas edildi →",

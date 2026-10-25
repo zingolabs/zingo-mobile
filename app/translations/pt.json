@@ -1019,7 +1019,7 @@
     "state-expired": "Expirado",
     "state-awaiting-deposit": "Aguardando depósito",
     "state-swapping": "Em andamento",
-    "shield-line": "Transparente → Orchard",
+    "shield-line": "Transparente → {pool}",
     "swap-to": "Swap para",
     "swap-from": "Swap de",
     "swapped-to": "Trocado para",

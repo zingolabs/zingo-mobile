@@ -99,7 +99,10 @@ export function transferRowText(args: {
       return {
         ...base,
         title: t('history.shield'),
-        line: `${t('history.shield-line')} · ${when}`,
+        /** The pool the funds went to, as the detail shows it: Ironwood now, Orchard before NU6.3. */
+        line: vt.poolType
+          ? `${t('history.shield-line').replace('{pool}', vt.poolType)} · ${when}`
+          : when,
         top: amount,
         topTone: failed ? 'muted' : 'default',
       };

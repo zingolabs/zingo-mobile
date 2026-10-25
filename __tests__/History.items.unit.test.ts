@@ -1,6 +1,7 @@
 jest.mock('@app/RPCModule', () => ({ __esModule: true, default: {} }));
 
 import { ValueTransferKindEnum } from '@app/AppState';
+import { PoolEnum } from '@app/AppState';
 import type { ValueTransferType } from '@app/AppState';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
@@ -168,6 +169,23 @@ test('Tests that a sent transfer is titled by its address and signed negative', 
   expect(text.titleMono).toBe(true);
   expect(text.top).toBe('−1.5 ZEC');
   expect(text.bottom).toBe('$924.36');
+});
+
+test('Tests that a shield names the pool its funds went to when the transfer carries one', () => {
+  const shieldT = (key: string) =>
+    key === 'history.shield-line' ? 'Transparent → {pool}' : key;
+  const lineOf = (poolType?: PoolEnum) =>
+    transferRowText({
+      vt: vt('e'.repeat(64), 1, ValueTransferKindEnum.Shield, { poolType }),
+      when: 'Oct 24',
+      currency: 'ZEC',
+      usd: '',
+      t: shieldT,
+    }).line;
+
+  expect(lineOf(PoolEnum.IronwoodPool)).toBe('Transparent → Ironwood · Oct 24');
+  expect(lineOf(PoolEnum.OrchardPool)).toBe('Transparent → Orchard · Oct 24');
+  expect(lineOf(undefined)).toBe('Oct 24');
 });
 
 test('Tests that a recent row reads in minutes and an older one by day', () => {

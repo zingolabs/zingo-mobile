@@ -1019,7 +1019,7 @@
     "state-expired": "Истёк",
     "state-awaiting-deposit": "Ожидает депозит",
     "state-swapping": "Обмен идёт",
-    "shield-line": "Прозрачный → Orchard",
+    "shield-line": "Прозрачный → {pool}",
     "swap-to": "Обмен на",
     "swap-from": "Обмен с",
     "swapped-to": "Обменяно на",
