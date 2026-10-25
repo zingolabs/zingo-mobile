@@ -155,7 +155,12 @@ export default function FullPanel({
       return;
     }
     return navigation.addListener('beforeRemove', e => {
-      if (closing.current || e.data.action.type === 'REPLACE') {
+      // Only the panel on top lowers; the ones under it leave with it.
+      if (
+        closing.current ||
+        e.data.action.type === 'REPLACE' ||
+        !navigation.isFocused()
+      ) {
         return;
       }
       e.preventDefault();

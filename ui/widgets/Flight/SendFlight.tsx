@@ -5,6 +5,7 @@ import Svg, { Circle, Path } from 'react-native-svg';
 import Animated, {
   Easing,
   ReduceMotion,
+  cancelAnimation,
   interpolate,
   useAnimatedProps,
   useAnimatedStyle,
@@ -131,6 +132,10 @@ export default function SendFlight({ width = 300 }: { width?: number }) {
       }),
       -1,
     );
+    return () => {
+      cancelAnimation(clock);
+      cancelAnimation(trip);
+    };
   }, [clock, trip]);
 
   const trail = useAnimatedProps(() => ({
