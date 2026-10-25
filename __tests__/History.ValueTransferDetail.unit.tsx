@@ -114,4 +114,23 @@ describe('Component History ValueTransferDetail - test', () => {
     });
     expect(screen.queryByTestId('valuetransferdetail.save-contact')).toBe(null);
   });
+
+  test('Tests that the amount carries a sign only when money left or came into the wallet', () => {
+    const signOf = (i: number) => {
+      const view = open(i);
+      const text = String(
+        [screen.getByTestId('valuetransferdetail.amount').props.children]
+          .flat(Infinity)
+          .join(''),
+      );
+      view.unmount();
+      return text.startsWith('+') ? '+' : text.startsWith('−') ? '−' : '';
+    };
+    expect(signOf(0)).toBe('−'); // sent
+    expect(signOf(3)).toBe('+'); // received
+    expect(signOf(1)).toBe(''); // memo to self
+    expect(signOf(2)).toBe(''); // send to self
+    expect(signOf(4)).toBe(''); // shield
+    expect(signOf(5)).toBe(''); // rejection
+  });
 });

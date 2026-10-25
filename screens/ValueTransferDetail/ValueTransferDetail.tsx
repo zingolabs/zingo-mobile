@@ -170,12 +170,8 @@ const ValueTransferDetail: React.FunctionComponent<
     quote.kind === 'quote' && server.chainName === ChainNameEnum.mainChainName
       ? `$${Utils.parseNumberFloatToStringLocale(vt.amount * quote.price, 2)}`
       : '';
-  const sign = received
-    ? '+'
-    : vt.kind === ValueTransferKindEnum.Shield
-      ? ''
-      : '−';
-  /** Four decimals cut, not rounded, and the rest smaller: never more than it was. */
+  /** Money in or out of the wallet only, as History's rows sign it; moves within it carry none. */
+  const sign = received ? '+' : sent ? '−' : '';
 
   const rows: DetailRow[] = [
     {
