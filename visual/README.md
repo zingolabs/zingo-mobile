@@ -118,6 +118,11 @@ browsers on a two-core runner starve those callbacks and a sheet captures
 mid-present. CSS animations and the text caret run on real time too, so the
 screenshot freezes them.
 
+A static story (a sheet) mounts on a real rendering step, at a fake time
+that varies with the runner, so a loop inside it would land on a different
+frame each run. The capture emulates reduced motion for static stories:
+reanimated settles every loop on its end frame.
+
 What remains is a frame of jitter on a long linear animation, a few dozen
 anti-aliased pixels. The image gate allows `JITTER_PIXELS` per pair (100),
 far below any real change. The `globalSetup` step clears the output bundle
