@@ -13,7 +13,7 @@ import Animated, {
   WithTimingConfig,
 } from 'react-native-reanimated';
 
-import { useTheme, radiusMd, space20 } from '@app/theme';
+import { useTheme, radiusMd, space20, iconSizeSm } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { ChevronDown } from '@ui/primitives/Icons/Chevron';
@@ -341,7 +341,7 @@ const NoticeStack: React.FunctionComponent<NoticeStackProps> = ({
                     ).replace('{n}', String(more))}
               </Text>
               <Animated.View style={chevron}>
-                <ChevronDown size={16} color={colors.fgMuted} />
+                <ChevronDown size={iconSizeSm} color={colors.fgMuted} />
               </Animated.View>
             </Pressable>
           </Animated.View>

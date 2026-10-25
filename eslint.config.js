@@ -34,6 +34,143 @@ const colorLock = [
   },
 ];
 
+/**
+ * The geometry lock (zingo-adrs zingo-mobile/0023): type, radii and icon
+ * sizes come from app/theme and the Text variants, never from a number on
+ * a screen. A number is a Literal, a negative one, or an arithmetic
+ * expression; a token is an Identifier or a MemberExpression.
+ */
+const NUMBER =
+  ':matches(Literal[raw=/^[0-9]/], UnaryExpression[operator="-"], BinaryExpression)';
+/** The value of a style property, or either branch of a ternary there. */
+const VALUE = keys =>
+  `:matches(Property[key.name=${keys}], Property[key.name=${keys}] > ConditionalExpression) > ${NUMBER}`;
+/** Icon components: ui/primitives/Icons, drawn on the Icon base. */
+const ICON =
+  '/(Icon|Chevron(Up|Down|Left|Right)|TriangleAlert|RescanArrows|RescanCloud)$/';
+const geometryLock = [
+  {
+    selector: VALUE('/^(fontSize|lineHeight|letterSpacing)$/'),
+    message:
+      'Use a Text variant (app/theme/typography), not a fontSize, lineHeight or letterSpacing by hand.',
+  },
+  {
+    selector: VALUE(
+      '/^border(TopLeft|TopRight|BottomLeft|BottomRight|TopStart|TopEnd|BottomStart|BottomEnd)?Radius$/',
+    ),
+    message:
+      'Use a radius token from app/theme (radiusSm, radiusMd, radiusPill, radiusSheet), not a number.',
+  },
+  {
+    selector: `JSXOpeningElement[name.name=${ICON}] > JSXAttribute[name.name="size"] > JSXExpressionContainer > ${NUMBER}`,
+    message:
+      'Use an icon size token from app/theme (iconSizeSm, iconSizeMd, iconSize), not a number.',
+  },
+  {
+    selector: `JSXAttribute[name.name=/^(fontSize|letterSpacing)$/] > :matches(Literal, JSXExpressionContainer > ${NUMBER})`,
+    message:
+      'Use a Text variant (app/theme/typography), not a fontSize or letterSpacing by hand.',
+  },
+];
+
+/**
+ * Files the redesign has not reached (DESIGN.md "Known gaps") and the
+ * approved exceptions (A: the tab bar). They keep hand-set values until
+ * each one moves onto the system; remove a file here when it does.
+ */
+const geometryGaps = [
+  // exception A: the tab bar
+  'app/navigation/CustomTabBar.tsx',
+  'ui/primitives/Icons/TabIcons.tsx',
+  // DESIGN.md "Known gaps": the Header's internals, the Address Book, the
+  // server list, ChainSelect, the migration screens
+  'screens/AddressBook/AddressBook.tsx',
+  'screens/AddressBook/components/AddressRowHead.tsx',
+  'screens/AddressBook/components/ContactRow.tsx',
+  'screens/MeetIronwood/MeetIronwood.tsx',
+  'screens/MigrationBatchSending/MigrationBatchSending.tsx',
+  'screens/MigrationCadence/MigrationCadence.tsx',
+  'screens/MigrationSchedule/MigrationSchedule.tsx',
+  'screens/MigrationSending/MigrationSending.tsx',
+  'screens/MigrationSplitPlan/MigrationSplitPlan.tsx',
+  'screens/MigrationSplitting/MigrationSplitting.tsx',
+  'screens/MigrationStatus/MigrationStatus.tsx',
+  'screens/MigrationStrategy/MigrationStrategy.tsx',
+  'screens/MigrationStrategy/components/NymGateSheet.tsx',
+  'screens/MigrationTransactions/MigrationTransactions.tsx',
+  'screens/Server/ServerRow.tsx',
+  'ui/widgets/ChainSelect.tsx',
+  'ui/widgets/ChainTypeToggle.tsx',
+  'ui/widgets/ContactSheet.tsx',
+  'ui/widgets/Header/Header.tsx',
+  'ui/widgets/Header/components/PriceRow.tsx',
+  'ui/widgets/SearchField.tsx',
+  'ui/widgets/SegmentedSwitch.tsx',
+  'ui/widgets/StepperHeader.tsx',
+  // not yet redesigned: hand-set values until each screen moves onto the
+  // system (counts as of 2026-10-25)
+  'screens/About/About.tsx',
+  'screens/History/History.tsx',
+  'screens/History/components/HistoryAvatar.tsx',
+  'screens/History/components/HistoryRowBody.tsx',
+  'screens/History/components/IronwoodMigrationBanner.tsx',
+  'screens/ImportChooser/ImportChooser.tsx',
+  'screens/ImportUfvk/ImportUfvk.tsx',
+  'screens/Insight/Insight.tsx',
+  'screens/Insight/components/ActivityChart.tsx',
+  'screens/Insight/components/Donut.tsx',
+  'screens/Launching/Launching.tsx',
+  'screens/Messages/MessageList.tsx',
+  'screens/Messages/components/MessageLine.tsx',
+  'screens/MixnetDoctor/MixnetDoctor.tsx',
+  'screens/OptionsPanel/OptionsPanel.tsx',
+  'screens/Pools/Pools.tsx',
+  'screens/SeedBackup/SeedBackup.tsx',
+  'screens/SeedBackup/components/ConfirmStep.tsx',
+  'screens/SeedBackup/components/DoneStep.tsx',
+  'screens/SeedBackup/components/InfoStep.tsx',
+  'screens/SeedBackup/components/ScreenshotSheet.tsx',
+  'screens/SeedBackup/components/SeedParts.tsx',
+  'screens/SeedBackup/components/StepParts.tsx',
+  'screens/SeedBackup/components/WordsStep.tsx',
+  'screens/Send/components/SendErrorSheet.tsx',
+  'screens/Server/CustomServerBox.tsx',
+  'screens/Server/Server.tsx',
+  'screens/Server/ServerLog.tsx',
+  'screens/Settings/Settings.tsx',
+  'screens/StartMenu/StartMenu.tsx',
+  'screens/Swap/components/TokenLogo.tsx',
+  'screens/SwapResult/SwapResult.tsx',
+  'screens/SyncReport/SyncReport.tsx',
+  'screens/ViewingKey/ViewingKey.tsx',
+  'screens/ViewingKey/components/KeyCard.tsx',
+  'screens/ViewingKey/components/KeyQr.tsx',
+  'screens/WalletError/WalletError.tsx',
+  'screens/WalletSeed/WalletSeed.tsx',
+  'ui/primitives/AppSheetModal.tsx',
+  'ui/primitives/ProgressBar.tsx',
+  'ui/primitives/Radio.tsx',
+  'ui/widgets/ActionMenuBottomSheet.tsx',
+  'ui/widgets/Address/Address.tsx',
+  'ui/widgets/BusyButton.tsx',
+  'ui/widgets/CardExpand.tsx',
+  'ui/widgets/ConfirmBottomSheet.tsx',
+  'ui/widgets/CurrencyAmount.tsx',
+  'ui/widgets/DeleteWalletSheet.tsx',
+  'ui/widgets/Flight/SendFlight.tsx',
+  'ui/widgets/Flight/SwapFlight.tsx',
+  'ui/widgets/NewAddressTag.tsx',
+  'ui/widgets/ProgressState.tsx',
+  'ui/widgets/SaveSheet.tsx',
+  'ui/widgets/ScanOverlay.tsx',
+  'ui/widgets/SeedPhraseInput.tsx',
+  'ui/widgets/SeedSheet.tsx',
+  'ui/widgets/SelectBottomSheet.tsx',
+  'ui/widgets/TextInputAddress.tsx',
+  'ui/widgets/ZecAmount.tsx',
+  'ui/widgets/toastConfig.tsx',
+];
+
 module.exports = [
   {
     ignores: [
@@ -77,6 +214,15 @@ module.exports = [
     rules: {
       'react-native/no-color-literals': 'error',
       'no-restricted-syntax': ['error', ...colorLock],
+    },
+  },
+  {
+    // The geometry lock, on screens and shared UI; app/theme defines the
+    // values and app/ logic has no geometry.
+    files: ['screens/**', 'ui/**'],
+    ignores: ['**/*.stories.tsx', ...geometryGaps],
+    rules: {
+      'no-restricted-syntax': ['error', ...colorLock, ...geometryLock],
     },
   },
   {
