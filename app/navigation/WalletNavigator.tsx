@@ -10,6 +10,7 @@ import { Route } from '@app/AppState';
 import { ContextAppLoaded, useSwapService } from '@app/context';
 import { AppDrawerParamList, HomeTabParamList } from '@app/types';
 import CustomTabBar from './CustomTabBar';
+import { skipExitingWithScreen } from './screenLayout';
 import { duration } from '@app/theme/motion';
 import LoadedAppOptionsPanelHost from '@app/LoadedApp/LoadedAppOptionsPanelHost';
 
@@ -110,6 +111,7 @@ function HomeTabs() {
       detachInactiveScreens={true}
       initialRouteName={Route.History}
       backBehavior="initialRoute"
+      screenLayout={skipExitingWithScreen}
       tabBar={renderTabBar}
       screenOptions={{ headerShown: false, ...TAB_FADE }}
     >
@@ -141,6 +143,7 @@ export function WalletNavigator() {
   return (
     <Stack.Navigator
       initialRouteName={Route.Home}
+      screenLayout={skipExitingWithScreen}
       screenOptions={{
         headerShown: false,
         // Each screen extends edge-to-edge (BottomSheets handle their own
