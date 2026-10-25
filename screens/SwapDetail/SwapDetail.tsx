@@ -48,6 +48,7 @@ import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
 import TextField from '@ui/primitives/TextField';
+import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
 import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
 import {
@@ -378,6 +379,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
             placeholder={t('swap.deposit-hash-placeholder')}
             mono
             error={attachError || undefined}
+            trailingIcon={ClipboardPasteIcon}
             trailingLabel={t('swap.paste')}
             onTrailingPress={async () =>
               setHash((await Clipboard.getString()).trim())

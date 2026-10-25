@@ -89,7 +89,6 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
           style={{
             paddingTop: 8,
             paddingBottom: 6,
-            paddingHorizontal: 16,
             backgroundColor: colors.bgSurface,
             borderTopLeftRadius: radiusSheet,
             borderTopRightRadius: radiusSheet,

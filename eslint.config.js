@@ -5,6 +5,35 @@ const compat = new FlatCompat({
   resolvePluginsRelativeTo: __dirname,
 });
 
+/**
+ * The color lock: a color is named by its token in app/theme, never by
+ * value. Shared by every block that sets no-restricted-syntax, because a
+ * later block replaces the rule instead of adding to it.
+ */
+const colorLock = [
+  {
+    selector:
+      'Literal[value=/^#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/]',
+    message: 'Use a color token from app/theme, not a hex value.',
+  },
+  {
+    selector: 'Literal[value=/^rgba?[(]/]',
+    message: 'Use a color token from app/theme, not an rgb value.',
+  },
+  {
+    // A named color where a color is expected: a style property or a
+    // JSX attribute that carries a color (the BIP39 list has "black").
+    selector:
+      ':matches(Property[key.name=/[cC]olor$|^fill$|^stroke$/], JSXAttribute[name.name=/[cC]olor$|^fill$|^stroke$/]) :matches(Literal, JSXExpressionContainer > Literal)[value=/^(red|yellow|green|blue|white|black|coral|gray|grey|orange|pink|purple|cyan|magenta|silver|gold|navy|teal|lime|olive|maroon|brown|tan|crimson|salmon|tomato|ivory|beige|khaki|violet|indigo)$/i]',
+    message: 'Use a color token from app/theme, not a named color.',
+  },
+  {
+    selector:
+      'TemplateElement[value.raw=/#[0-9a-fA-F]{3,8}([^0-9a-zA-Z]|$)|rgba?[(]/]',
+    message: 'Use a color token from app/theme, not a color in a string.',
+  },
+];
+
 module.exports = [
   {
     ignores: [
@@ -47,30 +76,7 @@ module.exports = [
     ignores: ['app/theme/**', '**/*.stories.tsx'],
     rules: {
       'react-native/no-color-literals': 'error',
-      'no-restricted-syntax': [
-        'error',
-        {
-          selector:
-            'Literal[value=/^#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/]',
-          message: 'Use a color token from app/theme, not a hex value.',
-        },
-        {
-          selector: 'Literal[value=/^rgba?[(]/]',
-          message: 'Use a color token from app/theme, not an rgb value.',
-        },
-        {
-          // A named color where a color is expected: a style property or a
-          // JSX attribute that carries a color (the BIP39 list has "black").
-          selector:
-            ':matches(Property[key.name=/[cC]olor$|^fill$|^stroke$/], JSXAttribute[name.name=/[cC]olor$|^fill$|^stroke$/]) :matches(Literal, JSXExpressionContainer > Literal)[value=/^(red|yellow|green|blue|white|black|coral|gray|grey|orange|pink|purple|cyan|magenta|silver|gold|navy|teal|lime|olive|maroon|brown|tan|crimson|salmon|tomato|ivory|beige|khaki|violet|indigo)$/i]',
-          message: 'Use a color token from app/theme, not a named color.',
-        },
-        {
-          selector:
-            'TemplateElement[value.raw=/#[0-9a-fA-F]{3,8}([^0-9a-zA-Z]|$)|rgba?[(]/]',
-          message: 'Use a color token from app/theme, not a color in a string.',
-        },
-      ],
+      'no-restricted-syntax': ['error', ...colorLock],
     },
   },
   {
@@ -80,6 +86,7 @@ module.exports = [
     rules: {
       'no-restricted-syntax': [
         'error',
+        ...colorLock,
         {
           selector: "CallExpression[callee.name='translate']",
           message:

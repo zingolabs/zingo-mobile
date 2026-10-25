@@ -27,6 +27,7 @@ import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
 import TextField from '@ui/primitives/TextField';
+import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 import Banner from '@ui/widgets/Banner';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { RefreshIcon } from '@ui/primitives/Icons/RefreshIcon';
@@ -184,6 +185,7 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
         placeholder={translate('swap.deposit-hash-placeholder') as string}
         mono
         error={attachError || undefined}
+        trailingIcon={ClipboardPasteIcon}
         trailingLabel={translate('swap.paste') as string}
         onTrailingPress={async () =>
           setHash((await Clipboard.getString()).trim())

@@ -4,11 +4,7 @@ import { FieldAction, FieldActions } from '@ui/primitives/TextField';
 import { useInsetFill } from '@ui/primitives/Surface';
 import { View, TextInput } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
-import {
-  useTheme,
-  radiusMd,
-  space4,
-} from '@app/theme';
+import { useTheme, radiusMd, space4 } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
