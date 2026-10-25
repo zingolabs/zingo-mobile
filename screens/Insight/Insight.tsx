@@ -99,6 +99,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
   const percent = (share: number): string =>
     sharesHidden ? `${MASK}%` : `${Math.round(share * 100)}%`;
   const zecText = (zec: number): string => amounts.show(formatAmount(zec));
+  const onAmount = amounts.hidden ? amounts.reveal : undefined;
   const sendsText = (n: number): string =>
     `${formatInteger(n)} ${translate(n === 1 ? 'insight.send' : 'insight.sends-unit') as string}`;
   const value = (v: number): string =>
@@ -390,6 +391,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
           </Text>
           <ActivityChart
             masked={sharesHidden}
+            onReveal={onAmount}
             insight={insight}
             metric={metric}
             from={from}
@@ -448,6 +450,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
           {cardHead(translate('insight.where') as string)}
           <Donut
             masked={sharesHidden}
+            onReveal={onAmount}
             slices={slices}
             selected={selected}
             onSelect={setSelected}
@@ -649,6 +652,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                   {on && (
                     <Text
                       testID={`insight.row.${s.g}.detail`}
+                      onPress={onAmount}
                       style={{
                         marginTop: 8,
                         marginLeft: 48,

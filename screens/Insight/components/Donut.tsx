@@ -184,6 +184,8 @@ type DonutProps = {
   caption: string;
   /** Privacy hides the slices' shares. */
   masked: boolean;
+  /** Shows the hidden amounts for a few seconds. */
+  onReveal?: () => void;
 };
 
 // Where the sends went: a ring of rounded slices with the total, or the
@@ -195,6 +197,7 @@ const Donut: React.FunctionComponent<DonutProps> = ({
   center,
   caption,
   masked,
+  onReveal,
 }) => {
   const shown = useSharedValue(0);
   useEffect(() => {
@@ -308,6 +311,7 @@ const Donut: React.FunctionComponent<DonutProps> = ({
               lineHeight: 15,
               textAlign: 'center',
             }}
+            onPress={onReveal}
           >
             {caption}
           </Text>
