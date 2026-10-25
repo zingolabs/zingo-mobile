@@ -8,7 +8,10 @@
  */
 import { GlobalConst, Done, DONE, ErrorKeyed, errorKeyed } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
-import { SwapStore, readCurrentWalletFingerprint } from '@app/swap';
+import {
+  forgetWalletOnFile,
+  releaseWalletOnFile,
+} from '@app/services/WalletLocalData';
 import { SyncCoordinator } from './SyncCoordinator';
 
 export type WalletLifecycleErrorKey =
@@ -39,13 +42,13 @@ export class WalletLifecycleService {
       return err('rpc.walletnotfound-error');
     }
     await this.syncCoordinator.stopSyncProcess(STOP_WAIT_MS);
-    // The swap records go before the wallet file: whoever restores another
-    // seed on this device must not find the previous wallet's swaps. An
-    // unreadable fingerprint skips the wipe, since a guessed one could name
-    // another wallet's bucket.
-    const fingerprint = await readCurrentWalletFingerprint();
-    if (fingerprint) {
-      await SwapStore.clearForWallet(fingerprint);
+    // Its swap records and pin go before the file; if they cannot, the
+    // file stays too.
+    try {
+      await forgetWalletOnFile();
+    } catch (e) {
+      console.log(`changeWallet: forgetting the wallet failed: ${e}`);
+      return err('rpc.deletewallet-error');
     }
     const result = await RPCModule.deleteExistingWallet();
 
@@ -75,6 +78,13 @@ export class WalletLifecycleService {
     // without the method) is a failure too.
     let result: string | boolean;
     try {
+      // The wallet replaced is lost with its data; the one swapped out
+      // lives on as the backup and keeps its own.
+      if (replace) {
+        await forgetWalletOnFile();
+      } else {
+        await releaseWalletOnFile();
+      }
       result = replace
         ? await RPCModule.replaceWalletWithBackup()
         : await RPCModule.restoreExistingWalletBackup();

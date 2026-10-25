@@ -4,7 +4,6 @@ import LinearGradient from 'react-native-linear-gradient';
 import Animated, {
   ReduceMotion,
   interpolate,
-  interpolateColor,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -27,13 +26,17 @@ import {
 } from '@ui/primitives/Icons/TabIcons';
 import { expandTabBar, tabBarCompact } from './tabBarScroll';
 
+/** The 28 pt mark with this much above and below it, as dev's bar. */
+const ICON = 28;
+const ICON_PAD = 10;
 /**
  * The tab bar is the one place drawn at the prototype's own values (the
- * designer's exception): its size, the 28 pt marks and the 11 pt names.
+ * designer's exception): its width, the 28 pt marks, the capsule and the
+ * shrink. Marks only, no names: the height is dev's, the mark and its pad.
  */
 const FULL = {
   width: 366,
-  height: 66,
+  height: ICON + ICON_PAD * 2 + 5 * 2 + 2,
   pad: 5,
   radius: 33,
   capsule: 28,
@@ -47,9 +50,6 @@ const SHRUNK = {
   capsule: 21,
   bottom: 26,
 };
-const ICON = 28;
-const NAME_H = 14;
-const NAME_GAP = 3;
 const PRESSED = 0.88;
 const SHRUNK_ICON = 0.86;
 /** The bar keeps this gutter on a narrow phone. */
@@ -142,12 +142,6 @@ const Tab = ({
     ],
   }));
   const onLayer = useAnimatedStyle(() => ({ opacity: on.value }));
-  const name = useAnimatedStyle(() => ({
-    color: interpolateColor(on.value, [0, 1], [idle.color, selected.leaf]),
-    opacity: 1 - tabBarCompact.value,
-    height: NAME_H * (1 - tabBarCompact.value),
-    marginTop: NAME_GAP * (1 - tabBarCompact.value),
-  }));
 
   return (
     <Pressable
@@ -171,9 +165,6 @@ const Tab = ({
           {tab.icon(selected)}
         </Animated.View>
       </Animated.View>
-      <Animated.Text numberOfLines={1} style={[styles.name, name]}>
-        {label}
-      </Animated.Text>
     </Pressable>
   );
 };
@@ -314,12 +305,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  name: {
-    fontSize: 11,
-    lineHeight: NAME_H,
-    fontWeight: '600',
-    overflow: 'hidden',
   },
 });
 

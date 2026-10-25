@@ -205,6 +205,8 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       label: translate('server.title') as string,
       icon: (
         <ServerIcon
+          /** One more than its neighbours: the cylinder sits inside its box with more margin. */
+          size={31}
           noInternet={!netInfo.isConnected}
           unreachable={unreachable}
           offline={isOffline}

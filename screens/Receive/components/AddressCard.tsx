@@ -18,6 +18,8 @@ import {
   space16,
   touchTarget,
   useTheme,
+  slopFor,
+  space4,
 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
@@ -40,6 +42,8 @@ import { addressKindKey } from '@screens/Receive/addressKind';
 
 /** The QR at the size the app always draws it, on its light plate. */
 const QR_SIZE = 200;
+/** A line of text in the card, about 20 high; its slop grows it to 44. */
+const LINE_H = 20;
 
 /** The pin, green and tilted while the address is pinned. */
 export function PinButton({
@@ -122,6 +126,7 @@ export default function AddressCard({
   const { colors } = useTheme();
   const t = (key: string) => translate(key) as string;
   const transparent = address.addressKind === AddressKindEnum.t;
+  /** Only the icon carries the pool's colour; its name reads in the text colour. */
   const kindColor = transparent ? colors.fgTransparent : colors.fgAccent;
 
   return (
@@ -144,7 +149,6 @@ export default function AddressCard({
               <Text
                 testID="receive.kind"
                 variant="bodySmall"
-                color={kindColor}
                 style={{ fontWeight: '600' }}
               >
                 {t(addressKindKey(address))}
@@ -169,49 +173,51 @@ export default function AddressCard({
                 logoMargin={3}
               />
             </View>
-            {tag ? (
-              <Text
-                testID="receive.tag"
-                variant="bodyStrong"
-                numberOfLines={1}
-                style={{ minHeight: touchTarget, textAlignVertical: 'center' }}
-              >
-                {tag}
-              </Text>
-            ) : (
-              <Pressable
-                testID="receive.add-tag"
-                accessibilityRole="button"
-                onPress={onAddTag}
-                style={{ minHeight: touchTarget, justifyContent: 'center' }}
-              >
+            {/* The tag and the address read as one group, 4 apart; each keeps a 44 pt tap area through its slop. */}
+            <View style={{ alignItems: 'center', gap: space4 }}>
+              {tag ? (
                 <Text
-                  variant="caption"
-                  style={{
-                    fontWeight: '700',
-                    textDecorationLine: 'underline',
-                    textDecorationColor: colors.fgMuted,
-                  }}
+                  testID="receive.tag"
+                  variant="bodyStrong"
+                  numberOfLines={1}
                 >
-                  {t('receive.add-tag')}
+                  {tag}
+                </Text>
+              ) : (
+                <Pressable
+                  testID="receive.add-tag"
+                  accessibilityRole="button"
+                  onPress={onAddTag}
+                  hitSlop={slopFor(LINE_H)}
+                >
+                  <Text
+                    variant="caption"
+                    style={{
+                      fontWeight: '700',
+                      textDecorationLine: 'underline',
+                      textDecorationColor: colors.fgMuted,
+                    }}
+                  >
+                    {t('receive.add-tag')}
+                  </Text>
+                </Pressable>
+              )}
+              <Pressable
+                testID={
+                  transparent
+                    ? 'receive.transparent-address'
+                    : 'receive.unified-address'
+                }
+                accessibilityRole="button"
+                accessibilityLabel={t('receive.copy-address-button')}
+                onPress={onCopy}
+                hitSlop={slopFor(LINE_H)}
+              >
+                <Text variant="address">
+                  {Utils.trimToSmall(address.address, 10)}
                 </Text>
               </Pressable>
-            )}
-            <Pressable
-              testID={
-                transparent
-                  ? 'receive.transparent-address'
-                  : 'receive.unified-address'
-              }
-              accessibilityRole="button"
-              accessibilityLabel={t('receive.copy-address-button')}
-              onPress={onCopy}
-              style={{ minHeight: touchTarget, justifyContent: 'center' }}
-            >
-              <Text variant="address">
-                {Utils.trimToSmall(address.address, 10)}
-              </Text>
-            </Pressable>
+            </View>
           </View>
           <View style={{ position: 'absolute', right: space8, top: space8 }}>
             <PinButton

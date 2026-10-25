@@ -54,6 +54,8 @@ type RadioRowProps = {
   onPress: () => void;
   /** A coin's or a chain's logo, after the radio. */
   leading?: React.ReactNode;
+  /** What the row leads to, at its end and inside its press. */
+  aside?: React.ReactNode;
   /** Buttons at the end of the row, outside its own press. */
   trailing?: React.ReactNode;
   first?: boolean;
@@ -68,6 +70,7 @@ export default function RadioRow({
   selected,
   onPress,
   leading,
+  aside,
   trailing,
   first,
   testID,
@@ -124,6 +127,7 @@ export default function RadioRow({
             </Text>
           )}
         </View>
+        {aside}
       </Pressable>
       {!!trailing && (
         <View

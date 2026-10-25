@@ -10,6 +10,7 @@ import { Route } from '@app/AppState';
 import { ContextAppLoaded, useSwapService } from '@app/context';
 import { AppDrawerParamList, HomeTabParamList } from '@app/types';
 import CustomTabBar from './CustomTabBar';
+import { skipExitingWithScreen } from './screenLayout';
 import { duration } from '@app/theme/motion';
 import LoadedAppOptionsPanelHost from '@app/LoadedApp/LoadedAppOptionsPanelHost';
 
@@ -110,6 +111,7 @@ function HomeTabs() {
       detachInactiveScreens={true}
       initialRouteName={Route.History}
       backBehavior="initialRoute"
+      screenLayout={skipExitingWithScreen}
       tabBar={renderTabBar}
       screenOptions={{ headerShown: false, ...TAB_FADE }}
     >
@@ -141,6 +143,7 @@ export function WalletNavigator() {
   return (
     <Stack.Navigator
       initialRouteName={Route.Home}
+      screenLayout={skipExitingWithScreen}
       screenOptions={{
         headerShown: false,
         // Each screen extends edge-to-edge (BottomSheets handle their own
@@ -150,7 +153,11 @@ export function WalletNavigator() {
     >
       <Stack.Screen name={Route.Home} component={Home} />
       <Stack.Group>
-        <Stack.Screen name={Route.Settings} component={Settings} />
+        <Stack.Screen
+          name={Route.Settings}
+          component={Settings}
+          options={{ animation: 'slide_from_right' }}
+        />
         <Stack.Screen
           name={Route.Server}
           component={WalletServer}
@@ -160,7 +167,11 @@ export function WalletNavigator() {
         <Stack.Screen name={Route.MixnetDoctor} component={MixnetDoctor} />
         <Stack.Screen name={Route.Insight} component={Insight} />
         <Stack.Screen name={Route.SyncReport} component={SyncReport} />
-        <Stack.Screen name={Route.Pools} component={Pools} />
+        <Stack.Screen
+          name={Route.Pools}
+          component={Pools}
+          options={{ animation: 'slide_from_right' }}
+        />
         <Stack.Screen
           name={Route.WalletSeed}
           component={WalletSeed}

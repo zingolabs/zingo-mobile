@@ -93,9 +93,9 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
             style={
               {
                 "alignItems": "center",
-                "display": "flex",
                 "flexDirection": "row",
-                "justifyContent": "center",
+                "gap": 4,
+                "paddingRight": 4,
               }
             }
           >
@@ -122,6 +122,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
               accessible={true}
               collapsable={false}
               focusable={true}
+              hitSlop={4}
               onBlur={[Function]}
               onClick={[Function]}
               onFocus={[Function]}
@@ -134,9 +135,9 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
               style={
                 {
                   "alignItems": "center",
-                  "height": 44,
+                  "height": 36,
                   "justifyContent": "center",
-                  "width": 44,
+                  "width": 36,
                 }
               }
               testID="send.scan-button"

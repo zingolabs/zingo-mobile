@@ -178,6 +178,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
     <FullPanel
       title={t('receive.your-addresses')}
       onBack={close}
+      fit
       testID="addresslist"
     >
       <Text variant="caption" tone="muted" style={{ marginTop: space4 }}>
@@ -185,7 +186,9 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
       </Text>
       {group(
         t('receive.group-shielded'),
-        t('receive.group-count').replace('{n}', String(shielded.length)),
+        shielded.length === 1
+          ? t('receive.group-count-one')
+          : t('receive.group-count').replace('{n}', String(shielded.length)),
       )}
       <RadioList testID="addresslist.shielded">
         {pinnedFirst(shielded).map(row)}

@@ -194,7 +194,7 @@
     "report": "Relatório de sincronia",
     "changewallet": "Abrir outra Carteira",
     "restorebackupwallet": "Restaurar Último Backup da Carteira",
-    "fundpools": "Fundos na Pool",
+    "fundpools": "Pools",
     "insight": "Visão Financeira",
     "addressbook": "Agenda de Endereços",
     "support": "E-mail de suporte do {name}",
@@ -246,6 +246,7 @@
     "deletewallet-error": "Error: não foi possível excluir a carteira atual."
   },
   "settings": {
+    "back-acc": "Voltar",
     "restorebackup-replace": "O backup é uma carteira Mainnet, e só se faz backup de carteiras Mainnet. Abri-lo apaga esta carteira {net} do telefone: você perderá o acesso a ela se não tiver a frase semente. O Zingo muda para um servidor Mainnet e o backup fica vazio.",
     "restorebackup-replace-vo": "O backup é uma carteira Mainnet, e só se faz backup de carteiras Mainnet. Abri-lo apaga esta carteira somente leitura {net} do telefone: você perderá o acesso a ela se não tiver a chave de visualização (UFVK). O Zingo muda para um servidor Mainnet e o backup fica vazio.",
     "restorebackup-switch": "Mudar para Mainnet",
@@ -635,7 +636,7 @@
     "pinned": "Fixado. Aparece sempre primeiro em Receber.",
     "unpinned": "Desafixado. Receber mostra seu endereço mais recente.",
     "copy": "Copiar",
-    "transparent-public": "Endereços transparentes são públicos: qualquer um pode ver o que recebem. Proteja esses fundos no Início para mantê-los privados.",
+    "transparent-public": "Endereços transparentes expõem seus dados.",
     "new-title": "Novo endereço",
     "new-sub": "Use um endereço diferente para cada pessoa, assim os pagamentos não podem ser ligados.",
     "new-type": "Tipo",
@@ -656,7 +657,8 @@
     "group-shielded": "Protegidos",
     "group-transparent": "Transparentes",
     "group-count": "{n} endereços",
-    "public-note": "Públicos"
+    "public-note": "Públicos",
+    "group-count-one": "1 endereço"
   },
   "swap": {
     "title": "Swap",
@@ -920,9 +922,9 @@
     "deposit-you-get": "Você vai receber",
     "result-refunded-buy": "O swap não foi concluído, então o {coin} voltou para seu endereço de reembolso, menos a taxa de rede.",
     "result-missing": "Falta",
-    "detail-save-contact": "Salvar este endereço de {coin} como contato",
     "tx-privacy": "Privacidade",
-    "tx-private": "Privado · NYM Enhanced"
+    "tx-private": "Privado · NYM Enhanced",
+    "no-route-now": "Nenhuma rota está disponível para este swap agora."
   },
   "history": {
     "shield-all": "Blindar Todos os Fundos",
@@ -1017,7 +1019,7 @@
     "state-expired": "Expirado",
     "state-awaiting-deposit": "Aguardando depósito",
     "state-swapping": "Em andamento",
-    "shield-line": "Transparente → Orchard",
+    "shield-line": "Transparente → {pool}",
     "swap-to": "Swap para",
     "swap-from": "Swap de",
     "swapped-to": "Trocado para",
@@ -1204,19 +1206,20 @@
     "miss-chain": "Esse código não é um endereço de {chain}."
   },
   "pools": {
-    "title": "Fundos nas Pools",
-    "ironwood-title": "IRONWOOD (UA)",
-    "ironwood-balance": "Saldo Total",
-    "ironwood-confirmed-balance": "Saldo confirmado",
-    "orchard-title": "ORCHARD (legado)",
-    "orchard-balance": "Saldo Total",
-    "orchard-confirmed-balance": "Saldo confirmado",
-    "sapling-title": "SAPLING (Privado)",
-    "sapling-balance": "Saldo Total",
-    "sapling-confirmed-balance": "Saldo confirmado",
-    "transparent-title": "TRANSPARENTE",
-    "transparent-balance": "Saldo Total",
-    "transparent-confirmed-balance": "Saldo confirmado",
+    "title": "Pools",
+    "back-acc": "Voltar",
+    "ironwood-title": "Ironwood",
+    "orchard-title": "Orchard",
+    "sapling-title": "Sapling",
+    "transparent-title": "Transparente",
+    "total": "Total",
+    "spendable": "Disponível",
+    "confirmed": "Confirmado",
+    "confirming": "{amount} está sendo confirmado. Fica disponível após os próximos blocos.",
+    "orchard-leftover": "Restou após a atualização. Movê-lo custaria mais em taxas do que vale.",
+    "transparent-shield": "Qualquer pessoa pode ver. Proteja para mantê-lo privado.",
+    "hidden-toast": "Oculto. Continua em Menu › Pools.",
+    "undo": "Desfazer",
     "dust": "A quantidade transparente é muito pequena para ser protegida."
   },
   "meetironwood": {
@@ -1238,6 +1241,7 @@
   },
   "ironwoodbanner": {
     "pool": "Atualização Ironwood",
+    "hide": "Ocultar",
     "balance": "Saldo:",
     "start": "Saiba mais",
     "inflight-title": "Migração em andamento",
@@ -1491,6 +1495,7 @@
     "amount": "Valor",
     "fee": "Taxa de rede",
     "you-get": "Você recebe no Orchard",
+    "you-get-ironwood": "Você recebe no Ironwood",
     "button": "Proteger",
     "notice-title": "Fundos transparentes",
     "notice-public": "público",

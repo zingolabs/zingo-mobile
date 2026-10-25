@@ -194,7 +194,7 @@
     "report": "Sync / Rescan Report",
     "changewallet": "Change to another Wallet",
     "restorebackupwallet": "Restore Last Wallet Backup",
-    "fundpools": "Fund Pools",
+    "fundpools": "Pools",
     "insight": "Financial Insight",
     "addressbook": "Address Book",
     "support": "{name} support email",
@@ -246,6 +246,7 @@
     "deletewallet-error": "Error: Couldn't delete the current wallet."
   },
   "settings": {
+    "back-acc": "Back",
     "restorebackup-replace": "The backup is a Mainnet wallet and only Mainnet wallets are backed up. Opening it deletes this {net} wallet from this phone: you'll lose access to it unless you have its seed phrase. Zingo switches to a Mainnet server, and the backup is emptied.",
     "restorebackup-replace-vo": "The backup is a Mainnet wallet and only Mainnet wallets are backed up. Opening it deletes this view-only {net} wallet from this phone: you'll lose access to it unless you have its viewing key (UFVK). Zingo switches to a Mainnet server, and the backup is emptied.",
     "restorebackup-switch": "Switch to Mainnet",
@@ -635,7 +636,7 @@
     "pinned": "Pinned. It always shows first in Receive.",
     "unpinned": "Unpinned. Receive shows your newest address.",
     "copy": "Copy",
-    "transparent-public": "Transparent addresses are public: anyone can see what they receive. Shield those funds from Home to keep them private.",
+    "transparent-public": "Transparent addresses expose your data.",
     "new-title": "New address",
     "new-sub": "Use a different address for each person so payments can’t be linked.",
     "new-type": "Type",
@@ -656,7 +657,8 @@
     "group-shielded": "Shielded",
     "group-transparent": "Transparent",
     "group-count": "{n} addresses",
-    "public-note": "Public"
+    "public-note": "Public",
+    "group-count-one": "1 address"
   },
   "swap": {
     "title": "Swap",
@@ -920,9 +922,9 @@
     "deposit-you-get": "You’ll get",
     "result-refunded-buy": "The swap didn’t complete, so the {coin} went back to your refund address, minus the network fee.",
     "result-missing": "Missing",
-    "detail-save-contact": "Save this {coin} address as a contact",
     "tx-privacy": "Privacy",
-    "tx-private": "Private · NYM Enhanced"
+    "tx-private": "Private · NYM Enhanced",
+    "no-route-now": "No route is available for this swap right now."
   },
   "history": {
     "shield-all": "Shield All funds",
@@ -1017,7 +1019,7 @@
     "state-expired": "Expired",
     "state-awaiting-deposit": "Awaiting deposit",
     "state-swapping": "Swapping",
-    "shield-line": "Transparent → Orchard",
+    "shield-line": "Transparent → {pool}",
     "swap-to": "Swap to",
     "swap-from": "Swap from",
     "swapped-to": "Swapped to",
@@ -1204,19 +1206,20 @@
     "miss-chain": "That code isn't a {chain} address."
   },
   "pools": {
-    "title": "Fund Pools",
-    "ironwood-title": "IRONWOOD (UA)",
-    "ironwood-balance": "Total Balance",
-    "ironwood-confirmed-balance": "Confirmed Balance",
-    "orchard-title": "ORCHARD (legacy)",
-    "orchard-balance": "Total Balance",
-    "orchard-confirmed-balance": "Confirmed Balance",
-    "sapling-title": "SAPLING (Private)",
-    "sapling-balance": "Total Balance",
-    "sapling-confirmed-balance": "Confirmed Balance",
-    "transparent-title": "TRANSPARENT",
-    "transparent-balance": "Total Balance",
-    "transparent-confirmed-balance": "Confirmed Balance",
+    "title": "Pools",
+    "back-acc": "Back",
+    "ironwood-title": "Ironwood",
+    "orchard-title": "Orchard",
+    "sapling-title": "Sapling",
+    "transparent-title": "Transparent",
+    "total": "Total",
+    "spendable": "Spendable",
+    "confirmed": "Confirmed",
+    "confirming": "{amount} is confirming. It is spendable after the next blocks.",
+    "orchard-leftover": "Left after the upgrade. Moving it would cost more in fees than it is worth.",
+    "transparent-shield": "Anyone can see it. Shield it to keep it private.",
+    "hidden-toast": "Hidden. It stays in Menu › Pools.",
+    "undo": "Undo",
     "dust": "The transparent amount is too small to be shielded."
   },
   "meetironwood": {
@@ -1238,6 +1241,7 @@
   },
   "ironwoodbanner": {
     "pool": "Ironwood upgrade",
+    "hide": "Hide",
     "balance": "Balance:",
     "start": "Learn more",
     "inflight-title": "Migration in Progress",
@@ -1491,6 +1495,7 @@
     "amount": "Amount",
     "fee": "Network fee",
     "you-get": "You get in Orchard",
+    "you-get-ironwood": "You get in Ironwood",
     "button": "Shield",
     "notice-title": "Transparent funds",
     "notice-public": "public",

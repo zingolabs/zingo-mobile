@@ -30,7 +30,7 @@ import { TrackResponseType } from './types/TrackResponseType';
  *     boot is the natural moment to retry transient failures anyway.
  *   - Dedupe: if the executor's update did not change any user-visible field,
  *     we skip the `SwapStore.upsert` write. This avoids hammering
- *     EncryptedStorage when the provider returns the same `/track` response
+ *     storage when the provider returns the same `/track` response
  *     for many ticks.
  *
  * Stop conditions:

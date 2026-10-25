@@ -30,10 +30,11 @@ export const BUTTON_HEIGHT = buttonMinHeight;
  * secondary moves · quiet: gray, only Cancel and a Close that leaves a flow ·
  * danger: deletes or cannot be undone · nym: only actions through the mixnet ·
  * secondary: an outlined action beside others of the same weight (Copy,
- * Verify), on the inset fill of the surface it sits on.
+ * Verify), on the inset fill of the surface it sits on · viewOnly: the
+ * view-only notice's action, a pill in the view-only blue.
  */
 export type ButtonVariant =
-  'primary' | 'text' | 'quiet' | 'danger' | 'nym' | 'secondary';
+  'primary' | 'text' | 'quiet' | 'danger' | 'nym' | 'secondary' | 'viewOnly';
 
 /** small: inside banners and rows only. */
 export type ButtonSize = 'regular' | 'small';
@@ -78,6 +79,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
   const { colors } = useTheme();
   const inset = useInsetFill();
   const outlined = variant === 'secondary';
+  const viewOnly = variant === 'viewOnly';
   const small = size === 'small';
   const minHeight = small ? buttonMinHeightSmall : buttonMinHeight;
   /** A small button still takes a full `touchTarget`. */
@@ -90,19 +92,22 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     text: undefined,
     quiet: undefined,
     secondary: undefined,
+    viewOnly: undefined,
   }[variant];
   const label =
     fill !== undefined
       ? colors.fgOnAccent
-      : variant === 'quiet'
-        ? colors.fgMuted
-        : outlined
-          ? disabled
-            ? colors.fgMuted
-            : colors.fgDefault
-          : disabled
-            ? colors.fgAccentDisabled
-            : colors.fgAccent;
+      : viewOnly
+        ? colors.fgDefault
+        : variant === 'quiet'
+          ? colors.fgMuted
+          : outlined
+            ? disabled
+              ? colors.fgMuted
+              : colors.fgDefault
+            : disabled
+              ? colors.fgAccentDisabled
+              : colors.fgAccent;
 
   return (
     <TouchableOpacity
@@ -115,12 +120,16 @@ const Button: React.FunctionComponent<ButtonProps> = ({
       style={{
         backgroundColor: outlined
           ? inset
-          : fill !== undefined && disabled
-            ? colors.bgAccentDisabled
-            : fill,
+          : viewOnly
+            ? colors.bgViewOnlySubtle
+            : fill !== undefined && disabled
+              ? colors.bgAccentDisabled
+              : fill,
         ...(outlined
           ? { borderWidth: 1, borderColor: colors.bottomSheetBorder }
-          : {}),
+          : viewOnly
+            ? { borderWidth: 1, borderColor: colors.fgViewOnly }
+            : {}),
         borderRadius: radiusPill,
         minHeight,
         maxWidth: '100%',

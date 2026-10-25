@@ -5,6 +5,7 @@ import Svg, { Path } from 'react-native-svg';
 import Animated, {
   Easing,
   ReduceMotion,
+  cancelAnimation,
   interpolate,
   interpolateColor,
   useAnimatedStyle,
@@ -99,6 +100,10 @@ export default function SwapFlight({
       }),
       -1,
     );
+    return () => {
+      cancelAnimation(clock);
+      cancelAnimation(trip);
+    };
   }, [clock, trip]);
 
   const token = useAnimatedStyle(() => {

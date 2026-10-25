@@ -403,7 +403,7 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
         }}
       >
         <ClockIcon size={iconSizeSm} color={colors.fgMuted} />
-        <Text variant="caption" tone="muted">
+        <Text variant="caption" tone="muted" style={{ flexShrink: 1 }}>
           {translate('swap.review-price-fixed') as string}
         </Text>
       </View>

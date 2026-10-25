@@ -194,7 +194,7 @@
     "report": "Отчёт о сканировании",
     "changewallet": "Сменить кошелёк",
     "restorebackupwallet": "Восстановить последнюю резервную копию кошелька",
-    "fundpools": "Ваши активы в пулах",
+    "fundpools": "Пулы",
     "insight": "Аналитика",
     "addressbook": "Адресная книга",
     "support": "Email поддержки {name}",
@@ -246,6 +246,7 @@
     "deletewallet-error": "Error: Не удалось удалить текущий кошелёк."
   },
   "settings": {
+    "back-acc": "Назад",
     "restorebackup-replace": "Резервная копия — это кошелёк Mainnet, а копии делаются только для кошельков Mainnet. Её открытие удалит этот кошелёк {net} с телефона: без его сид-фразы доступ к нему будет утрачен. Zingo переключится на сервер Mainnet, а резервная копия станет пустой.",
     "restorebackup-replace-vo": "Резервная копия — это кошелёк Mainnet, а копии делаются только для кошельков Mainnet. Её открытие удалит этот кошелёк {net} только для просмотра с телефона: без его ключа просмотра (UFVK) доступ к нему будет утрачен. Zingo переключится на сервер Mainnet, а резервная копия станет пустой.",
     "restorebackup-switch": "Перейти на Mainnet",
@@ -635,7 +636,7 @@
     "pinned": "Закреплён. Всегда первый в разделе «Получить».",
     "unpinned": "Откреплён. «Получить» показывает ваш новейший адрес.",
     "copy": "Копировать",
-    "transparent-public": "Прозрачные адреса публичны: любой видит, что на них приходит. Защитите эти средства на главном экране, чтобы они стали приватными.",
+    "transparent-public": "Прозрачные адреса раскрывают ваши данные.",
     "new-title": "Новый адрес",
     "new-sub": "Используйте отдельный адрес для каждого человека, чтобы платежи нельзя было связать.",
     "new-type": "Тип",
@@ -656,7 +657,8 @@
     "group-shielded": "Защищённые",
     "group-transparent": "Прозрачные",
     "group-count": "Адресов: {n}",
-    "public-note": "Публичные"
+    "public-note": "Публичные",
+    "group-count-one": "1 адрес"
   },
   "swap": {
     "title": "Обмен",
@@ -920,9 +922,9 @@
     "deposit-you-get": "Вы получите",
     "result-refunded-buy": "Обмен не завершился, поэтому {coin} вернулись на адрес возврата за вычетом сетевой комиссии.",
     "result-missing": "Не хватает",
-    "detail-save-contact": "Сохранить этот адрес {coin} как контакт",
     "tx-privacy": "Приватность",
-    "tx-private": "Приватно · NYM Enhanced"
+    "tx-private": "Приватно · NYM Enhanced",
+    "no-route-now": "Сейчас для этого обмена нет доступного маршрута."
   },
   "history": {
     "shield-all": "Экранирование всех средств",
@@ -1017,7 +1019,7 @@
     "state-expired": "Истёк",
     "state-awaiting-deposit": "Ожидает депозит",
     "state-swapping": "Обмен идёт",
-    "shield-line": "Прозрачный → Orchard",
+    "shield-line": "Прозрачный → {pool}",
     "swap-to": "Обмен на",
     "swap-from": "Обмен с",
     "swapped-to": "Обменяно на",
@@ -1204,19 +1206,20 @@
     "miss-chain": "Этот код не является адресом в сети {chain}."
   },
   "pools": {
-    "title": "Ваши активы в пулах",
-    "ironwood-title": "IRONWOOD (Унифицированный адрес)",
-    "ironwood-balance": "Общий баланс",
-    "ironwood-confirmed-balance": "Подтвержденный баланс",
-    "orchard-title": "ORCHARD (устаревший)",
-    "orchard-balance": "Общий баланс",
-    "orchard-confirmed-balance": "Подтвержденный баланс",
-    "sapling-title": "SAPLING (Приватный Z-адрес)",
-    "sapling-balance": "Общий баланс",
-    "sapling-confirmed-balance": "Подтвержденный баланс",
-    "transparent-title": "ПРОЗРАЧНЫЙ (T-адрес)",
-    "transparent-balance": "Общий баланс",
-    "transparent-confirmed-balance": "Подтвержденный баланс",
+    "title": "Пулы",
+    "back-acc": "Назад",
+    "ironwood-title": "Ironwood",
+    "orchard-title": "Orchard",
+    "sapling-title": "Sapling",
+    "transparent-title": "Прозрачный",
+    "total": "Всего",
+    "spendable": "Доступно",
+    "confirmed": "Подтверждено",
+    "confirming": "{amount} подтверждается. Станет доступно после следующих блоков.",
+    "orchard-leftover": "Осталось после обновления. Перевод обойдётся в комиссиях дороже, чем сама сумма.",
+    "transparent-shield": "Это видят все. Экранируйте, чтобы сохранить приватность.",
+    "hidden-toast": "Скрыто. Сумма остаётся в Меню › Пулы.",
+    "undo": "Отменить",
     "dust": "Сумма прозрачных ZEC недостаточна для экранирования."
   },
   "meetironwood": {
@@ -1238,6 +1241,7 @@
   },
   "ironwoodbanner": {
     "pool": "Обновление Ironwood",
+    "hide": "Скрыть",
     "balance": "Баланс:",
     "start": "Подробнее",
     "inflight-title": "Миграция выполняется",
@@ -1491,6 +1495,7 @@
     "amount": "Сумма",
     "fee": "Сетевая комиссия",
     "you-get": "Вы получите в Orchard",
+    "you-get-ironwood": "Вы получите в Ironwood",
     "button": "Экранировать",
     "notice-title": "Прозрачные средства",
     "notice-public": "публично",

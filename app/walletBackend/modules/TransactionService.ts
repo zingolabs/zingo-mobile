@@ -15,6 +15,7 @@ import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConf
 import { depositSpendsSourceAddress } from '@app/swap/depositRouting';
 import { SyncCoordinator } from './SyncCoordinator';
 import { withSyncStopped } from '@app/walletBackend/utils/syncBracket';
+import { Buffer } from 'buffer';
 
 // What a swap deposit needs: where, how much, and the memo or source address
 // rule that decides its shape.
@@ -197,6 +198,7 @@ function bytesToHex(bytes: Uint8Array): string {
   return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
 }
 
+/** Hermes has TextEncoder but no TextDecoder. */
 function utf8Text(bytes: Uint8Array): string {
-  return new TextDecoder().decode(bytes);
+  return Buffer.from(bytes).toString('utf8');
 }

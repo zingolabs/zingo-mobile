@@ -43,30 +43,41 @@ export default function TooltipHost({
   const hostRef = useRef<View>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [spec, setSpec] = useState<TooltipSpec | null>(null);
+  /**
+   * The bubble showing, read outside the state updaters: closing one sets the
+   * tooltip's own state, which must not happen while the host renders.
+   */
+  const specRef = useRef<TooltipSpec | null>(null);
+  const apply = useCallback((next: TooltipSpec | null) => {
+    specRef.current = next;
+    setSpec(next);
+  }, []);
 
   const dismiss = useCallback(() => {
-    setSpec(current => {
-      current?.onClose();
-      return null;
-    });
-  }, []);
+    const current = specRef.current;
+    apply(null);
+    current?.onClose();
+  }, [apply]);
 
   const value = useMemo<TooltipHostValue>(
     () => ({
       hostRef,
       hostWidth: size.width,
       hostHeight: size.height,
-      show: next =>
-        setSpec(current => {
-          if (current && current.owner !== next.owner) {
-            current.onClose();
-          }
-          return next;
-        }),
-      hide: owner =>
-        setSpec(current => (current?.owner === owner ? null : current)),
+      show: next => {
+        const current = specRef.current;
+        apply(next);
+        if (current && current.owner !== next.owner) {
+          current.onClose();
+        }
+      },
+      hide: owner => {
+        if (specRef.current?.owner === owner) {
+          apply(null);
+        }
+      },
     }),
-    [size],
+    [size, apply],
   );
 
   return (

@@ -26,6 +26,7 @@ const colors: ThemeColors = {
   fgDefault: '#c3c3c3',
 
   fgMuted: '#888888',
+  fgOptionIcon: '#B1BBC5',
   borderMuted: '#4A6487',
   bgMuted: '#888888',
   bgMutedSubtle: '#8888881F',

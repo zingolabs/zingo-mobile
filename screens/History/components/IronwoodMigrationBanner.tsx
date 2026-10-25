@@ -24,6 +24,7 @@ import Banner from '@ui/widgets/Banner';
 
 import SegmentedBar from '@ui/primitives/SegmentedBar';
 import { ContextAppLoaded } from '@app/context';
+import { useOrchardResidualOnly } from '@app/hooks/useOrchardResidualOnly';
 import Utils from '@app/utils';
 import { Route } from '@app/AppState';
 import { migrationStatus, reconcileMigration } from '@app/walletBackend';
@@ -148,6 +149,8 @@ type IronwoodMigrationBannerProps = {
   // Deep-link back into the in-flight private migration, at whichever screen
   // its phase needs next.
   onResume: (route: 'MigrationSplitting' | 'MigrationStatus') => void;
+  /** Hides the notice; offered only while Orchard holds just a residual. */
+  onHide: () => void;
 };
 
 /**
@@ -164,7 +167,7 @@ type IronwoodMigrationBannerProps = {
  */
 const IronwoodMigrationBanner: React.FunctionComponent<
   IronwoodMigrationBannerProps
-> = ({ amount, currencyName, onStart, onResume }) => {
+> = ({ amount, currencyName, onStart, onResume, onHide }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, info, privacy } = context;
   const { colors } = useTheme();
@@ -174,6 +177,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
   const [migration, setMigration] = useState<RPCMigrationStatusType | null>(
     null,
   );
+  const residualOnly = useOrchardResidualOnly();
 
   // A window opens at a block boundary, so `due_now` flips while the user sits
   // on History with nothing to re-trigger a read. Keying the refresh to the
@@ -457,18 +461,42 @@ const IronwoodMigrationBanner: React.FunctionComponent<
         plain
         title={translate('ironwoodbanner.pool') as string}
         actionBeside
+        // Only a residual left in Orchard, after a migration or with nothing
+        // worth migrating: Pools shows it, so here it can go. Real funds keep
+        // the notice up.
         action={
-          <Button
-            testID="ironwoodbanner.start"
-            variant="primary"
-            inline
-            /** The pill it had beside the pool text. */
-            style={{ minHeight: 0, paddingHorizontal: 22, paddingVertical: 10 }}
-            textStyle={{ fontSize: 15 }}
-            title={translate('ironwoodbanner.start') as string}
-            onPress={onStart}
-          />
+          residualOnly ? (
+            <Button
+              testID="ironwoodbanner.start"
+              variant="primary"
+              size="small"
+              inline
+              /** Narrower, to make room for the X beside it. */
+              style={{ paddingHorizontal: 14 }}
+              title={translate('ironwoodbanner.start') as string}
+              onPress={onStart}
+            />
+          ) : (
+            <Button
+              testID="ironwoodbanner.start"
+              variant="primary"
+              inline
+              /** The pill it had beside the pool text. */
+              style={{
+                minHeight: 0,
+                paddingHorizontal: 22,
+                paddingVertical: 10,
+              }}
+              textStyle={{ fontSize: 15 }}
+              title={translate('ironwoodbanner.start') as string}
+              onPress={onStart}
+            />
+          )
         }
+        onDismiss={residualOnly ? onHide : undefined}
+        dismissBeside
+        dismissLabel={translate('ironwoodbanner.hide') as string}
+        dismissTestID="ironwoodbanner.hide"
       >
         {translate('ironwoodbanner.balance') as string}{' '}
         <Text variant="bodySmall" style={{ fontWeight: '700' }}>

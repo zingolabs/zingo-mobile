@@ -178,18 +178,18 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
               size={32}
               surfaceColor={colors.bgSurface}
               forceBadge={!multi}
+              hideBadge={multi}
             />
           }
           title={group.ticker}
           sub={group.name}
-          trailing={
+          aside={
             multi ? (
               <View
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
                   columnGap: space8,
-                  paddingRight: space12,
                 }}
               >
                 {badgeStack(group)}
@@ -280,6 +280,7 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
           <BottomSheetScrollView
             contentContainerStyle={{
               paddingHorizontal: space16,
+              paddingTop: space8,
               paddingBottom: 32,
             }}
           >
@@ -310,6 +311,7 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{
               paddingHorizontal: space16,
+              paddingTop: space8,
               paddingBottom: 32,
             }}
           >

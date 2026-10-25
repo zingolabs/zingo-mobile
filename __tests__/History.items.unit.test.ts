@@ -1,17 +1,14 @@
 jest.mock('@app/RPCModule', () => ({ __esModule: true, default: {} }));
 
 import { ValueTransferKindEnum } from '@app/AppState';
+import { PoolEnum } from '@app/AppState';
 import type { ValueTransferType } from '@app/AppState';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
 import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
 import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
-import {
-  ITEM_HEIGHT,
-  buildHistoryItems,
-  monthAt,
-} from '@screens/History/historyItems';
+import { buildHistoryItems } from '@screens/History/historyItems';
 import {
   shortWhen,
   swapRowText,
@@ -130,24 +127,6 @@ test('Tests that an open swap shows its transactions under it, oldest first, whe
   ]);
 });
 
-test('Tests that a pinned month follows the scroll offset when rows pass under it', () => {
-  const r = record();
-  const rows = [swapRow(r), vt('c'.repeat(64), 1_000_000)];
-  const items = buildHistoryItems({
-    rows,
-    all: rows,
-    records: [r],
-    open: new Set(),
-    monthOf,
-  });
-
-  expect(monthAt(items, 0)).toBe('');
-  expect(monthAt(items, 10)).toBe('Oct 2026');
-  expect(monthAt(items, ITEM_HEIGHT.month + ITEM_HEIGHT.swap + 1)).toBe(
-    'Apr 2026',
-  );
-});
-
 const t = (key: string) => key;
 
 test('Tests that a completed sell shows what it got on top and the ZEC that left under it', () => {
@@ -190,6 +169,23 @@ test('Tests that a sent transfer is titled by its address and signed negative', 
   expect(text.titleMono).toBe(true);
   expect(text.top).toBe('−1.5 ZEC');
   expect(text.bottom).toBe('$924.36');
+});
+
+test('Tests that a shield names the pool its funds went to when the transfer carries one', () => {
+  const shieldT = (key: string) =>
+    key === 'history.shield-line' ? 'Transparent → {pool}' : key;
+  const lineOf = (poolType?: PoolEnum) =>
+    transferRowText({
+      vt: vt('e'.repeat(64), 1, ValueTransferKindEnum.Shield, { poolType }),
+      when: 'Oct 24',
+      currency: 'ZEC',
+      usd: '',
+      t: shieldT,
+    }).line;
+
+  expect(lineOf(PoolEnum.IronwoodPool)).toBe('Transparent → Ironwood · Oct 24');
+  expect(lineOf(PoolEnum.OrchardPool)).toBe('Transparent → Orchard · Oct 24');
+  expect(lineOf(undefined)).toBe('Oct 24');
 });
 
 test('Tests that a recent row reads in minutes and an older one by day', () => {

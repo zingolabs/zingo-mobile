@@ -78,7 +78,10 @@ test('Tests that the native entry carries an empty memo when the provider checks
   );
 });
 
-test("Tests that Maya's shielded memo rides as a 0 ZEC note beside the payment when the provider names a memo address", async () => {
+test("Tests that Maya's shielded memo rides as a 0 ZEC note beside the payment when the provider names a memo address, on Hermes without TextDecoder", async () => {
+  // Hermes has no TextDecoder; Node does, so take it away here.
+  const decoder = global.TextDecoder;
+  delete (global as { TextDecoder?: unknown }).TextDecoder;
   bridge.confirmProcess.mockResolvedValueOnce(
     JSON.stringify({ txids: ['deposit'] }),
   );
@@ -101,6 +104,7 @@ test("Tests that Maya's shielded memo rides as a 0 ZEC note beside the payment w
     ]),
   );
   expect(bridge.sendSwapDepositProcess).not.toHaveBeenCalled();
+  global.TextDecoder = decoder;
 });
 
 test('Tests that a refused deposit rejects with the native error when the entry answers an error document', async () => {

@@ -67,6 +67,7 @@ import {
   LaunchingModeEnum,
   BlockExplorerEnum,
   SnackbarDurationEnum,
+  SnackbarActionType,
 } from '@app/AppState';
 import Utils from '@app/utils';
 import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
@@ -83,7 +84,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '@app/services/createAlert';
 import { sendEmail } from '@app/services/sendEmail';
 import Toast from 'react-native-toast-message';
-import { toastConfig } from '@ui/widgets/toastConfig';
+import { ACTION_SNACKBAR_MS, toastConfig } from '@ui/widgets/toastConfig';
 import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
 import Launching from '@screens/Launching';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
@@ -644,6 +645,7 @@ export class LoadedAppClass extends Component<
       saplingPool: props.saplingPool,
       transparentPool: props.transparentPool,
       addLastSnackbar: this.addLastSnackbar,
+      addActionSnackbar: this.addActionSnackbar,
       restartApp: () =>
         this.navigateToLoadingApp({
           kind: 'boot',
@@ -1944,6 +1946,17 @@ export class LoadedAppClass extends Component<
     });
   };
 
+  addActionSnackbar = (message: string, action: SnackbarActionType) => {
+    Toast.show({
+      type: 'appAction',
+      text1: message,
+      props: action,
+      visibilityTime: ACTION_SNACKBAR_MS,
+      position: 'bottom',
+      bottomOffset: 80,
+    });
+  };
+
   setLastError = (error: string) => {
     // irrelevant errors ignored.
     // don't store time-out errors
@@ -2025,6 +2038,7 @@ export class LoadedAppClass extends Component<
       saplingPool: this.state.saplingPool,
       transparentPool: this.state.transparentPool,
       addLastSnackbar: this.addLastSnackbar,
+      addActionSnackbar: this.addActionSnackbar,
       addressBook: this.state.addressBook,
       launchAddTagModal: this.state.launchAddTagModal,
       shieldingAmount: this.state.shieldingAmount,

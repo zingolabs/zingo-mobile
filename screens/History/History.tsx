@@ -18,7 +18,15 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { useTheme, slopFor } from '@app/theme';
+import {
+  useTheme,
+  slopFor,
+  radiusMd,
+  space4,
+  space8,
+  space16,
+  space20,
+} from '@app/theme';
 
 import {
   ChainNameEnum,
@@ -40,13 +48,14 @@ import ValueTransferLine from './components/ValueTransferLine';
 import SwapLine from './components/SwapLine';
 import LegLine from './components/LegLine';
 import MonthHeader from './components/MonthHeader';
-import { ITEM_HEIGHT, buildHistoryItems, monthAt } from './historyItems';
+import { ITEM_HEIGHT, buildHistoryItems } from './historyItems';
 import type { HistoryItem } from './historyItems';
 import IronwoodMigrationBanner from './components/IronwoodMigrationBanner';
 import SeedBackupNotice from './components/SeedBackupNotice';
 import TransparentNotice from './components/TransparentNotice';
 import ShieldSheet from './components/ShieldSheet';
 import { useShieldFunds } from '@app/hooks/useShieldFunds';
+import { useIronwoodNoticeHide } from '@app/hooks/useIronwoodNoticeHide';
 import ViewOnlyNotice from './components/ViewOnlyNotice';
 import NoticeStack, { Notice, NOTICE_RADIUS } from '@ui/widgets/NoticeStack';
 import { PriceCard } from '@ui/widgets/Header/components/PriceRow';
@@ -79,6 +88,7 @@ import { useFreshRows } from './useFreshRows';
 import { FiltersIcon } from '@ui/primitives/Icons/FiltersIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { onTabScrollY } from '@app/navigation/tabBarScroll';
+import { PANEL_TOP } from '@ui/widgets/Header/Header';
 import { ChevronUp } from '@ui/primitives/Icons/Chevron';
 
 /** How long a finished backup keeps its green pill before the card leaves. */
@@ -104,6 +114,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     language,
     setBackgroundError,
     addLastSnackbar,
+    addActionSnackbar,
     server,
     doRefresh,
     setPrivacyOption,
@@ -185,6 +196,19 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     !!totalBalance &&
     totalBalance.confirmedOrchardBalance > 0;
   const orchardAmount = totalBalance ? totalBalance.totalOrchardBalance : 0;
+  // Hidden with the X until more lands in Orchard than it held at the time.
+  const ironwoodHide = useIronwoodNoticeHide();
+  const ironwoodHidden =
+    !ironwoodHide.loaded ||
+    (ironwoodHide.hide.kind === 'hidden' &&
+      orchardAmount <= ironwoodHide.hide.orchard);
+  const hideIronwoodNotice = () => {
+    ironwoodHide.setHide({ kind: 'hidden', orchard: orchardAmount });
+    addActionSnackbar(translate('pools.hidden-toast') as string, {
+      label: translate('pools.undo') as string,
+      onPress: () => ironwoodHide.setHide({ kind: 'shown' }),
+    });
+  };
   // The seed notice steps aside while the backup flow grows out of it.
   const focused = useIsFocused();
   const [backingUp, setBackingUp] = useState<boolean>(false);
@@ -241,7 +265,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       ),
     });
   }
-  if (showIronwoodBanner) {
+  if (showIronwoodBanner && !ironwoodHidden) {
     notices.push({
       key: 'ironwood',
       node: (
@@ -250,6 +274,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
           currencyName={info.currencyName}
           onStart={() => navigation.navigate(Route.MeetIronwood)}
           onResume={route => navigation.navigate(route)}
+          onHide={hideIronwoodNotice}
         />
       ),
     });
@@ -345,7 +370,8 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     [],
   );
 
-  const [dataProvider, setDataProvider] = useState<DataProvider>(_dataProvider);
+  /** The rows the list holds; each new set is cloned from the last, so the list diffs them. */
+  const dataProviderRef = useRef<DataProvider>(_dataProvider);
 
   // Bottom-sheet that hosts the history list itself. Snap points are ordered
   // from smallest sheet height (most balance area visible above) to largest
@@ -354,7 +380,6 @@ const History: React.FunctionComponent<HistoryProps> = () => {
   //   - With USD: 3 snaps -> [ZEC+USD visible, only ZEC visible, only top icons visible]
   //   - Without USD: 2 snaps -> [ZEC visible, only top icons visible]
   // Top icons strip height is a code-side constant (~55 px) — same on any phone.
-  const TOP_ICONS_H = 55;
   const SNAP_GAP = 4;
   // Bump applied to the snaps that sit just below a balance row (low + mid);
   // the max snap (just below the top icons strip) doesn't need it.
@@ -390,9 +415,9 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     const snapLow = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
     const snapMid = Math.min(
       Math.max(snapBase + usdRowH + BALANCE_SNAP_BUMP, snapLow + 1),
-      containerH - TOP_ICONS_H - SNAP_GAP,
+      containerH - PANEL_TOP,
     );
-    const snapMax = Math.max(containerH - TOP_ICONS_H - SNAP_GAP, snapLow + 1);
+    const snapMax = Math.max(containerH - PANEL_TOP, snapLow + 1);
 
     if (bannerH > 0) {
       // Three stops, as the redesign has them: under the notices, under the
@@ -572,19 +597,25 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       language,
     ],
   );
-  // The month pinned over the list while its rows scroll under it.
-  const [pinnedMonth, setPinnedMonth] = useState<string>('');
-  const historyItemsRef = useRef<HistoryItem[]>([]);
-  historyItemsRef.current = historyItems;
-  useEffect(() => {
-    setDataProvider(data => data.cloneWithRows(historyItems));
+  /**
+   * The rows and their layouts change in the same render. Set a render
+   * later, the list laid out one set of rows while it held another, and
+   * read the position of a row it had no layout for ("Cannot read property
+   * 'y' of undefined") whenever the count changed.
+   */
+  const dataProvider = useMemo(() => {
+    dataProviderRef.current =
+      dataProviderRef.current.cloneWithRows(historyItems);
+    return dataProviderRef.current;
   }, [historyItems]);
 
+  /** One provider for the list's life: each row's type is read from the rows it holds. */
   const layoutProvider = useMemo(
     () =>
       new LayoutProvider(
         (index: number) => {
-          const item = historyItems[index];
+          const item = dataProviderRef.current.getDataForIndex(index) as
+            HistoryItem | undefined;
           return item?.kind === 'month'
             ? ViewTypes.MONTH
             : item?.kind === 'leg'
@@ -601,7 +632,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                 : ITEM_HEIGHT.transfer;
         },
       ),
-    [historyItems],
+    [],
   );
 
   // Auto-pagination: RecyclerListView fires onEndReached when the user
@@ -676,7 +707,6 @@ const History: React.FunctionComponent<HistoryProps> = () => {
 
   const handleScroll = useCallback(
     (_rawEvent: ScrollEvent, _offsetX: number, offsetY: number) => {
-      setPinnedMonth(monthAt(historyItemsRef.current, offsetY));
       onTabScrollY(offsetY);
       const isTop = offsetY <= 100;
 
@@ -887,13 +917,12 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      marginHorizontal: 20,
-                      marginTop: 4,
-                      marginBottom: 4,
-                      paddingVertical: 8,
-                      paddingLeft: 16,
-                      paddingRight: 8,
-                      borderRadius: 12,
+                      marginHorizontal: space20,
+                      marginVertical: space4,
+                      paddingVertical: space8,
+                      paddingLeft: space16,
+                      paddingRight: space8,
+                      borderRadius: radiusMd,
                       borderWidth: 1,
                       borderColor: colors.borderAccent,
                       backgroundColor: colors.bgAccentSubtle,
@@ -914,14 +943,17 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                     <Pressable
                       testID="history.filter.clear"
                       accessibilityRole="button"
-                      hitSlop={8}
+                      hitSlop={space8}
                       onPress={() => {
                         setFilterKind(null);
                         setFilterFailed(false);
                         setFilterMemos(false);
                         setFilterWithFunds(false);
                       }}
-                      style={{ paddingHorizontal: 8, paddingVertical: 4 }}
+                      style={{
+                        paddingHorizontal: space8,
+                        paddingVertical: space4,
+                      }}
                     >
                       <Text
                         variant="caption"
@@ -1007,14 +1039,6 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                     }}
                   >
                     <FadeText>{translate('history.empty') as string}</FadeText>
-                  </View>
-                )}
-                {!!pinnedMonth && (
-                  <View
-                    pointerEvents="none"
-                    style={{ position: 'absolute', top: 0, left: 0, right: 0 }}
-                  >
-                    <MonthHeader label={pinnedMonth} />
                   </View>
                 )}
               </View>

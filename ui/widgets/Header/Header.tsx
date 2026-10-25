@@ -25,8 +25,12 @@ import { useOptionsPanel } from '@app/context/optionsPanel';
 /** The bar with the menu, the mixnet and Messages: its row and the space under it. */
 const BAR_ROW = 57;
 const BAR_BOTTOM = 10;
-/** The Header's height without the balance: where a full panel starts. */
-export const HEADER_BAR_HEIGHT = BAR_ROW + BAR_BOTTOM;
+/**
+ * Where every panel's top edge sits, under the top bar's icons: the tabs'
+ * fixed panels and the full panels opened over them, so one covers the
+ * other exactly.
+ */
+export const PANEL_TOP = 59;
 
 const HEADER_FADE_MS = 320;
 import {

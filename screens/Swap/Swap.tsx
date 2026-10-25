@@ -13,9 +13,9 @@ import Animated from 'react-native-reanimated';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import {
   space12,
-  space16,
   space4,
   space8,
+  space20,
   useTheme,
   iconSizeSm,
   radiusPill,
@@ -75,13 +75,11 @@ import SwapHistorySheet, { swapPairLabel } from './components/SwapHistorySheet';
 import { tokenToSwapAsset } from './swapAssets';
 import { useCoinPrice } from './useCoinPrice';
 import { onTabScroll } from '@app/navigation/tabBarScroll';
+import { PANEL_TOP } from '@ui/widgets/Header/Header';
+import { MASK } from '@screens/History/components/HistoryRowBody';
 import InsufficientFundsSheet from './components/InsufficientFundsSheet';
 
 type SwapProps = HomeTabScreenProps<'Swap'>;
-
-/** The strip of icons at the top of the header the sheet stops under. */
-const TOP_ICONS_H = 55;
-const SNAP_GAP = 4;
 
 /**
  * The swap tab: pick the other side, state an amount, and quote it. ZEC is
@@ -99,6 +97,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     walletChainName,
     mixnetView,
     setPrivacyOption,
+    privacy,
     addLastSnackbar,
     addressBook,
     setAddressBook,
@@ -141,7 +140,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
   // Fixed under the header's icons: the form needs the height, and the
   // balance it would reveal is already on the card.
   const snapPoints = useMemo(
-    () => [containerH > 0 ? containerH - TOP_ICONS_H - SNAP_GAP : '93%'],
+    () => [containerH > 0 ? containerH - PANEL_TOP : '93%'],
     [containerH],
   );
 
@@ -360,8 +359,12 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
         style={{ flex: 1 }}
         onLayout={e => setContainerH(e.nativeEvent.layout.height)}
       >
+        {/* Only the top bar: the panel covers the rest, and nothing should show while it settles. */}
         <Header
           title={''}
+          noBalance={true}
+          noSyncingStatus={true}
+          noPrivacy={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
           setShieldingAmount={setShieldingAmount}
@@ -372,14 +375,20 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
           pointerEvents="box-none"
           style={[StyleSheet.absoluteFill, sheetSlideStyle]}
         >
-          <AppSheet ref={sheetRef} snapPoints={snapPoints} header={sheetHeader}>
+          <AppSheet
+            ref={sheetRef}
+            snapPoints={snapPoints}
+            header={sheetHeader}
+            animateOnMount={false}
+          >
             <ScrollView
               onScroll={onTabScroll}
               scrollEventThrottle={16}
               keyboardShouldPersistTaps="handled"
               testID="swap.scroll-view"
               contentContainerStyle={{
-                paddingHorizontal: space16,
+                paddingHorizontal: space20,
+                paddingTop: space8,
                 paddingBottom:
                   Platform.OS === GlobalConst.platformOSandroid ? 120 : 160,
                 rowGap: space12,
@@ -438,9 +447,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                   tone="warning"
                   title={translate('swap.edge-blocked-title') as string}
                 >
-                  <Text variant="bodySmall">
-                    {translate('swap.edge-blocked-body') as string}
-                  </Text>
+                  {translate('swap.edge-blocked-body') as string}
                 </Banner>
               )}
               {!!form.catalogError && (
@@ -461,11 +468,15 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                     : usdOf(form.amount)
                 }
                 availableText={
-                  form.isOutbound
-                    ? usdMode
-                      ? `${toFiatText(String(form.maxSpendableForSwap), price) || '0.00'}`
-                      : `${formatAmountForDisplay(String(form.maxSpendableForSwap))} ${info.currencyName}`
-                    : undefined
+                  !form.isOutbound
+                    ? undefined
+                    : privacy
+                      ? usdMode
+                        ? MASK
+                        : `${MASK} ${info.currencyName}`
+                      : usdMode
+                        ? `${toFiatText(String(form.maxSpendableForSwap), price) || '0.00'}`
+                        : `${formatAmountForDisplay(String(form.maxSpendableForSwap))} ${info.currencyName}`
                 }
                 onUseMax={() =>
                   onChangeAmountText(
@@ -519,7 +530,11 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                   }}
                 >
                   <InfoIcon size={iconSizeSm} color={colors.fgDanger} />
-                  <Text variant="bodySmall" tone="danger">
+                  <Text
+                    variant="bodySmall"
+                    tone="danger"
+                    style={{ flexShrink: 1 }}
+                  >
                     {translate('swap.over-balance') as string}
                   </Text>
                 </View>
@@ -753,20 +768,16 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
               {form.cta === 'noRoutes' && (
                 <Banner
                   tone="warning"
-                  title={translate('swap.no-routes-title') as string}
+                  title={translate('swap.no-route-now') as string}
                 >
-                  <Text variant="bodySmall">
-                    {form.quoteError ||
-                      (translate('swap.no-routes-body') as string)}
-                  </Text>
                   {form.unavailable.length > 0 && (
-                    <View style={{ marginTop: 8, rowGap: 8 }}>
+                    <View style={{ rowGap: space4 }}>
                       <Pressable
                         testID="swap.see-why"
                         accessibilityRole="button"
                         accessibilityState={{ expanded: whyOpen }}
                         onPress={() => setWhyOpen(open => !open)}
-                        hitSlop={8}
+                        hitSlop={space8}
                         style={{
                           flexDirection: 'row',
                           alignItems: 'center',
@@ -776,7 +787,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                         <Text
                           variant="caption"
                           tone="warning"
-                          style={{ fontWeight: '700' }}
+                          style={{ textDecorationLine: 'underline' }}
                         >
                           {translate('swap.see-why') as string}
                         </Text>
@@ -799,14 +810,9 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                             variant="caption"
                             tone="muted"
                           >
-                            <Text
-                              variant="caption"
-                              style={{ fontWeight: '600' }}
-                            >
-                              {providerShortLabel(row.provider)}
-                            </Text>
-                            {` · ${renderSwapText(row.reason, key =>
-                              (translate(key) as string).trim(),
+                            {`${providerShortLabel(row.provider)} · ${renderSwapText(
+                              row.reason,
+                              key => (translate(key) as string).trim(),
                             )}`}
                           </Text>
                         ))}

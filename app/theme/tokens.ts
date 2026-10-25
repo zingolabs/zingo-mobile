@@ -29,6 +29,8 @@ export type ThemeColors = {
   fgDefault: string;
 
   fgMuted: string;
+  /** The options panel's icons, the tone their artwork is drawn in. */
+  fgOptionIcon: string;
   borderMuted: string;
   bgMuted: string;
   bgMutedSubtle: string;
@@ -127,6 +129,7 @@ export const themeTokens: ThemeColors = {
   fgDefault: '#D3E2F8',
 
   fgMuted: muted,
+  fgOptionIcon: '#B1BBC5',
   borderMuted: '#4A6487',
   bgMuted: muted,
   bgMutedSubtle: '#8DA0B81F',

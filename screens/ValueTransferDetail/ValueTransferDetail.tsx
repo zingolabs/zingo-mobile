@@ -36,6 +36,7 @@ import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
 import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
 import { RefreshIcon } from '@ui/primitives/Icons/RefreshIcon';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
+import SaveContactButton from '@ui/widgets/SaveContactButton';
 import DetailRows from '@screens/Swap/components/DetailRows';
 import type { DetailRow } from '@screens/Swap/components/DetailRows';
 import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
@@ -71,6 +72,7 @@ const ValueTransferDetail: React.FunctionComponent<
     blockExplorer,
     zecPrice,
     setSendPageState,
+    launchAddTagModal,
   } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const t = (key: string) => (translate(key) as string).trim();
@@ -168,12 +170,8 @@ const ValueTransferDetail: React.FunctionComponent<
     quote.kind === 'quote' && server.chainName === ChainNameEnum.mainChainName
       ? `$${Utils.parseNumberFloatToStringLocale(vt.amount * quote.price, 2)}`
       : '';
-  const sign = received
-    ? '+'
-    : vt.kind === ValueTransferKindEnum.Shield
-      ? ''
-      : '−';
-  /** Four decimals cut, not rounded, and the rest smaller: never more than it was. */
+  /** Money in or out of the wallet only, as History's rows sign it; moves within it carry none. */
+  const sign = received ? '+' : sent ? '−' : '';
 
   const rows: DetailRow[] = [
     {
@@ -355,6 +353,14 @@ const ValueTransferDetail: React.FunctionComponent<
       <View style={{ marginTop: 24 }}>
         <DetailRows rows={rows} />
       </View>
+
+      {sent && !!vt.address && !contact && !ownAddress(vt.address) && (
+        <SaveContactButton
+          testID="valuetransferdetail.save-contact"
+          label={t('swap.save-contact')}
+          onPress={() => launchAddTagModal(vt.address ?? '')}
+        />
+      )}
 
       {(!!memo || !!memoUA) && (
         <View

@@ -42,11 +42,12 @@ const tabBar = (index: number) => {
 };
 
 describe('CustomTabBar', () => {
-  test('Tests that every tab shows its name under its mark', () => {
+  test('Tests that every tab names itself for accessibility, with no visible name', () => {
     const { view } = tabBar(0);
-    ['home', 'send', 'receive', 'swap'].forEach(tab =>
-      expect(view.getByText(`loadedapp.tab-${tab}`)).toBeTruthy(),
-    );
+    ['home', 'send', 'receive', 'swap'].forEach(tab => {
+      expect(view.getByLabelText('loadedapp.tab-' + tab)).toBeTruthy();
+      expect(view.queryByText('loadedapp.tab-' + tab)).toBeNull();
+    });
   });
 
   test('Tests that only the active tab is marked selected when a tab is selected', () => {

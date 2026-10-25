@@ -5,7 +5,7 @@
 import 'react-native';
 import React from 'react';
 
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import ValueTransferDetail from '@screens/ValueTransferDetail';
 import {
   defaultAppContextLoaded,
@@ -46,9 +46,9 @@ describe('Component History ValueTransferDetail - test', () => {
   state.valueTransfers = mockValueTransfers;
 
   const amountOf = () => screen.getByTestId('valuetransferdetail.amount');
-  const open = (i: number) =>
+  const open = (i: number, context = state) =>
     render(
-      <ContextAppLoadedProvider value={state}>
+      <ContextAppLoadedProvider value={context}>
         <ValueTransferDetail {...makeDrawerProps(i)} />
       </ContextAppLoadedProvider>,
     );
@@ -90,5 +90,47 @@ describe('Component History ValueTransferDetail - test', () => {
     open(5);
     expect(amountOf()).toHaveTextContent(/0\.0009/);
     screen.getByText(/0\.0001/);
+  });
+
+  test('Tests that a send offers to save its address as a contact when the address book lacks it', () => {
+    const launchAddTagModal = jest.fn();
+    open(0, { ...state, addressBook: [], launchAddTagModal });
+    fireEvent.press(screen.getByTestId('valuetransferdetail.save-contact'));
+    expect(launchAddTagModal).toHaveBeenCalledWith(
+      mockValueTransfers[0].address,
+    );
+  });
+
+  test('Tests that a send shows no save action when its address is already a contact', () => {
+    open(0, {
+      ...state,
+      addressBook: [
+        {
+          label: 'Ana',
+          color: 'Ana',
+          address: mockValueTransfers[0].address ?? '',
+        },
+      ] as never,
+    });
+    expect(screen.queryByTestId('valuetransferdetail.save-contact')).toBe(null);
+  });
+
+  test('Tests that the amount carries a sign only when money left or came into the wallet', () => {
+    const signOf = (i: number) => {
+      const view = open(i);
+      const text = String(
+        [screen.getByTestId('valuetransferdetail.amount').props.children]
+          .flat(Infinity)
+          .join(''),
+      );
+      view.unmount();
+      return text.startsWith('+') ? '+' : text.startsWith('−') ? '−' : '';
+    };
+    expect(signOf(0)).toBe('−'); // sent
+    expect(signOf(3)).toBe('+'); // received
+    expect(signOf(1)).toBe(''); // memo to self
+    expect(signOf(2)).toBe(''); // send to self
+    expect(signOf(4)).toBe(''); // shield
+    expect(signOf(5)).toBe(''); // rejection
   });
 });

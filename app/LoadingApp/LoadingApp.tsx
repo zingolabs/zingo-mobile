@@ -139,6 +139,7 @@ import {
   OnboardingRoute,
 } from '@app/types';
 import { publishReport, reportState } from '@app/services/reportDiagnostics';
+import { forgetWalletOnFile } from '@app/services/WalletLocalData';
 
 const en = require('@app/translations/en.json');
 const es = require('@app/translations/es.json');
@@ -1060,8 +1061,17 @@ export class LoadingAppClass extends Component<
   confirmDelete = (context: DeleteWalletContext, next: () => void) => {
     this.afterDelete = async () => {
       if (context !== 'replace') {
-        const result = await deleteExistingWallet();
-        if (!resolvedTrue(result)) {
+        // No wallet is open here, so the data goes by the pointer to the
+        // wallet on file; if it cannot, the file stays too.
+        const forgotten = await forgetWalletOnFile().then(
+          () => true,
+          e => {
+            console.log(`confirmDelete: forgetting the wallet failed: ${e}`);
+            return false;
+          },
+        );
+        const deleted = forgotten && resolvedTrue(await deleteExistingWallet());
+        if (!deleted) {
           this.addLastSnackbar(
             this.state.translate('rpc.deletewallet-error') as string,
           );
