@@ -40,7 +40,7 @@ ESLint enforces the zone.
 
 Read `DESIGN.md` before you change a screen or a component. It and the
 tokens and components in `app/theme`, `ui/primitives` and `ui/widgets`
-govern every UI change (zingo-adrs zingo-mobile/0023).
+govern every UI change (zingo-adrs zingo-mobile/0024).
 
 - A prototype gives the layout, the content and the flow. Map each of its
   values to the nearest token, text variant or component.

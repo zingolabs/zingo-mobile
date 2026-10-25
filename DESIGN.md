@@ -765,7 +765,7 @@ onto the scale.
 3. Only then use it on the screen.
 
 The decision that this file and `app/theme` govern the interface is recorded
-in zingo-adrs (`zingo-mobile/0023`). `AGENTS.md` points every UI change here.
+in zingo-adrs (`zingo-mobile/0024`). `AGENTS.md` points every UI change here.
 
 **Known gaps.** Screens the redesign has not reached yet (the Header's
 internals, the Address Book, the server list, `ChainSelect`, the migration
