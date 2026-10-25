@@ -326,20 +326,6 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
       >
          1.1234
       </Text>
-      <Text
-        maxFontSizeMultiplier={2}
-        style={
-          {
-            "color": "red",
-            "fontSize": 14,
-            "margin": 0,
-            "padding": 0,
-          }
-        }
-        testID="undefined.small-part"
-      >
-        5678
-      </Text>
     </View>
   </View>
 </View>

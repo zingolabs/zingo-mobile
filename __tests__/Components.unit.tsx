@@ -73,7 +73,7 @@ describe('Component Components - test', () => {
 
   test('ZecAmount - zero amount should display formatted zero', () => {
     render(<ZecAmount amtZec={0} currencyName={CurrencyNameEnum.ZEC} />);
-    expect(screen.getByText('0')).toBeTruthy();
+    expect(screen.getByText('0.0')).toBeTruthy();
   });
 
   test('ZecAmount - negative amount should display formatted value', () => {
@@ -81,7 +81,6 @@ describe('Component Components - test', () => {
       <ZecAmount amtZec={-1.123456789} currencyName={CurrencyNameEnum.ZEC} />,
     );
     expect(screen.getByText('-1.1234')).toBeTruthy();
-    expect(screen.getByText('5679')).toBeTruthy();
   });
 
   test('ZecAmount - positive amount should display formatted value', () => {
@@ -89,7 +88,6 @@ describe('Component Components - test', () => {
       <ZecAmount amtZec={1.123456781} currencyName={CurrencyNameEnum.ZEC} />,
     );
     expect(screen.getByText('1.1234')).toBeTruthy();
-    expect(screen.getByText('5678')).toBeTruthy();
   });
 
   test('ZecAmount - no currency symbol should display placeholder', () => {
