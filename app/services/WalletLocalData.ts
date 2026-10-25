@@ -8,12 +8,14 @@ import {
 } from '@app/swap';
 import { callFfi } from '@app/walletBackend/ffi';
 import { RECEIVE_PIN_KEY_PREFIX } from './ReceivePinImpl';
+import { IRONWOOD_HIDDEN_KEY_PREFIX } from './IronwoodNoticeImpl';
 
 /**
  * What the app keeps beside the wallet file, keyed by the wallet's
- * fingerprint: its swap records and its pinned Receive address. They must
- * leave with the wallet file on every path that deletes or replaces it, or
- * they outlive a wallet the user removed.
+ * fingerprint: its swap records, its pinned Receive address and whether it
+ * hid the Ironwood notice. They must leave with the wallet file on every
+ * path that deletes or replaces it, or they outlive a wallet the user
+ * removed.
  *
  * The pointer names the wallet on file. It is what the delete falls back on
  * when no wallet is open to read the fingerprint from (onboarding), and what
@@ -24,11 +26,13 @@ const POINTER_KEY = 'wallet:fingerprint';
 const WALLET_SCOPED_PREFIXES = [
   SWAP_RECORDS_KEY_PREFIX,
   RECEIVE_PIN_KEY_PREFIX,
+  IRONWOOD_HIDDEN_KEY_PREFIX,
 ];
 
 async function forget(fingerprint: string): Promise<void> {
   await SwapStore.clearForWallet(fingerprint);
   await AsyncStorage.removeItem(RECEIVE_PIN_KEY_PREFIX + fingerprint);
+  await AsyncStorage.removeItem(IRONWOOD_HIDDEN_KEY_PREFIX + fingerprint);
 }
 
 /**

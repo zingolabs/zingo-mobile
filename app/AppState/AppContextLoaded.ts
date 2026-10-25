@@ -15,6 +15,7 @@ import { LanguageEnum } from './enums/LanguageEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
+import { SnackbarActionType } from './types/SnackbarActionType';
 import ValueTransferType from './types/ValueTransferType';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RescanState } from '@app/walletBackend/utils/syncProgress';
@@ -91,6 +92,8 @@ export default interface AppContextLoaded {
   transparentPool: boolean;
 
   addLastSnackbar: (message: string, duration?: SnackbarDurationEnum) => void;
+  /** A short toast with one action beside the text, such as Undo. */
+  addActionSnackbar: (message: string, action: SnackbarActionType) => void;
 
   // if the App is stalled - restart is fired
   restartApp: () => void;

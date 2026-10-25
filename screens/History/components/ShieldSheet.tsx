@@ -7,6 +7,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme, iconSize, radiusPill, space20 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
+import { isIronwoodActive } from '@app/AppState';
 import {
   MixnetView,
   sendGateOpen,
@@ -27,7 +28,7 @@ type ShieldSheetProps = {
 
 /**
  * Shielding the transparent balance, asked in place: from where, how much,
- * the network fee and what lands in Orchard. Shield waits for the mixnet,
+ * the network fee and what lands in the shielded pool. Shield waits for the mixnet,
  * like any send, and says so while it does.
  */
 const ShieldSheet = forwardRef<BottomSheetModal, ShieldSheetProps>(
@@ -89,7 +90,12 @@ const ShieldSheet = forwardRef<BottomSheetModal, ShieldSheetProps>(
                 { label: t('shield.amount'), value: zec(amount) },
                 { label: t('shield.fee'), value: zec(fee) },
                 {
-                  label: t('shield.you-get'),
+                  /** After NU6.3, shielding lands in Ironwood. */
+                  label: t(
+                    isIronwoodActive(info)
+                      ? 'shield.you-get-ironwood'
+                      : 'shield.you-get',
+                  ),
                   value: zec(Math.max(0, amount - fee)),
                   strong: true,
                 },

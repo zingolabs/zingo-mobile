@@ -22,6 +22,7 @@ const FP_B = 'b'.repeat(16);
 const seed = (fp: string) => {
   disk.set(`swap:records:${fp}`, '[{"recordId":"r"}]');
   disk.set(`receive:pin:${fp}`, 'u1pinned');
+  disk.set(`ironwood:hidden:${fp}`, '0.0004');
 };
 const keysOf = (fp: string) =>
   [...disk.keys()].filter(k => k.endsWith(fp) && k !== 'wallet:fingerprint');
@@ -50,7 +51,7 @@ beforeEach(() => {
   bridge.restoreExistingWalletBackup.mockResolvedValue('true');
 });
 
-test('Tests that forgetting the wallet clears its swaps and pin by the open wallet when one is open', async () => {
+test('Tests that forgetting the wallet clears its swaps, pin and hidden notice by the open wallet when one is open', async () => {
   bridge.getUfvkInfo.mockResolvedValue(JSON.stringify({ ufvk: UFVK_A }));
   seed(FP_A);
   seed(FP_B);
@@ -59,11 +60,11 @@ test('Tests that forgetting the wallet clears its swaps and pin by the open wall
   await forgetWalletOnFile();
 
   expect(keysOf(FP_A)).toEqual([]);
-  expect(keysOf(FP_B)).toHaveLength(2);
+  expect(keysOf(FP_B)).toHaveLength(3);
   expect(disk.has('wallet:fingerprint')).toBe(false);
 });
 
-test('Tests that forgetting the wallet clears its swaps and pin by the pointer when no wallet is open', async () => {
+test('Tests that forgetting the wallet clears its swaps, pin and hidden notice by the pointer when no wallet is open', async () => {
   seed(FP_A);
   disk.set('wallet:fingerprint', FP_A);
 
@@ -82,7 +83,7 @@ test('Tests that opening a wallet clears the previous wallet on file when the fi
   await adoptWalletOnFile(FP_B);
 
   expect(keysOf(FP_A)).toEqual([]);
-  expect(keysOf(FP_B)).toHaveLength(2);
+  expect(keysOf(FP_B)).toHaveLength(3);
   expect(disk.get('wallet:fingerprint')).toBe(FP_B);
 });
 
@@ -93,19 +94,19 @@ test('Tests that opening a wallet sweeps every other wallet’s data when there 
   await adoptWalletOnFile(FP_B);
 
   expect(keysOf(FP_A)).toEqual([]);
-  expect(keysOf(FP_B)).toHaveLength(2);
+  expect(keysOf(FP_B)).toHaveLength(3);
 });
 
 test('Tests that opening a wallet keeps other wallets’ data when a backup exists or cannot be ruled out', async () => {
   seed(FP_A);
   bridge.walletBackupExists.mockResolvedValue('true');
   await adoptWalletOnFile(FP_B);
-  expect(keysOf(FP_A)).toHaveLength(2);
+  expect(keysOf(FP_A)).toHaveLength(3);
 
   disk.delete('wallet:fingerprint');
   bridge.walletBackupExists.mockRejectedValue(new Error('bridge'));
   await adoptWalletOnFile(FP_B);
-  expect(keysOf(FP_A)).toHaveLength(2);
+  expect(keysOf(FP_A)).toHaveLength(3);
 });
 
 test('Tests that releasing the wallet keeps its data when the backup swaps places with it', async () => {
@@ -116,7 +117,7 @@ test('Tests that releasing the wallet keeps its data when the backup swaps place
   await releaseWalletOnFile();
   await adoptWalletOnFile(FP_B);
 
-  expect(keysOf(FP_A)).toHaveLength(2);
+  expect(keysOf(FP_A)).toHaveLength(3);
 });
 
 test('Tests that changing the wallet clears its data before the file goes when no wallet is open', async () => {
@@ -160,6 +161,6 @@ test('Tests that restoring the backup keeps the wallet it swaps out when replace
   const result = await service().restoreBackup(false);
 
   expect(result.kind).toBe('done');
-  expect(keysOf(FP_A)).toHaveLength(2);
+  expect(keysOf(FP_A)).toHaveLength(3);
   expect(disk.has('wallet:fingerprint')).toBe(false);
 });

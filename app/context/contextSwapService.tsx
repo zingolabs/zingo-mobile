@@ -9,6 +9,7 @@ import React, {
 
 import { ChainNameEnum, ValueTransferType } from '@app/AppState';
 import { resetPinnedAddress } from '@app/hooks/usePinnedAddress';
+import { resetIronwoodNoticeHide } from '@app/hooks/useIronwoodNoticeHide';
 import { adoptWalletOnFile } from '@app/services/WalletLocalData';
 import {
   SwapService,
@@ -95,8 +96,10 @@ export function SwapServiceProvider({
       SwapStore.unbind().catch(error =>
         console.error(`SwapServiceProvider: unbind failed ${error}`),
       );
-      // The pinned Receive address is per wallet too.
+      // The pinned Receive address and the hidden Ironwood notice are per
+      // wallet too.
       resetPinnedAddress();
+      resetIronwoodNoticeHide();
     };
   }, [chainName, apiKey]);
 

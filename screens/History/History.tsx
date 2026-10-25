@@ -55,6 +55,7 @@ import SeedBackupNotice from './components/SeedBackupNotice';
 import TransparentNotice from './components/TransparentNotice';
 import ShieldSheet from './components/ShieldSheet';
 import { useShieldFunds } from '@app/hooks/useShieldFunds';
+import { useIronwoodNoticeHide } from '@app/hooks/useIronwoodNoticeHide';
 import ViewOnlyNotice from './components/ViewOnlyNotice';
 import NoticeStack, { Notice, NOTICE_RADIUS } from '@ui/widgets/NoticeStack';
 import { PriceCard } from '@ui/widgets/Header/components/PriceRow';
@@ -113,6 +114,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     language,
     setBackgroundError,
     addLastSnackbar,
+    addActionSnackbar,
     server,
     doRefresh,
     setPrivacyOption,
@@ -194,6 +196,19 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     !!totalBalance &&
     totalBalance.confirmedOrchardBalance > 0;
   const orchardAmount = totalBalance ? totalBalance.totalOrchardBalance : 0;
+  // Hidden with the X until more lands in Orchard than it held at the time.
+  const ironwoodHide = useIronwoodNoticeHide();
+  const ironwoodHidden =
+    !ironwoodHide.loaded ||
+    (ironwoodHide.hide.kind === 'hidden' &&
+      orchardAmount <= ironwoodHide.hide.orchard);
+  const hideIronwoodNotice = () => {
+    ironwoodHide.setHide({ kind: 'hidden', orchard: orchardAmount });
+    addActionSnackbar(translate('pools.hidden-toast') as string, {
+      label: translate('pools.undo') as string,
+      onPress: () => ironwoodHide.setHide({ kind: 'shown' }),
+    });
+  };
   // The seed notice steps aside while the backup flow grows out of it.
   const focused = useIsFocused();
   const [backingUp, setBackingUp] = useState<boolean>(false);
@@ -250,7 +265,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       ),
     });
   }
-  if (showIronwoodBanner) {
+  if (showIronwoodBanner && !ironwoodHidden) {
     notices.push({
       key: 'ironwood',
       node: (
@@ -259,6 +274,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
           currencyName={info.currencyName}
           onStart={() => navigation.navigate(Route.MeetIronwood)}
           onResume={route => navigation.navigate(route)}
+          onHide={hideIronwoodNotice}
         />
       ),
     });

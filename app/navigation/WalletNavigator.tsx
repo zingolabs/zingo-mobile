@@ -150,7 +150,11 @@ export function WalletNavigator() {
     >
       <Stack.Screen name={Route.Home} component={Home} />
       <Stack.Group>
-        <Stack.Screen name={Route.Settings} component={Settings} />
+        <Stack.Screen
+          name={Route.Settings}
+          component={Settings}
+          options={{ animation: 'slide_from_right' }}
+        />
         <Stack.Screen
           name={Route.Server}
           component={WalletServer}
@@ -160,7 +164,11 @@ export function WalletNavigator() {
         <Stack.Screen name={Route.MixnetDoctor} component={MixnetDoctor} />
         <Stack.Screen name={Route.Insight} component={Insight} />
         <Stack.Screen name={Route.SyncReport} component={SyncReport} />
-        <Stack.Screen name={Route.Pools} component={Pools} />
+        <Stack.Screen
+          name={Route.Pools}
+          component={Pools}
+          options={{ animation: 'slide_from_right' }}
+        />
         <Stack.Screen
           name={Route.WalletSeed}
           component={WalletSeed}

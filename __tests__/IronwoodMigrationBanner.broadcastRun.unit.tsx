@@ -82,6 +82,7 @@ function renderBanner(latestBlock: number) {
         currencyName="ZEC"
         onStart={jest.fn()}
         onResume={jest.fn()}
+        onHide={jest.fn()}
       />
     </ContextAppLoadedProvider>
   );
@@ -132,6 +133,7 @@ describe('Ironwood banner broadcast run', () => {
           currencyName="ZEC"
           onStart={jest.fn()}
           onResume={jest.fn()}
+          onHide={jest.fn()}
         />
       </ContextAppLoadedProvider>,
     );

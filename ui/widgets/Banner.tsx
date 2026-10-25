@@ -13,6 +13,7 @@ import {
   useTheme,
   iconSizeSm,
   space8,
+  slopFor,
 } from '@app/theme';
 import Text from '@ui/primitives/Text';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
@@ -52,6 +53,11 @@ type BannerProps = {
    */
   plain?: boolean;
   onDismiss?: () => void;
+  /**
+   * The X in the row, after an `actionBeside` button, instead of in the
+   * card's corner: for a card too short to hold a corner X.
+   */
+  dismissBeside?: boolean;
   dismissLabel?: string;
   dismissTestID?: string;
   /**
@@ -80,6 +86,7 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
     dismissTestID,
     contentStyle,
     actionBeside = false,
+    dismissBeside = false,
     plain = false,
     testID,
   },
@@ -87,6 +94,8 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
 ) {
   const { colors } = useTheme();
   const inStack = useContext(BannerPlainContext);
+  const xBeside =
+    !!onDismiss && dismissBeside && actionBeside && action !== undefined;
   const flat = plain || inStack;
   const paint = {
     seed: {
@@ -245,11 +254,31 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
           )}
         </View>
         {action !== undefined && actionBeside && (
-          <View style={{ alignSelf: 'center' }}>{action}</View>
+          <View
+            style={{
+              alignSelf: 'center',
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: space8,
+            }}
+          >
+            {action}
+            {xBeside && (
+              <Pressable
+                testID={dismissTestID}
+                accessibilityRole="button"
+                accessibilityLabel={dismissLabel}
+                onPress={onDismiss}
+                hitSlop={slopFor(iconSizeMd)}
+              >
+                <XIcon size={iconSizeMd} color={colors.fgMuted} />
+              </Pressable>
+            )}
+          </View>
         )}
       </Animated.View>
       {/* In the card's corner, outside the row, so the action keeps its place. */}
-      {onDismiss && (
+      {onDismiss && !xBeside && (
         <Pressable
           testID={dismissTestID}
           accessibilityRole="button"

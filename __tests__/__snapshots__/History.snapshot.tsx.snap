@@ -574,7 +574,10 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                     <View
                       style={
                         {
+                          "alignItems": "center",
                           "alignSelf": "center",
+                          "flexDirection": "row",
+                          "gap": 8,
                         }
                       }
                     >
@@ -842,7 +845,7 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                       },
                     },
                   ],
-                  "_firstIndexToProcess": 0,
+                  "_firstIndexToProcess": 7,
                   "_hasStableIds": false,
                   "_requiresDataChangeHandling": false,
                   "_size": 7,
@@ -864,6 +867,67 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
               layoutProvider={
                 LayoutProvider {
                   "_getLayoutTypeForIndex": [Function],
+                  "_lastLayoutManager": WrapGridLayoutManager {
+                    "_isHorizontal": false,
+                    "_layoutProvider": [Circular],
+                    "_layouts": [
+                      {
+                        "height": 38,
+                        "type": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0,
+                      },
+                      {
+                        "height": 64,
+                        "type": 1,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0,
+                      },
+                      {
+                        "height": 64,
+                        "type": 1,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0,
+                      },
+                      {
+                        "height": 64,
+                        "type": 1,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0,
+                      },
+                      {
+                        "height": 64,
+                        "type": 1,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0,
+                      },
+                      {
+                        "height": 64,
+                        "type": 1,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0,
+                      },
+                      {
+                        "height": 64,
+                        "type": 1,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0,
+                      },
+                    ],
+                    "_totalHeight": 64,
+                    "_totalWidth": 0,
+                    "_window": {
+                      "height": 0,
+                      "width": 0,
+                    },
+                  },
                   "_setLayoutForType": [Function],
                   "_tempDim": {
                     "height": 0,
@@ -2186,7 +2250,10 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                     <View
                       style={
                         {
+                          "alignItems": "center",
                           "alignSelf": "center",
+                          "flexDirection": "row",
+                          "gap": 8,
                         }
                       }
                     >
@@ -2454,7 +2521,7 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                       },
                     },
                   ],
-                  "_firstIndexToProcess": 0,
+                  "_firstIndexToProcess": 7,
                   "_hasStableIds": false,
                   "_requiresDataChangeHandling": false,
                   "_size": 7,
@@ -2476,6 +2543,67 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
               layoutProvider={
                 LayoutProvider {
                   "_getLayoutTypeForIndex": [Function],
+                  "_lastLayoutManager": WrapGridLayoutManager {
+                    "_isHorizontal": false,
+                    "_layoutProvider": [Circular],
+                    "_layouts": [
+                      {
+                        "height": 38,
+                        "type": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0,
+                      },
+                      {
+                        "height": 64,
+                        "type": 1,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0,
+                      },
+                      {
+                        "height": 64,
+                        "type": 1,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0,
+                      },
+                      {
+                        "height": 64,
+                        "type": 1,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0,
+                      },
+                      {
+                        "height": 64,
+                        "type": 1,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0,
+                      },
+                      {
+                        "height": 64,
+                        "type": 1,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0,
+                      },
+                      {
+                        "height": 64,
+                        "type": 1,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0,
+                      },
+                    ],
+                    "_totalHeight": 64,
+                    "_totalWidth": 0,
+                    "_window": {
+                      "height": 0,
+                      "width": 0,
+                    },
+                  },
                   "_setLayoutForType": [Function],
                   "_tempDim": {
                     "height": 0,

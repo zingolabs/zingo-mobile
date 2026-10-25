@@ -148,6 +148,8 @@ type IronwoodMigrationBannerProps = {
   // Deep-link back into the in-flight private migration, at whichever screen
   // its phase needs next.
   onResume: (route: 'MigrationSplitting' | 'MigrationStatus') => void;
+  /** Hides the notice; offered only once the migration is complete. */
+  onHide: () => void;
 };
 
 /**
@@ -164,7 +166,7 @@ type IronwoodMigrationBannerProps = {
  */
 const IronwoodMigrationBanner: React.FunctionComponent<
   IronwoodMigrationBannerProps
-> = ({ amount, currencyName, onStart, onResume }) => {
+> = ({ amount, currencyName, onStart, onResume, onHide }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, info, privacy } = context;
   const { colors } = useTheme();
@@ -450,6 +452,9 @@ const IronwoodMigrationBanner: React.FunctionComponent<
   }
 
   // ----- Default variant -----
+  // A complete migration leaves its residual in Orchard: value that costs
+  // more in fees to move than it carries. Pools shows it; here it can go.
+  const done = phaseKind === 'complete';
   return (
     <Animated.View key="default" entering={variantEnter()}>
       <Banner
@@ -458,17 +463,38 @@ const IronwoodMigrationBanner: React.FunctionComponent<
         title={translate('ironwoodbanner.pool') as string}
         actionBeside
         action={
-          <Button
-            testID="ironwoodbanner.start"
-            variant="primary"
-            inline
-            /** The pill it had beside the pool text. */
-            style={{ minHeight: 0, paddingHorizontal: 22, paddingVertical: 10 }}
-            textStyle={{ fontSize: 15 }}
-            title={translate('ironwoodbanner.start') as string}
-            onPress={onStart}
-          />
+          done ? (
+            <Button
+              testID="ironwoodbanner.start"
+              variant="primary"
+              size="small"
+              inline
+              /** Narrower, to make room for the X beside it. */
+              style={{ paddingHorizontal: 14 }}
+              title={translate('ironwoodbanner.start') as string}
+              onPress={onStart}
+            />
+          ) : (
+            <Button
+              testID="ironwoodbanner.start"
+              variant="primary"
+              inline
+              /** The pill it had beside the pool text. */
+              style={{
+                minHeight: 0,
+                paddingHorizontal: 22,
+                paddingVertical: 10,
+              }}
+              textStyle={{ fontSize: 15 }}
+              title={translate('ironwoodbanner.start') as string}
+              onPress={onStart}
+            />
+          )
         }
+        onDismiss={done ? onHide : undefined}
+        dismissBeside
+        dismissLabel={translate('ironwoodbanner.hide') as string}
+        dismissTestID="ironwoodbanner.hide"
       >
         {translate('ironwoodbanner.balance') as string}{' '}
         <Text variant="bodySmall" style={{ fontWeight: '700' }}>

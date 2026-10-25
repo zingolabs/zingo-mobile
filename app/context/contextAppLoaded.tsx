@@ -60,6 +60,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   saplingPool: true,
   transparentPool: true,
   addLastSnackbar: () => {},
+  addActionSnackbar: () => {},
   restartApp: () => {},
   scrollToTop: false,
   setScrollToTop: () => {},
