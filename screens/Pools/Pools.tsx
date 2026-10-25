@@ -37,7 +37,7 @@ import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
 import { LogIcon } from '@ui/primitives/Icons/LogIcon';
 import { TreeIcon } from '@ui/primitives/Icons/TreeIcon';
-import { SproutIcon } from '@ui/primitives/Icons/SproutIcon';
+import { SaplingIcon } from '@ui/primitives/Icons/SaplingIcon';
 import { EyeIcon } from '@ui/primitives/Icons/EyeIcon';
 import ShieldSheet from '@screens/History/components/ShieldSheet';
 
@@ -109,7 +109,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
   const paint = {
     ironwood: { fg: colors.fgIronwood, bg: colors.bgIronwood, Icon: LogIcon },
     orchard: { fg: colors.fgOrchard, bg: colors.bgOrchard, Icon: TreeIcon },
-    sapling: { fg: colors.fgSapling, bg: colors.bgSapling, Icon: SproutIcon },
+    sapling: { fg: colors.fgSapling, bg: colors.bgSapling, Icon: SaplingIcon },
     transparent: {
       fg: colors.fgTransparent,
       bg: colors.bgTransparent,
