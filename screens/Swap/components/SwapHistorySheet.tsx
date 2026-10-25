@@ -16,6 +16,7 @@ import ListRow from '@ui/primitives/ListRow';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { RefreshIcon } from '@ui/primitives/Icons/RefreshIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { formatInteger } from '@app/utils/formatAmount';
 import SheetTitle from './SheetTitle';
 
 type SwapHistorySheetProps = {
@@ -56,7 +57,7 @@ function daysAgo(
   if (days === 1) {
     return t('swap.history-yesterday');
   }
-  return t('swap.history-days-ago').replace('{n}', String(days));
+  return t('swap.history-days-ago').replace('{n}', formatInteger(days));
 }
 
 /** The wallet's swaps, the ones in flight first. */

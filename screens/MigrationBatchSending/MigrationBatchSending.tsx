@@ -17,6 +17,7 @@ import Button from '@ui/primitives/Button';
 import SegmentedBar from '@ui/primitives/SegmentedBar';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
+import { formatAmount } from '@app/utils/formatAmount';
 import { Route } from '@app/AppState';
 import { executeDueParts, executeDuePartsStatus } from '@app/walletBackend';
 import { RPCBatchReportType } from '@app/walletBackend/types/RPCBatchReportType';
@@ -35,9 +36,6 @@ const ZATS_PER_ZEC = 10 ** 8;
 // feel stuck. Provisional — the manual-execution disclosure, shown once when
 // the cadence is chosen, already covers the user-present correlation.
 const BATCH_SEND_SPACING_MS = 3000;
-
-const fmt = (zats: number): string =>
-  `${parseFloat((zats / ZATS_PER_ZEC).toFixed(4))}`;
 
 // Broadcasts the open window's due batch via execute_due_parts, polling the
 // native side channel for "Sending i/N" while the one long call is in flight —
@@ -303,7 +301,7 @@ const MigrationBatchSending: React.FunctionComponent<
                 }}
               >
                 <Text style={{ color: colors.fgDefault, fontSize: 14 }}>
-                  {fmt(denomination)}
+                  {formatAmount(denomination / ZATS_PER_ZEC)}
                 </Text>
               </View>
             ))}

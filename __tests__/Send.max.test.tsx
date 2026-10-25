@@ -36,5 +36,5 @@ test('Tests that the spendable amount fills the amount field with the maximum wh
   await act(async () => {
     fireEvent.press(screen.getByTestId('send.max'));
   });
-  expect(screen.getByTestId('send.amount').props.value).toBe('0.50000000');
+  expect(screen.getByTestId('send.amount').props.value).toBe('0.5');
 });

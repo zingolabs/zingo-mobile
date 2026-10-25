@@ -26,6 +26,7 @@ import ProgressBar from '@ui/primitives/ProgressBar';
 import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
+import { formatAmount } from '@app/utils/formatAmount';
 import { Route } from '@app/AppState';
 import useTrickleProgress from '@app/hooks/useTrickleProgress';
 import { planIronwoodMigration, quickSplit } from '@app/walletBackend';
@@ -45,15 +46,10 @@ const ZATS_PER_ZEC = 10 ** 8;
 // hammering the wallet.
 const POLL_MS = 15 * 1000;
 
-// Compact ZEC amount: trims trailing zeros so a 10 ZEC total reads "10" and a
-// dust total "0.01", matching the plan values.
-const fmt = (zats: number): string =>
-  `${parseFloat((zats / ZATS_PER_ZEC).toFixed(4))}`;
-
 // The transaction's total re-noted value, matching the plan's Amount row. The
 // individual note denominations stay off this screen.
 const outputsLabel = (outputs: number[]): string =>
-  fmt(outputs.reduce((sum, v) => sum + v, 0));
+  formatAmount(outputs.reduce((sum, v) => sum + v, 0) / ZATS_PER_ZEC);
 
 // Round-granular truth is all the splitting API offers (there is no per-tx
 // build side channel like the drain's): a row is queued until its round

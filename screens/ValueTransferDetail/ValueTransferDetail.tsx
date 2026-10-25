@@ -1,6 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { formatZecAmount } from '@app/utils/formatZecAmount';
+import {
+  formatAmount,
+  formatInteger,
+  formatUsd,
+  toAmountInput,
+} from '@app/utils/formatAmount';
 import Tag from '@ui/widgets/Tag';
 import { Linking, Pressable, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -168,7 +173,7 @@ const ValueTransferDetail: React.FunctionComponent<
   const quote = fiatQuote(zecPrice, server, info.chainName);
   const todayUsd =
     quote.kind === 'quote' && server.chainName === ChainNameEnum.mainChainName
-      ? `$${Utils.parseNumberFloatToStringLocale(vt.amount * quote.price, 2)}`
+      ? formatUsd(vt.amount * quote.price)
       : '';
   /** Money in or out of the wallet only, as History's rows sign it; moves within it carry none. */
   const sign = received ? '+' : sent ? '−' : '';
@@ -202,16 +207,14 @@ const ValueTransferDetail: React.FunctionComponent<
       ? [
           {
             label: t('history.tx-fee'),
-            value: `${formatZecAmount(vt.fee ?? 0)} ${info.currencyName}`,
+            value: `${formatAmount(vt.fee ?? 0)} ${info.currencyName}`,
           },
         ]
       : []),
     {
       label: t('history.confirmations'),
       value:
-        failed || vt.confirmations < 0
-          ? '—'
-          : vt.confirmations.toLocaleString(),
+        failed || vt.confirmations < 0 ? '—' : formatInteger(vt.confirmations),
     },
     ...(vt.txid
       ? [
@@ -236,7 +239,7 @@ const ValueTransferDetail: React.FunctionComponent<
   const tryAgain = () => {
     const state = new SendPageStateClass(new ToAddrClass(0));
     state.toaddr.to = vt.address ?? '';
-    state.toaddr.amount = String(vt.amount);
+    state.toaddr.amount = toAmountInput(vt.amount);
     state.toaddr.memo = memo ?? '';
     setSendPageState(state);
     navigation.navigate(Route.Home, { screen: Route.Send });
@@ -333,7 +336,7 @@ const ValueTransferDetail: React.FunctionComponent<
           }
           style={{ marginTop: 12, fontVariant: ['tabular-nums'] }}
         >
-          {privacy ? MASK : `${sign}${formatZecAmount(vt.amount)}`}
+          {privacy ? MASK : `${sign}${formatAmount(vt.amount)}`}
           <Text variant="subtitle" tone="muted">
             {` ${info.currencyName}`}
           </Text>

@@ -7,6 +7,7 @@ import React, {
   useState,
 } from 'react';
 import { formatZecAmount } from '@app/utils/formatZecAmount';
+import { formatInteger, formatUsd } from '@app/utils/formatAmount';
 import Animated from 'react-native-reanimated';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Linking, Pressable, View } from 'react-native';
@@ -186,7 +187,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
   const back = record.refundInfo?.refundedAmountText;
   const usd = (amount: string, unit: number) => {
     const v = parseFloat(amount) * unit;
-    return unit > 0 && Number.isFinite(v) ? `≈ $${v.toFixed(2)}` : '';
+    return unit > 0 && Number.isFinite(v) ? `≈ ${formatUsd(v)}` : '';
   };
 
   const title = `${t(sell ? 'history.swap-to' : 'history.swap-from')} ${otherSym}`;
@@ -438,7 +439,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
                 }}
               >
                 <Text variant="caption" tone="muted">
-                  {String(legs.length)}
+                  {formatInteger(legs.length)}
                 </Text>
               </View>
             </View>

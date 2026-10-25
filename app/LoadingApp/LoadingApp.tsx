@@ -94,6 +94,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '@app/services/createAlert';
 import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
 import Utils from '@app/utils';
+import { formatInteger } from '@app/utils/formatAmount';
 import { RPCWalletKindType } from '@app/walletBackend/types/RPCWalletKindType';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '@ui/widgets/toastConfig';
@@ -1732,8 +1733,8 @@ export class LoadingAppClass extends Component<
         showConfirm({
           title: translate('loadingapp.saved-wallet-net-title') as string,
           message: (translate('loadingapp.saved-wallet-net-body') as string)
-            .replace('{birthday}', wallet.birthday.toLocaleString())
-            .replace('{tip}', tip.toLocaleString())
+            .replace('{birthday}', formatInteger(wallet.birthday))
+            .replace('{tip}', formatInteger(tip))
             .replace('{net}', netName(server.chainName)),
           buttons: [
             {

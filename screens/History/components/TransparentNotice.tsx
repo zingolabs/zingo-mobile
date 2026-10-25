@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { ContextAppLoaded } from '@app/context';
-import Utils from '@app/utils';
+import { formatAmount } from '@app/utils/formatAmount';
 import Button from '@ui/primitives/Button';
 import Banner from '@ui/widgets/Banner';
 import Tag from '@ui/widgets/Tag';
@@ -40,7 +40,7 @@ export default function TransparentNotice({
         '{amount}',
         privacy
           ? `••••• ${info.currencyName}`
-          : `${Utils.parseNumberFloatToStringLocale(amount, 4)} ${info.currencyName}`,
+          : `${formatAmount(amount)} ${info.currencyName}`,
       )}
     </Banner>
   );

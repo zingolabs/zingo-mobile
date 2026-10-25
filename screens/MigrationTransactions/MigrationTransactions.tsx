@@ -11,8 +11,8 @@ import ButtonStack from '@ui/primitives/ButtonStack';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
+import { formatAmount } from '@app/utils/formatAmount';
 import { Route } from '@app/AppState';
-import Utils from '@app/utils';
 import { planOrchardDrain } from '@app/walletBackend';
 import { RPCDrainPlanType } from '@app/walletBackend/types/RPCDrainPlanType';
 import { themeTokens } from '@app/theme';
@@ -106,11 +106,7 @@ const MigrationTransactions: React.FunctionComponent<
 
   const currencyName = info.currencyName;
   const zec = useCallback(
-    (zats: number) =>
-      `${Utils.parseNumberFloatToStringLocale(
-        zats / ZATS_PER_ZEC,
-        4,
-      )} ${currencyName}`,
+    (zats: number) => `${formatAmount(zats / ZATS_PER_ZEC)} ${currencyName}`,
     [currencyName],
   );
 

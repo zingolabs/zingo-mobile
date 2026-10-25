@@ -25,7 +25,7 @@ import Banner from '@ui/widgets/Banner';
 import SegmentedBar from '@ui/primitives/SegmentedBar';
 import { ContextAppLoaded } from '@app/context';
 import { useOrchardResidualOnly } from '@app/hooks/useOrchardResidualOnly';
-import Utils from '@app/utils';
+import { formatAmount, formatInteger } from '@app/utils/formatAmount';
 import { Route } from '@app/AppState';
 import { migrationStatus, reconcileMigration } from '@app/walletBackend';
 import {
@@ -260,9 +260,8 @@ const IronwoodMigrationBanner: React.FunctionComponent<
 
     const orchardLeftStr = privacy
       ? `${masked} ${currencyName}`
-      : `${Utils.parseNumberFloatToStringLocale(
+      : `${formatAmount(
           migration.orchard_confirmed_spendable / ZATS_PER_ZEC,
-          4,
         )} ${currencyName}`;
 
     // A batch is ready to send exactly when the backend reports a due batch:
@@ -322,7 +321,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
             ? (translate('ironwoodbanner.next-all-sent') as string)
             : (translate('ironwoodbanner.next-in-blocks') as string)
                 .replace('{n}', String(batchesConfirmed + 1))
-                .replace('{blocks}', String(blocksUntil));
+                .replace('{blocks}', formatInteger(blocksUntil));
     const nextActionActive = !splitting && (ready || !nextWake);
     const nextActionColor = confirming
       ? colors.fgWarning
@@ -500,7 +499,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
       >
         {translate('ironwoodbanner.balance') as string}{' '}
         <Text variant="bodySmall" style={{ fontWeight: '700' }}>
-          {privacy ? masked : Utils.parseNumberFloatToStringLocale(amount, 4)}
+          {privacy ? masked : formatAmount(amount)}
         </Text>{' '}
         {currencyName}
       </Banner>

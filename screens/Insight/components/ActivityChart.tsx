@@ -19,6 +19,7 @@ import {
   niceTop,
 } from '@screens/Insight/insightModel';
 import { themeTokens, useTheme } from '@app/theme';
+import { formatPercent } from '@app/utils/formatAmount';
 
 const H = 168;
 const TOP = 18;
@@ -154,7 +155,7 @@ const ActivityChart: React.FunctionComponent<ActivityChartProps> = ({
     Math.max(0, ...columns.map(c => c.reduce((s, v) => s + v, 0))),
     metric,
   );
-  const tickText = (v: number) => String(+v.toFixed(2));
+  const tickText = (v: number) => formatPercent(v, 2);
   const labels = Math.min(4, n);
   const labelAt = Array.from({ length: labels }, (_, k) =>
     labels > 1 ? Math.round((k * (n - 1)) / (labels - 1)) : 0,

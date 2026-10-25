@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useContext, useState } from 'react';
 import DetailRows from '@screens/Swap/components/DetailRows';
-import { formatZecAmount } from '@app/utils/formatZecAmount';
+import { formatAmount } from '@app/utils/formatAmount';
 import { View } from 'react-native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -41,7 +41,7 @@ const ShieldSheet = forwardRef<BottomSheetModal, ShieldSheetProps>(
     const open = sendGateOpen(mixnetView);
     const blocked = mixnetView.kind === 'transport' && mixnetView.sendBlocked;
     const zec = (value: number) =>
-      `${formatZecAmount(value)} ${info.currencyName}`;
+      `${formatAmount(value)} ${info.currencyName}`;
 
     const dismiss = useCallback(() => {
       (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss();

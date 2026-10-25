@@ -8,11 +8,13 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { getNumberFormatSettings } from 'react-native-localize';
 
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
+import { formatAmount, formatInteger } from '@app/utils/formatAmount';
 import Utils from '@app/utils';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
@@ -91,10 +93,11 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
   }));
 
   const price = zecPrice.zecPrice;
+  const { decimalSeparator } = getNumberFormatSettings();
   const zecText = (zec: number): string =>
-    privacy ? '-.----' : Utils.parseNumberFloatToStringLocale(zec, 4);
+    privacy ? `-${decimalSeparator}----` : formatAmount(zec);
   const sendsText = (n: number): string =>
-    `${n} ${translate(n === 1 ? 'insight.send' : 'insight.sends-unit') as string}`;
+    `${formatInteger(n)} ${translate(n === 1 ? 'insight.send' : 'insight.sends-unit') as string}`;
   const value = (v: number): string =>
     metric === 'amount' ? zecText(v) : sendsText(v);
   const day = (date: Date) =>
@@ -649,7 +652,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                         lineHeight: 17,
                       }}
                     >
-                      {`${sendsText(t.sends)} · ZEC ${zecText(t.amount)} · ${t.bytes.toLocaleString('en-US')} ${translate('insight.bytes') as string}`}
+                      {`${sendsText(t.sends)} · ${info.currencyName} ${zecText(t.amount)} · ${formatInteger(t.bytes)} ${translate('insight.bytes') as string}`}
                     </Text>
                   )}
                 </Pressable>

@@ -59,6 +59,11 @@ import {
   settleSend,
 } from '@app/walletBackend/transforms/sendSettlement';
 import Utils from '@app/utils';
+import {
+  formatAmount,
+  formatUsd,
+  toAmountInput,
+} from '@app/utils/formatAmount';
 /** After utils: the uris barrel and utils import each other, and this order resolves it. */
 import { parseZcashURI } from '@app/uris';
 import { useResult } from '@app/navigation/results';
@@ -274,7 +279,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
       sendAllRef.current ||
       (maxAmount > 0 &&
         Utils.parseStringLocaleToNumberFloat(amountPar) ===
-          Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))),
+          Number(maxAmount.toFixed(8))),
     [maxAmount],
   );
 
@@ -370,7 +375,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
               const newAmount = runProposeJson.amount / 10 ** 8;
               updateToField(
                 null,
-                Utils.parseNumberFloatToStringLocale(newAmount, 8),
+                toAmountInput(newAmount) || '0',
                 null,
                 null,
                 null,
@@ -499,9 +504,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
               setAddressText(tgt.address);
             }
             if (tgt.amount) {
-              setAmountText(
-                Utils.parseNumberFloatToStringLocale(tgt.amount, 8),
-              );
+              setAmountText(toAmountInput(tgt.amount));
             }
             if (tgt.memoString) {
               setMemoText(tgt.memoString);
@@ -669,7 +672,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
           if (
             Utils.parseStringLocaleToNumberFloat(amountText) >= 0 &&
             Utils.parseStringLocaleToNumberFloat(amountText) <=
-              Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
+              Number(maxAmount.toFixed(8))
           ) {
             setValidAmount(1); // valid
           } else {
@@ -812,10 +815,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
     // Zcash Name, or the short address.
     const to = sendPageStatePar.toaddr;
     const subject = {
-      amount: Utils.parseNumberFloatToStringLocale(
-        Utils.parseStringLocaleToNumberFloat(to.amount),
-        4,
-      ),
+      amount: formatAmount(Utils.parseStringLocaleToNumberFloat(to.amount)),
       who:
         addressBook.find(entry => entry.address === to.to)?.label ||
         to.znsAlias ||
@@ -1107,21 +1107,19 @@ const Send: React.FunctionComponent<SendProps> = () => {
                 converted={
                   inputZec
                     ? quote.kind === 'quote'
-                      ? `≈ $${Utils.parseNumberFloatToStringLocale(
+                      ? `≈ ${formatUsd(
                           (Utils.parseStringLocaleToNumberFloat(amountText) ||
                             0) * quote.price,
-                          2,
                         )}`
                       : ''
-                    : `≈ ${Utils.parseNumberFloatToStringLocale(
+                    : `≈ ${formatAmount(
                         Utils.parseStringLocaleToNumberFloat(amountText) || 0,
-                        4,
                       )} ${info.currencyName}`
                 }
                 available={
                   privacy
                     ? `••••• ${info.currencyName}`
-                    : `${Utils.splitZecAmountIntoBigSmall(maxAmount).bigPart} ${info.currencyName}`
+                    : `${formatAmount(maxAmount)} ${info.currencyName}`
                 }
                 availableError={spendableError}
                 onMax={() => {
@@ -1132,10 +1130,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                   if (maxAmount <= 0) {
                     return;
                   }
-                  const maxStr = Utils.parseNumberFloatToStringLocale(
-                    maxAmount,
-                    8,
-                  );
+                  const maxStr = toAmountInput(maxAmount);
                   sendAllRef.current = true;
                   updateToField(null, maxStr, null, null, null);
                   calculateFeeWithPropose(
@@ -1145,11 +1140,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                     includeUAMemoBoolean,
                   );
                 }}
-                fee={
-                  fee > 0
-                    ? `${Utils.parseNumberFloatToStringLocale(fee, 4)} ${info.currencyName}`
-                    : ''
-                }
+                fee={fee > 0 ? `${formatAmount(fee)} ${info.currencyName}` : ''}
                 invalid={validAmount < 0}
                 focused={focusedField === 'amount'}
                 onFocus={() => setFocusedField('amount')}
@@ -1177,11 +1168,11 @@ const Send: React.FunctionComponent<SendProps> = () => {
                         ? (translate('send.amount-confirming') as string)
                             .replace(
                               '{confirming}',
-                              `${Utils.splitZecAmountIntoBigSmall(confirmingAmount).bigPart} ${info.currencyName}`,
+                              `${formatAmount(confirmingAmount)} ${info.currencyName}`,
                             )
                             .replace(
                               '{max}',
-                              `${Utils.splitZecAmountIntoBigSmall(maxAmount).bigPart} ${info.currencyName}`,
+                              `${formatAmount(maxAmount)} ${info.currencyName}`,
                             )
                         : (translate('send.amount-over') as string)}
                   </Text>

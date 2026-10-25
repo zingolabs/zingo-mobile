@@ -12,7 +12,7 @@ import Button from '@ui/primitives/Button';
 import ProgressBar from '@ui/primitives/ProgressBar';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import Utils from '@app/utils';
+import { formatAmount } from '@app/utils/formatAmount';
 import useTrickleProgress from '@app/hooks/useTrickleProgress';
 import { drainOrchard, drainStatus } from '@app/walletBackend';
 import { RPCDrainType } from '@app/walletBackend/types/RPCDrainType';
@@ -28,11 +28,6 @@ const ZATS_PER_ZEC = 10 ** 8;
 // Share of the progress bar each drain phase owns: building (proving, the slow
 // part) fills the first 90%, broadcasting the last 10%.
 const BUILD_WEIGHT = 0.9;
-
-// Compact ZEC amount for the per-transaction note list: trims trailing zeros so
-// a 10 ZEC note reads "10" and a dust note "0.01", matching the preview values.
-const fmt = (zats: number): string =>
-  `${parseFloat((zats / ZATS_PER_ZEC).toFixed(4))}`;
 
 // Where a transaction is in its lifecycle, derived from the drain's live
 // { built, sent, phase } snapshot. Build proves+signs each tx (queued ->
@@ -85,9 +80,8 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
   // Total value landing in the Ironwood pool across every transaction (the sum
   // of the single output each drain transaction creates).
   const totalTransferred = transactions.reduce((sum, tx) => sum + tx.output, 0);
-  const totalTransferredStr = `${Utils.parseNumberFloatToStringLocale(
+  const totalTransferredStr = `${formatAmount(
     totalTransferred / ZATS_PER_ZEC,
-    4,
   )} ${info.currencyName}`;
 
   const [progress, setProgress] = useState<RPCDrainStatusType | null>(null);
@@ -328,7 +322,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
         {transactions.map((tx, i) => {
           const meta = statusMeta[deriveStatus(i, progress)];
           // The value this transaction moves into Ironwood (its single output).
-          const value = fmt(tx.output);
+          const value = formatAmount(tx.output / ZATS_PER_ZEC);
           return (
             <View
               key={i}

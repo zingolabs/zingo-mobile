@@ -1,4 +1,5 @@
 import type { QuoteResponseType } from './types/QuoteResponseType';
+import { formatMinimumAmount } from './formatMinimumAmount';
 import type { UnavailableProviderType } from './unavailableProviders';
 import { providerShortLabel } from './providerLabels';
 import { swapKey } from './swapText';
@@ -65,7 +66,6 @@ export function describeEmptyQuote(
   if (minimums.length === 0) {
     return swapKey('swap.msg-below-every-minimum');
   }
-  // Trailing zeros dropped so 0.01068069 does not read as 0.010680690000.
-  const largest = minimums[0].toFixed(8).replace(/0+$/, '').replace(/\.$/, '');
+  const largest = formatMinimumAmount(minimums[0]);
   return swapKey('swap.msg-too-small', { amount: `${largest}${unit}` });
 }

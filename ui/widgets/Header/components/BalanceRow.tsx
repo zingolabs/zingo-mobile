@@ -22,7 +22,7 @@ import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
 import InfoType from '@app/AppState/types/InfoType';
 import { fiatQuote } from '@app/price/fiatQuote';
 import ZecPriceType from '@app/AppState/types/ZecPriceType';
-import Utils from '@app/utils';
+import { formatAmount, formatUsd } from '@app/utils/formatAmount';
 import CurrencyAmount, { PriceTint } from '@ui/widgets/CurrencyAmount';
 import PriceFetcher, { usePriceRing } from '@ui/widgets/PriceFetcher';
 import RegText from '@ui/primitives/RegText';
@@ -81,7 +81,6 @@ type BalanceRowProps = {
   onUsdRowLayout?: (height: number) => void;
 };
 
-/** The balance as the redesign sets it: 4 decimals, the unit after it. */
 const MASK = '•••••';
 
 const BalanceRow: React.FC<BalanceRowProps> = React.memo(
@@ -121,8 +120,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     const fiatLabel = [
       privacy || quote.kind !== 'quote'
         ? ''
-        : '$ ' +
-          Utils.parseNumberFloatToStringLocale(quote.price * fiatTotal, 2),
+        : formatUsd(quote.price * fiatTotal),
       translate(ring.labelKey) as string,
       updatedAt
         ? (translate('header.lastupdate') as string) + ' ' + updatedAt
@@ -172,10 +170,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               variant="balance"
               style={{ fontVariant: ['tabular-nums'] }}
             >
-              {privacy
-                ? MASK
-                : /** Cut to four decimals, never rounded up. */
-                  Utils.splitZecAmountIntoBigSmall(fiatTotal).bigPart}
+              {privacy ? MASK : formatAmount(fiatTotal)}
             </Text>
             <Text variant="subtitle" tone="muted">
               {info.currencyName}

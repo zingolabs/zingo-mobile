@@ -16,6 +16,7 @@ import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
+import { formatAmount, formatPercent } from '@app/utils/formatAmount';
 import { Route } from '@app/AppState';
 import {
   migrationStatus,
@@ -33,9 +34,6 @@ type MigrationCadenceProps = NativeStackScreenProps<
 >;
 
 const ZATS_PER_ZEC = 10 ** 8;
-
-const fmt = (zats: number): string =>
-  `${parseFloat((zats / ZATS_PER_ZEC).toFixed(4))}`;
 
 // Zcash target block spacing, for turning a window count into a duration.
 const SECONDS_PER_BLOCK = 75;
@@ -144,7 +142,7 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
   navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addLastSnackbar } = context;
+  const { translate, addLastSnackbar, info } = context;
   const { colors } = useTheme();
 
   const [status, setStatus] = useState<RPCMigrationStatusType | null>(null);
@@ -206,7 +204,10 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
   );
   const moreBatches = Math.max(1, parts);
 
-  const windowHours = ((bucketModulus * SECONDS_PER_BLOCK) / 3600).toFixed(1);
+  const windowHours = formatPercent(
+    (bucketModulus * SECONDS_PER_BLOCK) / 3600,
+    1,
+  );
 
   // Review = Phase 2 consent: start_ironwood_migration binds the parts to the
   // now-split notes and schedules them under the chosen cadence. Its consent
@@ -316,10 +317,12 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
             }}
           >
             {dust
-              ? (translate('migrationcadence.dust-body') as string).replace(
-                  '{amount}',
-                  fmt(planRoute.residual),
-                )
+              ? (translate('migrationcadence.dust-body') as string)
+                  .replace(
+                    '{amount}',
+                    formatAmount(planRoute.residual / ZATS_PER_ZEC),
+                  )
+                  .replace('{currency}', info.currencyName)
               : (translate('migrationcadence.unconfirmed-body') as string)}
           </Text>
         </View>

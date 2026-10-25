@@ -35,6 +35,11 @@ import NymNote from '@screens/Swap/components/NymNote';
 import DetailRows from '@screens/Swap/components/DetailRows';
 import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import { formatSlippagePercent } from '@screens/Swap/components/SwapSettingsSheet';
+import {
+  formatAmount,
+  formatPercent,
+  formatUsd,
+} from '@app/utils/formatAmount';
 
 type SwapReviewProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -222,8 +227,8 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
     : feesInReceive * fiatValueBasis.receiveUsdUnitPrice;
   const feeValue = Number.isFinite(feeShare)
     ? [
-        `${(feeShare * 100).toFixed(2)}%`,
-        Number.isFinite(feeUsd) && feeUsd > 0 ? `≈ $${feeUsd.toFixed(2)}` : '',
+        `${formatPercent(feeShare * 100)}%`,
+        Number.isFinite(feeUsd) && feeUsd > 0 ? `≈ ${formatUsd(feeUsd)}` : '',
       ]
         .filter(Boolean)
         .join(' · ')
@@ -298,7 +303,7 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
             `${formatAmountForDisplay(quoteInput.sellAmountHumanDecimal)} ${sellSymbol}`,
           ),
           fiatValueBasis.receiveUsdUnitPrice > 0 && Number.isFinite(receiveUsd)
-            ? `≈ $${receiveUsd.toFixed(2)}`
+            ? `≈ ${formatUsd(receiveUsd)}`
             : '',
         ]
           .filter(Boolean)
@@ -326,7 +331,7 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
               ? [
                   {
                     label: translate('swap.review-zcash-fee') as string,
-                    value: `${Utils.parseNumberFloatToStringLocale(feeReserve, 4)} ${info.currencyName} · ${
+                    value: `${formatAmount(feeReserve)} ${info.currencyName} · ${
                       translate(
                         depositCarriesMemo(chosen.provider)
                           ? 'swap.review-two-tx'
@@ -352,7 +357,7 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
             {
               label: translate('swap.review-arrives') as string,
               value: [
-                chosen.estimatedTimeText ? `~${chosen.estimatedTimeText}` : '',
+                chosen.estimatedTimeText ?? '',
                 providerShortLabel(chosen.provider),
               ]
                 .filter(Boolean)

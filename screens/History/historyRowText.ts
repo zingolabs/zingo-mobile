@@ -8,7 +8,7 @@ import {
   providerShortLabel,
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
-import { formatZecAmount } from '@app/utils/formatZecAmount';
+import { formatAmount } from '@app/utils/formatAmount';
 
 type Translate = (key: string) => string;
 
@@ -47,8 +47,6 @@ export function shortWhen(
   return formatDay(timeMs);
 }
 
-/** Four decimals, the way the list writes ZEC. */
-const zec = formatZecAmount;
 /** A row names an address by its first and last 6 characters, as the prototype. */
 const shortAddress = (address: string): string =>
   address.length > 15 ? `${address.slice(0, 6)}…${address.slice(-6)}` : address;
@@ -71,7 +69,7 @@ export function transferRowText(args: {
     : pending
       ? { text: t(`history.${vt.status}`), tone: 'default' }
       : undefined;
-  const amount = `${zec(vt.amount)} ${currency}`;
+  const amount = `${formatAmount(vt.amount)} ${currency}`;
   const base = { state, bottom: usd, titleMono: false };
   switch (vt.kind) {
     case ValueTransferKindEnum.Sent:
@@ -181,9 +179,7 @@ export function swapRowText(args: {
         ...base,
         title: toward,
         state: { text: t('history.state-refunded'), tone: 'warning' },
-        top: Number.isFinite(cost)
-          ? `−${formatAmountForDisplay(cost.toFixed(8))} ${sellSym}`
-          : sold,
+        top: Number.isFinite(cost) ? `−${formatAmount(cost)} ${sellSym}` : sold,
         topTone: 'default',
         bottom:
           back !== undefined
@@ -250,13 +246,13 @@ export function legRowText(args: {
   const received = vt.kind === ValueTransferKindEnum.Received;
   const fee =
     vt.fee && vt.fee > 0
-      ? ` · ${t('history.fee')} ${zec(vt.fee)} ${currency}`
+      ? ` · ${t('history.fee')} ${formatAmount(vt.fee)} ${currency}`
       : '';
   return {
     title: t(received ? 'history.received' : 'history.sent').trim(),
     titleMono: false,
     line: `${time}${fee}`,
-    top: `${received ? '+' : '−'}${zec(vt.amount)} ${currency}`,
+    top: `${received ? '+' : '−'}${formatAmount(vt.amount)} ${currency}`,
     topTone: received ? 'positive' : 'default',
     bottom: usd,
   };
