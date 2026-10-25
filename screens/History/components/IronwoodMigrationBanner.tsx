@@ -24,6 +24,7 @@ import Banner from '@ui/widgets/Banner';
 
 import SegmentedBar from '@ui/primitives/SegmentedBar';
 import { ContextAppLoaded } from '@app/context';
+import { useOrchardResidualOnly } from '@app/hooks/useOrchardResidualOnly';
 import Utils from '@app/utils';
 import { Route } from '@app/AppState';
 import { migrationStatus, reconcileMigration } from '@app/walletBackend';
@@ -148,7 +149,7 @@ type IronwoodMigrationBannerProps = {
   // Deep-link back into the in-flight private migration, at whichever screen
   // its phase needs next.
   onResume: (route: 'MigrationSplitting' | 'MigrationStatus') => void;
-  /** Hides the notice; offered only once the migration is complete. */
+  /** Hides the notice; offered only while Orchard holds just a residual. */
   onHide: () => void;
 };
 
@@ -176,6 +177,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
   const [migration, setMigration] = useState<RPCMigrationStatusType | null>(
     null,
   );
+  const residualOnly = useOrchardResidualOnly();
 
   // A window opens at a block boundary, so `due_now` flips while the user sits
   // on History with nothing to re-trigger a read. Keying the refresh to the
@@ -452,9 +454,6 @@ const IronwoodMigrationBanner: React.FunctionComponent<
   }
 
   // ----- Default variant -----
-  // A complete migration leaves its residual in Orchard: value that costs
-  // more in fees to move than it carries. Pools shows it; here it can go.
-  const done = phaseKind === 'complete';
   return (
     <Animated.View key="default" entering={variantEnter()}>
       <Banner
@@ -462,8 +461,11 @@ const IronwoodMigrationBanner: React.FunctionComponent<
         plain
         title={translate('ironwoodbanner.pool') as string}
         actionBeside
+        // Only a residual left in Orchard, after a migration or with nothing
+        // worth migrating: Pools shows it, so here it can go. Real funds keep
+        // the notice up.
         action={
-          done ? (
+          residualOnly ? (
             <Button
               testID="ironwoodbanner.start"
               variant="primary"
@@ -491,7 +493,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
             />
           )
         }
-        onDismiss={done ? onHide : undefined}
+        onDismiss={residualOnly ? onHide : undefined}
         dismissBeside
         dismissLabel={translate('ironwoodbanner.hide') as string}
         dismissTestID="ironwoodbanner.hide"

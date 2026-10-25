@@ -26,7 +26,7 @@ import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { formatZecAmount } from '@app/utils/formatZecAmount';
 import { useShieldFunds } from '@app/hooks/useShieldFunds';
-import { useMigrationComplete } from '@app/hooks/useMigrationComplete';
+import { useOrchardResidualOnly } from '@app/hooks/useOrchardResidualOnly';
 import Header from '@ui/widgets/Header';
 import Card from '@ui/widgets/Card';
 import ListRow from '@ui/primitives/ListRow';
@@ -104,7 +104,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
     setScrollToBottom,
     sendPermitNow,
   });
-  const migrationComplete = useMigrationComplete();
+  const orchardResidualOnly = useOrchardResidualOnly();
 
   const paint = {
     ironwood: { fg: colors.fgIronwood, bg: colors.bgIronwood, Icon: LogIcon },
@@ -204,7 +204,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
       return null;
     }
     // Before confirming: zingolib leaves dust out of the confirmed figure.
-    if (pool.key === 'orchard' && migrationComplete && pool.total > 0) {
+    if (pool.key === 'orchard' && orchardResidualOnly && pool.total > 0) {
       return note(
         <InfoIcon size={iconSizeSm} color={colors.fgMuted} />,
         t('pools.orchard-leftover'),
