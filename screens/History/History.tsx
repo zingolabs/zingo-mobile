@@ -370,7 +370,8 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     [],
   );
 
-  const [dataProvider, setDataProvider] = useState<DataProvider>(_dataProvider);
+  /** The rows the list holds; each new set is cloned from the last, so the list diffs them. */
+  const dataProviderRef = useRef<DataProvider>(_dataProvider);
 
   // Bottom-sheet that hosts the history list itself. Snap points are ordered
   // from smallest sheet height (most balance area visible above) to largest
@@ -596,15 +597,25 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       language,
     ],
   );
-  useEffect(() => {
-    setDataProvider(data => data.cloneWithRows(historyItems));
+  /**
+   * The rows and their layouts change in the same render. Set a render
+   * later, the list laid out one set of rows while it held another, and
+   * read the position of a row it had no layout for ("Cannot read property
+   * 'y' of undefined") whenever the count changed.
+   */
+  const dataProvider = useMemo(() => {
+    dataProviderRef.current =
+      dataProviderRef.current.cloneWithRows(historyItems);
+    return dataProviderRef.current;
   }, [historyItems]);
 
+  /** One provider for the list's life: each row's type is read from the rows it holds. */
   const layoutProvider = useMemo(
     () =>
       new LayoutProvider(
         (index: number) => {
-          const item = historyItems[index];
+          const item = dataProviderRef.current.getDataForIndex(index) as
+            HistoryItem | undefined;
           return item?.kind === 'month'
             ? ViewTypes.MONTH
             : item?.kind === 'leg'
@@ -621,7 +632,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                 : ITEM_HEIGHT.transfer;
         },
       ),
-    [historyItems],
+    [],
   );
 
   // Auto-pagination: RecyclerListView fires onEndReached when the user
