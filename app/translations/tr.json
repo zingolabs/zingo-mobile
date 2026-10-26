@@ -1466,5 +1466,11 @@
     "sheet-incomplete": "Bitene kadar bakiye ve geçmiş eksik görünebilir",
     "rescan": "Yeniden tara",
     "rescan-started": "Yeniden tarama başladı"
+  },
+  "errorboundary": {
+    "title": "Bir şeyler ters gitti",
+    "message": "Beklenmeyen bir hata oluştu. Lütfen uygulamayı yeniden başlatın.",
+    "report": "Bildir",
+    "restart": "Yeniden başlat"
   }
 }
