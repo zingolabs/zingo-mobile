@@ -1,3 +1,4 @@
+/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import React, { useEffect, useState } from 'react';
