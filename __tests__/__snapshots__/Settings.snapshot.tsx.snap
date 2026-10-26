@@ -450,11 +450,13 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               </View>
             </View>
             <View
+              accessibilityLabel="text translated"
+              accessibilityRole="switch"
               accessibilityState={
                 {
                   "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
+                  "checked": false,
+                  "disabled": false,
                   "expanded": undefined,
                   "selected": undefined,
                 }
@@ -470,7 +472,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               accessible={true}
               collapsable={false}
               focusable={true}
+              hitSlop={
+                {
+                  "bottom": 13,
+                  "left": 2,
+                  "right": 2,
+                  "top": 13,
+                }
+              }
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -479,13 +491,43 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               onStartShouldSetResponder={[Function]}
               style={
                 {
-                  "opacity": 1,
+                  "height": 19,
+                  "width": 40,
                 }
               }
+              testID="settings.privacy"
             >
               <View
-                height={19}
-                width={40}
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {},
+                  ]
+                }
+              />
+              <View
+                style={
+                  [
+                    {
+                      "borderRadius": 999,
+                      "height": 15,
+                      "left": 2,
+                      "position": "absolute",
+                      "top": 2,
+                      "width": 15,
+                    },
+                    {
+                      "backgroundColor": "#FFFFFF",
+                    },
+                    {},
+                  ]
+                }
               />
             </View>
           </View>
@@ -523,10 +565,12 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               text translated
             </Text>
             <View
+              accessibilityLabel="text translated"
+              accessibilityRole="switch"
               accessibilityState={
                 {
                   "busy": undefined,
-                  "checked": undefined,
+                  "checked": false,
                   "disabled": false,
                   "expanded": undefined,
                   "selected": undefined,
@@ -543,7 +587,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               accessible={true}
               collapsable={false}
               focusable={true}
+              hitSlop={
+                {
+                  "bottom": 13,
+                  "left": 2,
+                  "right": 2,
+                  "top": 13,
+                }
+              }
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -552,14 +606,43 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               onStartShouldSetResponder={[Function]}
               style={
                 {
-                  "opacity": 1,
+                  "height": 19,
+                  "width": 40,
                 }
               }
               testID="settings.biometrics"
             >
               <View
-                height={19}
-                width={40}
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {},
+                  ]
+                }
+              />
+              <View
+                style={
+                  [
+                    {
+                      "borderRadius": 999,
+                      "height": 15,
+                      "left": 2,
+                      "position": "absolute",
+                      "top": 2,
+                      "width": 15,
+                    },
+                    {
+                      "backgroundColor": "#FFFFFF",
+                    },
+                    {},
+                  ]
+                }
               />
             </View>
           </View>

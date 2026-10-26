@@ -67,6 +67,15 @@ export type ThemeColors = {
   /** Nym's own green, only on actions that go through the mixnet. */
   bgNym: string;
   bgNymSubtle: string;
+  /** The switch (exception D): its off track. */
+  bgSwitchOff: string;
+  /** The deep end of the switch's on gradient, which starts at bgAccent. */
+  bgSwitchOnDeep: string;
+  /** The nym switch's on gradient, Nym's own green, top and deep end. */
+  bgSwitchNym: string;
+  bgSwitchNymDeep: string;
+  /** The switch's thumb. */
+  fgSwitchThumb: string;
 
   /** A price move: up and down are not success and error. */
   fgPriceUp: string;
@@ -162,6 +171,11 @@ export const themeTokens: ThemeColors = {
 
   bgNym: '#07FF94',
   bgNymSubtle: '#07FF941F',
+  bgSwitchOff: '#7E7E7E',
+  bgSwitchOnDeep: '#0A4004',
+  bgSwitchNym: '#14E76F',
+  bgSwitchNymDeep: '#049959',
+  fgSwitchThumb: '#FFFFFF',
 
   fgPriceUp: '#3CC52A',
   fgPriceDown: '#F2878A',

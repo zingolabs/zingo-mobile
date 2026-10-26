@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import React, { useEffect, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, {
   FadeIn,
   FadeOut,
@@ -15,6 +15,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useTheme } from '@app/theme';
+import Switch from '@ui/primitives/Switch';
 import { duration, ease } from '@app/theme/motion';
 import {
   ChainNameEnum,
@@ -170,55 +171,9 @@ const StatusDot: React.FC<StatusDotProps> = ({ status, offline }) => {
   );
 };
 
-type ToggleProps = { on: boolean; disabled: boolean; onToggle: () => void };
-
-const KNOB_MS = 220;
 // Offline fades the network switch and the lists to 40%.
 const LOCK_MS = 200;
 const LOCKED_OPACITY = 0.4;
-
-const Toggle: React.FC<ToggleProps> = ({ on, disabled, onToggle }) => {
-  const { colors } = useTheme();
-  const knob = useSharedValue(on ? 1 : 0);
-  useEffect(() => {
-    knob.value = withTiming(on ? 1 : 0, {
-      duration: KNOB_MS,
-      easing: ease.emphasized,
-    });
-  }, [on, knob]);
-  const knobStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: knob.value * 18 }],
-  }));
-  return (
-    <Pressable
-      testID="server.offline"
-      onPress={onToggle}
-      disabled={disabled}
-      accessibilityRole="switch"
-      accessibilityState={{ checked: on }}
-      hitSlop={8}
-      style={{
-        width: 44,
-        height: 26,
-        borderRadius: 13,
-        padding: 2,
-        backgroundColor: on ? colors.bgAccent : colors.bgMutedSubtle,
-      }}
-    >
-      <Animated.View
-        style={[
-          {
-            width: 22,
-            height: 22,
-            borderRadius: 11,
-            backgroundColor: on ? colors.bgCanvas : colors.fgMuted,
-          },
-          knobStyle,
-        ]}
-      />
-    </Pressable>
-  );
-};
 
 const Server: React.FunctionComponent<ServerProps> = ({
   translate,
@@ -657,10 +612,12 @@ const Server: React.FunctionComponent<ServerProps> = ({
                 {t('offline-sub')}
               </RegText>
             </View>
-            <Toggle
-              on={offline}
+            <Switch
+              testID="server.offline"
+              value={offline}
               disabled={busy || working}
-              onToggle={() => {
+              accessibilityLabel={t('offline')}
+              onValueChange={() => {
                 setCustomOpen(null);
                 if (offline && regtest) {
                   setTab(ChainNameEnum.mainChainName);
