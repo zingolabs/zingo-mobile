@@ -1147,6 +1147,7 @@
     "done": "Bitti"
   },
   "import": {
+    "back-acc": "Geri",
     "scan-hint": "Kamerayı bir kurtarma ifadesinin veya görüntüleme anahtarının QR koduna doğrultun.",
     "scan-miss": "Bu kod bir kurtarma ifadesi veya görüntüleme anahtarı değil.",
     "scan-found-seed": "Kurtarma ifadesi bulundu",

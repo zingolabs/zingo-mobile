@@ -2,24 +2,20 @@
 import Button, { BUTTON_HEIGHT } from '@ui/primitives/Button';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import React, { useContext, useEffect, useRef, useState } from 'react';
+import { View, Keyboard, Pressable } from 'react-native';
+
 import {
-  View,
-  TouchableOpacity,
-  TextInput,
-  Keyboard,
-  Pressable,
-} from 'react-native';
-import Animated, {
-  interpolateColor,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+  iconSizeSm,
+  space12,
+  space16,
+  space20,
+  space32,
+  useTheme,
+} from '@app/theme';
 
-import { useTheme, iconSizeMd } from '@app/theme';
-
-import RegText from '@ui/primitives/RegText';
-import BoldText from '@ui/primitives/BoldText';
+import Text from '@ui/primitives/Text';
+import TextField, { FieldAction } from '@ui/primitives/TextField';
+import TitleBar from '@ui/widgets/TitleBar';
 import { ContextAppLoading } from '@app/context';
 import SeedPhraseInput from '@ui/widgets/SeedPhraseInput';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
@@ -39,16 +35,12 @@ import {
   seedStatus,
   viewingKeyProblem,
 } from '@app/utils/seedPhrase';
-import { duration, ease } from '@app/theme/motion';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 
 // Positions from the 402 x 874 design.
-const BODY_TOP = 112;
-const SIDE = 28;
 const FIELD_WIDTH = 270;
-const BUTTON_WIDTH = 301;
 const BUTTON_BOTTOM = 31;
 const NOTE_BOTTOM = 96;
 
@@ -152,26 +144,11 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
     return () => clearTimeout(timer);
   }, [typedKey]);
 
-  const birthdayFocus = useSharedValue(0);
-  const birthdayBorder = useAnimatedStyle(() => ({
-    borderColor: interpolateColor(
-      birthdayFocus.value,
-      [0, 1],
-      [colors.bottomSheetBorder, colors.borderFocus],
-    ),
-  }));
   /** A birthday that came with the phrase fills the field when the user left it empty. */
   const fillBirthday = (height: number) => {
     if (!birthday) {
       setBirthday(String(height));
     }
-  };
-
-  const setBirthdayFocused = (focused: boolean) => {
-    birthdayFocus.value = withTiming(focused ? 1 : 0, {
-      duration: duration.base,
-      easing: ease.standard,
-    });
   };
 
   const tipBody = translate('import.birthday-tip-body') as string;
@@ -261,33 +238,32 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
     );
   };
 
-  const buttonBottom = keyboardHeight > 0 ? keyboardHeight + 12 : BUTTON_BOTTOM;
+  const buttonBottom =
+    keyboardHeight > 0 ? keyboardHeight + space12 : BUTTON_BOTTOM;
 
   return (
     <View style={{ flex: 1 }}>
-      <BoldText
-        style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          top: 14,
-          fontSize: 16,
-          lineHeight: 22,
-          textAlign: 'center',
+      <TitleBar
+        title={translate('import.screen-title') as string}
+        left={{
+          icon: ChevronLeft,
+          onPress: onClickCancel,
+          accessibilityLabel: translate('import.back-acc') as string,
+          testID: 'import.back',
+          accent: true,
+          disabled: busy,
         }}
-      >
-        {translate('import.screen-title') as string}
-      </BoldText>
+      />
 
       <KeyboardAwareScrollView
         keyboardShouldPersistTaps="handled"
-        bottomOffset={BUTTON_HEIGHT + 12 + 16}
+        bottomOffset={BUTTON_HEIGHT + space12 + space16}
         bounces={false}
         onScrollBeginDrag={() => setTipOpen(false)}
         style={{ flex: 1 }}
         contentContainerStyle={{
-          paddingTop: BODY_TOP,
-          paddingHorizontal: SIDE,
+          paddingTop: space32,
+          paddingHorizontal: space20,
           paddingBottom: 200,
         }}
       >
@@ -309,37 +285,28 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: 20,
+            marginBottom: space12,
           }}
         >
-          <BoldText style={{ fontSize: 13, lineHeight: 16 }}>
+          <Text variant="bodySmall" tone="muted" style={{ fontWeight: '600' }}>
             {translate('import.seed-label') as string}
-          </BoldText>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             {!!seedufvkText && (
-              <TouchableOpacity onPress={() => setSeedufvkText('')} hitSlop={8}>
-                <XIcon size={iconSizeMd} color={colors.fgMuted} />
-              </TouchableOpacity>
+              <FieldAction
+                icon={XIcon}
+                label={translate('clear') as string}
+                onPress={() => setSeedufvkText('')}
+              />
             )}
-            <Pressable
-              ref={scanButton}
-              testID="import.scan"
-              accessibilityRole="button"
-              accessibilityLabel={translate('scanner.title') as string}
-              onPress={openScanner}
-              style={({ pressed }) => ({
-                width: 34,
-                height: 34,
-                marginVertical: -9,
-                marginRight: -6,
-                borderRadius: 9,
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
-              })}
-            >
-              <ScanIcon size={24} color={colors.fgMuted} />
-            </Pressable>
+            <View ref={scanButton} collapsable={false}>
+              <FieldAction
+                icon={ScanIcon}
+                label={translate('scanner.title') as string}
+                onPress={openScanner}
+                testID="import.scan"
+              />
+            </View>
           </View>
         </View>
         <SeedPhraseInput
@@ -355,7 +322,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           onBirthday={fillBirthday}
         />
 
-        <View style={{ marginTop: 39, alignItems: 'center' }}>
+        <View style={{ marginTop: space32, alignItems: 'center' }}>
           <InfoTooltip
             testID="import.birthdayinfo"
             label={translate('import.birthday') as string}
@@ -364,38 +331,12 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             open={tipOpen}
             onToggle={setTipOpen}
           />
-          <Animated.View
-            style={[
-              {
-                marginTop: 14,
-                width: FIELD_WIDTH,
-                height: 42,
-                borderWidth: 1,
-                borderRadius: 10,
-                backgroundColor: colors.bgSurface,
-                flexDirection: 'row',
-                alignItems: 'center',
-                overflow: 'hidden',
-              },
-              birthdayBorder,
-            ]}
-          >
-            <TextInput
+          <View style={{ marginTop: space12, width: FIELD_WIDTH }}>
+            <TextField
+              label=""
               testID="import.birthdayinput"
-              accessible={true}
               accessibilityLabel={translate('import.birthday-acc') as string}
               placeholder={translate('import.birthday-placeholder') as string}
-              placeholderTextColor={colors.fgMuted}
-              onFocus={() => setBirthdayFocused(true)}
-              onBlur={() => setBirthdayFocused(false)}
-              style={{
-                color: colors.fgDefault,
-                fontSize: 13,
-                flex: 1,
-                height: 42,
-                paddingHorizontal: 15,
-                paddingVertical: 0,
-              }}
               value={birthday}
               onChangeText={(text: string) => {
                 const height = Number(text.replace(/\D/g, ''));
@@ -408,21 +349,12 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                   setBirthday(String(height));
                 }
               }}
-              editable={
-                latestBlock ? true : server.kind !== 'offline' ? false : true
-              }
+              disabled={!latestBlock && server.kind !== 'offline'}
+              clearable
+              clearLabel={translate('clear') as string}
               keyboardType="number-pad"
             />
-            {!!birthday && (!!latestBlock || server.kind === 'offline') && (
-              <TouchableOpacity
-                onPress={() => setBirthday('')}
-                hitSlop={8}
-                style={{ paddingRight: 12 }}
-              >
-                <XIcon size={iconSizeMd} color={colors.fgMuted} />
-              </TouchableOpacity>
-            )}
-          </Animated.View>
+          </View>
         </View>
       </KeyboardAwareScrollView>
 
@@ -431,29 +363,28 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           pointerEvents="none"
           style={{
             position: 'absolute',
-            left: 37,
-            right: 40,
+            left: space20,
+            right: space20,
             bottom: NOTE_BOTTOM,
             flexDirection: 'row',
-            gap: 11,
+            gap: space12,
           }}
         >
-          <InfoIcon size={16} color={colors.fgMuted} style={{ marginTop: 1 }} />
-          <RegText style={{ flex: 1, fontSize: 12, lineHeight: 13 }}>
+          <InfoIcon size={iconSizeSm} color={colors.fgMuted} />
+          <Text variant="caption" style={{ flex: 1 }}>
             {translate('import.text') as string}
-          </RegText>
+          </Text>
         </View>
       )}
       <View
         style={{
           position: 'absolute',
-          left: 0,
-          right: 0,
+          left: space20,
+          right: space20,
           bottom: buttonBottom,
-          alignItems: 'center',
         }}
       >
-        <View style={{ width: BUTTON_WIDTH }}>
+        <View>
           <Button
             variant="primary"
             testID="import.button.ok"
@@ -466,31 +397,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           />
         </View>
       </View>
-      {/* The scanner has its own back; this one sits above it (zIndex). */}
-      {scan.kind !== 'open' && (
-        <Pressable
-          testID="import.back"
-          onPress={onClickCancel}
-          disabled={busy}
-          hitSlop={14}
-          accessibilityRole="button"
-          style={({ pressed }) => ({
-            position: 'absolute',
-            left: 17,
-            top: 2,
-            width: 44,
-            height: 44,
-            borderRadius: 10,
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 3,
-            opacity: busy ? 0.4 : 1,
-            backgroundColor: pressed ? colors.bgSurface : undefined,
-          })}
-        >
-          <ChevronLeft size={20} color={colors.fgAccent} />
-        </Pressable>
-      )}
       {scan.kind === 'open' && (
         <ScanOverlay
           testID="import.scanner"

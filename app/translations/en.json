@@ -1147,6 +1147,7 @@
     "done": "Done"
   },
   "import": {
+    "back-acc": "Back",
     "scan-hint": "Point the camera at a seed phrase or viewing key QR code.",
     "scan-miss": "That code isn't a seed phrase or a viewing key.",
     "scan-found-seed": "Seed phrase found",
