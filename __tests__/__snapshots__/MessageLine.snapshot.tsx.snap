@@ -51,17 +51,16 @@ exports[`MessageLine - snapshots MessageLine received with messageAddress, no mo
         {
           "alignItems": "flex-start",
           "backgroundColor": "#18bd181F",
-          "borderBottomEndRadius": 20,
+          "borderBottomEndRadius": 12,
           "borderBottomStartRadius": 0,
-          "borderRadius": 20,
+          "borderRadius": 12,
           "display": "flex",
           "flexDirection": "column",
           "justifyContent": "flex-start",
-          "marginBottom": 5,
+          "marginBottom": 8,
           "marginLeft": 0,
-          "marginRight": 50,
-          "opacity": 1,
-          "padding": 10,
+          "marginRight": 48,
+          "padding": 12,
         }
       }
     >
@@ -140,8 +139,7 @@ hello
             {
               "flexDirection": "row",
               "marginHorizontal": 5,
-              "opacity": 1,
-              "paddingRight": 5,
+              "paddingRight": 4,
             }
           }
         >
@@ -236,9 +234,9 @@ hello
             style={
               {
                 "color": "#888888",
-                "fontSize": 15,
+                "fontSize": 12,
                 "fontWeight": "400",
-                "lineHeight": 21,
+                "lineHeight": 16,
               }
             }
           >
@@ -284,13 +282,8 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
   <View
     style={
       {
-        "backgroundColor": "#031124",
-        "borderBottomWidth": 1,
-        "borderColor": "#011401",
-        "borderTopWidth": 1,
-        "paddingBottom": 5,
-        "paddingLeft": 0,
-        "paddingTop": 5,
+        "paddingBottom": 8,
+        "paddingTop": 16,
       }
     }
   >
@@ -299,9 +292,10 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
       style={
         {
           "color": "#888888",
-          "fontSize": 15,
-          "fontWeight": "400",
-          "lineHeight": 21,
+          "fontSize": 12,
+          "fontWeight": "600",
+          "lineHeight": 16,
+          "textTransform": "uppercase",
         }
       }
     >
@@ -349,25 +343,22 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
           "alignItems": "flex-start",
           "backgroundColor": "#18bd181F",
           "borderBottomEndRadius": 0,
-          "borderBottomStartRadius": 20,
-          "borderRadius": 20,
+          "borderBottomStartRadius": 12,
+          "borderRadius": 12,
           "display": "flex",
           "flexDirection": "column",
           "justifyContent": "flex-start",
-          "marginBottom": 5,
-          "marginLeft": 50,
+          "marginBottom": 8,
+          "marginLeft": 48,
           "marginRight": 0,
-          "opacity": 1,
-          "padding": 10,
+          "padding": 12,
         }
       }
     >
       <View
         style={
           {
-            "marginBottom": 10,
-            "marginLeft": 30,
-            "marginTop": -10,
+            "marginBottom": 8,
           }
         }
       >
@@ -526,8 +517,7 @@ hello
             {
               "flexDirection": "row",
               "marginHorizontal": 5,
-              "opacity": 1,
-              "paddingRight": 5,
+              "paddingRight": 4,
             }
           }
         >
@@ -622,9 +612,9 @@ hello
             style={
               {
                 "color": "#888888",
-                "fontSize": 15,
+                "fontSize": 12,
                 "fontWeight": "400",
-                "lineHeight": 21,
+                "lineHeight": 16,
               }
             }
           >

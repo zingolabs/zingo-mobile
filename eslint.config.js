@@ -42,9 +42,9 @@ const colorLock = [
  */
 const NUMBER =
   ':matches(Literal[raw=/^[0-9]/], UnaryExpression[operator="-"], BinaryExpression)';
-/** The value of a style property, or either branch of a ternary there. */
+/** The value of a style property, or a number in either branch of a ternary there (not its test). */
 const VALUE = keys =>
-  `:matches(Property[key.name=${keys}], Property[key.name=${keys}] > ConditionalExpression) > ${NUMBER}`;
+  `:matches(Property[key.name=${keys}] > ${NUMBER}, Property[key.name=${keys}] > ConditionalExpression[consequent.raw=/^[0-9]/], Property[key.name=${keys}] > ConditionalExpression[alternate.raw=/^[0-9]/])`;
 /** Icon components: ui/primitives/Icons, drawn on the Icon base. */
 const ICON =
   '/(Icon|Chevron(Up|Down|Left|Right)|TriangleAlert|RescanArrows|RescanCloud)$/';
@@ -109,8 +109,6 @@ const geometryGaps = [
   'screens/Insight/components/ActivityChart.tsx',
   'screens/Insight/components/Donut.tsx',
   'screens/Launching/Launching.tsx',
-  'screens/Messages/MessageList.tsx',
-  'screens/Messages/components/MessageLine.tsx',
   'screens/MixnetDoctor/MixnetDoctor.tsx',
   'screens/OptionsPanel/OptionsPanel.tsx',
   'screens/Pools/Pools.tsx',

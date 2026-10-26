@@ -13,7 +13,6 @@ import {
   ScrollView,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  TouchableOpacity,
   ActivityIndicator,
   Pressable,
   StyleSheet,
@@ -22,13 +21,21 @@ import Animated from 'react-native-reanimated';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 
 import { useNavigation } from '@react-navigation/native';
-import { useTheme, slopFor } from '@app/theme';
+import {
+  iconSizeMd,
+  radiusPill,
+  slopFor,
+  space8,
+  space20,
+  space32,
+  useTheme,
+} from '@app/theme';
 import BottomSheet from '@gorhom/bottom-sheet';
 
 import { Route, ValueTransferType } from '@app/AppState';
 import { AppDrawerParamList, WalletNavigation } from '@app/types';
-import FadeText from '@ui/primitives/FadeText';
-import BoldText from '@ui/primitives/BoldText';
+import Text from '@ui/primitives/Text';
+import TitleBar from '@ui/widgets/TitleBar';
 import Button from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import MessageLine from './components/MessageLine';
@@ -74,41 +81,16 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
   const messagesSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
   const messagesHeader = (
-    <View
-      style={{
-        paddingTop: 12,
-        paddingBottom: 8,
-        paddingHorizontal: 16,
+    <TitleBar
+      title={translate('messages.title') as string}
+      left={{
+        icon: ChevronLeft,
+        accent: true,
+        onPress: () => navigation.goBack(),
+        accessibilityLabel: translate('messages.back-acc') as string,
+        testID: 'messages.back',
       }}
-    >
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          hitSlop={8}
-          style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-        >
-          <ChevronLeft size={20} color={colors.fgAccent} />
-        </TouchableOpacity>
-        <BoldText
-          numberOfLines={1}
-          style={{
-            flex: 1,
-            fontSize: 16,
-            lineHeight: 28,
-            textAlign: 'center',
-          }}
-        >
-          {translate('messages.title') as string}
-        </BoldText>
-        <View style={{ width: 28 }} />
-      </View>
-    </View>
+    />
   );
 
   useEffect(() => {
@@ -279,14 +261,14 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
             ) : messagesData.length === 0 ? (
               <View
                 style={{
-                  height: 150,
-                  display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'flex-start',
-                  marginTop: 30,
+                  marginTop: space32,
+                  paddingHorizontal: space20,
                 }}
               >
-                <FadeText>{translate('messages.empty') as string}</FadeText>
+                <Text variant="body" tone="muted">
+                  {translate('messages.empty') as string}
+                </Text>
               </View>
             ) : (
               <>
@@ -296,9 +278,9 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'flex-start',
-                      paddingHorizontal: 20,
-                      marginTop: 20,
-                      marginBottom: 10,
+                      paddingHorizontal: space20,
+                      marginTop: space20,
+                      marginBottom: space8,
                     }}
                   >
                     <Button
@@ -313,11 +295,13 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'flex-start',
-                      marginTop: 20,
-                      marginBottom: 10,
+                      marginTop: space20,
+                      marginBottom: space8,
                     }}
                   >
-                    <FadeText>{translate('history.end') as string}</FadeText>
+                    <Text variant="body" tone="muted">
+                      {translate('history.end') as string}
+                    </Text>
                   </View>
                 )}
                 {messagesData.map((vt, index) => (
@@ -333,33 +317,33 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
                 ))}
                 {/* Breathing room below the newest message so it doesn't
                     sit flush against the bottom edge of the sheet. */}
-                <View style={{ height: 20 }} />
+                <View style={{ height: space20 }} />
               </>
             )}
           </ScrollView>
         </AppSheet>
         {!isAtBottom && !loading && (
           <Pressable
-            hitSlop={slopFor(16)}
+            hitSlop={slopFor(36)}
             onPress={handleScrollToBottom}
+            accessibilityRole="button"
+            accessibilityLabel={translate('messages.bottom-acc') as string}
             style={({ pressed }) => ({
               position: 'absolute',
-              bottom: 30,
-              right: 10,
-              paddingHorizontal: 5,
-              paddingVertical: 10,
+              bottom: space32,
+              right: space20,
+              width: 36,
+              height: 36,
+              alignItems: 'center',
+              justifyContent: 'center',
               backgroundColor: colors.bgSurface,
-              borderRadius: 50,
+              borderRadius: radiusPill,
               transform: [{ scale: pressed ? 0.9 : 1 }],
               borderWidth: 1,
               borderColor: colors.borderMuted,
             })}
           >
-            <ChevronDown
-              style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-              size={16}
-              color={colors.fgMuted}
-            />
+            <ChevronDown size={iconSizeMd} color={colors.fgMuted} />
           </Pressable>
         )}
       </Animated.View>
