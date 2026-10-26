@@ -28,12 +28,13 @@ import {
   awaitsDeposit,
   canonicalChainAddress,
   formatAmountForDisplay,
+  isRefunding,
   isTerminalStatus,
   providerShortLabel,
   rateLimitedNotice,
   renderSwapText,
 } from '@app/swap';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
+import type { SwapRecordType } from '@app/swap';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
 import {
   sendGateOpen,
@@ -214,7 +215,10 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
       ? `≈ ${formatUsd(parseFloat(form.chosenRoute.expectedReceiveAmount) * receiveUsdUnitPrice)}`
       : '';
 
-  const pending = records.find(r => !isTerminalStatus(r.status));
+  // A late payment on its way back is not a swap in progress; it has no card.
+  const pending = records.find(
+    r => !isTerminalStatus(r.status) && !isRefunding(r),
+  );
   // The card counts the deposit's time down while it is awaited.
   const [nowMs, setNowMs] = useState<number>(() => Date.now());
   const awaiting = !!pending && awaitsDeposit(pending);
@@ -282,8 +286,8 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     }
     form.cancelReview();
   });
-  const openRecord = (recordId: string, status: SwapStatusEnum) =>
-    navigation.navigate(swapScreenFor(status), { recordId });
+  const openRecord = (record: SwapRecordType) =>
+    navigation.navigate(swapScreenFor(record), { recordId: record.recordId });
   const onContinue = () => {
     const proceed = () => {
       const review = form.review();
@@ -409,7 +413,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                 <Card
                   tone="selected"
                   testID="swap.pending"
-                  onPress={() => openRecord(pending.recordId, pending.status)}
+                  onPress={() => openRecord(pending)}
                 >
                   <View
                     style={{
@@ -980,7 +984,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
           nowMs={nowMs}
           onOpen={record => {
             historySheetRef.current?.dismiss();
-            openRecord(record.recordId, record.status);
+            openRecord(record);
           }}
         />
         <InsufficientFundsSheet

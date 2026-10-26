@@ -1,4 +1,5 @@
 import { SwapStatusEnum } from './enums/SwapStatusEnum';
+import { isRefunding } from './lateDeposit';
 import { SwapRecordType } from './types/SwapRecordType';
 
 /**
@@ -14,5 +15,17 @@ export function newlyExpired(
     record =>
       record.status === SwapStatusEnum.Expired &&
       seen.get(record.recordId) === SwapStatusEnum.AwaitingExternalDeposit,
+  );
+}
+
+/** The expired purchases whose late payment the provider just saw. */
+export function newlyRefunding(
+  seen: ReadonlyMap<string, SwapStatusEnum>,
+  records: ReadonlyArray<SwapRecordType>,
+): SwapRecordType[] {
+  return records.filter(
+    record =>
+      isRefunding(record) &&
+      seen.get(record.recordId) === SwapStatusEnum.Expired,
   );
 }

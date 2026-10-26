@@ -20,7 +20,13 @@ export {
 export { TrackingStatusEnum } from './enums/TrackingStatusEnum';
 export { canRemoveSwap } from './canRemoveSwap';
 export { hasDepositEvidence } from './depositEvidence';
-export { newlyExpired } from './newlyExpired';
+export { newlyExpired, newlyRefunding } from './swapTransitions';
+export {
+  LATE_WATCH_MS,
+  acceptsLateUpdate,
+  isRefunding,
+  watchesLateDeposit,
+} from './lateDeposit';
 export { isThorchainFamily } from './thorchainFamily';
 export {
   DEPOSIT_WINDOW_MS,

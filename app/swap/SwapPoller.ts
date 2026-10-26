@@ -5,6 +5,7 @@ import { ProviderRegistry } from './providers/ProviderRegistry';
 import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
 import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
 import { awaitsDeposit, depositOverdue } from './depositDeadline';
+import { acceptsLateUpdate, watchesLateDeposit } from './lateDeposit';
 import { isThorchainFamily } from './thorchainFamily';
 import { SwapStatusEnum, isTerminalStatus } from './enums/SwapStatusEnum';
 import { TrackingStatusEnum } from './enums/TrackingStatusEnum';
@@ -39,6 +40,9 @@ import { TrackResponseType } from './types/TrackResponseType';
  *     `Expired` here, without asking `/track`. The record keeps the tick
  *     alive until then, and a launch after the deadline expires it on the
  *     first tick.
+ *   - An expired purchase is still asked about for `LATE_WATCH_MS`, at the
+ *     idle cadence, for a payment that came late. Only an answer that
+ *     carries that payment, or a verdict on it, moves the record on.
  *
  * Stop conditions:
  *   - Records reaching a terminal `SwapStatusEnum` are dropped from polling
@@ -171,7 +175,7 @@ export class SwapPoller {
       // An awaited deposit keeps the tick alive until its deadline, so it
       // expires on time even when nothing about it can be asked.
       if (awaitsDeposit(record)) hasPollableRecord = true;
-      if (!this.isPollable(record)) continue;
+      if (!this.isPollable(record, now)) continue;
       hasPollableRecord = true;
       if (!this.isDue(record, now)) continue;
       await this.pollRecord(record, callerGeneration);
@@ -241,8 +245,10 @@ export class SwapPoller {
    * The third is recoverable from outside: attaching a deposit transaction
    * writes a hash and re-arms the poller through `SwapService`.
    */
-  private isPollable(record: SwapRecordType): boolean {
-    if (isTerminalStatus(record.status)) return false;
+  private isPollable(record: SwapRecordType, nowMs: number): boolean {
+    if (isTerminalStatus(record.status) && !watchesLateDeposit(record, nowMs)) {
+      return false;
+    }
     if (!this.registry.has(record.provider)) return false;
 
     const failures = this.failureCounts.get(record.recordId) ?? 0;
@@ -404,8 +410,20 @@ export class SwapPoller {
 
     if (!this.isRunningForGeneration(callerGeneration)) return;
 
-    const updated = executor.applyTrackUpdate(effectiveRecord, response);
+    let updated = executor.applyTrackUpdate(effectiveRecord, response);
     if (!this.isRunningForGeneration(callerGeneration)) return;
+
+    // An expired purchase moves only on a payment the provider saw; that
+    // payment came late, and the swap reads as refunding until the verdict.
+    if (effectiveRecord.status === SwapStatusEnum.Expired) {
+      if (!acceptsLateUpdate(updated)) return;
+      if (!isTerminalStatus(updated.status)) {
+        updated = {
+          ...updated,
+          lateDepositAtMs: updated.lateDepositAtMs ?? Date.now(),
+        };
+      }
+    }
 
     if (!hasMeaningfulChange(effectiveRecord, updated)) {
       return;

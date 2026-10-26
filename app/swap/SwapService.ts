@@ -410,6 +410,12 @@ export class SwapService {
       ...record,
       observedDepositTxHash: hash,
       status: SwapStatusEnum.Pending,
+      // A hash handed over for an expired purchase names a payment that came
+      // late, which the provider returns.
+      lateDepositAtMs:
+        record.status === SwapStatusEnum.Expired
+          ? (record.lateDepositAtMs ?? now)
+          : record.lateDepositAtMs,
       updatedAtMs: now,
     };
     await this.store.upsert(updated);

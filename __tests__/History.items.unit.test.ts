@@ -298,3 +298,22 @@ test('Tests that an expired purchase reads grey with the ZEC it would have got s
   expect(text.topStrike).toBe(true);
   expect(text.bottom).toBe('history.swap-not-sent');
 });
+
+test('Tests that a purchase paid after its quote expired reads refunding in amber with the coin going back', () => {
+  const text = swapRowText({
+    record: record({
+      direction: SwapDirectionEnum.Inbound,
+      status: SwapStatusEnum.Pending,
+      lateDepositAtMs: 1,
+      observedDepositTxHash: 'ab'.repeat(32),
+    }),
+    when: 'Oct 2',
+    t,
+  });
+  expect(text.state).toEqual({
+    text: 'history.state-refunding',
+    tone: 'warning',
+  });
+  expect(text.top).toBe('1.5 ZEC');
+  expect(text.bottom).toBe('history.going-back');
+});

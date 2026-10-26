@@ -6,6 +6,7 @@ import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
 import { ProviderRegistry } from '@app/swap/providers/ProviderRegistry';
 import type { MidgardClient } from '@app/swap/MidgardClient';
 import { FlashnetExecutor } from '@app/swap/providers/FlashnetExecutor';
+import { NearIntentsExecutor } from '@app/swap/providers/NearIntentsExecutor';
 import type { SwapKitClient } from '@app/swap/SwapKitClient';
 import type { SwapStore } from '@app/swap/SwapStore';
 import type { ProviderExecutor } from '@app/swap/providers/ProviderExecutor';
@@ -446,5 +447,111 @@ describe('SwapPoller on an awaited deposit with a deadline', () => {
     expect(upsert).toHaveBeenCalledWith(
       expect.objectContaining({ status: SwapStatusEnum.Expired }),
     );
+  });
+});
+
+describe('SwapPoller on an expired purchase', () => {
+  const T0 = 1_700_000_000_000;
+  const expiredAt = T0 + 600_000;
+  const expired = (overrides: Partial<SwapRecordType> = {}) =>
+    makeRecord({
+      recordId: 'rec-expired',
+      provider: SwapKitProviderEnum.Near,
+      direction: SwapDirectionEnum.Inbound,
+      sellAsset: BTC,
+      receiveAsset: ZEC,
+      depositAddress: 'bc1qdeposit',
+      providerData: {
+        kind: SwapKitProviderEnum.Near,
+        depositAddress: 'bc1qdeposit',
+      },
+      broadcast: undefined,
+      status: SwapStatusEnum.Expired,
+      createdAtMs: T0,
+      updatedAtMs: T0,
+      depositDeadlineMs: expiredAt,
+      terminalAtMs: expiredAt,
+      ...overrides,
+    });
+
+  const harnessAt = (
+    nowMs: number,
+    records: SwapRecordType[],
+    answer: TrackResponseType,
+  ) => {
+    jest.useFakeTimers({ now: nowMs });
+    const track = jest.fn(async (): Promise<TrackResponseType> => answer);
+    const upsert = jest.fn(async (_record: SwapRecordType) => undefined);
+    const poller = new SwapPoller({
+      client: { track } as unknown as SwapKitClient,
+      registry: new ProviderRegistry([new NearIntentsExecutor()]),
+      store: {
+        readAll: jest.fn(async () => records),
+        upsert,
+      } as unknown as typeof SwapStore,
+      midgardClient: {
+        findInboundActionByMemo: jest.fn(async () => null),
+      } as unknown as MidgardClient,
+      config: {
+        tickIntervalMs: 10_000,
+        activePollIntervalMs: 0,
+        idlePollIntervalMs: 0,
+      },
+    });
+    return { poller, track, upsert };
+  };
+
+  // An unpaid address answers with an open state; that is no payment.
+  it('keeps asking within the watch and stays expired on an answer without a payment', async () => {
+    const { poller, track, upsert } = harnessAt(
+      expiredAt + 60_000,
+      [expired()],
+      {
+        status: 'PENDING',
+      },
+    );
+    await poller.tickOnce();
+    expect(track).toHaveBeenCalledWith(
+      expect.objectContaining({ depositAddress: 'bc1qdeposit' }),
+    );
+    expect(upsert).not.toHaveBeenCalled();
+  });
+
+  it('turns to refunding on a late payment the provider saw', async () => {
+    const { poller, upsert } = harnessAt(expiredAt + 60_000, [expired()], {
+      status: 'PENDING',
+      trackingStatus: 'inbound',
+      legs: [{ chainId: 'bitcoin', hash: 'ab'.repeat(32) }],
+    });
+    await poller.tickOnce();
+    expect(upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: SwapStatusEnum.Pending,
+        observedDepositTxHash: 'ab'.repeat(32),
+        lateDepositAtMs: expiredAt + 60_000,
+      }),
+    );
+  });
+
+  it('takes the refund verdict straight away', async () => {
+    const { poller, upsert } = harnessAt(expiredAt + 60_000, [expired()], {
+      status: 'REFUNDED',
+    });
+    await poller.tickOnce();
+    const stored = upsert.mock.calls.at(-1)?.[0];
+    expect(stored?.status).toBe(SwapStatusEnum.Refunded);
+    expect(stored?.lateDepositAtMs).toBeUndefined();
+  });
+
+  it('stops asking once the watch is over', async () => {
+    const { poller, track } = harnessAt(
+      expiredAt + 24 * 60 * 60 * 1000,
+      [expired()],
+      { status: 'PENDING' },
+    );
+    poller.start();
+    await poller.tickOnce();
+    expect(track).not.toHaveBeenCalled();
+    expect(poller.isRunning()).toBe(false);
   });
 });

@@ -14,6 +14,7 @@ import {
   depositHalfwayMs,
   depositPhase,
   formatAmountForDisplay,
+  isRefunding,
   isTerminalStatus,
   providerShortLabel,
 } from '@app/swap';
@@ -65,9 +66,17 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
     return () => clearInterval(timer);
   }, [awaiting]);
 
-  // An expired swap has no result screen: its detail says why.
+  // An expired swap, or a late payment on its way back, has no result
+  // screen: its detail says why.
   useEffect(() => {
-    if (record && isTerminalStatus(record.status)) {
+    if (!record) {
+      return;
+    }
+    if (isRefunding(record)) {
+      navigation.replace(Route.SwapDetail, { recordId });
+      return;
+    }
+    if (isTerminalStatus(record.status)) {
       navigation.replace(
         record.status === SwapStatusEnum.Expired
           ? Route.SwapDetail

@@ -41,6 +41,7 @@ import {
   formatAmountForDisplay,
   isPrePaymentStatus,
   isRealLegHash,
+  isRefunding,
   isTerminalStatus,
   isThorchainFamily,
   providerLongLabel,
@@ -192,6 +193,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
   const outcome = swapOutcome(record.status);
   const done = outcome === 'completed';
   const expired = outcome === 'expired';
+  const refunding = isRefunding(record);
   const sellSym = record.sellAsset.ticker ?? record.sellAsset.symbol;
   const getSym = record.receiveAsset.ticker ?? record.receiveAsset.symbol;
   const other = sell ? record.receiveAsset : record.sellAsset;
@@ -335,6 +337,41 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
   ];
   /** Maya and THORChain track a payment by its hash, so a late one is handed over by hand. */
   const lateHashWanted = expired && isThorchainFamily(record.provider);
+  const sold = `${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}`;
+  /** A payment that came after the quote expired, on its way back. */
+  const view = refunding
+    ? {
+        hero: {
+          amount: formatAmountForDisplay(record.sellAmountHumanDecimal),
+          unit: sellSym,
+          tone: 'default' as const,
+          line: t('swap.going-back-line').replace('{amount}', sold),
+        },
+        pill: { text: t('history.state-refunding'), tone: 'warning' as const },
+        rows: [
+          rows[0],
+          rows[1],
+          {
+            label: t('swap.quote-valid-until'),
+            value: Utils.formatDate(
+              depositDeadlineMs(record),
+              'MMM d, h:mm aaa',
+              language,
+            ),
+          },
+          {
+            label: t('swap.result-reason'),
+            value: t('swap.late-why'),
+            wrap: true,
+          },
+          {
+            label: t('swap.goes-back-to'),
+            value: Utils.trimToSmall(record.sourceAddress, 6),
+            copy: record.sourceAddress,
+          },
+        ] as DetailRow[],
+      }
+    : { hero, pill, rows };
 
   const hasDepositEvidence =
     isRealLegHash(record.broadcast?.txId) ||
@@ -405,12 +442,12 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         }
         badge={other}
         title={title}
-        amount={hero.amount}
-        unit={hero.unit}
-        tone={hero.tone}
-        line={hero.line}
-        pill={pill.text}
-        pillTone={pill.tone}
+        amount={view.hero.amount}
+        unit={view.hero.unit}
+        tone={view.hero.tone}
+        line={view.hero.line}
+        pill={view.pill.text}
+        pillTone={view.pill.tone}
         strike={expired}
       />
 
@@ -452,7 +489,16 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         </View>
       )}
 
-      <DetailRows rows={rows} />
+      <DetailRows rows={view.rows} />
+
+      {refunding && (
+        <Text variant="bodySmall" tone="muted" style={{ marginTop: space12 }}>
+          {t('swap.late-note').replace(
+            '{provider}',
+            providerLongLabel(record.provider),
+          )}
+        </Text>
+      )}
 
       {expired && (
         <View style={{ marginTop: space12, rowGap: space12 }}>

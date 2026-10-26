@@ -103,6 +103,12 @@ export type SwapRecordType = {
   depositDeadlineMs?: number;
   /** When the user said the inbound deposit was sent. */
   depositSentAtMs?: number;
+  /**
+   * When the provider first saw a payment on a purchase that had already
+   * expired. The provider cannot swap it and returns it, so until a verdict
+   * arrives the swap reads as refunding.
+   */
+  lateDepositAtMs?: number;
   /** Set when status is `Refunded` (and sometimes `Failed`). */
   refundInfo?: RefundInfoType;
   /** Provider-supplied human-readable error message when `Failed`. */

@@ -18,6 +18,7 @@ import {
   SwapStatusEnum,
   depositDeadlineMs,
   depositHalfwayMs,
+  isRefunding,
   isTerminalStatus,
 } from '@app/swap';
 import Utils from '@app/utils';
@@ -96,7 +97,10 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
       return;
     }
     if (!isOutbound && !awaiting) {
-      navigation.replace(Route.SwapTracking, { recordId });
+      navigation.replace(
+        isRefunding(record) ? Route.SwapDetail : Route.SwapTracking,
+        { recordId },
+      );
       return;
     }
     if (awaiting && remainingMs <= 0 && swapService && !expiryAsked.current) {

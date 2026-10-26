@@ -5,6 +5,7 @@ import {
   SwapDirectionEnum,
   SwapStatusEnum,
   formatAmountForDisplay,
+  isRefunding,
   providerShortLabel,
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
@@ -214,6 +215,16 @@ export function swapRowText(args: {
         bottom: '',
       };
     default:
+      if (isRefunding(record)) {
+        return {
+          ...base,
+          title: toward,
+          state: { text: t('history.state-refunding'), tone: 'warning' },
+          top: sold,
+          topTone: 'default',
+          bottom: t('history.going-back'),
+        };
+      }
       return {
         ...base,
         title: toward,
