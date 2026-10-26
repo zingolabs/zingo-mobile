@@ -15,7 +15,6 @@ import {
   StyleSheet,
   Pressable,
   ScrollView,
-  Text,
 } from 'react-native';
 
 import { space20, space32, useTheme } from '@app/theme';
@@ -63,7 +62,7 @@ import { sendEmail } from '@app/services/sendEmail';
 import SaveSheet from '@ui/widgets/SaveSheet';
 import SwitchOff from '../../assets/img/switch-off.svg';
 import SettingSwitchOn from '../../assets/img/setting-switch-on.svg';
-import { ChevronLeft, ChevronRight } from '@ui/primitives/Icons/Chevron';
+import { ChevronRight } from '@ui/primitives/Icons/Chevron';
 import { RadioOffIcon } from '@ui/primitives/Icons/RadioOffIcon';
 import { RadioOnIcon } from '@ui/primitives/Icons/RadioOnIcon';
 
@@ -550,50 +549,19 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
         }}
       >
         <Header
-          title={''}
+          title={translate('settings.title') as string}
+          closeScreen={() => {
+            if (!disabled) {
+              navigateToHome();
+            }
+          }}
+          backTestID="settings.back"
+          backAccessibilityLabel={translate('settings.back-acc') as string}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
         />
-        <View
-          style={{
-            height: 44,
-            marginTop: 6,
-            marginBottom: 10,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Pressable
-            testID="settings.back"
-            accessibilityRole="button"
-            accessibilityLabel={translate('settings.back-acc') as string}
-            onPress={() => {
-              if (!disabled) {
-                navigateToHome();
-              }
-            }}
-            style={({ pressed }) => ({
-              position: 'absolute',
-              left: 10,
-              width: 44,
-              height: 44,
-              borderRadius: 12,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
-            })}
-          >
-            <ChevronLeft size={24} color={colors.fgAccent} />
-          </Pressable>
-          <Text
-            accessibilityRole="header"
-            style={{ color: colors.fgDefault, fontSize: 18, fontWeight: '700' }}
-          >
-            {translate('settings.title') as string}
-          </Text>
-        </View>
         <ScrollView
           keyboardShouldPersistTaps="handled"
           testID="settings.scroll-view"

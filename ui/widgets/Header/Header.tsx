@@ -42,7 +42,7 @@ import {
 import { ContextAppLoaded } from '@app/context';
 import { getZingoLogo } from '@app/utils/ZingoAppData';
 import { useSyncStatus } from '@app/hooks/useSyncStatus';
-import BoldText from '@ui/primitives/BoldText';
+import TitleBar from '@ui/widgets/TitleBar';
 import SyncLine from './components/SyncLine';
 import MixnetIcon from '@ui/primitives/Icons/MixnetIcon';
 import { viewPhase } from '@app/walletBackend/transforms/mixnetView';
@@ -59,6 +59,9 @@ type HeaderProps = {
   // side menu
   noDrawMenu?: boolean;
   closeScreen?: () => void;
+  /** The back arrow's testID and spoken label, with closeScreen. */
+  backTestID?: string;
+  backAccessibilityLabel?: string;
   // balance
   noBalance?: boolean;
   // syncing icons
@@ -102,6 +105,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   setPrivacyOption,
   receivedLegend,
   closeScreen,
+  backTestID,
+  backAccessibilityLabel,
   noUfvkIcon,
   showMessagesIcon,
   onUsdRowLayout,
@@ -372,56 +377,21 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       </View>
 
       {!!title && (
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            width: '100%',
-            marginVertical: 5,
-          }}
-        >
-          {closeScreen ? (
-            <>
-              <TouchableOpacity hitSlop={slopFor(24)} onPress={closeScreen}>
-                <ChevronLeft
-                  style={{ marginHorizontal: 10 }}
-                  size={24}
-                  color={colors.fgAccent}
-                />
-              </TouchableOpacity>
-              <BoldText
-                testID={testID}
-                style={{
-                  color: colors.fgDefault,
-                  fontSize: 18,
-                  paddingHorizontal: 5,
-                }}
-              >
-                {title}
-              </BoldText>
-              <View style={{ width: 30, height: 30, marginHorizontal: 10 }} />
-            </>
-          ) : (
-            <>
-              <View style={{ width: 30, height: 30, marginHorizontal: 10 }} />
-              <BoldText
-                testID={testID}
-                style={{
-                  color: colors.fgDefault,
-                  fontSize: 18,
-                  paddingHorizontal: 5,
-                  textAlign: 'center',
-                }}
-              >
-                {title}
-              </BoldText>
-              <View style={{ width: 30, height: 30, marginHorizontal: 10 }} />
-            </>
-          )}
-        </View>
+        <TitleBar
+          testID={testID}
+          title={title}
+          left={
+            closeScreen
+              ? {
+                  icon: ChevronLeft,
+                  accent: true,
+                  onPress: closeScreen,
+                  testID: backTestID,
+                  accessibilityLabel: backAccessibilityLabel ?? title,
+                }
+              : undefined
+          }
+        />
       )}
     </>
   );

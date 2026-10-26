@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useRef, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { useScrollToTop } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
@@ -29,7 +29,7 @@ import AppSheetModal from '@ui/primitives/AppSheetModal';
 import Button from '@ui/primitives/Button';
 import Header from '@ui/widgets/Header';
 import SearchField from '@ui/widgets/SearchField';
-import { ChevronDown, ChevronLeft } from '@ui/primitives/Icons/Chevron';
+import { ChevronDown } from '@ui/primitives/Icons/Chevron';
 import ContactRow, { ROW_LINE } from './components/ContactRow';
 import AddressRowHead from './components/AddressRowHead';
 import SegmentedSwitch from '@ui/widgets/SegmentedSwitch';
@@ -308,52 +308,20 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}
     >
       <Header
-        title={''}
+        title={
+          translate(
+            pick ? 'addressbook.pick-title' : 'addressbook.title',
+          ) as string
+        }
+        closeScreen={() => navigation.goBack()}
+        backTestID="addressbook.back"
+        backAccessibilityLabel={translate('addressbook.back-acc') as string}
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
         noPrivacy={true}
         noUfvkIcon={true}
       />
-      <View
-        style={{
-          height: 44,
-          marginTop: 6,
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginBottom: 10,
-        }}
-      >
-        <Pressable
-          testID="addressbook.back"
-          accessibilityRole="button"
-          accessibilityLabel={translate('addressbook.back-acc') as string}
-          onPress={() => navigation.goBack()}
-          style={({ pressed }) => ({
-            position: 'absolute',
-            left: 10,
-            width: 44,
-            height: 44,
-            borderRadius: 12,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
-          })}
-        >
-          <ChevronLeft size={24} color={colors.fgAccent} />
-        </Pressable>
-        <Text
-          accessibilityRole="header"
-          style={{ color: colors.fgDefault, fontSize: 18, fontWeight: '700' }}
-        >
-          {
-            translate(
-              pick ? 'addressbook.pick-title' : 'addressbook.title',
-            ) as string
-          }
-        </Text>
-      </View>
-
       <View style={{ marginHorizontal: SIDE }}>
         <SearchField
           testID="addressbook.search"

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import { ActivityIndicator, ScrollView, View } from 'react-native';
 import Animated, {
   ReduceMotion,
   useAnimatedStyle,
@@ -32,7 +32,6 @@ import Card from '@ui/widgets/Card';
 import ListRow from '@ui/primitives/ListRow';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
-import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
 import { LogIcon } from '@ui/primitives/Icons/LogIcon';
@@ -228,48 +227,16 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
       style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}
     >
       <Header
-        title={''}
+        title={t('pools.title')}
+        closeScreen={() => navigation.goBack()}
+        backTestID="pools.back"
+        backAccessibilityLabel={t('pools.back-acc')}
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
         noPrivacy={true}
         noUfvkIcon={true}
       />
-      <View
-        style={{
-          height: 44,
-          marginTop: 6,
-          marginBottom: 10,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Pressable
-          testID="pools.back"
-          accessibilityRole="button"
-          accessibilityLabel={t('pools.back-acc')}
-          onPress={() => navigation.goBack()}
-          style={({ pressed }) => ({
-            position: 'absolute',
-            left: 10,
-            width: 44,
-            height: 44,
-            borderRadius: 12,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
-          })}
-        >
-          <ChevronLeft size={24} color={colors.fgAccent} />
-        </Pressable>
-        <Text
-          accessibilityRole="header"
-          style={{ color: colors.fgDefault, fontSize: 18, fontWeight: '700' }}
-        >
-          {t('pools.title')}
-        </Text>
-      </View>
-
       <ScrollView
         testID="pools.scroll-view"
         contentContainerStyle={{

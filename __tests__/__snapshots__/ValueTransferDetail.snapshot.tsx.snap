@@ -120,6 +120,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
           }
         >
           <Text
+            accessibilityRole="header"
             maxFontSizeMultiplier={1.5}
             numberOfLines={1}
             style={
@@ -920,6 +921,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
           }
         >
           <Text
+            accessibilityRole="header"
             maxFontSizeMultiplier={1.5}
             numberOfLines={1}
             style={

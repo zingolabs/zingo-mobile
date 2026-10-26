@@ -120,6 +120,7 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
           }
         >
           <Text
+            accessibilityRole="header"
             maxFontSizeMultiplier={1.5}
             numberOfLines={1}
             style={
@@ -926,6 +927,7 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
           }
         >
           <Text
+            accessibilityRole="header"
             maxFontSizeMultiplier={1.5}
             numberOfLines={1}
             style={
