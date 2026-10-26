@@ -1,7 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
 import { View, Keyboard } from 'react-native';
-import { space8, space20, useTheme } from '@app/theme';
+import {
+  space8,
+  space20,
+  useTheme,
+  space4,
+  space16,
+  iconSizeSm,
+} from '@app/theme';
 
 import { GlobalConst, SnackbarDurationEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
@@ -88,12 +95,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
   };
 
   return (
-    <View
-      style={{
-        backgroundColor: colors.bgSurface,
-        paddingHorizontal: 10,
-      }}
-    >
+    <View style={{ paddingHorizontal: 10 }}>
       <Text
         variant="caption"
         tone="muted"
@@ -129,7 +131,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
-            marginVertical: 5,
+            marginVertical: space4,
             paddingHorizontal: 10,
           }}
         >
@@ -143,8 +145,9 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
               }}
             >
               <VerifyCheckIcon
+                size={iconSizeSm}
                 color={colors.fgAccent}
-                style={{ marginRight: 10 }}
+                style={{ marginRight: space8 }}
               />
               <Text
                 testID="receive.verify-mine"
@@ -165,8 +168,9 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
               }}
             >
               <VerifyXIcon
+                size={iconSizeSm}
                 color={colors.fgDanger}
-                style={{ marginRight: 10 }}
+                style={{ marginRight: space8 }}
               />
               <Text
                 testID="receive.verify-not-mine"
@@ -187,9 +191,8 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
-            gap: 10,
-            marginVertical: 5,
-            marginTop: 15,
+            marginTop: space16,
+            marginBottom: space4,
             paddingHorizontal: 10,
           }}
         >

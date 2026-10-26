@@ -6,8 +6,9 @@ import Animated, {
   ReduceMotion,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
+  withTiming,
 } from 'react-native-reanimated';
+import { duration, ease } from '@app/theme/motion';
 import {
   iconSizeMd,
   iconSizeSm,
@@ -20,6 +21,7 @@ import {
   useTheme,
   slopFor,
   space4,
+  radiusSm,
 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
@@ -59,9 +61,9 @@ export function PinButton({
   const { colors } = useTheme();
   const tilt = useSharedValue(pinned ? 1 : 0);
   useEffect(() => {
-    tilt.value = withSpring(pinned ? 1 : 0, {
-      damping: 12,
-      stiffness: 220,
+    tilt.value = withTiming(pinned ? 1 : 0, {
+      duration: duration.emphasized,
+      easing: ease.spring,
       reduceMotion: ReduceMotion.System,
     });
   }, [pinned, tilt]);
@@ -158,18 +160,19 @@ export default function AddressCard({
               style={{
                 padding: space12,
                 borderRadius: radiusMd,
-                backgroundColor: colors.fgDefault,
+                backgroundColor: colors.bgQrPaper,
               }}
             >
               <QRCode
                 value={address.address}
                 size={QR_SIZE}
                 ecl="L"
-                backgroundColor={colors.fgDefault}
+                color={colors.fgQrInk}
+                backgroundColor={colors.bgQrPaper}
                 logo={getZingoLogo()}
                 logoSize={30}
-                logoBackgroundColor={colors.fgDefault}
-                logoBorderRadius={7}
+                logoBackgroundColor={colors.bgQrPaper}
+                logoBorderRadius={radiusSm}
                 logoMargin={3}
               />
             </View>
@@ -190,14 +193,7 @@ export default function AddressCard({
                   onPress={onAddTag}
                   hitSlop={slopFor(LINE_H)}
                 >
-                  <Text
-                    variant="caption"
-                    style={{
-                      fontWeight: '700',
-                      textDecorationLine: 'underline',
-                      textDecorationColor: colors.fgMuted,
-                    }}
-                  >
+                  <Text variant="caption" style={{ fontWeight: '700' }}>
                     {t('receive.add-tag')}
                   </Text>
                 </Pressable>

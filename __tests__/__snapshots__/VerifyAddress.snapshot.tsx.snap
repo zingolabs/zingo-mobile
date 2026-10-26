@@ -4,7 +4,6 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
 <View
   style={
     {
-      "backgroundColor": "#031124",
       "paddingHorizontal": 10,
     }
   }
@@ -162,10 +161,9 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
           "alignItems": "center",
           "flexDirection": "row",
           "flexGrow": 1,
-          "gap": 10,
           "justifyContent": "center",
-          "marginTop": 15,
-          "marginVertical": 5,
+          "marginBottom": 4,
+          "marginTop": 16,
           "paddingHorizontal": 10,
         }
       }
