@@ -3,6 +3,10 @@
 # analysis, with the reason it must stay installed. Do not add a package
 # without recording why.
 ignores:
+  # Nothing imports it since the batch reminders left with the private
+  # migration. It is uninstalled in the LavaMoat stack (#1652), which
+  # regenerates the policy; this entry goes with it.
+  - '@notifee/react-native'
   # Required peer dependency of @react-navigation/native-stack and
   # @react-navigation/bottom-tabs; imported by them, not by app code.
   - 'react-native-screens'
