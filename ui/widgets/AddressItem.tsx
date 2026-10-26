@@ -22,7 +22,7 @@ import {
 } from '@app/AppState';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
-import { useTheme, slopFor } from '@app/theme';
+import { useTheme, slopFor, iconSize, iconSizeMd } from '@app/theme';
 import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
 import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
 
@@ -191,7 +191,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
           >
             <UserPlusIcon
               style={{ marginTop: 3 }}
-              size={20}
+              size={iconSizeMd}
               color={colors.fgAccent}
             />
           </View>
@@ -205,7 +205,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
         >
           <UserPlusIcon
             style={{ marginTop: 3 }}
-            size={24}
+            size={iconSize}
             color={colors.fgAccent}
           />
         </TouchableOpacity>
@@ -226,7 +226,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
         >
           <PlaneIcon
             style={{ marginTop: 3 }}
-            size={24}
+            size={iconSize}
             color={colors.fgAccent}
           />
         </TouchableOpacity>
