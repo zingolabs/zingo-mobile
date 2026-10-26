@@ -195,7 +195,7 @@ export default function SendFlight({ width = 300 }: { width?: number }) {
           <AnimatedPath
             d={FLY}
             fill="none"
-            stroke={colors.bgNym}
+            stroke={colors.fgNym}
             strokeWidth={2.5}
             strokeLinecap="round"
             strokeDasharray={[ROUTE.length, ROUTE.length]}
@@ -205,7 +205,7 @@ export default function SendFlight({ width = 300 }: { width?: number }) {
             cx={276}
             cy={18}
             fill="none"
-            stroke={colors.bgNym}
+            stroke={colors.fgNym}
             strokeWidth={2}
             animatedProps={dest}
           />
