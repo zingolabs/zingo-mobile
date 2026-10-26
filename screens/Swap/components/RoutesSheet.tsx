@@ -2,7 +2,7 @@
 import React, { forwardRef, useCallback, useContext, useMemo } from 'react';
 import { View } from 'react-native';
 import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { space16, space8 } from '@app/theme';
+import { space8, space20 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   formatAmountForDisplay,
@@ -16,7 +16,6 @@ import AppSheetModal from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
 import ListRow from '@ui/primitives/ListRow';
 import Tag from '@ui/widgets/Tag';
-import Button from '@ui/primitives/Button';
 import RadioRow, { RadioList } from '@ui/widgets/RadioRow';
 import SheetTitle from './SheetTitle';
 
@@ -84,62 +83,63 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
           />
         }
       >
-        <BottomSheetScrollView
-          contentContainerStyle={{
-            paddingHorizontal: space16,
-            paddingBottom: 32,
-          }}
-        >
-          <Text variant="caption" tone="muted" style={{ marginBottom: space8 }}>
+        <BottomSheetScrollView contentContainerStyle={{ paddingBottom: 32 }}>
+          <Text
+            variant="caption"
+            tone="muted"
+            style={{ marginBottom: space8, marginHorizontal: space20 }}
+          >
             {translate('swap.routes-sub') as string}
           </Text>
-          <RadioList testID="swap.routes">
-            {sorted.map((route, index) => {
-              const selected = route.routeId === selectedRouteId;
-              const best = index === 0;
-              const details = [
-                usd(route.expectedReceiveAmount),
-                route.estimatedTimeText ?? '',
-                providerShortLabel(route.provider),
-              ]
-                .filter(Boolean)
-                .join(' · ');
-              return (
-                <RadioRow
-                  key={route.routeId}
-                  testID={`swap.route.${route.provider}`}
-                  first={index === 0}
-                  title={`${formatAmountForDisplay(route.expectedReceiveAmount)} ${receiveSymbol}`}
-                  pill={
-                    best
-                      ? {
-                          text: translate('swap.routes-best') as string,
-                          tone: 'accent',
-                        }
-                      : undefined
-                  }
-                  sub={
-                    route.warningsText ? (
-                      <>
-                        {details}
-                        {'\n'}
-                        <Text variant="bodySmall" tone="warning">
-                          {route.warningsText}
-                        </Text>
-                      </>
-                    ) : (
-                      details
-                    )
-                  }
-                  selected={selected}
-                  onPress={() => {
-                    onSelect(route.routeId);
-                    dismiss();
-                  }}
-                />
-              );
-            })}
-          </RadioList>
+          <View style={{ marginHorizontal: space20 }}>
+            <RadioList testID="swap.routes">
+              {sorted.map((route, index) => {
+                const selected = route.routeId === selectedRouteId;
+                const best = index === 0;
+                const details = [
+                  usd(route.expectedReceiveAmount),
+                  route.estimatedTimeText ?? '',
+                  providerShortLabel(route.provider),
+                ]
+                  .filter(Boolean)
+                  .join(' · ');
+                return (
+                  <RadioRow
+                    key={route.routeId}
+                    testID={`swap.route.${route.provider}`}
+                    first={index === 0}
+                    title={`${formatAmountForDisplay(route.expectedReceiveAmount)} ${receiveSymbol}`}
+                    pill={
+                      best
+                        ? {
+                            text: translate('swap.routes-best') as string,
+                            tone: 'accent',
+                          }
+                        : undefined
+                    }
+                    sub={
+                      route.warningsText ? (
+                        <>
+                          {details}
+                          {'\n'}
+                          <Text variant="bodySmall" tone="warning">
+                            {route.warningsText}
+                          </Text>
+                        </>
+                      ) : (
+                        details
+                      )
+                    }
+                    selected={selected}
+                    onPress={() => {
+                      onSelect(route.routeId);
+                      dismiss();
+                    }}
+                  />
+                );
+              })}
+            </RadioList>
+          </View>
           {unavailable.map(entry => (
             <ListRow
               key={entry.provider}
@@ -163,13 +163,6 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
               subtitle={say(entry.reason)}
             />
           ))}
-          <View style={{ marginTop: space16 }}>
-            <Button
-              variant="quiet"
-              title={translate('swap.close') as string}
-              onPress={dismiss}
-            />
-          </View>
         </BottomSheetScrollView>
       </AppSheetModal>
     );

@@ -2,7 +2,7 @@
 import React, { forwardRef, useCallback, useContext } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { space16, useTheme, iconSizeMd, radiusPill } from '@app/theme';
+import { useTheme, iconSizeMd, radiusPill } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   SwapStatusEnum,
@@ -151,12 +151,7 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
           />
         }
       >
-        <BottomSheetScrollView
-          contentContainerStyle={{
-            paddingHorizontal: space16,
-            paddingBottom: 32,
-          }}
-        >
+        <BottomSheetScrollView contentContainerStyle={{ paddingBottom: 32 }}>
           {sorted.length === 0 && (
             <View style={{ alignItems: 'center', paddingVertical: 48 }}>
               <Text variant="body" tone="muted">
