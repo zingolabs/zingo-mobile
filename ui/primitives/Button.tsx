@@ -145,7 +145,11 @@ const Button: React.FunctionComponent<ButtonProps> = ({
       onPress={() => onPress()}
     >
       {busy ? (
-        <ActivityIndicator size="small" color={label} />
+        <ActivityIndicator
+          testID={testID ? `${testID}.spinner` : undefined}
+          size="small"
+          color={label}
+        />
       ) : LeadingIcon ? (
         <View
           style={{ flexDirection: 'row', alignItems: 'center', gap: space8 }}
