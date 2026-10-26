@@ -1,8 +1,7 @@
-/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback } from 'react';
 import { View } from 'react-native';
-import { radiusSheet, useTheme } from '@app/theme';
+import { radiusSheet, useTheme, radiusSm, space12 } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import {
   BottomSheetBackdrop,
@@ -13,8 +12,7 @@ import {
 
 import { TranslateType, WalletType } from '@app/AppState';
 import { formatInteger } from '@app/utils/formatAmount';
-import BoldText from '@ui/primitives/BoldText';
-import RegText from '@ui/primitives/RegText';
+import Text from '@ui/primitives/Text';
 import SheetRim from '@ui/primitives/SheetRim';
 import Button from '@ui/primitives/Button';
 
@@ -92,15 +90,13 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
             paddingBottom: 32,
           }}
         >
-          <BoldText
-            style={{ fontSize: 15, lineHeight: 20, textAlign: 'center' }}
-          >
+          <Text variant="bodyStrong" style={{ textAlign: 'center' }}>
             {
               translate(
                 wallet?.seed ? 'seedsheet.title' : 'seedsheet.title-key',
               ) as string
             }
-          </BoldText>
+          </Text>
           {wallet?.seed ? (
             <View style={{ flexDirection: 'row', marginTop: 24, gap: 13 }}>
               {columns.map((col, c) => (
@@ -114,18 +110,18 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
                         gap: 6,
                         height: 30,
                         paddingHorizontal: 10,
-                        borderRadius: 8,
+                        borderRadius: radiusSm,
                         backgroundColor: colors.bgCanvas,
                         borderWidth: 1,
                         borderColor: colors.bottomSheetBorder,
                       }}
                     >
-                      <RegText style={{ fontSize: 12, color: colors.fgMuted }}>
+                      <Text variant="caption" tone="muted">
                         {String(r * 3 + c + 1)}
-                      </RegText>
-                      <RegText style={{ fontSize: 13 }} selectable={false}>
+                      </Text>
+                      <Text variant="bodySmall" selectable={false}>
                         {word}
-                      </RegText>
+                      </Text>
                     </View>
                   ))}
                 </View>
@@ -135,21 +131,21 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
             <View
               style={{
                 marginTop: 24,
-                padding: 12,
-                borderRadius: 8,
+                padding: space12,
+                borderRadius: radiusSm,
                 backgroundColor: colors.bgCanvas,
                 borderWidth: 1,
                 borderColor: colors.bottomSheetBorder,
               }}
             >
-              <RegText style={{ fontSize: 13 }}>{wallet?.ufvk ?? ''}</RegText>
+              <Text variant="address">{wallet?.ufvk ?? ''}</Text>
             </View>
           )}
           <View
             style={{
               marginTop: 20,
               height: 38,
-              borderRadius: 10,
+              borderRadius: radiusSm,
               borderWidth: 1,
               borderColor: colors.bottomSheetBorder,
               backgroundColor: colors.bgCanvas,
@@ -159,12 +155,12 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
               paddingHorizontal: 15,
             }}
           >
-            <RegText style={{ fontSize: 12, color: colors.fgMuted }}>
+            <Text variant="caption" tone="muted">
               {translate('seedsheet.birthday') as string}
-            </RegText>
-            <BoldText style={{ fontSize: 13 }}>
+            </Text>
+            <Text variant="bodySmall" style={{ fontWeight: '600' }}>
               {formatInteger(wallet?.birthday ?? 0)}
-            </BoldText>
+            </Text>
           </View>
           <Button
             variant="primary"
