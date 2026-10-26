@@ -6,12 +6,21 @@ import {
   ActivityIndicator,
   Platform,
 } from 'react-native';
-import { useTheme } from '@app/theme';
+import {
+  iconSizeSm,
+  radiusMd,
+  space4,
+  space8,
+  space12,
+  space16,
+  space24,
+  useTheme,
+} from '@app/theme';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import ZecAmount from '@ui/widgets/ZecAmount';
-import FadeText from '@ui/primitives/FadeText';
+import Text from '@ui/primitives/Text';
 import {
   ValueTransferType,
   ValueTransferKindEnum,
@@ -24,7 +33,6 @@ import {
 
 import { ContextAppLoaded } from '@app/context';
 import AddressItem from '@ui/widgets/AddressItem';
-import RegText from '@ui/primitives/RegText';
 import Utils from '@app/utils';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
@@ -42,6 +50,10 @@ type MessageLineProps = {
 // Amounts under this are not worth a line of their own — the message is the
 // point, not the dust attached to it.
 const MIN_AMOUNT_SHOWN = 0.01;
+/** How far a bubble stays from the far side, so sent and received read apart. */
+const BUBBLE_INSET = space24 * 2;
+/** The corner a bubble points from, toward its sender. */
+const TAIL_CORNER = 0;
 
 const MessageLine: React.FunctionComponent<MessageLineProps> = ({
   index,
@@ -114,18 +126,14 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
       style={{ display: 'flex', flexDirection: 'column', marginHorizontal: 20 }}
     >
       {month !== '' && (
-        <View
-          style={{
-            paddingLeft: 0,
-            paddingTop: 5,
-            paddingBottom: 5,
-            borderTopWidth: 1,
-            borderBottomWidth: 1,
-            borderColor: colors.bgCanvas,
-            backgroundColor: colors.bgSurface,
-          }}
-        >
-          <FadeText>{month}</FadeText>
+        <View style={{ paddingTop: space16, paddingBottom: space8 }}>
+          <Text
+            variant="caption"
+            tone="muted"
+            style={{ fontWeight: '600', textTransform: 'uppercase' }}
+          >
+            {month}
+          </Text>
         </View>
       )}
       <TouchableOpacity
@@ -140,24 +148,29 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
             flexDirection: 'column',
             alignItems: 'flex-start',
             justifyContent: 'flex-start',
-            padding: 10,
-            marginBottom: 5,
-            marginLeft: vt.kind === ValueTransferKindEnum.Received ? 0 : 50,
-            marginRight: vt.kind === ValueTransferKindEnum.Received ? 50 : 0,
-            borderRadius: 20,
+            padding: space12,
+            marginBottom: space8,
+            marginLeft:
+              vt.kind === ValueTransferKindEnum.Received ? 0 : BUBBLE_INSET,
+            marginRight:
+              vt.kind === ValueTransferKindEnum.Received ? BUBBLE_INSET : 0,
+            borderRadius: radiusMd,
             borderBottomEndRadius:
-              vt.kind === ValueTransferKindEnum.Received ? 20 : 0,
-            borderBottomStartRadius:
-              vt.kind === ValueTransferKindEnum.Received ? 0 : 20,
-            backgroundColor:
               vt.kind === ValueTransferKindEnum.Received
-                ? colors.bgAccentSubtle
+                ? radiusMd
+                : TAIL_CORNER,
+            borderBottomStartRadius:
+              vt.kind === ValueTransferKindEnum.Received
+                ? TAIL_CORNER
+                : radiusMd,
+            backgroundColor:
+              vt.status === RPCValueTransfersStatusEnum.failed
+                ? colors.bgMutedSubtle
                 : colors.bgAccentSubtle,
-            opacity: vt.status === RPCValueTransfersStatusEnum.failed ? 0.5 : 1,
           }}
         >
           {!!vt.address && !messageAddress && (
-            <View style={{ marginTop: -10, marginBottom: 10, marginLeft: 30 }}>
+            <View style={{ marginBottom: space8 }}>
               <AddressItem address={vt.address} oneLine={true} />
             </View>
           )}
@@ -174,7 +187,9 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                     );
                   }}
                 >
-                  <RegText selectable={true}>{memo}</RegText>
+                  <Text variant="body" selectable={true}>
+                    {memo}
+                  </Text>
                 </TouchableOpacity>
               )}
               {!!memoUA && (
@@ -196,21 +211,20 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                 >
                   {!thisWalletAddress(memoUA) && memoUA !== messageAddress && (
                     <>
-                      <RegText>{GlobalConst.replyTo}</RegText>
-                      <TriangleAlert color={colors.fgWarning} size={16} />
-                      <RegText
-                        style={{
-                          color: colors.fgMuted,
-                        }}
-                      >
+                      <Text variant="body">{GlobalConst.replyTo}</Text>
+                      <TriangleAlert
+                        color={colors.fgWarning}
+                        size={iconSizeSm}
+                      />
+                      <Text variant="address" tone="muted">
                         {memoUA}
-                      </RegText>
+                      </Text>
                       {contactFound(memoUA).found && (
                         <View style={{ flexDirection: 'row' }}>
                           {!thisWalletAddress(memoUA) && (
-                            <RegText style={{ color: colors.fgMuted }}>
+                            <Text variant="bodySmall" tone="muted">
                               {translate('addressbook.likely') as string}
-                            </RegText>
+                            </Text>
                           )}
                           <AddressItem address={memoUA} onlyContact={true} />
                         </View>
@@ -230,27 +244,17 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
             }}
           >
             {vt.status === RPCValueTransfersStatusEnum.failed && (
-              <FadeText
-                style={{
-                  color: colors.fgDanger,
-                  alignSelf: 'center',
-                  fontSize: 12,
-                  opacity: 1,
-                  fontWeight: '700',
-                  marginRight: 10,
-                  marginTop: 2,
-                }}
+              <Text
+                variant="caption"
+                tone="danger"
+                style={{ fontWeight: '600', marginRight: space8 }}
               >
                 {translate(`history.${vt.status}`) as string}
-              </FadeText>
+              </Text>
             )}
             {vt.amount >= MIN_AMOUNT_SHOWN && (
               <ZecAmount
-                style={{
-                  paddingRight: 5,
-                  opacity:
-                    vt.status === RPCValueTransfersStatusEnum.failed ? 0.5 : 1,
-                }}
+                style={{ paddingRight: space4 }}
                 size={12}
                 currencyName={info.currencyName}
                 color={getAmountColor(vt)}
@@ -259,7 +263,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
               />
             )}
             <View>
-              <FadeText>
+              <Text variant="caption" tone="muted">
                 {vt.time
                   ? Utils.formatDate(
                       (vt.time || 0) * 1000,
@@ -267,7 +271,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                       language,
                     )
                   : '--'}
-              </FadeText>
+              </Text>
             </View>
             <View
               style={{
@@ -286,23 +290,23 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                 {vt.status === RPCValueTransfersStatusEnum.failed && (
                   <VerifyXIcon
                     style={{ marginLeft: 5, marginRight: 1, marginTop: 2 }}
-                    size={16}
+                    size={iconSizeSm}
                     color={colors.fgDanger}
                   />
                 )}
                 {(vt.status === RPCValueTransfersStatusEnum.calculated ||
-                  vt.status === RPCValueTransfersStatusEnum.transmitted) && (
+                  vt.status === RPCValueTransfersStatusEnum.transmitted ||
+                  vt.status === RPCValueTransfersStatusEnum.mempool) && (
                   <CheckCircleLineIcon
                     style={{ marginLeft: 5, marginRight: 1, marginTop: 2 }}
-                    size={16}
-                    color={colors.fgAccent}
+                    size={iconSizeSm}
+                    color={colors.fgWarning}
                   />
                 )}
-                {(vt.status === RPCValueTransfersStatusEnum.mempool ||
-                  vt.status === RPCValueTransfersStatusEnum.confirmed) && (
+                {vt.status === RPCValueTransfersStatusEnum.confirmed && (
                   <CheckCircleIcon
                     style={{ marginLeft: 5, marginRight: 1, marginTop: 2 }}
-                    size={16}
+                    size={iconSizeSm}
                     color={colors.fgAccent}
                     checkColor={colors.fgOnAccent}
                   />
@@ -311,14 +315,14 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                   vt.status !== RPCValueTransfersStatusEnum.failed && (
                     <CheckCircleLineIcon
                       style={{ marginLeft: 1, marginRight: 0, marginTop: 2 }}
-                      size={16}
-                      color={colors.fgAccent}
+                      size={iconSizeSm}
+                      color={colors.fgWarning}
                     />
                   )}
                 {vt.status === RPCValueTransfersStatusEnum.confirmed && (
                   <CheckCircleIcon
                     style={{ marginLeft: 1, marginRight: 0, marginTop: 2 }}
-                    size={16}
+                    size={iconSizeSm}
                     color={colors.fgAccent}
                     checkColor={colors.fgOnAccent}
                   />
@@ -332,7 +336,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                             ? 'small'
                             : 12
                         }
-                        color={colors.fgAccent}
+                        color={colors.fgMuted}
                       />
                     </View>
                   )}
