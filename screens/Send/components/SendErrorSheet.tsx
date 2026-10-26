@@ -78,9 +78,11 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
           disappearsOnIndex={-1}
           appearsOnIndex={0}
           pressBehavior="close"
+          style={{ backgroundColor: colors.bgScrim }}
+          opacity={1}
         />
       ),
-      [],
+      [colors],
     );
 
     const renderHandle = useCallback(
