@@ -514,6 +514,10 @@ never rounded up. Fiat shows two decimals. Only money in or out carries a
 sign: "+" on a receipt, "−" on a send, no sign on a move within the wallet
 (a shield, a send to oneself, a migration), in History and in the detail.
 
+**Struck text.** What never happened is struck through (`Text`'s `strike`),
+in `fgMuted`: an expired purchase's ZEC in its History row and its detail
+hero, and the deposit address nobody should pay anymore. Nothing else.
+
 **Short addresses.** In rows, detail rows, tokens and fields: first 6 … last
 6. On Receive's address card: first 10 … last 10. A field that holds an
 address stays one line and shortens it in the middle when not focused.

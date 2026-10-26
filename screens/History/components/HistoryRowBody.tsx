@@ -45,7 +45,9 @@ export default function HistoryRowBody({
       ? colors.fgWarning
       : text.state?.tone === 'danger'
         ? colors.fgDanger
-        : colors.fgDefault;
+        : text.state?.tone === 'muted'
+          ? colors.fgMuted
+          : colors.fgDefault;
   return (
     <View
       style={{
@@ -128,6 +130,7 @@ export default function HistoryRowBody({
           reveal={amounts}
           text={text.top}
           variant={compact ? 'bodySmall' : 'bodyStrong'}
+          strike={text.topStrike}
           numberOfLines={1}
           style={{ color: topColor, ...(compact ? { fontWeight: '600' } : {}) }}
         />

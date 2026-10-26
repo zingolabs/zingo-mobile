@@ -87,7 +87,12 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
       return;
     }
     if (isTerminalStatus(record.status)) {
-      navigation.replace(Route.SwapResult, { recordId });
+      navigation.replace(
+        record.status === SwapStatusEnum.Expired
+          ? Route.SwapDetail
+          : Route.SwapResult,
+        { recordId },
+      );
       return;
     }
     if (!isOutbound && !awaiting) {

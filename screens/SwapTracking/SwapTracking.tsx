@@ -8,6 +8,7 @@ import { Route } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import {
   SwapDirectionEnum,
+  SwapStatusEnum,
   awaitsDeposit,
   depositDeadlineMs,
   depositHalfwayMs,
@@ -64,9 +65,15 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
     return () => clearInterval(timer);
   }, [awaiting]);
 
+  // An expired swap has no result screen: its detail says why.
   useEffect(() => {
     if (record && isTerminalStatus(record.status)) {
-      navigation.replace(Route.SwapResult, { recordId });
+      navigation.replace(
+        record.status === SwapStatusEnum.Expired
+          ? Route.SwapDetail
+          : Route.SwapResult,
+        { recordId },
+      );
     }
   }, [record, navigation, recordId]);
 

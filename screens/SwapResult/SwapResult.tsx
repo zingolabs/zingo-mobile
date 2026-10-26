@@ -1,20 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext } from 'react';
 import DetailRows from '@screens/Swap/components/DetailRows';
 import { View } from 'react-native';
-import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import {
-  radiusMd,
-  space16,
-  space8,
-  useTheme,
-  radiusPill,
-  iconSize,
-} from '@app/theme';
+import { space16, useTheme, radiusPill, iconSize } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import { Route } from '@app/AppState';
-import { ContextAppLoaded, useSwapService } from '@app/context';
+import { ContextAppLoaded } from '@app/context';
 import {
   SwapDirectionEnum,
   canonicalChainAddress,
@@ -26,13 +18,10 @@ import { useShieldFunds } from '@app/hooks/useShieldFunds';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
-import TextField from '@ui/primitives/TextField';
-import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 import Banner from '@ui/widgets/Banner';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { RefreshIcon } from '@ui/primitives/Icons/RefreshIcon';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
-import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
@@ -60,12 +49,8 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate, info, totalBalance, addressBook } = context;
   const { colors } = useTheme();
-  const swapService = useSwapService();
   const record = useSwapRecord(recordId);
   const shield = useShieldFunds(context);
-  const [hash, setHash] = useState<string>('');
-  const [attaching, setAttaching] = useState<boolean>(false);
-  const [attachError, setAttachError] = useState<string>('');
 
   const home = useCallback(() => leaveFlow(navigation), [navigation]);
   const swapAgain = useCallback(
@@ -76,23 +61,6 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
       }),
     [navigation],
   );
-
-  const attach = useCallback(async () => {
-    const trimmed = hash.trim();
-    if (!trimmed || !swapService || !record) {
-      return;
-    }
-    setAttaching(true);
-    setAttachError('');
-    try {
-      await swapService.setObservedDepositTxHash({ recordId, hash: trimmed });
-      navigation.replace(Route.SwapTracking, { recordId });
-    } catch (e) {
-      setAttachError(`${e}`);
-    } finally {
-      setAttaching(false);
-    }
-  }, [hash, swapService, record, recordId, navigation]);
 
   if (!record) {
     return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
@@ -172,33 +140,6 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
   const shieldNote = (text: string) => (
     <View style={{ marginTop: space16 }}>
       <Banner tone="warning" title={text} />
-    </View>
-  );
-
-  const hashBox = (
-    <View style={{ rowGap: space8 }}>
-      <TextField
-        testID="swap.result.hash"
-        label={translate('swap.deposit-hash') as string}
-        value={hash}
-        onChangeText={setHash}
-        placeholder={translate('swap.deposit-hash-placeholder') as string}
-        mono
-        error={attachError || undefined}
-        trailingIcon={ClipboardPasteIcon}
-        trailingLabel={translate('swap.paste') as string}
-        onTrailingPress={async () =>
-          setHash((await Clipboard.getString()).trim())
-        }
-      />
-      <Button
-        inline
-        variant="text"
-        title={translate('swap.deposit-follow') as string}
-        disabled={attaching || hash.trim().length === 0}
-        busy={attaching}
-        onPress={attach}
-      />
     </View>
   );
 
@@ -416,51 +357,6 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
               ]
             : []),
         ])}
-      </SwapFlowScreen>
-    );
-  }
-
-  if (outcome === 'expired') {
-    return (
-      <SwapFlowScreen
-        testID="swap.result"
-        title=""
-        onClose={home}
-        footer={
-          <Button
-            testID="swap.result.new"
-            variant="primary"
-            title={translate('swap.result-new-swap') as string}
-            onPress={swapAgain}
-          />
-        }
-      >
-        {head(
-          'muted',
-          <ClockIcon size={iconSize} color={colors.fgMuted} />,
-          translate('swap.result-expired-title') as string,
-          translate('swap.result-expired-line') as string,
-        )}
-        {!isOutbound && (
-          <View
-            style={{
-              marginTop: space16 + 6,
-              borderWidth: 1,
-              borderColor: colors.bottomSheetBorder,
-              borderRadius: radiusMd,
-              padding: space16,
-              rowGap: space8,
-            }}
-          >
-            <Text variant="bodyStrong">
-              {translate('swap.result-already-paid') as string}
-            </Text>
-            <Text variant="bodySmall" tone="muted">
-              {translate('swap.result-paste-hash') as string}
-            </Text>
-            {hashBox}
-          </View>
-        )}
       </SwapFlowScreen>
     );
   }

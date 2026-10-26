@@ -20,6 +20,8 @@ export {
 export { TrackingStatusEnum } from './enums/TrackingStatusEnum';
 export { canRemoveSwap } from './canRemoveSwap';
 export { hasDepositEvidence } from './depositEvidence';
+export { newlyExpired } from './newlyExpired';
+export { isThorchainFamily } from './thorchainFamily';
 export {
   DEPOSIT_WINDOW_MS,
   awaitsDeposit,

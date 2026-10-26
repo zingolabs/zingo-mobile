@@ -264,3 +264,37 @@ test('Tests that a purchase whose payment the provider saw reads payment detecte
   });
   expect(sale.state?.text).toBe('history.state-swapping');
 });
+
+test('Tests that an expired purchase reads grey with the ZEC it would have got struck through and the coin not sent under it', () => {
+  const text = swapRowText({
+    record: record({
+      direction: SwapDirectionEnum.Inbound,
+      status: SwapStatusEnum.Expired,
+      sellAsset: {
+        swapKitId: 'BTC.BTC',
+        chain: 'BTC',
+        symbol: 'BTC',
+        ticker: 'BTC',
+        chainId: 'bitcoin',
+        decimals: 8,
+      },
+      receiveAsset: {
+        swapKitId: 'ZEC.ZEC',
+        chain: 'ZEC',
+        symbol: 'ZEC',
+        ticker: 'ZEC',
+        chainId: 'zcash',
+        decimals: 8,
+      },
+      sellAmountHumanDecimal: '0.03',
+      expectedReceiveAmount: '12.5',
+    }),
+    when: 'Oct 2',
+    t,
+  });
+  expect(text.state).toEqual({ text: 'history.state-expired', tone: 'muted' });
+  expect(text.top).toBe('+12.5 ZEC');
+  expect(text.topTone).toBe('muted');
+  expect(text.topStrike).toBe(true);
+  expect(text.bottom).toBe('history.swap-not-sent');
+});
