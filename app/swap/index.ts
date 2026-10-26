@@ -32,12 +32,13 @@ export {
 } from './lateDeposit';
 export { isThorchainFamily } from './thorchainFamily';
 export {
-  DEPOSIT_WINDOW_MS,
+  DEPOSIT_WAIT_MS,
+  DEPOSIT_WARN_AFTER_MS,
   awaitsDeposit,
   depositDeadlineMs,
-  depositHalfwayMs,
   depositOverdue,
   depositPhase,
+  depositWarnAtMs,
 } from './depositDeadline';
 export type { DepositPhase } from './depositDeadline';
 

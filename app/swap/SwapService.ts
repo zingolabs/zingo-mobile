@@ -14,7 +14,7 @@ import {
   shieldedMemoAddressFromSwap,
 } from './mayaShieldedMemo';
 import { SwapStatusEnum, isTerminalStatus } from './enums/SwapStatusEnum';
-import { DEPOSIT_WINDOW_MS } from './depositDeadline';
+import { DEPOSIT_WAIT_MS } from './depositDeadline';
 import { hasDepositEvidence } from './depositEvidence';
 import { SwapKitError } from './errors';
 import {
@@ -320,7 +320,7 @@ export class SwapService {
       status: initialStatus,
       depositDeadlineMs:
         direction === SwapDirectionEnum.Inbound
-          ? (chosenRoute.expiresAtMs ?? now + DEPOSIT_WINDOW_MS)
+          ? now + DEPOSIT_WAIT_MS
           : undefined,
       providerData: instructions.providerData,
       broadcast:
