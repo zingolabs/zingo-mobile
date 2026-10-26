@@ -43,11 +43,11 @@ const RADIUS = NOTICE_RADIUS;
 // As the wallet opens, the stack drops in 8 pt once its cards are measured.
 const DROP_PT = 8;
 const drop: WithTimingConfig = {
-  duration: 420,
+  duration: duration.sheet,
   easing: ease.out,
   reduceMotion: ReduceMotion.System,
 };
-const DROP_DELAY_MS = 200;
+const DROP_DELAY_MS = duration.base;
 
 const move: WithTimingConfig = {
   duration: duration.sheet,

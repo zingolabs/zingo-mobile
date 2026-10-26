@@ -103,7 +103,6 @@ const geometryGaps = [
   // not yet redesigned: hand-set values until each screen moves onto the
   // system (counts as of 2026-10-25)
   'screens/About/About.tsx',
-  'screens/History/components/IronwoodMigrationBanner.tsx',
   'screens/ImportChooser/ImportChooser.tsx',
   'screens/ImportUfvk/ImportUfvk.tsx',
   'screens/Insight/Insight.tsx',
