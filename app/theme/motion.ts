@@ -26,6 +26,10 @@ export const duration = {
   leavesReturn: 720,
   hero: 1100,
   hold: 1500,
+  /** A finished backup keeps its green pill this long before its notice leaves. */
+  noticeLeave: 900,
+  /** A row that just arrived glows, then settles. */
+  fresh: 1600,
 } as const;
 
 export const ease = {

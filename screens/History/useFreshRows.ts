@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ValueTransferType } from '@app/AppState';
-
-/** How long a new row stays lit, from the redesign's motion rules. */
-export const FRESH_MS = 1600;
+import { duration } from '@app/theme/motion';
 
 /**
  * The transactions that turned up while History was open: what was there at
@@ -30,7 +28,10 @@ export function useFreshRows(
       return;
     }
     setFresh(new Set(added));
-    const timer = setTimeout(() => setFresh(new Set()), FRESH_MS + 200);
+    const timer = setTimeout(
+      () => setFresh(new Set()),
+      duration.fresh + duration.base,
+    );
     return () => clearTimeout(timer);
   }, [valueTransfers]);
 
