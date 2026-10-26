@@ -88,13 +88,7 @@ const geometryGaps = [
   'screens/AddressBook/components/AddressRowHead.tsx',
   'screens/AddressBook/components/ContactRow.tsx',
   'screens/MeetIronwood/MeetIronwood.tsx',
-  'screens/MigrationBatchSending/MigrationBatchSending.tsx',
-  'screens/MigrationCadence/MigrationCadence.tsx',
-  'screens/MigrationSchedule/MigrationSchedule.tsx',
   'screens/MigrationSending/MigrationSending.tsx',
-  'screens/MigrationSplitPlan/MigrationSplitPlan.tsx',
-  'screens/MigrationSplitting/MigrationSplitting.tsx',
-  'screens/MigrationStatus/MigrationStatus.tsx',
   'screens/MigrationStrategy/MigrationStrategy.tsx',
   'screens/MigrationStrategy/components/NymGateSheet.tsx',
   'screens/MigrationTransactions/MigrationTransactions.tsx',
@@ -106,7 +100,6 @@ const geometryGaps = [
   'ui/widgets/Header/components/PriceRow.tsx',
   'ui/widgets/SearchField.tsx',
   'ui/widgets/SegmentedSwitch.tsx',
-  'ui/widgets/StepperHeader.tsx',
   // not yet redesigned: hand-set values until each screen moves onto the
   // system (counts as of 2026-10-25)
   'screens/About/About.tsx',
