@@ -27,8 +27,8 @@
 -keepattributes *Annotation*, Signature, InnerClasses, EnclosingMethod
 
 # Guava — the androidTest APK asserts with Google Truth, which needs Guava
-# (e.g. ImmutableList) at runtime. Because the app ships Guava (a notifee
-# dependency, also declared for WorkManager's ListenableFuture), AGP excludes
+# (e.g. ImmutableList) at runtime. Because the app ships Guava (declared for
+# WorkManager's ListenableFuture), AGP excludes
 # Guava from the test APK and the instrumentation classpath borrows the
 # app's copy — but the app itself reaches only a sliver of Guava, so R8
 # strips the rest and Truth dies with NoClassDefFoundError on device.

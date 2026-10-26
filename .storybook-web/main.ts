@@ -131,10 +131,6 @@ const main: StorybookConfig = {
         replacement: path.resolve(__dirname, './shims/react-native-fs.ts'),
       },
       {
-        find: '@notifee/react-native',
-        replacement: path.resolve(__dirname, './shims/notifee.ts'),
-      },
-      {
         find: 'react-native-linear-gradient',
         replacement: path.resolve(__dirname, './shims/linearGradient.tsx'),
       },
