@@ -332,8 +332,8 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
   <RCTScrollView
     contentContainerStyle={
       {
-        "paddingBottom": 28,
-        "paddingHorizontal": 21.5,
+        "paddingBottom": 32,
+        "paddingHorizontal": 20,
       }
     }
     onTouchStart={[Function]}
@@ -346,7 +346,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             {
               "backgroundColor": "#031124",
               "borderColor": "#05234C",
-              "borderRadius": 16,
+              "borderRadius": 12,
               "borderWidth": 1,
               "marginTop": 12,
               "padding": 16,
@@ -360,13 +360,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           ]
         }
       >
-        <View
-          style={
-            {
-              "margin": -10,
-            }
-          }
-        >
+        <View>
           <View
             style={
               {
@@ -384,11 +378,13 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
                 "fontWeight": "600",
+                "lineHeight": 21,
               }
             }
             testID="syncreport.status"
@@ -396,12 +392,13 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             text translated
           </Text>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#888888",
-                "fontSize": 12,
-                "lineHeight": 16,
-                "marginTop": 2,
+                "fontSize": 13,
+                "fontWeight": "400",
+                "lineHeight": 18,
               }
             }
           >
@@ -424,7 +421,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               {
                 "backgroundColor": "#031124",
                 "borderColor": "#05234C",
-                "borderRadius": 16,
+                "borderRadius": 12,
                 "borderWidth": 1,
                 "marginTop": 12,
                 "padding": 16,
@@ -451,17 +448,20 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#8FB4E6",
-                  "borderRadius": 3,
+                  "borderRadius": 999,
                   "height": 8,
                   "width": 8,
                 }
               }
             />
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#888888",
                   "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
                 }
               }
             >
@@ -469,12 +469,14 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             </Text>
           </View>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 13,
                 "fontWeight": "700",
-                "marginTop": 6,
+                "lineHeight": 18,
+                "marginTop": 4,
               }
             }
           >
@@ -487,7 +489,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               {
                 "backgroundColor": "#031124",
                 "borderColor": "#05234C",
-                "borderRadius": 16,
+                "borderRadius": 12,
                 "borderWidth": 1,
                 "marginTop": 12,
                 "padding": 16,
@@ -514,17 +516,20 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#18bd18",
-                  "borderRadius": 3,
+                  "borderRadius": 999,
                   "height": 8,
                   "width": 8,
                 }
               }
             />
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#888888",
                   "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
                 }
               }
             >
@@ -532,12 +537,14 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             </Text>
           </View>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 13,
                 "fontWeight": "700",
-                "marginTop": 6,
+                "lineHeight": 18,
+                "marginTop": 4,
               }
             }
           >
@@ -550,7 +557,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               {
                 "backgroundColor": "#031124",
                 "borderColor": "#05234C",
-                "borderRadius": 16,
+                "borderRadius": 12,
                 "borderWidth": 1,
                 "marginTop": 12,
                 "padding": 16,
@@ -577,17 +584,20 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#F99D00",
-                  "borderRadius": 3,
+                  "borderRadius": 999,
                   "height": 8,
                   "width": 8,
                 }
               }
             />
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#888888",
                   "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
                 }
               }
             >
@@ -595,12 +605,14 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             </Text>
           </View>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 13,
                 "fontWeight": "700",
-                "marginTop": 6,
+                "lineHeight": 18,
+                "marginTop": 4,
               }
             }
           >
@@ -614,7 +626,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           {
             "backgroundColor": "#031124",
             "borderColor": "#05234C",
-            "borderRadius": 16,
+            "borderRadius": 12,
             "borderWidth": 1,
             "marginTop": 12,
             "padding": 16,
@@ -627,26 +639,31 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               "alignItems": "center",
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "marginBottom": 10,
+              "marginBottom": 8,
             }
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
-                "fontWeight": "700",
+                "fontWeight": "600",
+                "lineHeight": 21,
               }
             }
           >
             text translated
           </Text>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#888888",
                 "fontSize": 12,
+                "fontWeight": "400",
+                "lineHeight": 16,
               }
             }
           >
@@ -659,7 +676,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           {
             "backgroundColor": "#031124",
             "borderColor": "#05234C",
-            "borderRadius": 16,
+            "borderRadius": 12,
             "borderWidth": 1,
             "marginTop": 12,
             "padding": 16,
@@ -672,26 +689,31 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               "alignItems": "center",
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "marginBottom": 10,
+              "marginBottom": 8,
             }
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
-                "fontWeight": "700",
+                "fontWeight": "600",
+                "lineHeight": 21,
               }
             }
           >
             text translated
           </Text>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#888888",
                 "fontSize": 12,
+                "fontWeight": "400",
+                "lineHeight": 16,
               }
             }
           >
@@ -701,11 +723,11 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         <View
           style={
             {
-              "columnGap": 14,
+              "columnGap": 12,
               "flexDirection": "row",
               "flexWrap": "wrap",
               "marginTop": 12,
-              "rowGap": 6,
+              "rowGap": 4,
             }
           }
         >
@@ -722,17 +744,20 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#18bd18",
-                  "borderRadius": 3,
+                  "borderRadius": 999,
                   "height": 8,
                   "width": 8,
                 }
               }
             />
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#888888",
                   "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
                 }
               }
             >
@@ -752,17 +777,20 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#F99D00",
-                  "borderRadius": 3,
+                  "borderRadius": 999,
                   "height": 8,
                   "width": 8,
                 }
               }
             />
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#888888",
                   "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
                 }
               }
             >
@@ -782,17 +810,20 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#ebff5a",
-                  "borderRadius": 3,
+                  "borderRadius": 999,
                   "height": 8,
                   "width": 8,
                 }
               }
             />
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#888888",
                   "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
                 }
               }
             >
@@ -812,17 +843,20 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#8FB4E6",
-                  "borderRadius": 3,
+                  "borderRadius": 999,
                   "height": 8,
                   "width": 8,
                 }
               }
             />
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#888888",
                   "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
                 }
               }
             >
@@ -842,17 +876,20 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#4A6487",
-                  "borderRadius": 3,
+                  "borderRadius": 999,
                   "height": 8,
                   "width": 8,
                 }
               }
             />
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#888888",
                   "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
                 }
               }
             >
