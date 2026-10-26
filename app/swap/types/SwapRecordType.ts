@@ -95,6 +95,14 @@ export type SwapRecordType = {
   // Lifecycle
   status: SwapStatusEnum;
   trackingStatus?: TrackingStatusEnum;
+  /**
+   * When the provider stops waiting for an inbound deposit, from the quote's
+   * expiry. Once it passes with no deposit seen, the swap expires locally.
+   * Absent on outbound swaps and on records made before it was kept.
+   */
+  depositDeadlineMs?: number;
+  /** When the user said the inbound deposit was sent. */
+  depositSentAtMs?: number;
   /** Set when status is `Refunded` (and sometimes `Failed`). */
   refundInfo?: RefundInfoType;
   /** Provider-supplied human-readable error message when `Failed`. */

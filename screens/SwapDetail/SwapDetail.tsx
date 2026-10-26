@@ -322,7 +322,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
       onBack={close}
       footer={
         <ButtonStack>
-          {canRemoveSwap(record.status) && (
+          {canRemoveSwap(record) && (
             <Button
               testID="swap.detail.remove"
               variant="quiet"

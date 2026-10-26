@@ -1,0 +1,145 @@
+import { SwapService } from '@app/swap/SwapService';
+import {
+  DEPOSIT_WINDOW_MS,
+  awaitsDeposit,
+  depositDeadlineMs,
+  depositOverdue,
+} from '@app/swap/depositDeadline';
+import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
+import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
+import type { SwapPoller } from '@app/swap/SwapPoller';
+import type { SwapStore } from '@app/swap/SwapStore';
+import type { SwapAssetType } from '@app/swap/types/SwapAssetType';
+import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
+
+const ZEC: SwapAssetType = {
+  swapKitId: 'ZEC.ZEC',
+  chain: 'ZEC',
+  symbol: 'ZEC',
+  ticker: 'ZEC',
+  chainId: 'zcash',
+  decimals: 8,
+};
+
+const BTC: SwapAssetType = {
+  swapKitId: 'BTC.BTC',
+  chain: 'BTC',
+  symbol: 'BTC',
+  ticker: 'BTC',
+  chainId: 'bitcoin',
+  decimals: 8,
+};
+
+const T0 = 1_700_000_000_000;
+
+const makeRecord = (
+  overrides: Partial<SwapRecordType> = {},
+): SwapRecordType => ({
+  recordId: 'rec-1',
+  depositAddress: 'bc1qdeposit',
+  provider: SwapKitProviderEnum.Near,
+  direction: SwapDirectionEnum.Inbound,
+  routeId: 'route-1',
+  sellAsset: BTC,
+  receiveAsset: ZEC,
+  sellAmountHumanDecimal: '0.03',
+  expectedReceiveAmount: '12.5',
+  minReceiveAmount: '12.4',
+  destinationAddress: 't1ephemeral',
+  sourceAddress: 'bc1qrefund',
+  status: SwapStatusEnum.AwaitingExternalDeposit,
+  providerData: {
+    kind: SwapKitProviderEnum.Near,
+    depositAddress: 'bc1qdeposit',
+  },
+  fiatValueBasis: {
+    sellUsdUnitPrice: 60000,
+    receiveUsdUnitPrice: 30,
+    capturedAt: 0,
+  },
+  createdAtMs: T0,
+  updatedAtMs: T0,
+  depositDeadlineMs: T0 + 600_000,
+  ...overrides,
+});
+
+test('Tests that the deadline is the quote’s when the record carries one and the window after creation when it does not', () => {
+  expect(depositDeadlineMs(makeRecord())).toBe(T0 + 600_000);
+  expect(depositDeadlineMs({ createdAtMs: T0 })).toBe(T0 + DEPOSIT_WINDOW_MS);
+});
+
+test('Tests that only an inbound deposit the provider has not seen is awaited', () => {
+  expect(awaitsDeposit(makeRecord())).toBe(true);
+  expect(
+    awaitsDeposit(makeRecord({ observedDepositTxHash: 'ab'.repeat(32) })),
+  ).toBe(false);
+  expect(awaitsDeposit(makeRecord({ status: SwapStatusEnum.Pending }))).toBe(
+    false,
+  );
+});
+
+test('Tests that an awaited deposit is overdue once its deadline passes and before that it is not', () => {
+  expect(depositOverdue(makeRecord(), T0 + 599_999)).toBe(false);
+  expect(depositOverdue(makeRecord(), T0 + 600_000)).toBe(true);
+  expect(
+    depositOverdue(
+      makeRecord({ observedDepositTxHash: 'ab'.repeat(32) }),
+      T0 + 900_000,
+    ),
+  ).toBe(false);
+});
+
+describe('SwapService.markDepositSent', () => {
+  const serviceOver = (record: SwapRecordType | null) => {
+    const upsert = jest.fn(async () => undefined);
+    const poller = {
+      isRunning: jest.fn(() => true),
+      start: jest.fn(),
+      tickOnce: jest.fn(async () => undefined),
+    };
+    const service = new SwapService({
+      client: null as never,
+      registry: null as never,
+      store: {
+        getByRecordId: async () => record,
+        upsert,
+      } as unknown as typeof SwapStore,
+      poller: poller as unknown as SwapPoller,
+      tokenCatalog: null as never,
+    });
+    return { service, upsert, poller };
+  };
+
+  it('keeps the moment the user said the deposit was sent and leaves the status alone', async () => {
+    const { service, upsert, poller } = serviceOver(makeRecord());
+
+    const updated = await service.markDepositSent({ recordId: 'rec-1' });
+
+    expect(updated.depositSentAtMs).toEqual(expect.any(Number));
+    expect(updated.status).toBe(SwapStatusEnum.AwaitingExternalDeposit);
+    expect(upsert).toHaveBeenCalledTimes(1);
+    expect(poller.tickOnce).toHaveBeenCalled();
+  });
+
+  it('keeps the first moment when the user says it twice', async () => {
+    const { service, upsert } = serviceOver(
+      makeRecord({ depositSentAtMs: T0 + 1 }),
+    );
+
+    const updated = await service.markDepositSent({ recordId: 'rec-1' });
+
+    expect(updated.depositSentAtMs).toBe(T0 + 1);
+    expect(upsert).not.toHaveBeenCalled();
+  });
+
+  it('refuses an outbound swap, whose deposit this wallet sends', async () => {
+    const { service } = serviceOver(
+      makeRecord({ direction: SwapDirectionEnum.Outbound }),
+    );
+
+    await expect(
+      service.markDepositSent({ recordId: 'rec-1' }),
+    ).rejects.toThrow('not an inbound record');
+  });
+});

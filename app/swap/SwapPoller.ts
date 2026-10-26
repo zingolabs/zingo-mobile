@@ -4,6 +4,7 @@ import { SwapStore } from './SwapStore';
 import { ProviderRegistry } from './providers/ProviderRegistry';
 import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
 import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
+import { awaitsDeposit, depositOverdue } from './depositDeadline';
 import { isThorchainFamily } from './thorchainFamily';
 import { SwapStatusEnum, isTerminalStatus } from './enums/SwapStatusEnum';
 import { TrackingStatusEnum } from './enums/TrackingStatusEnum';
@@ -32,6 +33,12 @@ import { TrackResponseType } from './types/TrackResponseType';
  *     we skip the `SwapStore.upsert` write. This avoids hammering
  *     storage when the provider returns the same `/track` response
  *     for many ticks.
+ *
+ * Expiry:
+ *   - An inbound deposit the provider has not seen by its deadline is marked
+ *     `Expired` here, without asking `/track`. The record keeps the tick
+ *     alive until then, and a launch after the deadline expires it on the
+ *     first tick.
  *
  * Stop conditions:
  *   - Records reaching a terminal `SwapStatusEnum` are dropped from polling
@@ -157,6 +164,13 @@ export class SwapPoller {
 
     for (const record of all) {
       if (!this.isRunningForGeneration(callerGeneration)) return;
+      if (depositOverdue(record, now)) {
+        await this.expire(record, now);
+        continue;
+      }
+      // An awaited deposit keeps the tick alive until its deadline, so it
+      // expires on time even when nothing about it can be asked.
+      if (awaitsDeposit(record)) hasPollableRecord = true;
       if (!this.isPollable(record)) continue;
       hasPollableRecord = true;
       if (!this.isDue(record, now)) continue;
@@ -168,6 +182,25 @@ export class SwapPoller {
     // poller is rearmed automatically when a new record appears.
     if (!hasPollableRecord && this.timer !== null) {
       this.stop();
+    }
+  }
+
+  /** Ends an awaited deposit whose deadline passed with nothing seen. */
+  private async expire(record: SwapRecordType, nowMs: number): Promise<void> {
+    const expired: SwapRecordType = {
+      ...record,
+      status: SwapStatusEnum.Expired,
+      terminalAtMs: nowMs,
+      updatedAtMs: nowMs,
+    };
+    try {
+      await this.store.upsert(expired);
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.log(
+        `SwapPoller: store.upsert (expiry) failed for ${record.depositAddress}:`,
+        errMsg,
+      );
     }
   }
 
