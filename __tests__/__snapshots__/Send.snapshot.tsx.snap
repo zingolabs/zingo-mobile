@@ -563,6 +563,14 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                       accessible={true}
                       collapsable={false}
                       focusable={true}
+                      hitSlop={
+                        {
+                          "bottom": 6,
+                          "left": 6,
+                          "right": 6,
+                          "top": 6,
+                        }
+                      }
                       onBlur={[Function]}
                       onClick={[Function]}
                       onFocus={[Function]}
@@ -649,7 +657,14 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                       accessible={true}
                       collapsable={false}
                       focusable={true}
-                      hitSlop={8}
+                      hitSlop={
+                        {
+                          "bottom": 14,
+                          "left": 14,
+                          "right": 14,
+                          "top": 14,
+                        }
+                      }
                       onBlur={[Function]}
                       onClick={[Function]}
                       onFocus={[Function]}
@@ -1444,6 +1459,14 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                       accessible={true}
                       collapsable={false}
                       focusable={true}
+                      hitSlop={
+                        {
+                          "bottom": 6,
+                          "left": 6,
+                          "right": 6,
+                          "top": 6,
+                        }
+                      }
                       onBlur={[Function]}
                       onClick={[Function]}
                       onFocus={[Function]}
@@ -1530,7 +1553,14 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                       accessible={true}
                       collapsable={false}
                       focusable={true}
-                      hitSlop={8}
+                      hitSlop={
+                        {
+                          "bottom": 14,
+                          "left": 14,
+                          "right": 14,
+                          "top": 14,
+                        }
+                      }
                       onBlur={[Function]}
                       onClick={[Function]}
                       onFocus={[Function]}
