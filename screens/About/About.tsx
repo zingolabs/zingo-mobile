@@ -1,3 +1,4 @@
+/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
