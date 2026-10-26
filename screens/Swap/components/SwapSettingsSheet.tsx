@@ -2,7 +2,7 @@
 import React, { forwardRef, useCallback, useContext, useState } from 'react';
 import { View } from 'react-native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { space12, space16, space8 } from '@app/theme';
+import { space12, space16, space8, space20 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
@@ -103,7 +103,7 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
           paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
         }}
       >
-        <View style={{ paddingHorizontal: space16 }}>
+        <View style={{ paddingHorizontal: space20 }}>
           {/* One row when it fits; the chips drop under the label when not. */}
           <View
             style={{

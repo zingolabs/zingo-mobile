@@ -2,7 +2,14 @@
 import React, { forwardRef, useCallback, useContext } from 'react';
 import { View } from 'react-native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { space16, space8, useTheme, radiusPill, iconSize } from '@app/theme';
+import {
+  space16,
+  space8,
+  useTheme,
+  radiusPill,
+  iconSize,
+  space20,
+} from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import { askGate, enactGateAnswer } from '@app/services/gateController';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
@@ -50,7 +57,7 @@ const AuthorizeSheet = forwardRef<BottomSheetModal, AuthorizeSheetProps>(
         <View
           style={{
             alignItems: 'center',
-            paddingHorizontal: space16,
+            paddingHorizontal: space20,
             paddingTop: space8,
           }}
         >

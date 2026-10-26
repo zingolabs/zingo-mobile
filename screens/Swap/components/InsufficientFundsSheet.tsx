@@ -2,12 +2,18 @@
 import React, { forwardRef, useCallback, useContext } from 'react';
 import { View } from 'react-native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { space12, space16, space8, useTheme, iconSize } from '@app/theme';
+import {
+  space12,
+  space16,
+  space8,
+  useTheme,
+  iconSize,
+  space20,
+} from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
-import ButtonStack from '@ui/primitives/ButtonStack';
 import { WalletIcon } from '@ui/primitives/Icons/WalletIcon';
 import { toAmountInput } from '@app/utils/formatAmount';
 import SheetTitle from './SheetTitle';
@@ -54,7 +60,7 @@ const InsufficientFundsSheet = forwardRef<
       }
       contentStyle={{ paddingBottom: 32 }}
     >
-      <View style={{ paddingHorizontal: space16 }}>
+      <View style={{ paddingHorizontal: space20 }}>
         <View style={{ alignItems: 'center', marginBottom: space12 }}>
           <WalletIcon size={iconSize} color={colors.fgWarning} />
         </View>
@@ -72,26 +78,19 @@ const InsufficientFundsSheet = forwardRef<
               : (translate('swap.reduce-note-all') as string)
             : (translate('swap.insufficient-hint') as string)}
         </Text>
-        <View style={{ marginTop: space16 }}>
-          <ButtonStack>
+        {maxSpendableForSwap > 0 && (
+          <View style={{ marginTop: space16 }}>
             <Button
-              variant="quiet"
-              title={translate('swap.close') as string}
-              onPress={dismiss}
+              testID="swap.reduce"
+              variant="primary"
+              title={`${translate('swap.reduce-to') as string} ${reduced} ${info.currencyName}`}
+              onPress={() => {
+                onReduce(reduced);
+                dismiss();
+              }}
             />
-            {maxSpendableForSwap > 0 && (
-              <Button
-                testID="swap.reduce"
-                variant="primary"
-                title={`${translate('swap.reduce-to') as string} ${reduced} ${info.currencyName}`}
-                onPress={() => {
-                  onReduce(reduced);
-                  dismiss();
-                }}
-              />
-            )}
-          </ButtonStack>
-        </View>
+          </View>
+        )}
       </View>
     </AppSheetModal>
   );

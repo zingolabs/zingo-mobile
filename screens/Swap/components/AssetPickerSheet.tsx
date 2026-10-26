@@ -15,6 +15,7 @@ import {
   useTheme,
   iconSizeMd,
   radiusSm,
+  space20,
 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import type { TokenEntryType } from '@app/swap';
@@ -280,7 +281,7 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
         {networksOf ? (
           <BottomSheetScrollView
             contentContainerStyle={{
-              paddingHorizontal: space16,
+              paddingHorizontal: space20,
               paddingTop: space8,
               paddingBottom: 32,
             }}
@@ -311,7 +312,7 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
           <BottomSheetScrollView
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{
-              paddingHorizontal: space16,
+              paddingHorizontal: space20,
               paddingTop: space8,
               paddingBottom: 32,
             }}
