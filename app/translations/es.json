@@ -1185,6 +1185,7 @@
     "birthday-tip-body": "No pasa nada si no la sabes."
   },
   "about": {
+    "back-acc": "Atrás",
     "copyright": [
       "Copyright (c) 2026, ZingoLabs.",
       "Construida con React Native.",

@@ -14,6 +14,9 @@ import { usePriceHealth } from './priceFetcherStore';
 import { useTimedReveal } from '@app/hooks/useTimedReveal';
 import { MASK } from '@ui/widgets/PrivateAmount';
 
+/** The fiat beside a ZEC amount, at ZecAmount's default size. */
+const AMOUNT_SIZE = 20;
+
 type CurrencyAmountProps = {
   price?: number;
   amtZec?: number;
@@ -56,7 +59,7 @@ const TintedText: React.FunctionComponent<{
       style={[
         {
           color: base,
-          fontSize: 20,
+          fontSize: AMOUNT_SIZE,
           fontWeight: '700',
           fontVariant: ['tabular-nums'],
           ...style,
@@ -119,7 +122,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
               maxFontSizeMultiplier={fontScaleBody}
               style={{
                 color: baseColor,
-                fontSize: 20,
+                fontSize: AMOUNT_SIZE,
                 fontWeight: '700',
                 ...style,
               }}
@@ -140,7 +143,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
               maxFontSizeMultiplier={fontScaleBody}
               style={{
                 color: baseColor,
-                fontSize: 20,
+                fontSize: AMOUNT_SIZE,
                 fontWeight: '700',
                 ...style,
               }}

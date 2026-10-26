@@ -1185,6 +1185,7 @@
     "birthday-tip-body": "Tudo bem se você não souber."
   },
   "about": {
+    "back-acc": "Voltar",
     "copyright": [
       "Copyright (c) 2026, ZingoLabs.",
       "Construído com React Native.",

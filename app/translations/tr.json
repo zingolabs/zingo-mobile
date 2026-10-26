@@ -1185,6 +1185,7 @@
     "birthday-tip-body": "Bilmiyorsanız sorun değil."
   },
   "about": {
+    "back-acc": "Geri",
     "copyright": [
       "Copyright (c) 2026, ZingoLabs.",
       "Built with React Native.",
