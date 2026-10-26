@@ -32,11 +32,9 @@ type MigrationStrategyProps = NativeStackScreenProps<
   nymSheetOpen?: boolean;
 };
 
-// Migration choices: opt out entirely ('none', the default), the immediate
-// drain ('now'), or the private two-phase path ('private': split notes, then
-// send batches inside scheduled windows). The private path ships later and
-// its card is disabled.
-type StrategyOption = 'none' | 'now' | 'private';
+// Migration choices: opt out entirely ('none', the default) or the immediate
+// drain ('now').
+type StrategyOption = 'none' | 'now';
 
 // Renders a translated string, bolding `**…**` spans in `highlight` and
 // `##…##` spans in `accent` (falling back to `highlight`), so a single
@@ -119,8 +117,6 @@ type OptionCardProps = {
   selected: boolean;
   onPress: () => void;
   colors: AppTheme['colors'];
-  disabled?: boolean;
-  badge?: string;
   accent?: string;
 };
 
@@ -130,13 +126,10 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
   selected,
   onPress,
   colors,
-  disabled = false,
-  badge,
   accent,
 }) => (
   <TouchableOpacity
-    activeOpacity={disabled ? 1 : 0.8}
-    disabled={disabled}
+    activeOpacity={0.8}
     onPress={onPress}
     style={{
       borderWidth: 1.5,
@@ -144,7 +137,6 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
       backgroundColor: colors.bgSurface,
       borderRadius: 14,
       padding: 18,
-      opacity: disabled ? 0.5 : 1,
     }}
   >
     <View
@@ -163,21 +155,6 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
         >
           {title}
         </Text>
-        {badge ? (
-          <View
-            style={{
-              marginLeft: 8,
-              paddingHorizontal: 8,
-              paddingVertical: 2,
-              borderRadius: 6,
-              backgroundColor: colors.bgMuted,
-            }}
-          >
-            <Text style={{ color: colors.bgSurface, fontSize: 12 }}>
-              {badge}
-            </Text>
-          </View>
-        ) : null}
       </View>
       <RadioDot
         selected={selected}
@@ -229,12 +206,8 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   }, [navigation]);
 
   const startMigration = useCallback(() => {
-    navigation.navigate(
-      selected === 'private'
-        ? Route.MigrationSplitPlan
-        : Route.MigrationTransactions,
-    );
-  }, [navigation, selected]);
+    navigation.navigate(Route.MigrationTransactions);
+  }, [navigation]);
 
   // Ends the enable wait once the transport settles: ready continues the
   // migration, a lost transport releases the button. A reconnecting
@@ -324,16 +297,6 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
             onPress={() => setSelected('now')}
             colors={colors}
             accent={colors.fgWarning}
-          />
-          <View style={{ height: 14 }} />
-          <OptionCard
-            title={translate('migrationstrategy.private-label') as string}
-            body={translate('migrationstrategy.private-body') as string}
-            selected={selected === 'private'}
-            onPress={() => {}}
-            colors={colors}
-            disabled={true}
-            badge={translate('migrationstrategy.coming-soon') as string}
           />
         </ScrollView>
 

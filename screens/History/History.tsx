@@ -273,7 +273,6 @@ const History: React.FunctionComponent<HistoryProps> = () => {
           amount={orchardAmount}
           currencyName={info.currencyName}
           onStart={() => navigation.navigate(Route.MeetIronwood)}
-          onResume={route => navigation.navigate(route)}
           onHide={hideIronwoodNotice}
         />
       ),
