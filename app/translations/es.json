@@ -1148,6 +1148,7 @@
     "done": "Hecho"
   },
   "import": {
+    "back-acc": "Atrás",
     "scan-hint": "Apunta la cámara al código QR de una frase semilla o de una clave de visualización.",
     "scan-miss": "Ese código no es una frase semilla ni una clave de visualización.",
     "scan-found-seed": "Frase semilla encontrada",

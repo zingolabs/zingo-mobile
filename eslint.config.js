@@ -103,8 +103,6 @@ const geometryGaps = [
   // not yet redesigned: hand-set values until each screen moves onto the
   // system (counts as of 2026-10-25)
   'screens/About/About.tsx',
-  'screens/ImportChooser/ImportChooser.tsx',
-  'screens/ImportUfvk/ImportUfvk.tsx',
   'screens/Insight/Insight.tsx',
   'screens/Insight/components/ActivityChart.tsx',
   'screens/Insight/components/Donut.tsx',
@@ -123,7 +121,6 @@ const geometryGaps = [
   'screens/Server/CustomServerBox.tsx',
   'screens/Server/Server.tsx',
   'screens/Server/ServerLog.tsx',
-  'screens/StartMenu/StartMenu.tsx',
   'screens/Swap/components/TokenLogo.tsx',
   'screens/SwapResult/SwapResult.tsx',
   'screens/ViewingKey/ViewingKey.tsx',
