@@ -125,7 +125,6 @@ const geometryGaps = [
   'screens/SeedBackup/components/SeedParts.tsx',
   'screens/SeedBackup/components/StepParts.tsx',
   'screens/SeedBackup/components/WordsStep.tsx',
-  'screens/Send/components/SendErrorSheet.tsx',
   'screens/Server/CustomServerBox.tsx',
   'screens/Server/Server.tsx',
   'screens/Server/ServerLog.tsx',
