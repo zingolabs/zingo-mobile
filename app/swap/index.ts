@@ -21,6 +21,8 @@ export { TrackingStatusEnum } from './enums/TrackingStatusEnum';
 export { canRemoveSwap } from './canRemoveSwap';
 export { hasDepositEvidence } from './depositEvidence';
 export { newlyExpired, newlyRefunding } from './swapTransitions';
+export { prefillFromRecord } from './swapPrefill';
+export type { SwapPrefillType } from './types/SwapPrefillType';
 export {
   LATE_WATCH_MS,
   acceptsLateUpdate,

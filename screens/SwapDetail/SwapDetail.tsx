@@ -44,6 +44,7 @@ import {
   isRefunding,
   isTerminalStatus,
   isThorchainFamily,
+  prefillFromRecord,
   providerLongLabel,
 } from '@app/swap';
 import { showConfirm } from '@app/services/showConfirm';
@@ -413,6 +414,19 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
       onBack={close}
       footer={
         <ButtonStack>
+          {expired && (
+            <Button
+              testID="swap.detail.new-quote"
+              variant="primary"
+              title={t('swap.get-new-quote')}
+              onPress={() =>
+                navigation.navigate(Route.Home, {
+                  screen: Route.Swap,
+                  params: { prefill: prefillFromRecord(record, Date.now()) },
+                })
+              }
+            />
+          )}
           {canRemoveSwap(record) && (
             <Button
               testID="swap.detail.remove"

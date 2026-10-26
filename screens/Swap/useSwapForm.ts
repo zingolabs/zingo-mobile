@@ -32,9 +32,10 @@ import {
   validateAddressForChain,
   zecNetworkFeeReserve,
 } from '@app/swap';
-import { parseAmountInput } from '@app/utils/formatAmount';
+import { decimalSeparator, parseAmountInput } from '@app/utils/formatAmount';
 import { selectionAcrossRefresh } from '@app/swap/selectionAcrossRefresh';
 import type {
+  SwapPrefillType,
   FiatValueBasisType,
   QuoteInput,
   RouteOptionType,
@@ -46,6 +47,7 @@ import type {
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
 import { deriveRefundAddress } from '@app/walletBackend';
 import {
+  tokenEntryOf,
   ZEC_ASSET,
   isQuotableToken,
   isZecWrapper,
@@ -105,6 +107,8 @@ export type SwapFormArgs = {
   mixnetBlocked: boolean;
   /** A sheet is open over the form: the quote countdown holds until it closes. */
   paused: boolean;
+  /** A purchase to ask about again: the form fills itself and arms the review. */
+  prefill?: SwapPrefillType;
 };
 
 /**
@@ -120,6 +124,7 @@ export function useSwapForm({
   zecChain,
   mixnetBlocked,
   paused,
+  prefill,
 }: SwapFormArgs) {
   const [direction, setDirection] = useState<SwapDirectionEnum>(() =>
     spendable > 0 ? SwapDirectionEnum.Outbound : SwapDirectionEnum.Inbound,
@@ -331,6 +336,61 @@ export function useSwapForm({
   const setActiveAddress = isOutbound
     ? setDestinationAddress
     : setRefundAddress;
+
+  // A prefill lands in three steps, each a render after the last: the
+  // direction, then the coin once the inbound catalog is in, then the amount
+  // and the refund address once the coin's chain has cleared the fields.
+  // Armed at the end, the review opens by itself when the quote is ready.
+  const [pendingPrefill, setPendingPrefill] = useState<SwapPrefillType | null>(
+    null,
+  );
+  const [prefillStage, setPrefillStage] = useState<'coin' | 'fields' | null>(
+    null,
+  );
+  const [prefillArmed, setPrefillArmed] = useState<boolean>(false);
+  const handledPrefillAt = useRef<number | null>(null);
+  useEffect(() => {
+    if (!prefill || handledPrefillAt.current === prefill.requestedAtMs) {
+      return;
+    }
+    handledPrefillAt.current = prefill.requestedAtMs;
+    setDirection(SwapDirectionEnum.Inbound);
+    setPendingPrefill(prefill);
+    setPrefillStage('coin');
+    setPrefillArmed(false);
+  }, [prefill]);
+  useEffect(() => {
+    if (
+      prefillStage !== 'coin' ||
+      !pendingPrefill ||
+      !tokens ||
+      tokensDirection !== SwapDirectionEnum.Inbound
+    ) {
+      return;
+    }
+    setSelectedToken(
+      tokens.find(t => t.identifier === pendingPrefill.sellAsset.swapKitId) ??
+        tokenEntryOf(pendingPrefill.sellAsset),
+    );
+    setPrefillStage('fields');
+  }, [prefillStage, pendingPrefill, tokens, tokensDirection]);
+  useEffect(() => {
+    if (
+      prefillStage !== 'fields' ||
+      !pendingPrefill ||
+      selectedToken?.identifier !== pendingPrefill.sellAsset.swapKitId
+    ) {
+      return;
+    }
+    setAmount(
+      pendingPrefill.sellAmountHumanDecimal.replace('.', decimalSeparator()),
+    );
+    setRefundAddress(pendingPrefill.refundAddress);
+    setPrefillStage(null);
+    setPendingPrefill(null);
+    setPrefillArmed(true);
+  }, [prefillStage, pendingPrefill, selectedToken]);
+  const disarmPrefill = useCallback(() => setPrefillArmed(false), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -892,5 +952,7 @@ export function useSwapForm({
     cancelReview,
     refuseRoute,
     finish,
+    prefillArmed,
+    disarmPrefill,
   };
 }

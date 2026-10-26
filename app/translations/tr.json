@@ -845,6 +845,7 @@
     "deleted": "Silindi",
     "delete-expired-title": "Süresi dolan bu takas silinsin mi?",
     "delete-expired-body": "Ödeme gelmedi, dolayısıyla söz konusu bir fon yok. Yalnızca geçmişten ve Takaslarınız’dan kaybolur.",
+    "get-new-quote": "Yeni teklif al",
     "shield": "Koru",
     "shield-note": "Şeffaf bakiyenizde, henüz gizli değil.",
     "cancel": "İptal",

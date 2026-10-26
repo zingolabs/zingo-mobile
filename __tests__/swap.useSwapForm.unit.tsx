@@ -202,3 +202,40 @@ test('Tests that the quote countdown holds while a sheet is open and carries on 
   await settle(7_000);
   await waitFor(() => expect(quote).toHaveBeenCalledTimes(2));
 });
+
+const PREFILL = {
+  sellAsset: {
+    swapKitId: 'BTC.BTC',
+    chain: 'BTC',
+    symbol: 'BTC',
+    ticker: 'BTC',
+    chainId: 'bitcoin',
+    decimals: 8,
+  },
+  sellAmountHumanDecimal: '0.03',
+  refundAddress: BTC_ADDRESS,
+  requestedAtMs: 1,
+};
+
+test('Tests that a purchase asked about again fills the coin, the amount and the refund address, buying ZEC, and arms the review', async () => {
+  const { swapService } = service();
+  const { result } = renderHook(() =>
+    useSwapForm({
+      swapService,
+      spendable: 10,
+      zecChain: ChainNameEnum.mainChainName,
+      mixnetBlocked: false,
+      paused: false,
+      prefill: PREFILL,
+    }),
+  );
+
+  await waitFor(() => expect(result.current.prefillArmed).toBe(true));
+  expect(result.current.isOutbound).toBe(false);
+  expect(result.current.selectedToken).toEqual(BTC);
+  expect(result.current.amount).toBe('0.03');
+  expect(result.current.activeAddress).toBe(BTC_ADDRESS);
+
+  act(() => result.current.disarmPrefill());
+  expect(result.current.prefillArmed).toBe(false);
+});

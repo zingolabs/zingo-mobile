@@ -94,7 +94,7 @@ type SwapProps = HomeTabScreenProps<'Swap'>;
  * always one side. The sheet sits fixed under the header's icons; the review
  * and everything after it are screens of their own.
  */
-const Swap: React.FunctionComponent<SwapProps> = () => {
+const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -133,6 +133,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     zecChain: walletChainName,
     mixnetBlocked: !sendGateOpen(mixnetView),
     paused: sheetsOpen > 0,
+    prefill: route.params?.prefill,
   });
 
   const [containerH, setContainerH] = useState<number>(0);
@@ -311,6 +312,14 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     }
     proceed();
   };
+
+  // A new quote asked from an expired swap goes straight to the review.
+  useEffect(() => {
+    if (form.prefillArmed && form.cta === 'ready') {
+      form.disarmPrefill();
+      onContinue();
+    }
+  });
 
   const noticeText = (): string => {
     const notice = form.quoteNotice;

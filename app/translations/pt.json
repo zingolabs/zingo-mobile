@@ -845,6 +845,7 @@
     "deleted": "Excluído",
     "delete-expired-title": "Excluir este swap expirado?",
     "delete-expired-body": "Nenhum pagamento chegou, então não há fundos envolvidos. Ele só desaparece do histórico e de Seus swaps.",
+    "get-new-quote": "Pedir uma nova cotação",
     "shield": "Blindar",
     "shield-note": "Está no seu saldo transparente, ainda não é privado.",
     "cancel": "Cancelar",

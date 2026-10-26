@@ -845,6 +845,7 @@
     "deleted": "Deleted",
     "delete-expired-title": "Delete this expired swap?",
     "delete-expired-body": "No payment arrived, so no funds are involved. It only disappears from History and Your swaps.",
+    "get-new-quote": "Get a new quote",
     "shield": "Shield",
     "shield-note": "It's in your transparent balance, not private yet.",
     "cancel": "Cancel",
