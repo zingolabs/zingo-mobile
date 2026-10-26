@@ -1,5 +1,6 @@
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
 const withStorybook = require('@storybook/react-native/metro/withStorybook');
+const { lockdownSerializer } = require('@lavamoat/react-native-lockdown');
 const exclusionList =
   require('metro-config/private/defaults/exclusionList').default;
 const path = require('path');
@@ -23,6 +24,16 @@ const defaultConfig = getDefaultConfig(__dirname);
 const { assetExts, sourceExts } = defaultConfig.resolver;
 
 const config = {
+  // Hardened JavaScript (SES). The shim loads as the first polyfill and
+  // repairs the intrinsics; after InitializeCore and before the entry file
+  // `hardenIntrinsics()` freezes Object, Array, Promise, JSON... so no
+  // dependency can patch them later. Hermes has no Compartments, so this is
+  // lockdown only, not per-package isolation. Shims that must patch an
+  // intrinsic go into getPolyfills, before the freeze.
+  serializer: lockdownSerializer(
+    { hermesRuntime: true },
+    { getPolyfills: defaultConfig.serializer.getPolyfills },
+  ),
   transformer: {
     babelTransformerPath: require.resolve('./svgXmlTransformer.js'),
     // Defer module evaluation until first use. Reduces cold-boot time
