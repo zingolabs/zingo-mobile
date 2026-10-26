@@ -1466,5 +1466,11 @@
     "sheet-incomplete": "O saldo e o histórico podem parecer incompletos até terminar",
     "rescan": "Reescanear",
     "rescan-started": "Reescaneamento iniciado"
+  },
+  "errorboundary": {
+    "title": "Algo deu errado",
+    "message": "Ocorreu um erro inesperado. Reinicie o aplicativo.",
+    "report": "Relatar",
+    "restart": "Reiniciar"
   }
 }

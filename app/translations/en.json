@@ -1466,5 +1466,11 @@
     "sheet-incomplete": "Balance and history can look incomplete until it finishes",
     "rescan": "Rescan",
     "rescan-started": "Rescan started"
+  },
+  "errorboundary": {
+    "title": "Something went wrong",
+    "message": "An unexpected error occurred. Please restart the app.",
+    "report": "Report",
+    "restart": "Restart"
   }
 }
