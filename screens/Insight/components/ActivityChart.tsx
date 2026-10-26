@@ -18,6 +18,9 @@ import {
   Metric,
   niceTop,
 } from '@screens/Insight/insightModel';
+import { themeTokens, useTheme } from '@app/theme';
+import { formatPercent } from '@app/utils/formatAmount';
+import { MASK } from '@ui/widgets/PrivateAmount';
 
 const H = 168;
 const TOP = 18;
@@ -25,15 +28,15 @@ const BOTTOM = 22;
 const GROW_MS = 560;
 const GROW_STAGGER = 22;
 const GROW_WINDOW = 400;
-const SEAM = '#04152A';
-const GRID = '#16304F';
-const TICK_INK = '#6F86A6';
-const AXIS_INK = '#7D93B3';
-const TIP_BG = '#020B18';
-const TIP_LINE = '#17375F';
-const TIP_HEAD = '#B9C6D6';
-const TIP_INK = '#D3E2F8';
-const TIP_RULE = '#12294A';
+const SEAM = themeTokens.bgSurface;
+const GRID = themeTokens.borderSubtle;
+const TICK_INK = themeTokens.fgMuted;
+const AXIS_INK = themeTokens.fgMuted;
+const TIP_BG = themeTokens.bgCanvas;
+const TIP_LINE = themeTokens.bottomSheetBorder;
+const TIP_HEAD = themeTokens.fgDefault;
+const TIP_INK = themeTokens.fgDefault;
+const TIP_RULE = themeTokens.borderSubtle;
 
 type Segment = { color: string; height: number };
 
@@ -121,6 +124,10 @@ type ActivityChartProps = {
   value: (v: number) => string;
   totalLabel: string;
   noneLabel: string;
+  /** Privacy hides the axis, which gives the amounts' scale away. */
+  masked: boolean;
+  /** Shows the hidden amounts for a few seconds. */
+  onReveal?: () => void;
 };
 
 // Stacked weekly bars, one color per recipient, with a card for the tapped week.
@@ -138,7 +145,10 @@ const ActivityChart: React.FunctionComponent<ActivityChartProps> = ({
   value,
   totalLabel,
   noneLabel,
+  masked,
+  onReveal,
 }) => {
+  const { colors } = useTheme();
   const [width, setWidth] = useState(0);
   const [tipW, setTipW] = useState(160);
   const n = to - from + 1;
@@ -152,7 +162,7 @@ const ActivityChart: React.FunctionComponent<ActivityChartProps> = ({
     Math.max(0, ...columns.map(c => c.reduce((s, v) => s + v, 0))),
     metric,
   );
-  const tickText = (v: number) => String(+v.toFixed(2));
+  const tickText = (v: number) => (masked ? MASK : formatPercent(v, 2));
   const labels = Math.min(4, n);
   const labelAt = Array.from({ length: labels }, (_, k) =>
     labels > 1 ? Math.round((k * (n - 1)) / (labels - 1)) : 0,
@@ -217,7 +227,7 @@ const ActivityChart: React.FunctionComponent<ActivityChartProps> = ({
             width: slot,
             height: plotH + 4,
             borderRadius: 6,
-            backgroundColor: 'rgba(255,255,255,0.05)',
+            backgroundColor: colors.bgMutedSubtle,
           }}
         />
       )}
@@ -280,14 +290,14 @@ const ActivityChart: React.FunctionComponent<ActivityChartProps> = ({
             style={{
               marginBottom: 5,
               color: TIP_HEAD,
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: '600',
             }}
           >
             {rangeLabel(week)}
           </Text>
           {tipRows.length === 0 && (
-            <Text style={{ color: TIP_INK, fontSize: 11.5, lineHeight: 18 }}>
+            <Text style={{ color: TIP_INK, fontSize: 12, lineHeight: 18 }}>
               {noneLabel}
             </Text>
           )}
@@ -309,14 +319,15 @@ const ActivityChart: React.FunctionComponent<ActivityChartProps> = ({
                 style={{
                   flex: 1,
                   color: TIP_INK,
-                  fontSize: 11.5,
+                  fontSize: 12,
                   lineHeight: 18,
                 }}
               >
                 {name(insight.groups[r.g])}
               </Text>
               <Text
-                style={{ color: TIP_INK, fontSize: 11.5, fontWeight: '600' }}
+                onPress={onReveal}
+                style={{ color: TIP_INK, fontSize: 12, fontWeight: '600' }}
               >
                 {value(r.v)}
               </Text>
@@ -335,15 +346,20 @@ const ActivityChart: React.FunctionComponent<ActivityChartProps> = ({
               <Text
                 style={{
                   flex: 1,
-                  color: '#fff',
-                  fontSize: 11.5,
+                  color: colors.fgDefault,
+                  fontSize: 12,
                   lineHeight: 18,
                 }}
               >
                 {totalLabel}
               </Text>
               <Text
-                style={{ color: '#fff', fontSize: 11.5, fontWeight: '600' }}
+                style={{
+                  color: colors.fgDefault,
+                  fontSize: 12,
+                  fontWeight: '600',
+                }}
+                onPress={onReveal}
               >
                 {value(tipTotal)}
               </Text>

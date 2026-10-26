@@ -5,7 +5,7 @@
 import 'react-native';
 import React from 'react';
 
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import ValueTransferDetail from '@screens/ValueTransferDetail';
 import {
   defaultAppContextLoaded,
@@ -37,89 +37,100 @@ function makeDrawerProps(
     },
   };
 }
-// test suite
+
 describe('Component History ValueTransferDetail - test', () => {
-  //unit test
   const state = { ...defaultAppContextLoaded };
   state.translate = mockTranslate;
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;
   state.valueTransfers = mockValueTransfers;
-  const props_0 = makeDrawerProps(0);
-  test('History ValueTransferDetail - sent ValueTransfer with 2 addresses', () => {
-    render(
-      <ContextAppLoadedProvider value={state}>
-        <ValueTransferDetail {...props_0} />
-      </ContextAppLoadedProvider>,
-    ).toJSON();
-    const num = screen.getAllByText('0.1234');
-    expect(num.length).toBe(2);
-    screen.getByText('0.0001');
-    screen.getByText('hola & hello');
-    const txt = screen.queryByText('hola & hello\nhello & hola');
-    expect(txt).toBe(null);
-  });
 
-  const props_1 = makeDrawerProps(1);
-  test('History ValueTransferDetail - memo self sent ValueTransfer', () => {
+  const amountOf = () => screen.getByTestId('valuetransferdetail.amount');
+  const open = (i: number, context = state) =>
     render(
-      <ContextAppLoadedProvider value={state}>
-        <ValueTransferDetail {...props_1} />
+      <ContextAppLoadedProvider value={context}>
+        <ValueTransferDetail {...makeDrawerProps(i)} />
       </ContextAppLoadedProvider>,
     );
-    const num = screen.getAllByText('0');
-    expect(num.length).toBe(2);
-    screen.getByText('0.0001');
+
+  test('Tests that a sent transfer shows its amount, fee and memo once when it went to two addresses', () => {
+    open(0);
+    expect(amountOf()).toHaveTextContent(/0\.1234/);
+    screen.getByText(/0\.0001/);
+    screen.getByText('hola & hello');
+    expect(screen.queryByText('hola & hello\nhello & hola')).toBe(null);
+  });
+
+  test('Tests that a memo sent to oneself shows both memos when it carried two', () => {
+    open(1);
+    expect(amountOf()).toHaveTextContent(/0/);
+    screen.getByText(/0\.0001/);
     screen.getByText('orchard memo\nsapling memo');
   });
 
-  const props_2 = makeDrawerProps(2);
-  test('History ValueTransferDetail - self sent ValueTransfer', () => {
-    render(
-      <ContextAppLoadedProvider value={state}>
-        <ValueTransferDetail {...props_2} />
-      </ContextAppLoadedProvider>,
-    );
-    const num = screen.getAllByText('0');
-    expect(num.length).toBe(2);
-    screen.getByText('0.0001');
+  test('Tests that a send to oneself shows its fee when it paid one', () => {
+    open(2);
+    screen.getByText(/0\.0001/);
   });
 
-  const props_3 = makeDrawerProps(3);
-  test('History ValueTransferDetail - received ValueTransfer with 2 pools', () => {
-    render(
-      <ContextAppLoadedProvider value={state}>
-        <ValueTransferDetail {...props_3} />
-      </ContextAppLoadedProvider>,
-    );
-    const num = screen.getAllByText('0.7765');
-    expect(num.length).toBe(2);
+  test('Tests that a received transfer shows its amount and memo once when it came in two pools', () => {
+    open(3);
+    expect(amountOf()).toHaveTextContent(/0\.7765/);
     screen.getByText('hola & hello');
-    const txt = screen.queryByText('hola & hello\nhello & hola');
-    expect(txt).toBe(null);
+    expect(screen.queryByText('hola & hello\nhello & hola')).toBe(null);
   });
 
-  const props_4 = makeDrawerProps(4);
-  test('History ValueTransferDetail - shield ValueTransfer', () => {
-    render(
-      <ContextAppLoadedProvider value={state}>
-        <ValueTransferDetail {...props_4} />
-      </ContextAppLoadedProvider>,
-    );
-    const num = screen.getAllByText('0.0009');
-    expect(num.length).toBe(2);
-    screen.getByText('0.0001');
+  test('Tests that a shielding shows its amount and fee when it is open', () => {
+    open(4);
+    expect(amountOf()).toHaveTextContent(/0\.0009/);
+    screen.getByText(/0\.0001/);
   });
 
-  const props_5 = makeDrawerProps(5);
-  test('History ValueTransferDetail - Rejection ValueTransfer', () => {
-    render(
-      <ContextAppLoadedProvider value={state}>
-        <ValueTransferDetail {...props_5} />
-      </ContextAppLoadedProvider>,
+  test('Tests that a rejection shows its amount and fee when it is open', () => {
+    open(5);
+    expect(amountOf()).toHaveTextContent(/0\.0009/);
+    screen.getByText(/0\.0001/);
+  });
+
+  test('Tests that a send offers to save its address as a contact when the address book lacks it', () => {
+    const launchAddTagModal = jest.fn();
+    open(0, { ...state, addressBook: [], launchAddTagModal });
+    fireEvent.press(screen.getByTestId('valuetransferdetail.save-contact'));
+    expect(launchAddTagModal).toHaveBeenCalledWith(
+      mockValueTransfers[0].address,
     );
-    const num = screen.getAllByText('0.0009');
-    expect(num.length).toBe(2);
-    screen.getByText('0.0001');
+  });
+
+  test('Tests that a send shows no save action when its address is already a contact', () => {
+    open(0, {
+      ...state,
+      addressBook: [
+        {
+          label: 'Ana',
+          color: 'Ana',
+          address: mockValueTransfers[0].address ?? '',
+        },
+      ] as never,
+    });
+    expect(screen.queryByTestId('valuetransferdetail.save-contact')).toBe(null);
+  });
+
+  test('Tests that the amount carries a sign only when money left or came into the wallet', () => {
+    const signOf = (i: number) => {
+      const view = open(i);
+      const text = String(
+        [screen.getByTestId('valuetransferdetail.amount').props.children]
+          .flat(Infinity)
+          .join(''),
+      );
+      view.unmount();
+      return text.startsWith('+') ? '+' : text.startsWith('−') ? '−' : '';
+    };
+    expect(signOf(0)).toBe('−'); // sent
+    expect(signOf(3)).toBe('+'); // received
+    expect(signOf(1)).toBe(''); // memo to self
+    expect(signOf(2)).toBe(''); // send to self
+    expect(signOf(4)).toBe(''); // shield
+    expect(signOf(5)).toBe(''); // rejection
   });
 });

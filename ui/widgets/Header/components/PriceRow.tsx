@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { Image, View, ViewStyle } from 'react-native';
-import { useTheme } from '@app/theme';
+import { radiusMd, useTheme } from '@app/theme';
 
 import { ServerType, TranslateType } from '@app/AppState';
 import { fiatQuote } from '@app/price/fiatQuote';
@@ -27,7 +27,7 @@ type PriceRowProps = Omit<PriceCardProps, 'style'>;
 // Vertical margins on the card. Reported back via onLayout so the parent
 // can size its bottom-sheet snap points to cover the whole price block
 // (margins included), not just the card itself.
-const CARD_MARGIN_TOP = 10;
+export const CARD_MARGIN_TOP = 10;
 const CARD_MARGIN_BOTTOM = 12;
 const CARD_VERTICAL_MARGINS = CARD_MARGIN_TOP + CARD_MARGIN_BOTTOM;
 
@@ -61,7 +61,7 @@ export const PriceCard: React.FC<PriceCardProps> = React.memo(
           alignItems: 'center',
           paddingHorizontal: 12,
           paddingVertical: 6,
-          borderRadius: 10,
+          borderRadius: radiusMd,
           backgroundColor: colors.bgSurface,
           borderWidth: 1,
           borderColor: colors.bottomSheetBorder,
@@ -74,21 +74,21 @@ export const PriceCard: React.FC<PriceCardProps> = React.memo(
           style={{ width: 32, height: 32, resizeMode: 'contain' }}
         />
         <View style={{ flex: 1 }}>
-          <BoldText style={{ color: colors.fgDefault, fontSize: 14 }}>
+          <BoldText style={{ color: colors.fgDefault, fontSize: 15 }}>
             Zcash
           </BoldText>
           <FadeText style={{ fontSize: 12 }}>ZEC</FadeText>
         </View>
         <View style={{ alignItems: 'flex-end' }}>
           <CurrencyAmount
-            style={{ fontSize: 14 }}
+            style={{ fontSize: 15 }}
             priceDate={quote.date}
             price={quote.price}
             amtZec={1}
             privacy={false}
           />
           {!!lastUpdate && (
-            <FadeText style={{ fontSize: 10 }}>
+            <FadeText style={{ fontSize: 12 }}>
               {(translate('header.lastupdate') as string) + ' ' + lastUpdate}
             </FadeText>
           )}

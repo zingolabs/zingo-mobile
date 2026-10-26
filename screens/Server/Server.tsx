@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import React, { useEffect, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, {
   FadeIn,
   FadeOut,
@@ -15,6 +15,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useTheme } from '@app/theme';
+import Switch from '@ui/primitives/Switch';
 import { duration, ease } from '@app/theme/motion';
 import {
   ChainNameEnum,
@@ -26,14 +27,15 @@ import {
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
 import { ServerStatus } from '@app/AppState/types/ServerStatus';
+import { formatInteger } from '@app/utils/formatAmount';
 import ServerRow, {
   Placement,
   useLift,
   DoneButton,
   Latency,
-  ROW_DIVIDER,
   RowCard,
   ScreenHeader,
+  CARD_SIDE,
 } from './ServerRow';
 import SegmentedSwitch from '@ui/widgets/SegmentedSwitch';
 import CustomServerBox from './CustomServerBox';
@@ -79,13 +81,39 @@ const CHAINS: ChainNameEnum[] = [
   ChainNameEnum.testChainName,
   ChainNameEnum.regtestChainName,
 ];
-const WAIT = '#E6B43C';
 const LEAVE_AFTER_SAVE_MS = 1500;
 
 const fadeIn = () =>
   FadeIn.duration(duration.base).reduceMotion(ReduceMotion.System);
 const fadeOut = () =>
   FadeOut.duration(duration.fast).reduceMotion(ReduceMotion.System);
+/**
+ * Fades its content back in whenever `key` changes, without remounting it.
+ * Keyed views with entering and exiting animations piled up when the
+ * networks were tapped quickly (each tap left one copy leaving while the next
+ * came in), which flickered; here a new tap just restarts the one fade.
+ */
+function useSwapFade(key: string, delay = 0) {
+  const opacity = useSharedValue(1);
+  const first = React.useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    opacity.value = withSequence(
+      withTiming(0, { duration: 0 }),
+      withTiming(0, { duration: delay }),
+      withTiming(1, {
+        duration: duration.base,
+        easing: ease.standard,
+        reduceMotion: ReduceMotion.System,
+      }),
+    );
+  }, [key, delay, opacity]);
+  return useAnimatedStyle(() => ({ opacity: opacity.value }));
+}
+
 const layout = () =>
   LinearTransition.duration(240)
     .easing(ease.emphasized)
@@ -119,9 +147,9 @@ const StatusDot: React.FC<StatusDotProps> = ({ status, offline }) => {
   const inner = offline
     ? colors.fgMuted
     : status === 'wait'
-      ? WAIT
+      ? colors.fgWarning
       : status === 'bad'
-        ? colors.fgDangerEmphasis
+        ? colors.fgDanger
         : colors.fgAccent;
   return (
     <View
@@ -144,55 +172,9 @@ const StatusDot: React.FC<StatusDotProps> = ({ status, offline }) => {
   );
 };
 
-type ToggleProps = { on: boolean; disabled: boolean; onToggle: () => void };
-
-const KNOB_MS = 220;
 // Offline fades the network switch and the lists to 40%.
 const LOCK_MS = 200;
 const LOCKED_OPACITY = 0.4;
-
-const Toggle: React.FC<ToggleProps> = ({ on, disabled, onToggle }) => {
-  const { colors } = useTheme();
-  const knob = useSharedValue(on ? 1 : 0);
-  useEffect(() => {
-    knob.value = withTiming(on ? 1 : 0, {
-      duration: KNOB_MS,
-      easing: ease.emphasized,
-    });
-  }, [on, knob]);
-  const knobStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: knob.value * 18 }],
-  }));
-  return (
-    <Pressable
-      testID="server.offline"
-      onPress={onToggle}
-      disabled={disabled}
-      accessibilityRole="switch"
-      accessibilityState={{ checked: on }}
-      hitSlop={8}
-      style={{
-        width: 44,
-        height: 26,
-        borderRadius: 13,
-        padding: 2,
-        backgroundColor: on ? colors.bgAccent : ROW_DIVIDER,
-      }}
-    >
-      <Animated.View
-        style={[
-          {
-            width: 22,
-            height: 22,
-            borderRadius: 11,
-            backgroundColor: on ? colors.bgCanvas : colors.fgMuted,
-          },
-          knobStyle,
-        ]}
-      />
-    </Pressable>
-  );
-};
 
 const Server: React.FunctionComponent<ServerProps> = ({
   translate,
@@ -310,7 +292,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
           ? t('card-bad', { net: netName(server.chainName) })
           : t('card-connected', {
               net: netName(server.chainName),
-              height: blockHeight,
+              height: blockHeight && formatInteger(Number(blockHeight)),
             });
   const cardStatus: ServerStatus =
     !offline && !online && status !== 'wait' ? 'bad' : status;
@@ -420,15 +402,15 @@ const Server: React.FunctionComponent<ServerProps> = ({
     <>
       <BoldText
         style={{
-          marginHorizontal: 21.5,
+          marginHorizontal: CARD_SIDE,
           marginTop: 8,
           marginBottom: 18,
-          fontSize: 12.5,
+          fontSize: 13,
         }}
       >
         {t('regtest-label')}
       </BoldText>
-      <View style={{ marginHorizontal: 21.5 }}>{customBlock}</View>
+      <View style={{ marginHorizontal: CARD_SIDE }}>{customBlock}</View>
     </>
   ) : (
     <>
@@ -504,11 +486,11 @@ const Server: React.FunctionComponent<ServerProps> = ({
     </>
   );
 
+  const cardFade = useSwapFade(`${cardName}|${cardSub}`);
+  const bodyFade = useSwapFade(tab, duration.fast);
+
   return (
-    <View
-      style={{ flex: 1, backgroundColor: 'transparent' }}
-      onLayout={onLayout}
-    >
+    <View style={{ flex: 1 }} onLayout={onLayout}>
       <View
         testID="server.card"
         accessible
@@ -531,15 +513,10 @@ const Server: React.FunctionComponent<ServerProps> = ({
         }}
       >
         <StatusDot status={cardStatus} offline={offline} />
-        <Animated.View
-          key={`${cardName}|${cardSub}`}
-          entering={fadeIn()}
-          exiting={fadeOut()}
-          style={{ flex: 1, minWidth: 0 }}
-        >
+        <Animated.View style={[{ flex: 1, minWidth: 0 }, cardFade]}>
           <RegText
             numberOfLines={1}
-            style={{ fontSize: 13.5, lineHeight: 19, fontWeight: '500' }}
+            style={{ fontSize: 15, lineHeight: 19, fontWeight: '600' }}
           >
             {cardName}
           </RegText>
@@ -547,7 +524,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
             testID="server.card.sub"
             numberOfLines={1}
             style={{
-              fontSize: 11,
+              fontSize: 12,
               lineHeight: 16,
               marginTop: 1,
               color: colors.fgMuted,
@@ -603,12 +580,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
           showsVerticalScrollIndicator={false}
         >
           <Animated.View
-            key={tab}
-            entering={FadeIn.duration(200)
-              .delay(120)
-              .reduceMotion(ReduceMotion.System)}
-            exiting={FadeOut.duration(120).reduceMotion(ReduceMotion.System)}
-            style={lockStyle}
+            style={[lockStyle, bodyFade]}
             pointerEvents={offline ? 'none' : 'auto'}
           >
             {body}
@@ -616,7 +588,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
           <Animated.View
             layout={layout()}
             style={{
-              marginHorizontal: 21.5,
+              marginHorizontal: CARD_SIDE,
               marginTop: 17,
               minHeight: 66,
               borderRadius: 14,
@@ -632,19 +604,21 @@ const Server: React.FunctionComponent<ServerProps> = ({
             }}
           >
             <View style={{ flex: 1 }}>
-              <BoldText style={{ fontSize: 13.5, lineHeight: 19 }}>
+              <BoldText style={{ fontSize: 15, lineHeight: 19 }}>
                 {t('offline')}
               </BoldText>
               <RegText
-                style={{ fontSize: 11, lineHeight: 17, color: colors.fgMuted }}
+                style={{ fontSize: 12, lineHeight: 17, color: colors.fgMuted }}
               >
                 {t('offline-sub')}
               </RegText>
             </View>
-            <Toggle
-              on={offline}
+            <Switch
+              testID="server.offline"
+              value={offline}
               disabled={busy || working}
-              onToggle={() => {
+              accessibilityLabel={t('offline')}
+              onValueChange={() => {
                 setCustomOpen(null);
                 if (offline && regtest) {
                   setTab(ChainNameEnum.mainChainName);

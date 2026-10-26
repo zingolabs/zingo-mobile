@@ -50,7 +50,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
               flex: 1,
               paddingVertical: 8,
               alignItems: 'center',
-              backgroundColor: selected ? colors.bgAccent : 'transparent',
+              backgroundColor: selected ? colors.bgAccent : undefined,
               borderRadius: 8,
               borderWidth: selected ? 1 : 0,
               borderColor: colors.borderAccent,
@@ -58,7 +58,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
           >
             <RegText
               style={{
-                color: selected ? colors.bgCanvas : colors.fgAccent,
+                color: selected ? colors.fgOnAccent : colors.fgAccent,
                 fontSize: 12,
               }}
             >

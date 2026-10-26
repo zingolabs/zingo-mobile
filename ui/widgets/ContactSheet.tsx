@@ -1,18 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
-import Animated, {
-  ReduceMotion,
-  useAnimatedStyle,
-  useSharedValue,
-  withSequence,
-  withTiming,
-} from 'react-native-reanimated';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 
-import { useTheme } from '@app/theme';
-import { ease } from '@app/theme/motion';
+import { useTheme, slopFor, iconSizeMd } from '@app/theme';
 import { AddressBookFileClass, ChainNameEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { openScanner } from '@app/navigation/navigate';
@@ -20,29 +10,40 @@ import { useResult } from '@app/navigation/results';
 import { isZnsAlias, resolveZnsName } from '@app/uris/resolveZnsName';
 import Utils from '@app/utils';
 import { isWalletAddress } from '@app/walletBackend';
+import {
+  SWAP_ADDRESS_CHAINS,
+  addressFromPaymentUri,
+  canonicalChainAddress,
+  chainFromPaymentUri,
+  isValidChainAddress,
+} from '@app/swap';
+import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import RegText from '@ui/primitives/RegText';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import ChainSelect from '@ui/widgets/ChainSelect';
+import { fieldBorder } from '@ui/primitives/fieldBorder';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 
 const ZEC = 'ZEC';
 const NAME_MAX = 32;
 const CHECK_AT = 250;
 const ZNS_AT = 500;
-const SHAKE_MS = 60;
-const SAVE_OFF = 0.4;
-const OK_BORDER = 'rgba(20,157,5,0.6)';
-const OK_INK = '#7FD96E';
-const WARN_INK = '#E6C46A';
-const ERR_INK = '#F2878A';
 
 type Field = 'none' | 'name' | 'address';
 
 type Note = { tone: 'ok' | 'warn' | 'err'; text: string } | { tone: 'none' };
 
 export type ContactEdit =
-  | { kind: 'new'; preset: string; label: string }
+  | {
+      kind: 'new';
+      preset: string;
+      label: string;
+      /** The chain when the caller knows it (a swap); the field is then fixed. */
+      chain?: string;
+    }
   | { kind: 'edit'; contact: AddressBookFileClass };
 
 type Zns =
@@ -62,7 +63,8 @@ type ContactSheetProps = {
   edit: ContactEdit;
   book: AddressBookFileClass[];
   walletChain: ChainNameEnum;
-  onSave: (name: string, address: string) => Promise<void>;
+  /** `chain` is the SwapKit code the contact is filed under ('ZEC', 'BTC'…). */
+  onSave: (name: string, address: string, chain: string) => Promise<void>;
   onCancel: () => void;
 };
 
@@ -76,8 +78,12 @@ const kindKey = (address: string): string =>
         ? 'addressbook.kind-sapling'
         : 'addressbook.kind-unified';
 
-// The form that adds or edits a contact anywhere in the app: its name, the
-// chain (always Zcash for now) and its address.
+/**
+ * The form that adds or edits a contact anywhere in the app: its name, its
+ * chain and its address. A chain the caller knows (a swap, an existing
+ * contact) is fixed. Otherwise the most likely one is proposed and the list
+ * offers only the chains the address could belong to.
+ */
 const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
   edit,
   book,
@@ -98,13 +104,50 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
   const [saving, setSaving] = useState(false);
   const [focus, setFocus] = useState<Field>('none');
   const [touched, setTouched] = useState(false);
-  const shake = useSharedValue(0);
-  const shakeStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: shake.value }],
-  }));
   const scanButton = useRef<View>(null);
 
-  const alias = isZnsAlias(address);
+  /** Fixed when known: a swap names it, an existing contact keeps its own. */
+  const fixedChain = edit.kind === 'edit' ? edit.contact.swapChain : edit.chain;
+  /** What the user picked from the list, while it still fits the address. */
+  const [picked, setPicked] = useState<string>('');
+  /** Whether zingolib read the address as Zcash; unknown until it answers. */
+  const [zcashCheck, setZcashCheck] = useState<{
+    plain: string;
+    valid: boolean;
+  }>({ plain: '', valid: false });
+  const plain = useMemo(() => {
+    const typed = address.trim();
+    const named = chainFromPaymentUri(typed);
+    return named ? addressFromPaymentUri(named, typed) : typed;
+  }, [address]);
+  /** Zcash stays a candidate until zingolib says otherwise, so the proposal does not jump. */
+  const zcashValid = zcashCheck.plain === plain ? zcashCheck.valid : true;
+  const compatible = useMemo(() => {
+    if (fixedChain) {
+      return [fixedChain];
+    }
+    if (plain.length === 0) {
+      return [...SWAP_ADDRESS_CHAINS];
+    }
+    return SWAP_ADDRESS_CHAINS.filter(code =>
+      code === ZEC ? zcashValid : isValidChainAddress(code, plain),
+    );
+  }, [fixedChain, plain, zcashValid]);
+  const likely = (() => {
+    const named = chainFromPaymentUri(address.trim());
+    if (named && compatible.includes(named)) {
+      return named;
+    }
+    return compatible[0] ?? ZEC;
+  })();
+  const chain = fixedChain
+    ? fixedChain
+    : picked && compatible.includes(picked)
+      ? picked
+      : likely;
+  const zcash = chain === ZEC;
+
+  const alias = zcash && isZnsAlias(address);
 
   useEffect(() => {
     const typed = address.trim();
@@ -144,20 +187,30 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
     setCheck({ kind: 'checking' });
     let cancelled = false;
     const timer = setTimeout(async () => {
-      const { isValid } = await Utils.isValidAddress(typed, walletChain);
-      const own = isValid && (await isWalletAddress(typed));
+      const zec = (await Utils.isValidAddress(plain, walletChain)).isValid;
+      if (cancelled) {
+        return;
+      }
+      setZcashCheck({ plain, valid: zec });
+      if (!zcash) {
+        setCheck({
+          kind: isValidChainAddress(chain, plain) ? 'valid' : 'invalid',
+        });
+        return;
+      }
+      const own = zec && (await isWalletAddress(plain));
       if (!cancelled) {
-        setCheck({ kind: own ? 'own' : isValid ? 'valid' : 'invalid' });
+        setCheck({ kind: own ? 'own' : zec ? 'valid' : 'invalid' });
       }
     }, CHECK_AT);
     return () => {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [address, alias, walletChain]);
+  }, [address, alias, walletChain, plain, zcash, chain]);
 
   const trimmedName = name.trim();
-  const trimmedAddress = address.trim();
+  const trimmedAddress = canonicalChainAddress(chain, plain);
   /** The wallet's own tagged addresses are not contacts and are never listed, so they cannot clash with one. */
   const others = book.filter(
     entry =>
@@ -169,7 +222,11 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
   );
   const sameAddress =
     check.kind === 'valid'
-      ? others.find(entry => entry.address === trimmedAddress)
+      ? others.find(
+          entry =>
+            entry.address === trimmedAddress &&
+            entry.swapChain.toUpperCase() === chain.toUpperCase(),
+        )
       : undefined;
   const dupAddress = !!sameAddress;
   const ready =
@@ -192,9 +249,14 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
         : check.kind === 'own'
           ? (translate('addressbook.own-address') as string)
           : check.kind === 'invalid' && touched
-            ? (translate('send.invalidaddress') as string)
+            ? zcash
+              ? (translate('send.invalidaddress') as string)
+              : (translate('addressbook.not-chain-address') as string).replace(
+                  '{chain}',
+                  chainDisplayName(chain) || chain,
+                )
             : '';
-  const transparent = /^t/i.test(trimmedAddress);
+  const transparent = zcash && /^t/i.test(trimmedAddress);
   const note: Note = nameError
     ? { tone: 'err', text: nameError }
     : addressError
@@ -202,35 +264,31 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
       : check.kind === 'valid'
         ? {
             tone: transparent ? 'warn' : 'ok',
-            text: translate(kindKey(trimmedAddress)) as string,
+            text: zcash
+              ? (translate(kindKey(trimmedAddress)) as string)
+              : (translate('addressbook.chain-address') as string).replace(
+                  '{chain}',
+                  chainDisplayName(chain) || chain,
+                ),
           }
         : { tone: 'none' };
-  const noteInk = { ok: OK_INK, warn: WARN_INK, err: ERR_INK };
+  const noteInk = {
+    ok: colors.fgAccent,
+    warn: colors.fgTransparent,
+    err: colors.fgDanger,
+  };
 
   const border = (field: Field, bad: boolean, good: boolean): string =>
-    bad
-      ? colors.bgDanger
-      : good
-        ? OK_BORDER
-        : focus === field
-          ? colors.borderFocus
-          : colors.bottomSheetBorder;
+    fieldBorder(
+      colors,
+      focus === field,
+      bad ? 'invalid' : good ? 'valid' : 'unknown',
+    );
 
   const save = async () => {
-    if (!ready) {
-      setTouched(true);
-      const step = (x: number) =>
-        withTiming(x, {
-          duration: SHAKE_MS,
-          easing: ease.standard,
-          reduceMotion: ReduceMotion.System,
-        });
-      shake.value = withSequence(step(-4), step(4), step(-4), step(0));
-      return;
-    }
     Keyboard.dismiss();
     setSaving(true);
-    await onSave(trimmedName, trimmedAddress);
+    await onSave(trimmedName, trimmedAddress, chain);
   };
 
   useResult('addressbook.address', scanned => setAddress(scanned.trim()));
@@ -262,13 +320,13 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
   return (
     <View
       testID={`addressbook.sheet.${edit.kind}`}
-      style={{ paddingHorizontal: 22 }}
+      style={{ paddingHorizontal: 20 }}
     >
       <BoldText
         style={{
           marginTop: 4,
           textAlign: 'center',
-          fontSize: 15.5,
+          fontSize: 15,
           lineHeight: 21,
         }}
       >
@@ -310,16 +368,14 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
               padding: 10,
               color: colors.fgDefault,
               fontWeight: '600',
-              fontSize: 14,
-              backgroundColor: 'transparent',
+              fontSize: 15,
             }}
           />
           {!!name && (
-            <TouchableOpacity onPress={() => setName('')}>
-              <FontAwesomeIcon
+            <TouchableOpacity hitSlop={slopFor(20)} onPress={() => setName('')}>
+              <XIcon
                 style={{ marginRight: 10 }}
-                size={20}
-                icon={faXmark}
+                size={iconSizeMd}
                 color={colors.fgMuted}
               />
             </TouchableOpacity>
@@ -330,11 +386,11 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
       <View style={{ marginTop: 18 }}>
         <ChainSelect
           label={translate('addressbook.chain') as string}
-          value={ZEC}
-          options={[ZEC]}
-          onChange={() => {}}
+          value={chain}
+          options={compatible}
+          onChange={setPicked}
           translate={translate}
-          disabled
+          disabled={!!fixedChain}
         />
       </View>
 
@@ -364,7 +420,14 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             value={address}
             onChangeText={text => setAddress(text.replace(/\s+/g, ''))}
             multiline
-            placeholder={translate('addressbook.address-placeholder') as string}
+            placeholder={
+              zcash
+                ? (translate('addressbook.address-placeholder') as string)
+                : (translate('addressbook.chain-address') as string).replace(
+                    '{chain}',
+                    chainDisplayName(chain) || chain,
+                  )
+            }
             placeholderTextColor={colors.fgMuted}
             autoCapitalize="none"
             autoCorrect={false}
@@ -376,8 +439,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
               textAlignVertical: 'top',
               color: colors.fgDefault,
               fontWeight: '600',
-              fontSize: 14,
-              backgroundColor: 'transparent',
+              fontSize: 15,
             }}
           />
           <View style={{ alignItems: 'center', paddingVertical: 6, gap: 6 }}>
@@ -390,19 +452,19 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             >
               <ScanIcon
                 style={{ marginRight: 5 }}
-                size={28}
+                size={24}
                 color={colors.fgMuted}
               />
             </TouchableOpacity>
             {!!address && (
               <TouchableOpacity
+                hitSlop={slopFor(20)}
                 testID="addressbook.address-clear"
                 onPress={() => setAddress('')}
               >
-                <FontAwesomeIcon
+                <XIcon
                   style={{ marginRight: 5 }}
-                  size={20}
-                  icon={faXmark}
+                  size={iconSizeMd}
                   color={colors.fgMuted}
                 />
               </TouchableOpacity>
@@ -428,12 +490,12 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
           }}
         >
           {note.tone === 'ok' && (
-            <FontAwesomeIcon icon={faCheck} size={11} color={OK_INK} />
+            <CheckIcon size={16} color={colors.fgAccent} />
           )}
           {note.tone !== 'none' && (
             <RegText
               color={noteInk[note.tone]}
-              style={{ flex: 1, fontSize: 11, lineHeight: 16 }}
+              style={{ flex: 1, fontSize: 12, lineHeight: 16 }}
             >
               {note.text}
             </RegText>
@@ -441,30 +503,24 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
         </View>
       </View>
 
-      <Animated.View style={shakeStyle}>
-        <Button
-          testID="addressbook.save"
-          type={ButtonTypeEnum.Primary}
-          title={translate('save') as string}
-          disabled={saving}
-          onPress={save}
-          fullWidth
-          style={{
-            marginTop: 20,
-            opacity: ready ? 1 : SAVE_OFF,
-          }}
-          textStyle={{ fontSize: 15 }}
-        />
-      </Animated.View>
+      <Button
+        testID="addressbook.save"
+        variant="primary"
+        title={translate('save') as string}
+        disabled={saving || !ready}
+        onPress={save}
+        style={{
+          marginTop: 20,
+        }}
+      />
       <Button
         testID="addressbook.cancel"
-        type={ButtonTypeEnum.Link}
+        variant="quiet"
         title={translate('cancel') as string}
         onPress={() => {
           Keyboard.dismiss();
           onCancel();
         }}
-        fullWidth
         style={{ marginTop: 8 }}
       />
     </View>

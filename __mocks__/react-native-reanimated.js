@@ -80,6 +80,7 @@ const Extrapolation = {
 const useAnimatedStyle = jest.fn(() => ({}));
 const useAnimatedProps = jest.fn(() => ({}));
 const useSharedValue = jest.fn(v => ({ value: v }));
+const makeMutable = jest.fn(v => ({ value: v }));
 const useDerivedValue = jest.fn(fn => ({ value: fn() }));
 const useAnimatedGestureHandler = jest.fn(() => ({}));
 const useAnimatedReaction = jest.fn();
@@ -133,6 +134,7 @@ export {
   useDerivedValue,
   useReducedMotion,
   useSharedValue,
+  makeMutable,
   withDelay,
   withRepeat,
   withSequence,

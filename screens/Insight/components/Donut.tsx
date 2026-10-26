@@ -11,6 +11,7 @@ import Animated, {
 import Svg, { Circle, Path, Text as SvgText } from 'react-native-svg';
 
 import { ease } from '@app/theme/motion';
+import { themeTokens, useTheme } from '@app/theme';
 
 const BASE_R = 86;
 const SW = 28;
@@ -26,9 +27,9 @@ const DIM = 0.3;
 const HIT = SW / 2 + 6;
 const IN_MS = 720;
 const IN_AT = 260;
-const TRACK = '#0A1F3D';
-const DARK_INK = '#07121F';
-const SOFT_INK = '#8DA0B8';
+const TRACK = themeTokens.bgMutedSubtle;
+const DARK_INK = themeTokens.fgOnAccent;
+const SOFT_INK = themeTokens.fgMuted;
 
 export type Slice = { g: number; value: number; color: string };
 
@@ -87,6 +88,7 @@ type SliceLayerProps = {
   alone: boolean;
   selected: number;
   geometry: Geometry;
+  masked: boolean;
 };
 
 // One slice on its own layer, so it can push out and dim on its own.
@@ -95,7 +97,9 @@ const SliceLayer: React.FunctionComponent<SliceLayerProps> = ({
   alone,
   selected,
   geometry,
+  masked,
 }) => {
+  const { colors } = useTheme();
   const { size: SIZE, c: C, r: R } = geometry;
   const mid = (arc.a0 + arc.a1) / 2;
   const pop = useSharedValue(0);
@@ -120,7 +124,11 @@ const SliceLayer: React.FunctionComponent<SliceLayerProps> = ({
   const cap = (SW / 2 + 3) / R;
   const s0 = arc.a0 + cap;
   const s1 = arc.a1 - cap;
-  const label = arc.share < 0.01 ? '<1%' : `${Math.round(arc.share * 100)}%`;
+  const label = masked
+    ? ''
+    : arc.share < 0.01
+      ? '<1%'
+      : `${Math.round(arc.share * 100)}%`;
   return (
     <Animated.View
       pointerEvents="none"
@@ -157,7 +165,7 @@ const SliceLayer: React.FunctionComponent<SliceLayerProps> = ({
           y={C + Math.sin(mid) * R + 4}
           fontSize={10}
           fontWeight="700"
-          fill={light(arc.color) ? DARK_INK : '#fff'}
+          fill={light(arc.color) ? DARK_INK : colors.fgDefault}
           textAnchor="middle"
         >
           {label}
@@ -174,6 +182,10 @@ type DonutProps = {
   /** The total, or the selected slice's value, drawn by the caller. */
   center: React.ReactNode;
   caption: string;
+  /** Privacy hides the slices' shares. */
+  masked: boolean;
+  /** Shows the hidden amounts for a few seconds. */
+  onReveal?: () => void;
 };
 
 // Where the sends went: a ring of rounded slices with the total, or the
@@ -184,6 +196,8 @@ const Donut: React.FunctionComponent<DonutProps> = ({
   onSelect,
   center,
   caption,
+  masked,
+  onReveal,
 }) => {
   const shown = useSharedValue(0);
   useEffect(() => {
@@ -246,6 +260,7 @@ const Donut: React.FunctionComponent<DonutProps> = ({
           {all.map(a => (
             <SliceLayer
               key={a.g}
+              masked={masked}
               arc={a}
               alone={all.length === 1}
               selected={selected}
@@ -292,10 +307,11 @@ const Donut: React.FunctionComponent<DonutProps> = ({
             style={{
               marginTop: 2,
               color: SOFT_INK,
-              fontSize: 11.5,
+              fontSize: 12,
               lineHeight: 15,
               textAlign: 'center',
             }}
+            onPress={onReveal}
           >
             {caption}
           </Text>

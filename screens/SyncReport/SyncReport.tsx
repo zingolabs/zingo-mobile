@@ -26,6 +26,7 @@ import {
 } from '@app/services/gateController';
 import { showConfirm } from '@app/services/showConfirm';
 import Utils from '@app/utils';
+import { formatInteger } from '@app/utils/formatAmount';
 import CircularProgress from '@ui/primitives/CircularProgress';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
@@ -50,25 +51,26 @@ import {
   Phase,
   scaleMax,
 } from '@screens/SyncReport/syncModel';
+import { themeTokens } from '@app/theme';
 
 const SIDE = 21.5;
-const SOFT_INK = '#8DA0B8';
-const CODE_INK = '#B9C6D6';
-const AXIS_INK = '#7D93B3';
-const OK_INK = '#7FD96E';
-const RED_INK = '#F2878A';
-const GREEN = '#3CC52A';
-const AMBER = '#E6B43C';
-const BLUE = '#8FB4E6';
-const TRACK = '#0A1F3D';
-const TILE_BG = '#052520';
+const SOFT_INK = themeTokens.fgMuted;
+const CODE_INK = themeTokens.fgDefault;
+const AXIS_INK = themeTokens.fgMuted;
+const OK_INK = themeTokens.fgAccent;
+const RED_INK = themeTokens.fgDanger;
+const GREEN = themeTokens.fgAccent;
+const AMBER = themeTokens.fgWarning;
+const BLUE = themeTokens.fgCategory2;
+const TRACK = themeTokens.bgMutedSubtle;
+const TILE_BG = themeTokens.bgMutedSubtle;
 
 const CELL_COLOR: Record<CellState, string> = {
   scanned: GREEN,
   scanning: AMBER,
-  refetching: '#F7931A',
-  high: '#5B8DEF',
-  low: '#3A4A62',
+  refetching: themeTokens.fgSyncing,
+  high: themeTokens.fgCategory2,
+  low: themeTokens.borderMuted,
 };
 
 const PHASE_KEY: Record<Phase, string> = {
@@ -120,8 +122,6 @@ const TL_H = 88;
 const MAP_H = 63;
 
 type SyncReportProps = NativeStackScreenProps<AppDrawerParamList, 'SyncReport'>;
-
-const nf = (n: number): string => n.toLocaleString('en-US');
 
 const fill = (text: string, values: Record<string, string>): string =>
   Object.entries(values).reduce(
@@ -274,7 +274,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
       >
         {title}
       </Text>
-      <Text style={{ color: SOFT_INK, fontSize: 11.5 }}>{note}</Text>
+      <Text style={{ color: SOFT_INK, fontSize: 12 }}>{note}</Text>
     </View>
   );
 
@@ -284,10 +284,12 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const sub = !netInfo.isConnected
     ? (translate('sync.offline') as string)
     : synced
-      ? fill(translate('sync.both-at') as string, { tip: nf(serverTip) })
+      ? fill(translate('sync.both-at') as string, {
+          tip: formatInteger(serverTip),
+        })
       : fill(translate('sync.at') as string, {
-          wallet: nf(h.wallet),
-          tip: nf(serverTip),
+          wallet: formatInteger(h.wallet),
+          tip: formatInteger(serverTip),
         });
 
   const max = scaleMax(serverTip);
@@ -310,7 +312,13 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     bgEnd > 0 && timeOf(bgStart, 'yyyyMMdd') === timeOf(bgEnd, 'yyyyMMdd');
   const bgOutcome = backgroundOutcome(backgroundSyncInfo);
   const bgIcon: Record<BackgroundOutcome, React.ReactNode> = {
-    ok: <CheckCircleIcon size={BG_ICON} />,
+    ok: (
+      <CheckCircleIcon
+        size={BG_ICON}
+        color={colors.fgAccent}
+        checkColor={colors.fgOnAccent}
+      />
+    ),
     skipped: <BanIcon size={BG_ICON} color={SOFT_INK} />,
     failed: <TriangleAlert size={BG_ICON} color={RED_INK} />,
     interrupted: <TriangleAlert size={BG_ICON} color={AMBER} />,
@@ -332,21 +340,23 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     <View style={{ marginTop: 10 }}>
       {[
         {
-          icon: <BlocksIcon />,
+          icon: <BlocksIcon color={colors.fgMuted} />,
           text: (
             <Text>
               {startBefore}
-              <Text style={{ fontWeight: '700' }}>{nf(birthday)}</Text>
+              <Text style={{ fontWeight: '700' }}>
+                {formatInteger(birthday)}
+              </Text>
               {startAfter}
             </Text>
           ),
         },
         {
-          icon: <ClockIcon />,
+          icon: <ClockIcon color={colors.fgMuted} />,
           text: translate('sync.sheet-time') as string,
         },
         {
-          icon: <HalfCircleIcon />,
+          icon: <HalfCircleIcon color={colors.fgMuted} />,
           text: translate('sync.sheet-incomplete') as string,
         },
       ].map((row, i) => (
@@ -425,10 +435,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             borderRadius: 12,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
+            backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
           })}
         >
-          <ChevronLeft size={22} color={colors.fgAccent} strokeWidth={2.2} />
+          <ChevronLeft size={24} color={colors.fgAccent} />
         </Pressable>
         <Text
           accessibilityRole="header"
@@ -474,13 +484,13 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             borderRadius: 12,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
+            backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
           })}
         >
           <Animated.View
             style={[{ width: RESCAN_ICON, height: RESCAN_ICON }, rescanStyle]}
           >
-            <RescanCloud size={RESCAN_ICON} />
+            <RescanCloud size={RESCAN_ICON} color={colors.fgMuted} />
             <Animated.View
               style={[
                 {
@@ -493,7 +503,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                 arrowsStyle,
               ]}
             >
-              <RescanArrows size={RESCAN_ICON} />
+              <RescanArrows size={RESCAN_ICON} color={colors.fgAccent} />
             </Animated.View>
           </Animated.View>
         </Pressable>
@@ -533,7 +543,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               testID="syncreport.status"
               style={{
                 color: colors.fgDefault,
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: '600',
               }}
             >
@@ -543,7 +553,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               style={{
                 marginTop: 2,
                 color: SOFT_INK,
-                fontSize: 11.5,
+                fontSize: 12,
                 lineHeight: 16,
               }}
             >
@@ -574,7 +584,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                     backgroundColor: t.dot,
                   }}
                 />
-                <Text style={{ color: SOFT_INK, fontSize: 11.5 }}>
+                <Text style={{ color: SOFT_INK, fontSize: 12 }}>
                   {translate(t.key) as string}
                 </Text>
               </View>
@@ -582,11 +592,11 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                 style={{
                   marginTop: 6,
                   color: colors.fgDefault,
-                  fontSize: 13.5,
+                  fontSize: 13,
                   fontWeight: '700',
                 }}
               >
-                {nf(t.value)}
+                {formatInteger(t.value)}
               </Text>
             </View>
           ))}
@@ -598,7 +608,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
         >
           {cardHead(
             translate('sync.blocks') as string,
-            fill(translate('sync.scanned-n') as string, { n: nf(h.scanned) }),
+            fill(translate('sync.scanned-n') as string, {
+              n: formatInteger(h.scanned),
+            }),
           )}
           <Svg
             width={cardW}
@@ -638,7 +650,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               textAnchor={birthdayLeft ? 'start' : 'end'}
             >
               {fill(translate('sync.birthday-at') as string, {
-                n: nf(birthday),
+                n: formatInteger(birthday),
               })}
             </SvgText>
             <Path d={`M${xTip} 42V68`} stroke={BLUE} strokeWidth={1.5} />
@@ -649,7 +661,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               fill={CODE_INK}
               textAnchor="end"
             >
-              {fill(translate('sync.tip-at') as string, { n: nf(serverTip) })}
+              {fill(translate('sync.tip-at') as string, {
+                n: formatInteger(serverTip),
+              })}
             </SvgText>
           </Svg>
         </View>
@@ -705,7 +719,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                     backgroundColor: CELL_COLOR[l.state],
                   }}
                 />
-                <Text style={{ color: SOFT_INK, fontSize: 11 }}>
+                <Text style={{ color: SOFT_INK, fontSize: 12 }}>
                   {translate(l.key) as string}
                 </Text>
               </View>
@@ -740,13 +754,11 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               >
                 {translate('sync.last-background') as string}
               </Text>
-              <Text style={{ color: SOFT_INK, fontSize: 11.5, lineHeight: 16 }}>
+              <Text style={{ color: SOFT_INK, fontSize: 12, lineHeight: 16 }}>
                 {bgWhen}
               </Text>
               {!!backgroundSyncInfo.message && (
-                <Text
-                  style={{ color: SOFT_INK, fontSize: 11.5, lineHeight: 16 }}
-                >
+                <Text style={{ color: SOFT_INK, fontSize: 12, lineHeight: 16 }}>
                   {backgroundSyncInfo.message}
                 </Text>
               )}
@@ -755,7 +767,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               testID="syncreport.background-outcome"
               style={{
                 color: BG_INK[bgOutcome],
-                fontSize: 11.5,
+                fontSize: 12,
                 fontWeight: '600',
               }}
             >

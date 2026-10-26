@@ -22,16 +22,14 @@ import Animated from 'react-native-reanimated';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 
 import { useNavigation } from '@react-navigation/native';
-import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronLeft, faAngleDown } from '@fortawesome/free-solid-svg-icons';
+import { useTheme, slopFor } from '@app/theme';
 import BottomSheet from '@gorhom/bottom-sheet';
 
 import { Route, ValueTransferType } from '@app/AppState';
 import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import MessageLine from './components/MessageLine';
 import { ContextAppLoaded } from '@app/context';
@@ -39,6 +37,7 @@ import Header from '@ui/widgets/Header';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import Utils from '@app/utils';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { ChevronDown, ChevronLeft } from '@ui/primitives/Icons/Chevron';
 
 type MessageListProps = NativeStackScreenProps<AppDrawerParamList, 'Messages'>;
 
@@ -94,11 +93,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
           hitSlop={8}
           style={{ paddingHorizontal: 4, paddingVertical: 4 }}
         >
-          <FontAwesomeIcon
-            icon={faChevronLeft}
-            size={20}
-            color={colors.fgAccent}
-          />
+          <ChevronLeft size={20} color={colors.fgAccent} />
         </TouchableOpacity>
         <BoldText
           numberOfLines={1}
@@ -278,7 +273,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
             {loading ? (
               <ActivityIndicator
                 size="large"
-                color={colors.fgAccent}
+                color={colors.fgMuted}
                 style={{ marginVertical: 20 }}
               />
             ) : messagesData.length === 0 ? (
@@ -291,9 +286,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
                   marginTop: 30,
                 }}
               >
-                <FadeText style={{ color: colors.fgAccent }}>
-                  {translate('messages.empty') as string}
-                </FadeText>
+                <FadeText>{translate('messages.empty') as string}</FadeText>
               </View>
             ) : (
               <>
@@ -303,12 +296,13 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'flex-start',
+                      paddingHorizontal: 20,
                       marginTop: 20,
                       marginBottom: 10,
                     }}
                   >
                     <Button
-                      type={ButtonTypeEnum.Secondary}
+                      variant="text"
                       title={translate('history.loadmore') as string}
                       onPress={loadMoreClicked}
                     />
@@ -323,9 +317,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
                       marginBottom: 10,
                     }}
                   >
-                    <FadeText style={{ color: colors.fgAccent }}>
-                      {translate('history.end') as string}
-                    </FadeText>
+                    <FadeText>{translate('history.end') as string}</FadeText>
                   </View>
                 )}
                 {messagesData.map((vt, index) => (
@@ -348,6 +340,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
         </AppSheet>
         {!isAtBottom && !loading && (
           <Pressable
+            hitSlop={slopFor(16)}
             onPress={handleScrollToBottom}
             style={({ pressed }) => ({
               position: 'absolute',
@@ -355,17 +348,16 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
               right: 10,
               paddingHorizontal: 5,
               paddingVertical: 10,
-              backgroundColor: colors.bgChrome,
+              backgroundColor: colors.bgSurface,
               borderRadius: 50,
               transform: [{ scale: pressed ? 0.9 : 1 }],
               borderWidth: 1,
               borderColor: colors.borderMuted,
             })}
           >
-            <FontAwesomeIcon
+            <ChevronDown
               style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
               size={16}
-              icon={faAngleDown}
               color={colors.fgMuted}
             />
           </Pressable>

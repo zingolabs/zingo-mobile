@@ -28,7 +28,7 @@ import {
   isWalletAddress,
   loadExistingWallet,
   parseAddress,
-  reconcileMigration,
+  cancelOldPrivateMigration,
   setConfigWalletToProd,
 } from '@app/walletBackend';
 import {
@@ -67,14 +67,20 @@ import {
   LaunchingModeEnum,
   BlockExplorerEnum,
   SnackbarDurationEnum,
+  SnackbarActionType,
 } from '@app/AppState';
 import Utils from '@app/utils';
+import {
+  formatAmount,
+  formatInteger,
+  toAmountInput,
+} from '@app/utils/formatAmount';
 import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
 import { AppTheme } from '@app/theme';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
-import { ContextAppLoadedProvider } from '@app/context';
+import { ContextAppLoadedProvider, SwapServiceProvider } from '@app/context';
 import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
 import { otherServers, staticAlternatives } from '@app/uris/serverChoice';
 import selectingServer from '@app/services/selectingServer';
@@ -83,7 +89,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '@app/services/createAlert';
 import { sendEmail } from '@app/services/sendEmail';
 import Toast from 'react-native-toast-message';
-import { toastConfig } from '@ui/widgets/toastConfig';
+import { ACTION_SNACKBAR_MS, toastConfig } from '@ui/widgets/toastConfig';
+import { MASK } from '@ui/widgets/PrivateAmount';
 import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
 import Launching from '@screens/Launching';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
@@ -105,10 +112,12 @@ import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
 import FadeInOnMount from '@ui/widgets/FadeInOnMount';
 import { showConfirm } from '@app/services/showConfirm';
 import { WalletNavigator } from '@app/navigation/WalletNavigator';
+import TooltipHost from '@ui/widgets/TooltipHost';
 import {
   closeOptionsPanel,
   OptionsPanelProvider,
 } from '@app/context/optionsPanel';
+import type { SwapDepositArgs } from '@app/walletBackend';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { rescanStep } from '@app/walletBackend/utils/syncProgress';
 import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
@@ -162,6 +171,9 @@ type LoadedAppProps = NativeStackScreenProps<RootParamList, 'Wallet'> & {
 // The wallet fades in over the loading screen as it opens.
 const HOME_FADE_MS = 300;
 
+/** iOS gives a backgrounded app a few seconds; the save still has to fit. */
+const BACKGROUND_STOP_WAIT_MS = 3 * 1000;
+
 const SERVER_DEFAULT_0: ServerType = remoteServer(
   serverUris(() => {})[0].uri,
   serverUris(() => {})[0].chainName,
@@ -204,7 +216,12 @@ export default function LoadedApp(props: LoadedAppProps) {
     }),
     [],
   );
-  const i18n = useMemo(() => new I18n(file), [file]);
+  const i18n = useMemo(() => {
+    const instance = new I18n(file);
+    /** A key missing in a locale shows the English text, never `[missing … translation]`. */
+    instance.enableFallback = true;
+    return instance;
+  }, [file]);
 
   // `translate` carries `language` in its memo deps so its identity changes
   // when the user switches language. Memoized children that include
@@ -634,6 +651,7 @@ export class LoadedAppClass extends Component<
       saplingPool: props.saplingPool,
       transparentPool: props.transparentPool,
       addLastSnackbar: this.addLastSnackbar,
+      addActionSnackbar: this.addActionSnackbar,
       restartApp: () =>
         this.navigateToLoadingApp({
           kind: 'boot',
@@ -644,6 +662,8 @@ export class LoadedAppClass extends Component<
       setScrollToBottom: this.setScrollToBottom,
       setShieldingAmount: this.setShieldingAmount,
       sendTransaction: this.sendTransaction,
+      sendSwapDeposit: this.sendSwapDeposit,
+      resumeSwapDeposit: this.resumeSwapDeposit,
       setServerOption: this.setServerOption,
       clearToAddr: this.clearToAddr,
       doRescan: this.doRescan,
@@ -706,6 +726,7 @@ export class LoadedAppClass extends Component<
       keepAwake: this.keepAwake,
       onZingolibVersionChanged: this.setZingolibVersion,
       onBirthdayChanged: this.setBirthday,
+      onBirthdayAdjusted: this.noticeBirthdayAdjusted,
       onError: this.setLastError,
       onPersistentSyncFailure: this.recoverServer,
       onMixnetViewChanged: this.setMixnetView,
@@ -755,14 +776,9 @@ export class LoadedAppClass extends Component<
     await this.rpc.clearTimers();
     await this.rpc.configure();
 
-    // ZIP 318: classify the private migration's parts on every launch and
-    // apply what is safe unattended (promotions, expiries, rebuilds,
-    // completion). Never syncs, offline-safe, a no-op without a migration.
-    // The app-facing actions need no handling here: the History banner reads
-    // migration_status on focus and routes the user to the right screen.
-    // reconcileMigration never rejects (FfiResult); a transient failure just
-    // defers the cleanup to the next launch.
-    reconcileMigration();
+    // The private migration is gone from the app: one an older build left in
+    // flight is cancelled, silently, so the drain can move its notes.
+    cancelOldPrivateMigration();
 
     this.clearToAddr();
 
@@ -790,6 +806,9 @@ export class LoadedAppClass extends Component<
             // setting value for background task Android
             await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
             await this.rpc.clearTimers();
+            // A suspended app's connection dies, so the engine is stopped rather
+            // than paused; the foreground tick launches a fresh session.
+            await this.rpc.stopSyncProcess(BACKGROUND_STOP_WAIT_MS);
             this.setSyncingStatus({} as RPCSyncStatusType);
             // We need to save the wallet file here because
             // sometimes the App can lose the last synced chunk
@@ -831,6 +850,9 @@ export class LoadedAppClass extends Component<
           // setting value for background task Android
           await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
           await this.rpc.clearTimers();
+          // A suspended app's connection dies, so the engine is stopped rather
+          // than paused; the foreground tick launches a fresh session.
+          await this.rpc.stopSyncProcess(BACKGROUND_STOP_WAIT_MS);
           this.setSyncingStatus({} as RPCSyncStatusType);
           // We need to save the wallet file here because
           // sometimes the App can lose the last synced chunk
@@ -1074,9 +1096,7 @@ export class LoadedAppClass extends Component<
             const to = new ToAddrClass(0);
 
             to.to = tgt.address || '';
-            to.amount = tgt.amount
-              ? Utils.parseNumberFloatToStringLocale(tgt.amount, 8)
-              : '';
+            to.amount = tgt.amount ? toAmountInput(tgt.amount) : '';
             to.memo = tgt.memoString || '';
 
             uriToAddr = to;
@@ -1178,6 +1198,8 @@ export class LoadedAppClass extends Component<
             );
             // the ValueTransfer is confirmed when the confirmations are > 0
             if (vtNew.length > 0 && vtNew[0].confirmations > 0) {
+              const amount = (zec: number) =>
+                this.state.privacy ? MASK : formatAmount(zec);
               let message: string = '';
               let title: string = '';
               if (
@@ -1188,7 +1210,7 @@ export class LoadedAppClass extends Component<
                   (this.state.translate('loadedapp.incoming-funds') as string) +
                   (this.state.translate('history.received') as string) +
                   ' ' +
-                  Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
+                  amount(vtNew[0].amount) +
                   ' ' +
                   this.state.info.currencyName;
                 title = this.state.translate(
@@ -1207,7 +1229,7 @@ export class LoadedAppClass extends Component<
                   (vtNew[0].fee
                     ? ((' ' + this.state.translate('send.fee')) as string) +
                       ' ' +
-                      Utils.parseNumberFloatToStringLocale(vtNew[0].fee, 8) +
+                      amount(vtNew[0].fee) +
                       ' ' +
                       this.state.info.currencyName
                     : '');
@@ -1225,7 +1247,7 @@ export class LoadedAppClass extends Component<
                   (vtNew[0].fee
                     ? ((' ' + this.state.translate('send.fee')) as string) +
                       ' ' +
-                      Utils.parseNumberFloatToStringLocale(vtNew[0].fee, 8) +
+                      amount(vtNew[0].fee) +
                       ' ' +
                       this.state.info.currencyName
                     : '');
@@ -1240,14 +1262,14 @@ export class LoadedAppClass extends Component<
                   (this.state.translate('history.migration') as string) +
                   (vtNew[0].amount > 0
                     ? ' ' +
-                      Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
+                      amount(vtNew[0].amount) +
                       ' ' +
                       this.state.info.currencyName
                     : '') +
                   (vtNew[0].fee
                     ? ((' ' + this.state.translate('send.fee')) as string) +
                       ' ' +
-                      Utils.parseNumberFloatToStringLocale(vtNew[0].fee, 8) +
+                      amount(vtNew[0].fee) +
                       ' ' +
                       this.state.info.currencyName
                     : '');
@@ -1262,7 +1284,7 @@ export class LoadedAppClass extends Component<
                   (this.state.translate('loadedapp.incoming-funds') as string) +
                   (this.state.translate('history.received') as string) +
                   ' ' +
-                  Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
+                  amount(vtNew[0].amount) +
                   ' ' +
                   this.state.info.currencyName;
                 title = this.state.translate(
@@ -1276,7 +1298,7 @@ export class LoadedAppClass extends Component<
                   (this.state.translate('loadedapp.incoming-funds') as string) +
                   (this.state.translate('history.shield') as string) +
                   ' ' +
-                  Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
+                  amount(vtNew[0].amount) +
                   ' ' +
                   this.state.info.currencyName;
                 title = this.state.translate(
@@ -1290,7 +1312,7 @@ export class LoadedAppClass extends Component<
                   (this.state.translate('loadedapp.payment-made') as string) +
                   (this.state.translate('history.sent') as string) +
                   ' ' +
-                  Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
+                  amount(vtNew[0].amount) +
                   ' ' +
                   this.state.info.currencyName;
                 title = this.state.translate('loadedapp.send-menu') as string;
@@ -1438,6 +1460,11 @@ export class LoadedAppClass extends Component<
       return this.rpc.sendTransaction(sendJson, sendAll);
     });
 
+  sendSwapDeposit = (args: SwapDepositArgs): Promise<string[]> =>
+    this.rpc.sendSwapDeposit(args);
+
+  resumeSwapDeposit = (): Promise<string[]> => this.rpc.resumeSwapDeposit();
+
   doRefresh = (what: 'valueTransfers' | 'messages') => {
     if (what === 'valueTransfers') {
       // Value Transfers
@@ -1461,6 +1488,16 @@ export class LoadedAppClass extends Component<
       //const start = Date.now();
       this.setState({ birthday });
     }
+  };
+
+  noticeBirthdayAdjusted = (height: number) => {
+    this.addLastSnackbar(
+      (this.state.translate('loadedapp.birthday-adjusted') as string).replace(
+        '{height}',
+        formatInteger(height),
+      ),
+      SnackbarDurationEnum.longer,
+    );
   };
 
   setServerOption = async (
@@ -1910,6 +1947,17 @@ export class LoadedAppClass extends Component<
     });
   };
 
+  addActionSnackbar = (message: string, action: SnackbarActionType) => {
+    Toast.show({
+      type: 'appAction',
+      text1: message,
+      props: action,
+      visibilityTime: ACTION_SNACKBAR_MS,
+      position: 'bottom',
+      bottomOffset: 80,
+    });
+  };
+
   setLastError = (error: string) => {
     // irrelevant errors ignored.
     // don't store time-out errors
@@ -1991,6 +2039,7 @@ export class LoadedAppClass extends Component<
       saplingPool: this.state.saplingPool,
       transparentPool: this.state.transparentPool,
       addLastSnackbar: this.addLastSnackbar,
+      addActionSnackbar: this.addActionSnackbar,
       addressBook: this.state.addressBook,
       launchAddTagModal: this.state.launchAddTagModal,
       shieldingAmount: this.state.shieldingAmount,
@@ -2027,6 +2076,8 @@ export class LoadedAppClass extends Component<
       setScrollToBottom: this.setScrollToBottom,
       setShieldingAmount: this.setShieldingAmount,
       sendTransaction: this.sendTransaction,
+      sendSwapDeposit: this.sendSwapDeposit,
+      resumeSwapDeposit: this.resumeSwapDeposit,
       setServerOption: this.setServerOption,
       clearToAddr: this.clearToAddr,
       doRescan: this.doRescan,
@@ -2044,24 +2095,29 @@ export class LoadedAppClass extends Component<
     return (
       <>
         <ContextAppLoadedProvider value={context}>
-          <PriceTrafficDriver />
-          <GestureHandlerRootView>
-            <BottomSheetModalProvider>
-              <BottomSheetBackHandler />
-              <ConfirmBottomSheet />
-              <OptionsPanelProvider>
-                <FadeInOnMount duration={HOME_FADE_MS}>
-                  <WalletNavigator />
-                </FadeInOnMount>
-              </OptionsPanelProvider>
-              <AddTagModalHost
-                ref={this.addTagModalRef}
-                target={this.state.addTagModalTarget}
-                setAddressBook={this.setAddressBook}
-                translate={this.state.translate}
-              />
-            </BottomSheetModalProvider>
-          </GestureHandlerRootView>
+          <SwapServiceProvider chainName={this.state.walletChainName}>
+            <PriceTrafficDriver />
+            <GestureHandlerRootView>
+              <BottomSheetModalProvider>
+                <BottomSheetBackHandler />
+                <ConfirmBottomSheet />
+                <OptionsPanelProvider>
+                  <FadeInOnMount duration={HOME_FADE_MS}>
+                    {/* The tooltip layer for screens outside any sheet or panel. */}
+                    <TooltipHost>
+                      <WalletNavigator />
+                    </TooltipHost>
+                  </FadeInOnMount>
+                </OptionsPanelProvider>
+                <AddTagModalHost
+                  ref={this.addTagModalRef}
+                  target={this.state.addTagModalTarget}
+                  setAddressBook={this.setAddressBook}
+                  translate={this.state.translate}
+                />
+              </BottomSheetModalProvider>
+            </GestureHandlerRootView>
+          </SwapServiceProvider>
         </ContextAppLoadedProvider>
         <Toast config={toastConfig} />
       </>

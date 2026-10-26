@@ -66,6 +66,8 @@ interface RPCModuleAPI {
   pollSyncInfo(): Promise<string>;
   runSyncProcess(): Promise<string>;
   pauseSyncProcess(): Promise<string>;
+  stopSyncProcess(): Promise<string>;
+  syncCaughtUpInfo(): Promise<string>;
   statusSyncInfo(): Promise<string>;
   runRescanProcess(): Promise<string>;
 
@@ -108,6 +110,15 @@ interface RPCModuleAPI {
   shieldProcess(): Promise<string>;
   confirmProcess(): Promise<string>;
 
+  // Swap deposits. The amount crosses the bridge as a string of zatoshis.
+  sendSwapDepositProcess(
+    vaultAddress: string,
+    amount: string,
+    memoHex: string,
+  ): Promise<string>;
+  reserveRefundAddressProcess(): Promise<string>;
+  deriveRefundAddressProcess(): Promise<string>;
+
   // Ironwood migration (Orchard -> Ironwood drain)
   planOrchardDrainProcess(): Promise<string>;
   drainOrchardProcess(): Promise<string>;
@@ -115,35 +126,10 @@ interface RPCModuleAPI {
   // drainOrchardProcess (reads a native side channel, not the lightclient lock).
   drainStatusProcess(): Promise<string>;
 
-  // Ironwood private migration (ZIP 318 note splitting + scheduled parts).
-  // Numeric arguments cross the bridge as strings; empty perBucket keeps
-  // zingolib's default cadence.
-  planIronwoodMigrationProcess(): Promise<string>;
-  startIronwoodMigrationProcess(
-    planHashHex: string,
-    perBucket: string,
-  ): Promise<string>;
-  continueNoteSplittingProcess(): Promise<string>;
-  // Phase 1 splitting, stateless and send-shaped (zingolib/0016). One call per
-  // round; loop until the outcome is `complete`, then startIronwoodMigration.
-  quickSplitProcess(): Promise<string>;
-  // Live progress of the in-flight splitting round; safe to poll concurrently
-  // with quickSplitProcess (reads a native side channel, not the lightclient
-  // lock).
-  splitStatusProcess(): Promise<string>;
-  reschedulePartsProcess(perBucket: string): Promise<string>;
+  // An old private migration (ZIP 318), left by builds that offered it:
+  // launch reads it, records what confirmed and cancels the rest.
   migrationStatusProcess(): Promise<string>;
-  // The window calendar (past, current, future) for a schedule grid, valid
-  // with or without a migration; null before the wallet has ever synced.
-  windowTimelineProcess(): Promise<string>;
   reconcileMigrationProcess(): Promise<string>;
-  // Phase-2 execute tap: sends a scheduled window's due batch. spacingMs (the
-  // delay sequenced between the batch's sends) crosses as a string.
-  executeDuePartsProcess(spacingMs: string): Promise<string>;
-  // Live progress of the in-flight batch; safe to poll concurrently with
-  // executeDuePartsProcess (reads a native side channel, not the lightclient
-  // lock).
-  executeDuePartsStatusProcess(): Promise<string>;
   cancelIronwoodMigrationProcess(): Promise<string>;
 
   // Wallet options / configuration
@@ -154,8 +140,6 @@ interface RPCModuleAPI {
     performanceLevel: string,
     minConfirmations: string,
   ): Promise<string>;
-
-  setBroadcastCandidates(candidatesJson: string): Promise<string>;
 
   attachMixnet(socks5Addr: string, exitNode: string): Promise<string>;
   enableMixnet(proxyPath: string): Promise<string>;

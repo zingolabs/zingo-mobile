@@ -25,9 +25,10 @@ const FADE_DURATION_MS = 125;
 //   3) end:       panel at full opacity, sheet fully off-screen
 // Close path is untouched: panel just fades 1 → 0 immediately.
 const OPEN_FADE_DELAY_MS = 125;
-// A screen pushed from the panel dims it in place: the panel never moves,
-// so the screen pops straight back onto it.
-const PUSHED_DIM = 0.55;
+// A screen pushed from the panel veils it in place with bgScrim (the
+// token carries the dim): the panel never moves, so the screen pops
+// straight back onto it.
+const PUSHED_DIM = 1;
 const PUSH_IN_MS = 380;
 const PUSH_OUT_MS = 320;
 
@@ -133,7 +134,7 @@ const OptionsPanelHost: React.FC<OptionsPanelHostProps> = ({
           pointerEvents="none"
           style={[
             StyleSheet.absoluteFill,
-            { backgroundColor: colors.bgCanvas },
+            { backgroundColor: colors.bgScrim },
             dimStyle,
           ]}
         />

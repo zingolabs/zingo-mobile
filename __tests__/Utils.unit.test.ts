@@ -9,6 +9,7 @@ jest.mock('@app/RPCModule', () => ({
 }));
 
 import Utils from '@app/utils/Utils';
+import { themeTokens } from '@app/theme';
 import {
   BlockExplorerEnum,
   ChainNameEnum,
@@ -241,24 +242,24 @@ describe('Utils.getBlockExplorerTxIDURL', () => {
 });
 
 describe('Utils.getLabelColor', () => {
-  test('returns black for white background', () => {
-    expect(Utils.getLabelColor('#FFFFFF')).toBe('#000000');
+  test('returns the dark ink for white background', () => {
+    expect(Utils.getLabelColor('#FFFFFF')).toBe(themeTokens.fgOnAccent);
   });
 
-  test('returns white for black background', () => {
-    expect(Utils.getLabelColor('#000000')).toBe('#FFFFFF');
+  test('returns the light ink for black background', () => {
+    expect(Utils.getLabelColor('#000000')).toBe(themeTokens.fgDefault);
   });
 
   test('works without leading hash', () => {
-    expect(Utils.getLabelColor('FFFFFF')).toBe('#000000');
+    expect(Utils.getLabelColor('FFFFFF')).toBe(themeTokens.fgOnAccent);
   });
 
-  test('returns black for bright yellow', () => {
-    expect(Utils.getLabelColor('#FFFF00')).toBe('#000000');
+  test('returns the dark ink for bright yellow', () => {
+    expect(Utils.getLabelColor('#FFFF00')).toBe(themeTokens.fgOnAccent);
   });
 
-  test('returns white for dark blue', () => {
-    expect(Utils.getLabelColor('#00008B')).toBe('#FFFFFF');
+  test('returns the light ink for dark blue', () => {
+    expect(Utils.getLabelColor('#00008B')).toBe(themeTokens.fgDefault);
   });
 });
 

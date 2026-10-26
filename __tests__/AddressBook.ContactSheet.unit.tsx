@@ -18,11 +18,13 @@ jest.mock('@app/RPCModule', () => ({
   __esModule: true,
   default: {
     parseAddressInfo: async (address: string) =>
-      JSON.stringify({
-        status: 'success',
-        chain_name: 'main',
-        address_kind: address.startsWith('t') ? 'transparent' : 'unified',
-      }),
+      /^[ut]/.test(address)
+        ? JSON.stringify({
+            status: 'success',
+            chain_name: 'main',
+            address_kind: address.startsWith('t') ? 'transparent' : 'unified',
+          })
+        : JSON.stringify({ status: 'Invalid address' }),
     checkMyAddressInfo: async (address: string) =>
       JSON.stringify({ is_wallet_address: address === 'u1mine' }),
   },
@@ -88,7 +90,7 @@ describe('ContactSheet', () => {
     });
     expect(screen.getByTestId('addressbook.note.ok')).toBeTruthy();
     fireEvent.press(screen.getByTestId('addressbook.save'));
-    expect(onSave).toHaveBeenCalledWith('Bob', 'u1bob');
+    expect(onSave).toHaveBeenCalledWith('Bob', 'u1bob', 'ZEC');
   });
 
   test('Tests that the kind line marks the address public when it is transparent.', async () => {
@@ -134,5 +136,73 @@ describe('ContactSheet', () => {
     expect(screen.getByTestId('addressbook.note.err')).toHaveTextContent('own');
     fireEvent.press(screen.getByTestId('addressbook.save'));
     expect(onSave).not.toHaveBeenCalled();
+  });
+});
+
+describe('ContactSheet chain', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  const BTC_ADDRESS = 'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4';
+
+  test('Tests that the likely chain is proposed and saved when the address is not a Zcash one', async () => {
+    const onSave = jest.fn(async () => {});
+    const screen = render(
+      <ContextAppLoadedProvider
+        value={{ ...defaultAppContextLoaded, translate: mockTranslate }}
+      >
+        <ContactSheet
+          edit={{ kind: 'new', preset: '', label: '' }}
+          book={[]}
+          walletChain={ChainNameEnum.mainChainName}
+          onSave={onSave}
+          onCancel={() => {}}
+        />
+      </ContextAppLoadedProvider>,
+    );
+    fireEvent.changeText(screen.getByTestId('addressbook.name-field'), 'Bob');
+    fireEvent.changeText(
+      screen.getByTestId('addressbook.address-field'),
+      BTC_ADDRESS,
+    );
+    await act(async () => {
+      jest.advanceTimersByTime(300);
+    });
+    await act(async () => {
+      jest.advanceTimersByTime(300);
+    });
+    expect(screen.getByTestId('chainselect.ticker')).toHaveTextContent('BTC');
+    fireEvent.press(screen.getByTestId('addressbook.save'));
+    expect(onSave).toHaveBeenCalledWith('Bob', BTC_ADDRESS, 'BTC');
+  });
+
+  test('Tests that the chain stays fixed when the caller knows it', async () => {
+    const screen = render(
+      <ContextAppLoadedProvider
+        value={{ ...defaultAppContextLoaded, translate: mockTranslate }}
+      >
+        <ContactSheet
+          edit={{
+            kind: 'new',
+            preset: '0x1111111111111111111111111111111111111111',
+            label: '',
+            chain: 'BASE',
+          }}
+          book={[]}
+          walletChain={ChainNameEnum.mainChainName}
+          onSave={jest.fn()}
+          onCancel={() => {}}
+        />
+      </ContextAppLoadedProvider>,
+    );
+    await act(async () => {
+      jest.advanceTimersByTime(600);
+    });
+    expect(screen.getByTestId('chainselect.ticker')).toHaveTextContent('BASE');
+    expect(screen.getByTestId('chainselect.field')).toBeDisabled();
   });
 });

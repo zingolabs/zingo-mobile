@@ -5,6 +5,7 @@ import type { Preview } from '@storybook/react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ThemeProvider, useTheme, themeTokens } from '@app/theme';
+import { TextScaleContext } from '@ui/primitives/Text';
 
 // On web, Storybook's story container sizes to content, so a `flex: 1`
 // View collapses and the white iframe body shows through. Paint the page
@@ -35,12 +36,15 @@ const Canvas: React.FunctionComponent<{ children: React.ReactNode }> = ({
 
 const preview: Preview = {
   decorators: [
-    Story => (
+    // `parameters.textScale` simulates the OS text size: the web has none.
+    (Story, { parameters }) => (
       <SafeAreaProvider>
         <ThemeProvider>
-          <Canvas>
-            <Story />
-          </Canvas>
+          <TextScaleContext.Provider value={parameters.textScale ?? 1}>
+            <Canvas>
+              <Story />
+            </Canvas>
+          </TextScaleContext.Provider>
         </ThemeProvider>
       </SafeAreaProvider>
     ),

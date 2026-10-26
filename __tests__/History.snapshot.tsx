@@ -5,7 +5,7 @@
 import 'react-native';
 import React from 'react';
 
-import { render } from '@testing-library/react-native';
+import { act, render } from '@testing-library/react-native';
 import History from '@screens/History';
 import {
   defaultAppContextLoaded,
@@ -46,7 +46,7 @@ describe('Component History - test', () => {
   state.totalBalance = mockTotalBalance;
   // The price ring renders only for a Nym-consenting session.
 
-  test('History privacy normal - snapshot', () => {
+  test('History privacy normal - snapshot', async () => {
     // privacy normal
     state.privacy = false;
     const props = makeDrawerProps();
@@ -55,10 +55,12 @@ describe('Component History - test', () => {
         <History {...props} />
       </ContextAppLoadedProvider>,
     );
+    // Lets the per-wallet notice state load.
+    await act(async () => {});
     expect(history.toJSON()).toMatchSnapshot();
   });
 
-  test('History privacy high - snapshot', () => {
+  test('History privacy high - snapshot', async () => {
     // privacy normal
     state.privacy = true;
     const props = makeDrawerProps();
@@ -67,6 +69,8 @@ describe('Component History - test', () => {
         <History {...props} />
       </ContextAppLoadedProvider>,
     );
+    // Lets the per-wallet notice state load.
+    await act(async () => {});
     expect(history.toJSON()).toMatchSnapshot();
   });
 });

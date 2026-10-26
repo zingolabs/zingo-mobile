@@ -41,10 +41,9 @@ describe('ValueTransferLine - snapshots', () => {
         <ContextAppLoadedProvider value={state}>
           <ValueTransferLine
             index={0}
-            month="January 2024"
+            hairline={true}
             vt={vt}
             setValueTransferDetailModalShow={onFn}
-            nextLineWithSameTxid={false}
             registerSwipeable={registerSwipeable}
             closeAllSwipeables={onFn}
             closeOtherSwipeables={onFn}
@@ -61,10 +60,9 @@ describe('ValueTransferLine - snapshots', () => {
         <ContextAppLoadedProvider value={state}>
           <ValueTransferLine
             index={3}
-            month=""
+            hairline={true}
             vt={vt}
             setValueTransferDetailModalShow={onFn}
-            nextLineWithSameTxid={true}
             registerSwipeable={registerSwipeable}
             closeAllSwipeables={onFn}
             closeOtherSwipeables={onFn}
@@ -86,10 +84,9 @@ describe('ValueTransferLine - snapshots', () => {
         <ContextAppLoadedProvider value={state}>
           <ValueTransferLine
             index={1}
-            month=""
+            hairline={true}
             vt={vt}
             setValueTransferDetailModalShow={onFn}
-            nextLineWithSameTxid={false}
             registerSwipeable={registerSwipeable}
             closeAllSwipeables={onFn}
             closeOtherSwipeables={onFn}
@@ -110,10 +107,9 @@ describe('ValueTransferLine - snapshots', () => {
         <ContextAppLoadedProvider value={state}>
           <ValueTransferLine
             index={2}
-            month=""
+            hairline={true}
             vt={vt}
             setValueTransferDetailModalShow={onFn}
-            nextLineWithSameTxid={false}
             registerSwipeable={registerSwipeable}
             closeAllSwipeables={onFn}
             closeOtherSwipeables={onFn}

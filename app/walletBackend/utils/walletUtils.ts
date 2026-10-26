@@ -17,11 +17,14 @@ import {
   errorKeyed,
   ChainNameEnum,
 } from '@app/AppState';
+import { isNumber } from 'lodash';
 import RPCModule from '@app/RPCModule';
 import { callFfi, FfiResult } from '@app/walletBackend/ffi';
-import { serverUris } from '@app/uris';
+import { withSyncStopped } from './syncBracket';
 import { RPCZecPriceType } from '@app/walletBackend/types/RPCZecPriceType';
 import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
+import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
+import { RPCMigrationStatusType } from '@app/walletBackend/types/RPCMigrationStatusType';
 
 export type ZecPriceErrorKey =
   'info.error-price-fetch' | 'info.error-price-payload';
@@ -71,30 +74,6 @@ export async function walletExists(): Promise<boolean> {
   return resolvedTrue(await callFfi(RPCModule.walletExists()));
 }
 
-// Runs before every wallet init. A custom (off-registry) server pins migration
-// transmission to itself, since no registry pool applies. A registry server
-// leaves it unset so the library's curated Destination pool, which excludes
-// the sync operator, routes instead.
-async function applyBroadcastCandidates(
-  serverUri: string,
-  chainHint: string,
-): Promise<void> {
-  const chain = chainHint.split(':')[0];
-  const registry = serverUris(() => '')
-    .filter(s => (s.chainName as string) === chain && !s.obsolete)
-    .map(s => s.uri);
-  const strip = (uri: string) => uri.replace(/\/+$/, '');
-  const isCustom =
-    serverUri !== '' && !registry.some(uri => strip(uri) === strip(serverUri));
-  const payload = isCustom ? { transmissionUri: serverUri } : {};
-  try {
-    await RPCModule.setBroadcastCandidates(JSON.stringify(payload));
-  } catch {
-    // Best-effort pre-init: migration-over-mixnet refuses explicitly if unset,
-    // so a failure here must not block wallet creation.
-  }
-}
-
 // Bootstraps a brand-new wallet for the given server/chain. The success value
 // is the raw JSON (parseable as RPCWalletInfoType).
 //
@@ -107,7 +86,6 @@ export async function createNewWallet(
   performanceLevel: string,
   minConfirmations: string,
 ): Promise<FfiResult<string>> {
-  await applyBroadcastCandidates(serverUri, chainHint);
   return callFfi(
     RPCModule.createNewWallet(
       serverUri,
@@ -128,7 +106,6 @@ export async function restoreWalletFromSeed(
   performanceLevel: string,
   minConfirmations: string,
 ): Promise<FfiResult<string>> {
-  await applyBroadcastCandidates(serverUri, chainHint);
   return callFfi(
     RPCModule.restoreWalletFromSeed(
       seed,
@@ -150,7 +127,6 @@ export async function restoreWalletFromUfvk(
   performanceLevel: string,
   minConfirmations: string,
 ): Promise<FfiResult<string>> {
-  await applyBroadcastCandidates(serverUri, chainHint);
   return callFfi(
     RPCModule.restoreWalletFromUfvk(
       ufvk,
@@ -170,7 +146,6 @@ export async function loadExistingWallet(
   performanceLevel: string,
   minConfirmations: string,
 ): Promise<FfiResult<string>> {
-  await applyBroadcastCandidates(serverUri, chainHint);
   return callFfi(
     RPCModule.loadExistingWallet(
       serverUri,
@@ -295,7 +270,7 @@ export async function planOrchardDrain(): Promise<FfiResult<string>> {
 // drain transaction at once. Mirrors the native `drainOrchardProcess`. The
 // success value is raw JSON (parseable as RPCDrainType).
 export async function drainOrchard(): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.drainOrchardProcess());
+  return withSyncStopped(() => callFfi(RPCModule.drainOrchardProcess()));
 }
 
 // Snapshot of the in-flight drain's progress, for rendering "Building i/N" then
@@ -308,127 +283,44 @@ export async function drainStatus(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.drainStatusProcess());
 }
 
-// Plans the private (ZIP 318 two-phase) Orchard -> Ironwood migration without
-// signing or broadcasting anything. Mirrors the native
-// `planIronwoodMigrationProcess`. The success value is raw JSON (parseable as
-// RPCMigrationPlanType, including the consent `plan_hash`).
-export async function planIronwoodMigration(): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.planIronwoodMigrationProcess());
-}
-
-// Phase 2 of the private migration. Called once quickSplit reports `complete`
-// (zingolib/0016): the notes are fully split by then, so this binds the parts to
-// their notes and schedules them at once. Consent is captured post-split, so
-// `planHashHex` is the hash of a fresh planIronwoodMigration read taken here,
-// not the pre-split one. `perBucket` null keeps zingolib's default cadence
-// (changeable later via rescheduleParts, until the first part is signed). The
-// success value is `{ started: true }` JSON; a stale consent rejects with code
-// MigrationConsentStale.
-export async function startIronwoodMigration(
-  planHashHex: string,
-  perBucket: number | null,
-): Promise<FfiResult<string>> {
-  return callFfi(
-    RPCModule.startIronwoodMigrationProcess(
-      planHashHex,
-      perBucket === null ? '' : String(perBucket),
-    ),
-  );
-}
-
-// Drives one step of note splitting: proves and broadcasts the next round of
-// Orchard self-sends, or reports what the pending round is waiting on. Long-
-// running like drainOrchard (Halo2 proving); the native side dispatches it on
-// the concurrent pool. The success value is raw JSON (parseable as
-// RPCSplitStepType).
-export async function continueNoteSplitting(): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.continueNoteSplittingProcess());
-}
-
-// Phase 1 note splitting, the send-shaped replacement for the stateful
-// startIronwoodMigration + continueNoteSplitting driver (zingolib/0016). One call
-// does one round: it pauses sync, plans against current notes, builds and
-// broadcasts the round, and persists no migration state. Long-running like
-// drainOrchard (Halo2 proving), dispatched on the concurrent pool. Loop it —
-// sync to confirmation between calls — until the outcome is `complete`, then
-// call startIronwoodMigration for Phase 2. The success value is raw JSON
-// (parseable as RPCSplitOutcomeType).
-export async function quickSplit(): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.quickSplitProcess());
-}
-
-// Snapshot of the in-flight splitting round's progress, for rendering
-// "built i/N" then "sent i/N". Mirrors the native `splitStatusProcess`; safe to
-// poll concurrently with a running `quickSplit` (native reads a side channel,
-// not the lightclient lock). The success value is raw JSON: `null` when no round
-// is running, otherwise `{ total, built, sent, phase }` (parseable as
-// RPCSplitStatusType).
-export async function splitStatus(): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.splitStatusProcess());
-}
-
-// Sets the Phase 2 cadence (parts per broadcast window) and re-buckets every
-// part with fresh randomization. Callable any time between consent and the
-// first signed part; afterwards rejects with code MigrationCadenceFixed.
-// After success the old schedule is void: re-read migrationStatus and re-arm
-// the reminders. The success value is `{ rescheduled: true }` JSON.
-export async function rescheduleParts(
-  perBucket: number,
-): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.reschedulePartsProcess(String(perBucket)));
-}
-
-// The private migration's progress, arranged for direct rendering (parseable
-// as RPCMigrationStatusType). `phase` is null when no migration is in
-// progress. ZIP 318 requires showing its `orchard_confirmed_spendable`
-// figure while one is.
+// Where an old private migration stands (parseable as RPCMigrationStatusType):
+// `phase` is null when none is in progress. Builds that offered the private
+// path could leave one in the wallet file; launch cancels it.
 export async function migrationStatus(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.migrationStatusProcess());
 }
 
-// The window calendar for a schedule grid (parseable as RPCWindowTimelineType):
-// every scheduled window past and future plus always the window the tip sits
-// in, so "you are here" and the grid render even before consent. The success
-// value is raw JSON `null` when the wallet has never synced, otherwise an array
-// of window reports. Offline-safe; never syncs.
-export async function windowTimeline(): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.windowTimelineProcess());
-}
-
-// Classifies every part against the local chain view, applies what is safe
-// unattended and returns what needs the app (parseable as RPCReconcileType).
-// Call on every launch; never syncs, offline-safe.
+// Records what an old private migration got confirmed before it is
+// cancelled. Never syncs, offline-safe.
 export async function reconcileMigration(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.reconcileMigrationProcess());
 }
 
-// Phase-2 execute tap: sends the scheduled migration's due batch (the current
-// window's parts plus any missed windows', folded in), sequencing sends
-// `spacingMs` apart. Long-running (prove + broadcast) like drainOrchard; the
-// native side dispatches it off the main queue. Mirrors the native
-// `executeDuePartsProcess`. The success value is raw JSON (parseable as
-// RPCBatchReportType).
-export async function executeDueParts(
-  spacingMs: number,
-): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.executeDuePartsProcess(String(spacingMs)));
-}
-
-// Snapshot of the in-flight execute batch's progress, for rendering
-// "Sending i/N". Mirrors the native `executeDuePartsStatusProcess`; safe to
-// poll concurrently with a running `executeDueParts` (native reads a side
-// channel, not the lightclient lock). The success value is raw JSON: `null`
-// when no batch is running, otherwise `{ total, resolved, sent, phase }`
-// (parseable as RPCBatchStatusType).
-export async function executeDuePartsStatus(): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.executeDuePartsStatusProcess());
-}
-
-// Abandons the in-progress private migration: confirmed parts stand, pending
-// ones are dropped and their notes released. The success value is
+// Abandons an old private migration: confirmed parts stand, pending ones are
+// dropped and their notes released. The success value is
 // `{ cancelled: true }` JSON.
 export async function cancelIronwoodMigration(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.cancelIronwoodMigrationProcess());
+}
+
+// Cancels a private migration an older build left in flight, so its notes
+// are free for the drain: what confirmed is recorded first. Silent, and a
+// no-op without one; a failure retries on the next launch.
+export async function cancelOldPrivateMigration(): Promise<void> {
+  await reconcileMigration();
+  const status = await migrationStatus();
+  if (!status.ok) {
+    return;
+  }
+  try {
+    const { phase } = JSON.parse(status.value) as RPCMigrationStatusType;
+    if (!phase || phase.kind === 'complete') {
+      return;
+    }
+  } catch {
+    return;
+  }
+  await cancelIronwoodMigration();
 }
 
 // Returns the spendable balance that could be sent to `address` right now,
@@ -530,6 +422,18 @@ export async function createNewTransparentAddress(): Promise<
   FfiResult<string>
 > {
   return callFfi(RPCModule.createNewTransparentAddressProcess());
+}
+
+// Reserves the next refund-scope transparent address, the one a swap provider
+// refunds a deposit to. Same JSON shape as createNewTransparentAddress.
+export async function reserveRefundAddress(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.reserveRefundAddressProcess());
+}
+
+// The same address without reserving it, for a quote to name while the swap
+// is still being chosen.
+export async function deriveRefundAddress(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.deriveRefundAddressProcess());
 }
 
 // Requests zingolib to forget about a transaction. The success value is a
@@ -699,6 +603,10 @@ export async function shieldConfirm(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.confirmProcess());
 }
 
+// The keys and birthday a wallet reports, with the height zingolib was given
+// when it raised the birthday to Sapling activation in this process.
+export type FetchedWallet = WalletType & { birthdayAdjustedFrom?: number };
+
 /**
  * Returns the wallet's secret material for the backup/seed display screens.
  *
@@ -708,7 +616,7 @@ export async function shieldConfirm(): Promise<FfiResult<string>> {
  */
 export async function fetchWallet(
   readOnly: boolean,
-): Promise<WalletType | null> {
+): Promise<FetchedWallet | null> {
   if (readOnly) {
     // only viewing key & birthday
     const result = await callFfi(RPCModule.getUfvkInfo());
@@ -716,11 +624,14 @@ export async function fetchWallet(
       return null;
     }
     try {
-      const RPCufvk: WalletType = JSON.parse(result.value);
+      const RPCufvk: RPCUfvkType = JSON.parse(result.value);
 
-      const wallet: WalletType = {} as WalletType;
-      if (RPCufvk.birthday) {
+      const wallet: FetchedWallet = {} as FetchedWallet;
+      if (isNumber(RPCufvk.birthday)) {
         wallet.birthday = RPCufvk.birthday;
+      }
+      if (isNumber(RPCufvk.birthday_adjusted_from)) {
+        wallet.birthdayAdjustedFrom = RPCufvk.birthday_adjusted_from;
       }
       if (RPCufvk.ufvk) {
         wallet.ufvk = RPCufvk.ufvk;
@@ -739,12 +650,15 @@ export async function fetchWallet(
     try {
       const RPCseed: RPCSeedType = JSON.parse(result.value);
 
-      const wallet: WalletType = {} as WalletType;
+      const wallet: FetchedWallet = {} as FetchedWallet;
       if (RPCseed.seed_phrase) {
         wallet.seed = RPCseed.seed_phrase;
       }
-      if (RPCseed.birthday) {
+      if (isNumber(RPCseed.birthday)) {
         wallet.birthday = RPCseed.birthday;
+      }
+      if (isNumber(RPCseed.birthday_adjusted_from)) {
+        wallet.birthdayAdjustedFrom = RPCseed.birthday_adjusted_from;
       }
 
       return wallet;

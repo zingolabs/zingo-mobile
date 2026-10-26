@@ -32,13 +32,9 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
-            "display": "flex",
-            "flexDirection": "row",
-            "flexWrap": "wrap",
-            "gap": 8,
+            "height": 57,
             "justifyContent": "center",
-            "marginHorizontal": 5,
-            "marginTop": 12,
+            "paddingTop": 12,
           }
         }
       />
@@ -181,12 +177,14 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
       }
     >
       <View
-        onLayout={[Function]}
         style={
-          {
-            "alignItems": "flex-end",
-            "alignSelf": "stretch",
-          }
+          [
+            {
+              "alignItems": "flex-end",
+              "alignSelf": "stretch",
+            },
+            null,
+          ]
         }
       >
         <View
@@ -194,74 +192,52 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             {
               "alignItems": "center",
               "flexDirection": "row",
-              "gap": 6,
+              "gap": 8,
             }
           }
         >
           <View />
           <View
-            accessibilityLabel="text translated"
-            accessibilityRole="button"
-            accessibilityState={
-              {
-                "busy": undefined,
-                "checked": undefined,
-                "disabled": undefined,
-                "expanded": false,
-                "selected": undefined,
-              }
-            }
-            accessibilityValue={
-              {
-                "max": undefined,
-                "min": undefined,
-                "now": undefined,
-                "text": undefined,
-              }
-            }
-            accessible={true}
-            collapsable={false}
-            focusable={true}
-            hitSlop={10}
-            onBlur={[Function]}
-            onClick={[Function]}
-            onFocus={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            testID="syncreport.info"
+            style={null}
           >
             <View
-              style={{}}
+              accessibilityLabel="text translated"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": false,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              hitSlop={14}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              testID="syncreport.info"
             >
               <View
-                style={
-                  {
-                    "alignItems": "center",
-                    "backgroundColor": "#A8B3C4",
-                    "borderRadius": 7,
-                    "height": 14,
-                    "justifyContent": "center",
-                    "width": 14,
-                  }
-                }
-              >
-                <Text
-                  style={
-                    {
-                      "color": "#060B12",
-                      "fontSize": 9.5,
-                      "fontWeight": "700",
-                      "lineHeight": 14,
-                    }
-                  }
-                >
-                  i
-                </Text>
-              </View>
+                style={{}}
+              />
             </View>
           </View>
         </View>
@@ -399,7 +375,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             style={
               {
                 "color": "#c3c3c3",
-                "fontSize": 14,
+                "fontSize": 15,
                 "fontWeight": "600",
               }
             }
@@ -410,8 +386,8 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "#8DA0B8",
-                "fontSize": 11.5,
+                "color": "#888888",
+                "fontSize": 12,
                 "lineHeight": 16,
                 "marginTop": 2,
               }
@@ -472,8 +448,8 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "#8DA0B8",
-                  "fontSize": 11.5,
+                  "color": "#888888",
+                  "fontSize": 12,
                 }
               }
             >
@@ -484,7 +460,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             style={
               {
                 "color": "#c3c3c3",
-                "fontSize": 13.5,
+                "fontSize": 13,
                 "fontWeight": "700",
                 "marginTop": 6,
               }
@@ -525,7 +501,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <View
               style={
                 {
-                  "backgroundColor": "#3CC52A",
+                  "backgroundColor": "#18bd18",
                   "borderRadius": 3,
                   "height": 8,
                   "width": 8,
@@ -535,8 +511,8 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "#8DA0B8",
-                  "fontSize": 11.5,
+                  "color": "#888888",
+                  "fontSize": 12,
                 }
               }
             >
@@ -547,7 +523,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             style={
               {
                 "color": "#c3c3c3",
-                "fontSize": 13.5,
+                "fontSize": 13,
                 "fontWeight": "700",
                 "marginTop": 6,
               }
@@ -588,7 +564,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <View
               style={
                 {
-                  "backgroundColor": "#E6B43C",
+                  "backgroundColor": "#F99D00",
                   "borderRadius": 3,
                   "height": 8,
                   "width": 8,
@@ -598,8 +574,8 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "#8DA0B8",
-                  "fontSize": 11.5,
+                  "color": "#888888",
+                  "fontSize": 12,
                 }
               }
             >
@@ -610,7 +586,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             style={
               {
                 "color": "#c3c3c3",
-                "fontSize": 13.5,
+                "fontSize": 13,
                 "fontWeight": "700",
                 "marginTop": 6,
               }
@@ -657,8 +633,8 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "#8DA0B8",
-                "fontSize": 11.5,
+                "color": "#888888",
+                "fontSize": 12,
               }
             }
           >
@@ -702,8 +678,8 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "#8DA0B8",
-                "fontSize": 11.5,
+                "color": "#888888",
+                "fontSize": 12,
               }
             }
           >
@@ -733,7 +709,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <View
               style={
                 {
-                  "backgroundColor": "#3CC52A",
+                  "backgroundColor": "#18bd18",
                   "borderRadius": 3,
                   "height": 8,
                   "width": 8,
@@ -743,8 +719,8 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "#8DA0B8",
-                  "fontSize": 11,
+                  "color": "#888888",
+                  "fontSize": 12,
                 }
               }
             >
@@ -763,7 +739,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <View
               style={
                 {
-                  "backgroundColor": "#E6B43C",
+                  "backgroundColor": "#F99D00",
                   "borderRadius": 3,
                   "height": 8,
                   "width": 8,
@@ -773,8 +749,8 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "#8DA0B8",
-                  "fontSize": 11,
+                  "color": "#888888",
+                  "fontSize": 12,
                 }
               }
             >
@@ -793,7 +769,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <View
               style={
                 {
-                  "backgroundColor": "#F7931A",
+                  "backgroundColor": "#ebff5a",
                   "borderRadius": 3,
                   "height": 8,
                   "width": 8,
@@ -803,8 +779,8 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "#8DA0B8",
-                  "fontSize": 11,
+                  "color": "#888888",
+                  "fontSize": 12,
                 }
               }
             >
@@ -823,7 +799,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <View
               style={
                 {
-                  "backgroundColor": "#5B8DEF",
+                  "backgroundColor": "#8FB4E6",
                   "borderRadius": 3,
                   "height": 8,
                   "width": 8,
@@ -833,8 +809,8 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "#8DA0B8",
-                  "fontSize": 11,
+                  "color": "#888888",
+                  "fontSize": 12,
                 }
               }
             >
@@ -853,7 +829,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <View
               style={
                 {
-                  "backgroundColor": "#3A4A62",
+                  "backgroundColor": "#4A6487",
                   "borderRadius": 3,
                   "height": 8,
                   "width": 8,
@@ -863,8 +839,8 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "#8DA0B8",
-                  "fontSize": 11,
+                  "color": "#888888",
+                  "fontSize": 12,
                 }
               }
             >

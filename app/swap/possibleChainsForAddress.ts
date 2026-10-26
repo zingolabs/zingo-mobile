@@ -1,10 +1,13 @@
 import { ChainNameEnum } from '@app/AppState';
-import { SWAP_ADDRESS_CHAINS } from './addressValidators';
+import {
+  SWAP_ADDRESS_CHAINS,
+  nearAccountNeedsConfirm,
+} from './addressValidators';
 import { validateAddressForChain } from './validateAddressForChain';
 
 /**
  * The chains an address could plausibly belong to, for the address-book / swap
- * "chain" selector.
+ * 'chain' selector.
  *
  * - Empty address → every validatable chain (nothing to narrow by yet).
  * - Non-empty → only the chains whose validator accepts it (an EVM `0x…`
@@ -28,5 +31,11 @@ export async function possibleChainsForAddress(
       ok: await validateAddressForChain(chain, addr, zcashChain),
     })),
   );
-  return checks.filter(c => c.ok).map(c => c.chain);
+  const chains = checks.filter(c => c.ok).map(c => c.chain);
+  // An ambiguous NEAR name is offered only when no other chain takes the
+  // address: a lowercase `bc1q…` or `thor1…` is a valid NEAR name too, and
+  // NEAR beside it would hide what the address really is.
+  return nearAccountNeedsConfirm(addr) && chains.length > 1
+    ? chains.filter(c => c !== 'NEAR')
+    : chains;
 }

@@ -513,7 +513,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         uniffi.zingo.SyncSettings(performanceLevel = performancelevel, minConfirmations = minconfirmations.toUInt())
 
     private fun connection(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String) =
-        uniffi.zingo.IndexerConnection(serverUri = serveruri, chainHint = chainhint, sync = syncSettings(performancelevel, minconfirmations))
+        uniffi.zingo.IndexerConnection(indexer = indexerChoice(serveruri), chainHint = chainhint, sync = syncSettings(performancelevel, minconfirmations))
 
     @ReactMethod
     fun createNewWallet(serveruri: String, birthday: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
@@ -778,6 +778,22 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
+    fun stopSyncProcess(promise: Promise) {
+        FfiOutcome.settling(promise, "stop_sync") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.stopSync()
+        }
+    }
+
+    @ReactMethod
+    fun syncCaughtUpInfo(promise: Promise) {
+        FfiOutcome.settling(promise, "sync_caught_up") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.syncCaughtUp()
+        }
+    }
+
+    @ReactMethod
     fun statusSyncInfo(promise: Promise) {
         FfiOutcome.settling(promise, "status_sync") {
             uniffi.zingo.initLogging()
@@ -821,7 +837,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun changeServerProcess(serveruri: String, promise: Promise) {
         FfiOutcome.settling(promise, "change_server") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.changeServer(serveruri = serveruri)
+            uniffi.zingo.changeServer(choice = indexerChoice(serveruri))
         }
     }
 
@@ -917,13 +933,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // FfiOutcome (zingo-mobile#1151, audit Issues Q and R): the resolved
     // value is always data, a typed ZingolibException rejects, and nothing
     // is ever encoded as error prose inside the success channel.
-
-    @ReactMethod
-    fun setBroadcastCandidates(candidatesJson: String, promise: Promise) {
-        FfiOutcome.settling(promise, "set_broadcast_candidates") {
-            uniffi.zingo.setBroadcastCandidates(candidatesJson = candidatesJson)
-        }
-    }
 
     @ReactMethod
     fun attachMixnet(socks5Addr: String, exitNode: String, promise: Promise) {
@@ -1102,6 +1111,34 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
+    fun sendSwapDepositProcess(vaultAddress: String, amount: String, memoHex: String, promise: Promise) {
+        FfiOutcome.settling(promise, "send_swap_deposit") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.sendSwapDeposit(
+                vaultAddress = vaultAddress,
+                amount = FfiArgs.requiredU64(amount, "amount"),
+                memoHex = memoHex,
+            )
+        }
+    }
+
+    @ReactMethod
+    fun reserveRefundAddressProcess(promise: Promise) {
+        FfiOutcome.settling(promise, "reserve_refund_address") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.reserveRefundAddress()
+        }
+    }
+
+    @ReactMethod
+    fun deriveRefundAddressProcess(promise: Promise) {
+        FfiOutcome.settling(promise, "derive_refund_address") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.deriveRefundAddress()
+        }
+    }
+
+    @ReactMethod
     fun planOrchardDrainProcess(promise: Promise) {
         FfiOutcome.settling(promise, "plan_orchard_drain") {
             uniffi.zingo.initLogging()
@@ -1128,66 +1165,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-    @ReactMethod
-    fun planIronwoodMigrationProcess(promise: Promise) {
-        FfiOutcome.settling(promise, "plan_ironwood_migration") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.planIronwoodMigration()
-        }
-    }
-
-    // `perBucket` crosses the bridge as a string (the module's numeric-arg
-    // convention); empty means "keep zingolib's default cadence", and a
-    // malformed value rejects as InvalidInput, matching the iOS bridge.
-    @ReactMethod
-    fun startIronwoodMigrationProcess(planHashHex: String, perBucket: String, promise: Promise) {
-        FfiOutcome.settling(promise, "start_ironwood_migration") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.startIronwoodMigration(planHashHex = planHashHex, perBucket = FfiArgs.optionalU32(perBucket, "per_bucket"))
-        }
-    }
-
-    // Proves and broadcasts one splitting round, so like the drain it runs
-    // long and holds the lightclient; settling launches on Dispatchers.IO,
-    // which keeps it off the main queue and lets status polls through.
-    @ReactMethod
-    fun continueNoteSplittingProcess(promise: Promise) {
-        FfiOutcome.settling(promise, "continue_note_splitting") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.continueNoteSplitting()
-        }
-    }
-
-    // Phase 1 splitting round (zingolib/0016). Proves and broadcasts, so like the
-    // drain it runs long and holds the lightclient; settling launches on
-    // Dispatchers.IO, which keeps it off the main queue and lets status polls
-    // through.
-    @ReactMethod
-    fun quickSplitProcess(promise: Promise) {
-        FfiOutcome.settling(promise, "quick_split") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.quickSplit()
-        }
-    }
-
-    // Polled concurrently while quickSplitProcess runs; the native splitStatus()
-    // reads a side channel, never the lightclient lock the round holds, so the
-    // poll returns immediately.
-    @ReactMethod
-    fun splitStatusProcess(promise: Promise) {
-        FfiOutcome.settling(promise, "split_status") {
-            uniffi.zingo.splitStatus()
-        }
-    }
-
-    @ReactMethod
-    fun reschedulePartsProcess(perBucket: String, promise: Promise) {
-        FfiOutcome.settling(promise, "reschedule_parts") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.rescheduleParts(perBucket = FfiArgs.requiredU32(perBucket, "per_bucket"))
-        }
-    }
-
+    // An old private migration (ZIP 318), left by builds that offered it:
+    // launch reads it, records what confirmed and cancels the rest.
     @ReactMethod
     fun migrationStatusProcess(promise: Promise) {
         FfiOutcome.settling(promise, "migration_status") {
@@ -1196,40 +1175,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun windowTimelineProcess(promise: Promise) {
-        FfiOutcome.settling(promise, "window_timeline") {
-            uniffi.zingo.windowTimeline()
-        }
-    }
-
-    @ReactMethod
     fun reconcileMigrationProcess(promise: Promise) {
         FfiOutcome.settling(promise, "reconcile_migration") {
             uniffi.zingo.initLogging()
             uniffi.zingo.reconcileMigration()
-        }
-    }
-
-    // Phase-2 execute tap: sends the scheduled migration's due batch. Long-
-    // running (prove + broadcast) like drainOrchardProcess, so settling's
-    // Dispatchers.IO launch applies; `spacingMs` crosses as a string (the
-    // module's numeric-arg convention) — the delay sequenced between the
-    // batch's sends.
-    @ReactMethod
-    fun executeDuePartsProcess(spacingMs: String, promise: Promise) {
-        FfiOutcome.settling(promise, "execute_due_parts") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.executeDueParts(spacingMs = FfiArgs.requiredU64(spacingMs, "spacing_ms"))
-        }
-    }
-
-    // Polled concurrently while executeDuePartsProcess runs; the native
-    // executeDuePartsStatus() reads a side channel, never the lightclient lock
-    // the batch holds, so the poll returns immediately.
-    @ReactMethod
-    fun executeDuePartsStatusProcess(promise: Promise) {
-        FfiOutcome.settling(promise, "execute_due_parts_status") {
-            uniffi.zingo.executeDuePartsStatus()
         }
     }
 
@@ -1242,3 +1191,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
 }
+
+internal fun indexerChoice(serveruri: String): uniffi.zingo.IndexerChoice =
+    if (serveruri.isEmpty()) uniffi.zingo.IndexerChoice.Offline else uniffi.zingo.IndexerChoice.Named(uri = serveruri)

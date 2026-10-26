@@ -12,6 +12,7 @@ import {
   SLIDE_DURATION_MS,
   SLIDE_EASING,
 } from '@app/hooks/useOptionsPanelSheetSlide';
+import { themeTokens } from '@app/theme';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
@@ -68,7 +69,7 @@ type MenuMorphIconProps = {
 
 export const MenuMorphIcon = ({
   size = 25,
-  color = '#B1BBC5',
+  color = themeTokens.fgMuted,
 }: MenuMorphIconProps) => {
   const { isOpen } = useOptionsPanel();
   const progress = useSharedValue(isOpen ? 1 : 0);
