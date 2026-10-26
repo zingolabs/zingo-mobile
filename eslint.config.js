@@ -123,8 +123,6 @@ const geometryGaps = [
   'screens/SeedBackup/components/StepParts.tsx',
   'screens/SeedBackup/components/WordsStep.tsx',
   'screens/Server/CustomServerBox.tsx',
-  'screens/Server/Server.tsx',
-  'screens/Server/ServerLog.tsx',
   'screens/Settings/Settings.tsx',
   'screens/StartMenu/StartMenu.tsx',
   'screens/Swap/components/TokenLogo.tsx',

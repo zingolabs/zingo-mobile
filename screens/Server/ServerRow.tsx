@@ -8,10 +8,20 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { space20, useTheme } from '@app/theme';
+import {
+  space20,
+  useTheme,
+  radiusMd,
+  radiusPill,
+  rowMinHeight,
+  space8,
+  space12,
+  space16,
+  iconSizeMd,
+} from '@app/theme';
 import { ease } from '@app/theme/motion';
 import BoldText from '@ui/primitives/BoldText';
-import RegText from '@ui/primitives/RegText';
+import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import { ChevronLeft, ChevronRight } from '@ui/primitives/Icons/Chevron';
 import Radio from '@ui/primitives/Radio';
@@ -40,18 +50,18 @@ export const Latency: React.FC<LatencyProps> = ({ ms, notResponding }) => {
       ? colors.fgAccent
       : colors.fgMuted;
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: space8 }}>
       <View
-        style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: dot }}
-      />
-      <RegText
         style={{
-          fontSize: 12,
-          color: bad ? colors.fgWarning : colors.fgMuted,
+          width: 6,
+          height: 6,
+          borderRadius: radiusPill,
+          backgroundColor: dot,
         }}
-      >
+      />
+      <Text variant="caption" tone={bad ? 'warning' : 'muted'}>
         {bad ? notResponding : `${ms} ms`}
-      </RegText>
+      </Text>
     </View>
   );
 };
@@ -109,13 +119,12 @@ const ServerRow: React.FC<ServerRowProps> = ({
         accessibilityRole="radio"
         accessibilityState={{ selected, disabled }}
         style={({ pressed }) => ({
-          minHeight: 55,
+          minHeight: rowMinHeight,
           flexDirection: 'row',
           alignItems: 'center',
-          gap: 13,
-          paddingVertical: 10,
-          paddingLeft: 14.5,
-          paddingRight: 16,
+          gap: space12,
+          paddingVertical: space8,
+          paddingHorizontal: space16,
           borderTopWidth: first ? 0 : 1,
           borderTopColor: colors.borderSubtle,
           opacity: pressed ? 0.7 : 1,
@@ -123,22 +132,17 @@ const ServerRow: React.FC<ServerRowProps> = ({
       >
         <Radio selected={selected} />
         <View style={{ flex: 1, minWidth: 0 }}>
-          <RegText
-            numberOfLines={1}
-            style={{ fontSize: 15, lineHeight: 19, fontWeight: '600' }}
-          >
+          <Text variant="bodyStrong" numberOfLines={1}>
             {title}
-          </RegText>
+          </Text>
           {!!sub && (
-            <RegText
-              style={{ fontSize: 12, lineHeight: 16, color: colors.fgMuted }}
-            >
+            <Text variant="bodySmall" tone="muted">
               {sub}
-            </RegText>
+            </Text>
           )}
         </View>
         {right}
-        {chevron && <ChevronRight size={16} color={colors.fgMuted} />}
+        {chevron && <ChevronRight size={iconSizeMd} color={colors.fgMuted} />}
       </Pressable>
     </Animated.View>
   );
@@ -152,7 +156,7 @@ export const RowCard: React.FC<{ children: React.ReactNode }> = ({
     <View
       style={{
         marginHorizontal: CARD_SIDE,
-        borderRadius: 14,
+        borderRadius: radiusMd,
         backgroundColor: colors.bgSurface,
         borderWidth: 1,
         borderColor: colors.bottomSheetBorder,
