@@ -42,9 +42,9 @@ const colorLock = [
  */
 const NUMBER =
   ':matches(Literal[raw=/^[0-9]/], UnaryExpression[operator="-"], BinaryExpression)';
-/** The value of a style property, or either branch of a ternary there. */
+/** The value of a style property, or a number in either branch of a ternary there (not its test). */
 const VALUE = keys =>
-  `:matches(Property[key.name=${keys}], Property[key.name=${keys}] > ConditionalExpression) > ${NUMBER}`;
+  `:matches(Property[key.name=${keys}] > ${NUMBER}, Property[key.name=${keys}] > ConditionalExpression[consequent.raw=/^[0-9]/], Property[key.name=${keys}] > ConditionalExpression[alternate.raw=/^[0-9]/])`;
 /** Icon components: ui/primitives/Icons, drawn on the Icon base. */
 const ICON =
   '/(Icon|Chevron(Up|Down|Left|Right)|TriangleAlert|RescanArrows|RescanCloud)$/';
@@ -103,14 +103,10 @@ const geometryGaps = [
   // not yet redesigned: hand-set values until each screen moves onto the
   // system (counts as of 2026-10-25)
   'screens/About/About.tsx',
-  'screens/ImportChooser/ImportChooser.tsx',
-  'screens/ImportUfvk/ImportUfvk.tsx',
   'screens/Insight/Insight.tsx',
   'screens/Insight/components/ActivityChart.tsx',
   'screens/Insight/components/Donut.tsx',
   'screens/Launching/Launching.tsx',
-  'screens/Messages/MessageList.tsx',
-  'screens/Messages/components/MessageLine.tsx',
   'screens/MixnetDoctor/MixnetDoctor.tsx',
   'screens/OptionsPanel/OptionsPanel.tsx',
   'screens/Pools/Pools.tsx',
@@ -125,10 +121,8 @@ const geometryGaps = [
   'screens/Server/CustomServerBox.tsx',
   'screens/Server/Server.tsx',
   'screens/Server/ServerLog.tsx',
-  'screens/StartMenu/StartMenu.tsx',
   'screens/Swap/components/TokenLogo.tsx',
   'screens/SwapResult/SwapResult.tsx',
-  'screens/SyncReport/SyncReport.tsx',
   'screens/ViewingKey/ViewingKey.tsx',
   'screens/ViewingKey/components/KeyCard.tsx',
   'screens/ViewingKey/components/KeyQr.tsx',
