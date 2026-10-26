@@ -30,6 +30,7 @@ import {
   formatAmountForDisplay,
   isRefunding,
   isTerminalStatus,
+  nearRefusesSmallRefunds,
   providerShortLabel,
   rateLimitedNotice,
   renderSwapText,
@@ -48,6 +49,8 @@ import { useResult } from '@app/navigation/results';
 import { WalletNavigation } from '@app/types';
 import { swapScreenFor } from './swapRoute';
 import { pendingSwapLabel } from './pendingSwapLabel';
+import { useNearSmallWarningHide } from '@app/hooks/useNearSmallWarningHide';
+import DontShowAgain from './components/DontShowAgain';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 import Utils from '@app/utils';
 import {
@@ -115,6 +118,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
   const navigation = useNavigation<WalletNavigation>();
   const swapService = useSwapService();
   const records = useSwapRecords();
+  const nearWarning = useNearSmallWarningHide();
   const sheetSlideStyle = useOptionsPanelSheetSlide();
   useDismissSheetsOnBlur();
 
@@ -306,6 +310,46 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
         buttons: [
           { text: translate('swap.close') as string, style: 'cancel' },
           { text: translate('swap.cta-ready') as string, onPress: proceed },
+        ],
+      });
+      return;
+    }
+    // Buying ZEC through NEAR under its no-refunds line: the warning comes
+    // first, once, or until the user asks not to see it again.
+    if (
+      !nearWarning.hidden &&
+      nearRefusesSmallRefunds({
+        provider: form.chosenRoute?.provider,
+        direction: form.direction,
+        sellUsd:
+          form.amountNumber *
+          (form.quoteContext?.fiatValueBasis.sellUsdUnitPrice ?? 0),
+      })
+    ) {
+      const dontShow = { current: false };
+      showConfirm({
+        title: translate('swap.near-small-title') as string,
+        message: translate('swap.near-small-body') as string,
+        content: (
+          <DontShowAgain
+            testID="swap.near-small.dont-show"
+            label={translate('swap.dont-show-again') as string}
+            onChange={checked => {
+              dontShow.current = checked;
+            }}
+          />
+        ),
+        buttons: [
+          {
+            text: translate('swap.cta-ready') as string,
+            onPress: () => {
+              if (dontShow.current) {
+                nearWarning.setHidden(true);
+              }
+              proceed();
+            },
+          },
+          { text: translate('swap.cancel') as string, style: 'cancel' },
         ],
       });
       return;
