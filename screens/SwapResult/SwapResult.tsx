@@ -1,4 +1,3 @@
-/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useState } from 'react';
 import DetailRows from '@screens/Swap/components/DetailRows';
@@ -388,7 +387,7 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
       >
         {head(
           'warning',
-          <TriangleAlert size={34} color={colors.fgWarning} />,
+          <TriangleAlert size={iconSize} color={colors.fgWarning} />,
           translate('swap.result-incomplete-title') as string,
           translate('swap.result-incomplete-line') as string,
         )}
