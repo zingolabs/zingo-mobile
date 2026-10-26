@@ -125,7 +125,6 @@ const geometryGaps = [
   'screens/Server/CustomServerBox.tsx',
   'screens/Server/Server.tsx',
   'screens/Server/ServerLog.tsx',
-  'screens/Settings/Settings.tsx',
   'screens/StartMenu/StartMenu.tsx',
   'screens/Swap/components/TokenLogo.tsx',
   'screens/SwapResult/SwapResult.tsx',
@@ -133,7 +132,6 @@ const geometryGaps = [
   'screens/ViewingKey/ViewingKey.tsx',
   'screens/ViewingKey/components/KeyCard.tsx',
   'screens/ViewingKey/components/KeyQr.tsx',
-  'screens/WalletError/WalletError.tsx',
   'screens/WalletSeed/WalletSeed.tsx',
   'ui/primitives/AppSheetModal.tsx',
   'ui/primitives/ProgressBar.tsx',
@@ -142,11 +140,7 @@ const geometryGaps = [
   'ui/widgets/BusyButton.tsx',
   'ui/widgets/CardExpand.tsx',
   'ui/widgets/CurrencyAmount.tsx',
-  'ui/widgets/Flight/SendFlight.tsx',
-  'ui/widgets/Flight/SwapFlight.tsx',
   'ui/widgets/ProgressState.tsx',
-  'ui/widgets/ScanOverlay.tsx',
-  'ui/widgets/SeedPhraseInput.tsx',
   'ui/widgets/ZecAmount.tsx',
 ];
 
