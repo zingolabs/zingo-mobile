@@ -8,21 +8,21 @@ import { assetShortLabel, formatFeeAmount } from '@app/swap/feeConversion';
  */
 
 describe('formatFeeAmount', () => {
-  it("caps at the wallet's own smallest unit", () => {
-    expect(formatFeeAmount(0.000012345678901234567)).toBe('0.00001235');
+  it("cuts at the wallet's own smallest unit, never rounding up", () => {
+    expect(formatFeeAmount(0.000012345678901234567)).toBe('0.00001234');
   });
 
   // The provider's string is what the breakdown shows beside the converted
   // figure, so it has to go through the same formatter to match it.
   it("takes the provider's string as readily as a number", () => {
-    expect(formatFeeAmount('0.000012345678901234567')).toBe('0.00001235');
+    expect(formatFeeAmount('0.000012345678901234567')).toBe('0.00001234');
     expect(formatFeeAmount('1.5')).toBe('1.5');
   });
 
-  it('trims the padding rather than printing it', () => {
+  it('trims the padding down to one decimal', () => {
     expect(formatFeeAmount(1.5)).toBe('1.5');
-    expect(formatFeeAmount(10)).toBe('10');
-    expect(formatFeeAmount(1000)).toBe('1000');
+    expect(formatFeeAmount(10)).toBe('10.0');
+    expect(formatFeeAmount(1000)).toBe('1000.0');
   });
 
   // Binary fractions surface as a long tail that is arithmetic rather than
@@ -37,11 +37,11 @@ describe('formatFeeAmount', () => {
   });
 
   it('reads a real zero, and anything unreadable, as zero', () => {
-    expect(formatFeeAmount(0)).toBe('0');
-    expect(formatFeeAmount('')).toBe('0');
-    expect(formatFeeAmount('not a number')).toBe('0');
-    expect(formatFeeAmount(undefined)).toBe('0');
-    expect(formatFeeAmount(Number.NaN)).toBe('0');
+    expect(formatFeeAmount(0)).toBe('0.0');
+    expect(formatFeeAmount('')).toBe('0.0');
+    expect(formatFeeAmount('not a number')).toBe('0.0');
+    expect(formatFeeAmount(undefined)).toBe('0.0');
+    expect(formatFeeAmount(Number.NaN)).toBe('0.0');
   });
 
   it('never reaches for scientific notation', () => {

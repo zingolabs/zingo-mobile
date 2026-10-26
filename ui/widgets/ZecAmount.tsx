@@ -8,12 +8,12 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { useTheme, fontScaleBody } from '@app/theme';
-import { getNumberFormatSettings } from 'react-native-localize';
 
-import Utils from '@app/utils';
+import { formatAmount } from '@app/utils/formatAmount';
 import { SvgXml } from 'react-native-svg';
 import { CurrencyNameEnum } from '@app/AppState';
 import { useTimedReveal } from '@app/hooks/useTimedReveal';
+import { MASK } from '@ui/widgets/PrivateAmount';
 
 /** The Ž of the ZEC logo, in its own units: bars of 20.12 above and
     below a Z of 107.61, 88.03 wide, 14.49 from the E. */
@@ -49,9 +49,8 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
 }) => {
   const { visible, reveal } = useTimedReveal(!!privacy);
   const privacyHigh: boolean = !visible;
-  const splits = Utils.splitZecAmountIntoBigSmall(amtZec);
+  const amount = typeof amtZec === 'undefined' ? '--' : formatAmount(amtZec);
   const { colors } = useTheme();
-  const { decimalSeparator } = getNumberFormatSettings();
   /** The text grows with the OS text size up to the cap; the Ž glyph is
       an svg and has to grow with it. */
   const scale = Math.min(useWindowDimensions().fontScale, fontScaleBody);
@@ -140,7 +139,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
                 padding: 0,
               }}
             >
-              {' -' + decimalSeparator + '----'}
+              {` ${MASK}`}
             </Text>
           ) : (
             <Text
@@ -154,21 +153,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
                 padding: 0,
               }}
             >
-              {' ' + splits.bigPart}
-            </Text>
-          )}
-          {splits.smallPart !== '0000' && !privacyHigh && (
-            <Text
-              testID={`${testID}.small-part`}
-              maxFontSizeMultiplier={fontScaleBody}
-              style={{
-                fontSize: size * 0.7,
-                color,
-                margin: 0,
-                padding: 0,
-              }}
-            >
-              {splits.smallPart}
+              {' ' + amount}
             </Text>
           )}
         </View>

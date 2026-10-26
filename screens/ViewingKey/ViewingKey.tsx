@@ -2,7 +2,6 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   BackHandler,
-  Pressable,
   StyleSheet,
   Text,
   useWindowDimensions,
@@ -32,7 +31,6 @@ import { getRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
 import { showConfirm } from '@app/services/showConfirm';
 import { fetchWallet } from '@app/walletBackend';
 import { copySensitive } from '@app/utils/sensitiveClipboard';
-import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { EyeIcon } from '@ui/primitives/Icons/EyeIcon';
 import { BanIcon } from '@ui/primitives/Icons/BanIcon';
 import { UsersIcon } from '@ui/primitives/Icons/UsersIcon';
@@ -201,7 +199,17 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
   const page = (
     <View testID="viewingkey" style={{ flex: 1, paddingTop: 4 }}>
       <Header
-        title={''}
+        title={
+          switchTo
+            ? (translate('viewingkey.switch-title') as string).replace(
+                '{net}',
+                net,
+              )
+            : (translate('viewingkey.title') as string)
+        }
+        closeScreen={close}
+        backTestID="viewingkey.back"
+        backAccessibilityLabel={translate('walletseed.back-acc') as string}
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
@@ -209,52 +217,6 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
         noUfvkIcon={true}
       />
       <View style={{ flex: 1 }}>
-        <View
-          style={{
-            minHeight: 44,
-            marginTop: 6,
-            marginBottom: 10,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Pressable
-            testID="viewingkey.back"
-            accessibilityRole="button"
-            accessibilityLabel={translate('walletseed.back-acc') as string}
-            onPress={close}
-            style={({ pressed }) => ({
-              position: 'absolute',
-              left: 10,
-              top: 0,
-              width: 44,
-              height: 44,
-              borderRadius: 12,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
-            })}
-          >
-            <ChevronLeft size={24} color={colors.fgAccent} />
-          </Pressable>
-          <Text
-            accessibilityRole="header"
-            style={{
-              color: colors.fgDefault,
-              fontSize: 18,
-              fontWeight: '700',
-              textAlign: 'center',
-              marginHorizontal: 60,
-            }}
-          >
-            {switchTo
-              ? (translate('viewingkey.switch-title') as string).replace(
-                  '{net}',
-                  net,
-                )
-              : (translate('viewingkey.title') as string)}
-          </Text>
-        </View>
         <Text
           style={{
             color: colors.fgMuted,

@@ -120,6 +120,7 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
           }
         >
           <Text
+            accessibilityRole="header"
             maxFontSizeMultiplier={1.5}
             numberOfLines={1}
             style={
@@ -277,7 +278,7 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
             }
             testID="send.confirm.amount"
           >
-            1.1235
+            1.1234
             <Text
               maxFontSizeMultiplier={1.5}
               style={
@@ -528,7 +529,7 @@ memo10
                     }
                   }
                 >
-                  0.0000 ZEC
+                  0.00001 ZEC
                 </Text>
               </View>
             </View>
@@ -595,7 +596,7 @@ memo10
                     }
                   }
                 >
-                  1.1235 ZEC
+                  1.1234 ZEC
                 </Text>
               </View>
             </View>
@@ -926,6 +927,7 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
           }
         >
           <Text
+            accessibilityRole="header"
             maxFontSizeMultiplier={1.5}
             numberOfLines={1}
             style={
@@ -1083,7 +1085,7 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
             }
             testID="send.confirm.amount"
           >
-            1.1235
+            1.1234
             <Text
               maxFontSizeMultiplier={1.5}
               style={
@@ -1334,7 +1336,7 @@ memo10
                     }
                   }
                 >
-                  0.0000 ZEC
+                  0.00001 ZEC
                 </Text>
               </View>
             </View>
@@ -1401,7 +1403,7 @@ memo10
                     }
                   }
                 >
-                  1.1235 ZEC
+                  1.1234 ZEC
                 </Text>
               </View>
             </View>

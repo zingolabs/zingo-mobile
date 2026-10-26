@@ -1,3 +1,5 @@
+import { formatAmount, formatExactAmount } from '@app/utils/formatAmount';
+
 import type { FiatValueBasisType } from './types/FiatValueBasisType';
 
 /**
@@ -74,25 +76,28 @@ export function convertFeeToAsset(args: {
 }
 
 /**
- * A fee amount at sane precision: at most 8 decimals, trailing zeros trimmed,
- * never scientific notation. Eight is the wallet's own limit, a zatoshi, and
- * the smallest thing any asset here is quoted in; past it the digits are the
- * provider's arithmetic rather than money anyone holds.
+ * A fee amount in the app's amount format (`formatAmount`): never more than
+ * 8 decimals, a zatoshi, the smallest thing any asset here is quoted in;
+ * past it the digits are the provider's arithmetic rather than money anyone
+ * holds.
  *
  * Accepts the provider's string as readily as a number, because a fee reaches
  * this both converted (a number) and verbatim (an 18-decimal ERC20 string that
  * would otherwise reach the screen in full).
  *
- * Empty, unparseable and non-finite values read "0".
+ * Empty, unparseable and non-finite values read as zero.
  */
 export function formatFeeAmount(amount: number | string | undefined): string {
   const value = typeof amount === 'string' ? parseFloat(amount) : amount;
-  if (value === undefined || !Number.isFinite(value) || value === 0) return '0';
-  const trimmed = value.toFixed(8).replace(/0+$/, '').replace(/\.$/, '');
-  // A fee smaller than the last place shown is still a fee. Printing "0" for
+  if (value === undefined || !Number.isFinite(value) || value === 0) {
+    return formatAmount(0);
+  }
+  // A fee smaller than the last place shown is still a fee. Printing zero for
   // it would read as no fee at all, so it reads as under the threshold, the
   // way the wallet already writes a sub-cent USD figure.
-  return Number(trimmed) === 0 ? '< 0.00000001' : trimmed;
+  return Math.abs(value) < 1e-8
+    ? `< ${formatExactAmount('0.00000001')}`
+    : formatAmount(value);
 }
 
 /**

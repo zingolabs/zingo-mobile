@@ -12,8 +12,8 @@ import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
+import { formatAmount } from '@app/utils/formatAmount';
 import { Route } from '@app/AppState';
-import Utils from '@app/utils';
 import { planIronwoodMigration } from '@app/walletBackend';
 import {
   RPCMigrationPlanType,
@@ -102,11 +102,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
 
   const currencyName = info.currencyName;
   const zec = useCallback(
-    (zats: number) =>
-      `${Utils.parseNumberFloatToStringLocale(
-        zats / ZATS_PER_ZEC,
-        4,
-      )} ${currencyName}`,
+    (zats: number) => `${formatAmount(zats / ZATS_PER_ZEC)} ${currencyName}`,
     [currencyName],
   );
 

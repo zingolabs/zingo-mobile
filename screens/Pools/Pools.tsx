@@ -1,13 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import { ActivityIndicator, ScrollView, View } from 'react-native';
 import Animated, {
   ReduceMotion,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { getNumberFormatSettings } from 'react-native-localize';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -28,11 +27,11 @@ import { formatZecAmount } from '@app/utils/formatZecAmount';
 import { useShieldFunds } from '@app/hooks/useShieldFunds';
 import { useOrchardResidualOnly } from '@app/hooks/useOrchardResidualOnly';
 import Header from '@ui/widgets/Header';
+import { useAmountReveal } from '@ui/widgets/PrivateAmount';
 import Card from '@ui/widgets/Card';
 import ListRow from '@ui/primitives/ListRow';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
-import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
 import { LogIcon } from '@ui/primitives/Icons/LogIcon';
@@ -67,7 +66,6 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
     totalBalance,
     info,
     translate,
-    privacy,
     addLastSnackbar,
     somePending,
     shieldingAmount,
@@ -85,9 +83,10 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
   } = context;
   const { colors } = useTheme();
   const t = (key: string) => translate(key) as string;
-  const { decimalSeparator } = getNumberFormatSettings();
-  const zec = (value: number) =>
-    privacy ? `-${decimalSeparator}----` : formatZecAmount(value);
+  /** One reveal for the screen: a tap on any amount shows them all. */
+  const amounts = useAmountReveal();
+  const zec = (value: number) => amounts.show(formatZecAmount(value));
+  const onAmount = amounts.hidden ? amounts.reveal : undefined;
 
   const shieldSheetRef = useRef<BottomSheetModal>(null);
   const { showShieldButton, shieldingFee, shieldNow } = useShieldFunds({
@@ -228,48 +227,16 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
       style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}
     >
       <Header
-        title={''}
+        title={t('pools.title')}
+        closeScreen={() => navigation.goBack()}
+        backTestID="pools.back"
+        backAccessibilityLabel={t('pools.back-acc')}
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
         noPrivacy={true}
         noUfvkIcon={true}
       />
-      <View
-        style={{
-          height: 44,
-          marginTop: 6,
-          marginBottom: 10,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Pressable
-          testID="pools.back"
-          accessibilityRole="button"
-          accessibilityLabel={t('pools.back-acc')}
-          onPress={() => navigation.goBack()}
-          style={({ pressed }) => ({
-            position: 'absolute',
-            left: 10,
-            width: 44,
-            height: 44,
-            borderRadius: 12,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
-          })}
-        >
-          <ChevronLeft size={24} color={colors.fgAccent} />
-        </Pressable>
-        <Text
-          accessibilityRole="header"
-          style={{ color: colors.fgDefault, fontSize: 18, fontWeight: '700' }}
-        >
-          {t('pools.title')}
-        </Text>
-      </View>
-
       <ScrollView
         testID="pools.scroll-view"
         contentContainerStyle={{
@@ -295,15 +262,20 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                 }}
               >
                 <Text variant="bodyStrong">{t('pools.total')}</Text>
-                <Text variant="bodyStrong" testID="pools.total">
+                <Text
+                  variant="bodyStrong"
+                  testID="pools.total"
+                  onPress={onAmount}
+                >
                   {zec(total)}{' '}
                   <Text variant="bodyStrong" tone="muted">
                     {info.currencyName}
                   </Text>
                 </Text>
               </View>
+              {/* The shares give the amounts away: only the track while hidden. */}
               <ShareBar
-                shares={pools.map(pool => ({
+                shares={(amounts.hidden ? [] : pools).map(pool => ({
                   key: pool.key,
                   value: pool.total,
                   color: paint[pool.key].fg,
@@ -336,9 +308,13 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       }}
                     />
                     <Text variant="caption" tone="muted">
-                      {`${t(`pools.${pool.key}-title`)} ${
-                        total > 0 ? Math.round((pool.total / total) * 100) : 0
-                      }%`}
+                      {amounts.hidden
+                        ? t(`pools.${pool.key}-title`)
+                        : `${t(`pools.${pool.key}-title`)} ${
+                            total > 0
+                              ? Math.round((pool.total / total) * 100)
+                              : 0
+                          }%`}
                     </Text>
                   </View>
                 ))}
@@ -386,6 +362,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                             <Text
                               variant="bodySmall"
                               testID={`pools.${pool.key}.ready`}
+                              onPress={onAmount}
                               style={{ color: readyColor, fontWeight: '600' }}
                             >
                               {zec(pool.ready)}
@@ -396,6 +373,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                           <Text
                             variant="bodyStrong"
                             testID={`pools.${pool.key}.total`}
+                            onPress={onAmount}
                             style={transparent ? { color: fg } : undefined}
                           >
                             {zec(pool.total)}{' '}

@@ -10,6 +10,7 @@ import {
   renderSwapText,
 } from '@app/swap';
 import type { SwapTextType } from '@app/swap';
+import { formatUsd } from '@app/utils/formatAmount';
 import type { RouteOptionType, UnavailableProviderType } from '@app/swap';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
@@ -68,7 +69,7 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
     const usd = (amount: string): string => {
       const value = parseFloat(amount) * receiveUsdUnitPrice;
       return Number.isFinite(value) && receiveUsdUnitPrice > 0
-        ? `≈ $${value.toFixed(2)}`
+        ? `≈ ${formatUsd(value)}`
         : '';
     };
 
@@ -98,7 +99,7 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
               const best = index === 0;
               const details = [
                 usd(route.expectedReceiveAmount),
-                route.estimatedTimeText ? `~${route.estimatedTimeText}` : '',
+                route.estimatedTimeText ?? '',
                 providerShortLabel(route.provider),
               ]
                 .filter(Boolean)

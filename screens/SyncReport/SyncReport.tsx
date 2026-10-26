@@ -26,6 +26,7 @@ import {
 } from '@app/services/gateController';
 import { showConfirm } from '@app/services/showConfirm';
 import Utils from '@app/utils';
+import { formatInteger } from '@app/utils/formatAmount';
 import CircularProgress from '@ui/primitives/CircularProgress';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
@@ -121,8 +122,6 @@ const TL_H = 88;
 const MAP_H = 63;
 
 type SyncReportProps = NativeStackScreenProps<AppDrawerParamList, 'SyncReport'>;
-
-const nf = (n: number): string => n.toLocaleString('en-US');
 
 const fill = (text: string, values: Record<string, string>): string =>
   Object.entries(values).reduce(
@@ -285,10 +284,12 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const sub = !netInfo.isConnected
     ? (translate('sync.offline') as string)
     : synced
-      ? fill(translate('sync.both-at') as string, { tip: nf(serverTip) })
+      ? fill(translate('sync.both-at') as string, {
+          tip: formatInteger(serverTip),
+        })
       : fill(translate('sync.at') as string, {
-          wallet: nf(h.wallet),
-          tip: nf(serverTip),
+          wallet: formatInteger(h.wallet),
+          tip: formatInteger(serverTip),
         });
 
   const max = scaleMax(serverTip);
@@ -343,7 +344,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           text: (
             <Text>
               {startBefore}
-              <Text style={{ fontWeight: '700' }}>{nf(birthday)}</Text>
+              <Text style={{ fontWeight: '700' }}>
+                {formatInteger(birthday)}
+              </Text>
               {startAfter}
             </Text>
           ),
@@ -593,7 +596,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                   fontWeight: '700',
                 }}
               >
-                {nf(t.value)}
+                {formatInteger(t.value)}
               </Text>
             </View>
           ))}
@@ -605,7 +608,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
         >
           {cardHead(
             translate('sync.blocks') as string,
-            fill(translate('sync.scanned-n') as string, { n: nf(h.scanned) }),
+            fill(translate('sync.scanned-n') as string, {
+              n: formatInteger(h.scanned),
+            }),
           )}
           <Svg
             width={cardW}
@@ -645,7 +650,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               textAnchor={birthdayLeft ? 'start' : 'end'}
             >
               {fill(translate('sync.birthday-at') as string, {
-                n: nf(birthday),
+                n: formatInteger(birthday),
               })}
             </SvgText>
             <Path d={`M${xTip} 42V68`} stroke={BLUE} strokeWidth={1.5} />
@@ -656,7 +661,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               fill={CODE_INK}
               textAnchor="end"
             >
-              {fill(translate('sync.tip-at') as string, { n: nf(serverTip) })}
+              {fill(translate('sync.tip-at') as string, {
+                n: formatInteger(serverTip),
+              })}
             </SvgText>
           </Svg>
         </View>

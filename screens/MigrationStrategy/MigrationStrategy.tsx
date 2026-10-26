@@ -19,8 +19,8 @@ import { deriveNymGateState } from './components/nymGateState';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
+import { formatAmount } from '@app/utils/formatAmount';
 import { Route } from '@app/AppState';
-import Utils from '@app/utils';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 
 type MigrationStrategyProps = NativeStackScreenProps<
@@ -257,10 +257,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   // Orchard balance shown so the user sees what would cross the pool boundary
   // (and become publicly visible) on the immediate path.
   const orchardAmount = totalBalance ? totalBalance.totalOrchardBalance : 0;
-  const amountStr = `${Utils.parseNumberFloatToStringLocale(
-    orchardAmount,
-    4,
-  )} ${info.currencyName}`;
+  const amountStr = `${formatAmount(orchardAmount)} ${info.currencyName}`;
   const nowBody = (translate('migrationstrategy.now-body') as string).replace(
     '{amount}',
     amountStr,

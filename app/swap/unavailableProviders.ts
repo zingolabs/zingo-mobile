@@ -1,5 +1,5 @@
 import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
-import { formatAmountForDisplay } from './formatAmountForDisplay';
+import { formatMinimumAmount } from './formatMinimumAmount';
 import type {
   QuoteProviderErrorType,
   QuoteResponseType,
@@ -122,12 +122,14 @@ function describeRefusal(
   const code = normaliseCode(error.errorCode) || normaliseCode(error.message);
 
   if (code === 'sellassetamounttoosmall') {
-    const minimum = formatAmountForDisplay(error.minAmount);
-    // A minimum of zero is the formatter saying it could not read one, not a
-    // provider that accepts nothing.
-    return minimum === '0'
-      ? swapKey('swap.msg-below-provider-minimum')
-      : swapKey('swap.msg-needs-at-least', { amount: `${minimum}${unit}` });
+    const minimum = parseFloat(error.minAmount ?? '');
+    // An unreadable or zero minimum is a provider that did not state one,
+    // not one that accepts nothing.
+    return Number.isFinite(minimum) && minimum > 0
+      ? swapKey('swap.msg-needs-at-least', {
+          amount: `${formatMinimumAmount(minimum)}${unit}`,
+        })
+      : swapKey('swap.msg-below-provider-minimum');
   }
 
   // NEAR states some minimums in dollars, in prose, under a generic code

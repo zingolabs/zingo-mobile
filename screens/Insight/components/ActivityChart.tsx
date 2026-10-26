@@ -19,6 +19,8 @@ import {
   niceTop,
 } from '@screens/Insight/insightModel';
 import { themeTokens, useTheme } from '@app/theme';
+import { formatPercent } from '@app/utils/formatAmount';
+import { MASK } from '@ui/widgets/PrivateAmount';
 
 const H = 168;
 const TOP = 18;
@@ -122,6 +124,10 @@ type ActivityChartProps = {
   value: (v: number) => string;
   totalLabel: string;
   noneLabel: string;
+  /** Privacy hides the axis, which gives the amounts' scale away. */
+  masked: boolean;
+  /** Shows the hidden amounts for a few seconds. */
+  onReveal?: () => void;
 };
 
 // Stacked weekly bars, one color per recipient, with a card for the tapped week.
@@ -139,6 +145,8 @@ const ActivityChart: React.FunctionComponent<ActivityChartProps> = ({
   value,
   totalLabel,
   noneLabel,
+  masked,
+  onReveal,
 }) => {
   const { colors } = useTheme();
   const [width, setWidth] = useState(0);
@@ -154,7 +162,7 @@ const ActivityChart: React.FunctionComponent<ActivityChartProps> = ({
     Math.max(0, ...columns.map(c => c.reduce((s, v) => s + v, 0))),
     metric,
   );
-  const tickText = (v: number) => String(+v.toFixed(2));
+  const tickText = (v: number) => (masked ? MASK : formatPercent(v, 2));
   const labels = Math.min(4, n);
   const labelAt = Array.from({ length: labels }, (_, k) =>
     labels > 1 ? Math.round((k * (n - 1)) / (labels - 1)) : 0,
@@ -317,7 +325,10 @@ const ActivityChart: React.FunctionComponent<ActivityChartProps> = ({
               >
                 {name(insight.groups[r.g])}
               </Text>
-              <Text style={{ color: TIP_INK, fontSize: 12, fontWeight: '600' }}>
+              <Text
+                onPress={onReveal}
+                style={{ color: TIP_INK, fontSize: 12, fontWeight: '600' }}
+              >
                 {value(r.v)}
               </Text>
             </View>
@@ -348,6 +359,7 @@ const ActivityChart: React.FunctionComponent<ActivityChartProps> = ({
                   fontSize: 12,
                   fontWeight: '600',
                 }}
+                onPress={onReveal}
               >
                 {value(tipTotal)}
               </Text>

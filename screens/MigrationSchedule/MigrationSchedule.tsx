@@ -16,6 +16,7 @@ import ButtonStack from '@ui/primitives/ButtonStack';
 import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
+import { formatAmount } from '@app/utils/formatAmount';
 import {
   Route,
   TARGET_BLOCK_SPACING_SECONDS,
@@ -39,9 +40,6 @@ type MigrationScheduleProps = NativeStackScreenProps<
 >;
 
 const ZATS_PER_ZEC = 10 ** 8;
-
-const fmt = (zats: number): string =>
-  `${parseFloat((zats / ZATS_PER_ZEC).toFixed(4))}`;
 
 // The schedule review: one card per coming window with its batch (the
 // denominations due) and when its reminder will fire. Confirm asks for
@@ -353,7 +351,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
                   }}
                 >
                   <Text style={{ color: colors.fgDefault, fontSize: 14 }}>
-                    {fmt(denomination)}
+                    {formatAmount(denomination / ZATS_PER_ZEC)}
                   </Text>
                 </View>
               ))}

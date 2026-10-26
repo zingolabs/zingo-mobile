@@ -9,9 +9,10 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import Utils from '@app/utils';
+import { formatUsd } from '@app/utils/formatAmount';
 import { usePriceHealth } from './priceFetcherStore';
 import { useTimedReveal } from '@app/hooks/useTimedReveal';
+import { MASK } from '@ui/widgets/PrivateAmount';
 
 type CurrencyAmountProps = {
   price?: number;
@@ -92,7 +93,6 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
     color ?? (health === 'live' ? colors.fgDefault : colors.fgMuted);
 
   useEffect(() => {
-    const zeroString = '0' + decimalSeparator + '00';
     var currencyStr;
 
     if (
@@ -100,12 +100,11 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
       typeof amtZec === 'undefined' ||
       price <= 0
     ) {
-      currencyStr = '-' + decimalSeparator + '--';
+      currencyStr = '$-' + decimalSeparator + '--';
     } else {
-      const currencyAmo = price * amtZec;
-      currencyStr = Utils.parseNumberFloatToStringLocale(currencyAmo, 2);
-      if (currencyStr === zeroString && amtZec > 0) {
-        currencyStr = '< 0' + decimalSeparator + '01';
+      currencyStr = formatUsd(price * amtZec);
+      if (currencyStr === formatUsd(0) && amtZec > 0) {
+        currencyStr = '< ' + formatUsd(0.01);
       }
     }
     setCurrencyString(currencyStr);
@@ -125,7 +124,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
                 ...style,
               }}
             >
-              {'$ -' + decimalSeparator + '--'}
+              {`$${MASK}`}
             </Text>
           ) : tint ? (
             <TintedText
@@ -134,7 +133,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
               style={style}
               selectable={selectable}
             >
-              {'$ ' + currencyString}
+              {currencyString}
             </TintedText>
           ) : (
             <Text
@@ -147,7 +146,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
               }}
               selectable={selectable}
             >
-              {'$ ' + currencyString}
+              {currencyString}
             </Text>
           )}
         </View>

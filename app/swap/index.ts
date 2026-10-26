@@ -78,6 +78,7 @@ export {
   isOutboundSwap,
 } from './swapRecordToValueTransfer';
 export { formatAmountForDisplay } from './formatAmountForDisplay';
+export { toDottedDecimal } from './toDottedDecimal';
 export { swapRowLabel } from './swapRowLabel';
 export { extractFiatValueBasis } from './quoteFiatBasis';
 export { describeEmptyQuote } from './describeEmptyQuote';
