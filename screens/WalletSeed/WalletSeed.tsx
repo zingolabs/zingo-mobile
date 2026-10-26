@@ -23,6 +23,7 @@ import { useScreenCapture } from '@app/hooks/useScreenCapture';
 import { getRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
 import { fetchWallet } from '@app/walletBackend';
 import { copySensitive } from '@app/utils/sensitiveClipboard';
+import { formatInteger } from '@app/utils/formatAmount';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
 import { ShieldCheckIcon } from '@ui/primitives/Icons/ShieldCheckIcon';
@@ -420,7 +421,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
             tipBody={translate('seedbackup.birthday-tip-body') as string}
             open={tip === 'birthday'}
             onToggle={toggle('birthday')}
-            value={birthday.toLocaleString()}
+            value={formatInteger(birthday)}
           />
         </View>
         {!readOnly && (

@@ -8,12 +8,14 @@
  * had been asked for.
  */
 
+import { formatPercent } from '@app/utils/formatAmount';
+
 import { swapKey, swapRaw } from './swapText';
 import type { SwapTextType } from './swapText';
 
 /** A basis-point figure as a percentage, to at most two decimals: 100 → "1". */
 function percent(bps: number): string {
-  return String(Number((Math.abs(bps) / 100).toFixed(2)));
+  return formatPercent(Math.abs(bps) / 100);
 }
 
 const usable = (bps: number | undefined): bps is number =>
@@ -71,6 +73,6 @@ export function describeRealizedSlippage(
     return swapKey('swap.msg-received-expected');
   return swapKey(
     bps > 0 ? 'swap.msg-received-less' : 'swap.msg-received-more',
-    { percent: (Math.abs(bps) / 100).toFixed(2) },
+    { percent: percent(bps) },
   );
 }

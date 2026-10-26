@@ -399,23 +399,20 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
               }}
               value={birthday}
               onChangeText={(text: string) => {
-                if (isNaN(Number(text))) {
-                  setBirthday('');
-                } else if (
-                  Number(text) <= 0 ||
-                  (Number(text) > latestBlock && server.kind !== 'offline')
+                const height = Number(text.replace(/\D/g, ''));
+                if (
+                  height <= 0 ||
+                  (height > latestBlock && server.kind !== 'offline')
                 ) {
                   setBirthday('');
                 } else {
-                  setBirthday(
-                    Number(text.replace('.', '').replace(',', '')).toFixed(0),
-                  );
+                  setBirthday(String(height));
                 }
               }}
               editable={
                 latestBlock ? true : server.kind !== 'offline' ? false : true
               }
-              keyboardType="numeric"
+              keyboardType="number-pad"
             />
             {!!birthday && (!!latestBlock || server.kind === 'offline') && (
               <TouchableOpacity

@@ -47,6 +47,12 @@ import { WalletNavigation } from '@app/types';
 import { swapScreenFor } from './swapRoute';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 import Utils from '@app/utils';
+import {
+  formatAmount,
+  formatUsd,
+  parseAmountInput,
+  toAmountInput,
+} from '@app/utils/formatAmount';
 import Header from '@ui/widgets/Header';
 import AppSheet from '@ui/primitives/AppSheet';
 import Text from '@ui/primitives/Text';
@@ -76,7 +82,6 @@ import { tokenToSwapAsset } from './swapAssets';
 import { useCoinPrice } from './useCoinPrice';
 import { onTabScroll } from '@app/navigation/tabBarScroll';
 import { PANEL_TOP } from '@ui/widgets/Header/Header';
-import { MASK } from '@screens/History/components/HistoryRowBody';
 import InsufficientFundsSheet from './components/InsufficientFundsSheet';
 
 type SwapProps = HomeTabScreenProps<'Swap'>;
@@ -97,7 +102,6 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     walletChainName,
     mixnetView,
     setPrivacyOption,
-    privacy,
     addLastSnackbar,
     addressBook,
     setAddressBook,
@@ -205,7 +209,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     : '';
   const receiveUsd =
     form.chosenRoute && receiveUsdUnitPrice > 0
-      ? `≈ $${(parseFloat(form.chosenRoute.expectedReceiveAmount) * receiveUsdUnitPrice).toFixed(2)}`
+      ? `≈ ${formatUsd(parseFloat(form.chosenRoute.expectedReceiveAmount) * receiveUsdUnitPrice)}`
       : '';
 
   const pending = records.find(r => !isTerminalStatus(r.status));
@@ -464,25 +468,25 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                 onToggleUnit={usdAvailable ? toggleUnit : undefined}
                 altText={
                   usdMode
-                    ? `≈ ${form.amount || '0'} ${sellSymbol}`
+                    ? `≈ ${formatAmount(parseAmountInput(form.amount))} ${sellSymbol}`
                     : usdOf(form.amount)
                 }
                 availableText={
                   !form.isOutbound
                     ? undefined
-                    : privacy
-                      ? usdMode
-                        ? MASK
-                        : `${MASK} ${info.currencyName}`
-                      : usdMode
-                        ? `${toFiatText(String(form.maxSpendableForSwap), price) || '0.00'}`
-                        : `${formatAmountForDisplay(String(form.maxSpendableForSwap))} ${info.currencyName}`
+                    : usdMode
+                      ? toFiatText(String(form.maxSpendableForSwap), price) ||
+                        Utils.parseNumberFloatToStringLocale(0, 2)
+                      : `${formatAmountForDisplay(String(form.maxSpendableForSwap))} ${info.currencyName}`
                 }
                 onUseMax={() =>
                   onChangeAmountText(
                     usdMode
-                      ? toFiatText(String(form.maxSpendableForSwap), price)
-                      : String(form.maxSpendableForSwap),
+                      ? toFiatText(
+                          toAmountInput(form.maxSpendableForSwap),
+                          price,
+                        )
+                      : toAmountInput(form.maxSpendableForSwap),
                   )
                 }
                 invalid={form.overBalance}
@@ -577,7 +581,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                       </Pressable>
                       {!!form.chosenRoute.estimatedTimeText && (
                         <Text variant="caption" tone="muted">
-                          {`~${form.chosenRoute.estimatedTimeText}`}
+                          {form.chosenRoute.estimatedTimeText}
                         </Text>
                       )}
                     </>

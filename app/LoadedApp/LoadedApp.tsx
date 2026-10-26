@@ -70,6 +70,11 @@ import {
   SnackbarActionType,
 } from '@app/AppState';
 import Utils from '@app/utils';
+import {
+  formatAmount,
+  formatInteger,
+  toAmountInput,
+} from '@app/utils/formatAmount';
 import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
 import { AppTheme } from '@app/theme';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
@@ -85,6 +90,7 @@ import { createAlert } from '@app/services/createAlert';
 import { sendEmail } from '@app/services/sendEmail';
 import Toast from 'react-native-toast-message';
 import { ACTION_SNACKBAR_MS, toastConfig } from '@ui/widgets/toastConfig';
+import { MASK } from '@ui/widgets/PrivateAmount';
 import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
 import Launching from '@screens/Launching';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
@@ -1095,9 +1101,7 @@ export class LoadedAppClass extends Component<
             const to = new ToAddrClass(0);
 
             to.to = tgt.address || '';
-            to.amount = tgt.amount
-              ? Utils.parseNumberFloatToStringLocale(tgt.amount, 8)
-              : '';
+            to.amount = tgt.amount ? toAmountInput(tgt.amount) : '';
             to.memo = tgt.memoString || '';
 
             uriToAddr = to;
@@ -1199,6 +1203,8 @@ export class LoadedAppClass extends Component<
             );
             // the ValueTransfer is confirmed when the confirmations are > 0
             if (vtNew.length > 0 && vtNew[0].confirmations > 0) {
+              const amount = (zec: number) =>
+                this.state.privacy ? MASK : formatAmount(zec);
               let message: string = '';
               let title: string = '';
               if (
@@ -1209,7 +1215,7 @@ export class LoadedAppClass extends Component<
                   (this.state.translate('loadedapp.incoming-funds') as string) +
                   (this.state.translate('history.received') as string) +
                   ' ' +
-                  Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
+                  amount(vtNew[0].amount) +
                   ' ' +
                   this.state.info.currencyName;
                 title = this.state.translate(
@@ -1228,7 +1234,7 @@ export class LoadedAppClass extends Component<
                   (vtNew[0].fee
                     ? ((' ' + this.state.translate('send.fee')) as string) +
                       ' ' +
-                      Utils.parseNumberFloatToStringLocale(vtNew[0].fee, 8) +
+                      amount(vtNew[0].fee) +
                       ' ' +
                       this.state.info.currencyName
                     : '');
@@ -1246,7 +1252,7 @@ export class LoadedAppClass extends Component<
                   (vtNew[0].fee
                     ? ((' ' + this.state.translate('send.fee')) as string) +
                       ' ' +
-                      Utils.parseNumberFloatToStringLocale(vtNew[0].fee, 8) +
+                      amount(vtNew[0].fee) +
                       ' ' +
                       this.state.info.currencyName
                     : '');
@@ -1261,14 +1267,14 @@ export class LoadedAppClass extends Component<
                   (this.state.translate('history.migration') as string) +
                   (vtNew[0].amount > 0
                     ? ' ' +
-                      Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
+                      amount(vtNew[0].amount) +
                       ' ' +
                       this.state.info.currencyName
                     : '') +
                   (vtNew[0].fee
                     ? ((' ' + this.state.translate('send.fee')) as string) +
                       ' ' +
-                      Utils.parseNumberFloatToStringLocale(vtNew[0].fee, 8) +
+                      amount(vtNew[0].fee) +
                       ' ' +
                       this.state.info.currencyName
                     : '');
@@ -1283,7 +1289,7 @@ export class LoadedAppClass extends Component<
                   (this.state.translate('loadedapp.incoming-funds') as string) +
                   (this.state.translate('history.received') as string) +
                   ' ' +
-                  Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
+                  amount(vtNew[0].amount) +
                   ' ' +
                   this.state.info.currencyName;
                 title = this.state.translate(
@@ -1297,7 +1303,7 @@ export class LoadedAppClass extends Component<
                   (this.state.translate('loadedapp.incoming-funds') as string) +
                   (this.state.translate('history.shield') as string) +
                   ' ' +
-                  Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
+                  amount(vtNew[0].amount) +
                   ' ' +
                   this.state.info.currencyName;
                 title = this.state.translate(
@@ -1311,7 +1317,7 @@ export class LoadedAppClass extends Component<
                   (this.state.translate('loadedapp.payment-made') as string) +
                   (this.state.translate('history.sent') as string) +
                   ' ' +
-                  Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
+                  amount(vtNew[0].amount) +
                   ' ' +
                   this.state.info.currencyName;
                 title = this.state.translate('loadedapp.send-menu') as string;
@@ -1493,7 +1499,7 @@ export class LoadedAppClass extends Component<
     this.addLastSnackbar(
       (this.state.translate('loadedapp.birthday-adjusted') as string).replace(
         '{height}',
-        height.toLocaleString(),
+        formatInteger(height),
       ),
       SnackbarDurationEnum.longer,
     );

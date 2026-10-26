@@ -23,7 +23,7 @@ describe('describeCostVsMarket', () => {
 
   it('states a route that delivers more', () => {
     expect(describeCostVsMarket(10)).toBe(
-      '0.10% above market value, fees included',
+      '0.1% above market value, fees included',
     );
   });
 

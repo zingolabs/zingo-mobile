@@ -19,7 +19,8 @@ import { kindKey } from '@screens/Send/components/RecipientField';
 import { AppDrawerParamList } from '@app/types';
 import Utils from '@app/utils';
 import { deliver } from '@app/navigation/results';
-import { fiatQuote, toFiatText } from '@app/price/fiatQuote';
+import { fiatQuote } from '@app/price/fiatQuote';
+import { formatAmount, formatUsd } from '@app/utils/formatAmount';
 import { sendPermit } from '@app/walletBackend/transforms/sendPermit';
 import { SendPageStateClass, ProposalPoolsType } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -40,9 +41,6 @@ const poolCrossingKey = ({
     ? 'send.private'
     : 'send.amountrevealed';
 };
-
-/** ZEC with the four decimals the review reads in. */
-const zec4 = (value: number) => Utils.parseNumberFloatToStringLocale(value, 4);
 
 /**
  * The review of a send, in the full panel: who it goes to with their avatar,
@@ -135,8 +133,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     ...(memoTotal
       ? [{ label: t('send.memo'), value: memoTotal, wrap: true }]
       : []),
-    { label: t('send.network-fee'), value: `${zec4(calculatedFee)} ${unit}` },
-    { label: t('send.total'), value: `${zec4(total)} ${unit}` },
+    {
+      label: t('send.network-fee'),
+      value: `${formatAmount(calculatedFee)} ${unit}`,
+    },
+    { label: t('send.total'), value: `${formatAmount(total)} ${unit}` },
   ];
 
   const avatar = contact ? (
@@ -230,7 +231,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           variant="balance"
           style={{ marginTop: 12, fontVariant: ['tabular-nums'] }}
         >
-          {zec4(amount)}
+          {formatAmount(amount)}
           <Text variant="subtitle" tone="muted">{` ${unit}`}</Text>
         </Text>
         {quote.kind === 'quote' && (
@@ -240,7 +241,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             tone="muted"
             style={{ marginTop: 4, fontVariant: ['tabular-nums'] }}
           >
-            {'$' + toFiatText(to.amount, quote.price)}
+            {formatUsd(amount * quote.price)}
           </Text>
         )}
       </View>

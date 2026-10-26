@@ -66,23 +66,56 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
           }
         }
       >
-        <Text
-          maxFontSizeMultiplier={1.3}
-          style={
+        <View
+          accessibilityRole="button"
+          accessibilityState={
             {
-              "color": "#c3c3c3",
-              "fontSize": 36,
-              "fontVariant": [
-                "tabular-nums",
-              ],
-              "fontWeight": "700",
-              "lineHeight": 40,
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": true,
+              "expanded": undefined,
+              "selected": undefined,
             }
           }
-          testID="header.balance"
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
         >
-          1.6234
-        </Text>
+          <Text
+            maxFontSizeMultiplier={1.3}
+            style={
+              {
+                "color": "#c3c3c3",
+                "fontSize": 36,
+                "fontVariant": [
+                  "tabular-nums",
+                ],
+                "fontWeight": "700",
+                "lineHeight": 40,
+              }
+            }
+            testID="header.balance"
+          >
+            1.6234
+          </Text>
+        </View>
         <Text
           maxFontSizeMultiplier={1.5}
           style={

@@ -14,6 +14,7 @@ import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
+import { formatInteger } from '@app/utils/formatAmount';
 import { SIDE, StepTitle } from './StepParts';
 import { CopyShowButtons, InfoRow, VEIL_MS, WordGrid } from './SeedParts';
 
@@ -106,7 +107,7 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
           tipBody={translate('seedbackup.birthday-tip-body') as string}
           open={tipOpen}
           onToggle={setTipOpen}
-          value={birthday.toLocaleString()}
+          value={formatInteger(birthday)}
         />
       </View>
       <View style={{ marginTop: 12 }}>

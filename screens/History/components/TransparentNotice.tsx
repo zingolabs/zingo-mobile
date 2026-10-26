@@ -1,9 +1,10 @@
 import React, { useContext } from 'react';
 import { ContextAppLoaded } from '@app/context';
-import Utils from '@app/utils';
+import { formatAmount } from '@app/utils/formatAmount';
 import Button from '@ui/primitives/Button';
 import Banner from '@ui/widgets/Banner';
 import Tag from '@ui/widgets/Tag';
+import PrivateAmount from '@ui/widgets/PrivateAmount';
 
 /**
  * The first notice of the stack while public funds wait to be shielded:
@@ -16,8 +17,9 @@ export default function TransparentNotice({
   amount: number;
   onShield: () => void;
 }) {
-  const { translate, info, privacy } = useContext(ContextAppLoaded);
+  const { translate, info } = useContext(ContextAppLoaded);
   const t = (key: string) => translate(key) as string;
+  const [before, after = ''] = t('shield.notice-body').split('{amount}');
   return (
     <Banner
       testID="transparent.notice"
@@ -36,12 +38,14 @@ export default function TransparentNotice({
         />
       }
     >
-      {t('shield.notice-body').replace(
-        '{amount}',
-        privacy
-          ? `••••• ${info.currencyName}`
-          : `${Utils.parseNumberFloatToStringLocale(amount, 4)} ${info.currencyName}`,
-      )}
+      {before}
+      <PrivateAmount
+        inline
+        variant="bodySmall"
+        tone="muted"
+        text={`${formatAmount(amount)} ${info.currencyName}`}
+      />
+      {after}
     </Banner>
   );
 }

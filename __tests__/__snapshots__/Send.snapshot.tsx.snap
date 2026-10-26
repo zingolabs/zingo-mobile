@@ -680,20 +680,54 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                       >
                         text translated
                       </Text>
-                      <Text
-                        maxFontSizeMultiplier={2}
-                        style={
+                      <View
+                        accessibilityRole="button"
+                        accessibilityState={
                           {
-                            "color": "#c3c3c3",
-                            "fontSize": 12,
-                            "fontWeight": "700",
-                            "lineHeight": 16,
-                            "textDecorationLine": "underline",
+                            "busy": undefined,
+                            "checked": undefined,
+                            "disabled": undefined,
+                            "expanded": undefined,
+                            "selected": undefined,
                           }
                         }
+                        accessibilityValue={
+                          {
+                            "max": undefined,
+                            "min": undefined,
+                            "now": undefined,
+                            "text": undefined,
+                          }
+                        }
+                        accessible={true}
+                        collapsable={false}
+                        focusable={true}
+                        hitSlop={8}
+                        onBlur={[Function]}
+                        onClick={[Function]}
+                        onFocus={[Function]}
+                        onResponderGrant={[Function]}
+                        onResponderMove={[Function]}
+                        onResponderRelease={[Function]}
+                        onResponderTerminate={[Function]}
+                        onResponderTerminationRequest={[Function]}
+                        onStartShouldSetResponder={[Function]}
                       >
-                        ••••• ZEC
-                      </Text>
+                        <Text
+                          maxFontSizeMultiplier={2}
+                          style={
+                            {
+                              "color": "#c3c3c3",
+                              "fontSize": 12,
+                              "fontWeight": "700",
+                              "lineHeight": 16,
+                              "textDecorationLine": "underline",
+                            }
+                          }
+                        >
+                          ••••• ZEC
+                        </Text>
+                      </View>
                     </View>
                   </View>
                 </View>

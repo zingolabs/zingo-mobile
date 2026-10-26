@@ -19,6 +19,8 @@
  * the fee is already inside it.
  */
 
+import { formatPercent } from '@app/utils/formatAmount';
+
 import { swapKey } from './swapText';
 import type { SwapTextType } from './swapText';
 
@@ -30,7 +32,7 @@ export function describeCostVsMarket(
 ): SwapTextType | undefined {
   if (typeof bps !== 'number' || !Number.isFinite(bps)) return undefined;
   if (Math.abs(bps) < AT_MARKET_BPS) return swapKey('swap.msg-at-market');
-  const percent = (Math.abs(bps) / 100).toFixed(2);
+  const percent = formatPercent(Math.abs(bps) / 100);
   return swapKey(bps < 0 ? 'swap.msg-below-market' : 'swap.msg-above-market', {
     percent,
   });

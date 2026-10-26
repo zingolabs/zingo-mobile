@@ -16,6 +16,7 @@ import {
 import { ContextAppLoaded } from '@app/context';
 import { fiatQuote } from '@app/price/fiatQuote';
 import Utils from '@app/utils';
+import { formatUsd } from '@app/utils/formatAmount';
 import { FileTextIcon } from '@ui/primitives/Icons/FileTextIcon';
 import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
 import { ArrowDownIcon } from '@ui/primitives/Icons/ArrowDownIcon';
@@ -40,12 +41,7 @@ type ValueTransferLineProps = {
 
 /** USD for a ZEC amount, at the transfer's own price when it carries one. */
 export function usdText(amount: number, price: number): string {
-  return price > 0
-    ? `$${(amount * price).toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`
-    : '';
+  return price > 0 ? formatUsd(amount * price) : '';
 }
 
 /**
@@ -66,7 +62,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   const {
     translate,
     language,
-    privacy,
     info,
     showSwipeableIcons,
     readOnly,
@@ -237,7 +232,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               )
             }
             text={text}
-            privacy={privacy}
             hairline={hairline}
             memo={haveMemo}
           />

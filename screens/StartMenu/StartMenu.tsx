@@ -12,6 +12,7 @@ import { useTheme } from '@app/theme';
 import { ContextAppLoading } from '@app/context';
 import { WalletType } from '@app/AppState';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
+import { formatInteger } from '@app/utils/formatAmount';
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
 import BusyButton from '@ui/widgets/BusyButton';
@@ -394,7 +395,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
               ) as string
             }  ·  ${(translate('loadingapp.card-birthday') as string).replace(
               '{height}',
-              recoveryWallet.birthday.toLocaleString(),
+              formatInteger(recoveryWallet.birthday),
             )}`}
           </RegText>
           <View style={{ marginTop: 12 }}>

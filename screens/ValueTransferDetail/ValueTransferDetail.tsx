@@ -1,8 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { formatZecAmount } from '@app/utils/formatZecAmount';
+import {
+  formatAmount,
+  formatInteger,
+  formatUsd,
+  toAmountInput,
+} from '@app/utils/formatAmount';
 import Tag from '@ui/widgets/Tag';
 import { Linking, Pressable, View } from 'react-native';
+import { useAmountReveal } from '@ui/widgets/PrivateAmount';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -46,8 +52,6 @@ type ValueTransferDetailProps = NativeStackScreenProps<
   'ValueTransferDetail'
 >;
 
-const MASK = '•••••';
-
 /**
  * A transaction, opened from History in the static full panel: its avatar,
  * what happened, the amount at 36, today's dollars and its status, then a
@@ -58,11 +62,12 @@ const ValueTransferDetail: React.FunctionComponent<
   ValueTransferDetailProps
 > = ({ route }) => {
   const navigation = useNavigation<WalletNavigation>();
+  /** A tap on any amount shows them all. */
+  const amounts = useAmountReveal();
   const {
     info,
     translate,
     language,
-    privacy,
     addLastSnackbar,
     server,
     addressBook,
@@ -168,7 +173,7 @@ const ValueTransferDetail: React.FunctionComponent<
   const quote = fiatQuote(zecPrice, server, info.chainName);
   const todayUsd =
     quote.kind === 'quote' && server.chainName === ChainNameEnum.mainChainName
-      ? `$${Utils.parseNumberFloatToStringLocale(vt.amount * quote.price, 2)}`
+      ? formatUsd(vt.amount * quote.price)
       : '';
   /** Money in or out of the wallet only, as History's rows sign it; moves within it carry none. */
   const sign = received ? '+' : sent ? '−' : '';
@@ -202,16 +207,16 @@ const ValueTransferDetail: React.FunctionComponent<
       ? [
           {
             label: t('history.tx-fee'),
-            value: `${formatZecAmount(vt.fee ?? 0)} ${info.currencyName}`,
+            value: amounts.show(
+              `${formatAmount(vt.fee ?? 0)} ${info.currencyName}`,
+            ),
           },
         ]
       : []),
     {
       label: t('history.confirmations'),
       value:
-        failed || vt.confirmations < 0
-          ? '—'
-          : vt.confirmations.toLocaleString(),
+        failed || vt.confirmations < 0 ? '—' : formatInteger(vt.confirmations),
     },
     ...(vt.txid
       ? [
@@ -236,7 +241,7 @@ const ValueTransferDetail: React.FunctionComponent<
   const tryAgain = () => {
     const state = new SendPageStateClass(new ToAddrClass(0));
     state.toaddr.to = vt.address ?? '';
-    state.toaddr.amount = String(vt.amount);
+    state.toaddr.amount = toAmountInput(vt.amount);
     state.toaddr.memo = memo ?? '';
     setSendPageState(state);
     navigation.navigate(Route.Home, { screen: Route.Send });
@@ -321,30 +326,37 @@ const ValueTransferDetail: React.FunctionComponent<
         >
           {head}
         </Text>
-        <Text
-          testID="valuetransferdetail.amount"
-          variant="balance"
-          color={
-            failed
-              ? colors.fgMuted
-              : received
-                ? colors.fgAccent
-                : colors.fgDefault
-          }
-          style={{ marginTop: 12, fontVariant: ['tabular-nums'] }}
+        <Pressable
+          accessibilityRole="button"
+          disabled={!amounts.hidden}
+          onPress={amounts.reveal}
         >
-          {privacy ? MASK : `${sign}${formatZecAmount(vt.amount)}`}
-          <Text variant="subtitle" tone="muted">
-            {` ${info.currencyName}`}
+          <Text
+            testID="valuetransferdetail.amount"
+            variant="balance"
+            color={
+              failed
+                ? colors.fgMuted
+                : received
+                  ? colors.fgAccent
+                  : colors.fgDefault
+            }
+            style={{ marginTop: 12, fontVariant: ['tabular-nums'] }}
+          >
+            {amounts.show(`${sign}${formatAmount(vt.amount)}`)}
+            <Text variant="subtitle" tone="muted">
+              {` ${info.currencyName}`}
+            </Text>
           </Text>
-        </Text>
-        {!!todayUsd && (
-          <Text variant="bodySmall" tone="muted" style={{ marginTop: 4 }}>
-            {privacy
-              ? MASK
-              : t('history.today-price').replace('{usd}', todayUsd)}
-          </Text>
-        )}
+          {!!todayUsd && (
+            <Text variant="bodySmall" tone="muted" style={{ marginTop: 4 }}>
+              {t('history.today-price').replace(
+                '{usd}',
+                amounts.show(todayUsd),
+              )}
+            </Text>
+          )}
+        </Pressable>
         <View style={{ marginTop: 12 }}>
           <Tag tone={status.tone}>{status.text}</Tag>
         </View>

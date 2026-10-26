@@ -9,6 +9,7 @@ import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
 import { WalletIcon } from '@ui/primitives/Icons/WalletIcon';
+import { toAmountInput } from '@app/utils/formatAmount';
 import SheetTitle from './SheetTitle';
 
 type InsufficientFundsSheetProps = {
@@ -22,11 +23,6 @@ type InsufficientFundsSheetProps = {
   onReduce: (amount: string) => void;
 };
 
-/** Down to the zatoshi, dropping anything finer, so the figure named is held. */
-function truncateToZatoshis(amount: number): string {
-  return (Math.floor(amount * 1e8) / 1e8).toFixed(8);
-}
-
 /**
  * The amount asked for is more than the wallet can spend. Offers the way out:
  * reducing to the largest swappable amount, which is what the user would
@@ -37,12 +33,14 @@ const InsufficientFundsSheet = forwardRef<
   BottomSheetModal,
   InsufficientFundsSheetProps
 >(({ spendable, maxSpendableForSwap, onReduce }, ref) => {
-  const { translate } = useContext(ContextAppLoaded);
+  const { translate, info } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const dismiss = useCallback(() => {
     (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss();
   }, [ref]);
-  const reduced = truncateToZatoshis(maxSpendableForSwap);
+  // Cut to the zatoshi, so the figure named is held; shown as it lands in
+  // the amount field.
+  const reduced = toAmountInput(maxSpendableForSwap);
 
   return (
     <AppSheetModal
@@ -85,7 +83,7 @@ const InsufficientFundsSheet = forwardRef<
               <Button
                 testID="swap.reduce"
                 variant="primary"
-                title={`${translate('swap.reduce-to') as string} ${reduced} ZEC`}
+                title={`${translate('swap.reduce-to') as string} ${reduced} ${info.currencyName}`}
                 onPress={() => {
                   onReduce(reduced);
                   dismiss();
