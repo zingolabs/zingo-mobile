@@ -41,17 +41,6 @@ export function swapOutcome(status: SwapStatusEnum): SwapOutcome {
   }
 }
 
-/** How long a deposit address waits for its payment. */
-export const DEPOSIT_WINDOW_MS = 15 * 60 * 1000;
-
-/** When the deposit must be paid by: the route's expiry, or the window. */
-export function depositDeadlineMs(record: {
-  createdAtMs: number;
-  expiresAtMs?: number;
-}): number {
-  return record.expiresAtMs ?? record.createdAtMs + DEPOSIT_WINDOW_MS;
-}
-
 /** `m:ss` of what is left, never below zero. */
 export function countdownText(remainingMs: number): string {
   const seconds = Math.max(0, Math.ceil(remainingMs / 1000));

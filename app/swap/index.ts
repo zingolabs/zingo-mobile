@@ -15,10 +15,17 @@ export { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
 export {
   SwapStatusEnum,
   isTerminalStatus,
-  canRemoveSwap,
   isPrePaymentStatus,
 } from './enums/SwapStatusEnum';
 export { TrackingStatusEnum } from './enums/TrackingStatusEnum';
+export { canRemoveSwap } from './canRemoveSwap';
+export { hasDepositEvidence } from './depositEvidence';
+export {
+  DEPOSIT_WINDOW_MS,
+  awaitsDeposit,
+  depositDeadlineMs,
+  depositOverdue,
+} from './depositDeadline';
 
 export type { DepositInstructionsType } from './types/DepositInstructionsType';
 export type { FiatValueBasisType } from './types/FiatValueBasisType';
@@ -129,6 +136,7 @@ export type {
   CommitRouteArgs,
   CommitRouteResult,
   MarkBroadcastedArgs,
+  MarkDepositSentArgs,
   SetObservedDepositTxHashArgs,
 } from './SwapService';
 

@@ -14,15 +14,14 @@ import {
   shieldedMemoAddressFromSwap,
 } from './mayaShieldedMemo';
 import { SwapStatusEnum, isTerminalStatus } from './enums/SwapStatusEnum';
+import { DEPOSIT_WINDOW_MS } from './depositDeadline';
+import { hasDepositEvidence } from './depositEvidence';
 import { SwapKitError } from './errors';
 import {
   ProviderRegistry,
   createDefaultProviderRegistry,
 } from './providers/ProviderRegistry';
-import {
-  TRACK_CAPTURE_VERSION,
-  isRealLegHash,
-} from './providers/trackUpdateBase';
+import { TRACK_CAPTURE_VERSION } from './providers/trackUpdateBase';
 import { DepositInstructionsType } from './types/DepositInstructionsType';
 import { FiatValueBasisType } from './types/FiatValueBasisType';
 import { QuoteResponseType, QuoteRouteType } from './types/QuoteResponseType';
@@ -45,6 +44,8 @@ import type { UnavailableProviderType } from './unavailableProviders';
  *   - `markBroadcasted(args)` — flip the broadcast bookkeeping once zingolib
  *     reports its tx id. The UI thread is responsible for handing off the
  *     instructions to RPC; this service never touches zingolib directly.
+ *   - `markDepositSent(args)` — keep the moment the user said an inbound
+ *     deposit was sent.
  *   - `listRecords` / `getRecord` — convenience pass-throughs to the store.
  *   - `forceRefresh` — pull-to-refresh via the poller.
  *   - `startPolling` / `stopPolling` — explicit lifecycle, caller-owned.
@@ -125,6 +126,11 @@ export type SetObservedDepositTxHashArgs = {
    *  the poller has nothing to query. Format validation is intentionally
    *  loose here — SwapKit returns the authoritative error on /track. */
   hash: string;
+};
+
+export type MarkDepositSentArgs = {
+  /** Locally-minted primary key returned by `commitRoute` on the record. */
+  recordId: string;
 };
 
 export class SwapService {
@@ -312,6 +318,10 @@ export class SwapService {
       sourceAddress: quoteInput.sourceAddress,
       requestedSlippageBps: quoteInput.slippageBps,
       status: initialStatus,
+      depositDeadlineMs:
+        direction === SwapDirectionEnum.Inbound
+          ? (chosenRoute.expiresAtMs ?? now + DEPOSIT_WINDOW_MS)
+          : undefined,
       providerData: instructions.providerData,
       broadcast:
         direction === SwapDirectionEnum.Outbound
@@ -416,6 +426,40 @@ export class SwapService {
       this.poller.tickOnce().catch(() => {
         // tickOnce already logs internally; we intentionally don't await.
       });
+    }
+    return updated;
+  }
+
+  /**
+   * The user says the inbound deposit left their other wallet. The record
+   * keeps the moment; the status moves only when the provider sees the
+   * deposit, and the deadline keeps running either way. Idempotent.
+   */
+  async markDepositSent(args: MarkDepositSentArgs): Promise<SwapRecordType> {
+    const { recordId } = args;
+    const record = await this.store.getByRecordId(recordId);
+    if (!record) {
+      throw new Error(`SwapService.markDepositSent: no record for ${recordId}`);
+    }
+    if (record.direction !== SwapDirectionEnum.Inbound) {
+      throw new Error(
+        `SwapService.markDepositSent: not an inbound record (${recordId})`,
+      );
+    }
+    if (record.depositSentAtMs !== undefined) {
+      return record;
+    }
+    const now = Date.now();
+    const updated: SwapRecordType = {
+      ...record,
+      depositSentAtMs: now,
+      updatedAtMs: now,
+    };
+    await this.store.upsert(updated);
+    const wasRunning = this.poller.isRunning();
+    this.poller.start();
+    if (wasRunning) {
+      this.poller.tickOnce().catch(() => {});
     }
     return updated;
   }
@@ -556,20 +600,6 @@ function parseProviderErrors(
     // sentence is the honest answer.
     return undefined;
   }
-}
-
-/**
- * Whether the provider can already see a deposit for this swap.
- *
- * Outbound gets its evidence from our own broadcast bookkeeping; inbound from
- * the source-chain hash, which reaches the record either from the user or from
- * Midgard. `isRealLegHash` rather than a truthiness check because `/track`
- * emits an all-zero placeholder for a leg that has not landed, and a record
- * written before that filter existed can still be carrying one.
- */
-function hasDepositEvidence(record: SwapRecordType): boolean {
-  if (record.broadcast?.status === BroadcastStatusEnum.Broadcasted) return true;
-  return isRealLegHash(record.observedDepositTxHash);
 }
 
 /**

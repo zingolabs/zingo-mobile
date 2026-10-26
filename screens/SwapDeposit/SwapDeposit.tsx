@@ -1,5 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -7,7 +13,12 @@ import { space12, space16, space8, useTheme, iconSizeSm } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import { Route } from '@app/AppState';
 import { ContextAppLoaded, useSwapService } from '@app/context';
-import { SwapDirectionEnum, SwapStatusEnum, isTerminalStatus } from '@app/swap';
+import {
+  SwapDirectionEnum,
+  SwapStatusEnum,
+  depositDeadlineMs,
+  isTerminalStatus,
+} from '@app/swap';
 import { leaveFlow } from '@app/navigation/navigate';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
@@ -19,7 +30,7 @@ import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import DepositSlip from '@screens/Swap/components/DepositSlip';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
-import { countdownText, depositDeadlineMs } from '@screens/Swap/swapProgress';
+import { countdownText } from '@screens/Swap/swapProgress';
 
 type SwapDepositProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -64,7 +75,9 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   const awaiting =
     !!record && record.status === SwapStatusEnum.AwaitingExternalDeposit;
 
-  // A record that moved on, or ran out of time, is no longer this screen's.
+  // A record that moved on is no longer this screen's. One out of time is
+  // asked about once; the poller expires it and the record leaves by itself.
+  const expiryAsked = useRef<boolean>(false);
   useEffect(() => {
     if (!record) {
       return;
@@ -77,8 +90,9 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
       navigation.replace(Route.SwapTracking, { recordId });
       return;
     }
-    if (awaiting && remainingMs <= 0 && swapService) {
-      navigation.replace(Route.SwapResult, { recordId });
+    if (awaiting && remainingMs <= 0 && swapService && !expiryAsked.current) {
+      expiryAsked.current = true;
+      swapService.forceRefresh().catch(() => {});
     }
   }, [
     record,

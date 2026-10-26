@@ -2,10 +2,8 @@ jest.mock('@app/RPCModule', () => ({ __esModule: true, default: {} }));
 
 import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
 import {
-  DEPOSIT_WINDOW_MS,
   SWAP_STEP_COUNT,
   countdownText,
-  depositDeadlineMs,
   swapOutcome,
   swapStepIndex,
 } from '@screens/Swap/swapProgress';
@@ -36,15 +34,6 @@ test('Tests that a swap opens on its deposit, its tracking or its detail when ta
   expect(swapScreenFor(SwapStatusEnum.Pending)).toBe(Route.SwapTracking);
   expect(swapScreenFor(SwapStatusEnum.Completed)).toBe(Route.SwapDetail);
   expect(swapScreenFor(SwapStatusEnum.Refunded)).toBe(Route.SwapDetail);
-});
-
-test('Tests that the deposit deadline is the window after creation when the route names no expiry', () => {
-  expect(depositDeadlineMs({ createdAtMs: 1_000 })).toBe(
-    1_000 + DEPOSIT_WINDOW_MS,
-  );
-  expect(depositDeadlineMs({ createdAtMs: 1_000, expiresAtMs: 5_000 })).toBe(
-    5_000,
-  );
 });
 
 test('Tests that the countdown reads m:ss and never goes below zero when time runs out', () => {

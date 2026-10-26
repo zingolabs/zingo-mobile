@@ -325,3 +325,126 @@ describe('SwapPoller auto-stop', () => {
     );
   });
 });
+
+describe('SwapPoller on an awaited deposit with a deadline', () => {
+  const T0 = 1_700_000_000_000;
+  const awaited = (overrides: Partial<SwapRecordType> = {}) =>
+    makeRecord({
+      recordId: 'rec-await',
+      provider: SwapKitProviderEnum.Near,
+      direction: SwapDirectionEnum.Inbound,
+      sellAsset: BTC,
+      receiveAsset: ZEC,
+      depositAddress: 'bc1qdeposit',
+      providerData: {
+        kind: SwapKitProviderEnum.Near,
+        depositAddress: 'bc1qdeposit',
+      },
+      broadcast: undefined,
+      status: SwapStatusEnum.AwaitingExternalDeposit,
+      createdAtMs: T0,
+      updatedAtMs: T0,
+      depositDeadlineMs: T0 + 600_000,
+      ...overrides,
+    });
+
+  const harnessAt = (nowMs: number, records: SwapRecordType[]) => {
+    jest.useFakeTimers({ now: nowMs });
+    const track = jest.fn(async (): Promise<TrackResponseType> => ({
+      status: 'NOT_STARTED',
+    }));
+    const upsert = jest.fn(async (_record: SwapRecordType) => undefined);
+    const poller = new SwapPoller({
+      client: { track } as unknown as SwapKitClient,
+      registry: new ProviderRegistry([
+        passthroughExecutor(SwapKitProviderEnum.MayachainStreaming),
+        passthroughExecutor(SwapKitProviderEnum.Near),
+      ]),
+      store: {
+        readAll: jest.fn(async () => records),
+        upsert,
+      } as unknown as typeof SwapStore,
+      midgardClient: {
+        findInboundActionByMemo: jest.fn(async () => null),
+      } as unknown as MidgardClient,
+      config: {
+        tickIntervalMs: 10_000,
+        activePollIntervalMs: 0,
+        idlePollIntervalMs: 0,
+      },
+    });
+    return { poller, track, upsert };
+  };
+
+  // The reported case: a deposit that never came kept the swap "in progress"
+  // for twelve hours, because only `/track` could end it and it never did.
+  it('expires the swap at the deadline with nothing seen, without asking /track', async () => {
+    const { poller, track, upsert } = harnessAt(T0 + 600_000, [awaited()]);
+    await poller.tickOnce();
+    expect(track).not.toHaveBeenCalled();
+    expect(upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recordId: 'rec-await',
+        status: SwapStatusEnum.Expired,
+        terminalAtMs: T0 + 600_000,
+      }),
+    );
+  });
+
+  it('keeps asking /track while the deadline is ahead', async () => {
+    const { poller, track, upsert } = harnessAt(T0 + 599_000, [awaited()]);
+    await poller.tickOnce();
+    expect(track).toHaveBeenCalledWith(
+      expect.objectContaining({ depositAddress: 'bc1qdeposit' }),
+    );
+    expect(upsert).not.toHaveBeenCalled();
+  });
+
+  // A deposit nothing can be asked about still has a deadline to meet, and
+  // the tick has to stay alive to meet it.
+  it('keeps running for an unqueryable deposit until its deadline', async () => {
+    const { poller, track, upsert } = harnessAt(T0 + 1_000, [
+      awaited({ provider: SwapKitProviderEnum.Chainflip }),
+    ]);
+    poller.start();
+    await poller.tickOnce();
+    expect(track).not.toHaveBeenCalled();
+    expect(upsert).not.toHaveBeenCalled();
+    expect(poller.isRunning()).toBe(true);
+    poller.stop();
+  });
+
+  it('expires an unqueryable deposit at its deadline', async () => {
+    const { poller, upsert } = harnessAt(T0 + 600_000, [
+      awaited({ provider: SwapKitProviderEnum.Chainflip }),
+    ]);
+    poller.start();
+    await poller.tickOnce();
+    expect(upsert).toHaveBeenCalledWith(
+      expect.objectContaining({ status: SwapStatusEnum.Expired }),
+    );
+    expect(poller.isRunning()).toBe(false);
+  });
+
+  it('leaves a deposit the provider saw alone past the deadline', async () => {
+    const { poller, upsert } = harnessAt(T0 + 900_000, [
+      awaited({ observedDepositTxHash: 'ab'.repeat(32) }),
+    ]);
+    await poller.tickOnce();
+    expect(upsert).not.toHaveBeenCalledWith(
+      expect.objectContaining({ status: SwapStatusEnum.Expired }),
+    );
+  });
+
+  // Records made before the deadline was kept read the window from their
+  // creation, so the ones already stuck end on the next launch.
+  it('expires a record without a deadline once the window after creation passes', async () => {
+    const { poller, upsert } = harnessAt(T0 + 15 * 60 * 1000, [
+      awaited({ depositDeadlineMs: undefined }),
+    ]);
+    await poller.tickOnce();
+    expect(upsert).toHaveBeenCalledWith(
+      expect.objectContaining({ status: SwapStatusEnum.Expired }),
+    );
+  });
+});
