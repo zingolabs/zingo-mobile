@@ -50,6 +50,13 @@ colors:
   bgViewOnlySubtle: "#8FB4E61F"
   bgNym: "#07FF94"
   bgNymSubtle: "#07FF941F"
+  # Switch (exception D): the off track, the deep end of the on gradient
+  # (which starts at bgAccent), the nym variant's gradient, the thumb
+  bgSwitchOff: "#7E7E7E"
+  bgSwitchOnDeep: "#0A4004"
+  bgSwitchNym: "#14E76F"
+  bgSwitchNymDeep: "#049959"
+  fgSwitchThumb: "#FFFFFF"
   fgPriceUp: "#3CC52A"
   fgPriceDown: "#F2878A"
   # Pools
@@ -372,24 +379,24 @@ components:
     backgroundColor: "{colors.bgTabCapsule}"
     textColor: "{colors.fgTabSelected}"
     rounded: "{rounded.pill}"
-  # Exception D. Literal values until the Switch's tokens land in app/theme.
-  # On, the track is a vertical gradient from fgAccent (top) to #0A4004.
+  # Exception D. On, the track is a vertical gradient from bgAccent (top)
+  # to bgSwitchOnDeep.
   switch-on:
     backgroundColor: "{colors.bgAccent}"
-    textColor: "#FFFFFF"
+    textColor: "{colors.fgSwitchThumb}"
     rounded: "{rounded.pill}"
     width: 40px
     height: 19px
-  # The nym variant's on track runs from #14E76F (top) to #049959.
+  # The nym variant's on track runs from bgSwitchNym (top) to bgSwitchNymDeep.
   switch-on-nym:
-    backgroundColor: "#14E76F"
-    textColor: "#FFFFFF"
+    backgroundColor: "{colors.bgSwitchNym}"
+    textColor: "{colors.fgSwitchThumb}"
     rounded: "{rounded.pill}"
     width: 40px
     height: 19px
   switch-off:
-    backgroundColor: "#7E7E7E"
-    textColor: "#FFFFFF"
+    backgroundColor: "{colors.bgSwitchOff}"
+    textColor: "{colors.fgSwitchThumb}"
     rounded: "{rounded.pill}"
     width: 40px
     height: 19px
@@ -748,9 +755,9 @@ today, and every toggle in the app uses it:
   `nym` variant draws the on track as a vertical gradient from `#14E76F` at
   the top to `#049959` at the bottom, as `nym-switch-on` does. Every other
   toggle uses the default.
-- Its colours go into `app/theme` as tokens with the primitive. It replaces
-  the switch drawings in `assets/img` (`setting-switch-on`, `switch-on`,
-  `nym-switch-on`, `switch-off`) and the one Server draws.
+- Its colours are tokens: `bgSwitchOff`, `bgSwitchOnDeep`, `bgSwitchNym`,
+  `bgSwitchNymDeep` and `fgSwitchThumb`. It replaced the switch drawings
+  in `assets/img` and the one Server drew.
 
 **Pending.** The labels inside the swap tracking animation (`SwapFlight`, 10
 and 11 pt) wait for the designer's decision: an approved exception, or moved

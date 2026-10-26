@@ -15,7 +15,6 @@ import {
   StyleSheet,
   Pressable,
   ScrollView,
-  Text,
 } from 'react-native';
 
 import { space20, space32, useTheme } from '@app/theme';
@@ -61,9 +60,8 @@ import { createAlert } from '@app/services/createAlert';
 import { showConfirm } from '@app/services/showConfirm';
 import { sendEmail } from '@app/services/sendEmail';
 import SaveSheet from '@ui/widgets/SaveSheet';
-import SwitchOff from '../../assets/img/switch-off.svg';
-import SettingSwitchOn from '../../assets/img/setting-switch-on.svg';
-import { ChevronLeft, ChevronRight } from '@ui/primitives/Icons/Chevron';
+import Switch from '@ui/primitives/Switch';
+import { ChevronRight } from '@ui/primitives/Icons/Chevron';
 import { RadioOffIcon } from '@ui/primitives/Icons/RadioOffIcon';
 import { RadioOnIcon } from '@ui/primitives/Icons/RadioOnIcon';
 
@@ -550,50 +548,19 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
         }}
       >
         <Header
-          title={''}
+          title={translate('settings.title') as string}
+          closeScreen={() => {
+            if (!disabled) {
+              navigateToHome();
+            }
+          }}
+          backTestID="settings.back"
+          backAccessibilityLabel={translate('settings.back-acc') as string}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
         />
-        <View
-          style={{
-            height: 44,
-            marginTop: 6,
-            marginBottom: 10,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Pressable
-            testID="settings.back"
-            accessibilityRole="button"
-            accessibilityLabel={translate('settings.back-acc') as string}
-            onPress={() => {
-              if (!disabled) {
-                navigateToHome();
-              }
-            }}
-            style={({ pressed }) => ({
-              position: 'absolute',
-              left: 10,
-              width: 44,
-              height: 44,
-              borderRadius: 12,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
-            })}
-          >
-            <ChevronLeft size={24} color={colors.fgAccent} />
-          </Pressable>
-          <Text
-            accessibilityRole="header"
-            style={{ color: colors.fgDefault, fontSize: 18, fontWeight: '700' }}
-          >
-            {translate('settings.title') as string}
-          </Text>
-        </View>
         <ScrollView
           keyboardShouldPersistTaps="handled"
           testID="settings.scroll-view"
@@ -678,13 +645,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                   </TouchableOpacity>
                 </InfoTooltip>
               </View>
-              <TouchableOpacity onPress={() => setPrivacy(!privacy)}>
-                {privacy ? (
-                  <SettingSwitchOn width={40} height={19} />
-                ) : (
-                  <SwitchOff width={40} height={19} />
-                )}
-              </TouchableOpacity>
+              <Switch
+                testID="settings.privacy"
+                value={privacy}
+                onValueChange={next => setPrivacy(next)}
+                accessibilityLabel={
+                  translate('settings.privacy-title') as string
+                }
+              />
             </View>
           </View>
 
@@ -705,17 +673,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
               <BoldText testID="settings.securitytitle">
                 {translate('settings.security-title') as string}
               </BoldText>
-              <TouchableOpacity
+              <Switch
                 testID="settings.biometrics"
+                value={biometrics}
                 disabled={disabled}
-                onPress={() => setBiometrics(!biometrics)}
-              >
-                {biometrics ? (
-                  <SettingSwitchOn width={40} height={19} />
-                ) : (
-                  <SwitchOff width={40} height={19} />
-                )}
-              </TouchableOpacity>
+                onValueChange={next => setBiometrics(next)}
+                accessibilityLabel={
+                  translate('settings.security-title') as string
+                }
+              />
             </View>
             {deviceSecurity.kind === 'insecure' && (
               <FadeText style={{ marginTop: 6 }}>
