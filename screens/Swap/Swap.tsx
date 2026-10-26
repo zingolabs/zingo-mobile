@@ -767,25 +767,18 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                               translate('swap.address-valid') as string
                             ).replace('{asset}', chainLabel)}
                           </Text>
-                          <Pressable
-                            testID="swap.save-contact"
-                            accessibilityRole="button"
-                            hitSlop={8}
-                            onPress={() =>
-                              saveContactSheetRef.current?.present()
-                            }
-                            style={{ marginLeft: 'auto' }}
-                          >
-                            <Text
-                              variant="caption"
-                              style={{
-                                fontWeight: '700',
-                                color: colors.fgAccent,
-                              }}
-                            >
-                              {translate('swap.save-contact') as string}
-                            </Text>
-                          </Pressable>
+                          <View style={{ marginLeft: 'auto' }}>
+                            <Button
+                              testID="swap.save-contact"
+                              variant="text"
+                              size="small"
+                              inline
+                              title={translate('swap.save-contact') as string}
+                              onPress={() =>
+                                saveContactSheetRef.current?.present()
+                              }
+                            />
+                          </View>
                         </>
                       )}
                     </View>
