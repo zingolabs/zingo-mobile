@@ -400,7 +400,6 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
             >
               {!!pending && (
                 <Card
-                  tone="selected"
                   testID="swap.pending"
                   onPress={() => openRecord(pending.recordId, pending.status)}
                 >
@@ -416,7 +415,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                         width: 8,
                         height: 8,
                         borderRadius: radiusPill,
-                        backgroundColor: colors.bgAccent,
+                        backgroundColor: colors.fgWarning,
                       }}
                     />
                     <View style={{ flex: 1 }}>
@@ -569,13 +568,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                         hitSlop={8}
                         style={{ minHeight: 32, justifyContent: 'center' }}
                       >
-                        <Text
-                          variant="caption"
-                          style={{
-                            fontWeight: '700',
-                            textDecorationLine: 'underline',
-                          }}
-                        >
+                        <Text variant="caption" style={{ fontWeight: '700' }}>
                           {providerShortLabel(form.chosenRoute.provider)}
                         </Text>
                       </Pressable>
@@ -599,17 +592,16 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                 </View>
               )}
               {form.rateLimited && (
-                <Text variant="caption" tone="warning">
-                  {renderSwapText(
+                <Banner
+                  tone="warning"
+                  title={renderSwapText(
                     rateLimitedNotice(form.rateLimitedUntilMs - form.nowMs),
                     key => (translate(key) as string).trim(),
                   )}
-                </Text>
+                />
               )}
               {!!form.quoteNotice && (
-                <Text variant="caption" tone="warning">
-                  {noticeText()}
-                </Text>
+                <Banner tone="warning" title={noticeText()} />
               )}
 
               {!!form.selectedToken && (
@@ -791,7 +783,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                         <Text
                           variant="caption"
                           tone="warning"
-                          style={{ textDecorationLine: 'underline' }}
+                          style={{ fontWeight: '700' }}
                         >
                           {translate('swap.see-why') as string}
                         </Text>

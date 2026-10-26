@@ -131,8 +131,8 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
                 : 'swap.pending-swapping',
             ),
             icon: tile(
-              <ActivityIndicator size="small" color={colors.fgAccent} />,
-              colors.bgAccentSubtle,
+              <ActivityIndicator size="small" color={colors.fgMuted} />,
+              colors.bgWarningSubtle,
             ),
             live: true,
           };

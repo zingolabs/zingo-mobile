@@ -227,7 +227,11 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
                     height: 6,
                     borderRadius: radiusPill,
                     backgroundColor:
-                      index <= step ? colors.fgAccent : colors.sheetHandle,
+                      index < step
+                        ? colors.fgAccent
+                        : index === step
+                          ? colors.fgWarning
+                          : colors.borderMuted,
                   }}
                 />
               ))}
