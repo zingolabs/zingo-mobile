@@ -13,7 +13,7 @@ import Animated, {
   WithTimingConfig,
 } from 'react-native-reanimated';
 
-import { useTheme, radiusMd, space20, iconSizeSm } from '@app/theme';
+import { useTheme, radiusMd, space20, iconSizeSm, slopFor } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { ChevronDown } from '@ui/primitives/Icons/Chevron';
@@ -318,7 +318,7 @@ const NoticeStack: React.FunctionComponent<NoticeStackProps> = ({
               testID="noticestack.toggle"
               accessibilityRole="button"
               accessibilityState={{ expanded }}
-              hitSlop={8}
+              hitSlop={slopFor(LABEL_H - 4)}
               onPress={() => setOpen(o => !o)}
               style={{
                 flexDirection: 'row',

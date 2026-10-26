@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useTheme } from '@app/theme';
+import { useTheme, radiusPill } from '@app/theme';
 import type { SwapAssetType } from '@app/swap';
 import TokenLogo from '@screens/Swap/components/TokenLogo';
 import { tokenEntryOf } from '@screens/Swap/swapAssets';
@@ -25,7 +25,7 @@ export default function HistoryAvatar({
       style={{
         width: AVATAR_SIZE,
         height: AVATAR_SIZE,
-        borderRadius: AVATAR_SIZE / 2,
+        borderRadius: radiusPill,
         backgroundColor: colors.bgMutedSubtle,
         alignItems: 'center',
         justifyContent: 'center',
@@ -40,7 +40,7 @@ export default function HistoryAvatar({
             bottom: -4,
             width: BADGE_SIZE + 4,
             height: BADGE_SIZE + 4,
-            borderRadius: (BADGE_SIZE + 4) / 2,
+            borderRadius: radiusPill,
             backgroundColor: colors.bgSurface,
             alignItems: 'center',
             justifyContent: 'center',

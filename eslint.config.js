@@ -103,9 +103,6 @@ const geometryGaps = [
   // not yet redesigned: hand-set values until each screen moves onto the
   // system (counts as of 2026-10-25)
   'screens/About/About.tsx',
-  'screens/History/History.tsx',
-  'screens/History/components/HistoryAvatar.tsx',
-  'screens/History/components/HistoryRowBody.tsx',
   'screens/History/components/IronwoodMigrationBanner.tsx',
   'screens/ImportChooser/ImportChooser.tsx',
   'screens/ImportUfvk/ImportUfvk.tsx',
@@ -161,7 +158,6 @@ const geometryGaps = [
   'ui/widgets/SelectBottomSheet.tsx',
   'ui/widgets/TextInputAddress.tsx',
   'ui/widgets/ZecAmount.tsx',
-  'ui/widgets/toastConfig.tsx',
 ];
 
 module.exports = [
