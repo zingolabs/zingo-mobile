@@ -136,7 +136,8 @@
     "sends-unit": "envios",
     "bytes": "bytes",
     "empty": "Nada enviado neste período.",
-    "add-contact": "Adicionar à lista de endereços"
+    "add-contact": "Adicionar à lista de endereços",
+    "reveal-address": "Mostrar endereço completo"
   },
   "loadingapp": {
     "saved-key-net-body": "Esta chave de visualização é da {keynet} e o Zingo está conectado a um servidor {net}, então não consegue importá-la. Escolha um servidor {keynet} para importá-la.",

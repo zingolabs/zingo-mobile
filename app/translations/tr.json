@@ -136,7 +136,8 @@
     "sends-unit": "gönderim",
     "bytes": "bayt",
     "empty": "Bu aralıkta hiçbir şey gönderilmedi.",
-    "add-contact": "Adres defterine ekle"
+    "add-contact": "Adres defterine ekle",
+    "reveal-address": "Tam adresi göster"
   },
   "loadingapp": {
     "saved-key-net-body": "Bu görüntüleme anahtarı {keynet} içindir ve Zingo bir {net} sunucusuna bağlı, bu yüzden onu içe aktaramaz. İçe aktarmak için bir {keynet} sunucusu seçin.",
