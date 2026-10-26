@@ -63,6 +63,12 @@ type FullPanelProps = {
    * that. It waits out of sight until the content is measured, then rises.
    */
   fit?: boolean;
+  /**
+   * The content brings its own scroller (a list that pages, a chat that
+   * scrolls from the bottom, a jump-back button over it); the panel only
+   * gives it the room under the title bar, without padding.
+   */
+  ownScroll?: boolean;
   testID?: string;
   children: React.ReactNode;
 };
@@ -84,6 +90,7 @@ export default function FullPanel({
   center,
   motion = 'rise',
   fit = false,
+  ownScroll = false,
   testID,
   children,
 }: FullPanelProps) {
@@ -222,33 +229,42 @@ export default function FullPanel({
         </View>
         <SurfaceContext.Provider value="surface">
           <TooltipHost>
-            <KeyboardAwareScrollView
-              testID={testID}
-              bottomOffset={16}
-              keyboardShouldPersistTaps="handled"
-              bounces={false}
-              alwaysBounceVertical={false}
-              style={{ flex: 1 }}
-              onContentSizeChange={
-                fit ? (_: number, h: number) => setContentH(h) : undefined
-              }
-              contentContainerStyle={{
-                flexGrow: center ? 1 : undefined,
-                justifyContent: center ? 'center' : 'flex-start',
-                paddingHorizontal: space20,
-                paddingTop: 8,
-                paddingBottom: footer ? 140 : 60,
-              }}
-            >
+            {ownScroll ? (
               <Animated.View
-                style={[
-                  contentStyle,
-                  center ? { flexGrow: 1, justifyContent: 'center' } : null,
-                ]}
+                testID={testID}
+                style={[{ flex: 1 }, contentStyle]}
               >
                 {children}
               </Animated.View>
-            </KeyboardAwareScrollView>
+            ) : (
+              <KeyboardAwareScrollView
+                testID={testID}
+                bottomOffset={16}
+                keyboardShouldPersistTaps="handled"
+                bounces={false}
+                alwaysBounceVertical={false}
+                style={{ flex: 1 }}
+                onContentSizeChange={
+                  fit ? (_: number, h: number) => setContentH(h) : undefined
+                }
+                contentContainerStyle={{
+                  flexGrow: center ? 1 : undefined,
+                  justifyContent: center ? 'center' : 'flex-start',
+                  paddingHorizontal: space20,
+                  paddingTop: 8,
+                  paddingBottom: footer ? 140 : 60,
+                }}
+              >
+                <Animated.View
+                  style={[
+                    contentStyle,
+                    center ? { flexGrow: 1, justifyContent: 'center' } : null,
+                  ]}
+                >
+                  {children}
+                </Animated.View>
+              </KeyboardAwareScrollView>
+            )}
           </TooltipHost>
         </SurfaceContext.Provider>
         {!!footer && (
