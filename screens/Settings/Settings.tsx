@@ -60,8 +60,7 @@ import { createAlert } from '@app/services/createAlert';
 import { showConfirm } from '@app/services/showConfirm';
 import { sendEmail } from '@app/services/sendEmail';
 import SaveSheet from '@ui/widgets/SaveSheet';
-import SwitchOff from '../../assets/img/switch-off.svg';
-import SettingSwitchOn from '../../assets/img/setting-switch-on.svg';
+import Switch from '@ui/primitives/Switch';
 import { ChevronRight } from '@ui/primitives/Icons/Chevron';
 import { RadioOffIcon } from '@ui/primitives/Icons/RadioOffIcon';
 import { RadioOnIcon } from '@ui/primitives/Icons/RadioOnIcon';
@@ -646,13 +645,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                   </TouchableOpacity>
                 </InfoTooltip>
               </View>
-              <TouchableOpacity onPress={() => setPrivacy(!privacy)}>
-                {privacy ? (
-                  <SettingSwitchOn width={40} height={19} />
-                ) : (
-                  <SwitchOff width={40} height={19} />
-                )}
-              </TouchableOpacity>
+              <Switch
+                testID="settings.privacy"
+                value={privacy}
+                onValueChange={next => setPrivacy(next)}
+                accessibilityLabel={
+                  translate('settings.privacy-title') as string
+                }
+              />
             </View>
           </View>
 
@@ -673,17 +673,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
               <BoldText testID="settings.securitytitle">
                 {translate('settings.security-title') as string}
               </BoldText>
-              <TouchableOpacity
+              <Switch
                 testID="settings.biometrics"
+                value={biometrics}
                 disabled={disabled}
-                onPress={() => setBiometrics(!biometrics)}
-              >
-                {biometrics ? (
-                  <SettingSwitchOn width={40} height={19} />
-                ) : (
-                  <SwitchOff width={40} height={19} />
-                )}
-              </TouchableOpacity>
+                onValueChange={next => setBiometrics(next)}
+                accessibilityLabel={
+                  translate('settings.security-title') as string
+                }
+              />
             </View>
             {deviceSecurity.kind === 'insecure' && (
               <FadeText style={{ marginTop: 6 }}>
