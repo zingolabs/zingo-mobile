@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useMemo, useState } from 'react';
 import { Keyboard, Pressable, View } from 'react-native';
-import { radiusSheet, useTheme, iconSizeMd } from '@app/theme';
+import { radiusSheet, useTheme, iconSizeMd, iconSizeSm } from '@app/theme';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -9,8 +9,8 @@ import {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 
+import Text from '@ui/primitives/Text';
 import BoldText from '@ui/primitives/BoldText';
-import RegText from '@ui/primitives/RegText';
 import SheetRim from '@ui/primitives/SheetRim';
 import SearchField from '@ui/widgets/SearchField';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
@@ -114,17 +114,13 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
           >
             {/* Left spacer matches the X Pressable's width (14×2 + 20 = 48). */}
             <View style={{ width: 48 }} />
-            <BoldText
+            <Text
+              variant="barTitle"
               numberOfLines={1}
-              style={{
-                flex: 1,
-                fontSize: 16,
-                lineHeight: 28,
-                textAlign: 'center',
-              }}
+              style={{ flex: 1, textAlign: 'center' }}
             >
               {title}
-            </BoldText>
+            </Text>
             <Pressable
               onPress={dismiss}
               hitSlop={8}
@@ -165,16 +161,15 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
                 opacity: pressed ? 0.6 : 1,
               })}
             >
-              <RegText
-                style={{
-                  fontSize: 16,
-                  color: selected ? colors.fgAccent : colors.fgDefault,
-                  fontWeight: selected ? '600' : '400',
-                }}
+              <Text
+                variant={selected ? 'bodyStrong' : 'body'}
+                tone={selected ? 'accent' : 'default'}
               >
                 {item.label}
-              </RegText>
-              {selected && <CheckIcon size={16} color={colors.fgAccent} />}
+              </Text>
+              {selected && (
+                <CheckIcon size={iconSizeSm} color={colors.fgAccent} />
+              )}
             </Pressable>
           );
         })}
