@@ -149,6 +149,7 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
           to={record.receiveAsset}
           provider={provider}
           nym={isOutbound}
+          waiting={awaiting}
           width={width - space20 * 2}
         />
         <Text
