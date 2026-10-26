@@ -136,7 +136,8 @@
     "sends-unit": "envíos",
     "bytes": "bytes",
     "empty": "No se envió nada en este periodo.",
-    "add-contact": "Añadir a la libreta de direcciones"
+    "add-contact": "Añadir a la libreta de direcciones",
+    "reveal-address": "Mostrar dirección completa"
   },
   "loadingapp": {
     "saved-key-net-body": "Esta clave de visualización es de {keynet} y Zingo está conectado a un servidor de {net}, así que no puede importarla. Elige un servidor de {keynet} para importarla.",

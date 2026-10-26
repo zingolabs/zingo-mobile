@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, {
   ReduceMotion,
   useAnimatedStyle,
@@ -18,6 +18,7 @@ import { MASK, useAmountReveal } from '@ui/widgets/PrivateAmount';
 import Utils from '@app/utils';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
+import AddressText from '@ui/primitives/Text';
 import CurrencyAmount from '@ui/widgets/CurrencyAmount';
 import ZecAmount from '@ui/widgets/ZecAmount';
 import Header from '@ui/widgets/Header';
@@ -45,7 +46,6 @@ const THUMB_BG = themeTokens.bgAccentSubtle;
 const THUMB_LINE = themeTokens.borderAccent;
 const PRESET_ON_BG = themeTokens.bgViewOnlySubtle;
 const PRESET_ON_LINE = themeTokens.borderMuted;
-const MONO = Platform.select({ ios: 'Menlo', default: 'monospace' });
 const SWEEP_MS = 460;
 const DEFAULT_WEEKS = 13;
 const SEG_W = 212;
@@ -68,22 +68,24 @@ function RowAddress({
   address: string;
   privacy: boolean;
 }) {
-  const { colors } = useTheme();
+  const { translate } = useContext(ContextAppLoaded);
   const { visible, reveal } = useTimedReveal(privacy);
-  return (
-    <Text
-      numberOfLines={1}
-      onPress={visible ? undefined : reveal}
-      style={{
-        color: colors.fgDefault,
-        fontSize: 12.5,
-        lineHeight: 18,
-        fontWeight: '500',
-        fontFamily: MONO,
-      }}
-    >
+  const body = (
+    <AddressText variant="address" numberOfLines={1}>
       {visible ? Utils.trimToSmall(address, 7) : mask(address)}
-    </Text>
+    </AddressText>
+  );
+  return visible ? (
+    body
+  ) : (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={translate('insight.reveal-address') as string}
+      onPress={reveal}
+      hitSlop={8}
+    >
+      {body}
+    </Pressable>
   );
 }
 

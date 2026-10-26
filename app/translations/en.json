@@ -136,7 +136,8 @@
     "sends-unit": "sends",
     "bytes": "bytes",
     "empty": "Nothing sent in this range.",
-    "add-contact": "Add to address book"
+    "add-contact": "Add to address book",
+    "reveal-address": "Show full address"
   },
   "loadingapp": {
     "saved-key-net-body": "This viewing key is for {keynet} and Zingo is connected to a {net} server, so it can't import it. Choose a {keynet} server to import it.",
