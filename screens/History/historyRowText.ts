@@ -69,7 +69,7 @@ export function transferRowText(args: {
   const state: RowState | undefined = failed
     ? { text: t('history.state-failed'), tone: 'danger' }
     : pending
-      ? { text: t(`history.${vt.status}`), tone: 'default' }
+      ? { text: t(`history.${vt.status}`), tone: 'warning' }
       : undefined;
   const amount = `${formatAmount(vt.amount)} ${currency}`;
   const base = { state, bottom: usd, titleMono: false };
@@ -217,7 +217,7 @@ export function swapRowText(args: {
               ? 'history.state-awaiting-deposit'
               : 'history.state-swapping',
           ),
-          tone: 'default',
+          tone: 'warning',
         },
         top: `≈ +${got} ${getSym}`,
         topTone: 'default',

@@ -5,10 +5,7 @@ import {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { ease } from '@app/theme/motion';
-
-/** How long a fold takes to open, from the redesign's motion rules. */
-const UNFOLD_MS = 260;
+import { duration, ease } from '@app/theme/motion';
 
 /**
  * The style a row takes as a fold opens under it: it fades in and settles
@@ -19,7 +16,7 @@ export function useUnfold() {
   const shown = useSharedValue(0);
   useEffect(() => {
     shown.value = withTiming(1, {
-      duration: UNFOLD_MS,
+      duration: duration.medium,
       easing: ease.emphasized,
       reduceMotion: ReduceMotion.System,
     });

@@ -192,7 +192,7 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
               accessibilityRole="button"
               accessibilityLabel={dismissLabel}
               onPress={onDismiss}
-              hitSlop={space8}
+              hitSlop={slopFor(iconSizeMd)}
             >
               <XIcon size={iconSizeMd} color={colors.fgMuted} />
             </Pressable>

@@ -17,11 +17,14 @@ import {
   StyleSheet,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
+import { duration } from '@app/theme/motion';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import {
   useTheme,
   slopFor,
   radiusMd,
+  radiusPill,
+  iconSizeMd,
   space4,
   space8,
   space16,
@@ -90,9 +93,6 @@ import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { onTabScrollY } from '@app/navigation/tabBarScroll';
 import { PANEL_TOP } from '@ui/widgets/Header/Header';
 import { ChevronUp } from '@ui/primitives/Icons/Chevron';
-
-/** How long a finished backup keeps its green pill before the card leaves. */
-const SEED_LEAVE_MS = 900;
 
 const ViewTypes = {
   MONTH: 0,
@@ -231,7 +231,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     }
     seedWasPending.current = false;
     setSeedLeaving(true);
-    const timer = setTimeout(() => setSeedLeaving(false), SEED_LEAVE_MS);
+    const timer = setTimeout(() => setSeedLeaving(false), duration.noticeLeave);
     return () => clearTimeout(timer);
   }, [seedBackedUp, focused]);
   const showSeedNotice = !readOnly && (!seedBackedUp || seedLeaving);
@@ -811,7 +811,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                 backgroundColor: colors.fgAccent,
                 width: 8,
                 height: 8,
-                borderRadius: 4,
+                borderRadius: radiusPill,
                 marginLeft: -3,
                 marginTop: -8,
                 borderWidth: 2,
@@ -1067,7 +1067,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
               alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: colors.bgSurface,
-              borderRadius: 50,
+              borderRadius: radiusPill,
               transform: [{ scale: pressed ? 0.9 : 1 }],
               opacity: isScrollingToTop ? 0.5 : 1,
               borderWidth: 1,
@@ -1075,7 +1075,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
             })}
           >
             <RingBorder size={36} />
-            <ChevronUp size={16} color={colors.fgMuted} />
+            <ChevronUp size={iconSizeMd} color={colors.fgMuted} />
           </Pressable>
         )}
       </Animated.View>

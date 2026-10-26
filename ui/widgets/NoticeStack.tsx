@@ -13,7 +13,7 @@ import Animated, {
   WithTimingConfig,
 } from 'react-native-reanimated';
 
-import { useTheme, radiusMd, space20, iconSizeSm } from '@app/theme';
+import { useTheme, radiusMd, space20, iconSizeSm, slopFor } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { ChevronDown } from '@ui/primitives/Icons/Chevron';
@@ -43,11 +43,11 @@ const RADIUS = NOTICE_RADIUS;
 // As the wallet opens, the stack drops in 8 pt once its cards are measured.
 const DROP_PT = 8;
 const drop: WithTimingConfig = {
-  duration: 420,
+  duration: duration.sheet,
   easing: ease.out,
   reduceMotion: ReduceMotion.System,
 };
-const DROP_DELAY_MS = 200;
+const DROP_DELAY_MS = duration.base;
 
 const move: WithTimingConfig = {
   duration: duration.sheet,
@@ -318,7 +318,7 @@ const NoticeStack: React.FunctionComponent<NoticeStackProps> = ({
               testID="noticestack.toggle"
               accessibilityRole="button"
               accessibilityState={{ expanded }}
-              hitSlop={8}
+              hitSlop={slopFor(LABEL_H - 4)}
               onPress={() => setOpen(o => !o)}
               style={{
                 flexDirection: 'row',
