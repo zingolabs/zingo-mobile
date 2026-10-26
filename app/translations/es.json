@@ -425,6 +425,7 @@
     "reconnecting": "Reconectando a la mixnet…"
   },
   "mixnetdoctor": {
+    "back-acc": "Atrás",
     "title": "Doctor de Mixnet",
     "title-acc": "Pantalla de diagnóstico del Doctor de Mixnet",
     "intro": "Comprueba si el mixnet es accesible desde tu dispositivo usando tu dirección IP real.",

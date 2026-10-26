@@ -59,6 +59,11 @@ const colors: ThemeColors = {
 
   bgNym: '#07FF94',
   bgNymSubtle: '#07FF941F',
+  bgSwitchOff: '#7E7E7E',
+  bgSwitchOnDeep: '#0A4004',
+  bgSwitchNym: '#14E76F',
+  bgSwitchNymDeep: '#049959',
+  fgSwitchThumb: '#FFFFFF',
 
   fgPriceUp: '#3CC52A',
   fgPriceDown: '#F2878A',

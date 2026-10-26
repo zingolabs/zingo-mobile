@@ -94,7 +94,7 @@ export default function TitleBar({
       </View>
       <View style={{ flex: 1, alignItems: 'center' }}>
         {typeof title === 'string' ? (
-          <Text variant="barTitle" numberOfLines={1}>
+          <Text variant="barTitle" numberOfLines={1} accessibilityRole="header">
             {title}
           </Text>
         ) : (

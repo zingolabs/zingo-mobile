@@ -273,48 +273,16 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
       style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}
     >
       <Header
-        title={''}
+        title={translate('insight.title') as string}
+        closeScreen={() => navigation.goBack()}
+        backTestID="insight.back"
+        backAccessibilityLabel={translate('insight.back-acc') as string}
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
         noPrivacy={true}
         noUfvkIcon={true}
       />
-      <View
-        style={{
-          height: 44,
-          marginTop: 6,
-          marginBottom: 10,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Pressable
-          testID="insight.back"
-          accessibilityRole="button"
-          accessibilityLabel={translate('insight.back-acc') as string}
-          onPress={() => navigation.goBack()}
-          style={({ pressed }) => ({
-            position: 'absolute',
-            left: 10,
-            width: 44,
-            height: 44,
-            borderRadius: 12,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
-          })}
-        >
-          <ChevronLeft size={24} color={colors.fgAccent} />
-        </Pressable>
-        <Text
-          accessibilityRole="header"
-          style={{ color: colors.fgDefault, fontSize: 18, fontWeight: '700' }}
-        >
-          {translate('insight.title') as string}
-        </Text>
-      </View>
-
       <ScrollView
         testID="insight.scroll-view"
         contentContainerStyle={{ paddingHorizontal: SIDE, paddingBottom: 36 }}

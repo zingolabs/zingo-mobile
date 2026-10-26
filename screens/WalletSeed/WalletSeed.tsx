@@ -24,7 +24,6 @@ import { getRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
 import { fetchWallet } from '@app/walletBackend';
 import { copySensitive } from '@app/utils/sensitiveClipboard';
 import { formatInteger } from '@app/utils/formatAmount';
-import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
 import { ShieldCheckIcon } from '@ui/primitives/Icons/ShieldCheckIcon';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
@@ -254,52 +253,18 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
         style={{ flex: 1, paddingTop: 4 }}
       >
         <Header
-          title={''}
+          title={
+            translate(action ? TITLE[action] : 'loadedapp.walletseed') as string
+          }
+          closeScreen={leave}
+          backTestID="walletseed.back"
+          backAccessibilityLabel={translate('walletseed.back-acc') as string}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
           noUfvkIcon={true}
         />
-        <View
-          style={{
-            height: 44,
-            marginTop: 6,
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginBottom: 10,
-          }}
-        >
-          <Pressable
-            testID="walletseed.back"
-            accessibilityRole="button"
-            accessibilityLabel={translate('walletseed.back-acc') as string}
-            onPress={leave}
-            style={({ pressed }) => ({
-              position: 'absolute',
-              left: 10,
-              width: 44,
-              height: 44,
-              borderRadius: 12,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
-            })}
-          >
-            <ChevronLeft size={24} color={colors.fgAccent} />
-          </Pressable>
-          <Text
-            accessibilityRole="header"
-            style={{ color: colors.fgDefault, fontSize: 18, fontWeight: '700' }}
-          >
-            {
-              translate(
-                action ? TITLE[action] : 'loadedapp.walletseed',
-              ) as string
-            }
-          </Text>
-        </View>
-
         {action && (
           <Text
             testID="walletseed.leaving"

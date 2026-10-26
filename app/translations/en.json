@@ -425,6 +425,7 @@
     "reconnecting": "Reconnecting to mixnet…"
   },
   "mixnetdoctor": {
+    "back-acc": "Back",
     "title": "Mixnet Doctor",
     "title-acc": "Mixnet Doctor diagnostics screen",
     "intro": "Tests whether the mixnet is reachable from your device using your real IP address.",

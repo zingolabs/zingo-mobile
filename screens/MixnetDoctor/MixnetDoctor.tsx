@@ -279,6 +279,8 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
         noPrivacy={true}
         noUfvkIcon={true}
         closeScreen={closeScreen}
+        backTestID="mixnetdoctor.back"
+        backAccessibilityLabel={translate('mixnetdoctor.back-acc') as string}
       />
       <ScrollView contentContainerStyle={{ padding: 20 }}>
         <Animated.View
