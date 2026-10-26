@@ -42,9 +42,9 @@ const colorLock = [
  */
 const NUMBER =
   ':matches(Literal[raw=/^[0-9]/], UnaryExpression[operator="-"], BinaryExpression)';
-/** The value of a style property, or either branch of a ternary there. */
+/** The value of a style property, or a number in either branch of a ternary there (not its test). */
 const VALUE = keys =>
-  `:matches(Property[key.name=${keys}], Property[key.name=${keys}] > ConditionalExpression) > ${NUMBER}`;
+  `:matches(Property[key.name=${keys}] > ${NUMBER}, Property[key.name=${keys}] > ConditionalExpression[consequent.raw=/^[0-9]/], Property[key.name=${keys}] > ConditionalExpression[alternate.raw=/^[0-9]/])`;
 /** Icon components: ui/primitives/Icons, drawn on the Icon base. */
 const ICON =
   '/(Icon|Chevron(Up|Down|Left|Right)|TriangleAlert|RescanArrows|RescanCloud)$/';
@@ -102,14 +102,14 @@ const geometryGaps = [
   'ui/widgets/SegmentedSwitch.tsx',
   // not yet redesigned: hand-set values until each screen moves onto the
   // system (counts as of 2026-10-25)
-  'screens/ImportChooser/ImportChooser.tsx',
-  'screens/ImportUfvk/ImportUfvk.tsx',
+  'screens/About/About.tsx',
   'screens/Insight/Insight.tsx',
   'screens/Insight/components/ActivityChart.tsx',
   'screens/Insight/components/Donut.tsx',
   'screens/Launching/Launching.tsx',
-  'screens/Messages/MessageList.tsx',
-  'screens/Messages/components/MessageLine.tsx',
+  'screens/MixnetDoctor/MixnetDoctor.tsx',
+  'screens/OptionsPanel/OptionsPanel.tsx',
+  'screens/Pools/Pools.tsx',
   'screens/SeedBackup/SeedBackup.tsx',
   'screens/SeedBackup/components/ConfirmStep.tsx',
   'screens/SeedBackup/components/DoneStep.tsx',
@@ -121,26 +121,27 @@ const geometryGaps = [
   'screens/Server/CustomServerBox.tsx',
   'screens/Server/Server.tsx',
   'screens/Server/ServerLog.tsx',
-  'screens/Settings/Settings.tsx',
-  'screens/StartMenu/StartMenu.tsx',
-  'screens/SyncReport/SyncReport.tsx',
+  'screens/Swap/components/TokenLogo.tsx',
+  'screens/SwapResult/SwapResult.tsx',
   'screens/ViewingKey/ViewingKey.tsx',
   'screens/ViewingKey/components/KeyCard.tsx',
   'screens/ViewingKey/components/KeyQr.tsx',
-  'screens/WalletError/WalletError.tsx',
   'screens/WalletSeed/WalletSeed.tsx',
+  'ui/primitives/AppSheetModal.tsx',
+  'ui/primitives/ProgressBar.tsx',
+  'ui/primitives/Radio.tsx',
   'ui/widgets/ActionMenuBottomSheet.tsx',
+  'ui/widgets/Address/Address.tsx',
   'ui/widgets/BusyButton.tsx',
+  'ui/widgets/CardExpand.tsx',
   'ui/widgets/ConfirmBottomSheet.tsx',
+  'ui/widgets/CurrencyAmount.tsx',
   'ui/widgets/DeleteWalletSheet.tsx',
-  'ui/widgets/Flight/SendFlight.tsx',
-  'ui/widgets/Flight/SwapFlight.tsx',
   'ui/widgets/ProgressState.tsx',
   'ui/widgets/SaveSheet.tsx',
-  'ui/widgets/ScanOverlay.tsx',
-  'ui/widgets/SeedPhraseInput.tsx',
   'ui/widgets/SeedSheet.tsx',
   'ui/widgets/SelectBottomSheet.tsx',
+  'ui/widgets/ZecAmount.tsx',
 ];
 
 module.exports = [

@@ -36,6 +36,7 @@
   "syncing": "Senkronize ediliyor",
   "synced": "Senkronize edildi",
   "messages": {
+    "bottom-acc": "En yeni mesaja git",
     "title": "Mesajlar",
     "title-chats": "Mesajlar",
     "empty": "Henüz mesaj yok.",
@@ -1147,6 +1148,7 @@
     "done": "Bitti"
   },
   "import": {
+    "back-acc": "Geri",
     "scan-hint": "Kamerayı bir kurtarma ifadesinin veya görüntüleme anahtarının QR koduna doğrultun.",
     "scan-miss": "Bu kod bir kurtarma ifadesi veya görüntüleme anahtarı değil.",
     "scan-found-seed": "Kurtarma ifadesi bulundu",
@@ -1467,5 +1469,11 @@
     "sheet-incomplete": "Bitene kadar bakiye ve geçmiş eksik görünebilir",
     "rescan": "Yeniden tara",
     "rescan-started": "Yeniden tarama başladı"
+  },
+  "errorboundary": {
+    "title": "Bir şeyler ters gitti",
+    "message": "Beklenmeyen bir hata oluştu. Lütfen uygulamayı yeniden başlatın.",
+    "report": "Bildir",
+    "restart": "Yeniden başlat"
   }
 }
