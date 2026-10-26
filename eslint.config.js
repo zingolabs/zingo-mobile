@@ -126,7 +126,6 @@ const geometryGaps = [
   'screens/StartMenu/StartMenu.tsx',
   'screens/Swap/components/TokenLogo.tsx',
   'screens/SwapResult/SwapResult.tsx',
-  'screens/SyncReport/SyncReport.tsx',
   'screens/ViewingKey/ViewingKey.tsx',
   'screens/ViewingKey/components/KeyCard.tsx',
   'screens/ViewingKey/components/KeyQr.tsx',
