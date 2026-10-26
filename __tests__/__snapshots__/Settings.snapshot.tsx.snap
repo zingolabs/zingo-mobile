@@ -16,142 +16,226 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
   }
 >
   <View
-    onLayout={[Function]}
     style={
       {
         "backgroundColor": "#011401",
         "flex": 1,
+        "paddingTop": 4,
       }
     }
   >
-    <View
-      onLayout={[Function]}
-    >
-      <View>
-        <View
-          style={
-            [
-              {},
-              {
-                "alignItems": "center",
-                "backgroundColor": "#011401",
-                "display": "flex",
-                "minHeight": 50,
-                "paddingBottom": 10,
-                "paddingTop": 0,
-              },
-            ]
-          }
-          testID="header"
-        >
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "display": "flex",
-                "flexDirection": "row",
-                "flexWrap": "wrap",
-                "gap": 8,
-                "justifyContent": "center",
-                "marginHorizontal": 5,
-                "marginTop": 12,
-              }
-            }
-          />
-        </View>
+    <View>
+      <View
+        style={
+          [
+            {},
+            {
+              "alignItems": "center",
+              "backgroundColor": "#011401",
+              "display": "flex",
+              "minHeight": 50,
+              "paddingBottom": 10,
+              "paddingTop": 0,
+            },
+          ]
+        }
+        testID="header"
+      >
         <View
           style={
             {
-              "left": 0,
-              "paddingBottom": 11.5,
-              "paddingLeft": 20,
-              "paddingRight": 11.5,
-              "paddingTop": 16,
-              "position": "absolute",
-              "top": 0,
+              "alignItems": "center",
+              "height": 57,
+              "justifyContent": "center",
+              "paddingTop": 12,
             }
           }
-        >
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "gap": 14,
-              }
-            }
-          />
-        </View>
+        />
+      </View>
+      <View
+        style={
+          {
+            "left": 0,
+            "paddingBottom": 11.5,
+            "paddingLeft": 20,
+            "paddingRight": 11.5,
+            "paddingTop": 16,
+            "position": "absolute",
+            "top": 0,
+          }
+        }
+      >
         <View
           style={
-            [
-              {},
-              {
-                "padding": 13,
-                "position": "absolute",
-                "right": 0,
-                "top": 0,
-              },
-            ]
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 14,
+            }
           }
-        >
-          <Image
-            source={
-              {
-                "testUri": "../../../assets/img/logobig-zingo.png",
-              }
+        />
+      </View>
+      <View
+        style={
+          [
+            {},
+            {
+              "padding": 13,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+            },
+          ]
+        }
+      >
+        <Image
+          source={
+            {
+              "testUri": "../../../assets/img/logobig-zingo.png",
             }
-            style={
-              {
-                "borderRadius": 6,
-                "height": 30,
-                "resizeMode": "contain",
-                "width": 30,
-              }
+          }
+          style={
+            {
+              "borderRadius": 6,
+              "height": 30,
+              "resizeMode": "contain",
+              "width": 30,
             }
-          />
-        </View>
+          }
+        />
       </View>
     </View>
     <View
-      pointerEvents="box-none"
+      onLayout={[Function]}
       style={
-        [
-          {
-            "bottom": 0,
-            "left": 0,
-            "position": "absolute",
-            "right": 0,
-            "top": 0,
-          },
-          {},
-        ]
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "paddingBottom": 6,
+          "paddingHorizontal": 16,
+          "paddingTop": 8,
+        }
       }
     >
       <View
         style={
-          [
+          {
+            "alignItems": "flex-start",
+            "width": 48,
+          }
+        }
+      >
+        <View
+          accessibilityLabel="text translated"
+          accessibilityRole="button"
+          accessibilityState={
             {
-              "height": "100%",
-            },
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
             {
-              "backgroundColor": "#031124",
-            },
-            undefined,
-          ]
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          hitSlop={8}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "paddingHorizontal": 14,
+              "paddingVertical": 4,
+            }
+          }
+          testID="settings.back"
+        />
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flex": 1,
+          }
         }
       >
         <Text
+          accessibilityRole="header"
+          maxFontSizeMultiplier={1.5}
+          numberOfLines={1}
           style={
             {
               "color": "#c3c3c3",
+              "fontSize": 16,
+              "fontWeight": "700",
+              "lineHeight": 28,
+            }
+          }
+        >
+          text translated
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "flex-end",
+            "width": 48,
+          }
+        }
+      />
+    </View>
+    <RCTScrollView
+      alwaysBounceVertical={false}
+      bounces={false}
+      contentContainerStyle={
+        {
+          "alignItems": "stretch",
+          "flexDirection": "column",
+          "justifyContent": "flex-start",
+          "paddingBottom": 20,
+        }
+      }
+      keyboardShouldPersistTaps="handled"
+      onScrollBeginDrag={[Function]}
+      style={
+        {
+          "flex": 1,
+        }
+      }
+      testID="settings.scroll-view"
+    >
+      <View>
+        <Text
+          maxFontSizeMultiplier={2}
+          style={
+            {
+              "color": "#888888",
               "fontSize": 12,
+              "fontWeight": "400",
               "letterSpacing": 0.5,
               "marginBottom": 4,
-              "marginLeft": 25,
-              "marginRight": 25,
+              "marginLeft": 20,
+              "marginRight": 20,
               "marginTop": 24,
-              "opacity": 0.65,
             }
           }
         >
@@ -163,18 +247,19 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "alignItems": "center",
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "marginHorizontal": 25,
+              "marginHorizontal": 20,
               "marginVertical": 15,
             }
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
-                "fontSize": 16,
-                "fontWeight": "bold",
-                "opacity": 0.87,
+                "fontSize": 15,
+                "fontWeight": "600",
+                "lineHeight": 21,
               }
             }
           >
@@ -223,51 +308,34 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <Text
+                maxFontSizeMultiplier={2}
                 style={
                   {
                     "color": "#888888",
                     "fontSize": 15,
                     "fontWeight": "400",
+                    "lineHeight": 21,
                     "marginRight": 5,
-                    "opacity": 1,
                   }
                 }
               >
                 text translated
               </Text>
-              <
-                color="#888888"
-                icon={
-                  {
-                    "icon": [
-                      320,
-                      512,
-                      [
-                        9002,
-                      ],
-                      "f054",
-                      "M311.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L243.2 256 73.9 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z",
-                    ],
-                    "iconName": "chevron-right",
-                    "prefix": "fas",
-                  }
-                }
-                size={12}
-              />
             </View>
           </View>
         </View>
         <Text
+          maxFontSizeMultiplier={2}
           style={
             {
-              "color": "#c3c3c3",
+              "color": "#888888",
               "fontSize": 12,
+              "fontWeight": "400",
               "letterSpacing": 0.5,
               "marginBottom": 4,
-              "marginLeft": 25,
-              "marginRight": 25,
+              "marginLeft": 20,
+              "marginRight": 20,
               "marginTop": 24,
-              "opacity": 0.65,
             }
           }
         >
@@ -276,7 +344,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <View
           style={
             {
-              "marginHorizontal": 25,
+              "marginHorizontal": 20,
               "marginVertical": 15,
             }
           }
@@ -297,11 +365,13 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <View
-                onLayout={[Function]}
                 style={
-                  {
-                    "alignItems": "flex-start",
-                  }
+                  [
+                    {
+                      "alignItems": "flex-start",
+                    },
+                    null,
+                  ]
                 }
               >
                 <View
@@ -309,7 +379,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                     {
                       "alignItems": "center",
                       "flexDirection": "row",
-                      "gap": 6,
+                      "gap": 8,
                     }
                   }
                 >
@@ -348,12 +418,13 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                     }
                   >
                     <Text
+                      maxFontSizeMultiplier={2}
                       style={
                         {
                           "color": "#c3c3c3",
-                          "fontSize": 16,
-                          "fontWeight": "bold",
-                          "opacity": 0.87,
+                          "fontSize": 15,
+                          "fontWeight": "600",
+                          "lineHeight": 21,
                         }
                       }
                     >
@@ -361,150 +432,58 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                     </Text>
                   </View>
                   <View
-                    accessibilityLabel="text translated"
-                    accessibilityRole="button"
-                    accessibilityState={
-                      {
-                        "busy": undefined,
-                        "checked": undefined,
-                        "disabled": undefined,
-                        "expanded": false,
-                        "selected": undefined,
-                      }
-                    }
-                    accessibilityValue={
-                      {
-                        "max": undefined,
-                        "min": undefined,
-                        "now": undefined,
-                        "text": undefined,
-                      }
-                    }
-                    accessible={true}
-                    collapsable={false}
-                    focusable={true}
-                    hitSlop={10}
-                    onBlur={[Function]}
-                    onClick={[Function]}
-                    onFocus={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
-                    testID="settings.privacy-info"
+                    style={null}
                   >
                     <View
-                      style={{}}
+                      accessibilityLabel="text translated"
+                      accessibilityRole="button"
+                      accessibilityState={
+                        {
+                          "busy": undefined,
+                          "checked": undefined,
+                          "disabled": undefined,
+                          "expanded": false,
+                          "selected": undefined,
+                        }
+                      }
+                      accessibilityValue={
+                        {
+                          "max": undefined,
+                          "min": undefined,
+                          "now": undefined,
+                          "text": undefined,
+                        }
+                      }
+                      accessible={true}
+                      collapsable={false}
+                      focusable={true}
+                      hitSlop={14}
+                      onBlur={[Function]}
+                      onClick={[Function]}
+                      onFocus={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                      testID="settings.privacy-info"
                     >
                       <View
-                        style={
-                          {
-                            "alignItems": "center",
-                            "backgroundColor": "#A8B3C4",
-                            "borderRadius": 7,
-                            "height": 14,
-                            "justifyContent": "center",
-                            "width": 14,
-                          }
-                        }
-                      >
-                        <Text
-                          style={
-                            {
-                              "color": "#060B12",
-                              "fontSize": 9.5,
-                              "fontWeight": "700",
-                              "lineHeight": 14,
-                            }
-                          }
-                        >
-                          i
-                        </Text>
-                      </View>
+                        style={{}}
+                      />
                     </View>
                   </View>
                 </View>
               </View>
             </View>
             <View
+              accessibilityLabel="text translated"
+              accessibilityRole="switch"
               accessibilityState={
                 {
                   "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onClick={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              style={
-                {
-                  "opacity": 1,
-                }
-              }
-            >
-              <View
-                height={19}
-                width={40}
-              />
-            </View>
-          </View>
-        </View>
-        <View
-          style={
-            {
-              "marginLeft": 25,
-              "marginRight": 25,
-              "marginVertical": 15,
-            }
-          }
-        >
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-              }
-            }
-          >
-            <Text
-              style={
-                {
-                  "color": "#c3c3c3",
-                  "fontSize": 16,
-                  "fontWeight": "bold",
-                  "opacity": 0.87,
-                }
-              }
-              testID="settings.securitytitle"
-            >
-              text translated
-            </Text>
-            <View
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
+                  "checked": false,
                   "disabled": false,
                   "expanded": undefined,
                   "selected": undefined,
@@ -521,7 +500,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               accessible={true}
               collapsable={false}
               focusable={true}
+              hitSlop={
+                {
+                  "bottom": 13,
+                  "left": 2,
+                  "right": 2,
+                  "top": 13,
+                }
+              }
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -530,29 +519,174 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               onStartShouldSetResponder={[Function]}
               style={
                 {
-                  "opacity": 1,
+                  "height": 19,
+                  "width": 40,
+                }
+              }
+              testID="settings.privacy"
+            >
+              <View
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {},
+                  ]
+                }
+              />
+              <View
+                style={
+                  [
+                    {
+                      "borderRadius": 999,
+                      "height": 15,
+                      "left": 2,
+                      "position": "absolute",
+                      "top": 2,
+                      "width": 15,
+                    },
+                    {
+                      "backgroundColor": "#FFFFFF",
+                    },
+                    {},
+                  ]
+                }
+              />
+            </View>
+          </View>
+        </View>
+        <View
+          style={
+            {
+              "marginLeft": 20,
+              "marginRight": 20,
+              "marginVertical": 15,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <Text
+              maxFontSizeMultiplier={2}
+              style={
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 15,
+                  "fontWeight": "600",
+                  "lineHeight": 21,
+                }
+              }
+              testID="settings.securitytitle"
+            >
+              text translated
+            </Text>
+            <View
+              accessibilityLabel="text translated"
+              accessibilityRole="switch"
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": false,
+                  "disabled": false,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              hitSlop={
+                {
+                  "bottom": 13,
+                  "left": 2,
+                  "right": 2,
+                  "top": 13,
+                }
+              }
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "height": 19,
+                  "width": 40,
                 }
               }
               testID="settings.biometrics"
             >
               <View
-                height={19}
-                width={40}
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {},
+                  ]
+                }
+              />
+              <View
+                style={
+                  [
+                    {
+                      "borderRadius": 999,
+                      "height": 15,
+                      "left": 2,
+                      "position": "absolute",
+                      "top": 2,
+                      "width": 15,
+                    },
+                    {
+                      "backgroundColor": "#FFFFFF",
+                    },
+                    {},
+                  ]
+                }
               />
             </View>
           </View>
         </View>
         <Text
+          maxFontSizeMultiplier={2}
           style={
             {
-              "color": "#c3c3c3",
+              "color": "#888888",
               "fontSize": 12,
+              "fontWeight": "400",
               "letterSpacing": 0.5,
               "marginBottom": 4,
-              "marginLeft": 25,
-              "marginRight": 25,
+              "marginLeft": 20,
+              "marginRight": 20,
               "marginTop": 24,
-              "opacity": 0.65,
             }
           }
         >
@@ -564,19 +698,20 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "alignItems": "center",
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "marginLeft": 25,
-              "marginRight": 25,
+              "marginLeft": 20,
+              "marginRight": 20,
               "marginVertical": 15,
             }
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
-                "fontSize": 16,
-                "fontWeight": "bold",
-                "opacity": 0.87,
+                "fontSize": 15,
+                "fontWeight": "600",
+                "lineHeight": 21,
               }
             }
           >
@@ -625,51 +760,34 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <Text
+                maxFontSizeMultiplier={2}
                 style={
                   {
                     "color": "#888888",
                     "fontSize": 15,
                     "fontWeight": "400",
+                    "lineHeight": 21,
                     "marginRight": 5,
-                    "opacity": 1,
                   }
                 }
               >
                 text translated
               </Text>
-              <
-                color="#888888"
-                icon={
-                  {
-                    "icon": [
-                      320,
-                      512,
-                      [
-                        9002,
-                      ],
-                      "f054",
-                      "M311.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L243.2 256 73.9 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z",
-                    ],
-                    "iconName": "chevron-right",
-                    "prefix": "fas",
-                  }
-                }
-                size={12}
-              />
             </View>
           </View>
         </View>
         <Text
+          maxFontSizeMultiplier={2}
           style={
             {
-              "color": "#c3c3c3",
+              "color": "#888888",
               "fontSize": 12,
+              "fontWeight": "400",
               "letterSpacing": 0.5,
               "marginBottom": 4,
-              "marginLeft": 25,
-              "marginRight": 25,
+              "marginLeft": 20,
+              "marginRight": 20,
               "marginTop": 24,
-              "opacity": 0.65,
             }
           }
         >
@@ -708,7 +826,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "alignItems": "center",
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "marginHorizontal": 25,
+              "marginHorizontal": 20,
               "marginVertical": 15,
               "opacity": 1,
             }
@@ -716,37 +834,93 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           testID="settings.about"
         >
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
-                "fontSize": 16,
-                "fontWeight": "bold",
-                "opacity": 0.87,
+                "fontSize": 15,
+                "fontWeight": "600",
+                "lineHeight": 21,
               }
             }
           >
             text translated
           </Text>
-          <
-            color="#888888"
-            icon={
-              {
-                "icon": [
-                  320,
-                  512,
-                  [
-                    9002,
-                  ],
-                  "f054",
-                  "M311.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L243.2 256 73.9 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z",
-                ],
-                "iconName": "chevron-right",
-                "prefix": "fas",
-              }
-            }
-            size={12}
-          />
         </View>
+      </View>
+    </RCTScrollView>
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "center",
+          "paddingBottom": 24,
+          "paddingHorizontal": 20,
+          "paddingTop": 10,
+        }
+      }
+    >
+      <View
+        accessibilityRole="button"
+        accessibilityState={
+          {
+            "busy": false,
+            "checked": undefined,
+            "disabled": true,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={false}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "alignItems": "center",
+            "alignSelf": "stretch",
+            "backgroundColor": "#5a8c5a",
+            "borderRadius": 999,
+            "justifyContent": "center",
+            "maxWidth": "100%",
+            "minHeight": 44,
+            "opacity": 1,
+            "paddingHorizontal": 24,
+            "paddingVertical": 8,
+            "width": "100%",
+          }
+        }
+        testID="settings.button.save"
+      >
+        <Text
+          maxFontSizeMultiplier={1.5}
+          style={
+            {
+              "color": "#060B12",
+              "fontSize": 16,
+              "fontWeight": "700",
+              "lineHeight": 20,
+              "textAlign": "center",
+            }
+          }
+        >
+          text translated
+        </Text>
       </View>
     </View>
   </View>
@@ -792,37 +966,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     }
   >
     <Text
+      maxFontSizeMultiplier={2}
       style={
         {
           "color": "#18bd18",
           "fontSize": 16,
           "fontWeight": "600",
-          "opacity": 1,
         }
       }
     >
       text translated
     </Text>
-    <
-      color="#18bd18"
-      icon={
-        {
-          "icon": [
-            448,
-            512,
-            [
-              10003,
-              10004,
-            ],
-            "f00c",
-            "M434.8 70.1c14.3 10.4 17.5 30.4 7.1 44.7l-256 352c-5.5 7.6-14 12.3-23.4 13.1s-18.5-2.7-25.1-9.3l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l101.5 101.5 234-321.7c10.4-14.3 30.4-17.5 44.7-7.1z",
-          ],
-          "iconName": "check",
-          "prefix": "fas",
-        }
-      }
-      size={16}
-    />
   </View>
   <View
     accessibilityState={
@@ -866,12 +1020,12 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     }
   >
     <Text
+      maxFontSizeMultiplier={2}
       style={
         {
           "color": "#c3c3c3",
           "fontSize": 16,
           "fontWeight": "400",
-          "opacity": 1,
         }
       }
     >
@@ -920,12 +1074,12 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     }
   >
     <Text
+      maxFontSizeMultiplier={2}
       style={
         {
           "color": "#c3c3c3",
           "fontSize": 16,
           "fontWeight": "400",
-          "opacity": 1,
         }
       }
     >
@@ -974,12 +1128,12 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     }
   >
     <Text
+      maxFontSizeMultiplier={2}
       style={
         {
           "color": "#c3c3c3",
           "fontSize": 16,
           "fontWeight": "400",
-          "opacity": 1,
         }
       }
     >
@@ -1028,12 +1182,12 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     }
   >
     <Text
+      maxFontSizeMultiplier={2}
       style={
         {
           "color": "#c3c3c3",
           "fontSize": 16,
           "fontWeight": "400",
-          "opacity": 1,
         }
       }
     >
@@ -1082,12 +1236,12 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     }
   >
     <Text
+      maxFontSizeMultiplier={2}
       style={
         {
           "color": "#c3c3c3",
           "fontSize": 16,
           "fontWeight": "400",
-          "opacity": 1,
         }
       }
     >
@@ -1136,86 +1290,12 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     }
   >
     <Text
+      maxFontSizeMultiplier={2}
       style={
         {
           "color": "#18bd18",
           "fontSize": 16,
           "fontWeight": "600",
-          "opacity": 1,
-        }
-      }
-    >
-      text translated
-    </Text>
-    <
-      color="#18bd18"
-      icon={
-        {
-          "icon": [
-            448,
-            512,
-            [
-              10003,
-              10004,
-            ],
-            "f00c",
-            "M434.8 70.1c14.3 10.4 17.5 30.4 7.1 44.7l-256 352c-5.5 7.6-14 12.3-23.4 13.1s-18.5-2.7-25.1-9.3l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l101.5 101.5 234-321.7c10.4-14.3 30.4-17.5 44.7-7.1z",
-          ],
-          "iconName": "check",
-          "prefix": "fas",
-        }
-      }
-      size={16}
-    />
-  </View>
-  <View
-    accessibilityState={
-      {
-        "busy": undefined,
-        "checked": undefined,
-        "disabled": undefined,
-        "expanded": undefined,
-        "selected": undefined,
-      }
-    }
-    accessibilityValue={
-      {
-        "max": undefined,
-        "min": undefined,
-        "now": undefined,
-        "text": undefined,
-      }
-    }
-    accessible={true}
-    collapsable={false}
-    focusable={true}
-    onBlur={[Function]}
-    onClick={[Function]}
-    onFocus={[Function]}
-    onResponderGrant={[Function]}
-    onResponderMove={[Function]}
-    onResponderRelease={[Function]}
-    onResponderTerminate={[Function]}
-    onResponderTerminationRequest={[Function]}
-    onStartShouldSetResponder={[Function]}
-    style={
-      {
-        "alignItems": "center",
-        "flexDirection": "row",
-        "justifyContent": "space-between",
-        "opacity": 1,
-        "paddingHorizontal": 24,
-        "paddingVertical": 14,
-      }
-    }
-  >
-    <Text
-      style={
-        {
-          "color": "#c3c3c3",
-          "fontSize": 16,
-          "fontWeight": "400",
-          "opacity": 1,
         }
       }
     >
@@ -1264,12 +1344,66 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     }
   >
     <Text
+      maxFontSizeMultiplier={2}
       style={
         {
           "color": "#c3c3c3",
           "fontSize": 16,
           "fontWeight": "400",
-          "opacity": 1,
+        }
+      }
+    >
+      text translated
+    </Text>
+  </View>
+  <View
+    accessibilityState={
+      {
+        "busy": undefined,
+        "checked": undefined,
+        "disabled": undefined,
+        "expanded": undefined,
+        "selected": undefined,
+      }
+    }
+    accessibilityValue={
+      {
+        "max": undefined,
+        "min": undefined,
+        "now": undefined,
+        "text": undefined,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "opacity": 1,
+        "paddingHorizontal": 24,
+        "paddingVertical": 14,
+      }
+    }
+  >
+    <Text
+      maxFontSizeMultiplier={2}
+      style={
+        {
+          "color": "#c3c3c3",
+          "fontSize": 16,
+          "fontWeight": "400",
         }
       }
     >

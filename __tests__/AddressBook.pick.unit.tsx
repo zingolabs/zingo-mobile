@@ -151,3 +151,58 @@ describe('AddressBook as a picker', () => {
     expect(goBack).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('AddressBook as a picker for another chain', () => {
+  const zcash = new AddressBookFileClass(
+    'Lolo',
+    'u1lolo',
+    '#FFFFFF',
+    false,
+    ChainNameEnum.mainChainName,
+    'ZEC',
+  );
+  const bitcoin = new AddressBookFileClass(
+    'Bob',
+    'bc1qbob',
+    '#FFFFFF',
+    false,
+    ChainNameEnum.mainChainName,
+    'BTC',
+  );
+  const goBack = jest.fn();
+
+  const picker = () =>
+    render(
+      <ContextAppLoadedProvider
+        value={{
+          ...defaultAppContextLoaded,
+          translate: mockTranslate,
+          addressBook: [zcash, bitcoin],
+          walletChainName: ChainNameEnum.mainChainName,
+        }}
+      >
+        <AddressBook
+          navigation={{ goBack } as never}
+          route={{
+            key: 'Key-1',
+            name: 'AddressBook',
+            params: { pick: 'swap.contact', chain: 'BTC' },
+          }}
+        />
+      </ContextAppLoadedProvider>,
+    );
+
+  beforeEach(() => {
+    goBack.mockClear();
+    jest.mocked(deliver).mockClear();
+  });
+
+  test('Tests that only the contacts of that chain are offered, without the wallet tab, when the swap asks for one.', () => {
+    const screen = picker();
+    expect(screen.queryByTestId('addressbook.row.u1lolo.head')).toBeNull();
+    expect(screen.queryByTestId('addressbook.tabs')).toBeNull();
+    fireEvent.press(screen.getByTestId('addressbook.row.bc1qbob.head'));
+    expect(deliver).toHaveBeenCalledWith('swap.contact', 'bc1qbob');
+    expect(goBack).toHaveBeenCalledTimes(1);
+  });
+});

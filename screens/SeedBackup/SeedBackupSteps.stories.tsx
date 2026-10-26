@@ -31,7 +31,6 @@ const words = (hidden: boolean, checked: boolean) => (
     onCopy={() => {}}
     checked={checked}
     onCheck={() => {}}
-    nudge={0}
   />
 );
 

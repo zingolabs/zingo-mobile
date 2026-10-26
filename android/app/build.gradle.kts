@@ -101,6 +101,26 @@ val zmDescriptor: String = runCatching {
 }.getOrDefault("").ifEmpty { "zm_unknown" }
 val includeUniversalApk = (project.findProperty("includeUniversalApk") as? String)?.toBoolean() ?: false
 
+// The Binding Layer comes from the Prebuilt Bundle that the Bundle Pin
+// names (zingo-mobile/0020). The pin is the one source of the coordinate.
+// The fetch extracts the bundle as a Maven repository and prints its root
+// first. Gradle runs it when the repository resolves, not at configuration.
+// Gradle execs node by name, which resolves on every platform.
+val bindingLayerPin = groovy.json.JsonSlurper().parse(rootProject.file("../binding-layer.json")) as Map<*, *>
+val bindingLayerCoordinate = (bindingLayerPin["coordinates"] as Map<*, *>)["android"] as String
+val bindingLayerGroup = bindingLayerCoordinate.substringBefore(":")
+val bindingLayerFetch = providers.exec {
+    workingDir(rootProject.file(".."))
+    commandLine("node", rootProject.file("../scripts/fetch_binding_layer.mjs").absolutePath, "--platform", "android")
+    isIgnoreExitValue = true
+}
+val bindingLayerRepository = bindingLayerFetch.result.map { result ->
+    if (result.exitValue != 0) {
+        throw GradleException(bindingLayerFetch.standardError.asText.get().trim())
+    }
+    bindingLayerFetch.standardOutput.asText.get().trim().lines().first()
+}
+
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("local.zingo.jks.properties")
 if (keystorePropertiesFile.exists()) {
@@ -132,8 +152,8 @@ android {
         applicationId = "org.ZingoLabs.Zingo" // Real
         minSdk = rootProject.extra["minSdkVersion"] as Int
         targetSdk = rootProject.extra["targetSdkVersion"] as Int
-        versionCode = 322 // Real (prod baseline; beta flavor overrides below)
-        versionName = "2.1.0" // Real
+        versionCode = 323 // Real (prod baseline; beta flavor overrides below)
+        versionName = "2.1.1" // Real
         testBuildType = System.getProperty("testBuildType", "debug")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resValue("string", "zm_descriptor", zmDescriptor)
@@ -346,6 +366,43 @@ androidComponents {
 }
 
 
+// The React Native plugin registers a snapshot repository first on every
+// project, for its nightly builds, so each uncached lookup asks it before
+// Maven Central. package.json pins a release, which never resolves from a
+// snapshot repository. The plugin offers no switch for it, so this hook
+// removes every remote repository whose path names snapshots. The plugin
+// adds its repositories to every project from the afterEvaluate of :app,
+// registered when the plugins block applied it, before this script body,
+// so this hook runs after that. Reading the url of the Binding Layer
+// repository runs the fetch, and the hook skips that repository by name.
+// `yarn check:repositories` audits the result.
+val remoteSchemes = setOf("http", "https")
+val bindingLayerRepositoryName = "bindingLayer"
+afterEvaluate {
+    rootProject.allprojects {
+        repositories.removeAll { repository ->
+            repository is MavenArtifactRepository &&
+                repository.name != bindingLayerRepositoryName &&
+                repository.url.scheme in remoteSchemes &&
+                repository.url.path.contains("snapshot", ignoreCase = true)
+        }
+    }
+}
+
+// The exclusive content pins the group to the fetched repository. No remote
+// repository is asked for the coordinate and none can shadow it.
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = bindingLayerRepositoryName
+                setUrl(bindingLayerRepository.map { uri(it) })
+            }
+        }
+        filter { includeGroup(bindingLayerGroup) }
+    }
+}
+
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
@@ -409,8 +466,8 @@ dependencies {
     androidTestImplementation("androidx.test:runner:1.7.0")
     androidTestUtil("androidx.test:orchestrator:1.6.1")
 
-    // The Binding Layer from the zingolib submodule. It brings JNA with it.
-    implementation("org.zingolabs:zingo-binding-layer")
+    // The Binding Layer AAR. Its module metadata brings JNA with it.
+    implementation(bindingLayerCoordinate)
 
     // encrypted file storage
     implementation("androidx.security:security-crypto:1.0.0")

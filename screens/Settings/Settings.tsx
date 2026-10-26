@@ -14,24 +14,15 @@ import {
   Keyboard,
   StyleSheet,
   Pressable,
+  ScrollView,
 } from 'react-native';
-import Animated from 'react-native-reanimated';
-import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 
-import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faDotCircle,
-  faChevronLeft,
-  faChevronRight,
-} from '@fortawesome/free-solid-svg-icons';
-import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
+import { space20, space32, useTheme } from '@app/theme';
 
 import RegText from '@ui/primitives/RegText';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
-import AppSheet from '@ui/primitives/AppSheet';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 
@@ -51,13 +42,7 @@ import {
 import { useBiometricGate } from '@app/hooks/useBiometricGate';
 import SelectBottomSheet from '@ui/widgets/SelectBottomSheet';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
-import BottomSheet, {
-  BottomSheetFooter,
-  BottomSheetFooterProps,
-  BottomSheetModal,
-  BottomSheetScrollView,
-} from '@gorhom/bottom-sheet';
-import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import {
   RecoveryInfoSaveResult,
@@ -75,8 +60,10 @@ import { createAlert } from '@app/services/createAlert';
 import { showConfirm } from '@app/services/showConfirm';
 import { sendEmail } from '@app/services/sendEmail';
 import SaveSheet from '@ui/widgets/SaveSheet';
-import SwitchOff from '../../assets/img/switch-off.svg';
-import SettingSwitchOn from '../../assets/img/setting-switch-on.svg';
+import Switch from '@ui/primitives/Switch';
+import { ChevronRight } from '@ui/primitives/Icons/Chevron';
+import { RadioOffIcon } from '@ui/primitives/Icons/RadioOffIcon';
+import { RadioOnIcon } from '@ui/primitives/Icons/RadioOnIcon';
 
 type Options = {
   value: string;
@@ -185,13 +172,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   const [deviceSecurity, setDeviceSecurity] = useState<DeviceSecurityProbe>({
     kind: 'secured',
   });
-
-  // Bottom-sheet measurements — Settings has no balance area, so the sheet
-  // uses a single snap at the maximum height (just below the screen Header).
-  const [containerH, setContainerH] = useState<number>(0);
-  const [headerH, setHeaderH] = useState<number>(0);
-
-  const settingsSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
   // The system store that keeps the recovery info, by its platform name.
   const secureStore = Platform.OS === 'ios' ? 'Keychain' : 'Keystore';
@@ -494,15 +474,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                 style={{ flexDirection: 'row', alignItems: 'center' }}
                 onPress={() => setOption(typeOption(item.value))}
               >
-                <FontAwesomeIcon
-                  icon={
-                    typeOption(item.value) === valueOption
-                      ? faDotCircle
-                      : farCircle
-                  }
-                  size={16}
-                  color={colors.fgMuted}
-                />
+                {typeOption(item.value) === valueOption ? (
+                  <RadioOnIcon size={16} color={colors.fgMuted} />
+                ) : (
+                  <RadioOffIcon size={16} color={colors.fgMuted} />
+                )}
                 <RegText style={{ marginLeft: 10 }}>
                   {translate(`settings.value-${label}-${item.value}`) as string}
                 </RegText>
@@ -516,87 +492,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
 
   const languageSelectRef = useRef<BottomSheetModal>(null);
   const blockExplorerSelectRef = useRef<BottomSheetModal>(null);
-  const settingsSheetRef = useRef<BottomSheet>(null);
-  const sheetSlideStyle = useOptionsPanelSheetSlide();
   useDismissSheetsOnBlur();
-
-  const settingsHeader = (
-    <View
-      style={{
-        paddingTop: 12,
-        paddingBottom: 8,
-        paddingHorizontal: 16,
-      }}
-    >
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <TouchableOpacity
-          onPress={() => {
-            if (!disabled) {
-              navigateToHome();
-            }
-          }}
-          hitSlop={8}
-          style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-        >
-          <FontAwesomeIcon
-            icon={faChevronLeft}
-            size={20}
-            color={colors.fgAccent}
-          />
-        </TouchableOpacity>
-        <BoldText
-          numberOfLines={1}
-          style={{
-            flex: 1,
-            fontSize: 16,
-            lineHeight: 28,
-            textAlign: 'center',
-          }}
-        >
-          {translate('settings.title') as string}
-        </BoldText>
-        <View style={{ width: 28 }} />
-      </View>
-    </View>
-  );
-
-  const renderSettingsFooter = useCallback(
-    (props: BottomSheetFooterProps) => (
-      <BottomSheetFooter {...props} bottomInset={0}>
-        <View
-          style={{
-            backgroundColor: colors.bgSurface,
-            paddingTop: 10,
-            paddingBottom: 24,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Button
-            testID="settings.button.save"
-            disabled={disabled || disabledButton}
-            type={ButtonTypeEnum.Primary}
-            title={translate('settings.save') as string}
-            onPress={() => {
-              setTimeout(async () => {
-                await saveSettingsRef.current();
-                Keyboard.dismiss();
-              }, 100);
-            }}
-          />
-        </View>
-      </BottomSheetFooter>
-    ),
-
-    [colors, disabled, disabledButton, translate],
-  );
 
   const reportError = (error: string) => {
     createAlert(
@@ -615,8 +511,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   const sectionHeader = (key: string) => (
     <FadeText
       style={{
-        marginLeft: 25,
-        marginRight: 25,
+        marginLeft: space20,
+        marginRight: space20,
         marginTop: 24,
         marginBottom: 4,
         fontSize: 12,
@@ -648,422 +544,408 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
         style={{
           flex: 1,
           backgroundColor: colors.bgCanvas,
+          paddingTop: 4,
         }}
-        onLayout={e => setContainerH(e.nativeEvent.layout.height)}
       >
-        <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
-          <Header
-            title={''}
-            noBalance={true}
-            noSyncingStatus={true}
-            noDrawMenu={true}
-            noPrivacy={true}
-          />
-        </View>
-        <Animated.View
-          pointerEvents="box-none"
-          style={[StyleSheet.absoluteFill, sheetSlideStyle]}
+        <Header
+          title={translate('settings.title') as string}
+          closeScreen={() => {
+            if (!disabled) {
+              navigateToHome();
+            }
+          }}
+          backTestID="settings.back"
+          backAccessibilityLabel={translate('settings.back-acc') as string}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noPrivacy={true}
+        />
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          testID="settings.scroll-view"
+          bounces={false}
+          alwaysBounceVertical={false}
+          style={{
+            flex: 1,
+          }}
+          contentContainerStyle={{
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            justifyContent: 'flex-start',
+            paddingBottom: space20,
+          }}
+          onScrollBeginDrag={() => setOpenInfoSection(null)}
         >
-          <AppSheet
-            ref={settingsSheetRef}
-            snapPoints={settingsSnapPoints}
-            header={settingsHeader}
-            renderFooter={renderSettingsFooter}
+          {/* An open tip closes on a tap anywhere else. */}
+          {!!openInfoSection && (
+            <Pressable
+              onPress={() => setOpenInfoSection(null)}
+              style={[StyleSheet.absoluteFill, { zIndex: 1 }]}
+            />
+          )}
+          {/* SECTION: Preferences */}
+          {sectionHeader('settings.section-preferences')}
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginHorizontal: space20,
+              marginVertical: 15,
+            }}
           >
-            <BottomSheetScrollView
-              keyboardShouldPersistTaps="handled"
-              testID="settings.scroll-view"
-              bounces={false}
-              alwaysBounceVertical={false}
-              style={{
-                flex: 1,
-              }}
-              contentContainerStyle={{
-                flexDirection: 'column',
-                alignItems: 'stretch',
-                justifyContent: 'flex-start',
-                paddingBottom: 100,
-              }}
-              onScrollBeginDrag={() => setOpenInfoSection(null)}
+            <BoldText>
+              {translate('settings.language-title') as string}
+            </BoldText>
+            <TouchableOpacity
+              disabled={disabled}
+              onPress={() => languageSelectRef.current?.present()}
             >
-              {/* An open tip closes on a tap anywhere else. */}
-              {!!openInfoSection && (
-                <Pressable
-                  onPress={() => setOpenInfoSection(null)}
-                  style={[StyleSheet.absoluteFill, { zIndex: 1 }]}
-                />
-              )}
-              {/* SECTION: Preferences */}
-              {sectionHeader('settings.section-preferences')}
-
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginHorizontal: 25,
-                  marginVertical: 15,
-                }}
-              >
-                <BoldText>
-                  {translate('settings.language-title') as string}
-                </BoldText>
-                <TouchableOpacity
-                  disabled={disabled}
-                  onPress={() => languageSelectRef.current?.present()}
-                >
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <RegText
-                      style={{
-                        marginRight: 5,
-                        fontWeight: '400',
-                        color: colors.fgMuted,
-                      }}
-                    >
-                      {
-                        translate(
-                          `settings.value-language-${language}`,
-                        ) as string
-                      }
-                    </RegText>
-                    <FontAwesomeIcon
-                      icon={faChevronRight}
-                      size={12}
-                      color={colors.fgMuted}
-                    />
-                  </View>
-                </TouchableOpacity>
-              </View>
-
-              {/* SECTION: Privacy & Security */}
-              {sectionHeader('settings.section-privacysecurity')}
-
-              <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View style={{ flex: 1 }}>
-                    <InfoTooltip
-                      testID="settings.privacy-info"
-                      label={translate('settings.privacy-title') as string}
-                      text={
-                        PRIVACYS.find(d => String(d.value) === 'true')?.text ??
-                        ''
-                      }
-                      open={openInfoSection === 'privacy'}
-                      onToggle={open =>
-                        setOpenInfoSection(open ? 'privacy' : null)
-                      }
-                      alignStart
-                    >
-                      {/* A long press on the title opens the developer
-                          options. */}
-                      <TouchableOpacity
-                        onLongPress={() => setShowDeveloperOptions(true)}
-                      >
-                        <BoldText>
-                          {translate('settings.privacy-title') as string}
-                        </BoldText>
-                      </TouchableOpacity>
-                    </InfoTooltip>
-                  </View>
-                  <TouchableOpacity onPress={() => setPrivacy(!privacy)}>
-                    {privacy ? (
-                      <SettingSwitchOn width={40} height={19} />
-                    ) : (
-                      <SwitchOff width={40} height={19} />
-                    )}
-                  </TouchableOpacity>
-                </View>
-              </View>
-
-              <View
-                style={{
-                  marginLeft: 25,
-                  marginRight: 25,
-                  marginVertical: 15,
-                }}
-              >
-                <View
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <RegText
                   style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
+                    marginRight: 5,
+                    fontWeight: '400',
+                    color: colors.fgMuted,
                   }}
                 >
-                  <BoldText testID="settings.securitytitle">
-                    {translate('settings.security-title') as string}
-                  </BoldText>
-                  <TouchableOpacity
-                    testID="settings.biometrics"
-                    disabled={disabled}
-                    onPress={() => setBiometrics(!biometrics)}
-                  >
-                    {biometrics ? (
-                      <SettingSwitchOn width={40} height={19} />
-                    ) : (
-                      <SwitchOff width={40} height={19} />
-                    )}
-                  </TouchableOpacity>
-                </View>
-                {deviceSecurity.kind === 'insecure' && (
-                  <FadeText style={{ marginTop: 6 }}>
-                    {
-                      translate(
-                        'settings.security-device-locked-hint',
-                      ) as string
-                    }
-                  </FadeText>
-                )}
+                  {translate(`settings.value-language-${language}`) as string}
+                </RegText>
+                <ChevronRight size={16} color={colors.fgMuted} />
               </View>
+            </TouchableOpacity>
+          </View>
 
-              {/* SECTION: Network & Advanced */}
-              {sectionHeader('settings.section-networkadvanced')}
+          {/* SECTION: Privacy & Security */}
+          {sectionHeader('settings.section-privacysecurity')}
 
-              {/* Nym is no longer a choice: every transmission travels the
+          <View style={{ marginHorizontal: space20, marginVertical: 15 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{ flex: 1 }}>
+                <InfoTooltip
+                  testID="settings.privacy-info"
+                  label={translate('settings.privacy-title') as string}
+                  text={
+                    PRIVACYS.find(d => String(d.value) === 'true')?.text ?? ''
+                  }
+                  open={openInfoSection === 'privacy'}
+                  onToggle={open => setOpenInfoSection(open ? 'privacy' : null)}
+                  alignStart
+                >
+                  {/* A long press on the title opens the developer
+                          options. */}
+                  <TouchableOpacity
+                    onLongPress={() => setShowDeveloperOptions(true)}
+                  >
+                    <BoldText>
+                      {translate('settings.privacy-title') as string}
+                    </BoldText>
+                  </TouchableOpacity>
+                </InfoTooltip>
+              </View>
+              <Switch
+                testID="settings.privacy"
+                value={privacy}
+                onValueChange={next => setPrivacy(next)}
+                accessibilityLabel={
+                  translate('settings.privacy-title') as string
+                }
+              />
+            </View>
+          </View>
+
+          <View
+            style={{
+              marginLeft: space20,
+              marginRight: space20,
+              marginVertical: 15,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <BoldText testID="settings.securitytitle">
+                {translate('settings.security-title') as string}
+              </BoldText>
+              <Switch
+                testID="settings.biometrics"
+                value={biometrics}
+                disabled={disabled}
+                onValueChange={next => setBiometrics(next)}
+                accessibilityLabel={
+                  translate('settings.security-title') as string
+                }
+              />
+            </View>
+            {deviceSecurity.kind === 'insecure' && (
+              <FadeText style={{ marginTop: 6 }}>
+                {translate('settings.security-device-locked-hint') as string}
+              </FadeText>
+            )}
+          </View>
+
+          {/* SECTION: Network & Advanced */}
+          {sectionHeader('settings.section-networkadvanced')}
+
+          {/* Nym is no longer a choice: every transmission travels the
                   mixnet. The row is left as the way into the diagnostics,
                   and its green says the network is the one carrying the
                   wallet's traffic. */}
-              {mixnetView.kind === 'transport' && (
-                <TouchableOpacity
-                  testID="settings.mixnet"
-                  onPress={() => navigation.navigate(Route.MixnetDoctor)}
+          {mixnetView.kind === 'transport' && (
+            <TouchableOpacity
+              testID="settings.mixnet"
+              onPress={() => navigation.navigate(Route.MixnetDoctor)}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginHorizontal: space20,
+                marginVertical: 15,
+              }}
+            >
+              <BoldText style={{ color: colors.bgNym }}>
+                {translate('settings.nym-network') as string}
+              </BoldText>
+              <ChevronRight size={16} color={colors.fgMuted} />
+            </TouchableOpacity>
+          )}
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginLeft: space20,
+              marginRight: space20,
+              marginVertical: 15,
+            }}
+          >
+            <BoldText>
+              {translate('settings.blockexplorer-title') as string}
+            </BoldText>
+            <TouchableOpacity
+              disabled={disabled}
+              onPress={() => blockExplorerSelectRef.current?.present()}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <RegText
                   style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    marginHorizontal: 25,
-                    marginVertical: 15,
+                    marginRight: 5,
+                    fontWeight: '400',
+                    color: colors.fgMuted,
                   }}
                 >
-                  <BoldText style={{ color: '#07FF94' }}>
-                    {translate('settings.nym-network') as string}
-                  </BoldText>
-                  <FontAwesomeIcon
-                    icon={faChevronRight}
-                    size={12}
-                    color={colors.fgMuted}
-                  />
+                  {
+                    translate(
+                      `settings.value-blockexplorer-${blockExplorer}`,
+                    ) as string
+                  }
+                </RegText>
+                <ChevronRight size={16} color={colors.fgMuted} />
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          {/* SECTION: Other */}
+          {sectionHeader('settings.section-other')}
+
+          <TouchableOpacity
+            testID="settings.about"
+            disabled={disabled}
+            onPress={() => navigation.navigate(Route.About)}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginHorizontal: space20,
+              marginVertical: 15,
+            }}
+          >
+            <BoldText>{translate('loadedapp.about') as string}</BoldText>
+            <ChevronRight size={16} color={colors.fgMuted} />
+          </TouchableOpacity>
+
+          {(!recoveryInfoStored || recoveryInfoSave) && (
+            <View style={{ marginHorizontal: space20, marginVertical: 15 }}>
+              {!recoveryInfoStored && (
+                <TouchableOpacity
+                  testID="settings.recoveryinfo.save"
+                  disabled={savingRecoveryInfo}
+                  onPress={saveRecoveryInfoNow}
+                  accessibilityRole="button"
+                >
+                  <FadeText
+                    style={{
+                      color: colors.fgWarning,
+                      textAlign: 'center',
+                      textDecorationLine: 'underline',
+                    }}
+                  >
+                    {
+                      translate(
+                        `settings.recoveryinfo-notstored-${keyKind}`,
+                      ) as string
+                    }
+                  </FadeText>
                 </TouchableOpacity>
               )}
-
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginLeft: 25,
-                  marginRight: 25,
-                  marginVertical: 15,
-                }}
-              >
-                <BoldText>
-                  {translate('settings.blockexplorer-title') as string}
-                </BoldText>
-                <TouchableOpacity
-                  disabled={disabled}
-                  onPress={() => blockExplorerSelectRef.current?.present()}
+              {(savingRecoveryInfo || recoveryInfoSave) && (
+                <FadeText
+                  testID="settings.recoveryinfo.result"
+                  selectable
+                  style={{
+                    marginTop: recoveryInfoStored ? 0 : 8,
+                    textAlign: 'center',
+                    opacity: 1,
+                    color: savingRecoveryInfo
+                      ? colors.fgMuted
+                      : recoveryInfoSave?.kind === 'saved'
+                        ? colors.fgAccent
+                        : colors.fgDanger,
+                  }}
                 >
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <RegText
-                      style={{
-                        marginRight: 5,
-                        fontWeight: '400',
-                        color: colors.fgMuted,
-                      }}
-                    >
-                      {
-                        translate(
-                          `settings.value-blockexplorer-${blockExplorer}`,
-                        ) as string
-                      }
-                    </RegText>
-                    <FontAwesomeIcon
-                      icon={faChevronRight}
-                      size={12}
-                      color={colors.fgMuted}
-                    />
-                  </View>
-                </TouchableOpacity>
-              </View>
+                  {recoveryInfoSaveText()}
+                </FadeText>
+              )}
+            </View>
+          )}
 
-              {/* SECTION: Other */}
-              {sectionHeader('settings.section-other')}
+          {/* SECTION: Developer */}
+          {showDeveloperOptions && (
+            <>
+              {sectionHeader('settings.section-developer')}
+              <View style={{ width: '100%', marginBottom: 20 }}>
+                <View style={{ marginHorizontal: space20, marginVertical: 15 }}>
+                  <BoldText>
+                    {translate('settings.performancelevel-title') as string}
+                  </BoldText>
+                </View>
 
-              <TouchableOpacity
-                testID="settings.about"
-                disabled={disabled}
-                onPress={() => navigation.navigate(Route.About)}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginHorizontal: 25,
-                  marginVertical: 15,
-                }}
-              >
-                <BoldText>{translate('loadedapp.about') as string}</BoldText>
-                <FontAwesomeIcon
-                  icon={faChevronRight}
-                  size={12}
-                  color={colors.fgMuted}
-                />
-              </TouchableOpacity>
-
-              {(!recoveryInfoStored || recoveryInfoSave) && (
-                <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
-                  {!recoveryInfoStored && (
-                    <TouchableOpacity
-                      testID="settings.recoveryinfo.save"
-                      disabled={savingRecoveryInfo}
-                      onPress={saveRecoveryInfoNow}
-                      accessibilityRole="button"
-                    >
-                      <FadeText
-                        style={{
-                          color: colors.fgWarning,
-                          textAlign: 'center',
-                          textDecorationLine: 'underline',
-                        }}
-                      >
-                        {
-                          translate(
-                            `settings.recoveryinfo-notstored-${keyKind}`,
-                          ) as string
-                        }
-                      </FadeText>
-                    </TouchableOpacity>
-                  )}
-                  {(savingRecoveryInfo || recoveryInfoSave) && (
-                    <FadeText
-                      testID="settings.recoveryinfo.result"
-                      selectable
-                      style={{
-                        marginTop: recoveryInfoStored ? 0 : 8,
-                        textAlign: 'center',
-                        opacity: 1,
-                        color: savingRecoveryInfo
-                          ? colors.fgMuted
-                          : recoveryInfoSave?.kind === 'saved'
-                            ? colors.fgAccent
-                            : colors.fgDanger,
-                      }}
-                    >
-                      {recoveryInfoSaveText()}
-                    </FadeText>
+                <View style={{ marginLeft: space32, marginRight: space20 }}>
+                  {optionsRadio(
+                    PERFORMANCELEVELMENU,
+                    setPerformanceLevel as React.Dispatch<
+                      React.SetStateAction<string | boolean>
+                    >,
+                    String,
+                    performanceLevel,
+                    'performancelevel',
                   )}
                 </View>
-              )}
+                {!!lastError && (
+                  <>
+                    <View
+                      style={{
+                        marginHorizontal: space20,
+                        marginVertical: 15,
+                      }}
+                    >
+                      <BoldText>{'LAST ERROR'}</BoldText>
+                    </View>
 
-              {/* SECTION: Developer */}
-              {showDeveloperOptions && (
-                <>
-                  {sectionHeader('settings.section-developer')}
-                  <View style={{ width: '100%', marginBottom: 20 }}>
-                    <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
+                    <View style={{ marginHorizontal: space20 }}>
+                      <Button
+                        variant="primary"
+                        title={translate('view-error') as string}
+                        onPress={() => {
+                          reportError(lastError);
+                        }}
+                      />
+                    </View>
+                  </>
+                )}
+                {hasWalletBackup && (
+                  <>
+                    <View
+                      style={{
+                        marginHorizontal: space20,
+                        marginVertical: 15,
+                      }}
+                    >
                       <BoldText>
-                        {translate('settings.performancelevel-title') as string}
+                        {translate('loadedapp.restorebackupwallet') as string}
                       </BoldText>
                     </View>
 
-                    <View style={{ marginLeft: 40, marginRight: 25 }}>
-                      {optionsRadio(
-                        PERFORMANCELEVELMENU,
-                        setPerformanceLevel as React.Dispatch<
-                          React.SetStateAction<string | boolean>
-                        >,
-                        String,
-                        performanceLevel,
-                        'performancelevel',
-                      )}
-                    </View>
-                    {!!lastError && (
-                      <>
-                        <View
-                          style={{ marginHorizontal: 25, marginVertical: 15 }}
-                        >
-                          <BoldText>{'LAST ERROR'}</BoldText>
-                        </View>
-
-                        <View style={{ marginLeft: 40, marginRight: 25 }}>
-                          <Button
-                            type={ButtonTypeEnum.Primary}
-                            title={translate('view-error') as string}
-                            onPress={() => {
-                              reportError(lastError);
-                            }}
-                            twoButtons={true}
-                          />
-                        </View>
-                      </>
-                    )}
-                    {hasWalletBackup && (
-                      <>
-                        <View
-                          style={{ marginHorizontal: 25, marginVertical: 15 }}
-                        >
-                          <BoldText>
-                            {
-                              translate(
-                                'loadedapp.restorebackupwallet',
-                              ) as string
-                            }
-                          </BoldText>
-                        </View>
-
-                        <View style={{ marginLeft: 40, marginRight: 25 }}>
-                          <Button
-                            testID="settings.restorebackupwallet"
-                            type={ButtonTypeEnum.Secondary}
-                            title={
-                              translate('settings.restorebackup') as string
-                            }
-                            onPress={() =>
-                              showConfirm({
-                                title: translate(
-                                  'loadedapp.restorebackupwallet',
+                    <View style={{ marginHorizontal: space20 }}>
+                      <Button
+                        testID="settings.restorebackupwallet"
+                        variant="text"
+                        title={translate('settings.restorebackup') as string}
+                        onPress={() =>
+                          showConfirm({
+                            title: translate(
+                              'loadedapp.restorebackupwallet',
+                            ) as string,
+                            message: backupReplaces
+                              ? (
+                                  translate(
+                                    readOnly
+                                      ? 'settings.restorebackup-replace-vo'
+                                      : 'settings.restorebackup-replace',
+                                  ) as string
+                                ).replace(
+                                  '{net}',
+                                  translate(
+                                    `settings.value-chainname-${openNet}`,
+                                  ) as string,
+                                )
+                              : (translate(
+                                  'settings.restorebackup-warning',
+                                ) as string),
+                            buttons: [
+                              {
+                                text: translate(
+                                  backupReplaces
+                                    ? 'settings.restorebackup-switch'
+                                    : 'confirm',
                                 ) as string,
-                                message: backupReplaces
-                                  ? (
-                                      translate(
-                                        readOnly
-                                          ? 'settings.restorebackup-replace-vo'
-                                          : 'settings.restorebackup-replace',
-                                      ) as string
-                                    ).replace(
-                                      '{net}',
-                                      translate(
-                                        `settings.value-chainname-${openNet}`,
-                                      ) as string,
-                                    )
-                                  : (translate(
-                                      'settings.restorebackup-warning',
-                                    ) as string),
-                                buttons: [
-                                  {
-                                    text: translate(
-                                      backupReplaces
-                                        ? 'settings.restorebackup-switch'
-                                        : 'confirm',
-                                    ) as string,
-                                    onPress: restoreBackup,
-                                  },
-                                  {
-                                    text: translate('cancel') as string,
-                                    style: 'cancel',
-                                  },
-                                ],
-                              })
-                            }
-                            twoButtons={true}
-                          />
-                        </View>
-                      </>
-                    )}
-                  </View>
-                </>
-              )}
-            </BottomSheetScrollView>
-          </AppSheet>
-        </Animated.View>
+                                onPress: restoreBackup,
+                              },
+                              {
+                                text: translate('cancel') as string,
+                                style: 'cancel',
+                              },
+                            ],
+                          })
+                        }
+                      />
+                    </View>
+                  </>
+                )}
+              </View>
+            </>
+          )}
+        </ScrollView>
+        <View
+          style={{
+            paddingHorizontal: space20,
+            paddingTop: 10,
+            paddingBottom: 24,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Button
+            testID="settings.button.save"
+            disabled={disabled || disabledButton}
+            variant="primary"
+            title={translate('settings.save') as string}
+            onPress={() => {
+              setTimeout(async () => {
+                await saveSettingsRef.current();
+                Keyboard.dismiss();
+              }, 100);
+            }}
+          />
+        </View>
       </View>
       <SelectBottomSheet
         ref={languageSelectRef}

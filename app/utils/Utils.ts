@@ -34,6 +34,7 @@ import { RPCParseAddressType } from '@app/walletBackend/types/RPCParseAddressTyp
 import { RPCParseAddressStatusEnum } from '@app/walletBackend/enums/RPCParseAddressStatusEnum';
 import { RPCAddressKindEnum } from '@app/walletBackend/enums/RPCAddressKindEnum';
 import { RPCReceiversEnum } from '@app/walletBackend/enums/RPCReceiversEnum';
+import { themeTokens } from '@app/theme';
 
 export default class Utils {
   static trimToSmall(addr?: string, numChars?: number): string {
@@ -223,7 +224,7 @@ export default class Utils {
     const brightness: number = (r * 299 + g * 587 + b * 114) / 1000;
 
     // If the brightness is greater than 128, return dark text (black); otherwise, return light text (white).
-    return brightness > 128 ? '#000000' : '#FFFFFF';
+    return brightness > 128 ? themeTokens.fgOnAccent : themeTokens.fgDefault;
   }
 
   static async getSendManyJSON(

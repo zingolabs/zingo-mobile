@@ -41,6 +41,7 @@ import {
   suggestWords,
   tokenize,
 } from '@app/utils/seedPhrase';
+import { fieldBorder } from '@ui/primitives/fieldBorder';
 
 type SeedPhraseInputProps = {
   value: string;
@@ -80,12 +81,6 @@ const suggestionsEnter = () =>
 const SHAKE_PX = 6;
 const SHAKE_MS = 320;
 const CHIP_HEIGHT = 25;
-const BAD_BG = 'rgba(229,72,77,0.14)';
-const BAD_BORDER = 'rgba(229,72,77,0.45)';
-const BAD_TEXT = '#FF9DA0';
-const OK_BG = 'rgba(20,157,5,0.15)';
-const OK_BORDER = 'rgba(20,157,5,0.55)';
-const OK_TEXT = '#9FE092';
 
 const MONO = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
 
@@ -379,13 +374,11 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
   }, [pulse, flash]);
   const pulseStyle = useAnimatedStyle(() => ({ opacity: flash.value }));
 
-  const borderColor = fieldError
-    ? colors.fgDangerEmphasis
-    : complete
-      ? colors.borderAccent
-      : focused
-        ? colors.borderFocus
-        : colors.bottomSheetBorder;
+  const borderColor = fieldBorder(
+    colors,
+    focused,
+    fieldError ? 'invalid' : complete ? 'valid' : 'unknown',
+  );
   const counter = ufvk
     ? (translate(
         keyValid ? 'import.key-valid' : 'import.viewing-key',
@@ -464,7 +457,6 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
                 lineHeight: 21,
                 padding: 0,
                 textAlignVertical: 'top',
-                backgroundColor: 'transparent',
               }}
             />
           ) : (
@@ -491,17 +483,19 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
                       borderRadius: CHIP_HEIGHT / 2,
                       paddingLeft: 10,
                       paddingRight: 11,
-                      backgroundColor: valid ? colors.bgCanvas : BAD_BG,
+                      backgroundColor: valid
+                        ? colors.bgCanvas
+                        : colors.bgDangerSubtle,
                       borderWidth: valid ? 0 : 1,
-                      borderColor: BAD_BORDER,
+                      borderColor: colors.borderDanger,
                     }}
                   >
-                    <Text style={{ color: colors.fgMuted, fontSize: 10 }}>
+                    <Text style={{ color: colors.fgMuted, fontSize: 12 }}>
                       {i + 1}
                     </Text>
                     <Text
                       style={{
-                        color: valid ? colors.fgDefault : BAD_TEXT,
+                        color: valid ? colors.fgDefault : colors.fgDanger,
                         fontSize: 15,
                       }}
                     >
@@ -531,7 +525,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
                   fontSize: 15,
                 }}
               >
-                <Text style={{ color: 'transparent' }}>{draft}</Text>
+                <Text style={{ opacity: 0 }}>{draft}</Text>
                 {ghost}
               </Text>
               <TextInput
@@ -560,7 +554,6 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
                   paddingLeft: 3,
                   paddingRight: 0,
                   height: CHIP_HEIGHT,
-                  backgroundColor: 'transparent',
                 }}
               />
             </Animated.View>
@@ -572,7 +565,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
             style={{
               marginTop: 14,
               color: colors.fgMuted,
-              fontSize: 12.5,
+              fontSize: 13,
             }}
           >
             {draftHint}
@@ -599,19 +592,21 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
                   paddingHorizontal: 11,
                   justifyContent: 'center',
                   borderWidth: 1,
-                  borderColor: i === 0 ? OK_BORDER : colors.bottomSheetBorder,
-                  backgroundColor: i === 0 ? OK_BG : colors.bgCanvas,
+                  borderColor:
+                    i === 0 ? colors.borderAccent : colors.bottomSheetBorder,
+                  backgroundColor:
+                    i === 0 ? colors.bgAccentSubtle : colors.bgCanvas,
                 }}
               >
                 <Text
                   style={{
-                    color: i === 0 ? OK_TEXT : colors.fgMuted,
-                    fontSize: 12.5,
+                    color: i === 0 ? colors.fgAccent : colors.fgMuted,
+                    fontSize: 13,
                   }}
                 >
                   <Text
                     style={{
-                      color: i === 0 ? '#E2FFDB' : colors.fgDefault,
+                      color: i === 0 ? colors.fgAccent : colors.fgDefault,
                       fontWeight: '600',
                     }}
                   >
@@ -630,11 +625,11 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
               right: 13,
               bottom: 12,
               color: fieldError
-                ? BAD_TEXT
+                ? colors.fgDanger
                 : complete
                   ? colors.fgAccent
                   : colors.fgMuted,
-              fontSize: 11,
+              fontSize: 12,
             },
             counterStyle,
           ]}
@@ -648,8 +643,8 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
           style={{
             marginTop: 6,
             marginHorizontal: 2,
-            color: BAD_TEXT,
-            fontSize: 10.5,
+            color: colors.fgDanger,
+            fontSize: 12,
             lineHeight: 15,
           }}
         >

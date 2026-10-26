@@ -5,7 +5,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { GlobalConst } from '@app/AppState';
 import { RootParamList, ScanAccepts } from '@app/types';
 import { deliver } from '@app/navigation/results';
-import { validateAddressForChain } from '@app/swap';
+import { addressFromPaymentUri, validateAddressForChain } from '@app/swap';
 import Utils from '@app/utils';
 import ScanOverlay from '@ui/widgets/ScanOverlay';
 
@@ -26,8 +26,13 @@ const acceptsFor = (
         );
       };
     case 'chain':
+      // A wallet's receive QR is often a payment URI for the chain.
       return (value: string) =>
-        validateAddressForChain(accepts.chain, value, accepts.network);
+        validateAddressForChain(
+          accepts.chain,
+          addressFromPaymentUri(accepts.chain, value),
+          accepts.network,
+        );
   }
 };
 

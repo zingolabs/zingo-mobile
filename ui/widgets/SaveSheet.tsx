@@ -13,6 +13,8 @@ import { ease } from '@app/theme/motion';
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
 import SheetRim from '@ui/primitives/SheetRim';
+import Button from '@ui/primitives/Button';
+import ButtonStack from '@ui/primitives/ButtonStack';
 
 type SaveSheetProps = {
   testID: string;
@@ -76,7 +78,7 @@ const SaveSheet: React.FC<SaveSheetProps> = ({
           right: 0,
           top: 0,
           bottom: 0,
-          backgroundColor: 'rgba(2,6,12,0.62)',
+          backgroundColor: colors.bgScrim,
         }}
       >
         <Pressable
@@ -130,65 +132,26 @@ const SaveSheet: React.FC<SaveSheetProps> = ({
         >
           {body}
         </RegText>
-        <View style={{ flexDirection: 'row', gap: 10 }}>
-          <Pressable
+        <ButtonStack>
+          <Button
+            testID={`${testID}.keep`}
+            variant="quiet"
+            title={keepLabel}
+            onPress={onKeep}
+          />
+          <Button
             testID={`${testID}.discard`}
+            variant="text"
+            title={discardLabel}
             onPress={onDiscard}
-            accessibilityRole="button"
-            style={({ pressed }) => ({
-              flex: 1,
-              height: 44,
-              borderRadius: 22,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: pressed ? 'rgba(20,157,5,0.12)' : 'transparent',
-            })}
-          >
-            <BoldText style={{ fontSize: 15, color: colors.fgAccent }}>
-              {discardLabel}
-            </BoldText>
-          </Pressable>
-          <Pressable
+          />
+          <Button
             testID={`${testID}.save`}
+            variant="primary"
+            title={saveLabel}
             onPress={onSave}
-            accessibilityRole="button"
-            style={({ pressed }) => ({
-              flex: 1,
-              height: 44,
-              borderRadius: 22,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: colors.bgAccent,
-              transform: [{ scale: pressed ? 0.97 : 1 }],
-            })}
-          >
-            <RegText
-              style={{
-                fontSize: 15,
-                color: colors.bgCanvas,
-                fontWeight: '700',
-              }}
-            >
-              {saveLabel}
-            </RegText>
-          </Pressable>
-        </View>
-        <Pressable
-          testID={`${testID}.keep`}
-          onPress={onKeep}
-          accessibilityRole="button"
-          style={{
-            alignSelf: 'center',
-            marginTop: 12,
-            height: 30,
-            paddingHorizontal: 12,
-            justifyContent: 'center',
-          }}
-        >
-          <RegText style={{ fontSize: 12.5, color: colors.fgMuted }}>
-            {keepLabel}
-          </RegText>
-        </Pressable>
+          />
+        </ButtonStack>
       </Animated.View>
     </View>
   );

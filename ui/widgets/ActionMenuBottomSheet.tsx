@@ -1,9 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback } from 'react';
 import { Keyboard, Pressable, View } from 'react-native';
-import { radiusSheet, useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { radiusSheet, useTheme, iconSizeMd } from '@app/theme';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -14,6 +12,7 @@ import {
 import BoldText from '@ui/primitives/BoldText';
 import RegText from '@ui/primitives/RegText';
 import SheetRim from '@ui/primitives/SheetRim';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
 
 export type ActionMenuBottomSheetAction = {
   label: string;
@@ -44,9 +43,11 @@ const ActionMenuBottomSheet = forwardRef<
         disappearsOnIndex={-1}
         appearsOnIndex={0}
         pressBehavior="close"
+        style={{ backgroundColor: colors.bgScrim }}
+        opacity={1}
       />
     ),
-    [],
+    [colors],
   );
 
   const renderHandle = useCallback(
@@ -86,7 +87,7 @@ const ActionMenuBottomSheet = forwardRef<
             hitSlop={8}
             style={{ paddingHorizontal: 14, paddingVertical: 4 }}
           >
-            <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
+            <XIcon size={iconSizeMd} color={colors.fgMuted} />
           </Pressable>
         </View>
       </View>
@@ -143,9 +144,7 @@ const ActionMenuBottomSheet = forwardRef<
             <RegText
               style={{
                 fontSize: 16,
-                color: action.destructive
-                  ? colors.fgDangerEmphasis
-                  : colors.fgDefault,
+                color: action.destructive ? colors.fgDanger : colors.fgDefault,
                 fontWeight: '400',
               }}
             >

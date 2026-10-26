@@ -58,6 +58,8 @@ const CHAIN_ICONS: Record<string, ImageSourcePropType> = {
   XLAYER: require('../../assets/chains/xlayer.png'),
   XLM: require('../../assets/chains/xlm.png'),
   XRP: require('../../assets/chains/xrp.png'),
+  // Ours, not SwapKit's: the one mark in the picker this wallet holds.
+  ZEC: require('../../assets/img/zcash-yellow.png'),
 };
 
 /**

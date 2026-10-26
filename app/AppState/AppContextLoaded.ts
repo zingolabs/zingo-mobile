@@ -15,6 +15,7 @@ import { LanguageEnum } from './enums/LanguageEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
+import { SnackbarActionType } from './types/SnackbarActionType';
 import ValueTransferType from './types/ValueTransferType';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RescanState } from '@app/walletBackend/utils/syncProgress';
@@ -22,6 +23,7 @@ import TransparentAddressClass from './classes/TransparentAddressClass';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import type { SwapDepositArgs } from '@app/walletBackend/modules/TransactionService';
 import type {
   SendOutcome,
   SendPermit,
@@ -90,6 +92,8 @@ export default interface AppContextLoaded {
   transparentPool: boolean;
 
   addLastSnackbar: (message: string, duration?: SnackbarDurationEnum) => void;
+  /** A short toast with one action beside the text, such as Undo. */
+  addActionSnackbar: (message: string, action: SnackbarActionType) => void;
 
   // if the App is stalled - restart is fired
   restartApp: () => void;
@@ -106,6 +110,10 @@ export default interface AppContextLoaded {
     s: SendPageStateClass,
     sendAll?: boolean,
   ) => Promise<SendOutcome<string>>;
+  // A swap deposit: the txids in order, the vault payment last. The resume
+  // transmits the OP_RETURN step of a deposit whose deshield already went out.
+  sendSwapDeposit: (args: SwapDepositArgs) => Promise<string[]>;
+  resumeSwapDeposit: () => Promise<string[]>;
   setServerOption: (
     value: ServerType,
     selectServer: SelectServerEnum,

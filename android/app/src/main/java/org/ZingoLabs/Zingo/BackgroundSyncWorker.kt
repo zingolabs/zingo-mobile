@@ -133,10 +133,18 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
 
                 var syncStatusJson: String = ""
                 try {
-                    // statusSync throws on failure (typed FFI errors); the
-                    // catch below owns the error path, so the status JSON is
-                    // never inspected for an error sentinel.
-                    syncStatusJson = uniffi.zingo.statusSync()
+                    // The session is continuous: it never ends on its own,
+                    // so one that has ended stopped on a failure, which
+                    // pollSync throws.
+                    val poll = uniffi.zingo.pollSync()
+                    if (!poll.lowercase().startsWith("sync task is not complete")) {
+                        Log.i("SCHEDULED_TASK_RUN", "sync ENDED: $poll")
+                        break
+                    }
+                    // syncCaughtUp reads only the engine's published status;
+                    // statusSync would read a stale wallet as complete before
+                    // the engine publishes.
+                    syncStatusJson = uniffi.zingo.syncCaughtUp()
                 } catch (t: Throwable) {
                     Log.i("SCHEDULED_TASK_RUN", "Sync STATUS unknown error: $t")
                     // save the background JSON file
@@ -158,11 +166,10 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
 
                 try {
                     val status = JSONObject(syncStatusJson)
-                    val percent = status.optDouble("percentage_total_outputs_scanned").takeUnless { it.isNaN() }
-                        ?: status.getDouble("percentage_total_blocks_scanned")
+                    val percent = status.optDouble("percent")
 
-                    if (percent >= 100.0) {
-                        Log.i("SCHEDULED_TASK_RUN", "sync COMPLETED %: $percent")
+                    if (status.getBoolean("caught_up")) {
+                        Log.i("SCHEDULED_TASK_RUN", "sync CAUGHT UP %: $percent")
                         break
                     } else {
                         Log.i("SCHEDULED_TASK_RUN", "sync STATUS %: $percent")
@@ -199,6 +206,8 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             return Result.failure()
         }
 
+        stopSyncAndWait()
+
         // save the wallet file with the new data from the sync process
         rpcModule.saveWalletFile()
         Log.i("SCHEDULED_TASK_RUN", "wallet file SAVED")
@@ -234,6 +243,25 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
         rpcModule.saveBackgroundFile(jsonBackgroundOffline)
         Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundOffline")
         return Result.success()
+    }
+
+    // The engine would keep scanning after the worker returns; end it so the
+    // save holds the whole session and nothing runs on behind the app.
+    private fun stopSyncAndWait() {
+        try {
+            uniffi.zingo.stopSync()
+            val deadline = System.currentTimeMillis() + 30 * 1000
+            while (System.currentTimeMillis() < deadline) {
+                val poll = uniffi.zingo.pollSync()
+                if (!poll.lowercase().startsWith("sync task is not complete")) {
+                    return
+                }
+                Thread.sleep(200)
+            }
+            Log.w("SCHEDULED_TASK_RUN", "sync STOP timed out")
+        } catch (t: Throwable) {
+            Log.i("SCHEDULED_TASK_RUN", "sync STOP error: $t")
+        }
     }
 
     private fun loadWalletFile(): Boolean {

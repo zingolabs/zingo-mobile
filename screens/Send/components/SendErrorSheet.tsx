@@ -1,9 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback } from 'react';
-import { Keyboard, Pressable, StyleSheet, View } from 'react-native';
-import { radiusSheet, useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCircleInfo, faXmark } from '@fortawesome/free-solid-svg-icons';
+import TitleBar from '@ui/widgets/TitleBar';
+import Text from '@ui/primitives/Text';
+import { Keyboard, StyleSheet, View } from 'react-native';
+import { radiusSheet, useTheme, iconSizeSm, space12 } from '@app/theme';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -12,11 +12,10 @@ import {
 } from '@gorhom/bottom-sheet';
 
 import { TranslateType } from '@app/AppState';
-import BoldText from '@ui/primitives/BoldText';
-import FadeText from '@ui/primitives/FadeText';
-import RegText from '@ui/primitives/RegText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import SheetRim from '@ui/primitives/SheetRim';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 
 /**
  * Informational sheet that surfaces the raw error(s) returned by the fee
@@ -79,9 +78,11 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
           disappearsOnIndex={-1}
           appearsOnIndex={0}
           pressBehavior="close"
+          style={{ backgroundColor: colors.bgScrim }}
+          opacity={1}
         />
       ),
-      [],
+      [colors],
     );
 
     const renderHandle = useCallback(
@@ -90,40 +91,20 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
           style={{
             paddingTop: 8,
             paddingBottom: 6,
-            paddingHorizontal: 16,
             backgroundColor: colors.bgSurface,
             borderTopLeftRadius: radiusSheet,
             borderTopRightRadius: radiusSheet,
           }}
         >
           <SheetRim />
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
+          <TitleBar
+            title={title}
+            right={{
+              icon: XIcon,
+              accessibilityLabel: title,
+              onPress: dismiss,
             }}
-          >
-            <View style={{ width: 48 }} />
-            <BoldText
-              numberOfLines={1}
-              style={{ flex: 1, textAlign: 'center', color: colors.fgDefault }}
-            >
-              {title}
-            </BoldText>
-            <Pressable
-              onPress={dismiss}
-              accessibilityRole="button"
-              hitSlop={8}
-              style={{ padding: 14 }}
-            >
-              <FontAwesomeIcon
-                icon={faXmark}
-                size={20}
-                color={colors.fgDefault}
-              />
-            </Pressable>
-          </View>
+          />
         </View>
       ),
       [colors, dismiss, title],
@@ -132,7 +113,9 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
     const section = (label: string, message: string) =>
       message ? (
         <View style={{ rowGap: 6 }}>
-          <FadeText style={{ fontSize: 12 }}>{label}</FadeText>
+          <Text variant="caption" tone="muted">
+            {label}
+          </Text>
           <View
             style={[
               styles.infoRow,
@@ -142,21 +125,10 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
               },
             ]}
           >
-            <FontAwesomeIcon
-              icon={faCircleInfo}
-              size={16}
-              color={colors.fgDanger}
-            />
-            <RegText
-              style={{
-                color: colors.fgDefault,
-                flex: 1,
-                marginLeft: 10,
-                fontSize: 13,
-              }}
-            >
+            <InfoIcon size={iconSizeSm} color={colors.fgDanger} />
+            <Text variant="bodySmall" style={{ flex: 1, marginLeft: space12 }}>
               {message}
-            </RegText>
+            </Text>
           </View>
         </View>
       ) : null;
@@ -201,7 +173,7 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
 
           <View style={{ alignItems: 'center', marginTop: 4 }}>
             <Button
-              type={ButtonTypeEnum.Primary}
+              variant="primary"
               title={t('support', 'Support')}
               onPress={onSupportPress}
               testID="send.error.support"

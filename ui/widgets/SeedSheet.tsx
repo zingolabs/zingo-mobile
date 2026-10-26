@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { radiusSheet, useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import {
@@ -11,9 +11,11 @@ import {
 } from '@gorhom/bottom-sheet';
 
 import { TranslateType, WalletType } from '@app/AppState';
+import { formatInteger } from '@app/utils/formatAmount';
 import BoldText from '@ui/primitives/BoldText';
 import RegText from '@ui/primitives/RegText';
 import SheetRim from '@ui/primitives/SheetRim';
+import Button from '@ui/primitives/Button';
 
 const SeedHandle: React.FC = () => {
   const { colors } = useTheme();
@@ -57,12 +59,13 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
           {...props}
           disappearsOnIndex={-1}
           appearsOnIndex={0}
-          opacity={0.62}
           pressBehavior="none"
           onPress={dismiss}
+          style={{ backgroundColor: colors.bgScrim }}
+          opacity={1}
         />
       ),
-      [dismiss],
+      [colors, dismiss],
     );
 
     return (
@@ -89,7 +92,7 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
           }}
         >
           <BoldText
-            style={{ fontSize: 14.5, lineHeight: 20, textAlign: 'center' }}
+            style={{ fontSize: 15, lineHeight: 20, textAlign: 'center' }}
           >
             {
               translate(
@@ -116,10 +119,10 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
                         borderColor: colors.bottomSheetBorder,
                       }}
                     >
-                      <RegText style={{ fontSize: 10, color: colors.fgMuted }}>
+                      <RegText style={{ fontSize: 12, color: colors.fgMuted }}>
                         {String(r * 3 + c + 1)}
                       </RegText>
-                      <RegText style={{ fontSize: 12.5 }} selectable={false}>
+                      <RegText style={{ fontSize: 13 }} selectable={false}>
                         {word}
                       </RegText>
                     </View>
@@ -138,7 +141,7 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
                 borderColor: colors.bottomSheetBorder,
               }}
             >
-              <RegText style={{ fontSize: 12.5 }}>{wallet?.ufvk ?? ''}</RegText>
+              <RegText style={{ fontSize: 13 }}>{wallet?.ufvk ?? ''}</RegText>
             </View>
           )}
           <View
@@ -155,36 +158,19 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
               paddingHorizontal: 15,
             }}
           >
-            <RegText style={{ fontSize: 11, color: colors.fgMuted }}>
+            <RegText style={{ fontSize: 12, color: colors.fgMuted }}>
               {translate('seedsheet.birthday') as string}
             </RegText>
-            <BoldText style={{ fontSize: 12.5 }}>
-              {(wallet?.birthday ?? 0).toLocaleString()}
+            <BoldText style={{ fontSize: 13 }}>
+              {formatInteger(wallet?.birthday ?? 0)}
             </BoldText>
           </View>
-          <Pressable
+          <Button
+            variant="primary"
+            title={translate('seedsheet.done') as string}
             onPress={dismiss}
-            accessibilityRole="button"
-            style={({ pressed }) => ({
-              marginTop: 20,
-              height: 44,
-              borderRadius: 22,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: colors.bgAccent,
-              transform: [{ scale: pressed ? 0.97 : 1 }],
-            })}
-          >
-            <RegText
-              style={{
-                color: colors.bgCanvas,
-                fontSize: 16,
-                fontWeight: '700',
-              }}
-            >
-              {translate('seedsheet.done') as string}
-            </RegText>
-          </Pressable>
+            style={{ marginTop: 20 }}
+          />
         </BottomSheetView>
       </BottomSheetModal>
     );

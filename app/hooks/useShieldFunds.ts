@@ -14,6 +14,7 @@ import { shieldConfirm, shieldPropose } from '@app/walletBackend';
 import type { FfiResult } from '@app/walletBackend';
 import { RPCShieldProposeType } from '@app/walletBackend/types/RPCShieldProposeType';
 import { shieldEnd } from '@app/walletBackend/transforms/sendSettlement';
+import { withSyncStopped } from '@app/walletBackend/utils/syncBracket';
 import { SendPermit } from '@app/walletBackend/transforms/sendPermit';
 import Utils from '@app/utils';
 
@@ -37,6 +38,8 @@ type UseShieldFundsResult = {
   showShieldButton: boolean;
   shieldingFee: number;
   onPressShieldFunds: () => void;
+  /** Shields at once, for a caller that asked in its own sheet. */
+  shieldNow: () => Promise<void>;
   calculateAmountToShield: () => string;
   calculatePoolsToShield: () => string;
   calculateDisableButtonToShield: () => boolean;
@@ -158,8 +161,10 @@ export function useShieldFunds({
     }
 
     navigation.navigate(Route.Computing);
-    await shieldPropose();
-    const shield = await shieldConfirm();
+    const shield = await withSyncStopped(async () => {
+      await shieldPropose();
+      return shieldConfirm();
+    });
 
     setScrollToTop?.(true);
     setScrollToBottom?.(true);
@@ -212,6 +217,7 @@ export function useShieldFunds({
     showShieldButton,
     shieldingFee,
     onPressShieldFunds,
+    shieldNow: handleShieldFunds,
     calculateAmountToShield,
     calculatePoolsToShield,
     calculateDisableButtonToShield,

@@ -21,6 +21,7 @@ import SyncRescanReportIcon from '../../assets/img/options/sync-rescan-report.sv
 import FundsPoolsIcon from '../../assets/img/options/funds-pools.svg';
 import FinancialInsightIcon from '../../assets/img/options/financial-insight.svg';
 import SwitchWalletIcon from '../../assets/img/options/switch-wallet.svg';
+import { themeTokens } from '@app/theme';
 
 const SOCIAL_X_URL = 'https://x.com/ZingoLabs';
 const SOCIAL_GITHUB_URL = 'https://github.com/zingolabs/zingo-mobile';
@@ -204,10 +205,12 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       label: translate('server.title') as string,
       icon: (
         <ServerIcon
+          /** One more than its neighbours: the cylinder sits inside its box with more margin. */
+          size={31}
           noInternet={!netInfo.isConnected}
           unreachable={unreachable}
           offline={isOffline}
-          background="#111c2c"
+          background={themeTokens.bgSurface}
         />
       ),
       onPress: () => dispatch(MenuItemEnum.Server),

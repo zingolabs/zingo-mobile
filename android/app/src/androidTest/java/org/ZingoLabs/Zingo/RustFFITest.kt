@@ -24,7 +24,7 @@ const val OFFLINE_CHAIN_HINT = "regtest"
 /** The connection the instrumented tests open a wallet with. */
 fun testConnection(serverUri: String, chainHint: String): uniffi.zingo.IndexerConnection =
     uniffi.zingo.IndexerConnection(
-        serverUri = serverUri,
+        indexer = indexerChoice(serverUri),
         chainHint = chainHint,
         sync = uniffi.zingo.SyncSettings(performanceLevel = "Medium", minConfirmations = 1u),
     )
@@ -128,7 +128,19 @@ fun syncStatusOrReason(): String =
     runCatching { uniffi.zingo.statusSync() }
         .getOrElse { "status unavailable: ${it.message}" }
 
-/** Launches a sync of [what] and polls it each second to completion, failing with the elapsed time and the sync status at the deadline or on a sync error. */
+/** Whether the running session has reached the chain tip it found. */
+fun sessionCaughtUp(): Boolean =
+    Regex("\"caught_up\":\\s*true").containsMatchIn(uniffi.zingo.syncCaughtUp())
+
+/** Stops the session and polls each second until it has ended. Sync is continuous, so a session never ends on its own. */
+fun stopSyncAndWait() {
+    uniffi.zingo.stopSync()
+    while (uniffi.zingo.pollSync().lowercase().startsWith("sync task is not complete")) {
+        Thread.sleep(1000)
+    }
+}
+
+/** Launches a sync of [what], polls it each second until it reaches the tip and stops it, failing with the elapsed time and the sync status at the deadline or on a sync error. */
 fun syncToCompletion(what: String, deadlineSeconds: Int, elapsedSeconds: () -> Double) {
     val syncJson: String = uniffi.zingo.runSync()
     println("\nSync:")
@@ -136,12 +148,13 @@ fun syncToCompletion(what: String, deadlineSeconds: Int, elapsedSeconds: () -> D
 
     val syncStart = System.nanoTime()
     try {
-        while (!uniffi.zingo.pollSync().contains("sync_complete")) {
+        while (uniffi.zingo.pollSync().lowercase().startsWith("sync task is not complete") && !sessionCaughtUp()) {
             if (elapsedSeconds() > deadlineSeconds) {
                 throw AssertionError("the test passed its $deadlineSeconds s deadline after ${elapsedSeconds()} s while syncing $what: ${syncStatusOrReason()}")
             }
             Thread.sleep(1000)
         }
+        stopSyncAndWait()
     } catch (e: uniffi.zingo.ZingolibException) {
         throw AssertionError("the sync of $what failed after ${elapsedSeconds()} s: ${e.message}: ${syncStatusOrReason()}", e)
     }
@@ -378,9 +391,10 @@ class BuildDescriptorTest {
             .targetContext.getString(R.string.zm_descriptor)
         println("\nBuild descriptor:")
         println("$zingolib-$mobile")
-        val part = """[0-9A-Za-z.+-]+(_[0-9a-f]{5})?(_dirty)?"""
-        assertThat(zingolib).matches("zl_$part")
-        assertThat(mobile).matches("zm_$part")
+        val zingolibPart = """[0-9A-Za-z.+-]+_[0-9a-f]{16}(_dirty)?"""
+        val mobilePart = """[0-9A-Za-z.+-]+(_[0-9a-f]{5})?(_dirty)?"""
+        assertThat(zingolib).matches("zl_$zingolibPart")
+        assertThat(mobile).matches("zm_$mobilePart")
         assertThat(mobile).isNotEqualTo(UNDESCRIBED_BUILD)
     }
 }

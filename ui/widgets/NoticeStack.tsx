@@ -1,6 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { BannerPlainContext } from '@ui/widgets/Banner';
+import { Pressable, View } from 'react-native';
+import Text from '@ui/primitives/Text';
 import Animated, {
   Keyframe,
   ReduceMotion,
@@ -11,7 +13,7 @@ import Animated, {
   WithTimingConfig,
 } from 'react-native-reanimated';
 
-import { useTheme } from '@app/theme';
+import { useTheme, radiusMd, space20, iconSizeSm } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { ChevronDown } from '@ui/primitives/Icons/Chevron';
@@ -35,7 +37,7 @@ const SCALE_STEP = 0.06;
 const OPACITY_STEP = 0.1;
 // Every card is clipped to this radius; a card that draws its own border
 // uses the same one, or the clip cuts the border at the corners.
-export const NOTICE_RADIUS = 14;
+export const NOTICE_RADIUS = radiusMd;
 const RADIUS = NOTICE_RADIUS;
 
 // As the wallet opens, the stack drops in 8 pt once its cards are measured.
@@ -67,7 +69,7 @@ const leave = () =>
       easing: ease.standard,
     },
   })
-    .duration(duration.axis)
+    .duration(duration.sheet)
     .reduceMotion(ReduceMotion.Never);
 
 type Slot = {
@@ -168,7 +170,9 @@ const Card: React.FunctionComponent<{
     >
       <Animated.View style={content}>
         <View onLayout={e => onMeasure(e.nativeEvent.layout.height)}>
-          {children}
+          <BannerPlainContext.Provider value={true}>
+            {children}
+          </BannerPlainContext.Provider>
         </View>
       </Animated.View>
       <Animated.View
@@ -261,7 +265,7 @@ const NoticeStack: React.FunctionComponent<NoticeStackProps> = ({
     <Animated.View
       style={[
         {
-          marginHorizontal: 20,
+          marginHorizontal: space20,
           marginTop: MARGIN_TOP,
           marginBottom: MARGIN_BOTTOM,
         },
@@ -324,11 +328,9 @@ const NoticeStack: React.FunctionComponent<NoticeStackProps> = ({
               }}
             >
               <Text
-                style={{
-                  color: colors.fgMuted,
-                  fontSize: 11,
-                  fontWeight: '700',
-                }}
+                variant="caption"
+                tone="muted"
+                style={{ fontWeight: '700' }}
               >
                 {expanded
                   ? (translate('notices.less') as string)
@@ -339,7 +341,7 @@ const NoticeStack: React.FunctionComponent<NoticeStackProps> = ({
                     ).replace('{n}', String(more))}
               </Text>
               <Animated.View style={chevron}>
-                <ChevronDown size={12} color={colors.fgMuted} />
+                <ChevronDown size={iconSizeSm} color={colors.fgMuted} />
               </Animated.View>
             </Pressable>
           </Animated.View>

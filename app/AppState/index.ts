@@ -33,6 +33,7 @@ import { LanguageEnum } from './enums/LanguageEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
+import type { SnackbarActionType } from './types/SnackbarActionType';
 import { TransactionTypeEnum } from './enums/TransactionTypeEnum';
 import { PoolEnum } from './enums/PoolEnum';
 import { RestoreFromTypeEnum } from './enums/RestoreFromTypeEnum';
@@ -128,6 +129,7 @@ export type {
   BackgroundType,
   BackgroundErrorType,
   TranslateType,
+  SnackbarActionType,
   NetInfoType,
   ServerType,
   ServerUrisType,

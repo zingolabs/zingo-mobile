@@ -3,6 +3,7 @@
  */
 
 import 'react-native';
+import { StackActions } from '@react-navigation/native';
 import React from 'react';
 
 import { fireEvent, render } from '@testing-library/react-native';
@@ -95,9 +96,9 @@ jest.mock('@react-navigation/native', () => {
 
 function renderScreen() {
   const navigate = jest.fn();
-  const reset = jest.fn();
+  const dispatch = jest.fn();
   const props: any = {
-    navigation: { ...mockNavigation, navigate, reset },
+    navigation: { ...mockNavigation, navigate, dispatch },
     route: { key: 'Key-1', name: Route.MeetIronwood, params: undefined },
   };
   const utils = render(
@@ -107,7 +108,7 @@ function renderScreen() {
       <MeetIronwood {...props} />
     </ContextAppLoadedProvider>,
   );
-  return { ...utils, navigate, reset };
+  return { ...utils, navigate, dispatch };
 }
 
 const seenWrites = () =>
@@ -147,7 +148,7 @@ describe('MeetIronwood seen flag', () => {
     // shim. requireActual reaches the same instance the screen imports.
     const { BackHandler } = jest.requireActual('react-native');
     const addEventListener = jest.spyOn(BackHandler, 'addEventListener');
-    const { reset } = renderScreen();
+    const { dispatch } = renderScreen();
 
     const [, onBack] = addEventListener.mock.calls[0];
     (onBack as () => boolean)();
@@ -155,7 +156,7 @@ describe('MeetIronwood seen flag', () => {
     expect(seenWrites()).toEqual([
       [SettingsNameEnum.ironwoodOnboardSeen, true],
     ]);
-    expect(reset).toHaveBeenCalled();
+    expect(dispatch).toHaveBeenCalledWith(StackActions.popTo(Route.Home));
   });
 
   test('is written at most once, however many pages are crossed', () => {
