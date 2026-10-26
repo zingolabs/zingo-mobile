@@ -1,3 +1,4 @@
+/* geometry-gap: exception A, the tab bar */
 import React from 'react';
 import Svg, { Path } from 'react-native-svg';
 import { themeTokens } from '@app/theme';

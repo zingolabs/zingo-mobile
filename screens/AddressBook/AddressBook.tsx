@@ -1,3 +1,4 @@
+/* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useRef, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';

@@ -1,3 +1,4 @@
+/* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import { SnowflakeIcon } from '@ui/primitives/Icons/SnowflakeIcon';
 import { REVEAL_OPEN_MS } from '@ui/widgets/CircularReveal';
