@@ -169,7 +169,7 @@ export default function SwapFlight({
           <Path
             d={LEG_IN}
             fill="none"
-            stroke={nym ? colors.bgNym : NODE_DIM}
+            stroke={nym ? colors.fgNym : NODE_DIM}
             strokeOpacity={nym ? 0.55 : 1}
             strokeWidth={2}
             strokeDasharray={[1, 7]}
@@ -208,6 +208,8 @@ export default function SwapFlight({
           <SwapIcon size={18} color={colors.fgMuted} />
         </View>
         <Text
+          variant="caption"
+          tone="muted"
           numberOfLines={1}
           style={{
             position: 'absolute',
@@ -215,10 +217,7 @@ export default function SwapFlight({
             top: 84,
             width: 100,
             textAlign: 'center',
-            fontSize: 11,
-            lineHeight: 14,
             fontWeight: '600',
-            color: colors.fgMuted,
           }}
         >
           {provider}
@@ -236,13 +235,8 @@ export default function SwapFlight({
           >
             <NymOn width={12} height={12} />
             <Text
-              style={{
-                fontSize: 10,
-                lineHeight: 12,
-                fontWeight: '700',
-                letterSpacing: 0.6,
-                color: colors.bgNym,
-              }}
+              variant="caption"
+              style={{ fontWeight: '700', color: colors.fgNym }}
             >
               NYM
             </Text>

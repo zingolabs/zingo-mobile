@@ -43,7 +43,7 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
       : tone === 'warning'
         ? colors.fgWarning
         : tone === 'nym'
-          ? colors.bgNym
+          ? colors.fgNym
           : colors.fgDefault;
   return (
     <View
@@ -127,7 +127,7 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
               {!!row.badge && (
                 <Text
                   variant="bodySmall"
-                  style={{ fontWeight: '600', color: colors.bgNym }}
+                  style={{ fontWeight: '600', color: colors.fgNym }}
                 >
                   {row.badge}
                 </Text>

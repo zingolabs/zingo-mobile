@@ -709,7 +709,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                 marginVertical: 15,
               }}
             >
-              <BoldText style={{ color: colors.bgNym }}>
+              <BoldText style={{ color: colors.fgNym }}>
                 {translate('settings.nym-network') as string}
               </BoldText>
               <ChevronRight size={16} color={colors.fgMuted} />
