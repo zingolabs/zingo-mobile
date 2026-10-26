@@ -1,13 +1,14 @@
 name: Gradle cache
 description: >
   Sets up Gradle with the one Gradle cache entry that every Gradle job
-  shares. Each job restores the entry, and the job that passes writer saves
-  it. The one writer is the APK build of a push to the default branch,
-  which ci.yaml selects.
+  shares, and restores the NDK that the Android Gradle Plugin would
+  otherwise download during configuration. Each job restores both
+  entries, and the job that passes writer saves them. The one writer is
+  the APK build of a push to the default branch, which ci.yaml selects.
 
 inputs:
   writer:
-    description: Whether this job saves the Gradle cache.
+    description: Whether this job saves the Gradle cache and the NDK cache.
     required: false
     default: 'false'
 
@@ -25,3 +26,41 @@ runs:
       uses: gradle/actions/setup-gradle@v6
       with:
         cache-read-only: ${{ inputs.writer != 'true' }}
+
+    # The Android Gradle Plugin installs the NDK that android/build.gradle.kts
+    # pins into $ANDROID_HOME/ndk/<version> while it configures :app, which
+    # every Gradle job does, and the runner image ships other versions. The
+    # download is one more network dependency on the verdict path; a corrupt
+    # archive failed a run on 2026-10-22. The cache keeps the installed
+    # directory under a key that names the version, so a miss happens once
+    # per version, on the writer.
+    - name: Name the NDK directory
+      shell: bash
+      run: |
+        version="$(sed -n 's/.*set("ndkVersion", "\([^"]*\)").*/\1/p' android/build.gradle.kts)"
+        if [ -z "$version" ]; then
+          echo "::error::android/build.gradle.kts pins no ndkVersion"
+          exit 1
+        fi
+        if [ -z "$ANDROID_HOME" ]; then
+          echo "::error::the runner sets no ANDROID_HOME"
+          exit 1
+        fi
+        echo "NDK_CACHE_KEY=ndk-v1-${RUNNER_OS}-${RUNNER_ARCH}-${version}" >> "$GITHUB_ENV"
+        echo "NDK_CACHE_PATH=${ANDROID_HOME}/ndk/${version}" >> "$GITHUB_ENV"
+
+    # The combined action saves in its post step, after the job's Gradle
+    # invocations installed the NDK. The restore-only action never saves.
+    - name: NDK cache (writer)
+      if: ${{ inputs.writer == 'true' }}
+      uses: actions/cache@v6
+      with:
+        path: ${{ env.NDK_CACHE_PATH }}
+        key: ${{ env.NDK_CACHE_KEY }}
+
+    - name: NDK cache (reader)
+      if: ${{ inputs.writer != 'true' }}
+      uses: actions/cache/restore@v6
+      with:
+        path: ${{ env.NDK_CACHE_PATH }}
+        key: ${{ env.NDK_CACHE_KEY }}
