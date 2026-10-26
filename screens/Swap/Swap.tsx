@@ -255,7 +255,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     form.isOutbound &&
     mixnetView.kind === 'transport' &&
     mixnetView.sendBlocked;
-  const ctaEnabled = form.cta === 'ready' || form.cta === 'insufficient';
+  const ctaEnabled = form.cta === 'ready';
   // The review answers under one request: cancelled, done, or a refusal
   // with its provider and reason, which takes the route off the list.
   useResult('swap.contact', address => form.setActiveAddress(address));
@@ -274,10 +274,6 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
   const openRecord = (recordId: string, status: SwapStatusEnum) =>
     navigation.navigate(swapScreenFor(status), { recordId });
   const onContinue = () => {
-    if (form.cta === 'insufficient') {
-      insufficientSheetRef.current?.present();
-      return;
-    }
     const proceed = () => {
       const review = form.review();
       if (review) {
@@ -541,6 +537,43 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                   >
                     {translate('swap.over-balance') as string}
                   </Text>
+                </View>
+              )}
+
+              {/* The button says what is missing and stays off; the why
+                  (the fee on top of the amount, and what would fit) waits
+                  behind a link, in its sheet. */}
+              {form.cta === 'insufficient' && (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    columnGap: 8,
+                  }}
+                >
+                  <InfoIcon size={iconSizeSm} color={colors.fgDanger} />
+                  <Text
+                    variant="bodySmall"
+                    tone="danger"
+                    style={{ flexShrink: 1 }}
+                  >
+                    {translate('swap.insufficient-title') as string}
+                  </Text>
+                  <Pressable
+                    testID="swap.insufficient-why"
+                    accessibilityRole="button"
+                    hitSlop={space8}
+                    onPress={() => insufficientSheetRef.current?.present()}
+                    style={{ marginLeft: 'auto' }}
+                  >
+                    <Text
+                      variant="caption"
+                      tone="danger"
+                      style={{ fontWeight: '700' }}
+                    >
+                      {translate('swap.see-why') as string}
+                    </Text>
+                  </Pressable>
                 </View>
               )}
 
