@@ -12,7 +12,8 @@ import Animated, {
 import Svg, { Path, Rect, Text as SvgText } from 'react-native-svg';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { useTheme } from '@app/theme';
+import { iconSize, slopFor, space12, useTheme } from '@app/theme';
+import AppText from '@ui/primitives/Text';
 import { ease } from '@app/theme/motion';
 import { SnackbarDurationEnum } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
@@ -29,7 +30,6 @@ import Utils from '@app/utils';
 import { formatInteger } from '@app/utils/formatAmount';
 import CircularProgress from '@ui/primitives/CircularProgress';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
-import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import Header from '@ui/widgets/Header';
 import { BanIcon } from '@ui/primitives/Icons/BanIcon';
 import { BlocksIcon } from '@ui/primitives/Icons/BlocksIcon';
@@ -108,7 +108,7 @@ const LEGEND: { state: CellState; key: string }[] = [
 const RING = 76;
 const RING_STROKE = 6.5;
 const TURN_MS = 700;
-const RESCAN_ICON = 25;
+const RESCAN_ICON = iconSize;
 /**
  * The arrows' centre, (25.33, 23.33) on the icon's 32 grid, from the icon's
  * centre. The turn moves there, rotates and moves back: a percentage
@@ -405,62 +405,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
       style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}
     >
       <Header
-        title={''}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        noPrivacy={true}
-        noUfvkIcon={true}
-      />
-      <View
-        style={{
-          height: 44,
-          marginTop: 6,
-          zIndex: 3,
-          marginBottom: 10,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Pressable
-          testID="syncreport.back"
-          accessibilityRole="button"
-          accessibilityLabel={translate('sync.back-acc') as string}
-          onPress={() => navigation.goBack()}
-          style={({ pressed }) => ({
-            position: 'absolute',
-            left: 10,
-            width: 44,
-            height: 44,
-            borderRadius: 12,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
-          })}
-        >
-          <ChevronLeft size={24} color={colors.fgAccent} />
-        </Pressable>
-        <Text
-          accessibilityRole="header"
-          style={{ color: colors.fgDefault, fontSize: 18, fontWeight: '700' }}
-        >
-          {translate('sync.title') as string}
-        </Text>
-        <View
-          pointerEvents="box-none"
-          style={{
-            position: 'absolute',
-            left: 16,
-            right: 54,
-            top: 0,
-            bottom: 0,
-            justifyContent: 'center',
-            zIndex: 3,
-          }}
-        >
+        title={translate('sync.title') as string}
+        titleElement={
           <InfoTooltip
             testID="syncreport.info"
-            alignEnd
             below
             label={translate('sync.info-acc') as string}
             title={translate('sync.tip-title') as string}
@@ -468,46 +416,50 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             open={tip}
             onToggle={setTip}
           >
-            <View />
+            <AppText variant="barTitle" numberOfLines={1}>
+              {translate('sync.title') as string}
+            </AppText>
           </InfoTooltip>
-        </View>
-        <Pressable
-          testID="syncreport.rescan"
-          accessibilityRole="button"
-          accessibilityLabel={translate('sync.rescan-acc') as string}
-          onPress={openRescan}
-          style={({ pressed }) => ({
-            position: 'absolute',
-            right: 10,
-            width: 44,
-            height: 44,
-            borderRadius: 12,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
-          })}
-        >
-          <Animated.View
-            style={[{ width: RESCAN_ICON, height: RESCAN_ICON }, rescanStyle]}
+        }
+        closeScreen={() => navigation.goBack()}
+        backTestID="syncreport.back"
+        backAccessibilityLabel={translate('sync.back-acc') as string}
+        right={
+          <Pressable
+            testID="syncreport.rescan"
+            accessibilityRole="button"
+            accessibilityLabel={translate('sync.rescan-acc') as string}
+            onPress={openRescan}
+            hitSlop={slopFor(RESCAN_ICON)}
+            style={{ paddingHorizontal: space12 }}
           >
-            <RescanCloud size={RESCAN_ICON} color={colors.fgMuted} />
             <Animated.View
-              style={[
-                {
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
-                  width: RESCAN_ICON,
-                  height: RESCAN_ICON,
-                },
-                arrowsStyle,
-              ]}
+              style={[{ width: RESCAN_ICON, height: RESCAN_ICON }, rescanStyle]}
             >
-              <RescanArrows size={RESCAN_ICON} color={colors.fgAccent} />
+              <RescanCloud size={RESCAN_ICON} color={colors.fgMuted} />
+              <Animated.View
+                style={[
+                  {
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    width: RESCAN_ICON,
+                    height: RESCAN_ICON,
+                  },
+                  arrowsStyle,
+                ]}
+              >
+                <RescanArrows size={RESCAN_ICON} color={colors.fgAccent} />
+              </Animated.View>
             </Animated.View>
-          </Animated.View>
-        </Pressable>
-      </View>
+          </Pressable>
+        }
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+        noUfvkIcon={true}
+      />
 
       <ScrollView
         testID="syncreport.scroll-view"
