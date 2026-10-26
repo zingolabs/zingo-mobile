@@ -174,7 +174,11 @@ export function WalletNavigator() {
           component={AddressList}
           options={PANEL}
         />
-        <Stack.Screen name={Route.Messages} component={MessageList} />
+        <Stack.Screen
+          name={Route.Messages}
+          component={MessageList}
+          options={PANEL}
+        />
         <Stack.Screen
           name={Route.Confirm}
           component={Confirm}

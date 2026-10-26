@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import Animated, {
   ReduceMotion,
   useAnimatedStyle,
@@ -12,7 +12,23 @@ import Animated, {
 import Svg, { Path, Rect, Text as SvgText } from 'react-native-svg';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { useTheme } from '@app/theme';
+import {
+  iconSize,
+  iconSizeMd,
+  radiusMd,
+  radiusPill,
+  radiusSm,
+  slopFor,
+  space4,
+  space8,
+  space12,
+  space16,
+  space20,
+  space32,
+  textVariants,
+  useTheme,
+} from '@app/theme';
+import Text from '@ui/primitives/Text';
 import { ease } from '@app/theme/motion';
 import { SnackbarDurationEnum } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
@@ -29,7 +45,6 @@ import Utils from '@app/utils';
 import { formatInteger } from '@app/utils/formatAmount';
 import CircularProgress from '@ui/primitives/CircularProgress';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
-import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import Header from '@ui/widgets/Header';
 import { BanIcon } from '@ui/primitives/Icons/BanIcon';
 import { BlocksIcon } from '@ui/primitives/Icons/BlocksIcon';
@@ -53,7 +68,7 @@ import {
 } from '@screens/SyncReport/syncModel';
 import { themeTokens } from '@app/theme';
 
-const SIDE = 21.5;
+const SIDE = space20;
 const SOFT_INK = themeTokens.fgMuted;
 const CODE_INK = themeTokens.fgDefault;
 const AXIS_INK = themeTokens.fgMuted;
@@ -95,7 +110,7 @@ const BG_INK: Record<BackgroundOutcome, string> = {
   interrupted: AMBER,
 };
 
-const BG_ICON = 18;
+const BG_ICON = iconSizeMd;
 
 const LEGEND: { state: CellState; key: string }[] = [
   { state: 'scanned', key: 'sync.legend-scanned' },
@@ -108,7 +123,7 @@ const LEGEND: { state: CellState; key: string }[] = [
 const RING = 76;
 const RING_STROKE = 6.5;
 const TURN_MS = 700;
-const RESCAN_ICON = 25;
+const RESCAN_ICON = iconSize;
 /**
  * The arrows' centre, (25.33, 23.33) on the icon's 32 grid, from the icon's
  * centre. The turn moves there, rotates and moves back: a percentage
@@ -253,9 +268,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   };
 
   const card = {
-    marginTop: 12,
-    padding: 16,
-    borderRadius: 16,
+    marginTop: space12,
+    padding: space16,
+    borderRadius: radiusMd,
     borderWidth: 1,
     borderColor: colors.bottomSheetBorder,
     backgroundColor: colors.bgSurface,
@@ -266,15 +281,13 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 10,
+        marginBottom: space8,
       }}
     >
-      <Text
-        style={{ color: colors.fgDefault, fontSize: 15, fontWeight: '700' }}
-      >
-        {title}
+      <Text variant="bodyStrong">{title}</Text>
+      <Text variant="caption" tone="muted">
+        {note}
       </Text>
-      <Text style={{ color: SOFT_INK, fontSize: 12 }}>{note}</Text>
     </View>
   );
 
@@ -337,14 +350,14 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const startText = translate('sync.sheet-start') as string;
   const [startBefore, startAfter] = startText.split('{n}');
   const rescanRows = (
-    <View style={{ marginTop: 10 }}>
+    <View style={{ marginTop: space8 }}>
       {[
         {
           icon: <BlocksIcon color={colors.fgMuted} />,
           text: (
-            <Text>
+            <Text variant="bodySmall">
               {startBefore}
-              <Text style={{ fontWeight: '700' }}>
+              <Text variant="bodySmall" style={{ fontWeight: '700' }}>
                 {formatInteger(birthday)}
               </Text>
               {startAfter}
@@ -365,18 +378,18 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 12,
-            paddingVertical: 13,
-            paddingHorizontal: 4,
+            gap: space12,
+            paddingVertical: space12,
+            paddingHorizontal: space4,
             borderTopWidth: i === 0 ? 0 : 1,
             borderTopColor: colors.bottomSheetBorder,
           }}
         >
           <View
             style={{
-              width: 32,
-              height: 32,
-              borderRadius: 9,
+              width: 36,
+              height: 36,
+              borderRadius: radiusSm,
               backgroundColor: TILE_BG,
               alignItems: 'center',
               justifyContent: 'center',
@@ -384,14 +397,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           >
             {row.icon}
           </View>
-          <Text
-            style={{
-              flex: 1,
-              color: colors.fgDefault,
-              fontSize: 12,
-              lineHeight: 17,
-            }}
-          >
+          <Text variant="bodySmall" style={{ flex: 1 }}>
             {row.text}
           </Text>
         </View>
@@ -405,62 +411,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
       style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}
     >
       <Header
-        title={''}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        noPrivacy={true}
-        noUfvkIcon={true}
-      />
-      <View
-        style={{
-          height: 44,
-          marginTop: 6,
-          zIndex: 3,
-          marginBottom: 10,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Pressable
-          testID="syncreport.back"
-          accessibilityRole="button"
-          accessibilityLabel={translate('sync.back-acc') as string}
-          onPress={() => navigation.goBack()}
-          style={({ pressed }) => ({
-            position: 'absolute',
-            left: 10,
-            width: 44,
-            height: 44,
-            borderRadius: 12,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
-          })}
-        >
-          <ChevronLeft size={24} color={colors.fgAccent} />
-        </Pressable>
-        <Text
-          accessibilityRole="header"
-          style={{ color: colors.fgDefault, fontSize: 18, fontWeight: '700' }}
-        >
-          {translate('sync.title') as string}
-        </Text>
-        <View
-          pointerEvents="box-none"
-          style={{
-            position: 'absolute',
-            left: 16,
-            right: 54,
-            top: 0,
-            bottom: 0,
-            justifyContent: 'center',
-            zIndex: 3,
-          }}
-        >
+        title={translate('sync.title') as string}
+        titleElement={
           <InfoTooltip
             testID="syncreport.info"
-            alignEnd
             below
             label={translate('sync.info-acc') as string}
             title={translate('sync.tip-title') as string}
@@ -468,51 +422,58 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             open={tip}
             onToggle={setTip}
           >
-            <View />
+            <Text variant="barTitle" numberOfLines={1}>
+              {translate('sync.title') as string}
+            </Text>
           </InfoTooltip>
-        </View>
-        <Pressable
-          testID="syncreport.rescan"
-          accessibilityRole="button"
-          accessibilityLabel={translate('sync.rescan-acc') as string}
-          onPress={openRescan}
-          style={({ pressed }) => ({
-            position: 'absolute',
-            right: 10,
-            width: 44,
-            height: 44,
-            borderRadius: 12,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
-          })}
-        >
-          <Animated.View
-            style={[{ width: RESCAN_ICON, height: RESCAN_ICON }, rescanStyle]}
+        }
+        closeScreen={() => navigation.goBack()}
+        backTestID="syncreport.back"
+        backAccessibilityLabel={translate('sync.back-acc') as string}
+        right={
+          <Pressable
+            testID="syncreport.rescan"
+            accessibilityRole="button"
+            accessibilityLabel={translate('sync.rescan-acc') as string}
+            onPress={openRescan}
+            hitSlop={slopFor(RESCAN_ICON)}
+            style={{ paddingHorizontal: space12 }}
           >
-            <RescanCloud size={RESCAN_ICON} color={colors.fgMuted} />
             <Animated.View
-              style={[
-                {
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
-                  width: RESCAN_ICON,
-                  height: RESCAN_ICON,
-                },
-                arrowsStyle,
-              ]}
+              style={[{ width: RESCAN_ICON, height: RESCAN_ICON }, rescanStyle]}
             >
-              <RescanArrows size={RESCAN_ICON} color={colors.fgAccent} />
+              <RescanCloud size={RESCAN_ICON} color={colors.fgMuted} />
+              <Animated.View
+                style={[
+                  {
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    width: RESCAN_ICON,
+                    height: RESCAN_ICON,
+                  },
+                  arrowsStyle,
+                ]}
+              >
+                <RescanArrows size={RESCAN_ICON} color={colors.fgAccent} />
+              </Animated.View>
             </Animated.View>
-          </Animated.View>
-        </Pressable>
-      </View>
+          </Pressable>
+        }
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+        noUfvkIcon={true}
+      />
 
       <ScrollView
         testID="syncreport.scroll-view"
         onTouchStart={() => tip && setTip(false)}
-        contentContainerStyle={{ paddingHorizontal: SIDE, paddingBottom: 28 }}
+        contentContainerStyle={{
+          paddingHorizontal: SIDE,
+          paddingBottom: space32,
+        }}
       >
         <View
           style={[
@@ -521,16 +482,16 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               marginTop: 0,
               flexDirection: 'row',
               alignItems: 'center',
-              gap: 16,
+              gap: space16,
             },
           ]}
         >
-          <View style={{ margin: -10 }}>
+          <View>
             <CircularProgress
               size={RING}
               strokeWidth={RING_STROKE}
               bgColor={TRACK}
-              pgColor={synced ? GREEN : AMBER}
+              pgColor={synced ? GREEN : colors.fgSyncing}
               textSize={14}
               textColor={colors.fgDefault}
               textWeight="bold"
@@ -539,30 +500,16 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             />
           </View>
           <View style={{ flex: 1, minWidth: 0 }}>
-            <Text
-              testID="syncreport.status"
-              style={{
-                color: colors.fgDefault,
-                fontSize: 15,
-                fontWeight: '600',
-              }}
-            >
+            <Text testID="syncreport.status" variant="bodyStrong">
               {status}
             </Text>
-            <Text
-              style={{
-                marginTop: 2,
-                color: SOFT_INK,
-                fontSize: 12,
-                lineHeight: 16,
-              }}
-            >
+            <Text variant="bodySmall" tone="muted">
               {sub}
             </Text>
           </View>
         </View>
 
-        <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+        <View style={{ flexDirection: 'row', gap: space8, marginTop: space12 }}>
           {[
             { key: 'sync.server', dot: BLUE, value: h.server },
             { key: 'sync.wallet', dot: GREEN, value: h.wallet },
@@ -571,7 +518,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             <View
               key={t.key}
               testID={`syncreport.${t.key.split('.')[1]}`}
-              style={[card, { flex: 1, marginTop: 0, padding: 12 }]}
+              style={[card, { flex: 1, marginTop: 0, padding: space12 }]}
             >
               <View
                 style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
@@ -580,21 +527,17 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                   style={{
                     width: 8,
                     height: 8,
-                    borderRadius: 3,
+                    borderRadius: radiusPill,
                     backgroundColor: t.dot,
                   }}
                 />
-                <Text style={{ color: SOFT_INK, fontSize: 12 }}>
+                <Text variant="caption" tone="muted">
                   {translate(t.key) as string}
                 </Text>
               </View>
               <Text
-                style={{
-                  marginTop: 6,
-                  color: colors.fgDefault,
-                  fontSize: 13,
-                  fontWeight: '700',
-                }}
+                variant="bodySmall"
+                style={{ marginTop: space4, fontWeight: '700' }}
               >
                 {formatInteger(t.value)}
               </Text>
@@ -624,7 +567,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                 key={v}
                 x={i === 0 ? 0 : x(v)}
                 y={12}
-                fontSize={10}
+                fontSize={textVariants.caption.fontSize}
                 fill={AXIS_INK}
                 textAnchor={i === 0 ? 'start' : 'middle'}
               >
@@ -645,7 +588,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             <SvgText
               x={birthdayLeft ? x0 + 5 : x0 - 5}
               y={58}
-              fontSize={10}
+              fontSize={textVariants.caption.fontSize}
               fill={CODE_INK}
               textAnchor={birthdayLeft ? 'start' : 'end'}
             >
@@ -657,7 +600,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             <SvgText
               x={xTip - 5}
               y={76}
-              fontSize={10}
+              fontSize={textVariants.caption.fontSize}
               fill={CODE_INK}
               textAnchor="end"
             >
@@ -701,9 +644,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             style={{
               flexDirection: 'row',
               flexWrap: 'wrap',
-              rowGap: 6,
-              columnGap: 14,
-              marginTop: 12,
+              rowGap: space4,
+              columnGap: space12,
+              marginTop: space12,
             }}
           >
             {LEGEND.map(l => (
@@ -715,11 +658,11 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                   style={{
                     width: 8,
                     height: 8,
-                    borderRadius: 3,
+                    borderRadius: radiusPill,
                     backgroundColor: CELL_COLOR[l.state],
                   }}
                 />
-                <Text style={{ color: SOFT_INK, fontSize: 12 }}>
+                <Text variant="caption" tone="muted">
                   {translate(l.key) as string}
                 </Text>
               </View>
@@ -737,39 +680,30 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               {
                 flexDirection: 'row',
                 alignItems: 'center',
-                gap: 12,
-                paddingVertical: 14,
+                gap: space12,
+                paddingVertical: space12,
               },
             ]}
           >
             {bgIcon[bgOutcome]}
             <View style={{ flex: 1, minWidth: 0 }}>
-              <Text
-                style={{
-                  color: colors.fgDefault,
-                  fontSize: 13,
-                  lineHeight: 18,
-                  fontWeight: '600',
-                }}
-              >
+              <Text variant="bodySmall" style={{ fontWeight: '600' }}>
                 {translate('sync.last-background') as string}
               </Text>
-              <Text style={{ color: SOFT_INK, fontSize: 12, lineHeight: 16 }}>
+              <Text variant="caption" tone="muted">
                 {bgWhen}
               </Text>
               {!!backgroundSyncInfo.message && (
-                <Text style={{ color: SOFT_INK, fontSize: 12, lineHeight: 16 }}>
+                <Text variant="caption" tone="muted">
                   {backgroundSyncInfo.message}
                 </Text>
               )}
             </View>
             <Text
               testID="syncreport.background-outcome"
-              style={{
-                color: BG_INK[bgOutcome],
-                fontSize: 12,
-                fontWeight: '600',
-              }}
+              variant="caption"
+              color={BG_INK[bgOutcome]}
+              style={{ fontWeight: '600' }}
             >
               {translate(bgLabel) as string}
             </Text>
