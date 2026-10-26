@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import { BUTTON_HEIGHT } from '@ui/primitives/Button';
+import Button, { BUTTON_HEIGHT } from '@ui/primitives/Button';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
@@ -22,7 +22,6 @@ import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
 import { ContextAppLoading } from '@app/context';
 import SeedPhraseInput from '@ui/widgets/SeedPhraseInput';
-import BusyButton from '@ui/widgets/BusyButton';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
 import { RevealOrigin } from '@ui/widgets/CircularReveal';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
@@ -455,17 +454,15 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
         }}
       >
         <View style={{ width: BUTTON_WIDTH }}>
-          <BusyButton
+          <Button
+            variant="primary"
             testID="import.button.ok"
             title={translate('import.submit') as string}
-            enabled={keyReady}
+            disabled={!keyReady}
             busy={busy}
             onPress={() => {
               okButton();
             }}
-            onDisabledPress={() =>
-              addLastSnackbar(translate('import.need-words') as string)
-            }
           />
         </View>
       </View>

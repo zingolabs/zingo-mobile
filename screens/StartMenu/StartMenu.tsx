@@ -15,7 +15,7 @@ import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
 import { formatInteger } from '@app/utils/formatAmount';
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
-import BusyButton from '@ui/widgets/BusyButton';
+import Button from '@ui/primitives/Button';
 import ServerIcon from '@ui/widgets/ServerIcon';
 import { ease } from '@app/theme/motion';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
@@ -177,14 +177,12 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
 
   const pill = (title: string, onPress: () => void, testID: string) => (
     <View style={{ width: PILL_WIDTH }}>
-      <BusyButton
+      <Button
+        variant="primary"
         testID={testID}
         title={title}
-        labelSize={16}
-        enabled={true}
         busy={busyFor(testID)}
         onPress={press(testID, onPress)}
-        onDisabledPress={() => {}}
       />
     </View>
   );
@@ -399,15 +397,13 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             )}`}
           </RegText>
           <View style={{ marginTop: 12 }}>
-            <BusyButton
+            <Button
+              variant="primary"
+              size="small"
               testID="loadingapp.importthis"
               title={translate('loadingapp.import-this') as string}
-              labelSize={11}
-              height={30}
-              enabled={true}
               busy={busyFor('loadingapp.importthis')}
               onPress={press('loadingapp.importthis', importRecoveryWallet)}
-              onDisabledPress={() => {}}
             />
           </View>
           <View style={{ alignItems: 'center', marginTop: 6 }}>
