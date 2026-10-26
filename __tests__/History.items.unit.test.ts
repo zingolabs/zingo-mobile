@@ -245,3 +245,22 @@ test('Tests that a finished sale is titled with the contact name when its addres
   expect(text.title).toBe('Marta');
   expect(text.line).toBe('history.swapped-to BTC · MayaChain · Oct 2');
 });
+
+test('Tests that a purchase whose payment the provider saw reads payment detected while a sale in flight reads swapping', () => {
+  const seen = swapRowText({
+    record: record({
+      direction: SwapDirectionEnum.Inbound,
+      status: SwapStatusEnum.Pending,
+    }),
+    when: 'Oct 2',
+    t,
+  });
+  expect(seen.state?.text).toBe('history.state-payment-detected');
+
+  const sale = swapRowText({
+    record: record({ status: SwapStatusEnum.Pending }),
+    when: 'Oct 2',
+    t,
+  });
+  expect(sale.state?.text).toBe('history.state-swapping');
+});

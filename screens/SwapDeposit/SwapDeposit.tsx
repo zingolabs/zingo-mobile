@@ -17,8 +17,10 @@ import {
   SwapDirectionEnum,
   SwapStatusEnum,
   depositDeadlineMs,
+  depositHalfwayMs,
   isTerminalStatus,
 } from '@app/swap';
+import Utils from '@app/utils';
 import { leaveFlow } from '@app/navigation/navigate';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
@@ -42,16 +44,18 @@ const AFTER_DESHIELD = 'send after deshield';
 
 /**
  * The deposit a swap waits for. Buying ZEC, it is paid from the other wallet:
- * the slip says where, how much and with what memo, and the user says when
- * it is sent or hands over its hash. Selling ZEC, this screen appears only
- * when the wallet's own broadcast failed, with the way to try again.
+ * the time left to pay comes first, then the slip says where, how much and
+ * with what memo, and the user says when it is sent. Opened again from the
+ * tracking, the slip is read-only and the arrow goes back there. Selling
+ * ZEC, this screen appears only when the wallet's own broadcast failed, with
+ * the way to try again.
  */
 const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   navigation,
   route,
 }) => {
   const { recordId, broadcastError } = route.params;
-  const { translate, sendSwapDeposit, resumeSwapDeposit } =
+  const { translate, language, sendSwapDeposit, resumeSwapDeposit } =
     useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const swapService = useSwapService();
@@ -253,42 +257,68 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
     );
   }
 
+  const toTracking = () => navigation.replace(Route.SwapTracking, { recordId });
+  const sent = record.depositSentAtMs !== undefined;
+  const pastHalf = nowMs >= depositHalfwayMs(record);
+  const timeColor = pastHalf ? colors.fgWarning : colors.fgMuted;
+
   return (
     <SwapFlowScreen
       testID="swap.deposit"
       title={translate('swap.deposit-title') as string}
+      onBack={sent ? toTracking : undefined}
       footer={
-        <View style={{ rowGap: space8 }}>
-          <Button
-            testID="swap.deposit.sent"
-            variant="primary"
-            title={translate('swap.deposit-sent') as string}
-            onPress={() => navigation.replace(Route.SwapTracking, { recordId })}
-          />
-          <Text variant="caption" tone="muted" style={{ textAlign: 'center' }}>
-            {translate('swap.deposit-leave-note') as string}
-          </Text>
-        </View>
+        sent ? undefined : (
+          <View style={{ rowGap: space8 }}>
+            <Button
+              testID="swap.deposit.sent"
+              variant="primary"
+              title={translate('swap.deposit-sent') as string}
+              onPress={async () => {
+                await swapService
+                  ?.markDepositSent({ recordId })
+                  .catch(e =>
+                    console.log(`SwapDeposit: markDepositSent failed ${e}`),
+                  );
+                toTracking();
+              }}
+            />
+            <Text
+              variant="caption"
+              tone="muted"
+              style={{ textAlign: 'center' }}
+            >
+              {translate('swap.deposit-leave-note') as string}
+            </Text>
+          </View>
+        )
       }
     >
-      <DepositSlip record={record} />
       <View
+        testID="swap.deposit.time"
         style={{
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
           columnGap: 8,
-          marginTop: 16,
+          marginBottom: 16,
         }}
       >
-        <ClockIcon size={iconSizeSm} color={colors.fgMuted} />
-        <Text variant="caption" tone="muted" style={{ flexShrink: 1 }}>
-          {(translate('swap.deposit-time-left') as string).replace(
-            '{time}',
-            countdownText(remainingMs),
-          )}
+        <ClockIcon size={iconSizeSm} color={timeColor} />
+        <Text
+          variant="caption"
+          tone={pastHalf ? 'warning' : 'muted'}
+          style={{ flexShrink: 1, fontVariant: ['tabular-nums'] }}
+        >
+          {(translate('swap.deposit-time-left') as string)
+            .replace('{time}', countdownText(remainingMs))
+            .replace(
+              '{clock}',
+              Utils.formatDate(deadlineMs, 'h:mm aaa', language),
+            )}
         </Text>
       </View>
+      <DepositSlip record={record} />
     </SwapFlowScreen>
   );
 };

@@ -24,8 +24,11 @@ export {
   DEPOSIT_WINDOW_MS,
   awaitsDeposit,
   depositDeadlineMs,
+  depositHalfwayMs,
   depositOverdue,
+  depositPhase,
 } from './depositDeadline';
+export type { DepositPhase } from './depositDeadline';
 
 export type { DepositInstructionsType } from './types/DepositInstructionsType';
 export type { FiatValueBasisType } from './types/FiatValueBasisType';

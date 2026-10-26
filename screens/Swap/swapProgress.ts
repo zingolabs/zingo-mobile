@@ -1,22 +1,41 @@
+import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
 import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
 
-/** The three steps a swap walks, as the tracking screen draws them. */
-export const SWAP_STEP_COUNT = 3;
+type Progress = { direction: SwapDirectionEnum; status: SwapStatusEnum };
 
 /**
- * Which step a status sits on: 0 while the deposit is on its way, 1 while
- * the provider swaps, 2 once it paid out. A step is `done` below the current
- * one, `now` at it, and `next` above it.
+ * The steps a swap walks, as the tracking screen draws them. A sale has
+ * three: the ZEC leaves, the provider swaps, it pays out. A purchase has
+ * four: the payment is awaited, then seen, then swapped, then the ZEC lands.
  */
-export function swapStepIndex(status: SwapStatusEnum): number {
+export function swapStepKeys(direction: SwapDirectionEnum): string[] {
+  return direction === SwapDirectionEnum.Outbound
+    ? ['swap.step-sell-1', 'swap.step-sell-2', 'swap.step-sell-3']
+    : [
+        'swap.step-buy-1',
+        'swap.step-buy-2',
+        'swap.step-buy-3',
+        'swap.step-buy-4',
+      ];
+}
+
+/**
+ * Which step a swap sits on. A step is `done` below the current one, `now`
+ * at it, and `next` above it; a completed swap sits past the last.
+ */
+export function swapStepIndex({ direction, status }: Progress): number {
+  const count = swapStepKeys(direction).length;
+  if (status === SwapStatusEnum.Completed) return count;
+  if (direction === SwapDirectionEnum.Outbound) {
+    return status === SwapStatusEnum.PendingDeposit ? 0 : 1;
+  }
   switch (status) {
-    case SwapStatusEnum.PendingDeposit:
     case SwapStatusEnum.AwaitingExternalDeposit:
       return 0;
-    case SwapStatusEnum.Completed:
-      return SWAP_STEP_COUNT;
-    default:
+    case SwapStatusEnum.Pending:
       return 1;
+    default:
+      return 2;
   }
 }
 

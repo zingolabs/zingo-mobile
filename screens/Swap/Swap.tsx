@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useMemo, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import TitleBar from '@ui/widgets/TitleBar';
 import {
@@ -25,6 +25,7 @@ import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import { HomeTabScreenProps } from '@app/types';
 import { ContextAppLoaded, useSwapRecords, useSwapService } from '@app/context';
 import {
+  awaitsDeposit,
   canonicalChainAddress,
   formatAmountForDisplay,
   isTerminalStatus,
@@ -45,6 +46,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useResult } from '@app/navigation/results';
 import { WalletNavigation } from '@app/types';
 import { swapScreenFor } from './swapRoute';
+import { pendingSwapLabel } from './pendingSwapLabel';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 import Utils from '@app/utils';
 import {
@@ -213,10 +215,19 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
       : '';
 
   const pending = records.find(r => !isTerminalStatus(r.status));
-  const pendingState =
-    pending?.status === SwapStatusEnum.AwaitingExternalDeposit
-      ? (translate('swap.pending-waiting') as string)
-      : (translate('swap.pending-swapping') as string);
+  // The card counts the deposit's time down while it is awaited.
+  const [nowMs, setNowMs] = useState<number>(() => Date.now());
+  const awaiting = !!pending && awaitsDeposit(pending);
+  useEffect(() => {
+    if (!awaiting) {
+      return;
+    }
+    const timer = setInterval(() => setNowMs(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, [awaiting]);
+  const pendingState = pending
+    ? pendingSwapLabel(pending, nowMs, key => translate(key) as string)
+    : null;
 
   /** The address book's contact for the address in the field, on its chain. */
   const savedContact = addressBook.find(
@@ -417,8 +428,11 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                     />
                     <View style={{ flex: 1 }}>
                       <Text variant="bodyStrong">{swapPairLabel(pending)}</Text>
-                      <Text variant="bodySmall" tone="muted">
-                        {pendingState}
+                      <Text
+                        variant="bodySmall"
+                        tone={pendingState?.warning ? 'warning' : 'muted'}
+                      >
+                        {pendingState?.text}
                       </Text>
                     </View>
                   </View>
@@ -963,6 +977,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
         <SwapHistorySheet
           ref={historySheetRef}
           records={records}
+          nowMs={nowMs}
           onOpen={record => {
             historySheetRef.current?.dismiss();
             openRecord(record.recordId, record.status);

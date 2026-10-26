@@ -17,10 +17,13 @@ import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { RefreshIcon } from '@ui/primitives/Icons/RefreshIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { formatInteger } from '@app/utils/formatAmount';
+import { pendingSwapLabel } from '@screens/Swap/pendingSwapLabel';
 import SheetTitle from './SheetTitle';
 
 type SwapHistorySheetProps = {
   records: SwapRecordType[];
+  /** The clock the time left on an awaited deposit reads from. */
+  nowMs: number;
   /** Opens a swap where it stands: its deposit, its tracking or its detail. */
   onOpen: (record: SwapRecordType) => void;
 };
@@ -62,7 +65,7 @@ function daysAgo(
 
 /** The wallet's swaps, the ones in flight first. */
 const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
-  ({ records, onOpen }, ref) => {
+  ({ records, nowMs, onOpen }, ref) => {
     const { translate } = useContext(ContextAppLoaded);
     const t = (key: string) => translate(key) as string;
     const { colors } = useTheme();
@@ -125,11 +128,7 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
           };
         default:
           return {
-            label: t(
-              record.status === SwapStatusEnum.AwaitingExternalDeposit
-                ? 'swap.pending-waiting'
-                : 'swap.pending-swapping',
-            ),
+            label: pendingSwapLabel(record, nowMs, t).text,
             icon: tile(
               <ActivityIndicator size="small" color={colors.fgAccent} />,
               colors.bgAccentSubtle,
@@ -138,8 +137,6 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
           };
       }
     };
-    const nowMs = Date.now();
-
     return (
       <AppSheetModal
         ref={ref}

@@ -3,7 +3,9 @@ import {
   DEPOSIT_WINDOW_MS,
   awaitsDeposit,
   depositDeadlineMs,
+  depositHalfwayMs,
   depositOverdue,
+  depositPhase,
 } from '@app/swap/depositDeadline';
 import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
@@ -142,4 +144,36 @@ describe('SwapService.markDepositSent', () => {
       service.markDepositSent({ recordId: 'rec-1' }),
     ).rejects.toThrow('not an inbound record');
   });
+});
+
+test('Tests that the wait turns to a warning halfway between the commit and the deadline', () => {
+  expect(depositHalfwayMs(makeRecord())).toBe(T0 + 300_000);
+});
+
+test('Tests that a purchase reads awaiting, looking, not detected, detected and swapping as it moves', () => {
+  expect(depositPhase(makeRecord(), T0 + 1_000)).toBe('awaiting');
+  const sent = makeRecord({ depositSentAtMs: T0 + 1_000 });
+  expect(depositPhase(sent, T0 + 299_999)).toBe('looking');
+  expect(depositPhase(sent, T0 + 300_000)).toBe('notDetected');
+  expect(
+    depositPhase(
+      makeRecord({
+        status: SwapStatusEnum.Pending,
+        observedDepositTxHash: 'ab'.repeat(32),
+      }),
+      T0 + 1_000,
+    ),
+  ).toBe('detected');
+  expect(
+    depositPhase(makeRecord({ status: SwapStatusEnum.Processing }), T0),
+  ).toBe('swapping');
+  expect(
+    depositPhase(
+      makeRecord({
+        direction: SwapDirectionEnum.Outbound,
+        status: SwapStatusEnum.Pending,
+      }),
+      T0,
+    ),
+  ).toBe('swapping');
 });

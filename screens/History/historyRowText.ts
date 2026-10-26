@@ -215,7 +215,9 @@ export function swapRowText(args: {
             record.status === SwapStatusEnum.AwaitingExternalDeposit ||
               record.status === SwapStatusEnum.PendingDeposit
               ? 'history.state-awaiting-deposit'
-              : 'history.state-swapping',
+              : !sell && record.status === SwapStatusEnum.Pending
+                ? 'history.state-payment-detected'
+                : 'history.state-swapping',
           ),
           tone: 'warning',
         },
