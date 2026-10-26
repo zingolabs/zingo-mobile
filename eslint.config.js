@@ -151,7 +151,6 @@ const geometryGaps = [
   'ui/widgets/DeleteWalletSheet.tsx',
   'ui/widgets/Flight/SendFlight.tsx',
   'ui/widgets/Flight/SwapFlight.tsx',
-  'ui/widgets/NewAddressTag.tsx',
   'ui/widgets/ProgressState.tsx',
   'ui/widgets/SaveSheet.tsx',
   'ui/widgets/ScanOverlay.tsx',
