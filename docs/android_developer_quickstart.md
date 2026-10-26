@@ -55,7 +55,7 @@ And append to `Path`:
 1. Clone the repository:
    `git clone https://github.com/zingolabs/zingo-mobile.git`.
 2. Go to the cloned repo `cd zingo-mobile`.
-3. From the root of the project, install JS deps: `yarn`
+3. From the root of the project, install JS deps: `yarn setup`
 
 The Binding Layer comes from the Android Prebuilt Bundle that
 `binding-layer.json` pins. The Gradle build fetches it the first time

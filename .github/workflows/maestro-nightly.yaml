@@ -30,7 +30,7 @@ jobs:
           cache: yarn
 
       - name: Yarn install
-        run: yarn
+        run: yarn setup
 
       - name: Build APK
         working-directory: android
@@ -115,7 +115,7 @@ jobs:
           cache: yarn
 
       - name: Yarn install
-        run: yarn
+        run: yarn setup
 
       # The fetch extracts the ZingoBindings package under ios/binding-layer,
       # where the Xcode project references it.
