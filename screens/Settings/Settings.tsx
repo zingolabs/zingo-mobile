@@ -17,11 +17,20 @@ import {
   ScrollView,
 } from 'react-native';
 
-import { space20, space32, useTheme } from '@app/theme';
+import {
+  iconSizeMd,
+  rowMinHeight,
+  space4,
+  space8,
+  space12,
+  space16,
+  space20,
+  space24,
+  useTheme,
+} from '@app/theme';
 
-import RegText from '@ui/primitives/RegText';
-import FadeText from '@ui/primitives/FadeText';
-import BoldText from '@ui/primitives/BoldText';
+import Text from '@ui/primitives/Text';
+import Card from '@ui/widgets/Card';
 import Button from '@ui/primitives/Button';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
@@ -450,14 +459,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
     return DATA.map(item => {
       const infoSection = `${label}-${item.value}`;
       return (
-        <View key={'view-' + item.value} style={{ marginBottom: 5 }}>
-          <View
-            style={{
-              justifyContent: 'center',
-              marginTop: 10,
-              minHeight: 48,
-            }}
-          >
+        <View key={'view-' + item.value}>
+          <View style={{ justifyContent: 'center', minHeight: rowMinHeight }}>
             <InfoTooltip
               testID={`settings.${infoSection}-info`}
               label={
@@ -475,13 +478,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                 onPress={() => setOption(typeOption(item.value))}
               >
                 {typeOption(item.value) === valueOption ? (
-                  <RadioOnIcon size={16} color={colors.fgMuted} />
+                  <RadioOnIcon size={iconSizeMd} color={colors.fgAccent} />
                 ) : (
-                  <RadioOffIcon size={16} color={colors.fgMuted} />
+                  <RadioOffIcon size={iconSizeMd} color={colors.fgMuted} />
                 )}
-                <RegText style={{ marginLeft: 10 }}>
+                <Text variant="body" style={{ marginLeft: space12 }}>
                   {translate(`settings.value-${label}-${item.value}`) as string}
-                </RegText>
+                </Text>
               </TouchableOpacity>
             </InfoTooltip>
           </View>
@@ -508,20 +511,34 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
     setLastError('');
   };
 
-  const sectionHeader = (key: string) => (
-    <FadeText
-      style={{
-        marginLeft: space20,
-        marginRight: space20,
-        marginTop: 24,
-        marginBottom: 4,
-        fontSize: 12,
-        letterSpacing: 0.5,
-      }}
-    >
-      {(translate(key) as string).toUpperCase()}
-    </FadeText>
+  /** A section: its label over one card that holds its rows. */
+  const section = (key: string, rows: React.ReactNode) => (
+    <View style={{ marginHorizontal: space20, marginTop: space24 }}>
+      <Text
+        variant="caption"
+        tone="muted"
+        style={{
+          fontWeight: '600',
+          textTransform: 'uppercase',
+          marginBottom: space8,
+        }}
+      >
+        {translate(key) as string}
+      </Text>
+      <Card flush>{rows}</Card>
+    </View>
   );
+  /** A row of a section's card: 56 tall, the hairline above all but the first. */
+  const rowStyle = (first: boolean) => ({
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'space-between' as const,
+    minHeight: rowMinHeight,
+    paddingHorizontal: space16,
+    paddingVertical: space8,
+    borderTopWidth: first ? 0 : 1,
+    borderTopColor: colors.borderSubtle,
+  });
 
   if (!authPassed) {
     return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
@@ -585,194 +602,180 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
             />
           )}
           {/* SECTION: Preferences */}
-          {sectionHeader('settings.section-preferences')}
-
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginHorizontal: space20,
-              marginVertical: 15,
-            }}
-          >
-            <BoldText>
-              {translate('settings.language-title') as string}
-            </BoldText>
+          {section(
+            'settings.section-preferences',
             <TouchableOpacity
               disabled={disabled}
               onPress={() => languageSelectRef.current?.present()}
+              style={rowStyle(true)}
             >
+              <Text variant="bodyStrong">
+                {translate('settings.language-title') as string}
+              </Text>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <RegText
-                  style={{
-                    marginRight: 5,
-                    fontWeight: '400',
-                    color: colors.fgMuted,
-                  }}
+                <Text
+                  variant="body"
+                  tone="muted"
+                  style={{ marginRight: space4 }}
                 >
                   {translate(`settings.value-language-${language}`) as string}
-                </RegText>
-                <ChevronRight size={16} color={colors.fgMuted} />
+                </Text>
+                <ChevronRight size={iconSizeMd} color={colors.fgMuted} />
               </View>
-            </TouchableOpacity>
-          </View>
+            </TouchableOpacity>,
+          )}
 
           {/* SECTION: Privacy & Security */}
-          {sectionHeader('settings.section-privacysecurity')}
-
-          <View style={{ marginHorizontal: space20, marginVertical: 15 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <View style={{ flex: 1 }}>
-                <InfoTooltip
-                  testID="settings.privacy-info"
-                  label={translate('settings.privacy-title') as string}
-                  text={
-                    PRIVACYS.find(d => String(d.value) === 'true')?.text ?? ''
-                  }
-                  open={openInfoSection === 'privacy'}
-                  onToggle={open => setOpenInfoSection(open ? 'privacy' : null)}
-                  alignStart
-                >
-                  {/* A long press on the title opens the developer
-                          options. */}
-                  <TouchableOpacity
-                    onLongPress={() => setShowDeveloperOptions(true)}
+          {section(
+            'settings.section-privacysecurity',
+            <>
+              <View style={rowStyle(true)}>
+                <View style={{ flex: 1 }}>
+                  <InfoTooltip
+                    testID="settings.privacy-info"
+                    label={translate('settings.privacy-title') as string}
+                    text={
+                      PRIVACYS.find(d => String(d.value) === 'true')?.text ?? ''
+                    }
+                    open={openInfoSection === 'privacy'}
+                    onToggle={open =>
+                      setOpenInfoSection(open ? 'privacy' : null)
+                    }
+                    alignStart
                   >
-                    <BoldText>
-                      {translate('settings.privacy-title') as string}
-                    </BoldText>
-                  </TouchableOpacity>
-                </InfoTooltip>
+                    {/* A long press on the title opens the developer
+                          options. */}
+                    <TouchableOpacity
+                      onLongPress={() => setShowDeveloperOptions(true)}
+                    >
+                      <Text variant="bodyStrong">
+                        {translate('settings.privacy-title') as string}
+                      </Text>
+                    </TouchableOpacity>
+                  </InfoTooltip>
+                </View>
+                <Switch
+                  testID="settings.privacy"
+                  value={privacy}
+                  onValueChange={next => setPrivacy(next)}
+                  accessibilityLabel={
+                    translate('settings.privacy-title') as string
+                  }
+                />
               </View>
-              <Switch
-                testID="settings.privacy"
-                value={privacy}
-                onValueChange={next => setPrivacy(next)}
-                accessibilityLabel={
-                  translate('settings.privacy-title') as string
-                }
-              />
-            </View>
-          </View>
 
-          <View
-            style={{
-              marginLeft: space20,
-              marginRight: space20,
-              marginVertical: 15,
-            }}
-          >
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <BoldText testID="settings.securitytitle">
-                {translate('settings.security-title') as string}
-              </BoldText>
-              <Switch
-                testID="settings.biometrics"
-                value={biometrics}
-                disabled={disabled}
-                onValueChange={next => setBiometrics(next)}
-                accessibilityLabel={
-                  translate('settings.security-title') as string
-                }
-              />
-            </View>
-            {deviceSecurity.kind === 'insecure' && (
-              <FadeText style={{ marginTop: 6 }}>
-                {translate('settings.security-device-locked-hint') as string}
-              </FadeText>
-            )}
-          </View>
+              <View
+                style={[
+                  rowStyle(false),
+                  {
+                    flexDirection: 'column',
+                    alignItems: 'stretch',
+                    justifyContent: 'center',
+                  },
+                ]}
+              >
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <Text variant="bodyStrong" testID="settings.securitytitle">
+                    {translate('settings.security-title') as string}
+                  </Text>
+                  <Switch
+                    testID="settings.biometrics"
+                    value={biometrics}
+                    disabled={disabled}
+                    onValueChange={next => setBiometrics(next)}
+                    accessibilityLabel={
+                      translate('settings.security-title') as string
+                    }
+                  />
+                </View>
+                {deviceSecurity.kind === 'insecure' && (
+                  <Text
+                    variant="bodySmall"
+                    tone="muted"
+                    style={{ marginTop: space4 }}
+                  >
+                    {
+                      translate(
+                        'settings.security-device-locked-hint',
+                      ) as string
+                    }
+                  </Text>
+                )}
+              </View>
+            </>,
+          )}
 
           {/* SECTION: Network & Advanced */}
-          {sectionHeader('settings.section-networkadvanced')}
-
-          {/* Nym is no longer a choice: every transmission travels the
+          {section(
+            'settings.section-networkadvanced',
+            <>
+              {/* Nym is no longer a choice: every transmission travels the
                   mixnet. The row is left as the way into the diagnostics,
                   and its green says the network is the one carrying the
                   wallet's traffic. */}
-          {mixnetView.kind === 'transport' && (
-            <TouchableOpacity
-              testID="settings.mixnet"
-              onPress={() => navigation.navigate(Route.MixnetDoctor)}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginHorizontal: space20,
-                marginVertical: 15,
-              }}
-            >
-              <BoldText style={{ color: colors.fgNym }}>
-                {translate('settings.nym-network') as string}
-              </BoldText>
-              <ChevronRight size={16} color={colors.fgMuted} />
-            </TouchableOpacity>
+              {mixnetView.kind === 'transport' && (
+                <TouchableOpacity
+                  testID="settings.mixnet"
+                  onPress={() => navigation.navigate(Route.MixnetDoctor)}
+                  style={rowStyle(true)}
+                >
+                  <Text variant="bodyStrong" color={colors.fgNym}>
+                    {translate('settings.nym-network') as string}
+                  </Text>
+                  <ChevronRight size={iconSizeMd} color={colors.fgMuted} />
+                </TouchableOpacity>
+              )}
+
+              <TouchableOpacity
+                disabled={disabled}
+                onPress={() => blockExplorerSelectRef.current?.present()}
+                style={rowStyle(mixnetView.kind !== 'transport')}
+              >
+                <Text variant="bodyStrong">
+                  {translate('settings.blockexplorer-title') as string}
+                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Text
+                    variant="body"
+                    tone="muted"
+                    style={{ marginRight: space4 }}
+                  >
+                    {
+                      translate(
+                        `settings.value-blockexplorer-${blockExplorer}`,
+                      ) as string
+                    }
+                  </Text>
+                  <ChevronRight size={iconSizeMd} color={colors.fgMuted} />
+                </View>
+              </TouchableOpacity>
+            </>,
           )}
 
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginLeft: space20,
-              marginRight: space20,
-              marginVertical: 15,
-            }}
-          >
-            <BoldText>
-              {translate('settings.blockexplorer-title') as string}
-            </BoldText>
-            <TouchableOpacity
-              disabled={disabled}
-              onPress={() => blockExplorerSelectRef.current?.present()}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <RegText
-                  style={{
-                    marginRight: 5,
-                    fontWeight: '400',
-                    color: colors.fgMuted,
-                  }}
-                >
-                  {
-                    translate(
-                      `settings.value-blockexplorer-${blockExplorer}`,
-                    ) as string
-                  }
-                </RegText>
-                <ChevronRight size={16} color={colors.fgMuted} />
-              </View>
-            </TouchableOpacity>
-          </View>
-
           {/* SECTION: Other */}
-          {sectionHeader('settings.section-other')}
-
-          <TouchableOpacity
-            testID="settings.about"
-            disabled={disabled}
-            onPress={() => navigation.navigate(Route.About)}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginHorizontal: space20,
-              marginVertical: 15,
-            }}
-          >
-            <BoldText>{translate('loadedapp.about') as string}</BoldText>
-            <ChevronRight size={16} color={colors.fgMuted} />
-          </TouchableOpacity>
+          {section(
+            'settings.section-other',
+            <TouchableOpacity
+              testID="settings.about"
+              disabled={disabled}
+              onPress={() => navigation.navigate(Route.About)}
+              style={rowStyle(true)}
+            >
+              <Text variant="bodyStrong">
+                {translate('loadedapp.about') as string}
+              </Text>
+              <ChevronRight size={iconSizeMd} color={colors.fgMuted} />
+            </TouchableOpacity>,
+          )}
 
           {(!recoveryInfoStored || recoveryInfoSave) && (
-            <View style={{ marginHorizontal: space20, marginVertical: 15 }}>
+            <View style={{ marginHorizontal: space20, marginTop: space16 }}>
               {!recoveryInfoStored && (
                 <TouchableOpacity
                   testID="settings.recoveryinfo.save"
@@ -780,29 +783,27 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                   onPress={saveRecoveryInfoNow}
                   accessibilityRole="button"
                 >
-                  <FadeText
-                    style={{
-                      color: colors.fgWarning,
-                      textAlign: 'center',
-                      textDecorationLine: 'underline',
-                    }}
+                  <Text
+                    variant="caption"
+                    tone="warning"
+                    style={{ textAlign: 'center', fontWeight: '700' }}
                   >
                     {
                       translate(
                         `settings.recoveryinfo-notstored-${keyKind}`,
                       ) as string
                     }
-                  </FadeText>
+                  </Text>
                 </TouchableOpacity>
               )}
               {(savingRecoveryInfo || recoveryInfoSave) && (
-                <FadeText
+                <Text
                   testID="settings.recoveryinfo.result"
+                  variant="bodySmall"
                   selectable
                   style={{
-                    marginTop: recoveryInfoStored ? 0 : 8,
+                    marginTop: recoveryInfoStored ? 0 : space8,
                     textAlign: 'center',
-                    opacity: 1,
                     color: savingRecoveryInfo
                       ? colors.fgMuted
                       : recoveryInfoSave?.kind === 'saved'
@@ -811,7 +812,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                   }}
                 >
                   {recoveryInfoSaveText()}
-                </FadeText>
+                </Text>
               )}
             </View>
           )}
@@ -819,15 +820,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
           {/* SECTION: Developer */}
           {showDeveloperOptions && (
             <>
-              {sectionHeader('settings.section-developer')}
-              <View style={{ width: '100%', marginBottom: 20 }}>
-                <View style={{ marginHorizontal: space20, marginVertical: 15 }}>
-                  <BoldText>
+              {section(
+                'settings.section-developer',
+                <View
+                  style={{ paddingHorizontal: space16, paddingTop: space12 }}
+                >
+                  <Text variant="bodyStrong">
                     {translate('settings.performancelevel-title') as string}
-                  </BoldText>
-                </View>
-
-                <View style={{ marginLeft: space32, marginRight: space20 }}>
+                  </Text>
                   {optionsRadio(
                     PERFORMANCELEVELMENU,
                     setPerformanceLevel as React.Dispatch<
@@ -837,19 +837,21 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                     performanceLevel,
                     'performancelevel',
                   )}
-                </View>
+                </View>,
+              )}
+              <View
+                style={{ marginHorizontal: space20, marginBottom: space20 }}
+              >
                 {!!lastError && (
                   <>
-                    <View
-                      style={{
-                        marginHorizontal: space20,
-                        marginVertical: 15,
-                      }}
+                    <Text
+                      variant="bodyStrong"
+                      style={{ marginTop: space16, marginBottom: space8 }}
                     >
-                      <BoldText>{'LAST ERROR'}</BoldText>
-                    </View>
+                      {'LAST ERROR'}
+                    </Text>
 
-                    <View style={{ marginHorizontal: space20 }}>
+                    <View>
                       <Button
                         variant="primary"
                         title={translate('view-error') as string}
@@ -862,18 +864,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                 )}
                 {hasWalletBackup && (
                   <>
-                    <View
-                      style={{
-                        marginHorizontal: space20,
-                        marginVertical: 15,
-                      }}
+                    <Text
+                      variant="bodyStrong"
+                      style={{ marginTop: space16, marginBottom: space8 }}
                     >
-                      <BoldText>
-                        {translate('loadedapp.restorebackupwallet') as string}
-                      </BoldText>
-                    </View>
+                      {translate('loadedapp.restorebackupwallet') as string}
+                    </Text>
 
-                    <View style={{ marginHorizontal: space20 }}>
+                    <View>
                       <Button
                         testID="settings.restorebackupwallet"
                         variant="text"
@@ -926,8 +924,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
         <View
           style={{
             paddingHorizontal: space20,
-            paddingTop: 10,
-            paddingBottom: 24,
+            paddingTop: space12,
+            paddingBottom: space24,
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
