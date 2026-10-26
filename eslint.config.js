@@ -106,7 +106,6 @@ const geometryGaps = [
   'screens/History/History.tsx',
   'screens/History/components/HistoryAvatar.tsx',
   'screens/History/components/HistoryRowBody.tsx',
-  'screens/History/components/IronwoodMigrationBanner.tsx',
   'screens/ImportChooser/ImportChooser.tsx',
   'screens/ImportUfvk/ImportUfvk.tsx',
   'screens/Insight/Insight.tsx',
