@@ -16,7 +16,6 @@ import { RPCShieldProposeType } from '@app/walletBackend/types/RPCShieldProposeT
 import { shieldEnd } from '@app/walletBackend/transforms/sendSettlement';
 import { withSyncStopped } from '@app/walletBackend/utils/syncBracket';
 import { SendPermit } from '@app/walletBackend/transforms/sendPermit';
-import Utils from '@app/utils';
 
 type UseShieldFundsInput = {
   readOnly: boolean;
@@ -40,7 +39,6 @@ type UseShieldFundsResult = {
   onPressShieldFunds: () => void;
   /** Shields at once, for a caller that asked in its own sheet. */
   shieldNow: () => Promise<void>;
-  calculateAmountToShield: () => string;
   calculatePoolsToShield: () => string;
   calculateDisableButtonToShield: () => boolean;
 };
@@ -187,15 +185,6 @@ export function useShieldFunds({
     [],
   );
 
-  const calculateAmountToShield = useCallback(
-    (): string =>
-      Utils.parseNumberFloatToStringLocale(
-        somePending ? 0 : shieldingAmount,
-        8,
-      ),
-    [somePending, shieldingAmount],
-  );
-
   const calculateDisableButtonToShield = useCallback(
     (): boolean => (somePending ? 0 : shieldingAmount) <= 0,
     [somePending, shieldingAmount],
@@ -218,7 +207,6 @@ export function useShieldFunds({
     shieldingFee,
     onPressShieldFunds,
     shieldNow: handleShieldFunds,
-    calculateAmountToShield,
     calculatePoolsToShield,
     calculateDisableButtonToShield,
   };
