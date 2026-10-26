@@ -1,17 +1,22 @@
 import React from 'react';
 import Svg, { SvgProps } from 'react-native-svg';
+import { iconSize, iconStroke } from '@app/theme';
 
-interface IconSvgProps extends SvgProps {
+/**
+ * The SVG stroke that shows `iconStroke` at `size`: the 24 grid scales the
+ * stroke with the icon, so a 16 icon would otherwise look thin and a 34 bold.
+ */
+export const strokeFor = (size: number) => (iconStroke * iconSize) / size;
+
+interface IconSvgProps extends Omit<SvgProps, 'strokeWidth'> {
   size?: number;
   color?: string;
-  strokeWidth?: number;
   children?: React.ReactNode;
 }
 
 export function Icon({
-  size = 24,
+  size = iconSize,
   color = 'currentColor',
-  strokeWidth = 2,
   children,
   ...rest
 }: IconSvgProps) {
@@ -21,7 +26,7 @@ export function Icon({
       height={size}
       fill="none"
       stroke={color}
-      strokeWidth={strokeWidth}
+      strokeWidth={strokeFor(size)}
       strokeLinecap="round"
       strokeLinejoin="round"
       viewBox="0 0 24 24"

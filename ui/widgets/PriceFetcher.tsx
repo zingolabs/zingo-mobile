@@ -75,7 +75,6 @@ export const usePriceRing = (): PriceRingState => {
 };
 
 const RING_SIZE = 16;
-const RING_TRACK = '#13263F';
 
 // The countdown ring next to the fiat balance.
 const PriceFetcher: React.FunctionComponent = () => {
@@ -89,9 +88,9 @@ const PriceFetcher: React.FunctionComponent = () => {
   return (
     <QuoteRefreshRing
       size={RING_SIZE}
-      color={ring.muted ? 'rgba(255,255,255,0.30)' : colors.fgMuted}
+      color={ring.muted ? colors.borderMuted : colors.fgMuted}
       fetchColor={colors.fgAccent}
-      trackColor={RING_TRACK}
+      trackColor={colors.bgMutedSubtle}
       durationMs={ring.cadenceMs}
       resetKey={ring.resetKey}
       startProgress={ring.elapsedFraction}

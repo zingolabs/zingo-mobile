@@ -37,6 +37,7 @@ enum FfiOutcome {
     case .Read(let message): return ("Read", message)
     case .Send(let message): return ("Send", message)
     case .Shield(let message): return ("Shield", message)
+    case .SendAfterDeshield(let message): return ("SendAfterDeshield", message)
     case .InvalidInput(let message): return ("InvalidInput", message)
     case .Wallet(let message): return ("Wallet", message)
     case .Indexer(let message): return ("Indexer", message)
@@ -210,6 +211,21 @@ class RPCModule: NSObject {
   // Moves the existing wallet file to the resting protection this build
   // writes: class C plus backup exclusion. Old builds wrote class A, and
   // a synced wallet can open without a save.
+  // The swap records live in AsyncStorage, in Application Support. iCloud
+  // backs that folder up unless told otherwise, and the wallet file it
+  // belongs with is excluded, so the folder is created ahead of the first
+  // write and excluded the same way.
+  func excludeSwapStoreFromBackup() {
+    let fm = FileManager.default
+    guard let support = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first,
+          let bundleId = Bundle.main.bundleIdentifier else { return }
+    var storage = support.appendingPathComponent(bundleId).appendingPathComponent("RCTAsyncLocalStorage_V1")
+    try? fm.createDirectory(at: storage, withIntermediateDirectories: true)
+    var resourceValues = URLResourceValues()
+    resourceValues.isExcludedFromBackup = true
+    try? storage.setResourceValues(resourceValues)
+  }
+
   func applyWalletFileProtection() {
     let fm = FileManager.default
     guard let path = try? getFileName(Constants.WalletFileName.rawValue), fm.fileExists(atPath: path) else { return }
@@ -283,6 +299,7 @@ class RPCModule: NSObject {
   func walletExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     completePendingSwap()
     applyWalletFileProtection()
+    excludeSwapStoreFromBackup()
     do {
       let result = try fileExists(Constants.WalletFileName.rawValue)
       DispatchQueue.main.async {
@@ -300,6 +317,7 @@ class RPCModule: NSObject {
   func walletBackupExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     completePendingSwap()
     applyWalletFileProtection()
+    excludeSwapStoreFromBackup()
     do {
       let result = try fileExists(Constants.WalletBackupFileName.rawValue)
       DispatchQueue.main.async {
@@ -455,6 +473,10 @@ class RPCModule: NSObject {
     SyncSettings(performanceLevel: performancelevel, minConfirmations: UInt32(minconfirmations) ?? 0)
   }
 
+  private func indexerChoice(_ serveruri: String) -> IndexerChoice {
+    serveruri.isEmpty ? .offline : .named(uri: serveruri)
+  }
+
   private func connection(
     serveruri: String,
     chainhint: String,
@@ -462,7 +484,7 @@ class RPCModule: NSObject {
     minconfirmations: String
   ) -> IndexerConnection {
     IndexerConnection(
-      serverUri: serveruri,
+      indexer: indexerChoice(serveruri),
       chainHint: chainhint,
       sync: syncSettings(performancelevel: performancelevel, minconfirmations: minconfirmations))
   }
@@ -842,17 +864,6 @@ class RPCModule: NSObject {
       }
   }
 
-  // The app-supplied migration broadcast candidate pool (its indexer
-  // registry); zingolib embeds no default set.
-  @objc(setBroadcastCandidates:resolve:reject:)
-  func setBroadcastCandidatesProcess(_ candidatesJson: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try setBroadcastCandidates(candidatesJson: candidatesJson)
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
   // Mixnet Mode (send-over-nym). The wallet-side FFI seam, bridged on both
   // platforms; the local proxy is hosted separately by NymTransportModule.
   @objc(attachMixnet:exitNode:resolve:reject:)
@@ -932,6 +943,24 @@ class RPCModule: NSObject {
       }
   }
 
+  @objc(stopSyncProcess:reject:)
+  func stopSyncProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try stopSync()
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  @objc(syncCaughtUpInfo:reject:)
+  func syncCaughtUpInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try syncCaughtUp()
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
   @objc(statusSyncInfo:reject:)
   func statusSyncInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
@@ -981,7 +1010,7 @@ class RPCModule: NSObject {
   func changeServerProcess(_ serveruri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try changeServer(serveruri: serveruri)
+          try changeServer(choice: self.indexerChoice(serveruri))
         }.settle(resolve: resolve, reject: reject)
       }
   }
@@ -1245,6 +1274,36 @@ class RPCModule: NSObject {
       }
   }
 
+  @objc(sendSwapDepositProcess:amount:memo_hex:resolve:reject:)
+  func sendSwapDepositProcess(_ vault_address: String, amount: String, memo_hex: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try sendSwapDeposit(
+            vaultAddress: vault_address,
+            amount: FfiArgs.requiredU64(amount, name: "amount"),
+            memoHex: memo_hex)
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  @objc(reserveRefundAddressProcess:reject:)
+  func reserveRefundAddressProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try reserveRefundAddress()
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  @objc(deriveRefundAddressProcess:reject:)
+  func deriveRefundAddressProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try deriveRefundAddress()
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
   @objc(planOrchardDrainProcess:reject:)
   func planOrchardDrainProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
@@ -1276,77 +1335,8 @@ class RPCModule: NSObject {
       }
   }
 
-  @objc(planIronwoodMigrationProcess:reject:)
-  func planIronwoodMigrationProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try planIronwoodMigration()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  @objc(startIronwoodMigrationProcess:perBucket:resolve:reject:)
-  func startIronwoodMigrationProcess(_ plan_hash_hex: String, perBucket per_bucket: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          // Empty string means "keep zingolib's default cadence" (the
-          // module's numeric-arg-as-string convention); anything else must
-          // parse as a u32 — a malformed value rejects as InvalidInput
-          // instead of silently keeping the default.
-          try startIronwoodMigration(
-            planHashHex: plan_hash_hex,
-            perBucket: FfiArgs.optionalU32(per_bucket, name: "per_bucket"))
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  // Proves and broadcasts one splitting round, so like the drain it runs
-  // long; the global concurrent queue keeps it off the main thread.
-  @objc(continueNoteSplittingProcess:reject:)
-  func continueNoteSplittingProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try continueNoteSplitting()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  // Proves and broadcasts one Phase 1 splitting round (zingolib/0016), so like the
-  // drain it runs long; the global concurrent queue keeps it off the main
-  // thread.
-  @objc(quickSplitProcess:reject:)
-  func quickSplitProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try quickSplit()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  // Polled concurrently while `quickSplitProcess` runs; the native
-  // `splitStatus()` reads a side channel, never the lightclient lock the round
-  // holds, so the poll returns immediately.
-  @objc(splitStatusProcess:reject:)
-  func splitStatusProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try splitStatus()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  @objc(reschedulePartsProcess:resolve:reject:)
-  func reschedulePartsProcess(_ per_bucket: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          // `per_bucket` crosses as a string (numeric-arg convention); a
-          // malformed value rejects as InvalidInput — never an unsettled
-          // promise.
-          try rescheduleParts(perBucket: FfiArgs.requiredU32(per_bucket, name: "per_bucket"))
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
+  // An old private migration (ZIP 318), left by builds that offered it:
+  // launch reads it, records what confirmed and cancels the rest.
   @objc(migrationStatusProcess:reject:)
   func migrationStatusProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
@@ -1356,47 +1346,11 @@ class RPCModule: NSObject {
       }
   }
 
-  @objc(windowTimelineProcess:reject:)
-  func windowTimelineProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try windowTimeline()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
   @objc(reconcileMigrationProcess:reject:)
   func reconcileMigrationProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
           try reconcileMigration()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  // Phase-2 execute tap: proves and broadcasts the scheduled migration's due
-  // batch, so like the drain it runs long; the global concurrent queue keeps it
-  // off the main thread. `spacing_ms` crosses as a string (numeric-arg
-  // convention) — the delay sequenced between the batch's sends.
-  @objc(executeDuePartsProcess:resolve:reject:)
-  func executeDuePartsProcess(_ spacing_ms: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          // A malformed spacing rejects as InvalidInput — never an
-          // unsettled promise.
-          try executeDueParts(spacingMs: FfiArgs.requiredU64(spacing_ms, name: "spacing_ms"))
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  // Polled concurrently while `executeDuePartsProcess` runs; the native
-  // `executeDuePartsStatus()` reads a side channel, never the lightclient lock
-  // the batch holds, so the poll returns immediately.
-  @objc(executeDuePartsStatusProcess:reject:)
-  func executeDuePartsStatusProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try executeDuePartsStatus()
         }.settle(resolve: resolve, reject: reject)
       }
   }

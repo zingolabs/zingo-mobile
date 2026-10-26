@@ -73,11 +73,14 @@ export const goBack = (): void => {
   }
 };
 
-// Ends a one-way flow in the wallet: the stack holds only the home again.
+// Ends a one-way flow in the wallet: back to the home the stack already
+// holds. A reset would mount a new home while the old one and the flow's
+// panels unmount with their animations running, which Fabric on Android
+// fails ("Cannot remove child at index 0").
 export const leaveFlow = (
-  navigation: Pick<NavigationProp<ParamListBase>, 'reset'>,
+  navigation: Pick<NavigationProp<ParamListBase>, 'dispatch'>,
 ): void => {
-  navigation.reset({ index: 0, routes: [{ name: Route.Home }] });
+  navigation.dispatch(StackActions.popTo(Route.Home));
 };
 
 // The route names of the stack that holds the focused route, bottom first.

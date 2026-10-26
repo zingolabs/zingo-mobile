@@ -4,9 +4,7 @@ import { Animated, StyleSheet, View } from 'react-native';
 import { useTheme } from '@app/theme';
 
 type ProgressBarProps = {
-  // 0..1, driven frame for frame. Phases that report continuously have nothing
-  // discrete to count, so the bar travels rather than lighting pieces: see
-  // SegmentedBar for the other case.
+  // 0..1, driven frame for frame.
   progress: Animated.Value;
   color?: string;
   height?: number;

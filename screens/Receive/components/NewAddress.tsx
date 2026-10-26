@@ -1,28 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useMemo, useRef, useState } from 'react';
-import {
-  View,
-  TextInput,
-  Keyboard,
-  Pressable,
-  TouchableOpacity,
-} from 'react-native';
-import { useTheme } from '@app/theme';
-
+import React, { useContext, useState } from 'react';
+import { View, Keyboard } from 'react-native';
+import { space8, space16, space20 } from '@app/theme';
 import {
   AddressBookFileClass,
-  AddressKindEnum,
   ReceiverEnum,
   SnackbarDurationEnum,
 } from '@app/AppState';
-import RegText from '@ui/primitives/RegText';
 import { ContextAppLoaded } from '@app/context';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
-import { AddressUnifiedTypeEnum } from '@app/AppState';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronDown, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import SelectBottomSheet from '@ui/widgets/SelectBottomSheet';
+import Text from '@ui/primitives/Text';
+import Button from '@ui/primitives/Button';
+import ButtonStack from '@ui/primitives/ButtonStack';
+import RadioRow, { RadioList } from '@ui/widgets/RadioRow';
 import {
   createNewTransparentAddress,
   createNewUnifiedAddress,
@@ -31,95 +20,96 @@ import { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddres
 import { RPCTransparentAddressType } from '@app/walletBackend/types/RPCTransparentAddressType';
 import Utils from '@app/utils';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
+import TextField from '@ui/primitives/TextField';
+
+type NewKind = 'orchard' | 'orchardSapling' | 'sapling' | 'transparent';
+
+/** The kinds a new address can be, with the receivers each one asks for. */
+const KINDS: {
+  kind: NewKind;
+  title: string;
+  sub: string;
+  receivers: string;
+  pill?: 'best' | 'public';
+}[] = [
+  {
+    kind: 'orchard',
+    title: 'receive.shielded-orchard',
+    sub: 'receive.new-orchard-sub',
+    receivers: ReceiverEnum.o,
+    pill: 'best',
+  },
+  {
+    kind: 'orchardSapling',
+    title: 'receive.shielded-orchard-sapling',
+    sub: 'receive.new-orchard-sapling-sub',
+    receivers: ReceiverEnum.o + ReceiverEnum.z,
+  },
+  {
+    kind: 'sapling',
+    title: 'receive.shielded-sapling',
+    sub: 'receive.new-sapling-sub',
+    receivers: ReceiverEnum.z,
+  },
+  {
+    kind: 'transparent',
+    title: 'receive.kind-transparent',
+    sub: 'receive.new-transparent-sub',
+    receivers: '',
+    pill: 'public',
+  },
+];
 
 type NewAddressProps = {
-  addressKind: AddressKindEnum;
   closeSheet: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
 };
+
+/**
+ * A new address of the wallet: its kind as a radio list, Orchard marked
+ * Best and Transparent marked Public, and an optional tag. Receive shows
+ * it the moment it turns up in the wallet's addresses.
+ */
 const NewAddress: React.FunctionComponent<NewAddressProps> = ({
-  addressKind,
   closeSheet,
   setAddressBook,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar } = context;
-  const { colors } = useTheme();
+  const t = (key: string) => translate(key) as string;
 
   const [label, setLabel] = useState<string>('');
-  const [type, setType] = useState<AddressUnifiedTypeEnum>(
-    AddressUnifiedTypeEnum.orchard,
-  );
-  const uTypeSelectRef = useRef<BottomSheetModal>(null);
-
-  const uTypeItems = useMemo(
-    () => [
-      {
-        label: translate('receive.shielded-orchard') as string,
-        value: AddressUnifiedTypeEnum.orchard,
-      },
-      {
-        label: translate('receive.shielded-orchard-sapling') as string,
-        value: AddressUnifiedTypeEnum.orchardAndSapling,
-      },
-      {
-        label: translate('receive.shielded-sapling') as string,
-        value: AddressUnifiedTypeEnum.sapling,
-      },
-    ],
-    [translate],
-  );
+  const [kind, setKind] = useState<NewKind>('orchard');
+  const [creating, setCreating] = useState(false);
 
   const createAddress = async () => {
-    const receivers: string =
-      addressKind === AddressKindEnum.u &&
-      type === AddressUnifiedTypeEnum.orchard
-        ? ReceiverEnum.o
-        : addressKind === AddressKindEnum.u &&
-            type === AddressUnifiedTypeEnum.sapling
-          ? ReceiverEnum.z
-          : addressKind === AddressKindEnum.u &&
-              type === AddressUnifiedTypeEnum.orchardAndSapling
-            ? ReceiverEnum.o + ReceiverEnum.z
-            : '';
+    const receivers = KINDS.find(k => k.kind === kind)?.receivers ?? '';
+    setCreating(true);
     try {
-      const newAddressResult = receivers
+      const result = receivers
         ? await createNewUnifiedAddress(receivers)
         : await createNewTransparentAddress();
-
-      if (!newAddressResult.ok) {
+      if (!result.ok) {
         addLastSnackbar(
-          translate('receive.transparent.new-error') as string,
+          t('receive.transparent.new-error'),
           SnackbarDurationEnum.short,
         );
-      } else if (label) {
-        let newAddress: string;
-        if (receivers) {
-          const newUnifiedAddressJSON: RPCUnifiedAddressType = await JSON.parse(
-            newAddressResult.value,
-          );
-          newAddress = newUnifiedAddressJSON.encoded_address;
-        } else {
-          const newTransparentAddressJSON: RPCTransparentAddressType =
-            await JSON.parse(newAddressResult.value);
-          newAddress = newTransparentAddressJSON.encoded_address;
-        }
-        //console.log(label, newAddress);
-        const randomColors = Utils.generateColorList(1);
+      } else if (label.trim()) {
+        const parsed: RPCUnifiedAddressType | RPCTransparentAddressType =
+          JSON.parse(result.value);
         const ab = await AddressBookFileImpl.writeAddressBookItem(
-          label,
-          newAddress,
-          randomColors[0],
+          label.trim(),
+          parsed.encoded_address,
+          Utils.generateColorList(1)[0],
           true,
           context.walletChainName || context.server.chainName,
         );
-        //console.log(ab);
         setAddressBook(ab);
       }
     } catch (error) {
       console.log(`Critical Error new address ${error}`);
     }
-
+    setCreating(false);
     setLabel('');
     Keyboard.dismiss();
     setTimeout(() => {
@@ -128,144 +118,59 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
   };
 
   return (
-    <View
-      style={{
-        backgroundColor: colors.bgSurface,
-      }}
-    >
-      <View style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
-        <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>
-          {'Tag (Optional)'}
-        </RegText>
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            paddingHorizontal: 10,
-            marginTop: 10,
-          }}
-        >
-          <View
-            accessible={true}
-            style={{
-              flexGrow: 1,
-              borderWidth: 1,
-              borderRadius: 12,
-              borderColor: colors.borderMuted,
-              minWidth: 48,
-              minHeight: 48,
-              maxHeight: 150,
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}
-          >
-            <TextInput
-              style={{
-                color: colors.fgDefault,
-                fontWeight: '600',
-                fontSize: 14,
-                flex: 1,
-                minHeight: 48,
-                marginLeft: 5,
-                backgroundColor: 'transparent',
-              }}
-              placeholder={translate('addressbook.label-placeholder') as string}
-              placeholderTextColor={colors.fgMuted}
-              value={label}
-              onChangeText={(text: string) => setLabel(text)}
-              maxLength={50}
-            />
-            {label && (
-              <TouchableOpacity onPress={() => setLabel('')}>
-                <FontAwesomeIcon
-                  style={{ marginRight: 10 }}
-                  size={20}
-                  icon={faXmark}
-                  color={colors.fgAccentDisabled}
-                />
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-
-        {addressKind === AddressKindEnum.u && (
-          <>
-            <RegText style={{ marginTop: 30, paddingHorizontal: 10 }}>
-              {'Type of Address'}
-            </RegText>
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                paddingHorizontal: 10,
-                marginTop: 10,
-              }}
-            >
-              <Pressable
-                onPress={() => uTypeSelectRef.current?.present()}
-                style={{ flexGrow: 1 }}
-              >
-                <View
-                  style={{
-                    flexGrow: 1,
-                    flexDirection: 'row',
-                    borderWidth: 1,
-                    borderRadius: 5,
-                    borderColor: colors.fgDefault,
-                    backgroundColor: '#303d4f',
-                    minWidth: 48,
-                    minHeight: 48,
-                    maxHeight: 48,
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
-                  <RegText
-                    style={{
-                      color: colors.fgDefault,
-                      fontWeight: '600',
-                      marginLeft: 20,
-                      backgroundColor: 'transparent',
-                    }}
-                  >
-                    {type === AddressUnifiedTypeEnum.orchard
-                      ? (translate('receive.shielded-orchard') as string)
-                      : type === AddressUnifiedTypeEnum.orchardAndSapling
-                        ? (translate(
-                            'receive.shielded-orchard-sapling',
-                          ) as string)
-                        : type === AddressUnifiedTypeEnum.sapling
-                          ? (translate('receive.shielded-sapling') as string)
-                          : ''}
-                  </RegText>
-                  <FontAwesomeIcon
-                    size={12}
-                    icon={faChevronDown}
-                    color={colors.fgDefault}
-                    style={{ marginRight: 20 }}
-                  />
-                </View>
-              </Pressable>
-            </View>
-          </>
-        )}
-
-        <View
-          style={{
-            flexGrow: 1,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginVertical: 5,
-            marginTop: 15,
-          }}
-        >
+    <View testID="receive.new-sheet" style={{ paddingHorizontal: space20 }}>
+      <Text variant="caption" tone="muted" style={{ textAlign: 'center' }}>
+        {t('receive.new-sub')}
+      </Text>
+      <Text
+        variant="bodySmall"
+        tone="muted"
+        style={{ fontWeight: '600', marginTop: space16, marginBottom: space8 }}
+      >
+        {t('receive.new-type')}
+      </Text>
+      <RadioList>
+        {KINDS.map((k, index) => (
+          <RadioRow
+            key={k.kind}
+            testID={`receive.new-kind.${k.kind}`}
+            first={index === 0}
+            title={t(k.title)}
+            sub={t(k.sub)}
+            pill={
+              k.pill === 'best'
+                ? { text: t('receive.best'), tone: 'accent' }
+                : k.pill === 'public'
+                  ? { text: t('receive.public'), tone: 'transparent' }
+                  : undefined
+            }
+            selected={kind === k.kind}
+            onPress={() => setKind(k.kind)}
+          />
+        ))}
+      </RadioList>
+      <View style={{ marginTop: space16 }}>
+        <TextField
+          testID="receive.new-tag"
+          label={t('addressbook.tag')}
+          labelRight={
+            <Text variant="caption" tone="muted">
+              {t('receive.optional')}
+            </Text>
+          }
+          placeholder={t('receive.tag-placeholder')}
+          value={label}
+          onChangeText={setLabel}
+          maxLength={50}
+          clearable
+          clearLabel={t('clear')}
+        />
+      </View>
+      <View style={{ marginTop: space20 }}>
+        <ButtonStack>
           <Button
-            type={ButtonTypeEnum.Link}
-            title={translate('cancel') as string}
+            variant="quiet"
+            title={t('cancel')}
             onPress={() => {
               setLabel('');
               Keyboard.dismiss();
@@ -273,26 +178,16 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                 closeSheet();
               }, 100);
             }}
-            twoButtons={true}
           />
           <Button
-            type={ButtonTypeEnum.Primary}
-            title={translate('save') as string}
-            style={{ marginLeft: 10 }}
-            onPress={() => {
-              createAddress();
-            }}
-            twoButtons={true}
+            testID="receive.new-create"
+            variant="primary"
+            title={t('receive.create')}
+            busy={creating}
+            onPress={createAddress}
           />
-        </View>
+        </ButtonStack>
       </View>
-      <SelectBottomSheet
-        ref={uTypeSelectRef}
-        title={translate('loadedapp.options') as string}
-        items={uTypeItems}
-        value={type}
-        onChange={v => setType(v as AddressUnifiedTypeEnum)}
-      />
     </View>
   );
 };

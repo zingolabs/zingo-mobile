@@ -2,18 +2,14 @@
 import React, { useState } from 'react';
 import { Pressable, Text, TextStyle, View } from 'react-native';
 import Animated, { FadeIn, ReduceMotion } from 'react-native-reanimated';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faCheck,
-  faChevronRight,
-  faXmark,
-} from '@fortawesome/free-solid-svg-icons';
 
 import { useTheme } from '@app/theme';
 import { ChainNameEnum } from '@app/AppState';
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
-import { ROW_DIVIDER } from './ServerRow';
+import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { ChevronRight } from '@ui/primitives/Icons/Chevron';
 
 export type LogTone = 'ok' | 'bad' | 'warn' | 'mut' | '';
 
@@ -31,12 +27,9 @@ export type LogLine = {
 
 const MONO: TextStyle = {
   fontFamily: 'monospace',
-  fontSize: 10.5,
+  fontSize: 12,
   lineHeight: 16,
 };
-const OK_TEXT = '#6FD35C';
-const WARN_TEXT = '#E6C46A';
-const PINK = '#F07A86';
 const STEP_MS = 160;
 
 const lineIn = (index: number) =>
@@ -66,11 +59,11 @@ const ServerLog: React.FC<ServerLogProps> = ({
   }
   const finalColor = (tone: LogTone) =>
     tone === 'ok'
-      ? OK_TEXT
+      ? colors.fgAccent
       : tone === 'warn'
-        ? WARN_TEXT
+        ? colors.fgWarning
         : tone === 'bad'
-          ? PINK
+          ? colors.fgDanger
           : tone === 'mut'
             ? colors.fgMuted
             : colors.fgDefault;
@@ -99,7 +92,7 @@ const ServerLog: React.FC<ServerLogProps> = ({
                   marginTop: i === 0 ? 0 : 7,
                   paddingTop: i === 0 ? 0 : 7,
                   borderTopWidth: i === 0 ? 0 : 1,
-                  borderTopColor: ROW_DIVIDER,
+                  borderTopColor: colors.borderSubtle,
                 }
               : { marginTop: i === 0 ? 0 : 2 }
           }
@@ -108,7 +101,7 @@ const ServerLog: React.FC<ServerLogProps> = ({
             <Text
               testID={`server.custom.log.final.${line.tone || 'plain'}`}
               style={{
-                fontSize: 11.5,
+                fontSize: 12,
                 lineHeight: 17,
                 fontWeight: line.tone === 'mut' ? '500' : '600',
                 color: finalColor(line.tone),
@@ -122,7 +115,7 @@ const ServerLog: React.FC<ServerLogProps> = ({
                   accessibilityRole="link"
                   onPress={() => onSwitch(line.switchTo!.chain)}
                   style={{
-                    fontSize: 11,
+                    fontSize: 12,
                     fontWeight: 'bold',
                     color: colors.fgAccent,
                   }}
@@ -142,9 +135,9 @@ const ServerLog: React.FC<ServerLogProps> = ({
                 }}
               >
                 {line.tone === 'ok' ? (
-                  <FontAwesomeIcon icon={faCheck} size={10} color={OK_TEXT} />
+                  <CheckIcon size={16} color={colors.fgAccent} />
                 ) : line.tone === 'bad' ? (
-                  <FontAwesomeIcon icon={faXmark} size={10} color={PINK} />
+                  <XIcon size={16} color={colors.fgDanger} />
                 ) : (
                   <RegText style={{ ...MONO, color: colors.fgMuted }}>
                     ·
@@ -156,7 +149,7 @@ const ServerLog: React.FC<ServerLogProps> = ({
                 style={{
                   ...MONO,
                   flex: 1,
-                  color: line.tone === 'bad' ? PINK : colors.fgMuted,
+                  color: line.tone === 'bad' ? colors.fgDanger : colors.fgMuted,
                 }}
               >
                 {line.text}
@@ -182,13 +175,9 @@ const ServerLog: React.FC<ServerLogProps> = ({
                     transform: [{ rotate: open[i] ? '90deg' : '0deg' }],
                   }}
                 >
-                  <FontAwesomeIcon
-                    icon={faChevronRight}
-                    size={9}
-                    color={colors.fgAccent}
-                  />
+                  <ChevronRight size={16} color={colors.fgAccent} />
                 </View>
-                <BoldText style={{ fontSize: 11, color: colors.fgAccent }}>
+                <BoldText style={{ fontSize: 12, color: colors.fgAccent }}>
                   {detailsLabel}
                 </BoldText>
               </Pressable>

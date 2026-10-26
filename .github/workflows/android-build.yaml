@@ -67,17 +67,20 @@ jobs:
               run_id: context.runId,
             });
 
-  # The job already runs in android_builder:018, the image that zingolib's
-  # builder uses, so the builder runs its plan here with --in-image instead
-  # of starting a container. The output holds the ABI's two libraries and
-  # the Kotlin bindings.
+  # The job already runs in the image that zingolib's builder pins
+  # (binding_layer::PUBLISHED_ANDROID_IMAGE), so the builder runs its plan
+  # here with --in-image instead of starting a container. The output holds
+  # the ABI's two libraries and the Kotlin bindings.
   android-build:
     name: Build native rust & kotlin uniffi
     needs: android-check-build-cache
     if: ${{ needs.android-check-build-cache.outputs.binding-layer-found != 'true' }}
     runs-on: ${{ inputs.runner }}
     container:
-      image: zingodevops/android_builder:018
+      image: ghcr.io/zingolabs/android_builder:019
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     env:
       RUSTUP_HOME: ${{ github.workspace }}/.rustup
       CARGO_HOME:  ${{ github.workspace }}/.cargo
@@ -135,11 +138,6 @@ jobs:
             armeabi-v7a) rustup target add armv7-linux-androideabi ;;
             *)           echo "unknown ABI $ARCH"; exit 1 ;;
           esac
-
-      - name: Setup Node.js for the descriptor
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22.18.0
 
       # The builder finds the zingolib root from its own crate directory, so
       # it runs from the zingo-mobile root.

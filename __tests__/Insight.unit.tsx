@@ -11,7 +11,9 @@ import {
   ValueTransferKindEnum,
 } from '@app/AppState';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { REVEAL_MS } from '@app/utils/reveal';
 import Insight from '@screens/Insight';
+import { advance } from '../__mocks__/advanceTimers';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 const nowSec = Date.now() / 1000;
@@ -39,26 +41,28 @@ const ana = new AddressBookFileClass(
 
 const launchAddTagModal = jest.fn();
 
-const renderInsight = () =>
-  render(
-    <ContextAppLoadedProvider
-      value={{
-        ...defaultAppContextLoaded,
-        translate: (k: string) => k,
-        addressBook: [ana],
-        launchAddTagModal,
-        valueTransfers: [
-          sent('u1ana', 2, 'a'),
-          sent('u1stranger0000000000000000xyz', 1, 'b'),
-        ],
-      }}
-    >
-      <Insight
-        navigation={mockNavigation}
-        route={{ key: 'insight', name: 'Insight', params: undefined }}
-      />
-    </ContextAppLoadedProvider>,
-  );
+const insightWith = (privacy: boolean) => (
+  <ContextAppLoadedProvider
+    value={{
+      ...defaultAppContextLoaded,
+      translate: (k: string) => k,
+      addressBook: [ana],
+      launchAddTagModal,
+      privacy,
+      valueTransfers: [
+        sent('u1ana', 2, 'a'),
+        sent('u1stranger0000000000000000xyz', 1, 'b'),
+      ],
+    }}
+  >
+    <Insight
+      navigation={mockNavigation}
+      route={{ key: 'insight', name: 'Insight', params: undefined }}
+    />
+  </ContextAppLoadedProvider>
+);
+
+const renderInsight = (privacy = false) => render(insightWith(privacy));
 
 beforeEach(() => {
   launchAddTagModal.mockClear();
@@ -87,4 +91,45 @@ test('Tests that the donut center shows the total sent when nothing is selected.
   ).toBe(' 3.0');
   fireEvent.press(screen.getByTestId('insight.metric.sends'));
   expect(screen.getByTestId('insight.donut.value').props.children).toBe('2');
+});
+
+describe('Insight - privacy', () => {
+  beforeEach(() => jest.useFakeTimers());
+  afterEach(() => jest.useRealTimers());
+
+  test('Tests that the address of a row outside the book shows its mask when privacy is on.', () => {
+    renderInsight(true);
+
+    expect(screen.getByText('u1.....')).toBeTruthy();
+    expect(screen.queryByText('u1stran...0000xyz')).toBeNull();
+  });
+
+  test('Tests that the address of a row shows when it is tapped, and shows its mask again when the reveal time ends.', () => {
+    renderInsight(true);
+
+    fireEvent.press(screen.getByText('u1.....'));
+    expect(screen.getByText('u1stran...0000xyz')).toBeTruthy();
+
+    advance(REVEAL_MS);
+    expect(screen.getByText('u1.....')).toBeTruthy();
+  });
+
+  test('Tests that a revealed address shows its mask when privacy turns off and on again.', () => {
+    const { rerender } = renderInsight(true);
+
+    fireEvent.press(screen.getByText('u1.....'));
+    rerender(insightWith(false));
+    rerender(insightWith(true));
+
+    expect(screen.getByText('u1.....')).toBeTruthy();
+  });
+
+  test('Tests that the donut caption shows the mask of the address when privacy is on and the row is selected.', () => {
+    renderInsight(true);
+
+    fireEvent.press(screen.getByTestId('insight.row.1'));
+
+    expect(screen.getByText(/^u1\.\.\.\.\. · /)).toBeTruthy();
+    expect(screen.queryByText(/u1stran/)).toBeNull();
+  });
 });

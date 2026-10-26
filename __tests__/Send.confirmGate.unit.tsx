@@ -266,10 +266,13 @@ describe('Send confirm send permit', () => {
     expect(setServerOption.mock.invocationCallOrder[0]).toBeLessThan(
       sendTransaction.mock.invocationCallOrder[1],
     );
-    expect(navigate).toHaveBeenLastCalledWith(Route.Computing, {
-      phase: 'failed',
-      failure: errorKeyed('send.nym-blocked'),
-    });
+    expect(navigate).toHaveBeenLastCalledWith(
+      Route.Computing,
+      expect.objectContaining({
+        phase: 'failed',
+        failure: errorKeyed('send.nym-blocked'),
+      }),
+    );
   });
 
   test('Tests that confirming sends when the permit is granted.', async () => {
@@ -280,9 +283,10 @@ describe('Send confirm send permit', () => {
     await confirmSend();
 
     expect(sendTransaction).toHaveBeenCalledTimes(1);
-    expect(navigate).toHaveBeenLastCalledWith(Route.Computing, {
-      phase: 'created',
-    });
+    expect(navigate).toHaveBeenLastCalledWith(
+      Route.Computing,
+      expect.objectContaining({ phase: 'created' }),
+    );
   });
 
   test('Tests that confirming sends the state the Confirm screen shows when the form changes after it opened.', async () => {

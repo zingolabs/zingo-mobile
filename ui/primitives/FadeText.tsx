@@ -1,7 +1,6 @@
-/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { Text, TextStyle } from 'react-native';
-import { useTheme } from '@app/theme';
+import { TextStyle } from 'react-native';
+import Text from './Text';
 
 type FadeTextProps = {
   style?: TextStyle;
@@ -12,27 +11,9 @@ type FadeTextProps = {
   testID?: string;
 };
 
-const FadeText: React.FunctionComponent<FadeTextProps> = ({
-  style,
-  children,
-  numberOfLines,
-  ellipsizeMode,
-  selectable,
-  testID,
-}) => {
-  const { colors } = useTheme();
-
-  return (
-    <Text
-      testID={testID}
-      numberOfLines={numberOfLines}
-      ellipsizeMode={ellipsizeMode}
-      style={{ opacity: 0.65, color: colors.fgDefault, ...style }}
-      selectable={selectable}
-    >
-      {children}
-    </Text>
-  );
-};
+/** `Text` in the `muted` tone. Opacity would give a different gray on each ground. */
+const FadeText: React.FunctionComponent<FadeTextProps> = props => (
+  <Text variant="body" tone="muted" {...props} />
+);
 
 export default FadeText;

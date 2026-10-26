@@ -9,7 +9,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { useTheme } from '@app/theme';
+import { useTheme, fontScaleTitle } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
 import { BUTTON_HEIGHT } from '@ui/primitives/Button';
 
@@ -62,7 +62,7 @@ const BusyButton: React.FunctionComponent<BusyButtonProps> = ({
     const bg = interpolateColor(
       on.value,
       [0, 1],
-      [colors.bgSecondaryDisabled, colors.bgAccent],
+      [colors.bgAccentDisabled, colors.bgAccent],
     );
     const width =
       naturalWidth.value > 0
@@ -136,9 +136,10 @@ const BusyButton: React.FunctionComponent<BusyButtonProps> = ({
         >
           <Animated.Text
             numberOfLines={1}
+            maxFontSizeMultiplier={fontScaleTitle}
             style={[
               {
-                color: colors.bgCanvas,
+                color: colors.fgOnAccent,
                 fontWeight: '700',
                 fontSize: labelSize,
                 textAlign: 'center',
@@ -163,7 +164,7 @@ const BusyButton: React.FunctionComponent<BusyButtonProps> = ({
               <ActivityIndicator
                 testID={testID ? `${testID}.spinner` : undefined}
                 size="small"
-                color={colors.bgCanvas}
+                color={colors.fgOnAccent}
               />
             )}
           </Animated.View>

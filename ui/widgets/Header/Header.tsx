@@ -1,16 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { SnowflakeIcon } from '@ui/primitives/Icons/SnowflakeIcon';
 import { REVEAL_OPEN_MS } from '@ui/widgets/CircularReveal';
 import { ease } from '@app/theme/motion';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   StackActions,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
-import { useTheme } from '@app/theme';
+import { useTheme, iconSize, slopFor } from '@app/theme';
 import React, { useContext, useEffect, useRef } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
 import Animated, {
@@ -24,6 +22,16 @@ import { useOptionsPanel } from '@app/context/optionsPanel';
 
 // Mirror the panel host's fade duration so the header dissolves in lockstep
 // with the panel that's appearing over it.
+/** The bar with the menu, the mixnet and Messages: its row and the space under it. */
+const BAR_ROW = 57;
+const BAR_BOTTOM = 10;
+/**
+ * Where every panel's top edge sits, under the top bar's icons: the tabs'
+ * fixed panels and the full panels opened over them, so one covers the
+ * other exactly.
+ */
+export const PANEL_TOP = 59;
+
 const HEADER_FADE_MS = 320;
 import {
   NetInfoType,
@@ -33,14 +41,16 @@ import {
 } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { getZingoLogo } from '@app/utils/ZingoAppData';
-import { useShieldFunds } from '@app/hooks/useShieldFunds';
 import { useSyncStatus } from '@app/hooks/useSyncStatus';
-import BoldText from '@ui/primitives/BoldText';
-import SyncStatusBar from './components/SyncStatusBar';
+import TitleBar from '@ui/widgets/TitleBar';
+import SyncLine from './components/SyncLine';
+import MixnetIcon from '@ui/primitives/Icons/MixnetIcon';
+import { viewPhase } from '@app/walletBackend/transforms/mixnetView';
 import BalanceRow from './components/BalanceRow';
 import PriceRow from './components/PriceRow';
 import { MessagesIcon } from '@ui/primitives/Icons/MessagesIcon';
 import { MenuMorphIcon } from '@ui/widgets/MenuMorphIcon';
+import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 
 type HeaderProps = {
   // general
@@ -49,6 +59,9 @@ type HeaderProps = {
   // side menu
   noDrawMenu?: boolean;
   closeScreen?: () => void;
+  /** The back arrow's testID and spoken label, with closeScreen. */
+  backTestID?: string;
+  backAccessibilityLabel?: string;
   // balance
   noBalance?: boolean;
   // syncing icons
@@ -88,13 +101,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   translate: translateProp,
   netInfo: netInfoProp,
   privacy: privacyProp,
-  setBackgroundError,
   noPrivacy,
   setPrivacyOption,
-  addLastSnackbar,
   receivedLegend,
-  setShieldingAmount,
   closeScreen,
+  backTestID,
+  backAccessibilityLabel,
   noUfvkIcon,
   showMessagesIcon,
   onUsdRowLayout,
@@ -110,15 +122,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     syncingStatus,
     zecPrice,
     readOnly,
-    valueTransfersTotal,
-    somePending,
-    shieldingAmount,
     server,
     mixnetView,
-    sendPermitNow,
     seedBackedUp,
-    setScrollToTop,
-    setScrollToBottom,
   } = context;
 
   const translate = translateProp ?? context.translate;
@@ -135,7 +141,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const homeTab =
     route.name === Route.History ||
     route.name === Route.Send ||
-    route.name === Route.Receive;
+    route.name === Route.Receive ||
+    route.name === Route.Swap;
   // The panel lives in the home: from a pushed screen the button pops back
   // to it and shows the panel there.
   const toggleMenuDrawer = () => {
@@ -157,33 +164,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     opacity: headerOpacity.value,
   }));
 
-  const {
-    percentageOutputsScanned,
-    syncInProgress,
-    viewSyncStatus,
-    opacityValue,
-  } = useSyncStatus({ syncingStatus, noSyncingStatus });
-
-  const {
-    showShieldButton,
-    shieldingFee,
-    onPressShieldFunds,
-    calculateAmountToShield,
-    calculatePoolsToShield,
-    calculateDisableButtonToShield,
-  } = useShieldFunds({
-    readOnly,
-    setShieldingAmount,
-    server,
-    somePending,
-    totalBalance,
-    shieldingAmount,
-    translate,
-    addLastSnackbar,
-    setBackgroundError,
-    setScrollToTop,
-    setScrollToBottom,
-    sendPermitNow,
+  const mixnetPhase = viewPhase(mixnetView);
+  const { percentageOutputsScanned, syncInProgress } = useSyncStatus({
+    syncingStatus,
+    noSyncingStatus,
   });
 
   // The viewing key opens as a circle out of the snowflake, which turns 60°
@@ -222,50 +206,58 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               alignItems: 'center',
               backgroundColor: colors.bgCanvas,
               paddingTop: 0,
-              paddingBottom: 10,
+              paddingBottom: BAR_BOTTOM,
               minHeight: 50,
             },
           ]}
         >
-          <SyncStatusBar
-            noSyncingStatus={noSyncingStatus}
-            server={server}
-            netInfo={netInfo}
-            percentageOutputsScanned={percentageOutputsScanned}
-            syncInProgress={syncInProgress}
-            viewSyncStatus={viewSyncStatus}
-            opacityValue={opacityValue}
-            mixnetView={mixnetView}
-            translate={translate}
-            privacy={privacy}
-            noPrivacy={noPrivacy}
-            setPrivacyOption={setPrivacyOption}
-            addLastSnackbar={addLastSnackbar}
-            noBalance={noBalance}
-          />
+          {/* The mixnet icon alone in the middle of the bar, level with the menu. */}
+          <View
+            style={{
+              height: BAR_ROW,
+              alignItems: 'center',
+              justifyContent: 'center',
+              paddingTop: 12,
+            }}
+          >
+            {mixnetPhase !== 'absent' && (
+              <TouchableOpacity
+                testID="header.mixnet-status"
+                hitSlop={slopFor(22)}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  translate('settings.nym-diagnostics') as string
+                }
+                onPress={() => navigation.navigate(Route.MixnetDoctor)}
+              >
+                <MixnetIcon phase={mixnetPhase} />
+              </TouchableOpacity>
+            )}
+          </View>
 
           <BalanceRow
             noBalance={noBalance}
             noPrivacy={noPrivacy}
             setPrivacyOption={setPrivacyOption}
-            addLastSnackbar={addLastSnackbar}
             privacy={privacy}
             translate={translate}
             totalBalance={totalBalance}
             info={info}
             zecPrice={zecPrice}
             server={server}
-            showShieldButton={showShieldButton}
-            shieldingFee={shieldingFee}
-            valueTransfersTotal={valueTransfersTotal}
-            calculateAmountToShield={calculateAmountToShield}
-            calculatePoolsToShield={calculatePoolsToShield}
-            calculateDisableButtonToShield={calculateDisableButtonToShield}
-            onPressShieldFunds={onPressShieldFunds}
             receivedLegend={receivedLegend}
-            mixnetView={mixnetView}
             onUsdRowLayout={onUsdRowLayout}
           />
+
+          {!noBalance && !noSyncingStatus && (
+            <SyncLine
+              server={server}
+              netInfo={netInfo}
+              percentage={percentageOutputsScanned}
+              syncInProgress={syncInProgress}
+              translate={translate}
+            />
+          )}
 
           {!noBalance && !noPriceRow && (
             <PriceRow
@@ -292,6 +284,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           <View style={{ alignItems: 'center', flexDirection: 'row', gap: 14 }}>
             {!noDrawMenu && (
               <TouchableOpacity
+                hitSlop={slopFor(24)}
                 testID="header.drawmenu"
                 accessible={true}
                 accessibilityLabel={translate('menudrawer-acc') as string}
@@ -321,17 +314,14 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             {readOnly && !noUfvkIcon && (
               <Animated.View style={headerAnimatedStyle}>
                 <TouchableOpacity
+                  hitSlop={slopFor(24)}
                   testID="header.snowflake"
                   accessibilityRole="button"
                   accessibilityLabel={translate('viewingkey.title') as string}
                   onPress={ufvkShowModal}
                 >
                   <Animated.View ref={snowflake} style={snowStyle}>
-                    <SnowflakeIcon
-                      size={22}
-                      color={colors.fgViewOnly}
-                      strokeWidth={1.8}
-                    />
+                    <SnowflakeIcon size={iconSize} color={colors.fgViewOnly} />
                   </Animated.View>
                 </TouchableOpacity>
               </Animated.View>
@@ -364,11 +354,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   4.5 below. The nudge rides on the icon alone, leaving the
                   logo this corner falls back to where it already sat. */}
               <TouchableOpacity
+                hitSlop={slopFor(24)}
                 style={{ marginRight: 5, marginTop: 4.5 }}
                 testID="header.messages"
                 onPress={() => navigation.navigate(Route.Messages)}
               >
-                <MessagesIcon size={22} color="#B1BBC5" />
+                <MessagesIcon size={iconSize} color={colors.fgMuted} />
               </TouchableOpacity>
             </View>
           ) : (
@@ -386,57 +377,21 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       </View>
 
       {!!title && (
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            width: '100%',
-            marginVertical: 5,
-          }}
-        >
-          {closeScreen ? (
-            <>
-              <TouchableOpacity onPress={closeScreen}>
-                <FontAwesomeIcon
-                  style={{ marginHorizontal: 10 }}
-                  size={24}
-                  icon={faChevronLeft}
-                  color={colors.fgAccent}
-                />
-              </TouchableOpacity>
-              <BoldText
-                testID={testID}
-                style={{
-                  color: colors.fgDefault,
-                  fontSize: 18,
-                  paddingHorizontal: 5,
-                }}
-              >
-                {title}
-              </BoldText>
-              <View style={{ width: 30, height: 30, marginHorizontal: 10 }} />
-            </>
-          ) : (
-            <>
-              <View style={{ width: 30, height: 30, marginHorizontal: 10 }} />
-              <BoldText
-                testID={testID}
-                style={{
-                  color: colors.fgDefault,
-                  fontSize: 18,
-                  paddingHorizontal: 5,
-                  textAlign: 'center',
-                }}
-              >
-                {title}
-              </BoldText>
-              <View style={{ width: 30, height: 30, marginHorizontal: 10 }} />
-            </>
-          )}
-        </View>
+        <TitleBar
+          testID={testID}
+          title={title}
+          left={
+            closeScreen
+              ? {
+                  icon: ChevronLeft,
+                  accent: true,
+                  onPress: closeScreen,
+                  testID: backTestID,
+                  accessibilityLabel: backAccessibilityLabel ?? title,
+                }
+              : undefined
+          }
+        />
       )}
     </>
   );

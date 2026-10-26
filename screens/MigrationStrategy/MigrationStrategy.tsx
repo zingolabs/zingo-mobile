@@ -8,20 +8,20 @@ import React, {
   useState,
 } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { useTheme } from '@app/theme';
+import { useTheme, iconSizeMd } from '@app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import NymGateSheet from './components/NymGateSheet';
 import { deriveNymGateState } from './components/nymGateState';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
+import { formatAmount } from '@app/utils/formatAmount';
 import { Route } from '@app/AppState';
-import Utils from '@app/utils';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
 
 type MigrationStrategyProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -32,11 +32,9 @@ type MigrationStrategyProps = NativeStackScreenProps<
   nymSheetOpen?: boolean;
 };
 
-// Migration choices: opt out entirely ('none', the default), the immediate
-// drain ('now'), or the private two-phase path ('private': split notes, then
-// send batches inside scheduled windows). The private path ships later and
-// its card is disabled.
-type StrategyOption = 'none' | 'now' | 'private';
+// Migration choices: opt out entirely ('none', the default) or the immediate
+// drain ('now').
+type StrategyOption = 'none' | 'now';
 
 // Renders a translated string, bolding `**…**` spans in `highlight` and
 // `##…##` spans in `accent` (falling back to `highlight`), so a single
@@ -119,8 +117,6 @@ type OptionCardProps = {
   selected: boolean;
   onPress: () => void;
   colors: AppTheme['colors'];
-  disabled?: boolean;
-  badge?: string;
   accent?: string;
 };
 
@@ -130,13 +126,10 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
   selected,
   onPress,
   colors,
-  disabled = false,
-  badge,
   accent,
 }) => (
   <TouchableOpacity
-    activeOpacity={disabled ? 1 : 0.8}
-    disabled={disabled}
+    activeOpacity={0.8}
     onPress={onPress}
     style={{
       borderWidth: 1.5,
@@ -144,7 +137,6 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
       backgroundColor: colors.bgSurface,
       borderRadius: 14,
       padding: 18,
-      opacity: disabled ? 0.5 : 1,
     }}
   >
     <View
@@ -163,21 +155,6 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
         >
           {title}
         </Text>
-        {badge ? (
-          <View
-            style={{
-              marginLeft: 8,
-              paddingHorizontal: 8,
-              paddingVertical: 2,
-              borderRadius: 6,
-              backgroundColor: colors.bgMuted,
-            }}
-          >
-            <Text style={{ color: colors.bgSurface, fontSize: 12 }}>
-              {badge}
-            </Text>
-          </View>
-        ) : null}
       </View>
       <RadioDot
         selected={selected}
@@ -229,12 +206,8 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   }, [navigation]);
 
   const startMigration = useCallback(() => {
-    navigation.navigate(
-      selected === 'private'
-        ? Route.MigrationSplitPlan
-        : Route.MigrationTransactions,
-    );
-  }, [navigation, selected]);
+    navigation.navigate(Route.MigrationTransactions);
+  }, [navigation]);
 
   // Ends the enable wait once the transport settles: ready continues the
   // migration, a lost transport releases the button. A reconnecting
@@ -257,10 +230,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   // Orchard balance shown so the user sees what would cross the pool boundary
   // (and become publicly visible) on the immediate path.
   const orchardAmount = totalBalance ? totalBalance.totalOrchardBalance : 0;
-  const amountStr = `${Utils.parseNumberFloatToStringLocale(
-    orchardAmount,
-    4,
-  )} ${info.currencyName}`;
+  const amountStr = `${formatAmount(orchardAmount)} ${info.currencyName}`;
   const nowBody = (translate('migrationstrategy.now-body') as string).replace(
     '{amount}',
     amountStr,
@@ -287,7 +257,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
             justifyContent: 'center',
           }}
         >
-          <FontAwesomeIcon icon={faXmark} size={22} color={colors.fgMuted} />
+          <XIcon size={iconSizeMd} color={colors.fgMuted} />
         </TouchableOpacity>
         <ScrollView
           style={{ flex: 1 }}
@@ -328,16 +298,6 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
             colors={colors}
             accent={colors.fgWarning}
           />
-          <View style={{ height: 14 }} />
-          <OptionCard
-            title={translate('migrationstrategy.private-label') as string}
-            body={translate('migrationstrategy.private-body') as string}
-            selected={selected === 'private'}
-            onPress={() => {}}
-            colors={colors}
-            disabled={true}
-            badge={translate('migrationstrategy.coming-soon') as string}
-          />
         </ScrollView>
 
         <View
@@ -349,31 +309,31 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
             paddingHorizontal: 24,
           }}
         >
-          <Button
-            testID="migrationstrategy.back"
-            type={ButtonTypeEnum.Ghost}
-            title={translate('migrationstrategy.back') as string}
-            onPress={() => navigation.goBack()}
-            twoButtons={true}
-          />
-          <Button
-            testID="migrationstrategy.start"
-            type={ButtonTypeEnum.Primary}
-            title={translate('migrationstrategy.start') as string}
-            onPress={() => {
-              if (selected === 'none') {
-                closeMigration();
-                return;
-              }
-              if (nymGate.kind === 'ready') {
-                startMigration();
-                return;
-              }
-              setEnabling(true);
-              nymSheetRef.current?.present();
-            }}
-            twoButtons={true}
-          />
+          <ButtonStack>
+            <Button
+              testID="migrationstrategy.back"
+              variant="text"
+              title={translate('migrationstrategy.back') as string}
+              onPress={() => navigation.goBack()}
+            />
+            <Button
+              testID="migrationstrategy.start"
+              variant="primary"
+              title={translate('migrationstrategy.start') as string}
+              onPress={() => {
+                if (selected === 'none') {
+                  closeMigration();
+                  return;
+                }
+                if (nymGate.kind === 'ready') {
+                  startMigration();
+                  return;
+                }
+                setEnabling(true);
+                nymSheetRef.current?.present();
+              }}
+            />
+          </ButtonStack>
         </View>
       </View>
 

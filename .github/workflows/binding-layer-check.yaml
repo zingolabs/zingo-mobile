@@ -83,8 +83,8 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            zingolib/zingo-netutils/nym-proxy-ffi/target
-          key: binding-layer-proxy-tests-${{ runner.os }}-${{ hashFiles('zingolib/zingo-netutils/nym-proxy-ffi/Cargo.lock') }}
+            zingolib/target
+          key: binding-layer-proxy-tests-${{ runner.os }}-${{ hashFiles('zingolib/Cargo.lock') }}
 
       - name: Install cargo-nextest
         uses: taiki-e/install-action@v2
@@ -93,7 +93,7 @@ jobs:
 
       - name: Tests
         working-directory: ./zingolib/zingo-netutils/nym-proxy-ffi
-        run: cargo nextest run --locked --workspace
+        run: cargo nextest run --locked -p zingo-nym-proxy-ffi
 
       - name: Cancel the run on failure (fail-all)
         if: ${{ failure() && inputs.fail-all }}
@@ -129,15 +129,16 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            zingolib/zingo-netutils/nym-proxy-ffi/target
-          key: binding-layer-proxy-tests-${{ runner.os }}-${{ hashFiles('zingolib/zingo-netutils/nym-proxy-ffi/Cargo.lock') }}
+            zingolib/target
+          key: binding-layer-proxy-tests-${{ runner.os }}-${{ hashFiles('zingolib/Cargo.lock') }}
 
       - name: Install cargo-nextest
         uses: taiki-e/install-action@v2
         with:
           tool: cargo-nextest@0.9.98
 
-      # The proxy crate's .config/nextest.toml serializes the live binary.
+      # The proxy crate is a member of zingolib's workspace, whose nextest
+      # config does not serialize the live binary, so the run does.
       - name: Live mixnet start
         working-directory: ./zingolib/zingo-netutils/nym-proxy-ffi
-        run: cargo nextest run --locked --features live-mixnet --test live_mixnet
+        run: cargo nextest run --locked -p zingo-nym-proxy-ffi --features live-mixnet --test live_mixnet --test-threads 1

@@ -10,7 +10,11 @@ import { useTheme } from '@app/theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { LoadingSession, useSession } from '@app/navigation/session';
+import {
+  GateDeclined,
+  LoadingSession,
+  useSession,
+} from '@app/navigation/session';
 import { LoadingNavigator } from '@app/navigation/LoadingNavigator';
 import {
   currentRoute,
@@ -90,6 +94,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '@app/services/createAlert';
 import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
 import Utils from '@app/utils';
+import { formatInteger } from '@app/utils/formatAmount';
 import { RPCWalletKindType } from '@app/walletBackend/types/RPCWalletKindType';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '@ui/widgets/toastConfig';
@@ -110,7 +115,7 @@ import {
   probeUri,
   recommendedServers,
 } from '@app/services/serverPicking';
-import { isEqual } from 'lodash';
+import { defaultTo, isEqual } from 'lodash';
 import {
   createUpdateRecoveryWalletInfo,
   getRecoveryWalletInfo,
@@ -135,6 +140,7 @@ import {
   OnboardingRoute,
 } from '@app/types';
 import { publishReport, reportState } from '@app/services/reportDiagnostics';
+import { forgetWalletOnFile } from '@app/services/WalletLocalData';
 
 const en = require('@app/translations/en.json');
 const es = require('@app/translations/es.json');
@@ -150,13 +156,6 @@ const SERVER_DEFAULT_0: ServerType = remoteServer(
   serverUris(() => {})[0].uri,
   serverUris(() => {})[0].chainName,
 );
-
-const activationHeight = {
-  main: 419200,
-  test: 280000,
-  regtest: 1,
-  '': 1,
-};
 
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme();
@@ -192,7 +191,12 @@ export default function LoadingApp(props: LoadingAppProps) {
     }),
     [],
   );
-  const i18n = useMemo(() => new I18n(file), [file]);
+  const i18n = useMemo(() => {
+    const instance = new I18n(file);
+    /** A key missing in a locale shows the English text, never `[missing … translation]`. */
+    instance.enableFallback = true;
+    return instance;
+  }, [file]);
 
   const translate: (key: string) => TranslateType = (key: string) =>
     substituteZingoName(i18n.t(key) as TranslateType);
@@ -334,6 +338,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         openBoot={() =>
           setSession({ kind: 'boot', startingApp: true, newWallet: false })
         }
+        openLock={gate => setSession({ kind: 'locked', gate })}
         theme={theme}
         translate={translate}
         language={language}
@@ -355,6 +360,7 @@ type LoadingAppClassProps = {
   openWallet: (params: LoadedAppNavigationState) => void;
   openOnboarding: (start: 'Welcome' | 'OpenError') => void;
   openBoot: () => void;
+  openLock: (gate: GateDeclined) => void;
   translate: (key: string) => TranslateType;
   theme: AppTheme;
   language: LanguageEnum;
@@ -519,8 +525,14 @@ export class LoadingAppClass extends Component<
       const proceed = enactGateAnswer(
         startGate,
         {
-          // The narrowed answer is the gate outcome, whole.
-          lock: declined => this.setState({ biometricGate: declined }),
+          // The narrowed answer is the gate outcome, whole. The session
+          // picks the lock screen and the state feeds it: this class stays
+          // mounted across the switch, so its constructor never reads the
+          // session's gate.
+          lock: declined => {
+            this.setState({ biometricGate: declined });
+            this.props.openLock(declined);
+          },
           notice: this.addLastSnackbar,
         },
         this.state.translate,
@@ -1050,8 +1062,17 @@ export class LoadingAppClass extends Component<
   confirmDelete = (context: DeleteWalletContext, next: () => void) => {
     this.afterDelete = async () => {
       if (context !== 'replace') {
-        const result = await deleteExistingWallet();
-        if (!resolvedTrue(result)) {
+        // No wallet is open here, so the data goes by the pointer to the
+        // wallet on file; if it cannot, the file stays too.
+        const forgotten = await forgetWalletOnFile().then(
+          () => true,
+          e => {
+            console.log(`confirmDelete: forgetting the wallet failed: ${e}`);
+            return false;
+          },
+        );
+        const deleted = forgotten && resolvedTrue(await deleteExistingWallet());
+        if (!deleted) {
           this.addLastSnackbar(
             this.state.translate('rpc.deletewallet-error') as string,
           );
@@ -1315,29 +1336,7 @@ export class LoadingAppClass extends Component<
       }
     }
 
-    let walletBirthday = birthday.toString() || '0';
-    if (parseInt(walletBirthday, 10) < 0) {
-      walletBirthday = '0';
-    }
-    if (isNaN(parseInt(walletBirthday, 10))) {
-      walletBirthday = '0';
-    }
-
-    // birthday cannot be lower than sapling activation height
-    if (
-      Number(walletBirthday) < activationHeight[this.state.server.chainName]
-    ) {
-      // no reporting button, no needed.
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        this.state.translate('loadingapp.invalidbirthday-label') as string,
-        this.state.translate('loadingapp.invalidbirthday-error') as string,
-        false,
-        this.state.translate,
-      );
-      return;
-    }
+    const walletBirthday = String(defaultTo(birthday, 0));
 
     this.setState({ actionButtonsDisabled: true });
     // From the form, the Import button collapses first; from the Keychain
@@ -1364,7 +1363,7 @@ export class LoadingAppClass extends Component<
     if (type === RestoreFromTypeEnum.seedRestoreFrom) {
       result = await restoreWalletFromSeed(
         seedUfvk.toLowerCase(),
-        walletBirthday || '0',
+        walletBirthday,
         nativeUri(this.state.server),
         this.state.server.chainName,
         this.state.performanceLevel,
@@ -1373,7 +1372,7 @@ export class LoadingAppClass extends Component<
     } else {
       result = await restoreWalletFromUfvk(
         seedUfvk.toLowerCase(),
-        walletBirthday || '0',
+        walletBirthday,
         nativeUri(this.state.server),
         this.state.server.chainName,
         this.state.performanceLevel,
@@ -1734,8 +1733,8 @@ export class LoadingAppClass extends Component<
         showConfirm({
           title: translate('loadingapp.saved-wallet-net-title') as string,
           message: (translate('loadingapp.saved-wallet-net-body') as string)
-            .replace('{birthday}', wallet.birthday.toLocaleString())
-            .replace('{tip}', tip.toLocaleString())
+            .replace('{birthday}', formatInteger(wallet.birthday))
+            .replace('{tip}', formatInteger(tip))
             .replace('{net}', netName(server.chainName)),
           buttons: [
             {

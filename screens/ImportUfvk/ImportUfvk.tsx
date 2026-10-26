@@ -16,13 +16,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { useTheme } from '@app/theme';
-import {
-  faChevronLeft,
-  faCircleInfo,
-  faXmark,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { useTheme, iconSizeMd } from '@app/theme';
 
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
@@ -47,13 +41,9 @@ import {
   viewingKeyProblem,
 } from '@app/utils/seedPhrase';
 import { duration, ease } from '@app/theme/motion';
-
-const activationHeight = {
-  main: 419200,
-  test: 280000,
-  regtest: 1,
-  '': 1,
-};
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
+import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 
 // Positions from the 402 x 874 design.
 const BODY_TOP = 112;
@@ -94,7 +84,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   const [pulse, setPulse] = useState(0);
   const keyboardHeight = useKeyboardHeight();
 
-  const activation = activationHeight[server.chainName];
   const status = seedStatus(seedufvkText);
   const typedKey = status.kind === 'ufvk' ? status.key : '';
   // The check of the key in the field; unknown while it runs, or when the
@@ -163,8 +152,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
     const timer = setTimeout(() => setKeyPaused(true), KEY_PAUSE_MS);
     return () => clearTimeout(timer);
   }, [typedKey]);
-  const birthdayLow = !!birthday && Number(birthday) < activation;
-  const ready = keyReady && !birthdayLow;
 
   const birthdayFocus = useSharedValue(0);
   const birthdayBorder = useAnimatedStyle(() => ({
@@ -188,14 +175,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
     });
   };
 
-  const tipBody =
-    (translate('import.birthday-tip-body') as string) +
-    (server.kind === 'offline'
-      ? ''
-      : '\n' +
-        (translate('import.birthday-tip-range') as string)
-          .replace('{from}', activation.toLocaleString())
-          .replace('{to}', latestBlock ? latestBlock.toLocaleString() : '--'));
+  const tipBody = translate('import.birthday-tip-body') as string;
 
   useEffect(() => {
     // Both conditions must hold: a session with no server has nothing to ask,
@@ -285,7 +265,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   const buttonBottom = keyboardHeight > 0 ? keyboardHeight + 12 : BUTTON_BOTTOM;
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'transparent' }}>
+    <View style={{ flex: 1 }}>
       <BoldText
         style={{
           position: 'absolute',
@@ -333,17 +313,13 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             marginBottom: 20,
           }}
         >
-          <BoldText style={{ fontSize: 12.5, lineHeight: 16 }}>
+          <BoldText style={{ fontSize: 13, lineHeight: 16 }}>
             {translate('import.seed-label') as string}
           </BoldText>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
             {!!seedufvkText && (
               <TouchableOpacity onPress={() => setSeedufvkText('')} hitSlop={8}>
-                <FontAwesomeIcon
-                  size={16}
-                  icon={faXmark}
-                  color={colors.fgMuted}
-                />
+                <XIcon size={iconSizeMd} color={colors.fgMuted} />
               </TouchableOpacity>
             )}
             <Pressable
@@ -360,12 +336,10 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 borderRadius: 9,
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: pressed
-                  ? 'rgba(211,226,248,0.08)'
-                  : 'transparent',
+                backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
               })}
             >
-              <ScanIcon size={22} color={colors.fgMuted} />
+              <ScanIcon size={24} color={colors.fgMuted} />
             </Pressable>
           </View>
         </View>
@@ -405,7 +379,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 overflow: 'hidden',
               },
               birthdayBorder,
-              birthdayLow && { borderColor: colors.fgDangerEmphasis },
             ]}
           >
             <TextInput
@@ -423,27 +396,23 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 height: 42,
                 paddingHorizontal: 15,
                 paddingVertical: 0,
-                backgroundColor: 'transparent',
               }}
               value={birthday}
               onChangeText={(text: string) => {
-                if (isNaN(Number(text))) {
-                  setBirthday('');
-                } else if (
-                  Number(text) <= 0 ||
-                  (Number(text) > latestBlock && server.kind !== 'offline')
+                const height = Number(text.replace(/\D/g, ''));
+                if (
+                  height <= 0 ||
+                  (height > latestBlock && server.kind !== 'offline')
                 ) {
                   setBirthday('');
                 } else {
-                  setBirthday(
-                    Number(text.replace('.', '').replace(',', '')).toFixed(0),
-                  );
+                  setBirthday(String(height));
                 }
               }}
               editable={
                 latestBlock ? true : server.kind !== 'offline' ? false : true
               }
-              keyboardType="numeric"
+              keyboardType="number-pad"
             />
             {!!birthday && (!!latestBlock || server.kind === 'offline') && (
               <TouchableOpacity
@@ -451,11 +420,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 hitSlop={8}
                 style={{ paddingRight: 12 }}
               >
-                <FontAwesomeIcon
-                  size={14}
-                  icon={faXmark}
-                  color={colors.fgMuted}
-                />
+                <XIcon size={iconSizeMd} color={colors.fgMuted} />
               </TouchableOpacity>
             )}
           </Animated.View>
@@ -474,13 +439,8 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             gap: 11,
           }}
         >
-          <FontAwesomeIcon
-            icon={faCircleInfo}
-            size={13}
-            color={colors.fgAccent}
-            style={{ marginTop: 1 }}
-          />
-          <RegText style={{ flex: 1, fontSize: 9.5, lineHeight: 13 }}>
+          <InfoIcon size={16} color={colors.fgMuted} style={{ marginTop: 1 }} />
+          <RegText style={{ flex: 1, fontSize: 12, lineHeight: 13 }}>
             {translate('import.text') as string}
           </RegText>
         </View>
@@ -498,17 +458,13 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           <BusyButton
             testID="import.button.ok"
             title={translate('import.submit') as string}
-            enabled={ready}
+            enabled={keyReady}
             busy={busy}
             onPress={() => {
               okButton();
             }}
             onDisabledPress={() =>
-              addLastSnackbar(
-                translate(
-                  keyReady ? 'import.need-birthday' : 'import.need-words',
-                ) as string,
-              )
+              addLastSnackbar(translate('import.need-words') as string)
             }
           />
         </View>
@@ -532,14 +488,10 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             justifyContent: 'center',
             zIndex: 3,
             opacity: busy ? 0.4 : 1,
-            backgroundColor: pressed ? colors.bgSurface : 'transparent',
+            backgroundColor: pressed ? colors.bgSurface : undefined,
           })}
         >
-          <FontAwesomeIcon
-            icon={faChevronLeft}
-            size={18}
-            color={colors.fgAccent}
-          />
+          <ChevronLeft size={20} color={colors.fgAccent} />
         </Pressable>
       )}
       {scan.kind === 'open' && (
