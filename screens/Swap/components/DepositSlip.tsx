@@ -16,6 +16,7 @@ import {
   requiresExactAmountWarning,
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
+import { formatExactAmount } from '@app/utils/formatAmount';
 import Text from '@ui/primitives/Text';
 import { useInsetFill } from '@ui/primitives/Surface';
 import Button from '@ui/primitives/Button';
@@ -163,7 +164,7 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
         rows={[
           {
             label: t(memo ? 'swap.amount' : 'swap.send-exactly'),
-            value: `${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${ticker}`,
+            value: `${formatExactAmount(record.sellAmountHumanDecimal)} ${ticker}`,
             tip: memo ? undefined : t('swap.tip-exact'),
             copy: record.sellAmountHumanDecimal,
             mono: false,

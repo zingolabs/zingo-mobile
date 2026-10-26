@@ -1,6 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext } from 'react';
 import { formatZecAmount } from '@app/utils/formatZecAmount';
+import {
+  formatAmount,
+  formatInteger,
+  formatUsd,
+} from '@app/utils/formatAmount';
 import { Linking, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { space12, useTheme, iconSizeMd } from '@app/theme';
@@ -108,11 +113,14 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
       ? [
           {
             label: t('swap.tx-fee'),
-            value: `${Utils.parseNumberFloatToStringLocale(leg.fee, 5)} ${info.currencyName}`,
+            value: `${formatAmount(leg.fee)} ${info.currencyName}`,
           },
         ]
       : []),
-    { label: t('swap.tx-confirmations'), value: String(leg.confirmations) },
+    {
+      label: t('swap.tx-confirmations'),
+      value: formatInteger(leg.confirmations),
+    },
     {
       label: t('swap.tx-id'),
       value: Utils.trimToSmall(leg.txid, 6),
@@ -153,7 +161,7 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
         amount={`${received ? '+' : '−'}${formatZecAmount(leg.amount)}`}
         unit={info.currencyName}
         tone={received ? 'positive' : 'default'}
-        line={price > 0 ? `≈ $${(leg.amount * price).toFixed(2)}` : ''}
+        line={price > 0 ? `≈ ${formatUsd(leg.amount * price)}` : ''}
         pill={t(confirmed ? 'swap.tx-confirmed' : 'swap.tx-pending')}
         pillTone={confirmed ? 'accent' : 'neutral'}
       />

@@ -13,6 +13,8 @@ import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
+import { formatAmount, formatInteger } from '@app/utils/formatAmount';
+import { MASK, useAmountReveal } from '@ui/widgets/PrivateAmount';
 import Utils from '@app/utils';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
@@ -120,10 +122,15 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
   }));
 
   const price = zecPrice.zecPrice;
-  const zecText = (zec: number): string =>
-    privacy ? '-.----' : Utils.parseNumberFloatToStringLocale(zec, 4);
+  /** One reveal for the screen; shares give amounts away, sends counts do not. */
+  const amounts = useAmountReveal();
+  const sharesHidden = metric === 'amount' && amounts.hidden;
+  const percent = (share: number): string =>
+    sharesHidden ? `${MASK}%` : `${Math.round(share * 100)}%`;
+  const zecText = (zec: number): string => amounts.show(formatAmount(zec));
+  const onAmount = amounts.hidden ? amounts.reveal : undefined;
   const sendsText = (n: number): string =>
-    `${n} ${translate(n === 1 ? 'insight.send' : 'insight.sends-unit') as string}`;
+    `${formatInteger(n)} ${translate(n === 1 ? 'insight.send' : 'insight.sends-unit') as string}`;
   const value = (v: number): string =>
     metric === 'amount' ? zecText(v) : sendsText(v);
   const day = (date: Date) =>
@@ -224,7 +231,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
     slices.length === 0
       ? (translate('insight.in-range') as string)
       : focus
-        ? `${name(insight.groups[focus.g])} · ${Math.round((focus.value / total) * 100)}%`
+        ? `${name(insight.groups[focus.g])} · ${percent(focus.value / total)}`
         : (translate(
             metric === 'amount'
               ? 'insight.zec-in-range'
@@ -413,6 +420,8 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
             )}`}
           </Text>
           <ActivityChart
+            masked={sharesHidden}
+            onReveal={onAmount}
             insight={insight}
             metric={metric}
             from={from}
@@ -470,6 +479,8 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
         <View style={card}>
           {cardHead(translate('insight.where') as string)}
           <Donut
+            masked={sharesHidden}
+            onReveal={onAmount}
             slices={slices}
             selected={selected}
             onSelect={setSelected}
@@ -622,7 +633,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                             lineHeight: 16,
                           }}
                         >
-                          {`${Math.round(share * 100)}%${price > 0 ? ' · ' : ''}`}
+                          {`${percent(share)}${price > 0 ? ' · ' : ''}`}
                         </Text>
                         {price > 0 && (
                           <CurrencyAmount
@@ -665,6 +676,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                   {on && (
                     <Text
                       testID={`insight.row.${s.g}.detail`}
+                      onPress={onAmount}
                       style={{
                         marginTop: 8,
                         marginLeft: 48,
@@ -673,7 +685,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                         lineHeight: 17,
                       }}
                     >
-                      {`${sendsText(t.sends)} · ZEC ${zecText(t.amount)} · ${t.bytes.toLocaleString('en-US')} ${translate('insight.bytes') as string}`}
+                      {`${sendsText(t.sends)} · ${info.currencyName} ${zecText(t.amount)} · ${formatInteger(t.bytes)} ${translate('insight.bytes') as string}`}
                     </Text>
                   )}
                 </Pressable>

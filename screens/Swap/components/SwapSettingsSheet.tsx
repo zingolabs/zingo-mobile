@@ -14,6 +14,11 @@ import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { DEFAULT_SLIPPAGE_BPS } from '@screens/Swap/useSwapForm';
 import SheetTitle from './SheetTitle';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
+import {
+  formatPercent,
+  parseAmountInput,
+  toAmountInput,
+} from '@app/utils/formatAmount';
 
 type SwapSettingsSheetProps = {
   slippageBps: number;
@@ -29,7 +34,7 @@ const MAX_BPS = 1_000;
 const HIGH_BPS = 500;
 
 export function formatSlippagePercent(bps: number): string {
-  return (bps / 100).toFixed(bps % 100 === 0 ? 0 : 1);
+  return formatPercent(bps / 100);
 }
 
 /**
@@ -46,9 +51,7 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
       !PRESETS_BPS.includes(slippageBps),
     );
     const [custom, setCustom] = useState<string>(
-      PRESETS_BPS.includes(slippageBps)
-        ? ''
-        : formatSlippagePercent(slippageBps),
+      PRESETS_BPS.includes(slippageBps) ? '' : toAmountInput(slippageBps / 100),
     );
 
     // A preset picked but not yet applied: nothing changes until Done.
@@ -59,7 +62,7 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
       setCustom(
         PRESETS_BPS.includes(slippageBps)
           ? ''
-          : formatSlippagePercent(slippageBps),
+          : toAmountInput(slippageBps / 100),
       );
     }, [slippageBps]);
 
@@ -67,7 +70,7 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
       (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss();
     }, [ref]);
 
-    const parsedCustom = Math.round(parseFloat(custom.replace(',', '.')) * 100);
+    const parsedCustom = Math.round(parseAmountInput(custom) * 100);
     const customValid =
       Number.isFinite(parsedCustom) &&
       parsedCustom >= MIN_BPS &&
@@ -79,6 +82,8 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
     const customError =
       editing && custom.length > 0 && !customValid
         ? (translate('swap.slippage-range') as string)
+            .replace('{min}', formatSlippagePercent(MIN_BPS))
+            .replace('{max}', formatSlippagePercent(MAX_BPS))
         : undefined;
     const customHelper =
       editing && high ? (translate('swap.slippage-high') as string) : undefined;
@@ -174,6 +179,7 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
                 label={translate('swap.slippage') as string}
                 value={custom}
                 onChangeText={setCustom}
+                keyboardType="decimal-pad"
                 placeholder={formatSlippagePercent(slippageBps)}
                 error={customError}
                 helper={customHelper}

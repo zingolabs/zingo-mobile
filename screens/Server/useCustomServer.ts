@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 
 import { ChainNameEnum, TranslateType } from '@app/AppState';
 import { parseServerURI } from '@app/uris';
+import { formatInteger } from '@app/utils/formatAmount';
 import { probeServer } from '@app/walletBackend';
 import { LogLine } from './ServerLog';
 
@@ -260,7 +261,7 @@ export const useCustomServer = ({
         'ok',
         t('log-verified', {
           net: netName(chain),
-          height: probe.blockHeight.toLocaleString('en-US'),
+          height: formatInteger(probe.blockHeight),
         }),
         probe.details,
       ),

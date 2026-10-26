@@ -4,12 +4,11 @@ import { space12, space20, useTheme, iconSizeSm } from '@app/theme';
 import Text from '@ui/primitives/Text';
 import { MessagesIcon } from '@ui/primitives/Icons/MessagesIcon';
 import type { RowText } from '@screens/History/historyRowText';
+import PrivateAmount, { useAmountReveal } from '@ui/widgets/PrivateAmount';
 import { AVATAR_SIZE } from './HistoryAvatar';
 
 /** Where a row's text starts, which is also where its hairline starts. */
 export const ROW_TEXT_INSET = space20 + AVATAR_SIZE + space12;
-
-export const MASK = '•••••';
 
 /**
  * A History row's layout: the leading icon, the title over a line with the
@@ -19,7 +18,6 @@ export const MASK = '•••••';
 export default function HistoryRowBody({
   leading,
   text,
-  privacy,
   hairline,
   trailing,
   memo,
@@ -27,7 +25,6 @@ export default function HistoryRowBody({
 }: {
   leading?: React.ReactNode;
   text: RowText;
-  privacy: boolean;
   hairline: boolean;
   trailing?: React.ReactNode;
   memo?: boolean;
@@ -35,6 +32,8 @@ export default function HistoryRowBody({
   compact?: boolean;
 }) {
   const { colors } = useTheme();
+  /** A tap on either figure shows all of the row's amounts. */
+  const amounts = useAmountReveal();
   const topColor =
     text.topTone === 'positive'
       ? colors.fgAccent
@@ -118,27 +117,28 @@ export default function HistoryRowBody({
             style={{ flexShrink: 1 }}
           >
             {text.line}
+            {!!text.lineAmount && amounts.show(text.lineAmount)}
           </Text>
           {memo && <MessagesIcon size={iconSizeSm} color={colors.fgMuted} />}
         </View>
       </View>
       <View style={{ alignItems: 'flex-end' }}>
-        <Text
+        <PrivateAmount
+          reveal={amounts}
+          text={text.top}
           variant="bodyStrong"
           numberOfLines={1}
           style={{ color: topColor, fontSize: titleSize }}
-        >
-          {privacy ? MASK : text.top}
-        </Text>
+        />
         {!!text.bottom && (
-          <Text
+          <PrivateAmount
+            reveal={amounts}
+            text={text.bottom}
             variant="caption"
             tone="muted"
             numberOfLines={1}
             style={{ marginTop: 4 }}
-          >
-            {privacy ? MASK : text.bottom}
-          </Text>
+          />
         )}
       </View>
       {trailing}

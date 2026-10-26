@@ -21,6 +21,8 @@ type Story = StoryObj<typeof ComputingTxContent>;
 /**
  * Static as the others: the screen is a full panel (a sheet) that measures
  * on a real rendering step, so its capture needs the frame-by-frame play.
+ * The capture also reduces motion, so the flight's loop rests on its end
+ * frame instead of the frame the mount happened to land on.
  */
 export const Computing: Story = { tags: ['static'] };
 

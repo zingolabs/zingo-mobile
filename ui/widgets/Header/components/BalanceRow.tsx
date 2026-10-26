@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { Pressable, TouchableOpacity, View } from 'react-native';
 import Animated, {
   Easing,
   EntryExitAnimationFunction,
@@ -23,7 +23,10 @@ import InfoType from '@app/AppState/types/InfoType';
 import { fiatQuote } from '@app/price/fiatQuote';
 import ZecPriceType from '@app/AppState/types/ZecPriceType';
 import Utils from '@app/utils';
+import { formatUsd } from '@app/utils/formatAmount';
 import CurrencyAmount, { PriceTint } from '@ui/widgets/CurrencyAmount';
+import { MASK } from '@ui/widgets/PrivateAmount';
+import { useTimedReveal } from '@app/hooks/useTimedReveal';
 import PriceFetcher, { usePriceRing } from '@ui/widgets/PriceFetcher';
 import RegText from '@ui/primitives/RegText';
 import Text from '@ui/primitives/Text';
@@ -82,7 +85,6 @@ type BalanceRowProps = {
 };
 
 /** The balance as the redesign sets it: 4 decimals, the unit after it. */
-const MASK = '•••••';
 
 const BalanceRow: React.FC<BalanceRowProps> = React.memo(
   ({
@@ -101,6 +103,9 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     const navigation = useNavigation<WalletNavigation>();
     const { colors } = useTheme();
     const reducedMotion = useReducedMotion();
+    const { visible: balanceVisible, reveal: revealBalance } =
+      useTimedReveal(privacy);
+    const balanceReveal = { hidden: !balanceVisible, reveal: revealBalance };
     const quote = fiatQuote(zecPrice, server, info.chainName);
     const showFiat = !noBalance && quote.kind === 'quote';
     const ring = usePriceRing();
@@ -121,8 +126,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     const fiatLabel = [
       privacy || quote.kind !== 'quote'
         ? ''
-        : '$ ' +
-          Utils.parseNumberFloatToStringLocale(quote.price * fiatTotal, 2),
+        : formatUsd(quote.price * fiatTotal),
       translate(ring.labelKey) as string,
       updatedAt
         ? (translate('header.lastupdate') as string) + ' ' + updatedAt
@@ -167,16 +171,22 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               marginBottom: showFiat ? 0 : BALANCE_BOTTOM_GAP,
             }}
           >
-            <Text
-              testID="header.balance"
-              variant="balance"
-              style={{ fontVariant: ['tabular-nums'] }}
+            <Pressable
+              accessibilityRole="button"
+              disabled={!balanceReveal.hidden}
+              onPress={balanceReveal.reveal}
             >
-              {privacy
-                ? MASK
-                : /** Cut to four decimals, never rounded up. */
-                  Utils.splitZecAmountIntoBigSmall(fiatTotal).bigPart}
-            </Text>
+              <Text
+                testID="header.balance"
+                variant="balance"
+                style={{ fontVariant: ['tabular-nums'] }}
+              >
+                {balanceReveal.hidden
+                  ? MASK
+                  : /** Cut to four decimals, never rounded up. */
+                    Utils.splitZecAmountIntoBigSmall(fiatTotal).bigPart}
+              </Text>
+            </Pressable>
             <Text variant="subtitle" tone="muted">
               {info.currencyName}
             </Text>

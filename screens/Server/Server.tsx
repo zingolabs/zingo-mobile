@@ -26,6 +26,7 @@ import {
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
 import { ServerStatus } from '@app/AppState/types/ServerStatus';
+import { formatInteger } from '@app/utils/formatAmount';
 import ServerRow, {
   Placement,
   useLift,
@@ -336,7 +337,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
           ? t('card-bad', { net: netName(server.chainName) })
           : t('card-connected', {
               net: netName(server.chainName),
-              height: blockHeight,
+              height: blockHeight && formatInteger(Number(blockHeight)),
             });
   const cardStatus: ServerStatus =
     !offline && !online && status !== 'wait' ? 'bad' : status;

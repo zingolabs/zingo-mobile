@@ -26,6 +26,7 @@ import RadioRow, { RadioList } from '@ui/widgets/RadioRow';
 import { ChevronRight } from '@ui/primitives/Icons/Chevron';
 import { ChainLogo } from '@ui/widgets/ChainSelect';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
+import { formatInteger } from '@app/utils/formatAmount';
 import TokenLogo from './TokenLogo';
 import SheetTitle from './SheetTitle';
 
@@ -196,7 +197,7 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
                 <Text variant="caption" tone="muted">
                   {t('swap.assets-networks').replace(
                     '{n}',
-                    String(group.tokens.length),
+                    formatInteger(group.tokens.length),
                   )}
                 </Text>
                 <ChevronRight size={iconSizeMd} color={colors.fgMuted} />

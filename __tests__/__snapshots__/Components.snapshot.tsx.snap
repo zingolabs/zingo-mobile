@@ -79,7 +79,7 @@ exports[`Component Components - test CurrencyAmount High Privacy - snapshot 1`] 
           }
         }
       >
-        $ -.--
+        $•••••
       </Text>
     </View>
   </View>
@@ -227,7 +227,7 @@ exports[`Component Components - test ZecAmount High Privacy - snapshot 1`] = `
           }
         }
       >
-         -.----
+         •••••
       </Text>
     </View>
   </View>
@@ -325,20 +325,6 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
         testID="undefined.big-part"
       >
          1.1234
-      </Text>
-      <Text
-        maxFontSizeMultiplier={2}
-        style={
-          {
-            "color": "red",
-            "fontSize": 14,
-            "margin": 0,
-            "padding": 0,
-          }
-        }
-        testID="undefined.small-part"
-      >
-        5678
       </Text>
     </View>
   </View>

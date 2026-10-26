@@ -134,11 +134,12 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
           {...props}
           disappearsOnIndex={-1}
           appearsOnIndex={0}
-          opacity={0.62}
           pressBehavior="close"
+          style={{ backgroundColor: colors.bgScrim }}
+          opacity={1}
         />
       ),
-      [],
+      [colors],
     );
 
     const sub = translate(

@@ -49,8 +49,7 @@ function SwapLine({
   onToggle,
 }: SwapLineProps) {
   const navigation = useNavigation<WalletNavigation>();
-  const { translate, language, privacy, addressBook } =
-    useContext(ContextAppLoaded);
+  const { translate, language, addressBook } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const t = (key: string) => (translate(key) as string).trim();
   const sale = record.direction === SwapDirectionEnum.Outbound;
@@ -114,7 +113,6 @@ function SwapLine({
           )
         }
         text={text}
-        privacy={privacy}
         hairline={hairline}
         trailing={
           legCount > 0 ? (

@@ -14,7 +14,8 @@ type PrivacyToggleProps = {
 
 /**
  * The eye beside "Total balance": it masks every amount in the app with
- * "•••••" until it is tapped again. A 44 pt target around an 18 pt icon.
+ * "•••••" until it is tapped again; a tap on an amount shows it for a few
+ * seconds. A 44 pt target around an 18 pt icon.
  */
 const PrivacyToggle: React.FC<PrivacyToggleProps> = React.memo(
   ({ privacy, setPrivacyOption, translate }) => {

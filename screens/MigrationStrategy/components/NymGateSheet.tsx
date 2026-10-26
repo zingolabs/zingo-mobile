@@ -40,9 +40,11 @@ const NymGateSheet = forwardRef<BottomSheetModal, NymGateSheetProps>(
           {...props}
           disappearsOnIndex={-1}
           appearsOnIndex={0}
+          style={{ backgroundColor: colors.bgScrim }}
+          opacity={1}
         />
       ),
-      [],
+      [colors],
     );
 
     return (

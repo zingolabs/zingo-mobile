@@ -13,6 +13,7 @@ import SegmentedBar from '@ui/primitives/SegmentedBar';
 import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
+import { formatAmount } from '@app/utils/formatAmount';
 import Utils from '@app/utils/Utils';
 import { Route, TARGET_BLOCK_SPACING_SECONDS } from '@app/AppState';
 import {
@@ -31,9 +32,6 @@ type MigrationStatusProps = NativeStackScreenProps<
 >;
 
 const ZATS_PER_ZEC = 10 ** 8;
-
-const fmt = (zats: number): string =>
-  `${parseFloat((zats / ZATS_PER_ZEC).toFixed(4))}`;
 
 // The private path's "home" while a migration is in flight: the landing after
 // the schedule is confirmed, and where the parts_scheduled banner resumes to.
@@ -474,7 +472,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
                     }}
                   >
                     <Text style={{ color: colors.fgDefault, fontSize: 14 }}>
-                      {fmt(denomination)}
+                      {formatAmount(denomination / ZATS_PER_ZEC)}
                     </Text>
                   </View>
                 ))}

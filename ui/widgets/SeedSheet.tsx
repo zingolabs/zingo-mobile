@@ -11,6 +11,7 @@ import {
 } from '@gorhom/bottom-sheet';
 
 import { TranslateType, WalletType } from '@app/AppState';
+import { formatInteger } from '@app/utils/formatAmount';
 import BoldText from '@ui/primitives/BoldText';
 import RegText from '@ui/primitives/RegText';
 import SheetRim from '@ui/primitives/SheetRim';
@@ -58,12 +59,13 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
           {...props}
           disappearsOnIndex={-1}
           appearsOnIndex={0}
-          opacity={0.62}
           pressBehavior="none"
           onPress={dismiss}
+          style={{ backgroundColor: colors.bgScrim }}
+          opacity={1}
         />
       ),
-      [dismiss],
+      [colors, dismiss],
     );
 
     return (
@@ -160,7 +162,7 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
               {translate('seedsheet.birthday') as string}
             </RegText>
             <BoldText style={{ fontSize: 13 }}>
-              {(wallet?.birthday ?? 0).toLocaleString()}
+              {formatInteger(wallet?.birthday ?? 0)}
             </BoldText>
           </View>
           <Button

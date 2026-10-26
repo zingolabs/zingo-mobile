@@ -28,9 +28,11 @@ import {
   rateLimitWaitMs,
   renderSwapText,
   swapRaw,
+  toDottedDecimal,
   validateAddressForChain,
   zecNetworkFeeReserve,
 } from '@app/swap';
+import { parseAmountInput } from '@app/utils/formatAmount';
 import { selectionAcrossRefresh } from '@app/swap/selectionAcrossRefresh';
 import type {
   FiatValueBasisType,
@@ -366,7 +368,7 @@ export function useSwapForm({
   const nearNeedsConfirm =
     counterpartyChain === 'NEAR' && nearAccountNeedsConfirm(canonicalAddress);
 
-  const amountNumber = parseFloat(amount.replace(',', '.'));
+  const amountNumber = parseAmountInput(amount);
   const amountValid = Number.isFinite(amountNumber) && amountNumber > 0;
   // Inbound the funds come from another wallet, whose balance this one
   // cannot know.
@@ -478,7 +480,7 @@ export function useSwapForm({
         sellAsset: isOutbound ? ZEC_ASSET : other,
         receiveAsset: isOutbound ? other : ZEC_ASSET,
         // SwapKit reads a dot-separated decimal whatever the user's locale.
-        sellAmountHumanDecimal: amount.replace(',', '.'),
+        sellAmountHumanDecimal: toDottedDecimal(amountNumber),
         ...quoteAddressPair({
           isOutbound,
           ephemeralAddress: ephemeral,
@@ -586,7 +588,7 @@ export function useSwapForm({
     swapService,
     selectedToken,
     isOutbound,
-    amount,
+    amountNumber,
     slippageBps,
     boundAddress,
     deriveEphemeral,
