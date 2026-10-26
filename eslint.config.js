@@ -104,10 +104,9 @@ const geometryGaps = [
   // system (counts as of 2026-10-25)
   'screens/About/About.tsx',
   'screens/ImportChooser/ImportChooser.tsx',
+  'screens/Insight/components/ActivityChart.tsx',
   'screens/ImportUfvk/ImportUfvk.tsx',
   'screens/Insight/Insight.tsx',
-  'screens/Insight/components/ActivityChart.tsx',
-  'screens/Insight/components/Donut.tsx',
   'screens/Launching/Launching.tsx',
   'screens/Messages/MessageList.tsx',
   'screens/Messages/components/MessageLine.tsx',
