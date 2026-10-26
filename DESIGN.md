@@ -778,10 +778,6 @@ in zingo-adrs (`zingo-mobile/0024`). `AGENTS.md` points every UI change here.
 internals, the Address Book, the server list, `ChainSelect`, the migration
 screens) still hold some hand-set values and legacy text components; they move
 onto the system as each is redesigned. Also open:
-- Send (Available, fee) and Confirm (amount, fee, total) still show 4 fixed
-  decimals; they follow the amount rule above.
-- `formatZecAmount` always writes a dot, while Send and Confirm use the
-  phone's decimal separator; one of the two has to win.
 - `AuthorizeSheet`'s title is `subtitle`; dialog-like sheets use
   `bodyStrong` 700.
 - `DetailRows` lives in `screens/Swap/components` but is shared, and belongs
