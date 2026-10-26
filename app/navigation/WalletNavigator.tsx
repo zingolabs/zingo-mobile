@@ -41,20 +41,6 @@ const MigrationTransactions = React.lazy(
   () => import('@screens/MigrationTransactions'),
 );
 const MigrationSending = React.lazy(() => import('@screens/MigrationSending'));
-const MigrationSplitPlan = React.lazy(
-  () => import('@screens/MigrationSplitPlan'),
-);
-const MigrationSplitting = React.lazy(
-  () => import('@screens/MigrationSplitting'),
-);
-const MigrationCadence = React.lazy(() => import('@screens/MigrationCadence'));
-const MigrationSchedule = React.lazy(
-  () => import('@screens/MigrationSchedule'),
-);
-const MigrationStatus = React.lazy(() => import('@screens/MigrationStatus'));
-const MigrationBatchSending = React.lazy(
-  () => import('@screens/MigrationBatchSending'),
-);
 const Insight = React.lazy(() => import('@screens/Insight'));
 const ComputingTxContent = React.lazy(() => import('@screens/Computing'));
 const SwapReview = React.lazy(() => import('@screens/SwapReview'));
@@ -225,30 +211,6 @@ export function WalletNavigator() {
         <Stack.Screen
           name={Route.MigrationSending}
           component={MigrationSending}
-        />
-        <Stack.Screen
-          name={Route.MigrationSplitPlan}
-          component={MigrationSplitPlan}
-        />
-        <Stack.Screen
-          name={Route.MigrationSplitting}
-          component={MigrationSplitting}
-        />
-        <Stack.Screen
-          name={Route.MigrationCadence}
-          component={MigrationCadence}
-        />
-        <Stack.Screen
-          name={Route.MigrationSchedule}
-          component={MigrationSchedule}
-        />
-        <Stack.Screen
-          name={Route.MigrationStatus}
-          component={MigrationStatus}
-        />
-        <Stack.Screen
-          name={Route.MigrationBatchSending}
-          component={MigrationBatchSending}
         />
         <Stack.Screen
           name={Route.SwapReview}

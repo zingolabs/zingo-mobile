@@ -135,9 +135,6 @@ const WALLET_LOCAL = new Set([
   'migrationStatusProcess',
   'reconcileMigrationProcess',
   'drainStatusProcess',
-  'splitStatusProcess',
-  'executeDuePartsStatusProcess',
-  'windowTimelineProcess',
   'initLogging',
 ]);
 

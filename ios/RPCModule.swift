@@ -1335,77 +1335,8 @@ class RPCModule: NSObject {
       }
   }
 
-  @objc(planIronwoodMigrationProcess:reject:)
-  func planIronwoodMigrationProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try planIronwoodMigration()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  @objc(startIronwoodMigrationProcess:perBucket:resolve:reject:)
-  func startIronwoodMigrationProcess(_ plan_hash_hex: String, perBucket per_bucket: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          // Empty string means "keep zingolib's default cadence" (the
-          // module's numeric-arg-as-string convention); anything else must
-          // parse as a u32 — a malformed value rejects as InvalidInput
-          // instead of silently keeping the default.
-          try startIronwoodMigration(
-            planHashHex: plan_hash_hex,
-            perBucket: FfiArgs.optionalU32(per_bucket, name: "per_bucket"))
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  // Proves and broadcasts one splitting round, so like the drain it runs
-  // long; the global concurrent queue keeps it off the main thread.
-  @objc(continueNoteSplittingProcess:reject:)
-  func continueNoteSplittingProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try continueNoteSplitting()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  // Proves and broadcasts one Phase 1 splitting round (zingolib/0016), so like the
-  // drain it runs long; the global concurrent queue keeps it off the main
-  // thread.
-  @objc(quickSplitProcess:reject:)
-  func quickSplitProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try quickSplit()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  // Polled concurrently while `quickSplitProcess` runs; the native
-  // `splitStatus()` reads a side channel, never the lightclient lock the round
-  // holds, so the poll returns immediately.
-  @objc(splitStatusProcess:reject:)
-  func splitStatusProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try splitStatus()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  @objc(reschedulePartsProcess:resolve:reject:)
-  func reschedulePartsProcess(_ per_bucket: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          // `per_bucket` crosses as a string (numeric-arg convention); a
-          // malformed value rejects as InvalidInput — never an unsettled
-          // promise.
-          try rescheduleParts(perBucket: FfiArgs.requiredU32(per_bucket, name: "per_bucket"))
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
+  // An old private migration (ZIP 318), left by builds that offered it:
+  // launch reads it, records what confirmed and cancels the rest.
   @objc(migrationStatusProcess:reject:)
   func migrationStatusProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
@@ -1415,47 +1346,11 @@ class RPCModule: NSObject {
       }
   }
 
-  @objc(windowTimelineProcess:reject:)
-  func windowTimelineProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try windowTimeline()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
   @objc(reconcileMigrationProcess:reject:)
   func reconcileMigrationProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
           try reconcileMigration()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  // Phase-2 execute tap: proves and broadcasts the scheduled migration's due
-  // batch, so like the drain it runs long; the global concurrent queue keeps it
-  // off the main thread. `spacing_ms` crosses as a string (numeric-arg
-  // convention) — the delay sequenced between the batch's sends.
-  @objc(executeDuePartsProcess:resolve:reject:)
-  func executeDuePartsProcess(_ spacing_ms: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          // A malformed spacing rejects as InvalidInput — never an
-          // unsettled promise.
-          try executeDueParts(spacingMs: FfiArgs.requiredU64(spacing_ms, name: "spacing_ms"))
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  // Polled concurrently while `executeDuePartsProcess` runs; the native
-  // `executeDuePartsStatus()` reads a side channel, never the lightclient lock
-  // the batch holds, so the poll returns immediately.
-  @objc(executeDuePartsStatusProcess:reject:)
-  func executeDuePartsStatusProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try executeDuePartsStatus()
         }.settle(resolve: resolve, reject: reject)
       }
   }

@@ -47,12 +47,6 @@ export const Route = {
   MigrationStrategy: 'MigrationStrategy',
   MigrationTransactions: 'MigrationTransactions',
   MigrationSending: 'MigrationSending',
-  MigrationSplitPlan: 'MigrationSplitPlan',
-  MigrationSplitting: 'MigrationSplitting',
-  MigrationCadence: 'MigrationCadence',
-  MigrationSchedule: 'MigrationSchedule',
-  MigrationStatus: 'MigrationStatus',
-  MigrationBatchSending: 'MigrationBatchSending',
 
   // Drawer with params
   AddressBook: 'AddressBook',

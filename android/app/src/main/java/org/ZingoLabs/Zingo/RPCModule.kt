@@ -1165,66 +1165,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-    @ReactMethod
-    fun planIronwoodMigrationProcess(promise: Promise) {
-        FfiOutcome.settling(promise, "plan_ironwood_migration") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.planIronwoodMigration()
-        }
-    }
-
-    // `perBucket` crosses the bridge as a string (the module's numeric-arg
-    // convention); empty means "keep zingolib's default cadence", and a
-    // malformed value rejects as InvalidInput, matching the iOS bridge.
-    @ReactMethod
-    fun startIronwoodMigrationProcess(planHashHex: String, perBucket: String, promise: Promise) {
-        FfiOutcome.settling(promise, "start_ironwood_migration") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.startIronwoodMigration(planHashHex = planHashHex, perBucket = FfiArgs.optionalU32(perBucket, "per_bucket"))
-        }
-    }
-
-    // Proves and broadcasts one splitting round, so like the drain it runs
-    // long and holds the lightclient; settling launches on Dispatchers.IO,
-    // which keeps it off the main queue and lets status polls through.
-    @ReactMethod
-    fun continueNoteSplittingProcess(promise: Promise) {
-        FfiOutcome.settling(promise, "continue_note_splitting") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.continueNoteSplitting()
-        }
-    }
-
-    // Phase 1 splitting round (zingolib/0016). Proves and broadcasts, so like the
-    // drain it runs long and holds the lightclient; settling launches on
-    // Dispatchers.IO, which keeps it off the main queue and lets status polls
-    // through.
-    @ReactMethod
-    fun quickSplitProcess(promise: Promise) {
-        FfiOutcome.settling(promise, "quick_split") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.quickSplit()
-        }
-    }
-
-    // Polled concurrently while quickSplitProcess runs; the native splitStatus()
-    // reads a side channel, never the lightclient lock the round holds, so the
-    // poll returns immediately.
-    @ReactMethod
-    fun splitStatusProcess(promise: Promise) {
-        FfiOutcome.settling(promise, "split_status") {
-            uniffi.zingo.splitStatus()
-        }
-    }
-
-    @ReactMethod
-    fun reschedulePartsProcess(perBucket: String, promise: Promise) {
-        FfiOutcome.settling(promise, "reschedule_parts") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.rescheduleParts(perBucket = FfiArgs.requiredU32(perBucket, "per_bucket"))
-        }
-    }
-
+    // An old private migration (ZIP 318), left by builds that offered it:
+    // launch reads it, records what confirmed and cancels the rest.
     @ReactMethod
     fun migrationStatusProcess(promise: Promise) {
         FfiOutcome.settling(promise, "migration_status") {
@@ -1233,40 +1175,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun windowTimelineProcess(promise: Promise) {
-        FfiOutcome.settling(promise, "window_timeline") {
-            uniffi.zingo.windowTimeline()
-        }
-    }
-
-    @ReactMethod
     fun reconcileMigrationProcess(promise: Promise) {
         FfiOutcome.settling(promise, "reconcile_migration") {
             uniffi.zingo.initLogging()
             uniffi.zingo.reconcileMigration()
-        }
-    }
-
-    // Phase-2 execute tap: sends the scheduled migration's due batch. Long-
-    // running (prove + broadcast) like drainOrchardProcess, so settling's
-    // Dispatchers.IO launch applies; `spacingMs` crosses as a string (the
-    // module's numeric-arg convention) — the delay sequenced between the
-    // batch's sends.
-    @ReactMethod
-    fun executeDuePartsProcess(spacingMs: String, promise: Promise) {
-        FfiOutcome.settling(promise, "execute_due_parts") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.executeDueParts(spacingMs = FfiArgs.requiredU64(spacingMs, "spacing_ms"))
-        }
-    }
-
-    // Polled concurrently while executeDuePartsProcess runs; the native
-    // executeDuePartsStatus() reads a side channel, never the lightclient lock
-    // the batch holds, so the poll returns immediately.
-    @ReactMethod
-    fun executeDuePartsStatusProcess(promise: Promise) {
-        FfiOutcome.settling(promise, "execute_due_parts_status") {
-            uniffi.zingo.executeDuePartsStatus()
         }
     }
 
