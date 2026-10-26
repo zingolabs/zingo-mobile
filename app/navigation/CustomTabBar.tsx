@@ -1,3 +1,4 @@
+/* geometry-gap: exception A, the tab bar */
 import React, { useContext, useEffect } from 'react';
 import { Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
