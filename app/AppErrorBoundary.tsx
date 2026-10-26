@@ -4,6 +4,7 @@ import RNRestart from 'react-native-restart';
 import * as RNLocalize from 'react-native-localize';
 
 import RPCModule from './RPCModule';
+import SettingsFileImpl from './services/SettingsFileImpl';
 import {
   fieldMinHeight,
   radiusSm,
@@ -23,8 +24,9 @@ import { getZingoName, getZingoVersion } from './utils/ZingoAppData';
 
 /**
  * The boundary is the React root, so the i18n context may not be mounted when
- * it catches. It reads the bundled files by the device language instead, with
- * English behind every key.
+ * it catches. It reads the bundled files itself: the language chosen in
+ * Settings once the file is read, the device language until then or when
+ * there is none, and English behind every key.
  */
 const files: Record<string, object> = {
   en: require('./translations/en.json'),
@@ -43,33 +45,54 @@ const lookup = (file: object, key: string): unknown =>
           : undefined,
       file,
     );
-const boundaryTranslate = (key: string): TranslateType => {
-  let language = 'en';
+const deviceLanguage = (): string => {
   try {
-    language =
-      RNLocalize.findBestLanguageTag(Object.keys(files))?.languageTag ?? 'en';
+    return (
+      RNLocalize.findBestLanguageTag(Object.keys(files))?.languageTag ?? 'en'
+    );
   } catch {
-    /* English */
+    return 'en';
   }
-  const value = lookup(files[language], key) ?? lookup(files.en, key);
-  return typeof value === 'string' ? value : key;
 };
+const translateIn =
+  (language: string) =>
+  (key: string): TranslateType => {
+    const file = files[language] ?? files[deviceLanguage()];
+    const value = lookup(file, key) ?? lookup(files.en, key);
+    return typeof value === 'string' ? value : key;
+  };
 
 type State = {
   hasError: boolean;
   error: Error | null;
   zingolibVersion: string;
+  /** The language chosen in Settings; '' until read, or when there is none. */
+  language: string;
 };
 
 class AppErrorBoundary extends Component<React.PropsWithChildren, State> {
-  state: State = { hasError: false, error: null, zingolibVersion: '' };
+  state: State = {
+    hasError: false,
+    error: null,
+    zingolibVersion: '',
+    language: '',
+  };
 
   static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error, zingolibVersion: '' };
+    return { hasError: true, error, zingolibVersion: '', language: '' };
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error('AppErrorBoundary caught:', error, info.componentStack);
+    SettingsFileImpl.readSettings()
+      .then(settings => {
+        if (settings.language && settings.language in files) {
+          this.setState({ language: settings.language });
+        }
+      })
+      .catch(() => {
+        /* the device language stays */
+      });
     // Best-effort fetch of the rust layer version so the report carries the
     // same identity info Settings would. Bounded by a 2s timeout because the
     // native bridge could be in a degraded state after a crash; on failure
@@ -102,7 +125,8 @@ class AppErrorBoundary extends Component<React.PropsWithChildren, State> {
     if (!this.state.hasError) {
       return this.props.children;
     }
-    const { error, zingolibVersion } = this.state;
+    const { error, zingolibVersion, language } = this.state;
+    const boundaryTranslate = translateIn(language);
     const appLabel = `${getZingoName()} ${getZingoVersion()}`;
     const header = sanitizePaths(
       error ? `${error.name}: ${error.message}` : 'Unknown error',
