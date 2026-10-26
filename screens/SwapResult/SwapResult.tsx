@@ -1,3 +1,4 @@
+/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useState } from 'react';
 import DetailRows from '@screens/Swap/components/DetailRows';
