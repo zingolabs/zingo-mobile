@@ -133,7 +133,6 @@ const geometryGaps = [
   'screens/ViewingKey/ViewingKey.tsx',
   'screens/ViewingKey/components/KeyCard.tsx',
   'screens/ViewingKey/components/KeyQr.tsx',
-  'screens/WalletError/WalletError.tsx',
   'screens/WalletSeed/WalletSeed.tsx',
   'ui/primitives/AppSheetModal.tsx',
   'ui/primitives/ProgressBar.tsx',
