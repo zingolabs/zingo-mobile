@@ -95,15 +95,11 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
   };
 
   return (
-    <View style={{ paddingHorizontal: 10 }}>
+    <View style={{ paddingHorizontal: space20 }}>
       <Text
         variant="caption"
         tone="muted"
-        style={{
-          textAlign: 'center',
-          marginHorizontal: space20,
-          marginBottom: space8,
-        }}
+        style={{ textAlign: 'center', marginBottom: space8 }}
       >
         {translate('receive.verify-sub') as string}
       </Text>
@@ -116,11 +112,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
         scanRequest="receive.address"
       />
       {!!errorAddress && (
-        <Text
-          variant="bodySmall"
-          tone="danger"
-          style={{ marginTop: space8, marginHorizontal: space20 }}
-        >
+        <Text variant="bodySmall" tone="danger" style={{ marginTop: space8 }}>
           {errorAddress}
         </Text>
       )}
@@ -132,7 +124,6 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             justifyContent: 'center',
             alignItems: 'center',
             marginVertical: space4,
-            paddingHorizontal: 10,
           }}
         >
           {verifyOK ? (
@@ -193,7 +184,6 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             alignItems: 'center',
             marginTop: space16,
             marginBottom: space4,
-            paddingHorizontal: 10,
           }}
         >
           <ButtonStack>

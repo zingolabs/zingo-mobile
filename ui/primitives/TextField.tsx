@@ -94,6 +94,8 @@ type TextFieldProps = {
   helper?: string;
   /** What to fix; turns the edge red. */
   error?: string;
+  /** The invalid edge alone, for a field whose caller shows the error itself. */
+  invalid?: boolean;
   /** Green edge once the value is known to be good. */
   valid?: boolean;
   disabled?: boolean;
@@ -142,6 +144,7 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
   placeholder,
   helper,
   error,
+  invalid = false,
   valid = false,
   disabled = false,
   mono = false,
@@ -173,7 +176,7 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
   const inset = useInsetFill();
   const [focused, setFocused] = useState(false);
   const validity: FieldValidity =
-    error !== undefined ? 'invalid' : valid ? 'valid' : 'unknown';
+    error !== undefined || invalid ? 'invalid' : valid ? 'valid' : 'unknown';
   const valueStyle = mono ? textVariants.address : textVariants.bodyStrong;
 
   return (

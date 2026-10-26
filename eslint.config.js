@@ -153,7 +153,6 @@ const geometryGaps = [
   'ui/widgets/SeedPhraseInput.tsx',
   'ui/widgets/SeedSheet.tsx',
   'ui/widgets/SelectBottomSheet.tsx',
-  'ui/widgets/TextInputAddress.tsx',
   'ui/widgets/ZecAmount.tsx',
 ];
 
