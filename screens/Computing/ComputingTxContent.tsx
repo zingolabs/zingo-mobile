@@ -9,7 +9,8 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { space20, useTheme, radiusPill } from '@app/theme';
+import { space20, useTheme, radiusPill, slopFor, iconSizeSm } from '@app/theme';
+import { duration } from '@app/theme/motion';
 import ProgressState from '@ui/widgets/ProgressState';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
@@ -23,9 +24,9 @@ import { Route } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 /** How long each step of the send is told before the next one. */
-const STEP_MS = 1100;
+const STEP_MS = duration.hero;
 /** The fade between one step's words and the next. */
-const STEP_FADE_MS = 160;
+const STEP_FADE_MS = duration.step;
 const STEPS = ['send.step-build', 'send.step-proof', 'send.step-nym'];
 
 type ComputingTxContentProps = NativeStackScreenProps<
@@ -165,7 +166,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
               <View style={{ marginTop: 16, alignItems: 'center' }}>
                 <TouchableOpacity
                   onPress={() => setShowErrorDetails(v => !v)}
-                  hitSlop={8}
+                  hitSlop={slopFor(iconSizeSm)}
                 >
                   <Text
                     variant="caption"

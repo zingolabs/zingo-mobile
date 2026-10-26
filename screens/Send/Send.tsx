@@ -1310,7 +1310,8 @@ const Send: React.FunctionComponent<SendProps> = () => {
                 {showCalcError ? (
                   <Button
                     variant="text"
-                    title={`${translate('send.calc-error') as string} ⓘ`}
+                    icon={InfoIcon}
+                    title={translate('send.calc-error') as string}
                     onPress={() => sendErrorSheetRef.current?.present()}
                     testID="send.calc-error"
                   />

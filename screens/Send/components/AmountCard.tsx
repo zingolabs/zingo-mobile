@@ -13,6 +13,7 @@ import {
   space16,
   textVariants,
   useTheme,
+  slopFor,
 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import Text from '@ui/primitives/Text';
@@ -121,6 +122,7 @@ export default function AmountCard({
             accessibilityLabel={t('send.switch-unit-acc')}
             disabled={!onToggleUnit}
             onPress={onToggleUnit}
+            hitSlop={slopFor(chipMinHeight)}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -165,7 +167,7 @@ export default function AmountCard({
             testID="send.max"
             accessibilityRole="button"
             onPress={onMax}
-            hitSlop={space8}
+            hitSlop={slopFor(iconSizeSm)}
             style={{ flexDirection: 'row', gap: space4 }}
           >
             <Text

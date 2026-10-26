@@ -309,10 +309,10 @@ export default function RecipientField({
           <Card flush>
             {matches.length > 0 && (
               <Text
-                variant="caption"
+                variant="bodySmall"
                 tone="muted"
                 style={{
-                  fontWeight: '700',
+                  fontWeight: '600',
                   paddingHorizontal: space12,
                   paddingTop: space8,
                 }}
