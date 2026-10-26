@@ -28,7 +28,7 @@ import {
   isWalletAddress,
   loadExistingWallet,
   parseAddress,
-  reconcileMigration,
+  cancelOldPrivateMigration,
   setConfigWalletToProd,
 } from '@app/walletBackend';
 import {
@@ -776,14 +776,9 @@ export class LoadedAppClass extends Component<
     await this.rpc.clearTimers();
     await this.rpc.configure();
 
-    // ZIP 318: classify the private migration's parts on every launch and
-    // apply what is safe unattended (promotions, expiries, rebuilds,
-    // completion). Never syncs, offline-safe, a no-op without a migration.
-    // The app-facing actions need no handling here: the History banner reads
-    // migration_status on focus and routes the user to the right screen.
-    // reconcileMigration never rejects (FfiResult); a transient failure just
-    // defers the cleanup to the next launch.
-    reconcileMigration();
+    // The private migration is gone from the app: one an older build left in
+    // flight is cancelled, silently, so the drain can move its notes.
+    cancelOldPrivateMigration();
 
     this.clearToAddr();
 

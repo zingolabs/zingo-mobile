@@ -1,13 +1,11 @@
 /**
- * The private-migration wrapper family (zingo-mobile#1187): all eleven
- * walletUtils wrappers around the ZIP 318 bridge methods share one typed
- * FFI contract, so one table exercises them all:
+ * The wrappers that cancel an old private migration at launch share one
+ * typed FFI contract, so one table exercises them all:
  *   - a resolution passes through verbatim as { ok: true }, even when it
  *     wears the historical error sentinel (data is never sniffed);
  *   - a rejection whose `.code` is a ZingolibError variant name maps to
  *     { ok: false } with that code;
- *   - a rejection without a recognized code maps to code 'Unknown';
- *   - numeric arguments cross the bridge as strings, null cadence as ''.
+ *   - a rejection without a recognized code maps to code 'Unknown'.
  */
 // Every member of the mocked bridge is a lazily created jest.fn, so a future
 // import-time touch of some other RPCModule member cannot break this suite.
@@ -19,21 +17,12 @@ import RPCModule from '@app/RPCModule';
 import { FfiResult } from '@app/walletBackend/ffi';
 import {
   cancelIronwoodMigration,
-  continueNoteSplitting,
-  executeDueParts,
-  executeDuePartsStatus,
+  cancelOldPrivateMigration,
   migrationStatus,
-  planIronwoodMigration,
-  quickSplit,
   reconcileMigration,
-  rescheduleParts,
-  splitStatus,
-  startIronwoodMigration,
 } from '@app/walletBackend/utils/walletUtils';
 
 const bridge = RPCModule as unknown as Record<string, jest.Mock>;
-
-const consentPlanHash = 'ab'.repeat(32);
 
 // The widened signature through which a case's untyped callArgs are applied.
 type CallableWrapper = (...args: unknown[]) => Promise<FfiResult<string>>;
@@ -48,30 +37,12 @@ type WrapperCase = {
 };
 
 const wrapperCases: WrapperCase[] = [
-  { wrapper: planIronwoodMigration, callArgs: [], expectedBridgeArgs: [] },
-  {
-    wrapper: startIronwoodMigration,
-    // A null cadence crosses as the empty string ("keep zingolib's default").
-    callArgs: [consentPlanHash, null],
-    expectedBridgeArgs: [consentPlanHash, ''],
-  },
-  {
-    wrapper: startIronwoodMigration,
-    callArgs: [consentPlanHash, 4],
-    expectedBridgeArgs: [consentPlanHash, '4'],
-  },
-  { wrapper: continueNoteSplitting, callArgs: [], expectedBridgeArgs: [] },
-  { wrapper: quickSplit, callArgs: [], expectedBridgeArgs: [] },
-  { wrapper: splitStatus, callArgs: [], expectedBridgeArgs: [] },
-  { wrapper: rescheduleParts, callArgs: [8], expectedBridgeArgs: ['8'] },
   { wrapper: migrationStatus, callArgs: [], expectedBridgeArgs: [] },
   { wrapper: reconcileMigration, callArgs: [], expectedBridgeArgs: [] },
-  { wrapper: executeDueParts, callArgs: [2000], expectedBridgeArgs: ['2000'] },
-  { wrapper: executeDuePartsStatus, callArgs: [], expectedBridgeArgs: [] },
   { wrapper: cancelIronwoodMigration, callArgs: [], expectedBridgeArgs: [] },
 ];
 
-describe('private-migration wrappers share one typed FFI contract', () => {
+describe('the private-migration cancel wrappers share one typed FFI contract', () => {
   it.each(wrapperCases)(
     '$wrapper.name',
     async ({ wrapper, callArgs, expectedBridgeArgs }) => {
@@ -117,4 +88,42 @@ describe('private-migration wrappers share one typed FFI contract', () => {
       });
     },
   );
+});
+
+describe('cancelOldPrivateMigration', () => {
+  const statusWith = (phase: object | null) =>
+    bridge.migrationStatusProcess.mockResolvedValue(JSON.stringify({ phase }));
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    bridge.reconcileMigrationProcess.mockResolvedValue('{}');
+    bridge.cancelIronwoodMigrationProcess.mockResolvedValue(
+      '{ "cancelled": true }',
+    );
+  });
+
+  test('Tests that a migration left in flight is recorded, then cancelled', async () => {
+    statusWith({ kind: 'parts_scheduled' });
+
+    await cancelOldPrivateMigration();
+
+    expect(bridge.reconcileMigrationProcess).toHaveBeenCalled();
+    expect(bridge.cancelIronwoodMigrationProcess).toHaveBeenCalled();
+  });
+
+  test('Tests that nothing is cancelled when no migration is under way', async () => {
+    statusWith(null);
+
+    await cancelOldPrivateMigration();
+
+    expect(bridge.cancelIronwoodMigrationProcess).not.toHaveBeenCalled();
+  });
+
+  test('Tests that nothing is cancelled when the migration is complete', async () => {
+    statusWith({ kind: 'complete', residual: 40000 });
+
+    await cancelOldPrivateMigration();
+
+    expect(bridge.cancelIronwoodMigrationProcess).not.toHaveBeenCalled();
+  });
 });
