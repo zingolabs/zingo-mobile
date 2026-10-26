@@ -1,3 +1,4 @@
+/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useMemo } from 'react';
 import { PixelRatio, Platform, View } from 'react-native';
