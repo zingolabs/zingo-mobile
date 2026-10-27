@@ -23,9 +23,9 @@ const BTC: SwapAssetType = {
 const meta: Meta<typeof SwapFlight> = {
   title: 'Components/SwapFlight',
   component: SwapFlight,
-  // Endless loops: the visual capture settles them on their end frame.
-  tags: ['loops'],
   args: { from: BTC, to: ZEC, provider: 'NEAR', nym: false },
+  /** Its loops settle on their end frame in the visual capture. */
+  tags: ['loop'],
 };
 
 export default meta;

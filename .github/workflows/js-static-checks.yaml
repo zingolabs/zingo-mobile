@@ -35,6 +35,23 @@ jobs:
       - name: Check formatting
         run: yarn prettier:check
 
+      # DESIGN.md mirrors app/theme ("Changing the system" in it): a PR that
+      # changes a theme value changes DESIGN.md too. The label
+      # design-md-unchanged lets a change with no visible effect through.
+      - name: DESIGN.md moves with app/theme
+        if: ${{ github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'design-md-unchanged') }}
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git fetch --no-tags --depth=1 origin "$BASE"
+          changed=$(git diff --name-only "$BASE" HEAD)
+          theme=$(printf '%s\n' "$changed" | grep -E '^app/theme/(tokens|radii|sizes|spacing|typography|motion)\.ts$' || true)
+          if [ -n "$theme" ] && ! printf '%s\n' "$changed" | grep -qx 'DESIGN.md'; then
+            echo "::error::app/theme changed without DESIGN.md: $(echo $theme)"
+            echo 'Update DESIGN.md (front matter and prose) in this PR, or add the design-md-unchanged label if nothing visible changes.'
+            exit 1
+          fi
+
       - name: Cancel the run on failure (fail-all)
         if: ${{ failure() && inputs.fail-all }}
         uses: actions/github-script@v9

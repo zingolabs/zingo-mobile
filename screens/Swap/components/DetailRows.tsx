@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { radiusMd, space12, useTheme, iconSizeSm } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
@@ -137,6 +138,8 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
               )}
               {!!row.copy && (
                 <Pressable
+                  kind="icon"
+                  circle={28}
                   accessibilityRole="button"
                   accessibilityLabel={translate('swap.copy') as string}
                   hitSlop={8}

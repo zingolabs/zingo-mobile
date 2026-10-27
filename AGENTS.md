@@ -48,7 +48,8 @@ govern every UI change (zingo-adrs zingo-mobile/0024).
   the same.
 - A value or a variant the system lacks goes into `app/theme` or the shared
   component first, with the designer's approval and a Storybook story, and
-  `DESIGN.md` changes in the same commit.
+  `DESIGN.md` changes in the same commit. CI fails a PR that changes
+  `app/theme` values without `DESIGN.md`.
 
 ## Code
 
