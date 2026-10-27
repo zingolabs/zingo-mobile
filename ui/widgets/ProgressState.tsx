@@ -1,9 +1,7 @@
-/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import Animated, {
-  Easing,
   FadeIn,
   ReduceMotion,
   ZoomIn,
@@ -16,16 +14,15 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { useTheme } from '@app/theme';
+import { iconSize, radiusPill, space8, space24, useTheme } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
-import RegText from '@ui/primitives/RegText';
-import BoldText from '@ui/primitives/BoldText';
-import TransactionCreatedIcon from '../../assets/img/transaction-created.svg';
-import TransactionFailedIcon from '../../assets/img/transaction-failed.svg';
+import Text from '@ui/primitives/Text';
+import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
 
 // One dot grows from 0.55 to 1 and from 35% to full opacity and back over
 // the first 80% of a 1.1 s loop; the next dot starts 160 ms later.
-const LOOP_MS = 1100;
+const LOOP_MS = duration.hero;
 const RISE_MS = LOOP_MS * 0.4;
 const HOLD_MS = LOOP_MS * 0.2;
 const DOT_OFFSET_MS = 160;
@@ -49,15 +46,18 @@ const Dot: React.FC<DotProps> = ({ size, gap, delay, color }) => {
         withSequence(
           withTiming(1, {
             duration: RISE_MS,
-            easing: Easing.inOut(Easing.ease),
+            easing: ease.standard,
           }),
           withTiming(0, {
             duration: RISE_MS,
-            easing: Easing.inOut(Easing.ease),
+            easing: ease.standard,
           }),
           withTiming(0, { duration: HOLD_MS }),
         ),
         -1,
+        false,
+        undefined,
+        ReduceMotion.System,
       ),
     );
     return () => {
@@ -74,7 +74,7 @@ const Dot: React.FC<DotProps> = ({ size, gap, delay, color }) => {
         {
           width: size,
           height: size,
-          borderRadius: size / 2,
+          borderRadius: radiusPill,
           marginHorizontal: gap / 2,
           backgroundColor: color,
         },
@@ -123,14 +123,17 @@ type ProgressStateProps = {
   body?: string;
 };
 
-const dotsExit = () => ZoomOut.duration(160).reduceMotion(ReduceMotion.System);
+const dotsExit = () =>
+  ZoomOut.duration(duration.fast).reduceMotion(ReduceMotion.System);
 const ringEnter = () =>
-  ZoomIn.duration(360)
+  ZoomIn.duration(duration.tabBar)
     .easing(ease.spring)
     .withInitialValues({ transform: [{ scale: 0.6 }] })
     .reduceMotion(ReduceMotion.System);
 const checkEnter = () =>
-  FadeIn.duration(320).delay(duration.base).reduceMotion(ReduceMotion.System);
+  FadeIn.duration(duration.emphasized)
+    .delay(duration.base)
+    .reduceMotion(ReduceMotion.System);
 
 // The dots and the ring share one 56 pt box so the title never moves.
 const ProgressState: React.FC<ProgressStateProps> = ({
@@ -145,7 +148,7 @@ const ProgressState: React.FC<ProgressStateProps> = ({
       <View
         style={{
           height: RING,
-          marginBottom: 26,
+          marginBottom: space24,
           alignItems: 'center',
           justifyContent: 'center',
         }}
@@ -161,7 +164,7 @@ const ProgressState: React.FC<ProgressStateProps> = ({
             style={{
               width: RING,
               height: RING,
-              borderRadius: RING / 2,
+              borderRadius: radiusPill,
               borderWidth: 2,
               borderColor:
                 state === 'done' ? colors.borderAccent : colors.borderDanger,
@@ -171,27 +174,25 @@ const ProgressState: React.FC<ProgressStateProps> = ({
           >
             <Animated.View entering={checkEnter()}>
               {state === 'done' ? (
-                <TransactionCreatedIcon width={26} height={26} />
+                <CheckIcon size={iconSize} color={colors.fgAccent} />
               ) : (
-                <TransactionFailedIcon width={26} height={26} />
+                <XIcon size={iconSize} color={colors.fgDanger} />
               )}
             </Animated.View>
           </Animated.View>
         )}
       </View>
-      <BoldText style={{ fontSize: 18, textAlign: 'center' }}>{title}</BoldText>
+      <Text variant="subtitle" style={{ textAlign: 'center' }}>
+        {title}
+      </Text>
       {!!body && (
-        <RegText
-          style={{
-            marginTop: 8,
-            fontSize: 12,
-            lineHeight: 18,
-            textAlign: 'center',
-            color: colors.fgMuted,
-          }}
+        <Text
+          variant="bodySmall"
+          tone="muted"
+          style={{ marginTop: space8, textAlign: 'center' }}
         >
           {body}
-        </RegText>
+        </Text>
       )}
     </>
   );
