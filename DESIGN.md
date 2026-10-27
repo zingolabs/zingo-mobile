@@ -627,6 +627,7 @@ Use the shared component; never build a second one that looks the same.
 | Label and value rows | `DetailRows` |
 | A list row | `ListRow`; a choice is a `RadioRow` in a `RadioList` |
 | A filter | `Chip` (it never navigates) |
+| Anything pressed that none of these covers | `Pressable` with its `kind`: `button`, `row`, `icon` or `link` (see Motion, Pressing) |
 | An on/off setting | `Switch` (exception D), the only toggle in the app |
 | An amount to type | `AmountCard` (exception C) |
 | A short status | `Tag` (read, not tapped) |
@@ -695,12 +696,47 @@ at 16 with no tile, the text in `caption` regular with no bold, padding 12,
 Durations and curves live in `app/theme/motion.ts`; nothing hand-times an
 animation.
 
+**Pressing.** Everything that reacts to a press reacts one way for its kind,
+through the shared `Pressable` and its `kind`, in `duration.fast` (140 ms) on
+`ease.standard`, in and out. A disabled control does not react.
+- Buttons and pills (every `Button`, small buttons, chips, the unit pill, the
+  coin button, the flip button, the round scroll-to-top and scroll-to-bottom
+  buttons): scale to 0.97. Their opacity stays.
+- Rows and tappable cards (`ListRow`, `RadioRow`, History's rows, swap rows,
+  Messages' rows, Server's rows, the options panel's tiles, a tappable
+  `Card`, the pending swap card): their background takes `bgMutedSubtle`.
+- Icon-only buttons (the `TitleBar`'s and the `Header`'s actions, back
+  included, `FieldAction`s, the close X, the eye, an info icon, copy, the
+  Address Book's action circles): a circle of `bgMutedSubtle` appears
+  behind the icon, the size of its tap area. Never a square.
+- Text links ("Save contact", "See why", "Clear", "Add tag", Available): fade
+  to 0.6.
+- The tab bar keeps its own press (the icon scales to 0.88, exception A).
+- `TouchableOpacity` is not used: its default fades a control to 0.2.
+
+**Expanding.** A row that opens in place (a contact in the Address Book)
+unfolds in `duration.medium` on `ease.emphasized`; its actions fade in
+`duration.base` on `ease.standard`, and fold back the same way. What an
+action draws after the press (the plane leaving, the pen, the bin's lid)
+belongs to that action and keeps the press above.
+
+**One motion at a time.** Opening something moves one thing.
+- A tab's panel is in place on its first frame; switching tabs only
+  cross-fades the content.
+- A full panel rises over the screen it came from, and nothing else moves.
+  From a sheet (Your swaps), the panel rises over it and the sheet leaves
+  underneath without its own motion.
+- Nothing flashes between screens: the screen behind stays drawn until the
+  panel covers it.
+
 - Sheets open and close in 420 ms on (.2, 0, 0, 1).
 - A full panel rises in 560 ms on (.32, .72, 0, 1) while its content fades
   in, and lowers in 460 ms. Steps inside it (review, sending, sent) only
   cross-fade their content in 150 ms.
 - Home's tabs cross-fade their content in 240 ms.
-- Menu screens slide in from the right.
+- Menu screens slide in from the right and back out to it: every screen
+  the options panel opens and Settings, through one shared option. The panel waits behind them under `bgScrim`, which fades in
+  `duration.screen` and out in `duration.sheetClose`.
 - Closing a flow lowers only the panel on top; the ones under it leave with
   it.
 - The tab bar's capsule slides in 360 ms on (.2, 0, 0, 1), its colours change
