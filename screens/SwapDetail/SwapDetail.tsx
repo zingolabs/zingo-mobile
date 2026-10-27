@@ -10,7 +10,8 @@ import { formatZecAmount } from '@app/utils/formatZecAmount';
 import { formatInteger, formatUsd } from '@app/utils/formatAmount';
 import Animated from 'react-native-reanimated';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { Linking, Pressable, View } from 'react-native';
+import { Linking, View } from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
@@ -566,6 +567,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
       {legs.length > 0 && (
         <View style={{ marginTop: space12 }}>
           <Pressable
+            kind="row"
             testID="swap.detail.legs"
             accessibilityRole="button"
             accessibilityState={{ expanded: legsOpen }}
@@ -609,6 +611,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
                 const received = leg.kind === ValueTransferKindEnum.Received;
                 return (
                   <Pressable
+                    kind="row"
                     key={`${leg.txid}:${leg.kind}`}
                     testID={`swap.detail.leg.${index}`}
                     accessibilityRole="button"
