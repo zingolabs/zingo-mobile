@@ -1,9 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useRef } from 'react';
-import { Animated, View, TouchableOpacity } from 'react-native';
+import { Animated, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
 import { slopFor, useTheme, iconSizeMd, iconSize } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import {
   ValueTransferType,
@@ -151,7 +152,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 alignItems: 'center',
               }}
             >
-              <TouchableOpacity
+              <Pressable
+                kind="icon"
                 hitSlop={slopFor(24)}
                 style={{ zIndex: 999, padding: 20 }}
                 onPress={() => {
@@ -164,7 +166,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   size={iconSize}
                   color={colors.fgDefault}
                 />
-              </TouchableOpacity>
+              </Pressable>
             </View>
             {!!vt.address && !readOnly && server.kind !== 'offline' && (
               <View
@@ -174,7 +176,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   alignItems: 'center',
                 }}
               >
-                <TouchableOpacity
+                <Pressable
+                  kind="icon"
                   hitSlop={slopFor(24)}
                   style={{ zIndex: 999, padding: 20 }}
                   onPress={() => {
@@ -188,7 +191,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   }}
                 >
                   <PlaneIcon size={iconSize} color={colors.fgAccent} />
-                </TouchableOpacity>
+                </Pressable>
               </View>
             )}
           </Animated.View>
@@ -202,7 +205,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
       testID={`vt-${index + 1}`}
       style={{ backgroundColor: colors.bgSurface }}
     >
-      <TouchableOpacity
+      <Pressable
+        kind="row"
         style={{ zIndex: 999 }}
         onPress={async () => {
           closeAllSwipeables();
@@ -236,7 +240,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
             memo={haveMemo}
           />
         </Swipeable>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };

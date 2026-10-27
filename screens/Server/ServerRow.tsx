@@ -1,7 +1,7 @@
 /* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useState } from 'react';
-import { LayoutChangeEvent, Pressable, View } from 'react-native';
+import { LayoutChangeEvent, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -21,6 +21,7 @@ import {
   iconSizeMd,
 } from '@app/theme';
 import { ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import BoldText from '@ui/primitives/BoldText';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
@@ -114,12 +115,13 @@ const ServerRow: React.FC<ServerRowProps> = ({
   return (
     <Animated.View style={shakeStyle}>
       <Pressable
+        kind="row"
         testID={testID}
         onPress={onPress}
         disabled={disabled}
         accessibilityRole="radio"
         accessibilityState={{ selected, disabled }}
-        style={({ pressed }) => ({
+        style={{
           minHeight: rowMinHeight,
           flexDirection: 'row',
           alignItems: 'center',
@@ -128,8 +130,7 @@ const ServerRow: React.FC<ServerRowProps> = ({
           paddingHorizontal: space16,
           borderTopWidth: first ? 0 : 1,
           borderTopColor: colors.borderSubtle,
-          opacity: pressed ? 0.7 : 1,
-        })}
+        }}
       >
         <Radio selected={selected} />
         <View style={{ flex: 1, minWidth: 0 }}>
@@ -209,12 +210,13 @@ export const ScreenHeader: React.FC<{
   return (
     <>
       <Pressable
+        kind="icon"
         testID={testID}
         onPress={onBack}
         disabled={disabled}
         hitSlop={14}
         accessibilityRole="button"
-        style={({ pressed }) => ({
+        style={{
           position: 'absolute',
           left: 17,
           top: TITLE_TOP,
@@ -224,8 +226,7 @@ export const ScreenHeader: React.FC<{
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 3,
-          backgroundColor: pressed ? colors.bgSurface : 'transparent',
-        })}
+        }}
       >
         <ChevronLeft size={20} color={colors.fgAccent} />
       </Pressable>

@@ -311,7 +311,9 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               accessible={true}
               collapsable={false}
               focusable={true}
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -319,19 +321,40 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "borderTopColor": "#FFFFFF0F",
-                  "borderTopWidth": 0,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "minHeight": 56,
-                  "opacity": 1,
-                  "paddingHorizontal": 16,
-                  "paddingVertical": 8,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "borderTopColor": "#FFFFFF0F",
+                    "borderTopWidth": 0,
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "minHeight": 56,
+                    "paddingHorizontal": 16,
+                    "paddingVertical": 8,
+                  },
+                  {},
+                ]
               }
             >
+              <View
+                pointerEvents="none"
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": undefined,
+                    },
+                    {},
+                  ]
+                }
+              />
               <Text
                 maxFontSizeMultiplier={2}
                 style={
@@ -465,8 +488,10 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                       }
                       accessible={true}
                       collapsable={false}
-                      focusable={false}
+                      focusable={true}
+                      onBlur={[Function]}
                       onClick={[Function]}
+                      onFocus={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -474,11 +499,31 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
                       style={
-                        {
-                          "opacity": 1,
-                        }
+                        [
+                          undefined,
+                          {},
+                        ]
                       }
                     >
+                      <View
+                        pointerEvents="none"
+                        style={
+                          [
+                            {
+                              "bottom": 0,
+                              "left": 0,
+                              "position": "absolute",
+                              "right": 0,
+                              "top": 0,
+                            },
+                            {
+                              "backgroundColor": "#8888881F",
+                              "borderRadius": undefined,
+                            },
+                            {},
+                          ]
+                        }
+                      />
                       <Text
                         maxFontSizeMultiplier={2}
                         style={
@@ -839,7 +884,9 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               accessible={true}
               collapsable={false}
               focusable={true}
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -847,19 +894,40 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "borderTopColor": "#FFFFFF0F",
-                  "borderTopWidth": 0,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "minHeight": 56,
-                  "opacity": 1,
-                  "paddingHorizontal": 16,
-                  "paddingVertical": 8,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "borderTopColor": "#FFFFFF0F",
+                    "borderTopWidth": 0,
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "minHeight": 56,
+                    "paddingHorizontal": 16,
+                    "paddingVertical": 8,
+                  },
+                  {},
+                ]
               }
             >
+              <View
+                pointerEvents="none"
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": undefined,
+                    },
+                    {},
+                  ]
+                }
+              />
               <Text
                 maxFontSizeMultiplier={2}
                 style={
@@ -954,7 +1022,9 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               accessible={true}
               collapsable={false}
               focusable={true}
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -962,20 +1032,41 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "borderTopColor": "#FFFFFF0F",
-                  "borderTopWidth": 0,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "minHeight": 56,
-                  "opacity": 1,
-                  "paddingHorizontal": 16,
-                  "paddingVertical": 8,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "borderTopColor": "#FFFFFF0F",
+                    "borderTopWidth": 0,
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "minHeight": 56,
+                    "paddingHorizontal": 16,
+                    "paddingVertical": 8,
+                  },
+                  {},
+                ]
               }
               testID="settings.about"
             >
+              <View
+                pointerEvents="none"
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": undefined,
+                    },
+                    {},
+                  ]
+                }
+              />
               <Text
                 maxFontSizeMultiplier={2}
                 style={

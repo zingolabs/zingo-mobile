@@ -150,17 +150,39 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "gap": 12,
-              "minHeight": 62,
-              "paddingHorizontal": 13,
-              "paddingVertical": 8,
-            }
+            [
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 12,
+                "minHeight": 62,
+                "paddingHorizontal": 13,
+                "paddingVertical": 8,
+              },
+              {},
+            ]
           }
           testID="addressbook.row.u1alice.head"
         >
+          <View
+            pointerEvents="none"
+            style={
+              [
+                {
+                  "bottom": 0,
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                },
+                {
+                  "backgroundColor": "#8888881F",
+                  "borderRadius": undefined,
+                },
+                {},
+              ]
+            }
+          />
           <View
             style={
               {

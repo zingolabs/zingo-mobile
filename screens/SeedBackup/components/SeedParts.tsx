@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { PixelRatio, Platform, Pressable, View } from 'react-native';
+import { PixelRatio, Platform, View } from 'react-native';
 import Animated, {
   Keyframe,
   ReduceMotion,
@@ -30,6 +30,7 @@ import {
 import Text from '@ui/primitives/Text';
 import { useInsetFill } from '@ui/primitives/Surface';
 import { ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import { ContextAppLoaded } from '@app/context';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
@@ -68,7 +69,6 @@ const iconTurn = () =>
   new Keyframe({
     0: { opacity: 0, transform: [{ rotate: '-20deg' }, { scale: 0.7 }] },
     100: {
-      opacity: 1,
       transform: [{ rotate: '0deg' }, { scale: 1 }],
       easing: ease.out,
     },
@@ -310,13 +310,13 @@ export const CopyShowButtons: React.FunctionComponent<{
       style={{ flexDirection: 'row', gap: space12, marginHorizontal: SIDE }}
     >
       <Pressable
+        kind="button"
         testID={`${testID}.copy`}
         accessibilityRole="button"
         onPress={copy}
-        style={({ pressed }) => ({
+        style={{
           ...outline,
-          transform: [{ scale: pressed ? 0.97 : 1 }],
-        })}
+        }}
       >
         <View style={{ width: iconSizeSm, height: iconSizeSm }}>
           <Animated.View
@@ -335,16 +335,16 @@ export const CopyShowButtons: React.FunctionComponent<{
         </Text>
       </Pressable>
       <Pressable
+        kind="button"
         testID={`${testID}.hide`}
         accessibilityRole="button"
         onPress={() => {
           setTurned(true);
           onToggleHide();
         }}
-        style={({ pressed }) => ({
+        style={{
           ...outline,
-          transform: [{ scale: pressed ? 0.97 : 1 }],
-        })}
+        }}
       >
         <View style={{ width: iconSizeSm, height: iconSizeSm }}>
           <Animated.View

@@ -1,14 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useMemo, useState } from 'react';
-import {
-  Linking,
-  Pressable,
-  ScrollView,
-  View,
-  useWindowDimensions,
-} from 'react-native';
+import { Linking, ScrollView, View, useWindowDimensions } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme, iconSize, radiusMd, radiusPill, space4 } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 
 import Text from '@ui/primitives/Text';
 import { TextScaleContext } from '@ui/primitives/Text';
@@ -111,7 +106,12 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
 
   const tripleChevron = useMemo(
     () => (
-      <Pressable onPress={onClose} hitSlop={12} style={{ padding: 4 }}>
+      <Pressable
+        kind="icon"
+        onPress={onClose}
+        hitSlop={12}
+        style={{ padding: 4 }}
+      >
         <View
           style={{
             width: 25,
@@ -150,6 +150,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
         <View style={{ width: 27, alignItems: 'flex-end' }}>
           {onSettings && (
             <Pressable
+              kind="icon"
               testID="header.settings"
               onPress={onSettings}
               hitSlop={12}
@@ -176,15 +177,16 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
         >
           {actions.map(action => (
             <Pressable
+              kind="row"
               key={action.id}
               testID={action.testID}
               onPress={action.disabled ? undefined : action.onPress}
-              style={({ pressed }) => ({
+              style={{
                 width: columns === 4 ? '25%' : '50%',
                 alignItems: 'center',
                 paddingVertical: 12,
-                opacity: action.disabled ? 0.35 : pressed ? 0.6 : 1,
-              })}
+                opacity: action.disabled ? 0.35 : 1,
+              }}
             >
               <View
                 style={{
@@ -263,6 +265,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
           >
             {socials.map(social => (
               <Pressable
+                kind="icon"
                 key={social.id}
                 onPress={() => handleSocialPress(social)}
                 hitSlop={8}

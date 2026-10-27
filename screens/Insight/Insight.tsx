@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import Animated, {
   ReduceMotion,
   useAnimatedStyle,
@@ -26,6 +26,7 @@ import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import Chip from '@ui/primitives/Chip';
 import { ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { formatAmount, formatInteger } from '@app/utils/formatAmount';
@@ -90,6 +91,7 @@ function RowAddress({
     body
   ) : (
     <Pressable
+      kind="link"
       accessibilityRole="button"
       accessibilityLabel={translate('insight.reveal-address') as string}
       onPress={reveal}
@@ -336,6 +338,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
           />
           {(['amount', 'sends'] as Metric[]).map(m => (
             <Pressable
+              kind="button"
               key={m}
               testID={`insight.metric.${m}`}
               accessibilityRole="tab"
@@ -460,6 +463,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
               const canAdd = group.kind === 'recipient' && !group.contact;
               return (
                 <Pressable
+                  kind="row"
                   key={s.g}
                   testID={`insight.row.${s.g}`}
                   accessibilityRole="button"
@@ -567,6 +571,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                     </View>
                     {canAdd && (
                       <Pressable
+                        kind="icon"
                         testID={`insight.row.${s.g}.add`}
                         accessibilityRole="button"
                         accessibilityLabel={
@@ -574,16 +579,13 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                         }
                         onPress={() => launchAddTagModal(group.address)}
                         hitSlop={slopFor(36)}
-                        style={({ pressed }) => ({
+                        style={{
                           width: 36,
                           height: 36,
                           borderRadius: radiusPill,
                           alignItems: 'center',
                           justifyContent: 'center',
-                          backgroundColor: pressed
-                            ? colors.bgAccentSubtle
-                            : undefined,
-                        })}
+                        }}
                       >
                         <UserPlusIcon
                           size={iconSizeMd}

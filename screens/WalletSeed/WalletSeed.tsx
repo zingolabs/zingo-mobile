@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   ReduceMotion,
   useAnimatedStyle,
@@ -25,6 +25,7 @@ import {
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import { duration } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { Route, SnackbarDurationEnum } from '@app/AppState';
@@ -398,12 +399,13 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               value={vkShort}
               trailing={
                 <Pressable
+                  kind="icon"
                   hitSlop={slopFor(28)}
                   testID="walletseed.vk-copy"
                   accessibilityRole="button"
                   accessibilityLabel={translate('walletseed.vk-copy') as string}
                   onPress={copyVk}
-                  style={({ pressed }) => ({
+                  style={{
                     width: 28,
                     height: 28,
                     marginLeft: space8,
@@ -411,8 +413,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
                     borderRadius: radiusPill,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
-                  })}
+                  }}
                 >
                   <CopyIcon size={iconSizeSm} color={colors.fgDefault} />
                 </Pressable>

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { View, useWindowDimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Animated, {
   ReduceMotion,
@@ -10,6 +10,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { space20, useTheme, radiusPill, slopFor, iconSizeSm } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { duration } from '@app/theme/motion';
 import ProgressState from '@ui/widgets/ProgressState';
 import Text from '@ui/primitives/Text';
@@ -164,7 +165,8 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
             />
             {failure !== undefined && (
               <View style={{ marginTop: 16, alignItems: 'center' }}>
-                <TouchableOpacity
+                <Pressable
+                  kind="link"
                   onPress={() => setShowErrorDetails(v => !v)}
                   hitSlop={slopFor(iconSizeSm)}
                 >
@@ -178,7 +180,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
                   >
                     {t('loadedapp.transactionfailed-details')}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
                 {showErrorDetails && (
                   <Text
                     variant="caption"
