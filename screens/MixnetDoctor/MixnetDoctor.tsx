@@ -21,7 +21,7 @@ import RegText from '@ui/primitives/RegText';
 import Button from '@ui/primitives/Button';
 import Header from '@ui/widgets/Header';
 import { AppDrawerParamList } from '@app/types';
-import { useTheme } from '@app/theme';
+import { useTheme, radiusMd, radiusPill } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   getMixnetBootstrapDetail,
@@ -122,7 +122,12 @@ const ReportSkeleton = ({ color }: { color: string }) => {
       {SKELETON_WIDTHS.map(width => (
         <View
           key={width}
-          style={{ width, height: 12, borderRadius: 6, backgroundColor: color }}
+          style={{
+            width,
+            height: 12,
+            borderRadius: radiusPill,
+            backgroundColor: color,
+          }}
         />
       ))}
     </Animated.View>
@@ -289,7 +294,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
             backgroundColor: colors.bgSurface,
             borderColor: colors.bottomSheetBorder,
             borderWidth: 1,
-            borderRadius: 12,
+            borderRadius: radiusMd,
             padding: 20,
             gap: 20,
           }}
@@ -304,7 +309,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
               layout={boxMorph()}
               style={{
                 backgroundColor: colors.bgCanvas,
-                borderRadius: 12,
+                borderRadius: radiusMd,
                 paddingHorizontal: 16,
                 paddingVertical: 4,
                 minHeight: REPORT_MIN_HEIGHT,

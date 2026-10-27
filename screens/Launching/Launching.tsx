@@ -1,8 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { Text, View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
 
-import { useTheme } from '@app/theme';
+import { space8, space20, useTheme } from '@app/theme';
+import Text from '@ui/primitives/Text';
 
 import {
   BiometricGateOutcome,
@@ -43,7 +44,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          width: '95%',
+          paddingHorizontal: space20,
         }}
       >
         <View
@@ -51,18 +52,15 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'flex-end',
-            width: '80%',
+            alignSelf: 'stretch',
             height: '40%',
-            marginTop: 20,
-            padding: 10,
+            marginTop: space20,
           }}
         >
-          <Text
-            style={{ color: colors.fgMuted, fontSize: 40, fontWeight: 'bold' }}
-          >
+          <Text variant="balance" tone="muted">
             {getZingoName()}
           </Text>
-          <Text style={{ color: colors.fgMuted, fontSize: 15 }}>
+          <Text variant="caption" tone="muted">
             {getZingoVersion()}
           </Text>
         </View>
@@ -71,19 +69,16 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'flex-start',
-            width: '80%',
+            alignSelf: 'stretch',
             height: '60%',
-            marginTop: 20,
-            padding: 10,
+            marginTop: space20,
           }}
         >
           {!!message && (
             <Text
-              style={{
-                color: colors.fgMuted,
-                fontSize: 15,
-                marginTop: 10,
-              }}
+              variant="body"
+              tone="muted"
+              style={{ marginTop: space8, textAlign: 'center' }}
               selectable
             >
               {message}
@@ -92,11 +87,9 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
           {biometricsFailed ? (
             <>
               <Text
+                variant="subtitle"
                 style={{
-                  color: colors.fgDefault,
-                  fontSize: 20,
-                  fontWeight: 'bold',
-                  marginTop: 10,
+                  marginTop: space8,
                   textAlign: 'center',
                 }}
                 selectable
@@ -104,10 +97,9 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                 {props.translate('biometricsfailed-title') as string}
               </Text>
               <Text
+                variant="body"
                 style={{
-                  color: colors.fgDefault,
-                  fontSize: 15,
-                  marginTop: 10,
+                  marginTop: space8,
                   textAlign: 'center',
                 }}
                 selectable
@@ -115,11 +107,10 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                 {props.translate('biometricsfailed-body') as string}
               </Text>
               <Text
+                variant="body"
                 style={{
-                  color: colors.fgDefault,
-                  fontSize: 15,
-                  marginTop: 10,
-                  marginBottom: 10,
+                  marginTop: space8,
+                  marginBottom: space8,
                   textAlign: 'center',
                 }}
                 selectable
@@ -130,7 +121,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                 variant="primary"
                 title={props.translate('biometricsfailed-button') as string}
                 onPress={() => props.tryAgain && props.tryAgain()}
-                style={{ marginBottom: 10, marginTop: 10 }}
+                style={{ marginVertical: space8 }}
               />
             </>
           ) : (
@@ -144,11 +135,9 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                 }
               />
               <Text
+                variant="subtitle"
                 style={{
-                  color: colors.fgDefault,
-                  fontSize: 20,
-                  fontWeight: 'bold',
-                  marginTop: 10,
+                  marginTop: space8,
                   opacity:
                     props.firstLaunchingMessage ===
                       LaunchingModeEnum.updating && !biometricsFailed
@@ -165,10 +154,9 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                 }
               </Text>
               <Text
+                variant="body"
                 style={{
-                  color: colors.fgDefault,
-                  fontSize: 15,
-                  marginTop: 10,
+                  marginTop: space8,
                   opacity:
                     props.firstLaunchingMessage ===
                       LaunchingModeEnum.updating && !biometricsFailed
@@ -185,11 +173,10 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                 }
               </Text>
               <Text
+                variant="body"
                 style={{
-                  color: colors.fgDefault,
-                  fontSize: 15,
-                  marginTop: 10,
-                  marginBottom: 10,
+                  marginTop: space8,
+                  marginBottom: space8,
                   opacity:
                     props.firstLaunchingMessage ===
                       LaunchingModeEnum.updating && !biometricsFailed

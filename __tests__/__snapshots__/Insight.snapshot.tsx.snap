@@ -193,8 +193,8 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
   <RCTScrollView
     contentContainerStyle={
       {
-        "paddingBottom": 36,
-        "paddingHorizontal": 21.5,
+        "paddingBottom": 32,
+        "paddingHorizontal": 20,
       }
     }
     testID="insight.scroll-view"
@@ -276,11 +276,13 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           testID="insight.metric.amount"
         >
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 13,
                 "fontWeight": "600",
+                "lineHeight": 18,
               }
             }
           >
@@ -328,11 +330,13 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           testID="insight.metric.sends"
         >
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#888888",
                 "fontSize": 13,
                 "fontWeight": "600",
+                "lineHeight": 18,
               }
             }
           >
@@ -345,9 +349,9 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           {
             "backgroundColor": "#031124",
             "borderColor": "#05234C",
-            "borderRadius": 20,
+            "borderRadius": 12,
             "borderWidth": 1,
-            "marginTop": 14,
+            "marginTop": 16,
             "padding": 16,
           }
         }
@@ -363,11 +367,13 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
-                "fontWeight": "700",
+                "fontWeight": "600",
+                "lineHeight": 21,
               }
             }
           >
@@ -375,12 +381,14 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           </Text>
         </View>
         <Text
+          maxFontSizeMultiplier={2}
           style={
             {
               "color": "#888888",
               "fontSize": 12,
+              "fontWeight": "400",
+              "lineHeight": 16,
               "marginBottom": 8,
-              "marginTop": 2,
             }
           }
         >
@@ -442,238 +450,306 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           style={
             {
               "flexDirection": "row",
-              "gap": 6,
+              "gap": 8,
               "marginTop": 12,
             }
           }
         >
           <View
-            accessibilityRole="button"
-            accessibilityState={
-              {
-                "busy": undefined,
-                "checked": undefined,
-                "disabled": undefined,
-                "expanded": undefined,
-                "selected": true,
-              }
-            }
-            accessibilityValue={
-              {
-                "max": undefined,
-                "min": undefined,
-                "now": undefined,
-                "text": undefined,
-              }
-            }
-            accessible={true}
-            collapsable={false}
-            focusable={true}
-            onBlur={[Function]}
-            onClick={[Function]}
-            onFocus={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
             style={
               {
-                "alignItems": "center",
-                "backgroundColor": "#8FB4E61F",
-                "borderColor": "#4A6487",
-                "borderRadius": 10,
-                "borderWidth": 1,
                 "flex": 1,
-                "height": 32,
-                "justifyContent": "center",
               }
             }
-            testID="insight.preset-4w"
           >
-            <Text
-              style={
+            <View
+              accessibilityRole="button"
+              accessibilityState={
                 {
-                  "color": "#c3c3c3",
-                  "fontSize": 12,
-                  "fontWeight": "600",
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": true,
                 }
               }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              hitSlop={
+                {
+                  "bottom": 6,
+                  "top": 6,
+                }
+              }
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": "#18bd181F",
+                  "borderColor": "#18bd18",
+                  "borderRadius": 999,
+                  "borderWidth": 1,
+                  "justifyContent": "center",
+                  "minHeight": 32,
+                  "opacity": 1,
+                  "paddingHorizontal": 12,
+                }
+              }
+              testID="insight.preset-4w"
             >
-              text translated
-            </Text>
+              <Text
+                maxFontSizeMultiplier={2}
+                style={
+                  {
+                    "color": "#18bd18",
+                    "fontSize": 13,
+                    "fontWeight": "600",
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                text translated
+              </Text>
+            </View>
           </View>
           <View
-            accessibilityRole="button"
-            accessibilityState={
-              {
-                "busy": undefined,
-                "checked": undefined,
-                "disabled": undefined,
-                "expanded": undefined,
-                "selected": true,
-              }
-            }
-            accessibilityValue={
-              {
-                "max": undefined,
-                "min": undefined,
-                "now": undefined,
-                "text": undefined,
-              }
-            }
-            accessible={true}
-            collapsable={false}
-            focusable={true}
-            onBlur={[Function]}
-            onClick={[Function]}
-            onFocus={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
             style={
               {
-                "alignItems": "center",
-                "backgroundColor": "#8FB4E61F",
-                "borderColor": "#4A6487",
-                "borderRadius": 10,
-                "borderWidth": 1,
                 "flex": 1,
-                "height": 32,
-                "justifyContent": "center",
               }
             }
-            testID="insight.preset-3m"
           >
-            <Text
-              style={
+            <View
+              accessibilityRole="button"
+              accessibilityState={
                 {
-                  "color": "#c3c3c3",
-                  "fontSize": 12,
-                  "fontWeight": "600",
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": true,
                 }
               }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              hitSlop={
+                {
+                  "bottom": 6,
+                  "top": 6,
+                }
+              }
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": "#18bd181F",
+                  "borderColor": "#18bd18",
+                  "borderRadius": 999,
+                  "borderWidth": 1,
+                  "justifyContent": "center",
+                  "minHeight": 32,
+                  "opacity": 1,
+                  "paddingHorizontal": 12,
+                }
+              }
+              testID="insight.preset-3m"
             >
-              text translated
-            </Text>
+              <Text
+                maxFontSizeMultiplier={2}
+                style={
+                  {
+                    "color": "#18bd18",
+                    "fontSize": 13,
+                    "fontWeight": "600",
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                text translated
+              </Text>
+            </View>
           </View>
           <View
-            accessibilityRole="button"
-            accessibilityState={
-              {
-                "busy": undefined,
-                "checked": undefined,
-                "disabled": undefined,
-                "expanded": undefined,
-                "selected": true,
-              }
-            }
-            accessibilityValue={
-              {
-                "max": undefined,
-                "min": undefined,
-                "now": undefined,
-                "text": undefined,
-              }
-            }
-            accessible={true}
-            collapsable={false}
-            focusable={true}
-            onBlur={[Function]}
-            onClick={[Function]}
-            onFocus={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
             style={
               {
-                "alignItems": "center",
-                "backgroundColor": "#8FB4E61F",
-                "borderColor": "#4A6487",
-                "borderRadius": 10,
-                "borderWidth": 1,
                 "flex": 1,
-                "height": 32,
-                "justifyContent": "center",
               }
             }
-            testID="insight.preset-6m"
           >
-            <Text
-              style={
+            <View
+              accessibilityRole="button"
+              accessibilityState={
                 {
-                  "color": "#c3c3c3",
-                  "fontSize": 12,
-                  "fontWeight": "600",
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": true,
                 }
               }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              hitSlop={
+                {
+                  "bottom": 6,
+                  "top": 6,
+                }
+              }
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": "#18bd181F",
+                  "borderColor": "#18bd18",
+                  "borderRadius": 999,
+                  "borderWidth": 1,
+                  "justifyContent": "center",
+                  "minHeight": 32,
+                  "opacity": 1,
+                  "paddingHorizontal": 12,
+                }
+              }
+              testID="insight.preset-6m"
             >
-              text translated
-            </Text>
+              <Text
+                maxFontSizeMultiplier={2}
+                style={
+                  {
+                    "color": "#18bd18",
+                    "fontSize": 13,
+                    "fontWeight": "600",
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                text translated
+              </Text>
+            </View>
           </View>
           <View
-            accessibilityRole="button"
-            accessibilityState={
-              {
-                "busy": undefined,
-                "checked": undefined,
-                "disabled": undefined,
-                "expanded": undefined,
-                "selected": true,
-              }
-            }
-            accessibilityValue={
-              {
-                "max": undefined,
-                "min": undefined,
-                "now": undefined,
-                "text": undefined,
-              }
-            }
-            accessible={true}
-            collapsable={false}
-            focusable={true}
-            onBlur={[Function]}
-            onClick={[Function]}
-            onFocus={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
             style={
               {
-                "alignItems": "center",
-                "backgroundColor": "#8FB4E61F",
-                "borderColor": "#4A6487",
-                "borderRadius": 10,
-                "borderWidth": 1,
                 "flex": 1,
-                "height": 32,
-                "justifyContent": "center",
               }
             }
-            testID="insight.preset-all"
           >
-            <Text
-              style={
+            <View
+              accessibilityRole="button"
+              accessibilityState={
                 {
-                  "color": "#c3c3c3",
-                  "fontSize": 12,
-                  "fontWeight": "600",
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": true,
                 }
               }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              hitSlop={
+                {
+                  "bottom": 6,
+                  "top": 6,
+                }
+              }
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": "#18bd181F",
+                  "borderColor": "#18bd18",
+                  "borderRadius": 999,
+                  "borderWidth": 1,
+                  "justifyContent": "center",
+                  "minHeight": 32,
+                  "opacity": 1,
+                  "paddingHorizontal": 12,
+                }
+              }
+              testID="insight.preset-all"
             >
-              text translated
-            </Text>
+              <Text
+                maxFontSizeMultiplier={2}
+                style={
+                  {
+                    "color": "#18bd18",
+                    "fontSize": 13,
+                    "fontWeight": "600",
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                text translated
+              </Text>
+            </View>
           </View>
         </View>
       </View>
@@ -682,9 +758,9 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           {
             "backgroundColor": "#031124",
             "borderColor": "#05234C",
-            "borderRadius": 20,
+            "borderRadius": 12,
             "borderWidth": 1,
-            "marginTop": 14,
+            "marginTop": 16,
             "padding": 16,
           }
         }
@@ -700,11 +776,13 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
-                "fontWeight": "700",
+                "fontWeight": "600",
+                "lineHeight": 21,
               }
             }
           >
@@ -812,12 +890,13 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               testID="insight.donut.center"
             >
               <Text
+                maxFontSizeMultiplier={1.5}
                 style={
                   {
                     "color": "#c3c3c3",
                     "fontSize": 22,
                     "fontWeight": "700",
-                    "lineHeight": 26,
+                    "lineHeight": 28,
                   }
                 }
                 testID="insight.donut.value"
@@ -825,12 +904,13 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
                 text translated
               </Text>
               <Text
+                maxFontSizeMultiplier={2}
                 style={
                   {
                     "color": "#888888",
                     "fontSize": 12,
-                    "lineHeight": 15,
-                    "marginTop": 2,
+                    "fontWeight": "400",
+                    "lineHeight": 16,
                     "textAlign": "center",
                   }
                 }
@@ -847,13 +927,13 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
             {
               "backgroundColor": "#031124",
               "borderColor": "#05234C",
-              "borderRadius": 20,
+              "borderRadius": 12,
               "borderWidth": 1,
-              "marginTop": 14,
+              "marginTop": 16,
               "padding": 16,
             },
             {
-              "paddingBottom": 22,
+              "paddingBottom": 20,
             },
           ]
         }
@@ -869,21 +949,26 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
-                "fontWeight": "700",
+                "fontWeight": "600",
+                "lineHeight": 21,
               }
             }
           >
             text translated
           </Text>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#888888",
                 "fontSize": 12,
+                "fontWeight": "400",
+                "lineHeight": 16,
               }
             }
           >
@@ -891,12 +976,14 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           </Text>
         </View>
         <Text
+          maxFontSizeMultiplier={2}
           style={
             {
               "color": "#888888",
-              "fontSize": 13,
-              "marginHorizontal": 10,
-              "marginVertical": 22,
+              "fontSize": 15,
+              "fontWeight": "400",
+              "lineHeight": 21,
+              "marginVertical": 20,
               "textAlign": "center",
             }
           }
@@ -907,8 +994,8 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         <View
           style={
             {
-              "marginHorizontal": -6,
-              "marginTop": 6,
+              "marginHorizontal": -8,
+              "marginTop": 8,
             }
           }
         />

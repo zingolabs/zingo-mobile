@@ -1,3 +1,4 @@
+/* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import { SnowflakeIcon } from '@ui/primitives/Icons/SnowflakeIcon';
 import { REVEAL_OPEN_MS } from '@ui/widgets/CircularReveal';
@@ -62,6 +63,10 @@ type HeaderProps = {
   /** The back arrow's testID and spoken label, with closeScreen. */
   backTestID?: string;
   backAccessibilityLabel?: string;
+  /** Drawn in place of the title text: the title with its tip, say. */
+  titleElement?: React.ReactElement;
+  /** An action at the bar's right end. */
+  right?: React.ComponentProps<typeof TitleBar>['right'];
   // balance
   noBalance?: boolean;
   // syncing icons
@@ -107,6 +112,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   closeScreen,
   backTestID,
   backAccessibilityLabel,
+  titleElement,
+  right,
   noUfvkIcon,
   showMessagesIcon,
   onUsdRowLayout,
@@ -376,10 +383,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         </Animated.View>
       </View>
 
-      {!!title && (
+      {(!!title || !!titleElement) && (
         <TitleBar
           testID={testID}
-          title={title}
+          title={titleElement ?? title}
+          right={right}
           left={
             closeScreen
               ? {

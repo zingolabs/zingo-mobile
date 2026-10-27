@@ -10,12 +10,12 @@ import Animated, {
 import Svg, { Defs, FeGaussianBlur, Filter, G, Path } from 'react-native-svg';
 import { create } from 'qrcode';
 
-import { useTheme } from '@app/theme';
-import { ease } from '@app/theme/motion';
+import { useTheme, iconSize, radiusMd, radiusSm } from '@app/theme';
+import { duration, ease } from '@app/theme/motion';
 import { SnowflakeIcon } from '@ui/primitives/Icons/SnowflakeIcon';
 import { themeTokens } from '@app/theme';
 
-const VEIL_MS = 220;
+const VEIL_MS = duration.tabColor;
 const BLUR_PT = 9;
 const QUIET = 2;
 const LOGO = 34;
@@ -97,7 +97,7 @@ const KeyQr: React.FunctionComponent<KeyQrProps> = ({
       style={{
         width: size,
         height: size,
-        borderRadius: 12,
+        borderRadius: radiusMd,
         overflow: 'hidden',
         backgroundColor: PAPER,
       }}
@@ -115,13 +115,13 @@ const KeyQr: React.FunctionComponent<KeyQrProps> = ({
           top: (size - LOGO) / 2,
           width: LOGO,
           height: LOGO,
-          borderRadius: 9,
+          borderRadius: radiusSm,
           backgroundColor: PAPER,
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <SnowflakeIcon size={24} color={colors.fgViewOnly} />
+        <SnowflakeIcon size={iconSize} color={colors.fgViewOnly} />
       </View>
     </View>
   );
