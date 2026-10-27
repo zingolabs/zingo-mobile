@@ -1,4 +1,3 @@
-/* geometry-gap: not yet on the system */
 import React, { useContext, useRef } from 'react';
 import { Keyboard, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import {
@@ -9,7 +8,7 @@ import {
   BottomSheetModal,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import { radiusSheet, useTheme } from '@app/theme';
+import { radiusSheet, useTheme, radiusPill } from '@app/theme';
 import { SurfaceContext } from './Surface';
 import TooltipHost from '@ui/widgets/TooltipHost';
 import { duration, ease } from '@app/theme/motion';
@@ -178,7 +177,7 @@ const styles = StyleSheet.create({
   mask: roundedClip,
   maskFill: { flex: 1, ...roundedClip },
   handle: { paddingTop: 10, paddingBottom: 6 },
-  indicator: { width: 36, height: 4, borderRadius: 2 },
+  indicator: { width: 36, height: 4, borderRadius: radiusPill },
 });
 
 export default AppSheetModal;

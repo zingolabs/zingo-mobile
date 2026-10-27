@@ -1,4 +1,3 @@
-/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useState } from 'react';
 import { Image, View } from 'react-native';
@@ -7,7 +6,7 @@ import Text from '@ui/primitives/Text';
 import Utils from '@app/utils';
 import { getChainIcon } from '@ui/widgets/chainIcons';
 import { isDarkLogo } from './darkLogos';
-import { useTheme } from '@app/theme';
+import { useTheme, radiusPill } from '@app/theme';
 
 type TokenLogoProps = {
   token: TokenEntryType | null | undefined;
@@ -83,7 +82,7 @@ export default function TokenLogo({
           style={{
             width: size,
             height: size,
-            borderRadius: size / 2,
+            borderRadius: radiusPill,
             backgroundColor: imageBg,
           }}
         />
@@ -103,7 +102,7 @@ export default function TokenLogo({
             bottom: -badgeOverhang,
             width: badgeWrap,
             height: badgeWrap,
-            borderRadius: badgeWrap / 2,
+            borderRadius: radiusPill,
             backgroundColor: surfaceColor,
             alignItems: 'center',
             justifyContent: 'center',
@@ -117,7 +116,7 @@ export default function TokenLogo({
             style={{
               width: badgeSize,
               height: badgeSize,
-              borderRadius: badgeSize / 2,
+              borderRadius: radiusPill,
             }}
           />
         </View>
@@ -143,7 +142,7 @@ function LetterAvatar({
       style={{
         width: size,
         height: size,
-        borderRadius: size / 2,
+        borderRadius: radiusPill,
         backgroundColor: bg,
         alignItems: 'center',
         justifyContent: 'center',

@@ -1,13 +1,12 @@
-/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useRef, useState } from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View } from 'react-native';
 
 import { useTheme } from '@app/theme';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 import FadeText from '@ui/primitives/FadeText';
-import BoldText from '@ui/primitives/BoldText';
+import TitleBar from '@ui/widgets/TitleBar';
 import AppSheet from '@ui/primitives/AppSheet';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
@@ -44,31 +43,15 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
   const aboutSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
   const aboutHeader = (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingTop: 12,
-        paddingBottom: 8,
-        paddingHorizontal: 16,
+    <TitleBar
+      title={getZingoName() + ' ' + getZingoVersion()}
+      left={{
+        icon: ChevronLeft,
+        onPress: closeScreen,
+        accessibilityLabel: translate('about.back-acc') as string,
+        accent: true,
       }}
-    >
-      <TouchableOpacity
-        onPress={closeScreen}
-        hitSlop={8}
-        style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-      >
-        <ChevronLeft size={20} color={colors.fgAccent} />
-      </TouchableOpacity>
-      <BoldText
-        numberOfLines={1}
-        style={{ flex: 1, fontSize: 16, lineHeight: 28, textAlign: 'center' }}
-      >
-        {getZingoName() + ' ' + getZingoVersion()}
-      </BoldText>
-      <View style={{ width: 28 }} />
-    </View>
+    />
   );
 
   return (

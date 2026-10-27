@@ -1,8 +1,8 @@
-/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
+  interpolate,
   interpolateColor,
   ReduceMotion,
   runOnJS,
@@ -95,7 +95,7 @@ const CardExpand: React.FunctionComponent<CardExpandProps> = ({
       top: (from.y - frame.y) * (1 - g),
       width: from.width + (frame.width - from.width) * g,
       height: from.height + (frame.height - from.height) * g,
-      borderRadius: RADIUS * (1 - g),
+      borderRadius: interpolate(g, [0, 1], [RADIUS, 0]),
       backgroundColor: interpolateColor(
         g,
         [0, 0.12, 1],

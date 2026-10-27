@@ -1,4 +1,3 @@
-/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback } from 'react';
 import { Keyboard, Pressable, View } from 'react-native';
@@ -10,8 +9,7 @@ import {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 
-import BoldText from '@ui/primitives/BoldText';
-import RegText from '@ui/primitives/RegText';
+import Text from '@ui/primitives/Text';
 import SheetRim from '@ui/primitives/SheetRim';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 
@@ -72,17 +70,13 @@ const ActionMenuBottomSheet = forwardRef<
           }}
         >
           <View style={{ width: 48 }} />
-          <BoldText
+          <Text
+            variant="barTitle"
             numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
+            style={{ flex: 1, textAlign: 'center' }}
           >
             {title ?? ''}
-          </BoldText>
+          </Text>
           <Pressable
             onPress={dismiss}
             hitSlop={8}
@@ -142,15 +136,12 @@ const ActionMenuBottomSheet = forwardRef<
               opacity: pressed ? 0.6 : 1,
             })}
           >
-            <RegText
-              style={{
-                fontSize: 16,
-                color: action.destructive ? colors.fgDanger : colors.fgDefault,
-                fontWeight: '400',
-              }}
+            <Text
+              variant="body"
+              tone={action.destructive ? 'danger' : 'default'}
             >
               {action.label}
-            </RegText>
+            </Text>
           </Pressable>
         ))}
       </BottomSheetScrollView>

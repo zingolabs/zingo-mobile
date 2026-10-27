@@ -1187,6 +1187,7 @@
     "birthday-tip-body": "Ничего страшного, если вы её не знаете."
   },
   "about": {
+    "back-acc": "Назад",
     "copyright": [
       "Права защищены (с) 2026, ZingoLabs.",
       "Используется React Native.",
