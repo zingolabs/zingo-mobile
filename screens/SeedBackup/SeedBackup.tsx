@@ -1,4 +1,3 @@
-/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import React, {
   useCallback,
@@ -15,6 +14,7 @@ import {
   View,
 } from 'react-native';
 import Animated, {
+  interpolate,
   FadeIn,
   FadeOut,
   interpolateColor,
@@ -367,7 +367,7 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
       width: from.width + (screen.width - from.width) * g,
       height: from.height + (screen.height - from.height) * g,
       opacity: whole.value,
-      borderRadius: RADIUS * (1 - g),
+      borderRadius: interpolate(g, [0, 1], [RADIUS, 0]),
       backgroundColor: interpolateColor(
         g,
         [0, 0.12, 1],
