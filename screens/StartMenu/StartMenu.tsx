@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { View, Pressable } from 'react-native';
+import { View } from 'react-native';
 import Animated, {
   FadeIn,
   FadeInUp,
@@ -30,6 +30,7 @@ import Card from '@ui/widgets/Card';
 import Tag from '@ui/widgets/Tag';
 import ServerIcon from '@ui/widgets/ServerIcon';
 import { duration, ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { WifiIcon } from '@ui/primitives/Icons/WifiIcon';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
@@ -228,6 +229,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
       >
         {!!netLabel && <Tag tone="warning">{netLabel}</Tag>}
         <Pressable
+          kind="icon"
           testID="loadingapp.server"
           onPress={customServer}
           disabled={actionButtonsDisabled}

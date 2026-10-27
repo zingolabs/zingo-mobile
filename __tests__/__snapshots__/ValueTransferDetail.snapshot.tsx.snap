@@ -267,6 +267,12 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            style={
+              [
+                undefined,
+                {},
+              ]
+            }
           >
             <Text
               maxFontSizeMultiplier={1.3}
@@ -723,6 +729,12 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            style={
+              [
+                undefined,
+                {},
+              ]
+            }
             testID="valuetransferdetail.memo"
           >
             <Text
@@ -1104,6 +1116,12 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            style={
+              [
+                undefined,
+                {},
+              ]
+            }
           >
             <Text
               maxFontSizeMultiplier={1.3}
@@ -1733,6 +1751,12 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            style={
+              [
+                undefined,
+                {},
+              ]
+            }
             testID="valuetransferdetail.memo"
           >
             <Text

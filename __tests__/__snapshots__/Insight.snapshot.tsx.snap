@@ -299,11 +299,14 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "alignItems": "center",
-              "flex": 1,
-              "justifyContent": "center",
-            }
+            [
+              {
+                "alignItems": "center",
+                "flex": 1,
+                "justifyContent": "center",
+              },
+              {},
+            ]
           }
           testID="insight.metric.amount"
         >
@@ -353,11 +356,14 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "alignItems": "center",
-              "flex": 1,
-              "justifyContent": "center",
-            }
+            [
+              {
+                "alignItems": "center",
+                "flex": 1,
+                "justifyContent": "center",
+              },
+              {},
+            ]
           }
           testID="insight.metric.sends"
         >

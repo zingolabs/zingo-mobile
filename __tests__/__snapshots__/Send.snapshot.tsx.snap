@@ -8,6 +8,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
       "flex": 1,
     }
   }
+  testID="send.container"
 >
   <View
     accessibilityLabel="text translated"
@@ -742,16 +743,19 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
                       style={
-                        {
-                          "alignItems": "center",
-                          "borderColor": "#05234C",
-                          "borderRadius": 999,
-                          "borderWidth": 1,
-                          "flexDirection": "row",
-                          "gap": 4,
-                          "minHeight": 32,
-                          "paddingHorizontal": 12,
-                        }
+                        [
+                          {
+                            "alignItems": "center",
+                            "borderColor": "#05234C",
+                            "borderRadius": 999,
+                            "borderWidth": 1,
+                            "flexDirection": "row",
+                            "gap": 4,
+                            "minHeight": 32,
+                            "paddingHorizontal": 12,
+                          },
+                          {},
+                        ]
                       }
                       testID="send.swap-entry"
                     >
@@ -836,10 +840,13 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
                       style={
-                        {
-                          "flexDirection": "row",
-                          "gap": 4,
-                        }
+                        [
+                          {
+                            "flexDirection": "row",
+                            "gap": 4,
+                          },
+                          {},
+                        ]
                       }
                       testID="send.max"
                     >
@@ -1250,6 +1257,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
       "flex": 1,
     }
   }
+  testID="send.container"
 >
   <View
     accessibilityLabel="text translated"
@@ -1984,16 +1992,19 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
                       style={
-                        {
-                          "alignItems": "center",
-                          "borderColor": "#05234C",
-                          "borderRadius": 999,
-                          "borderWidth": 1,
-                          "flexDirection": "row",
-                          "gap": 4,
-                          "minHeight": 32,
-                          "paddingHorizontal": 12,
-                        }
+                        [
+                          {
+                            "alignItems": "center",
+                            "borderColor": "#05234C",
+                            "borderRadius": 999,
+                            "borderWidth": 1,
+                            "flexDirection": "row",
+                            "gap": 4,
+                            "minHeight": 32,
+                            "paddingHorizontal": 12,
+                          },
+                          {},
+                        ]
                       }
                       testID="send.swap-entry"
                     >
@@ -2078,10 +2089,13 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
                       style={
-                        {
-                          "flexDirection": "row",
-                          "gap": 4,
-                        }
+                        [
+                          {
+                            "flexDirection": "row",
+                            "gap": 4,
+                          },
+                          {},
+                        ]
                       }
                       testID="send.max"
                     >

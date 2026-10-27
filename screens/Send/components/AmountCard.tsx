@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { Pressable, TextInput, View } from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
+import { TextInput, View } from 'react-native';
 import {
   chipMinHeight,
   fontScaleDisplay,
@@ -117,6 +118,7 @@ export default function AmountCard({
             }}
           />
           <Pressable
+            kind="button"
             testID="send.swap-entry"
             accessibilityRole="button"
             accessibilityLabel={t('send.switch-unit-acc')}
@@ -164,6 +166,7 @@ export default function AmountCard({
           }}
         >
           <Pressable
+            kind="link"
             testID="send.max"
             accessibilityRole="button"
             onPress={onMax}

@@ -32,7 +32,9 @@ exports[`MessageLine - snapshots MessageLine received with messageAddress, no mo
     accessible={true}
     collapsable={false}
     focusable={true}
+    onBlur={[Function]}
     onClick={[Function]}
+    onFocus={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -40,12 +42,33 @@ exports[`MessageLine - snapshots MessageLine received with messageAddress, no mo
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "opacity": 1,
-        "zIndex": 999,
-      }
+      [
+        {
+          "zIndex": 999,
+        },
+        {},
+      ]
     }
   >
+    <View
+      pointerEvents="none"
+      style={
+        [
+          {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          },
+          {
+            "backgroundColor": "#8888881F",
+            "borderRadius": undefined,
+          },
+          {},
+        ]
+      }
+    />
     <View
       style={
         {
@@ -92,7 +115,9 @@ exports[`MessageLine - snapshots MessageLine received with messageAddress, no mo
           accessible={true}
           collapsable={false}
           focusable={true}
+          onBlur={[Function]}
           onClick={[Function]}
+          onFocus={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -100,10 +125,12 @@ exports[`MessageLine - snapshots MessageLine received with messageAddress, no mo
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "opacity": 1,
-              "zIndex": 999,
-            }
+            [
+              {
+                "zIndex": 999,
+              },
+              {},
+            ]
           }
         >
           <Text
@@ -326,7 +353,9 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
     accessible={true}
     collapsable={false}
     focusable={true}
+    onBlur={[Function]}
     onClick={[Function]}
+    onFocus={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -334,12 +363,33 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "opacity": 1,
-        "zIndex": 999,
-      }
+      [
+        {
+          "zIndex": 999,
+        },
+        {},
+      ]
     }
   >
+    <View
+      pointerEvents="none"
+      style={
+        [
+          {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          },
+          {
+            "backgroundColor": "#8888881F",
+            "borderRadius": undefined,
+          },
+          {},
+        ]
+      }
+    />
     <View
       style={
         {
@@ -476,7 +526,9 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
           accessible={true}
           collapsable={false}
           focusable={true}
+          onBlur={[Function]}
           onClick={[Function]}
+          onFocus={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -484,10 +536,12 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "opacity": 1,
-              "zIndex": 999,
-            }
+            [
+              {
+                "zIndex": 999,
+              },
+              {},
+            ]
           }
         >
           <Text

@@ -1,10 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
+import Pressable from '@ui/primitives/Pressable';
 import {
   AccessibilityInfo,
   Animated,
   Easing,
-  Pressable,
   TextInput,
   View,
 } from 'react-native';
@@ -241,6 +241,7 @@ export default function PairCards({
           </Text>
           {isOutbound && !!availableText && (
             <Pressable
+              kind="link"
               accessibilityRole="button"
               accessibilityLabel={texts.useMax}
               onPress={onUseMax}
@@ -306,6 +307,7 @@ export default function PairCards({
         <Animated.View style={[underRow, { opacity: words }]}>
           {onToggleUnit ? (
             <Pressable
+              kind="link"
               accessibilityRole="button"
               accessibilityLabel={texts.switchUnit}
               onPress={onToggleUnit}
@@ -333,23 +335,24 @@ export default function PairCards({
 
       <View style={{ height: 0, alignItems: 'center', zIndex: 4 }}>
         <Pressable
+          kind="button"
           testID="swap.flip"
           accessibilityRole="button"
           accessibilityLabel={texts.flip}
           onPress={onFlip}
           hitSlop={(touchTarget - FLIP_SIZE) / 2}
-          style={({ pressed }) => ({
+          style={{
             position: 'absolute',
             top: -FLIP_SIZE / 2 + SEAM / 2,
             width: FLIP_SIZE,
             height: FLIP_SIZE,
             borderRadius: radiusPill,
-            backgroundColor: pressed ? colors.bgCanvas : colors.bgSurface,
+            backgroundColor: colors.bgSurface,
             borderWidth: 1,
             borderColor: colors.bottomSheetBorder,
             alignItems: 'center',
             justifyContent: 'center',
-          })}
+          }}
         >
           <Animated.View style={{ transform: [{ rotate: spin }] }}>
             <View style={{ transform: [{ rotate: '90deg' }] }}>
@@ -402,6 +405,7 @@ export default function PairCards({
           >
             {!!ring && (
               <Pressable
+                kind="icon"
                 accessibilityRole="button"
                 accessibilityLabel={texts.refreshNow}
                 onPress={ring.onPress}

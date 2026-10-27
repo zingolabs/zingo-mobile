@@ -2,7 +2,6 @@
 import React, { useEffect, useRef } from 'react';
 import { BackHandler, Platform, StyleSheet, View } from 'react-native';
 import Animated, {
-  Easing,
   ReduceMotion,
   useAnimatedStyle,
   useSharedValue,
@@ -14,23 +13,17 @@ import { useIsFocused } from '@react-navigation/native';
 
 import OptionsPanel, { OptionsPanelProps } from './OptionsPanel';
 import { useOptionsPanel } from '@app/context/optionsPanel';
-import { ease } from '@app/theme/motion';
+import { duration, ease } from '@app/theme/motion';
 import { useTheme } from '@app/theme';
 
-const FADE_DURATION_MS = 125;
-// Open sequence (total ≈ 250ms = slide duration):
-//   1) 0–125ms:   only the sheet slides down — panel stays at opacity 0
-//   2) 125–250ms: panel fades 0 → 1 while the sheet is still sliding,
-//      producing the "morphing" overlap between the two surfaces
-//   3) end:       panel at full opacity, sheet fully off-screen
-// Close path is untouched: panel just fades 1 → 0 immediately.
-const OPEN_FADE_DELAY_MS = 125;
-// A screen pushed from the panel veils it in place with bgScrim (the
-// token carries the dim): the panel never moves, so the screen pops
-// straight back onto it.
+/**
+ * Opening, the sheet slides away first and the panel fades in over its last
+ * part, so the two surfaces overlap; closing, the panel just fades out. A
+ * screen pushed from the panel veils it in place with bgScrim (the token
+ * carries the dim): the panel never moves, so the screen pops straight back
+ * onto it.
+ */
 const PUSHED_DIM = 1;
-const PUSH_IN_MS = 380;
-const PUSH_OUT_MS = 320;
 
 type OptionsPanelHostProps = OptionsPanelProps & {
   /** The home tabs. They stay fixed; only the sheet inside each tab slides,
@@ -60,16 +53,17 @@ const OptionsPanelHost: React.FC<OptionsPanelHostProps> = ({
 
   useEffect(() => {
     const tween = withTiming(shown ? 1 : 0, {
-      duration: FADE_DURATION_MS,
-      easing: Easing.out(Easing.cubic),
+      duration: duration.fast,
+      easing: ease.standard,
+      reduceMotion: ReduceMotion.System,
     });
-    opacity.value = shown ? withDelay(OPEN_FADE_DELAY_MS, tween) : tween;
+    opacity.value = shown ? withDelay(duration.fast, tween) : tween;
   }, [shown, opacity]);
 
   useEffect(() => {
     const under = kind === 'under';
     dim.value = withTiming(under ? PUSHED_DIM : 0, {
-      duration: under ? PUSH_IN_MS : PUSH_OUT_MS,
+      duration: under ? duration.screen : duration.sheetClose,
       easing: ease.emphasized,
       reduceMotion: ReduceMotion.System,
     });
