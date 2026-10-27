@@ -46,7 +46,13 @@ jest.mock('@app/services/selectingServer', () => ({
 import 'react-native';
 import React from 'react';
 
-import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
+import {
+  act,
+  fireEvent,
+  render,
+  waitFor,
+  screen,
+} from '@testing-library/react-native';
 import { deliver } from '@app/navigation/results';
 import { useNavigation } from '@react-navigation/native';
 import Send from '@screens/Send';
@@ -80,6 +86,16 @@ import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 import { mockOnline } from '../__mocks__/dataMocks/mockOnline';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
+
+/** Send mounts its sheet once its container is measured; jest never lays out. */
+const layoutSend = () => {
+  const container = screen.queryByTestId('send.container');
+  if (container) {
+    fireEvent(container, 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 400, height: 800 } },
+    });
+  }
+};
 
 const FEE_ZATOSHIS = 10_000;
 const SPENDABLE_ZATOSHIS = 100_000_000;
@@ -181,6 +197,7 @@ describe('Send confirm send permit', () => {
     const sendTransaction = jest.fn().mockResolvedValue(sent);
     const addLastSnackbar = jest.fn();
     const view = render(sendUi(online, sendTransaction, addLastSnackbar));
+    layoutSend();
     const confirmSend = await openConfirmScreen(view);
 
     view.rerender(
@@ -200,6 +217,7 @@ describe('Send confirm send permit', () => {
     const sendTransaction = jest.fn().mockResolvedValue(sent);
     const addLastSnackbar = jest.fn();
     const view = render(sendUi(online, sendTransaction, addLastSnackbar));
+    layoutSend();
     const confirmSend = await openConfirmScreen(view);
 
     view.rerender(
@@ -219,6 +237,7 @@ describe('Send confirm send permit', () => {
     const sendTransaction = jest.fn().mockResolvedValue(sent);
     const addLastSnackbar = jest.fn();
     const view = render(sendUi(online, sendTransaction, addLastSnackbar));
+    layoutSend();
     const confirmSend = await openConfirmScreen(view);
 
     view.rerender(
@@ -252,6 +271,7 @@ describe('Send confirm send permit', () => {
     const view = render(
       sendUi(online, sendTransaction, jest.fn(), setServerOption),
     );
+    layoutSend();
     const confirmSend = await openConfirmScreen(view);
 
     await confirmSend();
@@ -278,6 +298,7 @@ describe('Send confirm send permit', () => {
   test('Tests that confirming sends when the permit is granted.', async () => {
     const sendTransaction = jest.fn().mockResolvedValue(sent);
     const view = render(sendUi(online, sendTransaction, jest.fn()));
+    layoutSend();
     const confirmSend = await openConfirmScreen(view);
 
     await confirmSend();
@@ -292,6 +313,7 @@ describe('Send confirm send permit', () => {
   test('Tests that confirming sends the state the Confirm screen shows when the form changes after it opened.', async () => {
     const sendTransaction = jest.fn().mockResolvedValue(sent);
     const view = render(sendUi(online, sendTransaction, jest.fn()));
+    layoutSend();
     const confirmSend = await openConfirmScreen(view);
     const confirmCall = navigate.mock.calls.find(
       ([route]) => route === Route.Confirm,
@@ -310,6 +332,7 @@ describe('Send confirm send permit', () => {
     const sendTransaction = jest.fn().mockResolvedValue(sent);
     const absent = { ...online, mixnetView: ABSENT_MIXNET_VIEW };
     const view = render(sendUi(absent, sendTransaction, jest.fn()));
+    layoutSend();
     const confirmSend = await openConfirmScreen(view);
 
     expect(view.queryByTestId('send.mixnet-blocked')).toBeNull();
