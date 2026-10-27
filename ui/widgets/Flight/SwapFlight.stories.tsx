@@ -24,6 +24,8 @@ const meta: Meta<typeof SwapFlight> = {
   title: 'Components/SwapFlight',
   component: SwapFlight,
   args: { from: BTC, to: ZEC, provider: 'NEAR', nym: false },
+  /** Its loops settle on their end frame in the visual capture. */
+  tags: ['loop'],
 };
 
 export default meta;
