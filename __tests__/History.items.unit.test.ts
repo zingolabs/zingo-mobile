@@ -265,7 +265,7 @@ test('Tests that a purchase whose payment the provider saw reads payment detecte
   expect(sale.state?.text).toBe('history.state-swapping');
 });
 
-test('Tests that an expired purchase reads grey with the ZEC it would have got struck through and the coin not sent under it', () => {
+test('Tests that a purchase whose deposit was not detected reads grey with the ZEC it would have got struck through and the coin not sent under it', () => {
   const text = swapRowText({
     record: record({
       direction: SwapDirectionEnum.Inbound,

@@ -439,8 +439,8 @@ describe('SwapPoller on an awaited deposit with a deadline', () => {
 
   // Records made before the deadline was kept read the window from their
   // creation, so the ones already stuck end on the next launch.
-  it('expires a record without a deadline once the window after creation passes', async () => {
-    const { poller, upsert } = harnessAt(T0 + 15 * 60 * 1000, [
+  it('expires a record without a deadline 24 hours after creation', async () => {
+    const { poller, upsert } = harnessAt(T0 + 24 * 60 * 60 * 1000, [
       awaited({ depositDeadlineMs: undefined }),
     ]);
     await poller.tickOnce();

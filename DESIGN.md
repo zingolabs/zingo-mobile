@@ -707,6 +707,9 @@ animation.
 - Menu screens slide in from the right.
 - Closing a flow lowers only the panel on top; the ones under it leave with
   it.
+- A swap waiting for a payment from another wallet: the coin sent breathes
+  in place (`duration.breathe`, in and out on `ease.standard`) and nothing
+  travels until the provider sees the payment (`SwapFlight`'s `waiting`).
 - The tab bar's capsule slides in 360 ms on (.2, 0, 0, 1), its colours change
   in 220 ms, and it shrinks and grows in 360 ms.
 - Every animation honours Reduce Motion (`ReduceMotion.System`).

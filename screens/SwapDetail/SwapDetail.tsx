@@ -37,13 +37,13 @@ import {
   buildChainExplorerUrl,
   canonicalChainAddress,
   canRemoveSwap,
-  depositDeadlineMs,
   formatAmountForDisplay,
   isPrePaymentStatus,
   isRealLegHash,
   isRefunding,
   isTerminalStatus,
   isThorchainFamily,
+  prefillFromRecord,
   providerLongLabel,
 } from '@app/swap';
 import { showConfirm } from '@app/services/showConfirm';
@@ -289,14 +289,6 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
     ...(expired
       ? [
           {
-            label: t('swap.quote-valid-until'),
-            value: Utils.formatDate(
-              depositDeadlineMs(record),
-              'MMM d, h:mm aaa',
-              language,
-            ),
-          },
-          {
             label: t('swap.result-reason'),
             value: t('swap.expired-why'),
             wrap: true,
@@ -352,14 +344,6 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
           rows[0],
           rows[1],
           {
-            label: t('swap.quote-valid-until'),
-            value: Utils.formatDate(
-              depositDeadlineMs(record),
-              'MMM d, h:mm aaa',
-              language,
-            ),
-          },
-          {
             label: t('swap.result-reason'),
             value: t('swap.late-why'),
             wrap: true,
@@ -413,6 +397,19 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
       onBack={close}
       footer={
         <ButtonStack>
+          {expired && (
+            <Button
+              testID="swap.detail.new-quote"
+              variant="primary"
+              title={t('swap.get-new-quote')}
+              onPress={() =>
+                navigation.navigate(Route.Home, {
+                  screen: Route.Swap,
+                  params: { prefill: prefillFromRecord(record, Date.now()) },
+                })
+              }
+            />
+          )}
           {canRemoveSwap(record) && (
             <Button
               testID="swap.detail.remove"
