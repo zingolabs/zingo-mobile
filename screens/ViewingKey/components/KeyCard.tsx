@@ -1,17 +1,15 @@
-/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { Platform, Text, View } from 'react-native';
+import { View } from 'react-native';
 
-import { useTheme } from '@app/theme';
+import { radiusMd, space4, space12, space16, useTheme } from '@app/theme';
+import Text from '@ui/primitives/Text';
 import { ContextAppLoaded } from '@app/context';
 import { SIDE } from '@screens/SeedBackup/components/StepParts';
 import KeyQr from './KeyQr';
 
 const HEAD = 12;
 const TAIL = 8;
-
-const MONO = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
 
 const masked = (key: string) => `${key.slice(0, 6)}••••••…••••••••`;
 const truncated = (key: string) =>
@@ -38,8 +36,8 @@ const KeyCard: React.FunctionComponent<KeyCardProps> = ({
       style={{
         alignItems: 'center',
         marginHorizontal: SIDE,
-        paddingVertical: 18,
-        borderRadius: 16,
+        paddingVertical: space16,
+        borderRadius: radiusMd,
         borderWidth: 1,
         borderColor: colors.bottomSheetBorder,
         backgroundColor: colors.bgSurface,
@@ -47,26 +45,17 @@ const KeyCard: React.FunctionComponent<KeyCardProps> = ({
     >
       {!!value && <KeyQr value={value} size={qrSize} hidden={hidden} />}
       <Text
-        style={{
-          color: colors.fgMuted,
-          fontSize: 12,
-          fontWeight: '700',
-          letterSpacing: 0.6,
-          marginTop: 14,
-        }}
+        variant="bodySmall"
+        tone="muted"
+        style={{ fontWeight: '600', marginTop: space12 }}
       >
         {translate('viewingkey.label') as string}
       </Text>
       <Text
         testID={`${testID}.key`}
         selectable={false}
-        style={{
-          color: colors.fgDefault,
-          fontFamily: MONO,
-          fontSize: 14,
-          fontWeight: '400',
-          marginTop: 4,
-        }}
+        variant="address"
+        style={{ marginTop: space4 }}
       >
         {value ? (hidden ? masked(value) : truncated(value)) : ''}
       </Text>
