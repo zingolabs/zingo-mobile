@@ -24,6 +24,9 @@ the baseline holds what the CI runner drew. The PR flow is:
 2. Review the report. If the change is intended, comment `/visual-accept` on
    the PR. A bot downloads that run's `visual-head` artifact into
    `visual/__baseline__`, commits it to the branch, and turns the check green.
+   Only the files the gate failed change: an image within the jitter budget
+   or a timeline within the tolerance keeps its baseline, so jitter never
+   lands in a commit and two PRs only touch the stories they changed.
    The command needs write access to the repository and a finished run for the
    current commit.
 3. For a same result from a terminal, run `yarn visual:accept` on the branch,
