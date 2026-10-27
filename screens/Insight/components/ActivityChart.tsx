@@ -1,7 +1,6 @@
-/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import Animated, {
   ReduceMotion,
   useAnimatedStyle,
@@ -19,14 +18,28 @@ import {
   Metric,
   niceTop,
 } from '@screens/Insight/insightModel';
-import { themeTokens, useTheme } from '@app/theme';
+import {
+  radiusMd,
+  radiusPill,
+  radiusSm,
+  space4,
+  space8,
+  space12,
+  textVariants,
+  themeTokens,
+  useTheme,
+} from '@app/theme';
+import Text from '@ui/primitives/Text';
+import { duration } from '@app/theme/motion';
 import { formatPercent } from '@app/utils/formatAmount';
 import { MASK } from '@ui/widgets/PrivateAmount';
 
 const H = 168;
 const TOP = 18;
 const BOTTOM = 22;
-const GROW_MS = 560;
+const GROW_MS = duration.panelIn;
+/** The corners where a bar's stacked segments meet. */
+const SQUARE_CORNER = 0;
 const GROW_STAGGER = 22;
 const GROW_WINDOW = 400;
 const SEAM = themeTokens.bgSurface;
@@ -101,8 +114,8 @@ const Bar: React.FunctionComponent<BarProps> = ({
             backgroundColor: s.color,
             borderTopWidth: k === 0 ? 0 : 0.8,
             borderTopColor: SEAM,
-            borderTopLeftRadius: k === 0 ? radius : 0,
-            borderTopRightRadius: k === 0 ? radius : 0,
+            borderTopLeftRadius: k === 0 ? radius : SQUARE_CORNER,
+            borderTopRightRadius: k === 0 ? radius : SQUARE_CORNER,
           }}
         />
       ))}
@@ -197,7 +210,12 @@ const ActivityChart: React.FunctionComponent<ActivityChartProps> = ({
                   strokeDasharray="2 4"
                 />
                 {f > 0 && (
-                  <SvgText x={0} y={y - 5} fontSize={10} fill={TICK_INK}>
+                  <SvgText
+                    x={0}
+                    y={y - 5}
+                    fontSize={textVariants.caption.fontSize}
+                    fill={TICK_INK}
+                  >
                     {tickText(top * f)}
                   </SvgText>
                 )}
@@ -209,7 +227,7 @@ const ActivityChart: React.FunctionComponent<ActivityChartProps> = ({
               key={i}
               x={Math.max(18, Math.min(width - 18, i * slot + slot / 2))}
               y={H - 4}
-              fontSize={10}
+              fontSize={textVariants.caption.fontSize}
               fill={AXIS_INK}
               textAnchor="middle"
             >
@@ -227,7 +245,7 @@ const ActivityChart: React.FunctionComponent<ActivityChartProps> = ({
             top: TOP - 4,
             width: slot,
             height: plotH + 4,
-            borderRadius: 6,
+            borderRadius: radiusSm,
             backgroundColor: colors.bgMutedSubtle,
           }}
         />
@@ -278,57 +296,56 @@ const ActivityChart: React.FunctionComponent<ActivityChartProps> = ({
             left: tipLeft,
             minWidth: 150,
             maxWidth: 210,
-            paddingHorizontal: 11,
-            paddingTop: 9,
-            paddingBottom: 8,
-            borderRadius: 12,
+            paddingHorizontal: space12,
+            paddingVertical: space8,
+            borderRadius: radiusMd,
             borderWidth: 1,
             borderColor: TIP_LINE,
             backgroundColor: TIP_BG,
           }}
         >
           <Text
-            style={{
-              marginBottom: 5,
-              color: TIP_HEAD,
-              fontSize: 12,
-              fontWeight: '600',
-            }}
+            variant="caption"
+            color={TIP_HEAD}
+            style={{ marginBottom: space4, fontWeight: '600' }}
           >
             {rangeLabel(week)}
           </Text>
           {tipRows.length === 0 && (
-            <Text style={{ color: TIP_INK, fontSize: 12, lineHeight: 18 }}>
+            <Text variant="caption" color={TIP_INK}>
               {noneLabel}
             </Text>
           )}
           {tipRows.map(r => (
             <View
               key={r.g}
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: space8,
+              }}
             >
               <View
                 style={{
                   width: 8,
                   height: 8,
-                  borderRadius: 2.5,
+                  borderRadius: radiusPill,
                   backgroundColor: insight.groups[r.g].color,
                 }}
               />
               <Text
+                variant="caption"
+                color={TIP_INK}
                 numberOfLines={1}
-                style={{
-                  flex: 1,
-                  color: TIP_INK,
-                  fontSize: 12,
-                  lineHeight: 18,
-                }}
+                style={{ flex: 1 }}
               >
                 {name(insight.groups[r.g])}
               </Text>
               <Text
+                variant="caption"
+                color={TIP_INK}
                 onPress={onReveal}
-                style={{ color: TIP_INK, fontSize: 12, fontWeight: '600' }}
+                style={{ fontWeight: '600' }}
               >
                 {value(r.v)}
               </Text>
@@ -338,28 +355,18 @@ const ActivityChart: React.FunctionComponent<ActivityChartProps> = ({
             <View
               style={{
                 flexDirection: 'row',
-                marginTop: 4,
-                paddingTop: 4,
+                marginTop: space4,
+                paddingTop: space4,
                 borderTopWidth: 1,
                 borderTopColor: TIP_RULE,
               }}
             >
-              <Text
-                style={{
-                  flex: 1,
-                  color: colors.fgDefault,
-                  fontSize: 12,
-                  lineHeight: 18,
-                }}
-              >
+              <Text variant="caption" style={{ flex: 1 }}>
                 {totalLabel}
               </Text>
               <Text
-                style={{
-                  color: colors.fgDefault,
-                  fontSize: 12,
-                  fontWeight: '600',
-                }}
+                variant="caption"
+                style={{ fontWeight: '600' }}
                 onPress={onReveal}
               >
                 {value(tipTotal)}

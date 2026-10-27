@@ -1,7 +1,6 @@
-/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import Animated, {
   ReduceMotion,
   useAnimatedStyle,
@@ -12,7 +11,9 @@ import Animated, {
 import Svg, { Circle, Path, Text as SvgText } from 'react-native-svg';
 
 import { ease } from '@app/theme/motion';
-import { themeTokens, useTheme } from '@app/theme';
+import { textVariants, themeTokens, useTheme } from '@app/theme';
+import Text from '@ui/primitives/Text';
+import { duration } from '@app/theme/motion';
 
 const BASE_R = 86;
 const SW = 28;
@@ -22,15 +23,14 @@ const EDGE = 16;
 const PAD = 14;
 const MIN_SHARE = 0.11;
 const POP = 8;
-const POP_MS = 260;
-const DIM_MS = 200;
+const POP_MS = duration.medium;
+const DIM_MS = duration.base;
 const DIM = 0.3;
 const HIT = SW / 2 + 6;
-const IN_MS = 720;
-const IN_AT = 260;
+const IN_MS = duration.leavesReturn;
+const IN_AT = duration.medium;
 const TRACK = themeTokens.bgMutedSubtle;
 const DARK_INK = themeTokens.fgOnAccent;
-const SOFT_INK = themeTokens.fgMuted;
 
 export type Slice = { g: number; value: number; color: string };
 
@@ -164,7 +164,7 @@ const SliceLayer: React.FunctionComponent<SliceLayerProps> = ({
         <SvgText
           x={C + Math.cos(mid) * R}
           y={C + Math.sin(mid) * R + 4}
-          fontSize={10}
+          fontSize={textVariants.caption.fontSize}
           fontWeight="700"
           fill={light(arc.color) ? DARK_INK : colors.fgDefault}
           textAnchor="middle"
@@ -305,13 +305,9 @@ const Donut: React.FunctionComponent<DonutProps> = ({
         >
           {center}
           <Text
-            style={{
-              marginTop: 2,
-              color: SOFT_INK,
-              fontSize: 12,
-              lineHeight: 15,
-              textAlign: 'center',
-            }}
+            variant="caption"
+            tone="muted"
+            style={{ textAlign: 'center' }}
             onPress={onReveal}
           >
             {caption}
