@@ -37,7 +37,6 @@ import {
   buildChainExplorerUrl,
   canonicalChainAddress,
   canRemoveSwap,
-  depositDeadlineMs,
   formatAmountForDisplay,
   isPrePaymentStatus,
   isRealLegHash,
@@ -290,14 +289,6 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
     ...(expired
       ? [
           {
-            label: t('swap.quote-valid-until'),
-            value: Utils.formatDate(
-              depositDeadlineMs(record),
-              'MMM d, h:mm aaa',
-              language,
-            ),
-          },
-          {
             label: t('swap.result-reason'),
             value: t('swap.expired-why'),
             wrap: true,
@@ -352,14 +343,6 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         rows: [
           rows[0],
           rows[1],
-          {
-            label: t('swap.quote-valid-until'),
-            value: Utils.formatDate(
-              depositDeadlineMs(record),
-              'MMM d, h:mm aaa',
-              language,
-            ),
-          },
           {
             label: t('swap.result-reason'),
             value: t('swap.late-why'),
