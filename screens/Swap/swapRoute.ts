@@ -9,11 +9,15 @@ import type { SwapRecordType } from '@app/swap';
 
 /**
  * The screen a swap opens on, by where it stands: its deposit while that is
- * awaited or a sale's ZEC has not left, its tracking while it moves, its
- * detail once it stopped or when a late payment is on its way back.
+ * still to pay or a sale's ZEC has not left, its tracking while it moves or
+ * a payment said sent is looked for, its detail once it stopped or when a
+ * late payment is on its way back.
  */
 export function swapScreenFor(
-  record: Pick<SwapRecordType, 'direction' | 'status' | 'lateDepositAtMs'>,
+  record: Pick<
+    SwapRecordType,
+    'direction' | 'status' | 'lateDepositAtMs' | 'depositSentAtMs'
+  >,
 ):
   | typeof Route.SwapDeposit
   | typeof Route.SwapTracking
@@ -21,8 +25,8 @@ export function swapScreenFor(
   if (isTerminalStatus(record.status) || isRefunding(record)) {
     return Route.SwapDetail;
   }
-  return record.status === SwapStatusEnum.AwaitingExternalDeposit ||
-    unsentSale(record)
-    ? Route.SwapDeposit
-    : Route.SwapTracking;
+  const toPay =
+    record.status === SwapStatusEnum.AwaitingExternalDeposit &&
+    record.depositSentAtMs === undefined;
+  return toPay || unsentSale(record) ? Route.SwapDeposit : Route.SwapTracking;
 }

@@ -82,9 +82,21 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
 
   // A record that moved on is no longer this screen's. One out of time is
   // asked about once; the poller expires it and the record leaves by itself.
+  /** Opened from the tracking for the payment details: going back returns there. */
+  const overTracking = useCallback(() => {
+    const state = navigation.getState();
+    return state.routes[state.index - 1]?.name === Route.SwapTracking;
+  }, [navigation]);
   const expiryAsked = useRef<boolean>(false);
   useEffect(() => {
     if (!record) {
+      return;
+    }
+    if (
+      overTracking() &&
+      (isTerminalStatus(record.status) || (!isOutbound && !awaiting))
+    ) {
+      navigation.goBack();
       return;
     }
     if (isTerminalStatus(record.status)) {
@@ -115,6 +127,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
     swapService,
     navigation,
     recordId,
+    overTracking,
   ]);
 
   const attach = useCallback(async () => {
@@ -299,7 +312,11 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
     <SwapFlowScreen
       testID="swap.deposit"
       title={translate('swap.deposit-title') as string}
-      onBack={sent ? toTracking : undefined}
+      onBack={
+        sent
+          ? () => (overTracking() ? navigation.goBack() : toTracking())
+          : undefined
+      }
       footer={
         sent ? undefined : (
           <View style={{ rowGap: space8 }}>

@@ -52,6 +52,12 @@ test('Tests that a swap opens on its deposit, its tracking or its detail when ta
   expect(swapScreenFor(buy(SwapStatusEnum.AwaitingExternalDeposit))).toBe(
     Route.SwapDeposit,
   );
+  expect(
+    swapScreenFor({
+      ...buy(SwapStatusEnum.AwaitingExternalDeposit),
+      depositSentAtMs: 1,
+    }),
+  ).toBe(Route.SwapTracking);
   expect(swapScreenFor(sell(SwapStatusEnum.PendingDeposit))).toBe(
     Route.SwapDeposit,
   );

@@ -116,7 +116,7 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
               variant="text"
               title={t('swap.show-payment-details')}
               onPress={() =>
-                navigation.replace(Route.SwapDeposit, { recordId })
+                navigation.push(Route.SwapDeposit, { recordId })
               }
             />
           )}
