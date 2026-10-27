@@ -49,6 +49,7 @@ colors:
   fgViewOnly: "#8FB4E6"
   bgViewOnlySubtle: "#8FB4E61F"
   bgNym: "#07FF94"
+  fgNym: "#07FF94"
   bgNymSubtle: "#07FF941F"
   # Switch (exception D): the off track, the deep end of the on gradient
   # (which starts at bgAccent), the nym variant's gradient, the thumb
@@ -464,6 +465,8 @@ actions only, never decoration.
 
 **Roles that own their colour.**
 - `bgNym` (#07FF94): only actions and marks that go through the Nym mixnet.
+  `fgNym`, the same green, is for text and icons that say something goes
+  through the mixnet.
 - `fgViewOnly` / `bgViewOnlySubtle`: the view-only (watch-only) wallet: the
   snowflake, its tiles, its tag and the view-only notice's button.
 - `fgSyncing` (#EBFF5A): sync progress.
@@ -765,10 +768,6 @@ today, and every toggle in the app uses it:
 - Its colours are tokens: `bgSwitchOff`, `bgSwitchOnDeep`, `bgSwitchNym`,
   `bgSwitchNymDeep` and `fgSwitchThumb`. It replaced the switch drawings
   in `assets/img` and the one Server drew.
-
-**Pending.** The labels inside the swap tracking animation (`SwapFlight`, 10
-and 11 pt) wait for the designer's decision: an approved exception, or moved
-onto the scale.
 
 ## Changing the system
 

@@ -215,7 +215,7 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
           "backgroundColor": "#031124",
         },
         {
-          "paddingBottom": 30,
+          "paddingBottom": 32,
         },
       ]
     }

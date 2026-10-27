@@ -150,8 +150,8 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
           return {
             label: pendingSwapLabel(record, nowMs, t).text,
             icon: tile(
-              <ActivityIndicator size="small" color={colors.fgAccent} />,
-              colors.bgAccentSubtle,
+              <ActivityIndicator size="small" color={colors.fgMuted} />,
+              colors.bgWarningSubtle,
             ),
             live: true,
           };

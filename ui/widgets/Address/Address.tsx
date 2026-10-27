@@ -1,6 +1,6 @@
-/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { TextStyle } from 'react-native';
+import { textVariants } from '@app/theme';
+import { Platform, TextStyle } from 'react-native';
 import Button from '@ui/primitives/Button';
 
 type AddressProps = {
@@ -34,9 +34,10 @@ const Address: React.FunctionComponent<AddressProps> = ({
       title={shortAddress}
       testID={testID}
       textStyle={{
+        fontSize: textVariants.address.fontSize,
+        lineHeight: textVariants.address.lineHeight,
+        fontFamily: Platform.select({ ios: 'Menlo', default: 'monospace' }),
         ...style,
-        fontSize: 16,
-        fontFamily: 'monospace',
       }}
     />
   );

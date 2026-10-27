@@ -1,12 +1,21 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
-import { Pressable, Text, TextStyle, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import Animated, { FadeIn, ReduceMotion } from 'react-native-reanimated';
 
-import { useTheme } from '@app/theme';
+import {
+  useTheme,
+  iconSizeSm,
+  radiusMd,
+  radiusSm,
+  slopFor,
+  space4,
+  space8,
+  space12,
+} from '@app/theme';
 import { ChainNameEnum } from '@app/AppState';
-import RegText from '@ui/primitives/RegText';
-import BoldText from '@ui/primitives/BoldText';
+import Text from '@ui/primitives/Text';
+import { duration } from '@app/theme/motion';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { ChevronRight } from '@ui/primitives/Icons/Chevron';
@@ -25,12 +34,7 @@ export type LogLine = {
   details?: string;
 };
 
-const MONO: TextStyle = {
-  fontFamily: 'monospace',
-  fontSize: 12,
-  lineHeight: 16,
-};
-const STEP_MS = 160;
+const STEP_MS = duration.fast;
 
 const lineIn = (index: number) =>
   FadeIn.duration(STEP_MS)
@@ -73,13 +77,13 @@ const ServerLog: React.FC<ServerLogProps> = ({
       testID="server.custom.log"
       accessibilityLiveRegion="polite"
       style={{
-        marginTop: 10,
+        marginTop: space8,
         borderWidth: 1,
         borderColor: colors.bottomSheetBorder,
-        borderRadius: 10,
+        borderRadius: radiusMd,
         backgroundColor: colors.bgCanvas,
-        paddingVertical: 9,
-        paddingHorizontal: 11,
+        paddingVertical: space8,
+        paddingHorizontal: space12,
       }}
     >
       {lines.map((line, i) => (
@@ -89,8 +93,8 @@ const ServerLog: React.FC<ServerLogProps> = ({
           style={
             line.final
               ? {
-                  marginTop: i === 0 ? 0 : 7,
-                  paddingTop: i === 0 ? 0 : 7,
+                  marginTop: i === 0 ? 0 : space8,
+                  paddingTop: i === 0 ? 0 : space8,
                   borderTopWidth: i === 0 ? 0 : 1,
                   borderTopColor: colors.borderSubtle,
                 }
@@ -100,74 +104,67 @@ const ServerLog: React.FC<ServerLogProps> = ({
           {line.final ? (
             <Text
               testID={`server.custom.log.final.${line.tone || 'plain'}`}
-              style={{
-                fontSize: 12,
-                lineHeight: 17,
-                fontWeight: line.tone === 'mut' ? '500' : '600',
-                color: finalColor(line.tone),
-              }}
+              variant="caption"
+              color={finalColor(line.tone)}
+              style={{ fontWeight: '600' }}
             >
               {line.text}
               {line.switchTo && ' '}
               {line.switchTo && (
                 <Text
                   testID="server.custom.switch"
+                  variant="caption"
+                  tone="accent"
                   accessibilityRole="link"
                   onPress={() => onSwitch(line.switchTo!.chain)}
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 'bold',
-                    color: colors.fgAccent,
-                  }}
+                  style={{ fontWeight: '700' }}
                 >
                   {line.switchTo.label}
                 </Text>
               )}
             </Text>
           ) : (
-            <View style={{ flexDirection: 'row', gap: 7 }}>
+            <View style={{ flexDirection: 'row', gap: space8 }}>
               <View
                 style={{
-                  width: 12,
-                  height: 16,
+                  width: iconSizeSm,
+                  height: 18,
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
                 {line.tone === 'ok' ? (
-                  <CheckIcon size={16} color={colors.fgAccent} />
+                  <CheckIcon size={iconSizeSm} color={colors.fgAccent} />
                 ) : line.tone === 'bad' ? (
-                  <XIcon size={16} color={colors.fgDanger} />
+                  <XIcon size={iconSizeSm} color={colors.fgDanger} />
                 ) : (
-                  <RegText style={{ ...MONO, color: colors.fgMuted }}>
+                  <Text variant="address" tone="muted">
                     ·
-                  </RegText>
+                  </Text>
                 )}
               </View>
-              <RegText
+              <Text
                 selectable
-                style={{
-                  ...MONO,
-                  flex: 1,
-                  color: line.tone === 'bad' ? colors.fgDanger : colors.fgMuted,
-                }}
+                variant="address"
+                tone={line.tone === 'bad' ? 'danger' : 'muted'}
+                style={{ flex: 1 }}
               >
                 {line.text}
-              </RegText>
+              </Text>
             </View>
           )}
           {!!line.details && (
-            <View style={{ marginTop: 6 }}>
+            <View style={{ marginTop: space8 }}>
               <Pressable
                 testID="server.custom.details"
                 onPress={() => setOpen(o => ({ ...o, [i]: !o[i] }))}
                 accessibilityRole="button"
                 accessibilityState={{ expanded: !!open[i] }}
+                hitSlop={slopFor(iconSizeSm)}
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
-                  gap: 6,
-                  minHeight: 28,
+                  gap: space4,
                 }}
               >
                 <View
@@ -175,29 +172,33 @@ const ServerLog: React.FC<ServerLogProps> = ({
                     transform: [{ rotate: open[i] ? '90deg' : '0deg' }],
                   }}
                 >
-                  <ChevronRight size={16} color={colors.fgAccent} />
+                  <ChevronRight size={iconSizeSm} color={colors.fgAccent} />
                 </View>
-                <BoldText style={{ fontSize: 12, color: colors.fgAccent }}>
+                <Text
+                  variant="caption"
+                  tone="accent"
+                  style={{ fontWeight: '700' }}
+                >
                   {detailsLabel}
-                </BoldText>
+                </Text>
               </Pressable>
               {!!open[i] && (
-                <RegText
+                <Text
                   selectable
+                  variant="address"
+                  tone="muted"
                   style={{
-                    ...MONO,
-                    marginTop: 4,
-                    paddingVertical: 8,
-                    paddingHorizontal: 10,
-                    borderRadius: 8,
+                    marginTop: space4,
+                    paddingVertical: space8,
+                    paddingHorizontal: space12,
+                    borderRadius: radiusSm,
                     borderWidth: 1,
                     borderColor: colors.bottomSheetBorder,
                     backgroundColor: colors.bgSurface,
-                    color: colors.fgMuted,
                   }}
                 >
                   {line.details}
-                </RegText>
+                </Text>
               )}
             </View>
           )}

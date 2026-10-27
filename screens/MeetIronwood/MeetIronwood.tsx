@@ -1,3 +1,4 @@
+/* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import { leaveFlow } from '@app/navigation/navigate';
 import React, {

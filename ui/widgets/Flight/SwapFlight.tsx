@@ -13,7 +13,7 @@ import Animated, {
   withRepeat,
   withTiming,
 } from 'react-native-reanimated';
-import { useTheme } from '@app/theme';
+import { useTheme, iconSizeSm, radiusPill } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
 import type { SwapAssetType } from '@app/swap';
 import Text from '@ui/primitives/Text';
@@ -161,7 +161,7 @@ export default function SwapFlight({
           left: left - 5,
           top: 123,
           padding: 4,
-          borderRadius: 27,
+          borderRadius: radiusPill,
           borderWidth: 1,
           borderColor: NODE_DIM,
           backgroundColor: colors.bgSurface,
@@ -202,7 +202,7 @@ export default function SwapFlight({
           <Path
             d={LEG_IN}
             fill="none"
-            stroke={nym ? colors.bgNym : NODE_DIM}
+            stroke={nym ? colors.fgNym : NODE_DIM}
             strokeOpacity={nym ? 0.55 : 1}
             strokeWidth={2}
             strokeDasharray={[1, 7]}
@@ -230,7 +230,7 @@ export default function SwapFlight({
             top: 42,
             width: 36,
             height: 36,
-            borderRadius: 18,
+            borderRadius: radiusPill,
             borderWidth: 1,
             borderColor: NODE_DIM,
             backgroundColor: colors.bgCanvas,
@@ -238,9 +238,11 @@ export default function SwapFlight({
             justifyContent: 'center',
           }}
         >
-          <SwapIcon size={18} color={colors.fgMuted} />
+          <SwapIcon size={iconSizeSm} color={colors.fgMuted} />
         </View>
         <Text
+          variant="caption"
+          tone="muted"
           numberOfLines={1}
           style={{
             position: 'absolute',
@@ -248,10 +250,7 @@ export default function SwapFlight({
             top: 84,
             width: 100,
             textAlign: 'center',
-            fontSize: 11,
-            lineHeight: 14,
             fontWeight: '600',
-            color: colors.fgMuted,
           }}
         >
           {provider}
@@ -269,13 +268,8 @@ export default function SwapFlight({
           >
             <NymOn width={12} height={12} />
             <Text
-              style={{
-                fontSize: 10,
-                lineHeight: 12,
-                fontWeight: '700',
-                letterSpacing: 0.6,
-                color: colors.bgNym,
-              }}
+              variant="caption"
+              style={{ fontWeight: '700', color: colors.fgNym }}
             >
               NYM
             </Text>
@@ -289,7 +283,7 @@ export default function SwapFlight({
               top: 0,
               width: 14,
               height: 14,
-              borderRadius: 7,
+              borderRadius: radiusPill,
             },
             token,
           ]}

@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
+import { space20 } from '@app/theme';
 import { View } from 'react-native';
 
 import { ContextAppLoading } from '@app/context';
@@ -23,8 +24,8 @@ const WalletProgress: React.FunctionComponent<WalletProgressProps> = ({
       <View
         style={{
           position: 'absolute',
-          left: 32,
-          right: 32,
+          left: space20,
+          right: space20,
           top: `${CENTER_TOP * 100}%`,
           alignItems: 'center',
         }}

@@ -8,11 +8,9 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useTheme } from '@app/theme';
+import { useTheme, iconSize, radiusMd, radiusPill, space4 } from '@app/theme';
 
-import BoldText from '@ui/primitives/BoldText';
-import FadeText from '@ui/primitives/FadeText';
-import RegText from '@ui/primitives/RegText';
+import Text from '@ui/primitives/Text';
 import { TextScaleContext } from '@ui/primitives/Text';
 
 import { MenuMorphIcon } from '@ui/widgets/MenuMorphIcon';
@@ -145,7 +143,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
         <View
           style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
         >
-          <BoldText style={{ fontSize: 18 }}>{title}</BoldText>
+          <Text variant="subtitle">{title}</Text>
         </View>
         {/* The Settings door. Balances the chevron column, so the title
             stays centred whether or not the button is there. */}
@@ -156,7 +154,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
               onPress={onSettings}
               hitSlop={12}
             >
-              <BoltIcon size={24} color={colors.fgMuted} />
+              <BoltIcon size={iconSize} color={colors.fgMuted} />
             </Pressable>
           )}
         </View>
@@ -192,7 +190,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
                 style={{
                   width: 56,
                   height: 56,
-                  borderRadius: 12,
+                  borderRadius: radiusMd,
                   backgroundColor: colors.bgSurface,
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -210,7 +208,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
                       right: -4,
                       width: 11,
                       height: 11,
-                      borderRadius: 8,
+                      borderRadius: radiusPill,
                       borderWidth: 2.5,
                       borderColor: colors.bgCanvas,
                       backgroundColor: colors.fgWarning,
@@ -219,16 +217,13 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
                   />
                 )}
               </View>
-              <RegText
+              <Text
+                variant="caption"
                 numberOfLines={columns === 4 ? 2 : 3}
-                style={{
-                  fontSize: 12,
-                  textAlign: 'center',
-                  paddingHorizontal: 4,
-                }}
+                style={{ textAlign: 'center', paddingHorizontal: space4 }}
               >
                 {action.label}
-              </RegText>
+              </Text>
             </Pressable>
           ))}
         </View>
@@ -244,9 +239,14 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
           <View
             style={{ paddingTop: 16, paddingBottom: 4, alignItems: 'center' }}
           >
-            <FadeText style={{ fontSize: 12, textAlign: 'center' }} selectable>
+            <Text
+              variant="caption"
+              tone="muted"
+              style={{ textAlign: 'center' }}
+              selectable
+            >
               {copiedUrl}
-            </FadeText>
+            </Text>
           </View>
         )}
 
