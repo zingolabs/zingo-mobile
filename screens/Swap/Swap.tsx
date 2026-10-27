@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { maxBy } from 'lodash';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import TitleBar from '@ui/widgets/TitleBar';
 import { Platform, ScrollView, StyleSheet, View } from 'react-native';
@@ -216,9 +217,11 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
       ? `≈ ${formatUsd(parseFloat(form.chosenRoute.expectedReceiveAmount) * receiveUsdUnitPrice)}`
       : '';
 
-  // A late payment on its way back is not a swap in progress; it has no card.
-  const pending = records.find(
-    r => !isTerminalStatus(r.status) && !isRefunding(r),
+  // The newest swap in progress. A late payment on its way back is not one;
+  // it has no card.
+  const pending = maxBy(
+    records.filter(r => !isTerminalStatus(r.status) && !isRefunding(r)),
+    r => r.createdAtMs,
   );
   // The card turns to its warning half an hour after the payment address.
   const [nowMs, setNowMs] = useState<number>(() => Date.now());
