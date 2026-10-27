@@ -37,6 +37,18 @@ const colorLock = [
 ];
 
 /**
+ * The press lock: a control reacts to a press through ui/primitives/Pressable
+ * and its kind, never through a style written by hand (DESIGN.md, Pressing).
+ */
+const pressLock = [
+  {
+    selector: "ConditionalExpression[test.name='pressed']",
+    message:
+      'Press through ui/primitives/Pressable and its kind, not a pressed style written by hand.',
+  },
+];
+
+/**
  * The geometry lock (zingo-adrs zingo-mobile/0024): type, radii and icon
  * sizes come from app/theme and the Text variants, never from a number on
  * a screen. A number is a Literal, a negative one, or an arithmetic
@@ -115,6 +127,14 @@ module.exports = [
       'no-restricted-imports': [
         'error',
         {
+          paths: [
+            {
+              name: 'react-native',
+              importNames: ['TouchableOpacity', 'TouchableHighlight'],
+              message:
+                'Press through ui/primitives/Pressable and its kind (DESIGN.md, Pressing).',
+            },
+          ],
           patterns: [
             {
               group: ['@fortawesome/*'],
@@ -138,7 +158,7 @@ module.exports = [
     ignores: ['app/theme/**', '**/*.stories.tsx'],
     rules: {
       'react-native/no-color-literals': 'error',
-      'no-restricted-syntax': ['error', ...colorLock],
+      'no-restricted-syntax': ['error', ...colorLock, ...pressLock],
     },
   },
   {
@@ -147,7 +167,12 @@ module.exports = [
     files: ['screens/**', 'ui/**'],
     ignores: ['**/*.stories.tsx', ...geometryGaps],
     rules: {
-      'no-restricted-syntax': ['error', ...colorLock, ...geometryLock],
+      'no-restricted-syntax': [
+        'error',
+        ...colorLock,
+        ...pressLock,
+        ...geometryLock,
+      ],
     },
   },
   {
