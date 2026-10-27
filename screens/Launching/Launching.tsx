@@ -23,6 +23,9 @@ type LaunchingProps = {
 
 const Launching: React.FunctionComponent<LaunchingProps> = props => {
   const biometricsFailed = props.biometricGate.kind === 'declined';
+  const updating =
+    props.firstLaunchingMessage === LaunchingModeEnum.updating &&
+    !biometricsFailed;
   const message =
     props.biometricGate.kind === 'declined'
       ? Utils.renderGateFailure(props.biometricGate.failure, props.translate)
@@ -125,7 +128,15 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
               />
             </>
           ) : (
-            <>
+            /** Keeps the room so the logo does not jump; hidden from screen
+             * readers while it is invisible. */
+            <View
+              style={{ alignSelf: 'stretch', alignItems: 'center' }}
+              importantForAccessibility={
+                updating ? 'auto' : 'no-hide-descendants'
+              }
+              accessibilityElementsHidden={!updating}
+            >
               <ActivityIndicator
                 size="large"
                 color={
@@ -138,14 +149,10 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                 variant="subtitle"
                 style={{
                   marginTop: space8,
-                  opacity:
-                    props.firstLaunchingMessage ===
-                      LaunchingModeEnum.updating && !biometricsFailed
-                      ? 1
-                      : 0,
+                  opacity: updating ? 1 : 0,
                   textAlign: 'center',
                 }}
-                selectable
+                selectable={updating}
               >
                 {
                   props.translate(
@@ -157,14 +164,10 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                 variant="body"
                 style={{
                   marginTop: space8,
-                  opacity:
-                    props.firstLaunchingMessage ===
-                      LaunchingModeEnum.updating && !biometricsFailed
-                      ? 1
-                      : 0,
+                  opacity: updating ? 1 : 0,
                   textAlign: 'center',
                 }}
-                selectable
+                selectable={updating}
               >
                 {
                   props.translate(
@@ -177,14 +180,10 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                 style={{
                   marginTop: space8,
                   marginBottom: space8,
-                  opacity:
-                    props.firstLaunchingMessage ===
-                      LaunchingModeEnum.updating && !biometricsFailed
-                      ? 1
-                      : 0,
+                  opacity: updating ? 1 : 0,
                   textAlign: 'center',
                 }}
-                selectable
+                selectable={updating}
               >
                 {
                   props.translate(
@@ -192,7 +191,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                   ) as string
                 }
               </Text>
-            </>
+            </View>
           )}
         </View>
       </View>

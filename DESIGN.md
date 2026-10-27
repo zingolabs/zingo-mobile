@@ -469,7 +469,9 @@ actions only, never decoration.
   `fgNym`, the same green, is for text and icons that say something goes
   through the mixnet.
 - `fgViewOnly` / `bgViewOnlySubtle`: the view-only (watch-only) wallet: the
-  snowflake, its tiles, its tag and the view-only notice's button.
+  snowflake, its tiles, its tag and the view-only notice's button. Also the
+  viewing key's rows: the viewing key is what makes a view-only wallet, so it
+  takes that role's colour.
 - `fgSyncing` (#EBFF5A): sync progress.
 - `fgOptionIcon` (#B1BBC5): the artwork icons of the options panel (the side
   menu), so they all read at one weight and tone.
@@ -681,6 +683,10 @@ at 16 with no tile, the text in `caption` regular with no bold, padding 12,
 - Show a contact's name and avatar wherever their address appears, and offer
   "Save contact" wherever an outside address is not in the Address Book.
 - Write every new string in the five catalogs.
+- Keep the reserved space of text that is invisible for now (Launching's), so
+  the logo doesn't jump, but hide it from screen readers while it's invisible
+  (`importantForAccessibility="no-hide-descendants"` /
+  `accessibilityElementsHidden`), and don't make it `selectable`.
 
 **Don't**
 - Don't set `fontSize`, `lineHeight`, `letterSpacing`, `borderRadius`, a
@@ -712,8 +718,8 @@ animation.
 ## Exceptions
 
 Approved by the designer. Nothing else departs from the system. There are
-four: the tab bar (A), Swap's two cards (B), the amount card (C) and the
-switch (D).
+five: the tab bar (A), Swap's two cards (B), the amount card (C), the
+switch (D) and the brand (E).
 
 **A. The tab bar** is drawn at the prototype's own values:
 - 366 wide, 60 tall (icon 28 with 10 above and below), radius 33, padding 5,
@@ -764,6 +770,9 @@ today, and every toggle in the app uses it:
   `bgSwitchNymDeep` and `fgSwitchThumb`. It replaced the switch drawings
   in `assets/img` and the one Server drew.
 
+**E. The brand.** StartMenu's 49 pt "Zingo" keeps its size as a named
+exception. It is the wordmark, used once, not text.
+
 ## Changing the system
 
 1. A screen needs something the system lacks: propose it to the designer.
@@ -783,5 +792,3 @@ onto the system as each is redesigned. Also open:
   `bodyStrong` 700.
 - `DetailRows` lives in `screens/Swap/components` but is shared, and belongs
   in `ui/widgets`.
-- Pools still sets a few sizes by hand (its header's 44 and 12, the legend's
-  dots); they move to tokens.
