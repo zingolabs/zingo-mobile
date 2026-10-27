@@ -16,9 +16,12 @@ import { ContextAppLoaded, useSwapService } from '@app/context';
 import {
   SwapDirectionEnum,
   SwapStatusEnum,
+  canResendSale,
   depositDeadlineMs,
   isRefunding,
   isTerminalStatus,
+  prefillFromRecord,
+  unsentSale,
 } from '@app/swap';
 import { leaveFlow } from '@app/navigation/navigate';
 import Text from '@ui/primitives/Text';
@@ -30,6 +33,7 @@ import Banner from '@ui/widgets/Banner';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import DepositSlip from '@screens/Swap/components/DepositSlip';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
+import { useRemoveSwap } from '@screens/Swap/useRemoveSwap';
 
 type SwapDepositProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -43,9 +47,9 @@ const AFTER_DESHIELD = 'send after deshield';
  * The deposit a swap waits for. Buying ZEC, it is paid from the other wallet:
  * the slip says where, how much and with what memo, and the user says when
  * it is sent. Opened again from the tracking, the slip is read-only and the
- * arrow goes back there. No time shows. Selling
- * ZEC, this screen appears only when the wallet's own broadcast failed, with
- * the way to try again.
+ * arrow goes back there. No time shows. Selling ZEC, it is the sale whose
+ * ZEC did not leave: sent again while its quote holds, a new quote after,
+ * or deleted.
  */
 const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   navigation,
@@ -92,7 +96,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
       );
       return;
     }
-    if (!isOutbound && !awaiting) {
+    if (isOutbound ? !unsentSale(record) : !awaiting) {
       navigation.replace(
         isRefunding(record) ? Route.SwapDetail : Route.SwapTracking,
         { recordId },
@@ -186,6 +190,8 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
     recordId,
     navigation,
   ]);
+  const leave = useCallback(() => leaveFlow(navigation), [navigation]);
+  const removeSwap = useRemoveSwap(leave);
 
   if (!record) {
     return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
@@ -220,6 +226,8 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   );
 
   if (isOutbound) {
+    // Past its quote the ZEC is not sent again: a new quote takes over.
+    const resendable = canResendSale(record, nowMs);
     return (
       <SwapFlowScreen
         testID="swap.deposit"
@@ -228,26 +236,48 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
         footer={
           <ButtonStack>
             <Button
-              variant="quiet"
-              title={translate('swap.back-to-zingo') as string}
-              onPress={() => leaveFlow(navigation)}
-            />
-            <Button
-              testID="swap.deposit.retry"
-              variant="nym"
-              title={translate('swap.deposit-retry') as string}
-              busy={retrying}
+              testID="swap.deposit.remove"
+              variant="danger"
+              title={translate('swap.delete') as string}
               disabled={retrying}
-              onPress={retry}
+              onPress={() => removeSwap(record)}
             />
+            {resendable ? (
+              <Button
+                testID="swap.deposit.retry"
+                variant="nym"
+                title={translate('swap.deposit-retry') as string}
+                busy={retrying}
+                disabled={retrying}
+                onPress={retry}
+              />
+            ) : (
+              <Button
+                testID="swap.deposit.new-quote"
+                variant="primary"
+                title={translate('swap.get-new-quote') as string}
+                onPress={() =>
+                  navigation.navigate(Route.Home, {
+                    screen: Route.Swap,
+                    params: { prefill: prefillFromRecord(record, Date.now()) },
+                  })
+                }
+              />
+            )}
           </ButtonStack>
         }
       >
         <Banner
           tone="warning"
-          title={translate('swap.deposit-unsent') as string}
+          title={
+            translate(
+              resendable
+                ? 'swap.deposit-unsent'
+                : 'swap.deposit-unsent-expired',
+            ) as string
+          }
         >
-          {retryError || undefined}
+          {(resendable && retryError) || undefined}
         </Banner>
         <View style={{ height: space12 }} />
         <DepositSlip record={record} paid />

@@ -49,19 +49,17 @@ test('Tests that each ending lands on its own result when the swap stops moving'
 });
 
 test('Tests that a swap opens on its deposit, its tracking or its detail when tapped by where it stands', () => {
+  expect(swapScreenFor(buy(SwapStatusEnum.AwaitingExternalDeposit))).toBe(
+    Route.SwapDeposit,
+  );
+  expect(swapScreenFor(sell(SwapStatusEnum.PendingDeposit))).toBe(
+    Route.SwapDeposit,
+  );
+  expect(swapScreenFor(sell(SwapStatusEnum.Pending))).toBe(Route.SwapTracking);
+  expect(swapScreenFor(buy(SwapStatusEnum.Pending))).toBe(Route.SwapTracking);
+  expect(swapScreenFor(buy(SwapStatusEnum.Completed))).toBe(Route.SwapDetail);
+  expect(swapScreenFor(buy(SwapStatusEnum.Expired))).toBe(Route.SwapDetail);
   expect(
-    swapScreenFor({ status: SwapStatusEnum.AwaitingExternalDeposit }),
-  ).toBe(Route.SwapDeposit);
-  expect(swapScreenFor({ status: SwapStatusEnum.Pending })).toBe(
-    Route.SwapTracking,
-  );
-  expect(swapScreenFor({ status: SwapStatusEnum.Completed })).toBe(
-    Route.SwapDetail,
-  );
-  expect(swapScreenFor({ status: SwapStatusEnum.Expired })).toBe(
-    Route.SwapDetail,
-  );
-  expect(
-    swapScreenFor({ status: SwapStatusEnum.Pending, lateDepositAtMs: 1 }),
+    swapScreenFor({ ...buy(SwapStatusEnum.Pending), lateDepositAtMs: 1 }),
   ).toBe(Route.SwapDetail);
 });

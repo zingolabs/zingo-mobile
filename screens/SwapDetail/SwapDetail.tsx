@@ -34,12 +34,10 @@ import { useUnfold } from '@app/hooks/useUnfold';
 import { ContextAppLoaded, useSwapRecords, useSwapService } from '@app/context';
 import {
   SwapDirectionEnum,
-  SwapStore,
   buildChainExplorerUrl,
   canonicalChainAddress,
   canRemoveSwap,
   formatAmountForDisplay,
-  isPrePaymentStatus,
   isRealLegHash,
   isRefunding,
   isTerminalStatus,
@@ -47,7 +45,6 @@ import {
   prefillFromRecord,
   providerLongLabel,
 } from '@app/swap';
-import { showConfirm } from '@app/services/showConfirm';
 import Utils from '@app/utils';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
@@ -73,6 +70,7 @@ import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import SaveContactButton from '@ui/widgets/SaveContactButton';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
 import { swapOutcome } from '@screens/Swap/swapProgress';
+import { useRemoveSwap } from '@screens/Swap/useRemoveSwap';
 import { legName, legsOf } from '@screens/Swap/swapLegs';
 
 type SwapDetailProps = NativeStackScreenProps<
@@ -153,38 +151,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
     }
   }, [hash, swapService, record, recordId]);
 
-  const remove = useCallback(() => {
-    if (!record) {
-      return;
-    }
-    const expired = swapOutcome(record.status) === 'expired';
-    showConfirm({
-      title: t(
-        expired ? 'swap.delete-expired-title' : 'swap.detail-remove-title',
-      ),
-      message: t(
-        expired
-          ? 'swap.delete-expired-body'
-          : isPrePaymentStatus(record.status)
-            ? 'swap.detail-remove-unpaid'
-            : 'swap.detail-remove-body',
-      ),
-      buttons: [
-        { text: t('swap.cancel'), style: 'cancel' },
-        {
-          text: t('swap.delete'),
-          style: 'destructive',
-          onPress: () => {
-            SwapStore.deleteByRecordId(recordId).then(() => {
-              addLastSnackbar(t('swap.deleted'), SnackbarDurationEnum.short);
-              close();
-            });
-          },
-        },
-      ],
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [record, recordId, close]);
+  const removeSwap = useRemoveSwap(close);
 
   if (!record) {
     return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
@@ -416,7 +383,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
               testID="swap.detail.remove"
               variant="danger"
               title={t('swap.delete')}
-              onPress={remove}
+              onPress={() => removeSwap(record)}
             />
           )}
           {!!explorerUrl && (

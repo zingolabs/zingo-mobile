@@ -322,6 +322,7 @@ export class SwapService {
         direction === SwapDirectionEnum.Inbound
           ? now + DEPOSIT_WAIT_MS
           : undefined,
+      quoteExpiresAtMs: chosenRoute.expiresAtMs,
       providerData: instructions.providerData,
       broadcast:
         direction === SwapDirectionEnum.Outbound

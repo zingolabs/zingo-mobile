@@ -102,6 +102,12 @@ export type SwapRecordType = {
    * records made before it was kept.
    */
   depositDeadlineMs?: number;
+  /**
+   * Until when the provider holds the quote the swap was made at. A sale
+   * whose ZEC did not leave can be sent again only before it. Absent when
+   * the provider gave none, and on records made before it was kept.
+   */
+  quoteExpiresAtMs?: number;
   /** When the user said the inbound deposit was sent. */
   depositSentAtMs?: number;
   /**

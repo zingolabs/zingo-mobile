@@ -139,6 +139,12 @@ describe('SwapService.commitRoute deposit deadline', () => {
     );
   });
 
+  it('keeps the quote’s expiry, for a sale whose ZEC did not leave', async () => {
+    const { record } = await commitInbound(1_800_000_000_000);
+
+    expect(record.quoteExpiresAtMs).toBe(1_800_000_000_000);
+  });
+
   it('leaves an outbound swap without a deadline', async () => {
     const { record } = await commit(100);
 

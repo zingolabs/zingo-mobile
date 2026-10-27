@@ -764,6 +764,7 @@
     "deposit-follow": "Bu ödemeyi takip et",
     "deposit-unsent-title": "Depozito çıkmadı",
     "deposit-unsent": "Takas ayrıldı ama hiçbir şey gönderilmedi. Depozitoyu yeniden deneyin ya da başka bir cüzdandan ödeyip hash’ini yapıştırın.",
+    "deposit-unsent-expired": "Bu takasın ayrıldığı fiyat teklifinin süresi doldu ve hiçbir şey gönderilmedi. Bugünkü fiyattan takas için yeni bir teklif alın.",
     "deposit-retry": "Depozitoyu yeniden dene",
     "qr-carries-amount": "QR kodda adres ve tam tutar var",
     "qr-carries-memo": "QR kodda adres, tutar ve not var",

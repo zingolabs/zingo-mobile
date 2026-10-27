@@ -338,8 +338,8 @@ export function useSwapForm({
     : setRefundAddress;
 
   // A prefill lands in three steps, each a render after the last: the
-  // direction, then the coin once the inbound catalog is in, then the amount
-  // and the refund address once the coin's chain has cleared the fields.
+  // direction, then the coin once that direction's catalog is in, then the
+  // amount and the address once the coin's chain has cleared the fields.
   // Armed at the end, the review opens by itself when the quote is ready.
   const [pendingPrefill, setPendingPrefill] = useState<SwapPrefillType | null>(
     null,
@@ -354,7 +354,7 @@ export function useSwapForm({
       return;
     }
     handledPrefillAt.current = prefill.requestedAtMs;
-    setDirection(SwapDirectionEnum.Inbound);
+    setDirection(prefill.direction);
     setPendingPrefill(prefill);
     setPrefillStage('coin');
     setPrefillArmed(false);
@@ -364,13 +364,13 @@ export function useSwapForm({
       prefillStage !== 'coin' ||
       !pendingPrefill ||
       !tokens ||
-      tokensDirection !== SwapDirectionEnum.Inbound
+      tokensDirection !== pendingPrefill.direction
     ) {
       return;
     }
     setSelectedToken(
-      tokens.find(t => t.identifier === pendingPrefill.sellAsset.swapKitId) ??
-        tokenEntryOf(pendingPrefill.sellAsset),
+      tokens.find(t => t.identifier === pendingPrefill.asset.swapKitId) ??
+        tokenEntryOf(pendingPrefill.asset),
     );
     setPrefillStage('fields');
   }, [prefillStage, pendingPrefill, tokens, tokensDirection]);
@@ -378,14 +378,18 @@ export function useSwapForm({
     if (
       prefillStage !== 'fields' ||
       !pendingPrefill ||
-      selectedToken?.identifier !== pendingPrefill.sellAsset.swapKitId
+      selectedToken?.identifier !== pendingPrefill.asset.swapKitId
     ) {
       return;
     }
     setAmount(
       pendingPrefill.sellAmountHumanDecimal.replace('.', decimalSeparator()),
     );
-    setRefundAddress(pendingPrefill.refundAddress);
+    if (pendingPrefill.direction === SwapDirectionEnum.Outbound) {
+      setDestinationAddress(pendingPrefill.address);
+    } else {
+      setRefundAddress(pendingPrefill.address);
+    }
     setPrefillStage(null);
     setPendingPrefill(null);
     setPrefillArmed(true);
