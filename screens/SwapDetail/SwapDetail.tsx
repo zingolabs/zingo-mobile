@@ -381,7 +381,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
           {canRemoveSwap(record) && (
             <Button
               testID="swap.detail.remove"
-              variant="danger"
+              variant="dangerText"
               title={t('swap.delete')}
               onPress={() => removeSwap(record)}
             />
@@ -423,11 +423,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
           </Text>
           <DepositSlip record={record} paid={sell} />
           <Text variant="bodySmall" tone="muted">
-            {t(
-              sell
-                ? 'swap.deposit-left-anyway'
-                : 'swap.deposit-already-paid',
-            )}
+            {t(sell ? 'swap.deposit-left-anyway' : 'swap.deposit-already-paid')}
           </Text>
           <TextField
             testID="swap.detail.hash"

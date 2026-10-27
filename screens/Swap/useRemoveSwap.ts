@@ -19,9 +19,7 @@ export function useRemoveSwap(onDone: () => void) {
       const t = (key: string) => (translate(key) as string).trim();
       const expired = swapOutcome(record.status) === 'expired';
       showConfirm({
-        title: t(
-          expired ? 'swap.delete-expired-title' : 'swap.detail-remove-title',
-        ),
+        title: t('swap.delete'),
         message: t(
           expired
             ? 'swap.delete-expired-body'

@@ -250,7 +250,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
           <ButtonStack>
             <Button
               testID="swap.deposit.remove"
-              variant="danger"
+              variant="dangerText"
               title={translate('swap.delete') as string}
               disabled={retrying}
               onPress={() => removeSwap(record)}

@@ -235,7 +235,8 @@ const ValueTransferDetail: React.FunctionComponent<
       message: t('history.remove-alert'),
       buttons: [
         {
-          text: t('confirm'),
+          text: t('history.remove'),
+          style: 'destructive',
           onPress: async () => {
             if (!setBackgroundError || !addLastSnackbar) {
               return;
@@ -283,7 +284,7 @@ const ValueTransferDetail: React.FunctionComponent<
             {failed && vt.confirmations === 0 && (
               <Button
                 testID="valuetransferdetail.remove"
-                variant="quiet"
+                variant="dangerText"
                 title={t('history.remove')}
                 onPress={remove}
               />
