@@ -236,7 +236,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
         header={sheetType === 'NAT' ? undefined : xHeader}
         handle={sheetType === 'NAT'}
         contentStyle={{
-          paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
+          paddingBottom:
+            keyboardHeight > 0 ? keyboardHeight + space20 : space32,
         }}
       >
         {sheetType === 'NA' && (

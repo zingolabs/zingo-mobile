@@ -3,7 +3,6 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   BackHandler,
   StyleSheet,
-  Text,
   useWindowDimensions,
   View,
 } from 'react-native';
@@ -17,7 +16,16 @@ import Animated, {
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useTheme } from '@app/theme';
+import {
+  useTheme,
+  iconSizeMd,
+  radiusSm,
+  space12,
+  space16,
+  space24,
+} from '@app/theme';
+import Text from '@ui/primitives/Text';
+import { duration } from '@app/theme/motion';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { SnackbarDurationEnum } from '@app/AppState';
@@ -44,8 +52,8 @@ import { themeTokens } from '@app/theme';
 
 const QR = 196;
 const TILE_BG = themeTokens.bgViewOnlySubtle;
-const PUSH_IN_MS = 380;
-const PUSH_OUT_MS = 320;
+const PUSH_IN_MS = duration.screen;
+const PUSH_OUT_MS = duration.emphasized;
 
 // Moves the screen in from the right and back out, for the menu entry.
 const Slide: React.FunctionComponent<{
@@ -218,13 +226,9 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
       />
       <View style={{ flex: 1 }}>
         <Text
-          style={{
-            color: colors.fgMuted,
-            fontSize: 15,
-            lineHeight: 20,
-            textAlign: 'center',
-            marginHorizontal: SIDE,
-          }}
+          variant="body"
+          tone="muted"
+          style={{ textAlign: 'center', marginHorizontal: SIDE }}
         >
           {switchTo
             ? (translate('viewingkey.switch-sub') as string).replace(
@@ -234,7 +238,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
             : (translate('viewingkey.sub') as string)}
         </Text>
 
-        <View style={{ marginTop: 22 }}>
+        <View style={{ marginTop: space24 }}>
           <KeyCard
             testID="viewingkey"
             value={key}
@@ -243,7 +247,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
           />
         </View>
 
-        <View style={{ marginTop: 14 }}>
+        <View style={{ marginTop: space12 }}>
           <CopyShowButtons
             testID="viewingkey"
             hidden={hidden}
@@ -252,32 +256,31 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
           />
         </View>
 
-        <View style={{ marginTop: 18, marginHorizontal: SIDE, gap: 12 }}>
+        <View
+          style={{ marginTop: space16, marginHorizontal: SIDE, gap: space12 }}
+        >
           {rows.map(({ id, Icon }) => (
             <View
               key={id}
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: space12,
+              }}
             >
               <View
                 style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 9,
+                  width: 36,
+                  height: 36,
+                  borderRadius: radiusSm,
                   backgroundColor: TILE_BG,
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <Icon size={16} color={colors.fgViewOnly} />
+                <Icon size={iconSizeMd} color={colors.fgViewOnly} />
               </View>
-              <Text
-                style={{
-                  flex: 1,
-                  color: colors.fgDefault,
-                  fontSize: 13,
-                  lineHeight: 18,
-                }}
-              >
+              <Text variant="bodySmall" style={{ flex: 1 }}>
                 {translate(`viewingkey.${id}`) as string}
               </Text>
             </View>
@@ -289,7 +292,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
             position: 'absolute',
             left: SIDE,
             right: SIDE,
-            bottom: insets.bottom + 24,
+            bottom: insets.bottom + space24,
           }}
         >
           <Button

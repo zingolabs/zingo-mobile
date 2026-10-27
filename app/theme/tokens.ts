@@ -66,6 +66,8 @@ export type ThemeColors = {
 
   /** Nym's own green, only on actions that go through the mixnet. */
   bgNym: string;
+  /** Text and icons that say something goes through the mixnet. */
+  fgNym: string;
   bgNymSubtle: string;
   /** The switch (exception D): its off track. */
   bgSwitchOff: string;
@@ -170,6 +172,7 @@ export const themeTokens: ThemeColors = {
   bgViewOnlySubtle: '#8FB4E61F',
 
   bgNym: '#07FF94',
+  fgNym: '#07FF94',
   bgNymSubtle: '#07FF941F',
   bgSwitchOff: '#7E7E7E',
   bgSwitchOnDeep: '#0A4004',

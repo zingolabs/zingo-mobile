@@ -328,7 +328,7 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
       >
         {head(
           'warning',
-          <TriangleAlert size={34} color={colors.fgWarning} />,
+          <TriangleAlert size={iconSize} color={colors.fgWarning} />,
           translate('swap.result-incomplete-title') as string,
           translate('swap.result-incomplete-line') as string,
         )}
@@ -410,8 +410,8 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
       }
     >
       {head(
-        'accent',
-        <ShieldIcon size={iconSize} color={colors.fgAccent} />,
+        'warning',
+        <ShieldIcon size={iconSize} color={colors.fgWarning} />,
         translate('swap.pending-swapping') as string,
         `${info.currencyName}`,
       )}

@@ -36,6 +36,7 @@
   "syncing": "Sincronizando",
   "synced": "Sincronizada",
   "messages": {
+    "bottom-acc": "Ir al mensaje más reciente",
     "title": "Mensajes",
     "title-chats": "Mensajes",
     "empty": "Todavía no hay mensajes.",
@@ -1174,6 +1175,7 @@
     "done": "Hecho"
   },
   "import": {
+    "back-acc": "Atrás",
     "scan-hint": "Apunta la cámara al código QR de una frase semilla o de una clave de visualización.",
     "scan-miss": "Ese código no es una frase semilla ni una clave de visualización.",
     "scan-found-seed": "Frase semilla encontrada",
@@ -1212,6 +1214,7 @@
     "birthday-tip-body": "No pasa nada si no la sabes."
   },
   "about": {
+    "back-acc": "Atrás",
     "copyright": [
       "Copyright (c) 2026, ZingoLabs.",
       "Construida con React Native.",
@@ -1493,5 +1496,11 @@
     "sheet-incomplete": "El saldo y el historial pueden verse incompletos hasta que termine",
     "rescan": "Reescanear",
     "rescan-started": "Reescaneo iniciado"
+  },
+  "errorboundary": {
+    "title": "Algo salió mal",
+    "message": "Ocurrió un error inesperado. Reinicia la aplicación.",
+    "report": "Informar",
+    "restart": "Reiniciar"
   }
 }

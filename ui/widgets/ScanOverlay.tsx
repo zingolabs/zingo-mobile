@@ -1,13 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  Vibration,
-  View,
-} from 'react-native';
+import { Platform, Pressable, StyleSheet, Vibration, View } from 'react-native';
 import Animated, {
   Easing,
   Keyframe,
@@ -26,7 +19,16 @@ import {
 } from 'react-native-vision-camera';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useTheme } from '@app/theme';
+import {
+  iconSize,
+  iconSizeSm,
+  radiusPill,
+  space4,
+  space8,
+  space12,
+  useTheme,
+} from '@app/theme';
+import Text from '@ui/primitives/Text';
 import { ease } from '@app/theme/motion';
 import CircularReveal, { RevealOrigin } from '@ui/widgets/CircularReveal';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
@@ -271,7 +273,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
                   right: 12,
                   top: 0,
                   height: 2,
-                  borderRadius: 1,
+                  borderRadius: radiusPill,
                   backgroundColor: colors.fgAccent,
                 },
                 line,
@@ -298,16 +300,9 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
               hitSlop={8}
               style={{ position: 'absolute', left: 10, padding: 10 }}
             >
-              <ChevronLeft size={24} color={colors.fgAccent} />
+              <ChevronLeft size={iconSize} color={colors.fgAccent} />
             </Pressable>
-            <Text
-              accessibilityRole="header"
-              style={{
-                color: colors.fgDefault,
-                fontSize: 16,
-                fontWeight: '700',
-              }}
-            >
+            <Text accessibilityRole="header" variant="barTitle">
               {texts.title}
             </Text>
           </View>
@@ -327,20 +322,18 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
-                  gap: 6,
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
-                  borderRadius: 14,
+                  gap: space8,
+                  paddingHorizontal: space12,
+                  paddingVertical: space4,
+                  borderRadius: radiusPill,
                   backgroundColor: colors.bgAccentSubtle,
                 }}
               >
-                <CheckIcon size={16} color={colors.fgAccent} />
+                <CheckIcon size={iconSizeSm} color={colors.fgAccent} />
                 <Text
-                  style={{
-                    color: colors.fgAccent,
-                    fontSize: 13,
-                    fontWeight: '700',
-                  }}
+                  variant="bodySmall"
+                  tone="accent"
+                  style={{ fontWeight: '700' }}
                 >
                   {typeof texts.found === 'function'
                     ? texts.found(found.current)
@@ -350,12 +343,9 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
             ) : (
               <Text
                 accessibilityLiveRegion="polite"
-                style={{
-                  textAlign: 'center',
-                  color: stage === 'miss' ? colors.fgWarning : colors.fgDefault,
-                  fontSize: 15,
-                  lineHeight: 20,
-                }}
+                variant="body"
+                tone={stage === 'miss' ? 'warning' : 'default'}
+                style={{ textAlign: 'center' }}
               >
                 {stage === 'miss' ? texts.miss : texts.hint}
               </Text>
@@ -374,14 +364,14 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
               bottom: insets.bottom + 40,
               width: 52,
               height: 52,
-              borderRadius: 26,
+              borderRadius: radiusPill,
               alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: torch ? colors.fgDefault : colors.bgMutedSubtle,
             }}
           >
             <FlashlightIcon
-              size={24}
+              size={iconSize}
               color={torch ? colors.bgCanvas : colors.fgDefault}
             />
           </Pressable>
