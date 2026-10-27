@@ -1,15 +1,10 @@
 import { execFileSync, spawnSync } from 'node:child_process';
-import {
-  cpSync,
-  existsSync,
-  mkdtempSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs';
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { RunJob, captureVerdict } from './captureVerdict';
+import { promote } from './promote';
 
 const dir = dirname(fileURLToPath(import.meta.url));
 const baseline = join(dir, '__baseline__');
@@ -92,8 +87,7 @@ gh(['run', 'download', String(run!.id), '-n', 'visual-head', '-D', tmp]);
 if (!existsSync(join(tmp, 'images'))) {
   refuse(`Run ${run!.id} has no images to accept.`);
 }
-rmSync(baseline, { recursive: true, force: true });
-cpSync(tmp, baseline, { recursive: true });
+promote(tmp, baseline);
 rmSync(tmp, { recursive: true, force: true });
 
 const git = (args: string[]) =>

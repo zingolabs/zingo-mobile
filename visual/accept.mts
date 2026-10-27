@@ -10,11 +10,12 @@
 // report, accept, commit visual/__baseline__, push. --local exists for trying
 // the harness out; expect CI to flag drift against it.
 import { execSync, spawnSync } from 'node:child_process';
-import { cpSync, existsSync, mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { RunJob, captureVerdict } from './captureVerdict';
+import { promote as promoteBundle } from './promote';
 
 const dir = dirname(fileURLToPath(import.meta.url));
 const baseline = join(dir, '__baseline__');
@@ -77,9 +78,8 @@ const promote = (bundle: string, label: string) => {
   if (!existsSync(join(bundle, 'images'))) {
     fail(`${label} has no images/ folder: nothing to accept.`);
   }
-  rmSync(baseline, { recursive: true, force: true });
-  cpSync(bundle, baseline, { recursive: true });
-  console.log(`baseline ← ${label}`);
+  promoteBundle(bundle, baseline);
+  console.log(`baseline ← ${label} (files past the gate's jitter only)`);
   console.log('review `git status visual/__baseline__`, then commit and push.');
 };
 

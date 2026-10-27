@@ -12,10 +12,15 @@ import {
 } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  JITTER_PIXELS,
+  Sample,
+  TOLERANCE,
+  Timeline,
+  timelineDeviation,
+} from './thresholds';
 import { themeTokens } from '@app/theme/tokens';
 
-type Sample = { t: number; offset: number };
-type Timeline = { story: string; step: number; samples: Sample[] };
 type Verdict = 'new' | 'pass' | 'changed';
 type Entry = {
   file: string;
@@ -83,19 +88,11 @@ const MUTED = styled ? T.fgMuted : '#5b6b7f';
 const CHART_BG = styled ? T.bgCanvas : '#0b1220';
 const reportSrc = join(dir, 'report');
 
-const TOLERANCE = 2; // px; above run-to-run jitter, below a real curve change
-
 // MixnetIcon halo geometry, mirrored so a replay draws the same arc.
 const SIDE = 20;
 const RADIUS = 6;
 const PERIMETER = 4 * (SIDE - 2 * RADIUS) + 2 * Math.PI * RADIUS;
 const LIT_ARC = PERIMETER * 0.32;
-
-// Pixels a pair may differ by and still pass. A long linear animation (the
-// 8s quote ring) lands a frame apart between two runs of the same machine,
-// about 40 anti-aliased pixels on a 1.5M-pixel capture. A real change to
-// even a small icon is hundreds. The budget sits between.
-const JITTER_PIXELS = 100;
 
 // --- image gate: reg-cli exits nonzero when a pair differs. A story with
 // no baseline, or a baseline with no story, fails too: the committed
@@ -141,16 +138,7 @@ const timelines: Entry[] = timelineFiles.map(file => {
     return { file, story: cur.story, verdict: 'new', maxDev: 0, at: 0, cur };
   }
   const base = readSamples(basePath);
-  let maxDev = 0;
-  let at = 0;
-  const n = Math.min(cur.samples.length, base.samples.length);
-  for (let i = 0; i < n; i += 1) {
-    const d = Math.abs(cur.samples[i].offset - base.samples[i].offset);
-    if (d > maxDev) {
-      maxDev = d;
-      at = cur.samples[i].t;
-    }
-  }
+  const { maxDev, at } = timelineDeviation(cur, base);
   const verdict: Verdict = maxDev > TOLERANCE ? 'changed' : 'pass';
   return { file, story: cur.story, verdict, maxDev, at, cur, base };
 });
