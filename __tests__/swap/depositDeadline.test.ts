@@ -1,11 +1,11 @@
 import { SwapService } from '@app/swap/SwapService';
 import {
-  DEPOSIT_WINDOW_MS,
+  DEPOSIT_WAIT_MS,
   awaitsDeposit,
   depositDeadlineMs,
-  depositHalfwayMs,
   depositOverdue,
   depositPhase,
+  depositWarnAtMs,
 } from '@app/swap/depositDeadline';
 import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
@@ -66,9 +66,9 @@ const makeRecord = (
   ...overrides,
 });
 
-test('Tests that the deadline is the quote’s when the record carries one and the window after creation when it does not', () => {
+test('Tests that the wait ends at the record’s own deadline, or 24 hours after creation when it has none', () => {
   expect(depositDeadlineMs(makeRecord())).toBe(T0 + 600_000);
-  expect(depositDeadlineMs({ createdAtMs: T0 })).toBe(T0 + DEPOSIT_WINDOW_MS);
+  expect(depositDeadlineMs({ createdAtMs: T0 })).toBe(T0 + DEPOSIT_WAIT_MS);
 });
 
 test('Tests that only an inbound deposit the provider has not seen is awaited', () => {
@@ -146,15 +146,15 @@ describe('SwapService.markDepositSent', () => {
   });
 });
 
-test('Tests that the wait turns to a warning halfway between the commit and the deadline', () => {
-  expect(depositHalfwayMs(makeRecord())).toBe(T0 + 300_000);
+test('Tests that the wait turns to a warning half an hour after the payment address was made', () => {
+  expect(depositWarnAtMs(makeRecord())).toBe(T0 + 30 * 60 * 1000);
 });
 
 test('Tests that a purchase reads awaiting, looking, not detected, detected and swapping as it moves', () => {
   expect(depositPhase(makeRecord(), T0 + 1_000)).toBe('awaiting');
   const sent = makeRecord({ depositSentAtMs: T0 + 1_000 });
-  expect(depositPhase(sent, T0 + 299_999)).toBe('looking');
-  expect(depositPhase(sent, T0 + 300_000)).toBe('notDetected');
+  expect(depositPhase(sent, T0 + 30 * 60 * 1000 - 1)).toBe('looking');
+  expect(depositPhase(sent, T0 + 30 * 60 * 1000)).toBe('notDetected');
   expect(
     depositPhase(
       makeRecord({

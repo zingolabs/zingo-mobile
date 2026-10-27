@@ -1,32 +1,23 @@
-import { depositDeadlineMs, depositPhase } from '@app/swap';
+import { depositPhase } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
-import { countdownText } from './swapProgress';
 
 /**
  * What a swap in flight says under its pair, on the card on top of Swap and
- * in Your swaps. While the deposit is awaited it carries the time left; past
- * half of it with nothing seen, the line is a warning.
+ * in Your swaps. A payment not seen half an hour after its address was made
+ * reads as a warning. No time shows.
  */
 export function pendingSwapLabel(
   record: SwapRecordType,
   nowMs: number,
   t: (key: string) => string,
 ): { text: string; warning: boolean } {
-  const phase = depositPhase(record, nowMs);
-  const left = t('swap.pending-time-left').replace(
-    '{time}',
-    countdownText(depositDeadlineMs(record) - nowMs),
-  );
-  switch (phase) {
+  switch (depositPhase(record, nowMs)) {
     case 'awaiting':
-      return { text: `${t('swap.pending-waiting')} · ${left}`, warning: false };
+      return { text: t('swap.pending-waiting'), warning: false };
     case 'looking':
-      return { text: `${t('swap.pending-looking')} · ${left}`, warning: false };
+      return { text: t('swap.pending-looking'), warning: false };
     case 'notDetected':
-      return {
-        text: `${t('swap.pending-not-detected')} · ${left}`,
-        warning: true,
-      };
+      return { text: t('swap.pending-not-detected'), warning: true };
     case 'detected':
       return { text: t('swap.pending-detected'), warning: false };
     case 'swapping':

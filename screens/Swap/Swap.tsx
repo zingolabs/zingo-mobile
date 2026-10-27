@@ -224,14 +224,14 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
   const pending = records.find(
     r => !isTerminalStatus(r.status) && !isRefunding(r),
   );
-  // The card counts the deposit's time down while it is awaited.
+  // The card turns to its warning half an hour after the payment address.
   const [nowMs, setNowMs] = useState<number>(() => Date.now());
   const awaiting = !!pending && awaitsDeposit(pending);
   useEffect(() => {
     if (!awaiting) {
       return;
     }
-    const timer = setInterval(() => setNowMs(Date.now()), 1000);
+    const timer = setInterval(() => setNowMs(Date.now()), 30_000);
     return () => clearInterval(timer);
   }, [awaiting]);
   const pendingState = pending
