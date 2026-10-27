@@ -40,6 +40,7 @@ exports[`TextInputAddress - snapshots TextInputAddress disabled without label 1`
           "fontFamily": "Menlo",
           "fontSize": 13,
           "fontWeight": "400",
+          "minWidth": 0,
           "paddingRight": 0,
           "paddingVertical": 8,
         }
@@ -200,6 +201,7 @@ exports[`TextInputAddress - snapshots TextInputAddress empty, enabled, with labe
           "fontFamily": "Menlo",
           "fontSize": 13,
           "fontWeight": "400",
+          "minWidth": 0,
           "paddingRight": 0,
           "paddingVertical": 8,
         }

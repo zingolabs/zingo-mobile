@@ -146,6 +146,7 @@ typography:
     fontWeight: 400
     lineHeight: 18px
 rounded:
+  xs: 4px
   sm: 8px
   md: 12px
   sheet: 28px
@@ -468,7 +469,9 @@ actions only, never decoration.
   `fgNym`, the same green, is for text and icons that say something goes
   through the mixnet.
 - `fgViewOnly` / `bgViewOnlySubtle`: the view-only (watch-only) wallet: the
-  snowflake, its tiles, its tag and the view-only notice's button.
+  snowflake, its tiles, its tag and the view-only notice's button. Also the
+  viewing key's rows: the viewing key is what makes a view-only wallet, so it
+  takes that role's colour.
 - `fgSyncing` (#EBFF5A): sync progress.
 - `fgOptionIcon` (#B1BBC5): the artwork icons of the options panel (the side
   menu), so they all read at one weight and tone.
@@ -595,7 +598,7 @@ inset), not from shadows or blur.
 
 ## Shapes
 
-**Radii.** `radiusSm` 8: tags and icon tiles. `radiusMd` 12: cards, groups of
+**Radii.** `radiusXs` 4: the checkbox. `radiusSm` 8: tags and icon tiles. `radiusMd` 12: cards, groups of
 rows, fields, notices, notes, detail rows, the QR plate. `radiusPill`: buttons,
 chips, toggles, avatars, the tab bar and its capsule. `radiusSheet` 28: the top
 corners of every panel and sheet. Nothing else.
@@ -622,13 +625,14 @@ Use the shared component; never build a second one that looks the same.
 |---|---|
 | Any text | `Text` with a variant and a tone. `BoldText`, `RegText` and `FadeText` are legacy and leave the screens they are found in |
 | Any button | `Button`: `primary` (the one main action of a view), `secondary` (outlined, beside others of the same weight: Copy, Verify), `text` (green: Back, Skip, secondary moves), `quiet` (grey: only Cancel and a Close that leaves a flow), `danger` (deletes or cannot be undone), `nym` (only through the mixnet), `viewOnly` (the view-only notice). `small` only inside notices and rows |
-| A field | `TextField` with `FieldAction`s |
+| A field | `TextField` with `FieldAction`s. With a prefix and a suffix (the custom server): same measures as every field, `fieldMinHeight` 48, `radiusMd` 12, the value's text variant; the prefix ("https://") and the suffix (":" and the port) in `fgMuted` |
 | A card | `Card` (tones `default`, `selected`, pools) |
 | Label and value rows | `DetailRows` |
 | A list row | `ListRow`; a choice is a `RadioRow` in a `RadioList` |
 | A filter | `Chip` (it never navigates) |
 | Anything pressed that none of these covers | `Pressable` with its `kind`: `button`, `row`, `icon` or `link` (see Motion, Pressing) |
 | An on/off setting | `Switch` (exception D), the only toggle in the app |
+| A checkbox | `Checkbox`: box 16 × 16 (`iconSizeSm`), radius 4 as `radiusXs` (`radiusSm` 8 would read as a radio at that size), border 1.5 in `borderMuted` when off; `bgAccent` with the tick in `fgOnAccent` when on. The label next to it is part of the tap area, at least 44 high |
 | An amount to type | `AmountCard` (exception C) |
 | A short status | `Tag` (read, not tapped) |
 | A person or the wallet | `Avatar` |
@@ -680,6 +684,10 @@ at 16 with no tile, the text in `caption` regular with no bold, padding 12,
 - Show a contact's name and avatar wherever their address appears, and offer
   "Save contact" wherever an outside address is not in the Address Book.
 - Write every new string in the five catalogs.
+- Keep the reserved space of text that is invisible for now (Launching's), so
+  the logo doesn't jump, but hide it from screen readers while it's invisible
+  (`importantForAccessibility="no-hide-descendants"` /
+  `accessibilityElementsHidden`), and don't make it `selectable`.
 
 **Don't**
 - Don't set `fontSize`, `lineHeight`, `letterSpacing`, `borderRadius`, a
@@ -746,8 +754,8 @@ belongs to that action and keeps the press above.
 ## Exceptions
 
 Approved by the designer. Nothing else departs from the system. There are
-four: the tab bar (A), Swap's two cards (B), the amount card (C) and the
-switch (D).
+five: the tab bar (A), Swap's two cards (B), the amount card (C), the
+switch (D) and the brand (E).
 
 **A. The tab bar** is drawn at the prototype's own values:
 - 366 wide, 60 tall (icon 28 with 10 above and below), radius 33, padding 5,
@@ -798,6 +806,9 @@ today, and every toggle in the app uses it:
   `bgSwitchNymDeep` and `fgSwitchThumb`. It replaced the switch drawings
   in `assets/img` and the one Server drew.
 
+**E. The brand.** StartMenu's 49 pt "Zingo" keeps its size as a named
+exception. It is the wordmark, used once, not text.
+
 ## Changing the system
 
 1. A screen needs something the system lacks: propose it to the designer.
@@ -817,5 +828,3 @@ onto the system as each is redesigned. Also open:
   `bodyStrong` 700.
 - `DetailRows` lives in `screens/Swap/components` but is shared, and belongs
   in `ui/widgets`.
-- Pools still sets a few sizes by hand (its header's 44 and 12, the legend's
-  dots); they move to tokens.

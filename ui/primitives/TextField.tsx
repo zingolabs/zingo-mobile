@@ -120,6 +120,18 @@ type TextFieldProps = {
   trailing?: React.ReactNode;
   /** Shown in the box instead of the input: a picked contact's token. */
   replacement?: React.ReactNode;
+  /** Fixed text before the value, in fgMuted ("https://"). */
+  prefix?: string;
+  /** After the value, inside the box: a ":" and a port input. */
+  suffix?: React.ReactNode;
+  /** Not editable for a moment (a test running), without the disabled look. */
+  readOnly?: boolean;
+  /** Focus held by an input in the suffix, so the edge lights for it too. */
+  active?: boolean;
+  selectTextOnFocus?: boolean;
+  onSubmitEditing?: () => void;
+  returnKeyType?: React.ComponentProps<typeof TextInput>['returnKeyType'];
+  textContentType?: React.ComponentProps<typeof TextInput>['textContentType'];
   /** A line of its own under the box (a kind, a warning); `error` and `helper` replace it. */
   footer?: React.ReactNode;
   onFocus?: () => void;
@@ -161,6 +173,14 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
   clearable = false,
   clearLabel,
   replacement,
+  prefix,
+  suffix,
+  active = false,
+  readOnly = false,
+  selectTextOnFocus,
+  onSubmitEditing,
+  returnKeyType,
+  textContentType,
   footer,
   onFocus,
   onBlur,
@@ -205,10 +225,15 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
           backgroundColor: inset,
           borderRadius: radiusMd,
           borderWidth: 1,
-          borderColor: fieldBorder(colors, focused, validity),
+          borderColor: fieldBorder(colors, focused || active, validity),
           paddingLeft: space12,
         }}
       >
+        {!!prefix && !replacement && (
+          <Text variant="body" tone="muted">
+            {prefix}
+          </Text>
+        )}
         {replacement ?? (
           <TextInput
             ref={inputRef}
@@ -222,11 +247,15 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
             autoCapitalize={autoCapitalize}
             autoCorrect={autoCorrect}
             spellCheck={autoCorrect}
+            selectTextOnFocus={selectTextOnFocus}
+            onSubmitEditing={onSubmitEditing}
+            returnKeyType={returnKeyType}
+            textContentType={textContentType}
             value={value}
             onChangeText={onChangeText}
             placeholder={placeholder}
             placeholderTextColor={colors.fgMuted}
-            editable={!disabled}
+            editable={!disabled && !readOnly}
             multiline={multiline}
             onFocus={() => {
               setFocused(true);
@@ -243,7 +272,9 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
               ...(multiline && maxLines
                 ? { maxHeight: valueStyle.lineHeight * maxLines + space8 * 2 }
                 : {}),
-              paddingRight: TrailingIcon || trailing || clearable ? 0 : space12,
+              minWidth: 0,
+              paddingRight:
+                TrailingIcon || trailing || clearable || suffix ? 0 : space12,
               color: colors.fgDefault,
               fontSize: valueStyle.fontSize,
               fontWeight: valueStyle.fontWeight,
@@ -251,6 +282,7 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
             }}
           />
         )}
+        {suffix}
         {(!!TrailingIcon ||
           (clearable && !!value && !disabled) ||
           !!trailing) && (

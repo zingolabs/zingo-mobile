@@ -2,7 +2,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { PixelRatio, Platform, View } from 'react-native';
 import Animated, {
-  Keyframe,
   ReduceMotion,
   useAnimatedStyle,
   useSharedValue,
@@ -16,11 +15,8 @@ import Svg, {
 } from 'react-native-svg';
 
 import {
-  buttonMinHeight,
   fontScaleBody,
-  iconSizeSm,
   radiusMd,
-  radiusPill,
   radiusSm,
   space8,
   space12,
@@ -29,8 +25,8 @@ import {
 } from '@app/theme';
 import Text from '@ui/primitives/Text';
 import { useInsetFill } from '@ui/primitives/Surface';
-import { ease } from '@app/theme/motion';
-import Pressable from '@ui/primitives/Pressable';
+import { duration, ease } from '@app/theme/motion';
+import Button from '@ui/primitives/Button';
 import { ContextAppLoaded } from '@app/context';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
@@ -55,26 +51,7 @@ const BLUR_DEVIATION = Platform.select({
   ios: 3.5,
   default: BLUR_PT,
 });
-const COPIED_MS = 1600;
 const COLUMNS = 3;
-
-const iconPop = () =>
-  new Keyframe({
-    0: { opacity: 0, transform: [{ scale: 0.4 }] },
-    100: { opacity: 1, transform: [{ scale: 1 }], easing: ease.spring },
-  })
-    .duration(240)
-    .reduceMotion(ReduceMotion.System);
-const iconTurn = () =>
-  new Keyframe({
-    0: { opacity: 0, transform: [{ rotate: '-20deg' }, { scale: 0.7 }] },
-    100: {
-      transform: [{ rotate: '0deg' }, { scale: 1 }],
-      easing: ease.out,
-    },
-  })
-    .duration(VEIL_MS)
-    .reduceMotion(ReduceMotion.System);
 
 // A word drawn through a gaussian blur, for the hidden state. Drawn once
 // and kept mounted: the filter is the costly part, the veil only fades it.
@@ -268,7 +245,7 @@ export const InfoRow: React.FunctionComponent<{
   );
 };
 
-// Copy and Show / Hide side by side.
+// Copy and Show / Hide side by side, as secondary Buttons.
 export const CopyShowButtons: React.FunctionComponent<{
   hidden: boolean;
   onToggleHide: () => void;
@@ -276,11 +253,7 @@ export const CopyShowButtons: React.FunctionComponent<{
   testID: string;
 }> = ({ hidden, onToggleHide, onCopy, testID }) => {
   const { translate } = useContext(ContextAppLoaded);
-  const { colors } = useTheme();
-  const fill = useInsetFill();
   const [copied, setCopied] = useState(false);
-  // The eye turns as feedback to a tap, not when the screen mounts.
-  const [turned, setTurned] = useState(false);
   const copiedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => () => clearTimeout(copiedTimer.current), []);
@@ -289,79 +262,33 @@ export const CopyShowButtons: React.FunctionComponent<{
     onCopy();
     setCopied(true);
     clearTimeout(copiedTimer.current);
-    copiedTimer.current = setTimeout(() => setCopied(false), COPIED_MS);
-  };
-
-  const outline = {
-    flex: 1,
-    minHeight: buttonMinHeight,
-    borderRadius: radiusPill,
-    borderWidth: 1,
-    borderColor: colors.bottomSheetBorder,
-    backgroundColor: fill,
-    flexDirection: 'row' as const,
-    alignItems: 'center' as const,
-    justifyContent: 'center' as const,
-    gap: space8,
+    copiedTimer.current = setTimeout(() => setCopied(false), duration.hold);
   };
 
   return (
     <View
       style={{ flexDirection: 'row', gap: space12, marginHorizontal: SIDE }}
     >
-      <Pressable
-        kind="button"
-        testID={`${testID}.copy`}
-        accessibilityRole="button"
-        onPress={copy}
-        style={{
-          ...outline,
-        }}
-      >
-        <View style={{ width: iconSizeSm, height: iconSizeSm }}>
-          <Animated.View
-            key={copied ? 'copied' : 'copy'}
-            entering={copied ? iconPop() : undefined}
-          >
-            {copied ? (
-              <CheckIcon size={iconSizeSm} color={colors.fgAccent} />
-            ) : (
-              <CopyIcon size={iconSizeSm} color={colors.fgDefault} />
-            )}
-          </Animated.View>
-        </View>
-        <Text variant="button">
-          {translate(copied ? 'seedbackup.copied' : 'copy') as string}
-        </Text>
-      </Pressable>
-      <Pressable
-        kind="button"
-        testID={`${testID}.hide`}
-        accessibilityRole="button"
-        onPress={() => {
-          setTurned(true);
-          onToggleHide();
-        }}
-        style={{
-          ...outline,
-        }}
-      >
-        <View style={{ width: iconSizeSm, height: iconSizeSm }}>
-          <Animated.View
-            key={hidden ? 'show' : 'hide'}
-            entering={turned ? iconTurn() : undefined}
-          >
-            {hidden ? (
-              <EyeIcon size={iconSizeSm} color={colors.fgDefault} />
-            ) : (
-              <EyeOffIcon size={iconSizeSm} color={colors.fgDefault} />
-            )}
-          </Animated.View>
-        </View>
-        <Text variant="button">
-          {translate(hidden ? 'seedbackup.show' : 'seedbackup.hide') as string}
-        </Text>
-      </Pressable>
+      <View style={{ flex: 1 }}>
+        <Button
+          testID={`${testID}.copy`}
+          variant="secondary"
+          icon={copied ? CheckIcon : CopyIcon}
+          title={translate(copied ? 'seedbackup.copied' : 'copy') as string}
+          onPress={copy}
+        />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Button
+          testID={`${testID}.hide`}
+          variant="secondary"
+          icon={hidden ? EyeIcon : EyeOffIcon}
+          title={
+            translate(hidden ? 'seedbackup.show' : 'seedbackup.hide') as string
+          }
+          onPress={onToggleHide}
+        />
+      </View>
     </View>
   );
 };

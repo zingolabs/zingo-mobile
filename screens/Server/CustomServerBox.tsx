@@ -1,4 +1,3 @@
-/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
 import { TextInput, View } from 'react-native';
@@ -10,13 +9,19 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { useTheme, space8 } from '@app/theme';
+import {
+  fontScaleBody,
+  space8,
+  space12,
+  textVariants,
+  useTheme,
+} from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ChainNameEnum } from '@app/AppState';
-import RegText from '@ui/primitives/RegText';
+import Text from '@ui/primitives/Text';
+import TextField from '@ui/primitives/TextField';
 import ServerLog, { LogLine } from './ServerLog';
 import { schemeFor } from './useCustomServer';
-import { fieldBorder } from '@ui/primitives/fieldBorder';
 import Button from '@ui/primitives/Button';
 
 type CustomServerBoxProps = {
@@ -50,6 +55,9 @@ type CustomServerBoxProps = {
   onSwitch: (chain: ChainNameEnum) => void;
 };
 
+/** Five digits at the value's size. */
+const PORT_WIDTH = 64;
+
 const CustomServerBox: React.FC<CustomServerBoxProps> = ({
   chain,
   host,
@@ -71,7 +79,7 @@ const CustomServerBox: React.FC<CustomServerBoxProps> = ({
   onSwitch,
 }) => {
   const { colors } = useTheme();
-  const [focused, setFocused] = useState(false);
+  const [portFocused, setPortFocused] = useState(false);
   const hostInput = useRef<TextInput>(null);
   const portInput = useRef<TextInput>(null);
   const fieldX = useSharedValue(0);
@@ -121,11 +129,6 @@ const CustomServerBox: React.FC<CustomServerBoxProps> = ({
 
   const empty = !host.trim();
   const busy = working !== null;
-  const border = fieldBorder(
-    colors,
-    focused,
-    result === true ? 'valid' : result === false ? 'invalid' : 'unknown',
-  );
   const blur = () => {
     hostInput.current?.blur();
     portInput.current?.blur();
@@ -136,104 +139,84 @@ const CustomServerBox: React.FC<CustomServerBoxProps> = ({
 
   return (
     <View>
-      <Animated.View
-        style={[
-          {
-            flexDirection: 'row',
-            height: 41,
-            borderRadius: 10,
-            borderWidth: 1,
-            borderColor: border,
-            backgroundColor: colors.bgSurface,
-            overflow: 'hidden',
-          },
-          fieldStyle,
-        ]}
-      >
-        <View style={{ justifyContent: 'center', paddingLeft: 12 }}>
-          <RegText style={{ fontSize: 13, color: colors.fgMuted }}>
-            {schemeFor(chain)}
-          </RegText>
-        </View>
-        <TextInput
-          ref={hostInput}
+      <Animated.View style={fieldStyle}>
+        <TextField
+          label=""
+          inputRef={hostInput}
           testID="server.custom.host"
           accessibilityLabel={labels.host}
+          prefix={schemeFor(chain)}
           value={host}
           onChangeText={text => {
             if (onHost(text)) {
               portInput.current?.focus();
             }
           }}
-          selectTextOnFocus
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          onSubmitEditing={() => {
-            blur();
-            onTest();
-          }}
-          editable={!disabled && !busy}
+          valid={result === true}
+          invalid={result === false}
+          active={portFocused}
+          disabled={disabled}
+          readOnly={busy}
           placeholder={
             chain === ChainNameEnum.regtestChainName
               ? labels.hostRegtest
               : labels.host
           }
-          placeholderTextColor={colors.fgMuted}
           keyboardType="url"
           autoCapitalize="none"
           autoCorrect={false}
-          spellCheck={false}
           textContentType="URL"
           returnKeyType="go"
-          style={{
-            flex: 1,
-            minWidth: 0,
-            paddingLeft: 1,
-            paddingRight: 12,
-            fontSize: 13,
-            color: colors.fgDefault,
+          selectTextOnFocus
+          onSubmitEditing={() => {
+            blur();
+            onTest();
           }}
+          suffix={
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                alignSelf: 'stretch',
+                paddingLeft: space8,
+                borderLeftWidth: 1,
+                borderLeftColor: colors.bottomSheetBorder,
+              }}
+            >
+              <Text variant="body" tone="muted">
+                :
+              </Text>
+              <TextInput
+                ref={portInput}
+                testID="server.custom.port"
+                accessibilityLabel={labels.port}
+                value={port}
+                onChangeText={onPort}
+                selectTextOnFocus
+                onFocus={() => setPortFocused(true)}
+                onBlur={() => setPortFocused(false)}
+                onSubmitEditing={() => {
+                  blur();
+                  onTest();
+                }}
+                editable={!disabled && !busy}
+                keyboardType="number-pad"
+                maxLength={5}
+                returnKeyType="go"
+                maxFontSizeMultiplier={fontScaleBody}
+                style={{
+                  width: PORT_WIDTH,
+                  paddingLeft: space8 / 2,
+                  paddingRight: space12,
+                  fontSize: textVariants.bodyStrong.fontSize,
+                  fontWeight: textVariants.bodyStrong.fontWeight,
+                  color: colors.fgDefault,
+                  fontVariant: ['tabular-nums'],
+                }}
+              />
+            </View>
+          }
         />
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            borderLeftWidth: 1,
-            borderLeftColor: colors.bottomSheetBorder,
-          }}
-        >
-          <RegText
-            style={{ fontSize: 13, color: colors.fgMuted, paddingLeft: 9 }}
-          >
-            :
-          </RegText>
-          <TextInput
-            ref={portInput}
-            testID="server.custom.port"
-            accessibilityLabel={labels.port}
-            value={port}
-            onChangeText={onPort}
-            selectTextOnFocus
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-            onSubmitEditing={() => {
-              blur();
-              onTest();
-            }}
-            editable={!disabled && !busy}
-            keyboardType="number-pad"
-            maxLength={5}
-            returnKeyType="go"
-            style={{
-              width: 52,
-              paddingLeft: 3,
-              paddingRight: 10,
-              fontSize: 13,
-              color: colors.fgDefault,
-              fontVariant: ['tabular-nums'],
-            }}
-          />
-        </View>
       </Animated.View>
 
       {/** Test and Save sit side by side: they act on the server field, they

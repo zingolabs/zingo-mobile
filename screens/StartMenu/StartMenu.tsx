@@ -40,7 +40,7 @@ const TITLE_TOP = 294 / 874;
 const CARD_TOP = 422 / 874;
 const BOTTOM_MARGIN = 60;
 const BACK_ONLINE_MS = duration.fresh;
-// The brand on the launch screen is bigger than any text variant.
+// Exception E, the brand: the wordmark, used once, not text.
 const BRAND_SIZE = 49;
 const BRAND_LINE = 59;
 

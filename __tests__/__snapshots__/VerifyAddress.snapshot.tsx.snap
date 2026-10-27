@@ -62,6 +62,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
             "fontFamily": "Menlo",
             "fontSize": 13,
             "fontWeight": "400",
+            "minWidth": 0,
             "paddingRight": 0,
             "paddingVertical": 8,
           }
