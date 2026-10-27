@@ -9,7 +9,7 @@ import React, {
 import { View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { space12, space16, space8, useTheme, iconSizeSm } from '@app/theme';
+import { space12, space16, space8, useTheme } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import { Route } from '@app/AppState';
 import { ContextAppLoaded, useSwapService } from '@app/context';
@@ -17,10 +17,9 @@ import {
   SwapDirectionEnum,
   SwapStatusEnum,
   depositDeadlineMs,
-  depositHalfwayMs,
+  isRefunding,
   isTerminalStatus,
 } from '@app/swap';
-import Utils from '@app/utils';
 import { leaveFlow } from '@app/navigation/navigate';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
@@ -28,11 +27,9 @@ import ButtonStack from '@ui/primitives/ButtonStack';
 import TextField from '@ui/primitives/TextField';
 import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 import Banner from '@ui/widgets/Banner';
-import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import DepositSlip from '@screens/Swap/components/DepositSlip';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
-import { countdownText } from '@screens/Swap/swapProgress';
 
 type SwapDepositProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -44,9 +41,9 @@ const AFTER_DESHIELD = 'send after deshield';
 
 /**
  * The deposit a swap waits for. Buying ZEC, it is paid from the other wallet:
- * the time left to pay comes first, then the slip says where, how much and
- * with what memo, and the user says when it is sent. Opened again from the
- * tracking, the slip is read-only and the arrow goes back there. Selling
+ * the slip says where, how much and with what memo, and the user says when
+ * it is sent. Opened again from the tracking, the slip is read-only and the
+ * arrow goes back there. No time shows. Selling
  * ZEC, this screen appears only when the wallet's own broadcast failed, with
  * the way to try again.
  */
@@ -55,7 +52,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   route,
 }) => {
   const { recordId, broadcastError } = route.params;
-  const { translate, language, sendSwapDeposit, resumeSwapDeposit } =
+  const { translate, sendSwapDeposit, resumeSwapDeposit } =
     useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const swapService = useSwapService();
@@ -69,7 +66,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   const [retrying, setRetrying] = useState<boolean>(false);
 
   useEffect(() => {
-    const timer = setInterval(() => setNowMs(Date.now()), 1000);
+    const timer = setInterval(() => setNowMs(Date.now()), 30_000);
     return () => clearInterval(timer);
   }, []);
 
@@ -87,11 +84,19 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
       return;
     }
     if (isTerminalStatus(record.status)) {
-      navigation.replace(Route.SwapResult, { recordId });
+      navigation.replace(
+        record.status === SwapStatusEnum.Expired
+          ? Route.SwapDetail
+          : Route.SwapResult,
+        { recordId },
+      );
       return;
     }
     if (!isOutbound && !awaiting) {
-      navigation.replace(Route.SwapTracking, { recordId });
+      navigation.replace(
+        isRefunding(record) ? Route.SwapDetail : Route.SwapTracking,
+        { recordId },
+      );
       return;
     }
     if (awaiting && remainingMs <= 0 && swapService && !expiryAsked.current) {
@@ -259,8 +264,6 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
 
   const toTracking = () => navigation.replace(Route.SwapTracking, { recordId });
   const sent = record.depositSentAtMs !== undefined;
-  const pastHalf = nowMs >= depositHalfwayMs(record);
-  const timeColor = pastHalf ? colors.fgWarning : colors.fgMuted;
 
   return (
     <SwapFlowScreen
@@ -294,30 +297,6 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
         )
       }
     >
-      <View
-        testID="swap.deposit.time"
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          columnGap: 8,
-          marginBottom: 16,
-        }}
-      >
-        <ClockIcon size={iconSizeSm} color={timeColor} />
-        <Text
-          variant="caption"
-          tone={pastHalf ? 'warning' : 'muted'}
-          style={{ flexShrink: 1, fontVariant: ['tabular-nums'] }}
-        >
-          {(translate('swap.deposit-time-left') as string)
-            .replace('{time}', countdownText(remainingMs))
-            .replace(
-              '{clock}',
-              Utils.formatDate(deadlineMs, 'h:mm aaa', language),
-            )}
-        </Text>
-      </View>
       <DepositSlip record={record} />
     </SwapFlowScreen>
   );

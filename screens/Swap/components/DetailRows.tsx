@@ -30,6 +30,8 @@ export type DetailRow = {
   block?: React.ReactNode;
   /** A word after the value in Nym green: the review's NYM Enhanced. */
   badge?: string;
+  /** The value struck through: an address nobody should pay anymore. */
+  strike?: boolean;
 };
 
 /** A detail's facts, label on the left and value on the right. */
@@ -114,6 +116,7 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
               {row.leading}
               <Text
                 variant={(row.mono ?? !!row.copy) ? 'address' : 'bodySmall'}
+                strike={row.strike}
                 numberOfLines={row.wrap ? undefined : 1}
                 style={{
                   flexShrink: 1,

@@ -517,6 +517,10 @@ never rounded up. Fiat shows two decimals. Only money in or out carries a
 sign: "+" on a receipt, "−" on a send, no sign on a move within the wallet
 (a shield, a send to oneself, a migration), in History and in the detail.
 
+**Struck text.** What never happened is struck through (`Text`'s `strike`),
+in `fgMuted`: an expired purchase's ZEC in its History row and its detail
+hero, and the deposit address nobody should pay anymore. Nothing else.
+
 **Short addresses.** In rows, detail rows, tokens and fields: first 6 … last
 6. On Receive's address card: first 10 … last 10. A field that holds an
 address stays one line and shortens it in the middle when not focused.
@@ -703,6 +707,9 @@ animation.
 - Menu screens slide in from the right.
 - Closing a flow lowers only the panel on top; the ones under it leave with
   it.
+- A swap waiting for a payment from another wallet: the coin sent breathes
+  in place (`duration.breathe`, in and out on `ease.standard`) and nothing
+  travels until the provider sees the payment (`SwapFlight`'s `waiting`).
 - The tab bar's capsule slides in 360 ms on (.2, 0, 0, 1), its colours change
   in 220 ms, and it shrinks and grows in 360 ms.
 - Every animation honours Reduce Motion (`ReduceMotion.System`).

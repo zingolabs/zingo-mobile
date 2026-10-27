@@ -28,12 +28,14 @@ import {
   awaitsDeposit,
   canonicalChainAddress,
   formatAmountForDisplay,
+  isRefunding,
   isTerminalStatus,
+  nearRefusesSmallRefunds,
   providerShortLabel,
   rateLimitedNotice,
   renderSwapText,
 } from '@app/swap';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
+import type { SwapRecordType } from '@app/swap';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
 import {
   sendGateOpen,
@@ -47,6 +49,8 @@ import { useResult } from '@app/navigation/results';
 import { WalletNavigation } from '@app/types';
 import { swapScreenFor } from './swapRoute';
 import { pendingSwapLabel } from './pendingSwapLabel';
+import { useNearSmallWarningHide } from '@app/hooks/useNearSmallWarningHide';
+import DontShowAgain from './components/DontShowAgain';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 import Utils from '@app/utils';
 import {
@@ -93,7 +97,7 @@ type SwapProps = HomeTabScreenProps<'Swap'>;
  * always one side. The sheet sits fixed under the header's icons; the review
  * and everything after it are screens of their own.
  */
-const Swap: React.FunctionComponent<SwapProps> = () => {
+const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -114,6 +118,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
   const navigation = useNavigation<WalletNavigation>();
   const swapService = useSwapService();
   const records = useSwapRecords();
+  const nearWarning = useNearSmallWarningHide();
   const sheetSlideStyle = useOptionsPanelSheetSlide();
   useDismissSheetsOnBlur();
 
@@ -132,6 +137,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     zecChain: walletChainName,
     mixnetBlocked: !sendGateOpen(mixnetView),
     paused: sheetsOpen > 0,
+    prefill: route.params?.prefill,
   });
 
   const [containerH, setContainerH] = useState<number>(0);
@@ -214,15 +220,18 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
       ? `≈ ${formatUsd(parseFloat(form.chosenRoute.expectedReceiveAmount) * receiveUsdUnitPrice)}`
       : '';
 
-  const pending = records.find(r => !isTerminalStatus(r.status));
-  // The card counts the deposit's time down while it is awaited.
+  // A late payment on its way back is not a swap in progress; it has no card.
+  const pending = records.find(
+    r => !isTerminalStatus(r.status) && !isRefunding(r),
+  );
+  // The card turns to its warning half an hour after the payment address.
   const [nowMs, setNowMs] = useState<number>(() => Date.now());
   const awaiting = !!pending && awaitsDeposit(pending);
   useEffect(() => {
     if (!awaiting) {
       return;
     }
-    const timer = setInterval(() => setNowMs(Date.now()), 1000);
+    const timer = setInterval(() => setNowMs(Date.now()), 30_000);
     return () => clearInterval(timer);
   }, [awaiting]);
   const pendingState = pending
@@ -282,8 +291,8 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     }
     form.cancelReview();
   });
-  const openRecord = (recordId: string, status: SwapStatusEnum) =>
-    navigation.navigate(swapScreenFor(status), { recordId });
+  const openRecord = (record: SwapRecordType) =>
+    navigation.navigate(swapScreenFor(record), { recordId: record.recordId });
   const onContinue = () => {
     const proceed = () => {
       const review = form.review();
@@ -305,8 +314,56 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
       });
       return;
     }
+    // Buying ZEC through NEAR under its no-refunds line: the warning comes
+    // first, once, or until the user asks not to see it again.
+    if (
+      !nearWarning.hidden &&
+      nearRefusesSmallRefunds({
+        provider: form.chosenRoute?.provider,
+        direction: form.direction,
+        sellUsd:
+          form.amountNumber *
+          (form.quoteContext?.fiatValueBasis.sellUsdUnitPrice ?? 0),
+      })
+    ) {
+      const dontShow = { current: false };
+      showConfirm({
+        title: translate('swap.near-small-title') as string,
+        message: translate('swap.near-small-body') as string,
+        content: (
+          <DontShowAgain
+            testID="swap.near-small.dont-show"
+            label={translate('swap.dont-show-again') as string}
+            onChange={checked => {
+              dontShow.current = checked;
+            }}
+          />
+        ),
+        buttons: [
+          {
+            text: translate('swap.cta-ready') as string,
+            onPress: () => {
+              if (dontShow.current) {
+                nearWarning.setHidden(true);
+              }
+              proceed();
+            },
+          },
+          { text: translate('swap.cancel') as string, style: 'cancel' },
+        ],
+      });
+      return;
+    }
     proceed();
   };
+
+  // A new quote asked from an expired swap goes straight to the review.
+  useEffect(() => {
+    if (form.prefillArmed && form.cta === 'ready') {
+      form.disarmPrefill();
+      onContinue();
+    }
+  });
 
   const noticeText = (): string => {
     const notice = form.quoteNotice;
@@ -406,10 +463,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
               }}
             >
               {!!pending && (
-                <Card
-                  testID="swap.pending"
-                  onPress={() => openRecord(pending.recordId, pending.status)}
-                >
+                <Card testID="swap.pending" onPress={() => openRecord(pending)}>
                   <View
                     style={{
                       flexDirection: 'row',
@@ -964,7 +1018,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
           nowMs={nowMs}
           onOpen={record => {
             historySheetRef.current?.dismiss();
-            openRecord(record.recordId, record.status);
+            openRecord(record);
           }}
         />
         <InsufficientFundsSheet

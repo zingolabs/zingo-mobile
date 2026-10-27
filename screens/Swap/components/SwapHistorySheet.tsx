@@ -7,6 +7,7 @@ import { ContextAppLoaded } from '@app/context';
 import {
   SwapStatusEnum,
   formatAmountForDisplay,
+  isRefunding,
   isTerminalStatus,
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
@@ -14,6 +15,7 @@ import AppSheetModal from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
 import ListRow from '@ui/primitives/ListRow';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
+import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
 import { RefreshIcon } from '@ui/primitives/Icons/RefreshIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { formatInteger } from '@app/utils/formatAmount';
@@ -116,8 +118,16 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
             ),
             live: false,
           };
-        case SwapStatusEnum.Failed:
         case SwapStatusEnum.Expired:
+          return {
+            label: t('swap.history-expired'),
+            icon: tile(
+              <ClockIcon size={iconSizeMd} color={colors.fgMuted} />,
+              colors.bgMutedSubtle,
+            ),
+            live: false,
+          };
+        case SwapStatusEnum.Failed:
           return {
             label: t('swap.history-failed'),
             icon: tile(
@@ -127,6 +137,16 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
             live: false,
           };
         default:
+          if (isRefunding(record)) {
+            return {
+              label: t('swap.history-refunding'),
+              icon: tile(
+                <RefreshIcon size={iconSizeMd} color={colors.fgWarning} />,
+                colors.bgWarningSubtle,
+              ),
+              live: false,
+            };
+          }
           return {
             label: pendingSwapLabel(record, nowMs, t).text,
             icon: tile(

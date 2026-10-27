@@ -40,7 +40,10 @@ import {
   formatAmountForDisplay,
   isPrePaymentStatus,
   isRealLegHash,
+  isRefunding,
   isTerminalStatus,
+  isThorchainFamily,
+  prefillFromRecord,
   providerLongLabel,
 } from '@app/swap';
 import { showConfirm } from '@app/services/showConfirm';
@@ -57,6 +60,7 @@ import {
   ChevronRight,
   ChevronUp,
 } from '@ui/primitives/Icons/Chevron';
+import Banner from '@ui/widgets/Banner';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import DepositSlip from '@screens/Swap/components/DepositSlip';
 import DetailHero from '@screens/Swap/components/DetailHero';
@@ -152,20 +156,28 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
     if (!record) {
       return;
     }
+    const expired = swapOutcome(record.status) === 'expired';
     showConfirm({
-      title: t('swap.detail-remove-title'),
+      title: t(
+        expired ? 'swap.delete-expired-title' : 'swap.detail-remove-title',
+      ),
       message: t(
-        isPrePaymentStatus(record.status)
-          ? 'swap.detail-remove-unpaid'
-          : 'swap.detail-remove-body',
+        expired
+          ? 'swap.delete-expired-body'
+          : isPrePaymentStatus(record.status)
+            ? 'swap.detail-remove-unpaid'
+            : 'swap.detail-remove-body',
       ),
       buttons: [
-        { text: t('swap.close'), style: 'cancel' },
+        { text: t('swap.cancel'), style: 'cancel' },
         {
-          text: t('swap.detail-remove'),
+          text: t('swap.delete'),
           style: 'destructive',
           onPress: () => {
-            SwapStore.deleteByRecordId(recordId).then(close);
+            SwapStore.deleteByRecordId(recordId).then(() => {
+              addLastSnackbar(t('swap.deleted'), SnackbarDurationEnum.short);
+              close();
+            });
           },
         },
       ],
@@ -180,6 +192,8 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
   const sell = record.direction === SwapDirectionEnum.Outbound;
   const outcome = swapOutcome(record.status);
   const done = outcome === 'completed';
+  const expired = outcome === 'expired';
+  const refunding = isRefunding(record);
   const sellSym = record.sellAsset.ticker ?? record.sellAsset.symbol;
   const getSym = record.receiveAsset.ticker ?? record.receiveAsset.symbol;
   const other = sell ? record.receiveAsset : record.sellAsset;
@@ -206,20 +220,35 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
               ? `${formatAmountForDisplay(back)} ${t('swap.detail-of')} ${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym} ${t('swap.detail-came-back')}`
               : '',
         }
-      : {
-          amount: `${done ? '+' : '≈ +'}${formatAmountForDisplay(got)}`,
-          unit: getSym,
-          tone: done ? ('positive' as const) : ('default' as const),
-          line: `−${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}${usd(got, record.fiatValueBasis.receiveUsdUnitPrice) ? ` · ${usd(got, record.fiatValueBasis.receiveUsdUnitPrice)}` : ''}`,
-        };
+      : expired
+        ? {
+            amount: `+${formatAmountForDisplay(got)}`,
+            unit: getSym,
+            tone: 'muted' as const,
+            line: t('history.swap-not-sent').replace(
+              '{amount}',
+              `${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}`,
+            ),
+          }
+        : {
+            amount: `${done ? '+' : '≈ +'}${formatAmountForDisplay(got)}`,
+            unit: getSym,
+            tone: done ? ('positive' as const) : ('default' as const),
+            line: `−${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}${usd(got, record.fiatValueBasis.receiveUsdUnitPrice) ? ` · ${usd(got, record.fiatValueBasis.receiveUsdUnitPrice)}` : ''}`,
+          };
   const pill =
     outcome === 'completed'
       ? { text: t('swap.history-done'), tone: 'accent' as const }
       : outcome === 'refunded'
         ? { text: t('swap.history-refunded'), tone: 'warning' as const }
-        : outcome === 'failed' || outcome === 'expired'
+        : outcome === 'failed'
           ? { text: t('swap.history-failed'), tone: 'danger' as const }
-          : { text: t('swap.history-in-progress'), tone: 'neutral' as const };
+          : expired
+            ? { text: t('history.state-expired'), tone: 'neutral' as const }
+            : {
+                text: t('swap.history-in-progress'),
+                tone: 'neutral' as const,
+              };
 
   const feesUsd =
     record.totalFeesInReceiveAsset &&
@@ -257,7 +286,24 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
       ),
     },
     { label: t('swap.provider'), value: providerLongLabel(record.provider) },
-    ...(feesUsd ? [{ label: t('swap.review-fees'), value: feesUsd }] : []),
+    ...(expired
+      ? [
+          {
+            label: t('swap.result-reason'),
+            value: t('swap.expired-why'),
+            wrap: true,
+          },
+          {
+            label: t('swap.deposit-address'),
+            value: Utils.trimToSmall(record.depositAddress, 6),
+            mono: true,
+            strike: true,
+          },
+        ]
+      : []),
+    ...(feesUsd && !expired
+      ? [{ label: t('swap.review-fees'), value: feesUsd }]
+      : []),
     ...(done && sell
       ? [
           {
@@ -277,10 +323,39 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
           },
         ]
       : []),
-    ...(!done && reason
+    ...(!done && !expired && reason
       ? [{ label: t('swap.result-reason'), value: reason, wrap: true }]
       : []),
   ];
+  /** Maya and THORChain track a payment by its hash, so a late one is handed over by hand. */
+  const lateHashWanted = expired && isThorchainFamily(record.provider);
+  const sold = `${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}`;
+  /** A payment that came after the quote expired, on its way back. */
+  const view = refunding
+    ? {
+        hero: {
+          amount: formatAmountForDisplay(record.sellAmountHumanDecimal),
+          unit: sellSym,
+          tone: 'default' as const,
+          line: t('swap.going-back-line').replace('{amount}', sold),
+        },
+        pill: { text: t('history.state-refunding'), tone: 'warning' as const },
+        rows: [
+          rows[0],
+          rows[1],
+          {
+            label: t('swap.result-reason'),
+            value: t('swap.late-why'),
+            wrap: true,
+          },
+          {
+            label: t('swap.goes-back-to'),
+            value: Utils.trimToSmall(record.sourceAddress, 6),
+            copy: record.sourceAddress,
+          },
+        ] as DetailRow[],
+      }
+    : { hero, pill, rows };
 
   const hasDepositEvidence =
     isRealLegHash(record.broadcast?.txId) ||
@@ -322,11 +397,24 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
       onBack={close}
       footer={
         <ButtonStack>
+          {expired && (
+            <Button
+              testID="swap.detail.new-quote"
+              variant="primary"
+              title={t('swap.get-new-quote')}
+              onPress={() =>
+                navigation.navigate(Route.Home, {
+                  screen: Route.Swap,
+                  params: { prefill: prefillFromRecord(record, Date.now()) },
+                })
+              }
+            />
+          )}
           {canRemoveSwap(record) && (
             <Button
               testID="swap.detail.remove"
-              variant="quiet"
-              title={t('swap.detail-remove')}
+              variant="danger"
+              title={t('swap.delete')}
               onPress={remove}
             />
           )}
@@ -351,12 +439,13 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         }
         badge={other}
         title={title}
-        amount={hero.amount}
-        unit={hero.unit}
-        tone={hero.tone}
-        line={hero.line}
-        pill={pill.text}
-        pillTone={pill.tone}
+        amount={view.hero.amount}
+        unit={view.hero.unit}
+        tone={view.hero.tone}
+        line={view.hero.line}
+        pill={view.pill.text}
+        pillTone={view.pill.tone}
+        strike={expired}
       />
 
       {awaitingDeposit && (
@@ -397,7 +486,74 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         </View>
       )}
 
-      <DetailRows rows={rows} />
+      <DetailRows rows={view.rows} />
+
+      {refunding && (
+        <Text variant="bodySmall" tone="muted" style={{ marginTop: space12 }}>
+          {t('swap.late-note').replace(
+            '{provider}',
+            providerLongLabel(record.provider),
+          )}
+        </Text>
+      )}
+
+      {expired && (
+        <View style={{ marginTop: space12, rowGap: space12 }}>
+          <Banner
+            testID="swap.detail.dont-send"
+            tone="warning"
+            title={t('swap.expired-dont-send')}
+          />
+          <View
+            style={{
+              borderWidth: 1,
+              borderColor: colors.bottomSheetBorder,
+              borderRadius: radiusMd,
+              padding: 16,
+              rowGap: space8,
+            }}
+          >
+            <Text variant="bodyStrong">{t('swap.result-already-paid')}</Text>
+            <Text variant="bodySmall" tone="muted">
+              {t('swap.expired-late-refund')
+                .replace('{provider}', providerLongLabel(record.provider))
+                .replace(
+                  '{address}',
+                  Utils.trimToSmall(record.sourceAddress, 5),
+                )}
+            </Text>
+            {lateHashWanted && (
+              <>
+                <Text variant="bodySmall" tone="muted">
+                  {t('swap.result-paste-hash')}
+                </Text>
+                <TextField
+                  testID="swap.detail.late-hash"
+                  label={t('swap.deposit-hash')}
+                  value={hash}
+                  onChangeText={setHash}
+                  placeholder={t('swap.deposit-hash-placeholder')}
+                  mono
+                  error={attachError || undefined}
+                  trailingIcon={ClipboardPasteIcon}
+                  trailingLabel={t('swap.paste')}
+                  onTrailingPress={async () =>
+                    setHash((await Clipboard.getString()).trim())
+                  }
+                />
+                <Button
+                  inline
+                  variant="text"
+                  title={t('swap.deposit-follow')}
+                  disabled={attaching || hash.trim().length === 0}
+                  busy={attaching}
+                  onPress={attach}
+                />
+              </>
+            )}
+          </View>
+        </View>
+      )}
 
       {!!outside.address && !contact && (
         <SaveContactButton

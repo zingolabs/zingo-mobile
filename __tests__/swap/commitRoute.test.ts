@@ -88,8 +88,7 @@ describe('SwapService.commitRoute', () => {
 
 /**
  * The deadline is what ends a deposit that never comes, so the commit has to
- * keep it. The quote's expiry is the provider's own figure; a quote without
- * one gets the window, since a deposit with no end is the bug this guards.
+ * keep it: an internal 24 hours from the payment address, never shown.
  */
 describe('SwapService.commitRoute deposit deadline', () => {
   const commitInbound = (expiresAtMs?: number) => {
@@ -132,16 +131,12 @@ describe('SwapService.commitRoute deposit deadline', () => {
     });
   };
 
-  it('keeps the quote’s expiry as the deposit deadline', async () => {
+  it('waits 24 hours from the commit, whatever the quote’s expiry', async () => {
     const { record } = await commitInbound(1_800_000_000_000);
 
-    expect(record.depositDeadlineMs).toBe(1_800_000_000_000);
-  });
-
-  it('gives a quote without an expiry the window from the commit', async () => {
-    const { record } = await commitInbound(undefined);
-
-    expect(record.depositDeadlineMs).toBe(record.createdAtMs + 15 * 60 * 1000);
+    expect(record.depositDeadlineMs).toBe(
+      record.createdAtMs + 24 * 60 * 60 * 1000,
+    );
   });
 
   it('leaves an outbound swap without a deadline', async () => {

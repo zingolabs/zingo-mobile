@@ -96,13 +96,20 @@ export type SwapRecordType = {
   status: SwapStatusEnum;
   trackingStatus?: TrackingStatusEnum;
   /**
-   * When the provider stops waiting for an inbound deposit, from the quote's
-   * expiry. Once it passes with no deposit seen, the swap expires locally.
-   * Absent on outbound swaps and on records made before it was kept.
+   * When Zingo stops waiting for an inbound deposit: 24 hours after the
+   * payment address was made. Once it passes with no deposit seen, the swap
+   * closes locally as "Deposit not detected". Absent on outbound swaps and on
+   * records made before it was kept.
    */
   depositDeadlineMs?: number;
   /** When the user said the inbound deposit was sent. */
   depositSentAtMs?: number;
+  /**
+   * When the provider first saw a payment on a purchase that had already
+   * expired. The provider cannot swap it and returns it, so until a verdict
+   * arrives the swap reads as refunding.
+   */
+  lateDepositAtMs?: number;
   /** Set when status is `Refunded` (and sometimes `Failed`). */
   refundInfo?: RefundInfoType;
   /** Provider-supplied human-readable error message when `Failed`. */

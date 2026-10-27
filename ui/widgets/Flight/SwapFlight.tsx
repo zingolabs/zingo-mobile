@@ -14,6 +14,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useTheme, iconSizeSm, radiusPill } from '@app/theme';
+import { duration, ease } from '@app/theme/motion';
 import type { SwapAssetType } from '@app/swap';
 import Text from '@ui/primitives/Text';
 import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
@@ -57,14 +58,17 @@ const NODES = [
  * A swap on its way, drawn: the coin you send on the left, the one you get
  * on the right, the provider in the middle, and a token that leaves in the
  * colour of one and arrives in the colour of the other. Selling ZEC, the
- * first leg goes through NYM and lights its mix nodes. 300 x 200, scaled
- * down to `width` when narrower.
+ * first leg goes through NYM and lights its mix nodes. Waiting for a payment
+ * from another wallet, the coin you send breathes on its side and nothing
+ * travels until the provider sees it. 300 x 200, scaled down to `width` when
+ * narrower.
  */
 export default function SwapFlight({
   from,
   to,
   provider,
   nym,
+  waiting = false,
   width = 300,
 }: {
   from: SwapAssetType;
@@ -72,11 +76,14 @@ export default function SwapFlight({
   provider: string;
   /** The first leg goes through the mixnet: selling ZEC. */
   nym: boolean;
+  /** The payment is not seen yet: the coin breathes in place, nothing travels. */
+  waiting?: boolean;
   width?: number;
 }) {
   const { colors } = useTheme();
   const clock = useSharedValue(0);
   const trip = useSharedValue(0);
+  const breath = useSharedValue(0);
   /** ZEC travels in the accent green; the other coin in the text colour. */
   const coinColor = (asset: SwapAssetType) =>
     asset.chain.toUpperCase() === 'ZEC' ? colors.fgAccent : colors.fgDefault;
@@ -84,6 +91,23 @@ export default function SwapFlight({
   const endColor = coinColor(to);
 
   useEffect(() => {
+    if (waiting) {
+      cancelAnimation(clock);
+      cancelAnimation(trip);
+      trip.value = 0;
+      breath.value = withRepeat(
+        withTiming(1, {
+          duration: duration.breathe,
+          easing: ease.standard,
+          reduceMotion: ReduceMotion.System,
+        }),
+        -1,
+        true,
+      );
+      return () => cancelAnimation(breath);
+    }
+    cancelAnimation(breath);
+    breath.value = 0;
     clock.value = withRepeat(
       withTiming(1, {
         duration: TRIP_MS,
@@ -104,12 +128,17 @@ export default function SwapFlight({
       cancelAnimation(clock);
       cancelAnimation(trip);
     };
-  }, [clock, trip]);
+  }, [clock, trip, breath, waiting]);
+
+  const breathing = useAnimatedStyle(() => ({
+    transform: [{ scale: interpolate(breath.value, [0, 1], [1, 1.08]) }],
+    borderColor: interpolateColor(breath.value, [0, 1], [NODE_DIM, startColor]),
+  }));
 
   const token = useAnimatedStyle(() => {
     const p = trip.value;
     return {
-      opacity: interpolate(p, [0, 0.12, 0.86, 1], [0, 1, 1, 0]),
+      opacity: waiting ? 0 : interpolate(p, [0, 0.12, 0.86, 1], [0, 1, 1, 0]),
       backgroundColor: interpolateColor(
         p,
         [0, 0.45, 0.55, 1],
@@ -123,25 +152,29 @@ export default function SwapFlight({
     };
   });
 
-  const coin = (asset: SwapAssetType, left: number) => (
-    <View
-      style={{
-        position: 'absolute',
-        left: left - 5,
-        top: 123,
-        padding: 4,
-        borderRadius: radiusPill,
-        borderWidth: 1,
-        borderColor: NODE_DIM,
-        backgroundColor: colors.bgSurface,
-      }}
+  const coin = (asset: SwapAssetType, left: number, breathes: boolean) => (
+    <Animated.View
+      testID={breathes ? 'swap.flight.waiting' : undefined}
+      style={[
+        {
+          position: 'absolute',
+          left: left - 5,
+          top: 123,
+          padding: 4,
+          borderRadius: radiusPill,
+          borderWidth: 1,
+          borderColor: NODE_DIM,
+          backgroundColor: colors.bgSurface,
+        },
+        breathes ? breathing : null,
+      ]}
     >
       <TokenLogo
         token={tokenEntryOf(asset)}
         size={44}
         surfaceColor={colors.bgSurface}
       />
-    </View>
+    </Animated.View>
   );
 
   const scale = Math.min(1, width / 300);
@@ -188,8 +221,8 @@ export default function SwapFlight({
               <MixNode key={node.at} {...node} clock={clock} />
             ))}
         </Svg>
-        {coin(from, 24)}
-        {coin(to, 232)}
+        {coin(from, 24, waiting)}
+        {coin(to, 232, false)}
         <View
           style={{
             position: 'absolute',

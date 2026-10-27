@@ -8,15 +8,14 @@ import { Route } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import {
   SwapDirectionEnum,
+  SwapStatusEnum,
   awaitsDeposit,
-  depositDeadlineMs,
-  depositHalfwayMs,
   depositPhase,
   formatAmountForDisplay,
+  isRefunding,
   isTerminalStatus,
   providerShortLabel,
 } from '@app/swap';
-import Utils from '@app/utils';
 import { leaveFlow } from '@app/navigation/navigate';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
@@ -24,11 +23,7 @@ import Banner from '@ui/widgets/Banner';
 import SwapFlight from '@ui/widgets/Flight/SwapFlight';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
-import {
-  countdownText,
-  swapStepIndex,
-  swapStepKeys,
-} from '@screens/Swap/swapProgress';
+import { swapStepIndex, swapStepKeys } from '@screens/Swap/swapProgress';
 
 type SwapTrackingProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -38,9 +33,9 @@ type SwapTrackingProps = NativeStackScreenProps<
 /**
  * The swap on its way: the token flies from coin to coin through the
  * provider, and the step the poller has reached is told under it with its
- * dots. Buying ZEC, the first step waits for the payment with the time left
- * and the way back to the slip; past half of it with nothing seen, a warning
- * says what to check. Leaving is free: the poller keeps watching, and the
+ * dots. Buying ZEC, the first step waits for the payment with the way back
+ * to the slip; half an hour on with nothing seen, a warning says what to
+ * check. No time shows. Leaving is free: the poller keeps watching, and the
  * record keeps the place.
  */
 const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
@@ -48,7 +43,7 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
   route,
 }) => {
   const { recordId } = route.params;
-  const { translate, language } = useContext(ContextAppLoaded);
+  const { translate } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const { width } = useWindowDimensions();
   const record = useSwapRecord(recordId);
@@ -60,13 +55,27 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
     if (!awaiting) {
       return;
     }
-    const timer = setInterval(() => setNowMs(Date.now()), 1000);
+    const timer = setInterval(() => setNowMs(Date.now()), 30_000);
     return () => clearInterval(timer);
   }, [awaiting]);
 
+  // An expired swap, or a late payment on its way back, has no result
+  // screen: its detail says why.
   useEffect(() => {
-    if (record && isTerminalStatus(record.status)) {
-      navigation.replace(Route.SwapResult, { recordId });
+    if (!record) {
+      return;
+    }
+    if (isRefunding(record)) {
+      navigation.replace(Route.SwapDetail, { recordId });
+      return;
+    }
+    if (isTerminalStatus(record.status)) {
+      navigation.replace(
+        record.status === SwapStatusEnum.Expired
+          ? Route.SwapDetail
+          : Route.SwapResult,
+        { recordId },
+      );
     }
   }, [record, navigation, recordId]);
 
@@ -86,12 +95,6 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
     record.actualReceiveAmount ?? record.expectedReceiveAmount,
   )} ${symbol(record.receiveAsset)} · ${provider}`;
 
-  const deadlineMs = depositDeadlineMs(record);
-  const pastHalf = nowMs >= depositHalfwayMs(record);
-  const clock = Utils.formatDate(deadlineMs, 'h:mm aaa', language);
-  const timeLeft = t('swap.tracking-time-left')
-    .replace('{time}', countdownText(deadlineMs - nowMs))
-    .replace('{clock}', clock);
   const notDetected = depositPhase(record, nowMs) === 'notDetected';
 
   return (
@@ -133,6 +136,7 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
           to={record.receiveAsset}
           provider={provider}
           nym={isOutbound}
+          waiting={awaiting}
           width={width - space20 * 2}
         />
         <Text
@@ -156,20 +160,6 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
         >
           {line}
         </Text>
-        {awaiting && (
-          <Text
-            testID="swap.tracking.time"
-            variant="caption"
-            tone={pastHalf ? 'warning' : 'muted'}
-            style={{
-              marginTop: 4,
-              textAlign: 'center',
-              fontVariant: ['tabular-nums'],
-            }}
-          >
-            {timeLeft}
-          </Text>
-        )}
         <View
           testID="swap.tracking.steps"
           style={{ flexDirection: 'row', columnGap: 8, marginTop: 20 }}
@@ -203,8 +193,7 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
                   '{amount}',
                   formatAmountForDisplay(record.sellAmountHumanDecimal),
                 )
-                .replace('{coin}', symbol(record.sellAsset))
-                .replace('{clock}', clock)}
+                .replace('{coin}', symbol(record.sellAsset))}
             </Banner>
           </View>
         )}
