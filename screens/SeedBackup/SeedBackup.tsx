@@ -28,7 +28,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { useTheme, iconSizeMd } from '@app/theme';
+import { useTheme, iconSizeMd, radiusPill } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { SnackbarDurationEnum } from '@app/AppState';
@@ -526,7 +526,7 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
                   style={({ pressed }) => ({
                     width: 44,
                     height: 44,
-                    borderRadius: 12,
+                    borderRadius: radiusPill,
                     alignItems: 'center',
                     justifyContent: 'center',
                     backgroundColor: pressed ? colors.bgMutedSubtle : undefined,

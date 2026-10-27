@@ -1,7 +1,7 @@
 /* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import Animated, {
   Keyframe,
   ReduceMotion,
@@ -13,6 +13,7 @@ import Animated, {
 import Svg, { Path } from 'react-native-svg';
 
 import { useTheme } from '@app/theme';
+import Text from '@ui/primitives/Text';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { formatInteger } from '@app/utils/formatAmount';
@@ -159,14 +160,7 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
             </Animated.View>
           </Animated.View>
         </View>
-        <Text
-          style={{
-            flex: 1,
-            color: colors.fgMuted,
-            fontSize: 13,
-            lineHeight: 18,
-          }}
-        >
+        <Text variant="bodySmall" tone="muted" style={{ flex: 1 }}>
           {translate('seedbackup.paper') as string}
         </Text>
       </Pressable>
