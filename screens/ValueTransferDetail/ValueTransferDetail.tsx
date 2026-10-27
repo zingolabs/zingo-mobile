@@ -30,6 +30,7 @@ import Utils from '@app/utils';
 import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { transferStatus } from '@app/utils/transferStatus';
 import { removeTransaction } from '@app/walletBackend';
 import { createAlert } from '@app/services/createAlert';
 import { showConfirm } from '@app/services/showConfirm';
@@ -149,27 +150,7 @@ const ValueTransferDetail: React.FunctionComponent<
     return <Avatar kind="icon" icon={icon} danger={failed} size="lg" />;
   })();
 
-  const status = failed
-    ? {
-        text: t('history.state-failed'),
-        tone: 'danger' as const,
-      }
-    : vt.confirmations === 0
-      ? {
-          text: t('history.in-mempool'),
-          tone: 'warning' as const,
-        }
-      : pending
-        ? {
-            text: t('history.confirming')
-              .replace('{n}', String(vt.confirmations))
-              .replace('{of}', String(GlobalConst.minConfirmations)),
-            tone: 'warning' as const,
-          }
-        : {
-            text: t('swap.tx-confirmed'),
-            tone: 'accent' as const,
-          };
+  const status = transferStatus(vt, t);
 
   const quote = fiatQuote(zecPrice, server, info.chainName);
   const todayUsd =

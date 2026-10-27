@@ -869,7 +869,6 @@
     "tx-confirmations": "Confirmações",
     "tx-id": "ID da transação",
     "tx-confirmed": "Confirmada",
-    "tx-pending": "Pendente",
     "tx-dont-send": "Não envie mais ZEC para este endereço.",
     "auth-title": "Autorize o depósito",
     "auth-use": "Usar digital",

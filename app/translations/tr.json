@@ -869,7 +869,6 @@
     "tx-confirmations": "Onaylar",
     "tx-id": "İşlem kimliği",
     "tx-confirmed": "Onaylandı",
-    "tx-pending": "Bekliyor",
     "tx-dont-send": "Bu adrese daha fazla ZEC göndermeyin.",
     "auth-title": "Depozitoyu onaylayın",
     "auth-use": "Parmak izini kullan",

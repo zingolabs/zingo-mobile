@@ -14,6 +14,7 @@ import { Route, ValueTransferKindEnum } from '@app/AppState';
 import { ContextAppLoaded, useSwapRecords } from '@app/context';
 import { fiatQuote } from '@app/price/fiatQuote';
 import Utils from '@app/utils';
+import { transferStatus } from '@app/utils/transferStatus';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import Banner from '@ui/widgets/Banner';
@@ -79,7 +80,7 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
         ? quote.price
         : 0;
   const role = legRole(leg, record, t);
-  const confirmed = leg.confirmations > 0;
+  const status = transferStatus(leg, t);
   const rows: DetailRow[] = [
     {
       label: t('swap.detail-date'),
@@ -162,8 +163,8 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
         unit={info.currencyName}
         tone={received ? 'positive' : 'default'}
         line={price > 0 ? `≈ ${formatUsd(leg.amount * price)}` : ''}
-        pill={t(confirmed ? 'swap.tx-confirmed' : 'swap.tx-pending')}
-        pillTone={confirmed ? 'accent' : 'warning'}
+        pill={status.text}
+        pillTone={status.tone}
       />
       <DetailRows rows={rows} />
       <Text variant="caption" tone="muted" style={{ marginTop: space12 }}>
