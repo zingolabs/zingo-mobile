@@ -59,9 +59,3 @@ export function swapOutcome(status: SwapStatusEnum): SwapOutcome {
       return 'inFlight';
   }
 }
-
-/** `m:ss` of what is left, never below zero. */
-export function countdownText(remainingMs: number): string {
-  const seconds = Math.max(0, Math.ceil(remainingMs / 1000));
-  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
-}

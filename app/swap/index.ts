@@ -22,6 +22,7 @@ export { canRemoveSwap } from './canRemoveSwap';
 export { hasDepositEvidence } from './depositEvidence';
 export { newlyExpired, newlyRefunding } from './swapTransitions';
 export { prefillFromRecord } from './swapPrefill';
+export { NEAR_NO_REFUND_USD, nearRefusesSmallRefunds } from './nearSmallSwap';
 export type { SwapPrefillType } from './types/SwapPrefillType';
 export {
   LATE_WATCH_MS,
@@ -31,12 +32,13 @@ export {
 } from './lateDeposit';
 export { isThorchainFamily } from './thorchainFamily';
 export {
-  DEPOSIT_WINDOW_MS,
+  DEPOSIT_WAIT_MS,
+  DEPOSIT_WARN_AFTER_MS,
   awaitsDeposit,
   depositDeadlineMs,
-  depositHalfwayMs,
   depositOverdue,
   depositPhase,
+  depositWarnAtMs,
 } from './depositDeadline';
 export type { DepositPhase } from './depositDeadline';
 
