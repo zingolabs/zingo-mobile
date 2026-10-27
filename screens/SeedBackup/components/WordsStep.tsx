@@ -1,68 +1,13 @@
-/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
-import { Pressable, View } from 'react-native';
-import Animated, {
-  Keyframe,
-  ReduceMotion,
-  useAnimatedProps,
-  useSharedValue,
-  withDelay,
-  withTiming,
-} from 'react-native-reanimated';
-import Svg, { Path } from 'react-native-svg';
+import React, { useContext, useState } from 'react';
+import { View } from 'react-native';
 
-import { useTheme } from '@app/theme';
-import Text from '@ui/primitives/Text';
-import { ease } from '@app/theme/motion';
+import { space12, space16 } from '@app/theme';
+import Checkbox from '@ui/primitives/Checkbox';
 import { ContextAppLoaded } from '@app/context';
 import { formatInteger } from '@app/utils/formatAmount';
 import { SIDE, StepTitle } from './StepParts';
-import { CopyShowButtons, InfoRow, VEIL_MS, WordGrid } from './SeedParts';
-
-// Length of the tick path below, in viewBox units.
-const TICK_LENGTH = 21.3;
-
-const boxPop = () =>
-  new Keyframe({
-    0: { transform: [{ scale: 0.8 }] },
-    100: { transform: [{ scale: 1 }], easing: ease.spring },
-  })
-    .duration(VEIL_MS)
-    .reduceMotion(ReduceMotion.System);
-
-const AnimatedPath = Animated.createAnimatedComponent(Path);
-
-// The checkbox tick, drawn in as the box fills.
-const DrawnTick: React.FunctionComponent<{ color: string }> = ({ color }) => {
-  const drawn = useSharedValue(0);
-  useEffect(() => {
-    drawn.value = withDelay(
-      40,
-      withTiming(1, {
-        duration: 200,
-        easing: ease.out,
-        reduceMotion: ReduceMotion.System,
-      }),
-    );
-  }, [drawn]);
-  const stroke = useAnimatedProps(() => ({
-    strokeDashoffset: TICK_LENGTH * (1 - drawn.value),
-  }));
-  return (
-    <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
-      <AnimatedPath
-        d="M5 12.5 10 17.5 19.5 7"
-        stroke={color}
-        strokeWidth={3.6}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeDasharray={TICK_LENGTH}
-        animatedProps={stroke}
-      />
-    </Svg>
-  );
-};
+import { CopyShowButtons, InfoRow, WordGrid } from './SeedParts';
 
 type WordsStepProps = {
   words: string[];
@@ -89,10 +34,7 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
   onCheck,
 }) => {
   const { translate } = useContext(ContextAppLoaded);
-  const { colors } = useTheme();
   const [tipOpen, setTipOpen] = useState(false);
-  // The box pops as feedback to a tap, not when the step mounts checked.
-  const [tapped, setTapped] = useState(false);
 
   return (
     <View onTouchStart={() => tipOpen && setTipOpen(false)}>
@@ -101,7 +43,7 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
         sub={translate('seedbackup.words-sub') as string}
       />
       <WordGrid testID="seedbackup.words" words={words} veiled={veiled} />
-      <View style={{ marginTop: 12, zIndex: 2 }}>
+      <View style={{ marginTop: space12, zIndex: 2 }}>
         <InfoRow
           testID="seedbackup.birthday"
           label={translate('seedbackup.birthday') as string}
@@ -112,7 +54,7 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
           value={formatInteger(birthday)}
         />
       </View>
-      <View style={{ marginTop: 12 }}>
+      <View style={{ marginTop: space12 }}>
         <CopyShowButtons
           testID="seedbackup"
           hidden={hidden}
@@ -120,50 +62,14 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
           onCopy={onCopy}
         />
       </View>
-      <Pressable
-        testID="seedbackup.check"
-        accessibilityRole="checkbox"
-        accessibilityState={{ checked }}
-        onPress={() => {
-          setTapped(true);
-          onCheck();
-        }}
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 8,
-          marginHorizontal: SIDE,
-          marginTop: 22,
-          paddingVertical: 4,
-        }}
-      >
-        <View style={{ width: 17, height: 17 }}>
-          <Animated.View
-            key={checked ? 'on' : 'off'}
-            entering={checked && tapped ? boxPop() : undefined}
-          >
-            <Animated.View
-              style={[
-                {
-                  width: 17,
-                  height: 17,
-                  borderRadius: 4,
-                  borderWidth: 1.5,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: checked ? colors.bgAccent : colors.bgSurface,
-                },
-                { borderColor: checked ? colors.bgAccent : colors.borderMuted },
-              ]}
-            >
-              {checked && <DrawnTick color={colors.fgOnAccent} />}
-            </Animated.View>
-          </Animated.View>
-        </View>
-        <Text variant="bodySmall" tone="muted" style={{ flex: 1 }}>
-          {translate('seedbackup.paper') as string}
-        </Text>
-      </Pressable>
+      <View style={{ marginHorizontal: SIDE, marginTop: space16 }}>
+        <Checkbox
+          testID="seedbackup.check"
+          checked={checked}
+          onChange={onCheck}
+          label={translate('seedbackup.paper') as string}
+        />
+      </View>
     </View>
   );
 };
