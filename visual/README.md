@@ -70,6 +70,14 @@ The tool captures each story from `storybook-static/index.json`:
 You write the state variants (disabled, error, and each theme) as separate
 stories with args. Each variant becomes its own baseline.
 
+## Looping stories
+
+A story that loops forever as part of its picture (the swap flight) takes the
+`loops` tag. The capture loads it under reduced motion, as it does for
+`static` stories, so every loop settles on its end frame and the screenshot is
+the same on every run. Without it the fake clock still lands the loop on a
+different frame each time, and the gate flags a change nobody made.
+
 ## Animated stories
 
 A story with the `animated` tag (`tags: ['animated']`) does not get a pixel
