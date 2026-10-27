@@ -463,10 +463,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
               }}
             >
               {!!pending && (
-                <Card
-                  testID="swap.pending"
-                  onPress={() => openRecord(pending)}
-                >
+                <Card testID="swap.pending" onPress={() => openRecord(pending)}>
                   <View
                     style={{
                       flexDirection: 'row',
