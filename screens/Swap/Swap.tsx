@@ -644,7 +644,10 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                       <Text
                         variant="caption"
                         tone="danger"
-                        style={{ fontWeight: '700' }}
+                        style={{
+                          fontWeight: '700',
+                          textDecorationLine: 'underline',
+                        }}
                       >
                         {translate('swap.see-why') as string}
                       </Text>
@@ -662,7 +665,11 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                       paddingHorizontal: 4,
                     }}
                   >
-                    <Text variant="caption" tone="muted" style={{ flex: 1 }}>
+                    <Text
+                      variant="bodySmall"
+                      tone="muted"
+                      style={{ flex: 1, fontWeight: '600' }}
+                    >
                       {translate('swap.provider') as string}
                     </Text>
                     {form.chosenRoute ? (
@@ -678,7 +685,13 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                           hitSlop={8}
                           style={{ minHeight: 32, justifyContent: 'center' }}
                         >
-                          <Text variant="caption" style={{ fontWeight: '700' }}>
+                          <Text
+                            variant="bodySmall"
+                            style={{
+                              fontWeight: '600',
+                              textDecorationLine: 'underline',
+                            }}
+                          >
                             {providerShortLabel(form.chosenRoute.provider)}
                           </Text>
                         </Pressable>
@@ -889,7 +902,10 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                           <Text
                             variant="caption"
                             tone="warning"
-                            style={{ fontWeight: '700' }}
+                            style={{
+                              fontWeight: '700',
+                              textDecorationLine: 'underline',
+                            }}
                           >
                             {translate('swap.see-why') as string}
                           </Text>
