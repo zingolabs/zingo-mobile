@@ -9,7 +9,7 @@ import React, {
 import { View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { space12, space16, space8, useTheme, iconSizeSm } from '@app/theme';
+import { space12, space16, space8, useTheme } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import { Route } from '@app/AppState';
 import { ContextAppLoaded, useSwapService } from '@app/context';
@@ -17,6 +17,7 @@ import {
   SwapDirectionEnum,
   SwapStatusEnum,
   depositDeadlineMs,
+  isRefunding,
   isTerminalStatus,
 } from '@app/swap';
 import { leaveFlow } from '@app/navigation/navigate';
@@ -26,11 +27,9 @@ import ButtonStack from '@ui/primitives/ButtonStack';
 import TextField from '@ui/primitives/TextField';
 import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 import Banner from '@ui/widgets/Banner';
-import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import DepositSlip from '@screens/Swap/components/DepositSlip';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
-import { countdownText } from '@screens/Swap/swapProgress';
 
 type SwapDepositProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -43,8 +42,10 @@ const AFTER_DESHIELD = 'send after deshield';
 /**
  * The deposit a swap waits for. Buying ZEC, it is paid from the other wallet:
  * the slip says where, how much and with what memo, and the user says when
- * it is sent or hands over its hash. Selling ZEC, this screen appears only
- * when the wallet's own broadcast failed, with the way to try again.
+ * it is sent. Opened again from the tracking, the slip is read-only and the
+ * arrow goes back there. No time shows. Selling
+ * ZEC, this screen appears only when the wallet's own broadcast failed, with
+ * the way to try again.
  */
 const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   navigation,
@@ -65,7 +66,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   const [retrying, setRetrying] = useState<boolean>(false);
 
   useEffect(() => {
-    const timer = setInterval(() => setNowMs(Date.now()), 1000);
+    const timer = setInterval(() => setNowMs(Date.now()), 30_000);
     return () => clearInterval(timer);
   }, []);
 
@@ -83,11 +84,19 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
       return;
     }
     if (isTerminalStatus(record.status)) {
-      navigation.replace(Route.SwapResult, { recordId });
+      navigation.replace(
+        record.status === SwapStatusEnum.Expired
+          ? Route.SwapDetail
+          : Route.SwapResult,
+        { recordId },
+      );
       return;
     }
     if (!isOutbound && !awaiting) {
-      navigation.replace(Route.SwapTracking, { recordId });
+      navigation.replace(
+        isRefunding(record) ? Route.SwapDetail : Route.SwapTracking,
+        { recordId },
+      );
       return;
     }
     if (awaiting && remainingMs <= 0 && swapService && !expiryAsked.current) {
@@ -253,42 +262,42 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
     );
   }
 
+  const toTracking = () => navigation.replace(Route.SwapTracking, { recordId });
+  const sent = record.depositSentAtMs !== undefined;
+
   return (
     <SwapFlowScreen
       testID="swap.deposit"
       title={translate('swap.deposit-title') as string}
+      onBack={sent ? toTracking : undefined}
       footer={
-        <View style={{ rowGap: space8 }}>
-          <Button
-            testID="swap.deposit.sent"
-            variant="primary"
-            title={translate('swap.deposit-sent') as string}
-            onPress={() => navigation.replace(Route.SwapTracking, { recordId })}
-          />
-          <Text variant="caption" tone="muted" style={{ textAlign: 'center' }}>
-            {translate('swap.deposit-leave-note') as string}
-          </Text>
-        </View>
+        sent ? undefined : (
+          <View style={{ rowGap: space8 }}>
+            <Button
+              testID="swap.deposit.sent"
+              variant="primary"
+              title={translate('swap.deposit-sent') as string}
+              onPress={async () => {
+                await swapService
+                  ?.markDepositSent({ recordId })
+                  .catch(e =>
+                    console.log(`SwapDeposit: markDepositSent failed ${e}`),
+                  );
+                toTracking();
+              }}
+            />
+            <Text
+              variant="caption"
+              tone="muted"
+              style={{ textAlign: 'center' }}
+            >
+              {translate('swap.deposit-leave-note') as string}
+            </Text>
+          </View>
+        )
       }
     >
       <DepositSlip record={record} />
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          columnGap: 8,
-          marginTop: 16,
-        }}
-      >
-        <ClockIcon size={iconSizeSm} color={colors.fgMuted} />
-        <Text variant="caption" tone="muted" style={{ flexShrink: 1 }}>
-          {(translate('swap.deposit-time-left') as string).replace(
-            '{time}',
-            countdownText(remainingMs),
-          )}
-        </Text>
-      </View>
     </SwapFlowScreen>
   );
 };

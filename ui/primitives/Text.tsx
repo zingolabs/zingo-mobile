@@ -27,6 +27,8 @@ export type TextProps = Omit<RNTextProps, 'style'> & {
   tone?: TextTone;
   /** Wins over `tone`; for the rare color no tone names yet. */
   color?: string;
+  /** Struck through: an amount or an address that is no longer good. */
+  strike?: boolean;
   style?: StyleProp<TextStyle>;
 };
 
@@ -34,6 +36,7 @@ const Text: React.FunctionComponent<TextProps> = ({
   variant = 'body',
   tone = 'default',
   color,
+  strike = false,
   style,
   ...rest
 }) => {
@@ -57,6 +60,7 @@ const Text: React.FunctionComponent<TextProps> = ({
     /** A caller that sets its own size keeps RN's line height, so it never clips. */
     ...(own.fontSize === undefined ? { lineHeight: v.lineHeight } : {}),
     ...(v.mono ? { fontFamily: monoFamily } : {}),
+    ...(strike ? { textDecorationLine: 'line-through' as const } : {}),
     ...own,
   };
 

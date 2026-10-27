@@ -245,3 +245,75 @@ test('Tests that a finished sale is titled with the contact name when its addres
   expect(text.title).toBe('Marta');
   expect(text.line).toBe('history.swapped-to BTC · MayaChain · Oct 2');
 });
+
+test('Tests that a purchase whose payment the provider saw reads payment detected while a sale in flight reads swapping', () => {
+  const seen = swapRowText({
+    record: record({
+      direction: SwapDirectionEnum.Inbound,
+      status: SwapStatusEnum.Pending,
+    }),
+    when: 'Oct 2',
+    t,
+  });
+  expect(seen.state?.text).toBe('history.state-payment-detected');
+
+  const sale = swapRowText({
+    record: record({ status: SwapStatusEnum.Pending }),
+    when: 'Oct 2',
+    t,
+  });
+  expect(sale.state?.text).toBe('history.state-swapping');
+});
+
+test('Tests that a purchase whose deposit was not detected reads grey with the ZEC it would have got struck through and the coin not sent under it', () => {
+  const text = swapRowText({
+    record: record({
+      direction: SwapDirectionEnum.Inbound,
+      status: SwapStatusEnum.Expired,
+      sellAsset: {
+        swapKitId: 'BTC.BTC',
+        chain: 'BTC',
+        symbol: 'BTC',
+        ticker: 'BTC',
+        chainId: 'bitcoin',
+        decimals: 8,
+      },
+      receiveAsset: {
+        swapKitId: 'ZEC.ZEC',
+        chain: 'ZEC',
+        symbol: 'ZEC',
+        ticker: 'ZEC',
+        chainId: 'zcash',
+        decimals: 8,
+      },
+      sellAmountHumanDecimal: '0.03',
+      expectedReceiveAmount: '12.5',
+    }),
+    when: 'Oct 2',
+    t,
+  });
+  expect(text.state).toEqual({ text: 'history.state-expired', tone: 'muted' });
+  expect(text.top).toBe('+12.5 ZEC');
+  expect(text.topTone).toBe('muted');
+  expect(text.topStrike).toBe(true);
+  expect(text.bottom).toBe('history.swap-not-sent');
+});
+
+test('Tests that a purchase paid after its quote expired reads refunding in amber with the coin going back', () => {
+  const text = swapRowText({
+    record: record({
+      direction: SwapDirectionEnum.Inbound,
+      status: SwapStatusEnum.Pending,
+      lateDepositAtMs: 1,
+      observedDepositTxHash: 'ab'.repeat(32),
+    }),
+    when: 'Oct 2',
+    t,
+  });
+  expect(text.state).toEqual({
+    text: 'history.state-refunding',
+    tone: 'warning',
+  });
+  expect(text.top).toBe('1.5 ZEC');
+  expect(text.bottom).toBe('history.going-back');
+});

@@ -20,12 +20,27 @@ export {
 export { TrackingStatusEnum } from './enums/TrackingStatusEnum';
 export { canRemoveSwap } from './canRemoveSwap';
 export { hasDepositEvidence } from './depositEvidence';
+export { newlyExpired, newlyRefunding } from './swapTransitions';
+export { prefillFromRecord } from './swapPrefill';
+export { NEAR_NO_REFUND_USD, nearRefusesSmallRefunds } from './nearSmallSwap';
+export type { SwapPrefillType } from './types/SwapPrefillType';
 export {
-  DEPOSIT_WINDOW_MS,
+  LATE_WATCH_MS,
+  acceptsLateUpdate,
+  isRefunding,
+  watchesLateDeposit,
+} from './lateDeposit';
+export { isThorchainFamily } from './thorchainFamily';
+export {
+  DEPOSIT_WAIT_MS,
+  DEPOSIT_WARN_AFTER_MS,
   awaitsDeposit,
   depositDeadlineMs,
   depositOverdue,
+  depositPhase,
+  depositWarnAtMs,
 } from './depositDeadline';
+export type { DepositPhase } from './depositDeadline';
 
 export type { DepositInstructionsType } from './types/DepositInstructionsType';
 export type { FiatValueBasisType } from './types/FiatValueBasisType';

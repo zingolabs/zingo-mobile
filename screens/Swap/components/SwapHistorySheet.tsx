@@ -7,6 +7,7 @@ import { ContextAppLoaded } from '@app/context';
 import {
   SwapStatusEnum,
   formatAmountForDisplay,
+  isRefunding,
   isTerminalStatus,
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
@@ -14,13 +15,17 @@ import AppSheetModal from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
 import ListRow from '@ui/primitives/ListRow';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
+import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
 import { RefreshIcon } from '@ui/primitives/Icons/RefreshIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { formatInteger } from '@app/utils/formatAmount';
+import { pendingSwapLabel } from '@screens/Swap/pendingSwapLabel';
 import SheetTitle from './SheetTitle';
 
 type SwapHistorySheetProps = {
   records: SwapRecordType[];
+  /** The clock the time left on an awaited deposit reads from. */
+  nowMs: number;
   /** Opens a swap where it stands: its deposit, its tracking or its detail. */
   onOpen: (record: SwapRecordType) => void;
 };
@@ -62,7 +67,7 @@ function daysAgo(
 
 /** The wallet's swaps, the ones in flight first. */
 const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
-  ({ records, onOpen }, ref) => {
+  ({ records, nowMs, onOpen }, ref) => {
     const { translate } = useContext(ContextAppLoaded);
     const t = (key: string) => translate(key) as string;
     const { colors } = useTheme();
@@ -113,8 +118,16 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
             ),
             live: false,
           };
-        case SwapStatusEnum.Failed:
         case SwapStatusEnum.Expired:
+          return {
+            label: t('swap.history-expired'),
+            icon: tile(
+              <ClockIcon size={iconSizeMd} color={colors.fgMuted} />,
+              colors.bgMutedSubtle,
+            ),
+            live: false,
+          };
+        case SwapStatusEnum.Failed:
           return {
             label: t('swap.history-failed'),
             icon: tile(
@@ -124,12 +137,18 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
             live: false,
           };
         default:
+          if (isRefunding(record)) {
+            return {
+              label: t('swap.history-refunding'),
+              icon: tile(
+                <RefreshIcon size={iconSizeMd} color={colors.fgWarning} />,
+                colors.bgWarningSubtle,
+              ),
+              live: false,
+            };
+          }
           return {
-            label: t(
-              record.status === SwapStatusEnum.AwaitingExternalDeposit
-                ? 'swap.pending-waiting'
-                : 'swap.pending-swapping',
-            ),
+            label: pendingSwapLabel(record, nowMs, t).text,
             icon: tile(
               <ActivityIndicator size="small" color={colors.fgMuted} />,
               colors.bgWarningSubtle,
@@ -138,8 +157,6 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
           };
       }
     };
-    const nowMs = Date.now();
-
     return (
       <AppSheetModal
         ref={ref}

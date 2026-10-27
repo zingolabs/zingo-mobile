@@ -5,6 +5,7 @@ import {
   SwapDirectionEnum,
   SwapStatusEnum,
   formatAmountForDisplay,
+  isRefunding,
   providerShortLabel,
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
@@ -14,8 +15,11 @@ type Translate = (key: string) => string;
 
 /** How a row's figures are coloured: arriving value in green, failure muted. */
 export type RowTone = 'default' | 'positive' | 'muted';
-/** A state word before the date: in flight, refunded in amber, failed in red. */
-export type RowState = { text: string; tone: 'default' | 'warning' | 'danger' };
+/** A state word before the date: in flight, refunded in amber, failed in red, expired in grey. */
+export type RowState = {
+  text: string;
+  tone: 'default' | 'warning' | 'danger' | 'muted';
+};
 
 export type RowText = {
   title: string;
@@ -27,6 +31,8 @@ export type RowText = {
   lineAmount?: string;
   top: string;
   topTone: RowTone;
+  /** The top amount struck through: what an expired swap would have got. */
+  topStrike?: boolean;
   bottom: string;
 };
 
@@ -189,24 +195,36 @@ export function swapRowText(args: {
             : '',
       };
     }
-    case SwapStatusEnum.Failed:
     case SwapStatusEnum.Expired:
       return {
         ...base,
         title: toward,
-        state: {
-          text: t(
-            record.status === SwapStatusEnum.Expired
-              ? 'history.state-expired'
-              : 'history.state-failed',
-          ),
-          tone: 'danger',
-        },
+        state: { text: t('history.state-expired'), tone: 'muted' },
+        top: `+${got} ${getSym}`,
+        topTone: 'muted',
+        topStrike: true,
+        bottom: t('history.swap-not-sent').replace('{amount}', sold),
+      };
+    case SwapStatusEnum.Failed:
+      return {
+        ...base,
+        title: toward,
+        state: { text: t('history.state-failed'), tone: 'danger' },
         top: sold,
         topTone: 'muted',
         bottom: '',
       };
     default:
+      if (isRefunding(record)) {
+        return {
+          ...base,
+          title: toward,
+          state: { text: t('history.state-refunding'), tone: 'warning' },
+          top: sold,
+          topTone: 'default',
+          bottom: t('history.going-back'),
+        };
+      }
       return {
         ...base,
         title: toward,
@@ -215,7 +233,9 @@ export function swapRowText(args: {
             record.status === SwapStatusEnum.AwaitingExternalDeposit ||
               record.status === SwapStatusEnum.PendingDeposit
               ? 'history.state-awaiting-deposit'
-              : 'history.state-swapping',
+              : !sell && record.status === SwapStatusEnum.Pending
+                ? 'history.state-payment-detected'
+                : 'history.state-swapping',
           ),
           tone: 'warning',
         },

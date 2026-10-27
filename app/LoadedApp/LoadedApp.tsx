@@ -79,6 +79,7 @@ import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
 import { AppTheme } from '@app/theme';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
+import SwapExpiryNotice from '@screens/Swap/components/SwapExpiryNotice';
 import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
 import { ContextAppLoadedProvider, SwapServiceProvider } from '@app/context';
 import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
@@ -2097,6 +2098,7 @@ export class LoadedAppClass extends Component<
         <ContextAppLoadedProvider value={context}>
           <SwapServiceProvider chainName={this.state.walletChainName}>
             <PriceTrafficDriver />
+            <SwapExpiryNotice />
             <GestureHandlerRootView>
               <BottomSheetModalProvider>
                 <BottomSheetBackHandler />

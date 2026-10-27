@@ -92,7 +92,7 @@ function SwapLine({
       testID={`swap-${index + 1}`}
       accessibilityRole="button"
       onPress={() =>
-        navigation.navigate(swapScreenFor(record.status), {
+        navigation.navigate(swapScreenFor(record), {
           recordId: record.recordId,
         })
       }

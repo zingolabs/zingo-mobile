@@ -32,6 +32,8 @@ export const duration = {
   noticeLeave: 900,
   /** A row that just arrived glows, then settles. */
   fresh: 1600,
+  /** One breath of a coin waiting to be paid, in and out. */
+  breathe: 1600,
 } as const;
 
 export const ease = {

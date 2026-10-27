@@ -1,24 +1,29 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { space16, space20, useTheme, radiusPill } from '@app/theme';
+import { space16, space20, useTheme, radiusPill, space8 } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import { Route } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import {
   SwapDirectionEnum,
+  SwapStatusEnum,
+  awaitsDeposit,
+  depositPhase,
   formatAmountForDisplay,
+  isRefunding,
   isTerminalStatus,
   providerShortLabel,
 } from '@app/swap';
 import { leaveFlow } from '@app/navigation/navigate';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
+import Banner from '@ui/widgets/Banner';
 import SwapFlight from '@ui/widgets/Flight/SwapFlight';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
-import { SWAP_STEP_COUNT, swapStepIndex } from '@screens/Swap/swapProgress';
+import { swapStepIndex, swapStepKeys } from '@screens/Swap/swapProgress';
 
 type SwapTrackingProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -28,8 +33,10 @@ type SwapTrackingProps = NativeStackScreenProps<
 /**
  * The swap on its way: the token flies from coin to coin through the
  * provider, and the step the poller has reached is told under it with its
- * dots. Leaving is free: the poller keeps watching, and the record keeps the
- * place.
+ * dots. Buying ZEC, the first step waits for the payment with the way back
+ * to the slip; half an hour on with nothing seen, a warning says what to
+ * check. No time shows. Leaving is free: the poller keeps watching, and the
+ * record keeps the place.
  */
 const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
   navigation,
@@ -40,10 +47,35 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
   const { colors } = useTheme();
   const { width } = useWindowDimensions();
   const record = useSwapRecord(recordId);
+  const t = (key: string) => translate(key) as string;
 
+  const [nowMs, setNowMs] = useState<number>(() => Date.now());
+  const awaiting = !!record && awaitsDeposit(record);
   useEffect(() => {
-    if (record && isTerminalStatus(record.status)) {
-      navigation.replace(Route.SwapResult, { recordId });
+    if (!awaiting) {
+      return;
+    }
+    const timer = setInterval(() => setNowMs(Date.now()), 30_000);
+    return () => clearInterval(timer);
+  }, [awaiting]);
+
+  // An expired swap, or a late payment on its way back, has no result
+  // screen: its detail says why.
+  useEffect(() => {
+    if (!record) {
+      return;
+    }
+    if (isRefunding(record)) {
+      navigation.replace(Route.SwapDetail, { recordId });
+      return;
+    }
+    if (isTerminalStatus(record.status)) {
+      navigation.replace(
+        record.status === SwapStatusEnum.Expired
+          ? Route.SwapDetail
+          : Route.SwapResult,
+        { recordId },
+      );
     }
   }, [record, navigation, recordId]);
 
@@ -52,10 +84,8 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
   }
 
   const isOutbound = record.direction === SwapDirectionEnum.Outbound;
-  const steps = isOutbound
-    ? ['swap.step-sell-1', 'swap.step-sell-2', 'swap.step-sell-3']
-    : ['swap.step-buy-1', 'swap.step-buy-2', 'swap.step-buy-3'];
-  const current = Math.min(swapStepIndex(record.status), SWAP_STEP_COUNT - 1);
+  const steps = swapStepKeys(record.direction);
+  const current = Math.min(swapStepIndex(record), steps.length - 1);
   const symbol = (asset: typeof record.sellAsset) =>
     asset.ticker ?? asset.symbol;
   const provider = providerShortLabel(record.provider);
@@ -65,25 +95,37 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
     record.actualReceiveAmount ?? record.expectedReceiveAmount,
   )} ${symbol(record.receiveAsset)} · ${provider}`;
 
+  const notDetected = depositPhase(record, nowMs) === 'notDetected';
+
   return (
     <SwapFlowScreen
       testID="swap.tracking"
       title=""
       center
       footer={
-        <View>
+        <View style={{ rowGap: space8 }}>
           <Button
             testID="swap.tracking.leave"
             variant="primary"
-            title={translate('swap.back-to-zingo') as string}
+            title={t('swap.back-to-zingo')}
             onPress={() => leaveFlow(navigation)}
           />
+          {awaiting && (
+            <Button
+              testID="swap.tracking.details"
+              variant="text"
+              title={t('swap.show-payment-details')}
+              onPress={() =>
+                navigation.replace(Route.SwapDeposit, { recordId })
+              }
+            />
+          )}
           <Text
             variant="caption"
             tone="muted"
-            style={{ textAlign: 'center', marginTop: space16 }}
+            style={{ textAlign: 'center', marginTop: space8 }}
           >
-            {translate('swap.tracking-background') as string}
+            {t('swap.tracking-background')}
           </Text>
         </View>
       }
@@ -94,6 +136,7 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
           to={record.receiveAsset}
           provider={provider}
           nym={isOutbound}
+          waiting={awaiting}
           width={width - space20 * 2}
         />
         <Text
@@ -104,7 +147,7 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
             textAlign: 'center',
           }}
         >
-          {translate(steps[current]) as string}
+          {t(steps[current])}
         </Text>
         <Text
           variant="bodySmall"
@@ -138,6 +181,22 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
             />
           ))}
         </View>
+        {notDetected && (
+          <View style={{ alignSelf: 'stretch', marginTop: space16 + 8 }}>
+            <Banner
+              testID="swap.tracking.not-detected"
+              tone="warning"
+              title={t('swap.not-detected-title')}
+            >
+              {t('swap.not-detected-body')
+                .replace(
+                  '{amount}',
+                  formatAmountForDisplay(record.sellAmountHumanDecimal),
+                )
+                .replace('{coin}', symbol(record.sellAsset))}
+            </Banner>
+          </View>
+        )}
       </View>
     </SwapFlowScreen>
   );
