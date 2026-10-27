@@ -25,7 +25,7 @@ import DetailRows from '@screens/Swap/components/DetailRows';
 import type { DetailRow } from '@screens/Swap/components/DetailRows';
 import ShieldNote from '@screens/Swap/components/ShieldNote';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
-import { legName, legRole } from '@screens/Swap/swapLegs';
+import { legName, legRole, legsOf } from '@screens/Swap/swapLegs';
 
 type SwapTransactionProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -54,9 +54,9 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
     blockExplorer,
   } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
-  useSwapRecords();
+  const records = useSwapRecords();
   const record = useSwapRecord(recordId);
-  const leg = (valueTransfers ?? []).find(
+  const leg = legsOf(records, valueTransfers ?? [], recordId).find(
     vt => vt.txid === txid && vt.kind === kind,
   );
   const t = (key: string) => (translate(key) as string).trim();

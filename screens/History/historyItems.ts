@@ -3,6 +3,7 @@ import type { ValueTransferType } from '@app/AppState';
 import { swapTxidIndex } from '@app/swap/groupHistoryBySwap';
 import { isTerminalStatus } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
+import { mergeLegs } from '@screens/Swap/swapLegs';
 
 /** One entry of the History list, in the order it draws. */
 export type HistoryItem =
@@ -82,7 +83,7 @@ export function buildHistoryItems(args: {
     recordId: string,
     first: boolean,
   ) => {
-    const legs = [...(legsOf.get(recordId) ?? [])].sort(
+    const legs = mergeLegs(legsOf.get(recordId) ?? []).sort(
       (a, b) => a.time - b.time,
     );
     const isOpen = open.has(recordId) && legs.length > 0;

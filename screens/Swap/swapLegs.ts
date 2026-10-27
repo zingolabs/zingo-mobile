@@ -6,6 +6,26 @@ import type { SwapRecordType } from '@app/swap';
 
 type Translate = (key: string) => string;
 
+/**
+ * One leg per transaction and kind. A sale's shielded memo deposit pays the
+ * vault and sends the memo in a 0 ZEC note in the same transaction, two
+ * transfers of one payment: their amounts add up under the larger one.
+ */
+export function mergeLegs(legs: ValueTransferType[]): ValueTransferType[] {
+  const merged = new Map<string, ValueTransferType>();
+  legs.forEach(leg => {
+    const key = `${leg.txid}:${leg.kind}`;
+    const seen = merged.get(key);
+    if (!seen) {
+      merged.set(key, leg);
+      return;
+    }
+    const main = leg.amount > seen.amount ? leg : seen;
+    merged.set(key, { ...main, amount: seen.amount + leg.amount });
+  });
+  return [...merged.values()];
+}
+
 /** The Zcash transactions a swap made in this wallet, oldest first. */
 export function legsOf(
   records: SwapRecordType[],
@@ -13,13 +33,13 @@ export function legsOf(
   recordId: string,
 ): ValueTransferType[] {
   const index = swapTxidIndex(records);
-  return transfers
-    .filter(
+  return mergeLegs(
+    transfers.filter(
       vt =>
         vt.kind !== ValueTransferKindEnum.Swap &&
         index.get(vt.txid) === recordId,
-    )
-    .sort((a, b) => a.time - b.time);
+    ),
+  ).sort((a, b) => a.time - b.time);
 }
 
 /** The deshield to the wallet's own transparent address before a memo deposit. */

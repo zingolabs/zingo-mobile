@@ -127,6 +127,38 @@ test('Tests that an open swap shows its transactions under it, oldest first, whe
   ]);
 });
 
+test('Tests that a shielded memo deposit is one transaction under the swap, its vault payment and memo note added up, when the swap is open', () => {
+  const r = record();
+  const rows = [
+    swapRow(r),
+    vt(DEPOSIT, 2_000_010, ValueTransferKindEnum.Sent, {
+      amount: 0,
+      address: 'u1mayamemo',
+    }),
+    vt(DEPOSIT, 2_000_010, ValueTransferKindEnum.Sent, {
+      amount: 0.01,
+      address: 't1vault',
+    }),
+  ];
+
+  const items = buildHistoryItems({
+    rows,
+    all: rows,
+    records: [r],
+    open: new Set(['rec-1']),
+    monthOf,
+  });
+
+  expect(items.map(i => i.kind)).toEqual(['month', 'swap', 'leg']);
+  const swap = items[1];
+  expect(swap.kind === 'swap' && swap.legCount).toBe(1);
+  const leg = items[2];
+  expect(leg.kind === 'leg' && [leg.vt.amount, leg.vt.address]).toEqual([
+    0.01,
+    't1vault',
+  ]);
+});
+
 const t = (key: string) => key;
 
 test('Tests that a completed sell shows what it got on top and the ZEC that left under it', () => {
