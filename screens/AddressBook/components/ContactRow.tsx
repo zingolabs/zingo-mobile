@@ -87,7 +87,6 @@ const Action: React.FunctionComponent<ActionProps> = ({
   <View style={{ alignItems: 'center', gap: LABEL_GAP, width: ACTION_W }}>
     <Pressable
       kind="icon"
-      circle={CIRCLE}
       testID={testID}
       accessibilityRole="button"
       accessibilityLabel={label}

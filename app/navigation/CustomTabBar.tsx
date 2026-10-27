@@ -1,6 +1,7 @@
 /* geometry-gap: exception A, the tab bar */
 import React, { useContext, useEffect } from 'react';
-import { Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
 import LinearGradient from 'react-native-linear-gradient';
 import Animated, {
   ReduceMotion,
@@ -51,7 +52,6 @@ const SHRUNK = {
   capsule: 21,
   bottom: 26,
 };
-const PRESSED = 0.88;
 const SHRUNK_ICON = 0.86;
 /** The bar keeps this gutter on a narrow phone. */
 const GUTTER = 16;
@@ -128,7 +128,6 @@ const Tab = ({
 }) => {
   const tab = tabOf(routeName);
   const on = useSharedValue(focused ? 1 : 0);
-  const press = useSharedValue(1);
   useEffect(() => {
     on.value = withTiming(focused ? 1 : 0, colorMotion);
   }, [focused, on]);
@@ -136,9 +135,7 @@ const Tab = ({
   const icon = useAnimatedStyle(() => ({
     transform: [
       {
-        scale:
-          press.value *
-          interpolate(tabBarCompact.value, [0, 1], [1, SHRUNK_ICON]),
+        scale: interpolate(tabBarCompact.value, [0, 1], [1, SHRUNK_ICON]),
       },
     ],
   }));
@@ -146,14 +143,9 @@ const Tab = ({
 
   return (
     <Pressable
+      kind="icon"
       testID={testID}
       style={styles.tab}
-      onPressIn={() => {
-        press.value = withTiming(PRESSED, { duration: duration.fast });
-      }}
-      onPressOut={() => {
-        press.value = withTiming(1, { duration: duration.fast });
-      }}
       onPress={onPress}
       onLongPress={onLongPress}
       accessibilityRole="tab"
