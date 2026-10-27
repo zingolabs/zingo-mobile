@@ -2,14 +2,14 @@
 import React, { useContext, useState } from 'react';
 import { Keyboard, View } from 'react-native';
 
-import { space8, space12, useTheme } from '@app/theme';
+import { space8, space12, space4, space16, space20 } from '@app/theme';
 import { AddressBookFileClass, GlobalConst } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import Utils from '@app/utils';
-import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
-import RegText from '@ui/primitives/RegText';
+import ButtonStack from '@ui/primitives/ButtonStack';
+import Card from '@ui/widgets/Card';
 import ChainSelect from '@ui/widgets/ChainSelect';
 import Text from '@ui/primitives/Text';
 import TextField from '@ui/primitives/TextField';
@@ -34,7 +34,6 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
   setAddressBook,
 }) => {
   const { translate, server } = useContext(ContextAppLoaded);
-  const { colors } = useTheme();
   const [label, setLabel] = useState(current?.label ?? '');
   const [saving, setSaving] = useState(false);
   const ready = label.trim().length > 0;
@@ -55,30 +54,18 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
     closeSheet();
   };
 
-  const box = {
-    marginTop: 5,
-    borderWidth: 1,
-    borderRadius: 12,
-    borderColor: colors.bottomSheetBorder,
-    backgroundColor: colors.bgCanvas,
-  };
-
   return (
-    <View testID="addresstag.sheet" style={{ paddingHorizontal: 20 }}>
-      <BoldText
-        style={{
-          marginTop: 4,
-          textAlign: 'center',
-          fontSize: 15,
-          lineHeight: 21,
-        }}
+    <View testID="addresstag.sheet" style={{ paddingHorizontal: space20 }}>
+      <Text
+        variant="bodyStrong"
+        style={{ marginTop: space4, textAlign: 'center', fontWeight: '700' }}
       >
         {
           translate(
             current ? 'receive.edit-tag' : 'addressbook.add-tag',
           ) as string
         }
-      </BoldText>
+      </Text>
       <Text
         variant="caption"
         tone="muted"
@@ -101,7 +88,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
         />
       </View>
 
-      <View style={{ marginTop: 18 }}>
+      <View style={{ marginTop: space16 }}>
         <ChainSelect
           label={translate('addressbook.chain') as string}
           value={GlobalConst.zecSwapChain}
@@ -112,36 +99,37 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
         />
       </View>
 
-      <View style={{ marginTop: 18 }}>
-        <RegText>{translate('addressbook.address') as string}</RegText>
-        <View style={[box, { padding: 10, minHeight: 58 }]}>
-          <RegText
-            testID="addresstag.address"
-            style={{ fontWeight: '600', fontSize: 15 }}
-          >
+      <View style={{ marginTop: space16, rowGap: space4 }}>
+        <Text variant="bodySmall" tone="muted" style={{ fontWeight: '600' }}>
+          {translate('addressbook.address') as string}
+        </Text>
+        <Card>
+          <Text testID="addresstag.address" variant="address">
             {address}
-          </RegText>
-        </View>
+          </Text>
+        </Card>
       </View>
 
-      <Button
-        testID="addresstag.save"
-        variant="primary"
-        title={translate('save') as string}
-        disabled={saving || !ready}
-        onPress={save}
-        style={{ marginTop: 20 }}
-      />
-      <Button
-        testID="addresstag.cancel"
-        variant="quiet"
-        title={translate('cancel') as string}
-        onPress={() => {
-          Keyboard.dismiss();
-          closeSheet();
-        }}
-        style={{ marginTop: 8 }}
-      />
+      <View style={{ marginTop: space20 }}>
+        <ButtonStack>
+          <Button
+            testID="addresstag.save"
+            variant="primary"
+            title={translate('save') as string}
+            disabled={saving || !ready}
+            onPress={save}
+          />
+          <Button
+            testID="addresstag.cancel"
+            variant="quiet"
+            title={translate('cancel') as string}
+            onPress={() => {
+              Keyboard.dismiss();
+              closeSheet();
+            }}
+          />
+        </ButtonStack>
+      </View>
     </View>
   );
 };

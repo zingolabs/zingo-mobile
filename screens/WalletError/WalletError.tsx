@@ -1,9 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Platform, Pressable, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import Animated, {
-  FadeIn,
-  FadeOut,
   Keyframe,
   ReduceMotion,
   runOnJS,
@@ -13,19 +11,32 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { useTheme } from '@app/theme';
+import {
+  iconSize,
+  iconSizeMd,
+  iconSizeSm,
+  radiusPill,
+  radiusSm,
+  slopFor,
+  space4,
+  space8,
+  space12,
+  space16,
+  space20,
+  touchTarget,
+  useTheme,
+} from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
 import { ContextAppLoading } from '@app/context';
-import RegText from '@ui/primitives/RegText';
-import BoldText from '@ui/primitives/BoldText';
-import { LoadingDots } from '@ui/widgets/ProgressState';
+import Text from '@ui/primitives/Text';
+import Button from '@ui/primitives/Button';
+import Tag from '@ui/widgets/Tag';
 import { WalletErrorKind } from '@app/AppState/types/WalletErrorInfo';
 import { ChainNameEnum } from '@app/AppState';
 import { showConfirm } from '@app/services/showConfirm';
 import { DatabaseIcon } from '@ui/primitives/Icons/DatabaseIcon';
 import { ChevronDown } from '@ui/primitives/Icons/Chevron';
 import { WalletIcon } from '@ui/primitives/Icons/WalletIcon';
-import { themeTokens } from '@app/theme';
 
 type WalletErrorProps = {
   kind: WalletErrorKind;
@@ -53,28 +64,16 @@ const SHAKE_STEP_MS = 64;
 const BADGE_OUT_MS = 200;
 const DETAILS_OPEN_MS = 240;
 const DETAILS_CLOSE_MS = 180;
-const MONO = Platform.select({ ios: 'Menlo', default: 'monospace' });
-// The network pill on the wallet icon and the chips: amber for a network
-// other than Mainnet, green for Mainnet.
-const NET_AMBER = {
-  bg: themeTokens.bgWarning,
-  border: themeTokens.borderWarning,
-  ink: themeTokens.fgWarning,
-};
-const NET_GREEN = {
-  bg: themeTokens.bgAccentSubtle,
-  border: themeTokens.borderAccent,
-  ink: themeTokens.fgAccent,
-};
-const CHIP_LABEL = themeTokens.fgMuted;
+const SERVER_DOT = 8;
+const SUB_MAX = 310;
 
 const badgeEnter = () =>
   new Keyframe({
     0: { transform: [{ scale: 0 }] },
     100: { transform: [{ scale: 1 }], easing: ease.spring },
   })
-    .duration(300)
-    .delay(200)
+    .duration(duration.emphasized)
+    .delay(duration.base)
     .reduceMotion(ReduceMotion.System);
 // The details grow from 0 to their height while fading in, and fold back.
 // The text is measured in a free copy: inside the clipped box it would never
@@ -134,10 +133,6 @@ const DetailsBox: React.FunctionComponent<{
     </>
   );
 };
-const labelEnter = () =>
-  FadeIn.duration(duration.fast).reduceMotion(ReduceMotion.System);
-const labelExit = () =>
-  FadeOut.duration(duration.fast).reduceMotion(ReduceMotion.System);
 
 const WalletError: React.FunctionComponent<WalletErrorProps> = ({
   kind,
@@ -273,58 +268,41 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
       ],
     });
 
-  const netChip = (net: ChainNameEnum, label: string, testID: string) => {
-    const tone = net === ChainNameEnum.mainChainName ? NET_GREEN : NET_AMBER;
-    return (
-      <View testID={testID} style={{ alignItems: 'center', gap: 5 }}>
-        <View
-          style={{
-            height: 24,
-            paddingHorizontal: 11,
-            borderRadius: 12,
-            borderWidth: 1,
-            borderColor: tone.border,
-            backgroundColor: tone.bg,
-            justifyContent: 'center',
-          }}
-        >
-          <BoldText style={{ fontSize: 12, color: tone.ink }}>
-            {netName(net)}
-          </BoldText>
-        </View>
-        <RegText style={{ fontSize: 12, color: CHIP_LABEL }}>{label}</RegText>
-      </View>
-    );
-  };
+  const netChip = (net: ChainNameEnum, label: string, testID: string) => (
+    <View testID={testID} style={{ alignItems: 'center', gap: space4 }}>
+      <Tag tone={net === ChainNameEnum.mainChainName ? 'accent' : 'warning'}>
+        {netName(net)}
+      </Tag>
+      <Text variant="caption" tone="muted">
+        {label}
+      </Text>
+    </View>
+  );
 
   const link = (
     label: string,
     onPress: () => void,
     bottom: number,
-    size: number,
     testID: string,
   ) => (
-    <Pressable
-      testID={testID}
-      onPress={onPress}
-      disabled={busy}
-      hitSlop={8}
-      accessibilityRole="button"
-      style={({ pressed }) => ({
+    <View
+      style={{
         position: 'absolute',
         left: 0,
         right: 0,
         bottom,
-        height: 30,
         alignItems: 'center',
-        justifyContent: 'center',
-        opacity: pressed ? 0.6 : 1,
-      })}
+      }}
     >
-      <RegText style={{ fontSize: size, color: colors.fgMuted }}>
-        {label}
-      </RegText>
-    </Pressable>
+      <Button
+        testID={testID}
+        variant="text"
+        inline
+        disabled={busy}
+        title={label}
+        onPress={onPress}
+      />
+    </View>
   );
 
   return (
@@ -333,27 +311,27 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         testID="walleterror.server"
         onPress={onServer}
         disabled={busy}
-        hitSlop={8}
+        hitSlop={slopFor(touchTarget)}
         accessibilityRole="button"
         style={{
           position: 'absolute',
-          right: 19,
-          top: 1,
-          width: 32,
-          height: 32,
+          right: space12,
+          top: 0,
+          width: touchTarget,
+          height: touchTarget,
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <DatabaseIcon color={colors.fgMuted} size={20} />
+        <DatabaseIcon color={colors.fgMuted} size={iconSizeMd} />
         <View
           style={{
             position: 'absolute',
-            right: 2,
-            bottom: 3,
-            width: 8,
-            height: 8,
-            borderRadius: 4,
+            right: space8,
+            bottom: space8,
+            width: SERVER_DOT,
+            height: SERVER_DOT,
+            borderRadius: radiusPill,
             backgroundColor: dotColor,
             borderWidth: 2,
             borderColor: colors.bgCanvas,
@@ -370,7 +348,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
             alignSelf: 'center',
             width: ICON,
             height: ICON,
-            borderRadius: ICON / 2,
+            borderRadius: radiusPill,
             backgroundColor: colors.bgSurface,
             borderWidth: 1,
             borderColor: colors.bottomSheetBorder,
@@ -381,9 +359,9 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         ]}
       >
         {kind === 'server' ? (
-          <DatabaseIcon color={colors.fgDefault} size={24} />
+          <DatabaseIcon color={colors.fgDefault} size={iconSize} />
         ) : (
-          <WalletIcon color={colors.fgDefault} size={24} />
+          <WalletIcon color={colors.fgDefault} size={iconSize} />
         )}
         <Animated.View
           pointerEvents="none"
@@ -398,34 +376,22 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
               entering={badgeEnter()}
               style={{
                 position: 'absolute',
-                left: 55,
-                top: -2,
-                height: 20,
-                paddingHorizontal: 7,
-                borderRadius: 10,
-                borderWidth: 1,
-                borderColor: NET_AMBER.border,
-                backgroundColor: NET_AMBER.bg,
-                justifyContent: 'center',
+                left: ICON - space20,
+                top: 0,
               }}
             >
-              <BoldText
-                numberOfLines={1}
-                style={{ fontSize: 12, lineHeight: 12, color: NET_AMBER.ink }}
-              >
-                {netName(chain)}
-              </BoldText>
+              <Tag tone="warning">{netName(chain)}</Tag>
             </Animated.View>
           ) : (
             <Animated.View
               entering={badgeEnter()}
               style={{
                 position: 'absolute',
-                left: 57,
+                left: ICON - space20,
                 top: 0,
                 width: BADGE,
                 height: BADGE,
-                borderRadius: BADGE / 2,
+                borderRadius: radiusPill,
                 backgroundColor: colors.bgDanger,
                 borderWidth: 2,
                 borderColor: colors.bgCanvas,
@@ -433,15 +399,13 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
                 justifyContent: 'center',
               }}
             >
-              <BoldText
-                style={{
-                  fontSize: 12,
-                  lineHeight: 12,
-                  color: colors.fgOnAccent,
-                }}
+              <Text
+                variant="caption"
+                color={colors.fgOnAccent}
+                style={{ fontWeight: '700' }}
               >
                 !
-              </BoldText>
+              </Text>
             </Animated.View>
           )}
         </Animated.View>
@@ -450,34 +414,29 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
       <View
         style={{
           position: 'absolute',
-          left: 24,
-          right: 24,
+          left: space20,
+          right: space20,
           top: `${COLUMN_TOP * 100}%`,
           alignItems: 'center',
         }}
       >
-        <BoldText style={{ fontSize: 15, lineHeight: 22, textAlign: 'center' }}>
+        <Text variant="subtitle" style={{ textAlign: 'center' }}>
           {title}
-        </BoldText>
-        <RegText
-          style={{
-            marginTop: 6,
-            maxWidth: 310,
-            fontSize: 12,
-            lineHeight: 19,
-            textAlign: 'center',
-            color: colors.fgMuted,
-          }}
+        </Text>
+        <Text
+          variant="bodySmall"
+          tone="muted"
+          style={{ marginTop: space8, maxWidth: SUB_MAX, textAlign: 'center' }}
         >
           {sub}
-        </RegText>
+        </Text>
         {chain && (
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              gap: 10,
-              marginTop: 18,
+              gap: space12,
+              marginTop: space16,
             }}
           >
             {netChip(
@@ -485,11 +444,13 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
               translate('walleterror.chip-wallet') as string,
               'walleterror.chip.wallet',
             )}
-            <BoldText
-              style={{ fontSize: 15, color: colors.fgMuted, marginBottom: 16 }}
+            <Text
+              variant="bodyStrong"
+              tone="muted"
+              style={{ marginBottom: space16 }}
             >
               ≠
-            </BoldText>
+            </Text>
             {netChip(
               server.chainName,
               translate('walleterror.chip-server') as string,
@@ -500,43 +461,40 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         <Pressable
           testID="walleterror.details"
           onPress={() => setOpen(o => !o)}
-          hitSlop={6}
+          hitSlop={slopFor(iconSizeSm)}
           accessibilityRole="button"
           accessibilityState={{ expanded: open }}
           style={{
-            marginTop: 14,
-            paddingHorizontal: 8,
-            paddingVertical: 4,
+            marginTop: space12,
+            paddingHorizontal: space8,
+            paddingVertical: space4,
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 6,
+            gap: space4,
           }}
         >
-          <RegText style={{ fontSize: 12, color: colors.fgMuted }}>
+          <Text variant="caption" tone="muted">
             {translate('walleterror.details') as string}
-          </RegText>
+          </Text>
           <Animated.View style={chevronStyle}>
-            <ChevronDown size={16} color={colors.fgMuted} />
+            <ChevronDown size={iconSizeSm} color={colors.fgMuted} />
           </Animated.View>
         </Pressable>
         <View style={{ alignSelf: 'stretch' }}>
           <DetailsBox open={open}>
             <View
               style={{
-                marginTop: 6,
-                padding: 10,
-                borderRadius: 8,
+                marginTop: space8,
+                padding: space12,
+                borderRadius: radiusSm,
                 backgroundColor: colors.bgSurface,
                 borderWidth: 1,
                 borderColor: colors.bottomSheetBorder,
               }}
             >
-              <RegText
-                selectable
-                style={{ fontFamily: MONO, fontSize: 12, lineHeight: 16 }}
-              >
+              <Text selectable variant="address">
                 {details}
-              </RegText>
+              </Text>
             </View>
           </DetailsBox>
         </View>
@@ -547,71 +505,35 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
             translate('walleterror.more') as string,
             moreOptions,
             140,
-            12.5,
             'walleterror.more',
           )
         : link(
             translate('walleterror.import') as string,
             onImport,
             140,
-            14,
             'walleterror.import',
           )}
-      <Pressable
-        testID={chain ? 'walleterror.chain' : 'walleterror.open'}
-        onPress={chain ? () => onSwitchChain(chain) : onRetry}
-        disabled={busy}
-        accessibilityRole="button"
-        style={({ pressed }) => ({
+      <View
+        style={{
           position: 'absolute',
           bottom: 80,
-          left: 24,
-          right: 24,
-          height: 44,
-          borderRadius: 22,
-          backgroundColor: colors.bgAccent,
-          alignItems: 'center',
-          justifyContent: 'center',
-          transform: [{ scale: pressed && !busy ? 0.97 : 1 }],
-        })}
+          left: space20,
+          right: space20,
+        }}
       >
-        {busy ? (
-          <Animated.View
-            key="dots"
-            entering={labelEnter()}
-            exiting={labelExit()}
-          >
-            <LoadingDots
-              size={6}
-              gap={5}
-              color={colors.fgOnAccent}
-              testID="walleterror.open.dots"
-            />
-          </Animated.View>
-        ) : (
-          <Animated.View
-            key="label"
-            entering={labelEnter()}
-            exiting={labelExit()}
-          >
-            <RegText
-              style={{
-                fontSize: 16,
-                color: colors.fgOnAccent,
-                fontWeight: '700',
-              }}
-            >
-              {primaryLabel}
-            </RegText>
-          </Animated.View>
-        )}
-      </Pressable>
+        <Button
+          testID={chain ? 'walleterror.chain' : 'walleterror.open'}
+          variant="primary"
+          busy={busy}
+          title={primaryLabel}
+          onPress={chain ? () => onSwitchChain(chain) : onRetry}
+        />
+      </View>
       {!chain &&
         link(
           translate('walleterror.create') as string,
           onCreate,
           34,
-          13.5,
           'walleterror.create',
         )}
     </View>

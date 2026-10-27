@@ -290,7 +290,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                   {
                     "alignItems": "center",
                     "borderColor": "#18bd18",
-                    "borderRadius": 9,
+                    "borderRadius": 999,
                     "borderWidth": 2,
                     "height": 18,
                     "justifyContent": "center",
@@ -303,7 +303,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                     [
                       {
                         "backgroundColor": "#18bd18",
-                        "borderRadius": 4.5,
+                        "borderRadius": 999,
                         "height": 9,
                         "width": 9,
                       },
@@ -535,7 +535,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                   {
                     "alignItems": "center",
                     "borderColor": "#4A6487",
-                    "borderRadius": 9,
+                    "borderRadius": 999,
                     "borderWidth": 1.5,
                     "height": 18,
                     "justifyContent": "center",
@@ -548,7 +548,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                     [
                       {
                         "backgroundColor": "#18bd18",
-                        "borderRadius": 4.5,
+                        "borderRadius": 999,
                         "height": 9,
                         "width": 9,
                       },
@@ -780,7 +780,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                   {
                     "alignItems": "center",
                     "borderColor": "#4A6487",
-                    "borderRadius": 9,
+                    "borderRadius": 999,
                     "borderWidth": 1.5,
                     "height": 18,
                     "justifyContent": "center",
@@ -793,7 +793,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                     [
                       {
                         "backgroundColor": "#18bd18",
-                        "borderRadius": 4.5,
+                        "borderRadius": 999,
                         "height": 9,
                         "width": 9,
                       },
@@ -1078,7 +1078,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                   {
                     "alignItems": "center",
                     "borderColor": "#4A6487",
-                    "borderRadius": 9,
+                    "borderRadius": 999,
                     "borderWidth": 1.5,
                     "height": 18,
                     "justifyContent": "center",
@@ -1091,7 +1091,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                     [
                       {
                         "backgroundColor": "#18bd18",
-                        "borderRadius": 4.5,
+                        "borderRadius": 999,
                         "height": 9,
                         "width": 9,
                       },
@@ -1348,7 +1348,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                   {
                     "alignItems": "center",
                     "borderColor": "#4A6487",
-                    "borderRadius": 9,
+                    "borderRadius": 999,
                     "borderWidth": 1.5,
                     "height": 18,
                     "justifyContent": "center",
@@ -1361,7 +1361,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                     [
                       {
                         "backgroundColor": "#18bd18",
-                        "borderRadius": 4.5,
+                        "borderRadius": 999,
                         "height": 9,
                         "width": 9,
                       },

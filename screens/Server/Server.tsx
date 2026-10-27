@@ -14,7 +14,16 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { useTheme } from '@app/theme';
+import {
+  useTheme,
+  radiusMd,
+  radiusPill,
+  rowMinHeight,
+  space8,
+  space12,
+  space16,
+  space20,
+} from '@app/theme';
 import Switch from '@ui/primitives/Switch';
 import { duration, ease } from '@app/theme/motion';
 import {
@@ -24,8 +33,7 @@ import {
   ServerUrisType,
   TranslateType,
 } from '@app/AppState';
-import RegText from '@ui/primitives/RegText';
-import BoldText from '@ui/primitives/BoldText';
+import Text from '@ui/primitives/Text';
 import { ServerStatus } from '@app/AppState/types/ServerStatus';
 import { formatInteger } from '@app/utils/formatAmount';
 import ServerRow, {
@@ -151,20 +159,33 @@ const StatusDot: React.FC<StatusDotProps> = ({ status, offline }) => {
       : status === 'bad'
         ? colors.fgDanger
         : colors.fgAccent;
+  /** The dot's halo: its colour's subtle fill. */
+  const halo = offline
+    ? colors.bgMutedSubtle
+    : status === 'wait'
+      ? colors.bgWarningSubtle
+      : status === 'bad'
+        ? colors.bgDangerSubtle
+        : colors.bgAccentSubtle;
   return (
     <View
       style={{
         width: 16,
         height: 16,
-        borderRadius: 8,
-        backgroundColor: `${inner}38`,
+        borderRadius: radiusPill,
+        backgroundColor: halo,
         alignItems: 'center',
         justifyContent: 'center',
       }}
     >
       <Animated.View
         style={[
-          { width: 8, height: 8, borderRadius: 4, backgroundColor: inner },
+          {
+            width: 8,
+            height: 8,
+            borderRadius: radiusPill,
+            backgroundColor: inner,
+          },
           pulseStyle,
         ]}
       />
@@ -400,16 +421,18 @@ const Server: React.FunctionComponent<ServerProps> = ({
 
   const body = regtest ? (
     <>
-      <BoldText
+      <Text
+        variant="bodySmall"
+        tone="muted"
         style={{
           marginHorizontal: CARD_SIDE,
-          marginTop: 8,
-          marginBottom: 18,
-          fontSize: 13,
+          marginTop: space8,
+          marginBottom: space16,
+          fontWeight: '600',
         }}
       >
         {t('regtest-label')}
-      </BoldText>
+      </Text>
       <View style={{ marginHorizontal: CARD_SIDE }}>{customBlock}</View>
     </>
   ) : (
@@ -476,7 +499,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
             <Animated.View
               entering={fadeIn()}
               exiting={fadeOut()}
-              style={{ paddingHorizontal: 14.5, paddingBottom: 14 }}
+              style={{ paddingHorizontal: space16, paddingBottom: space16 }}
             >
               {customBlock}
             </Animated.View>
@@ -496,42 +519,35 @@ const Server: React.FunctionComponent<ServerProps> = ({
         accessible
         style={{
           position: 'absolute',
-          left: 22.5,
-          right: 22.5,
+          left: space20,
+          right: space20,
           top: `${CARD_TOP * 100}%`,
           marginTop: -lift,
-          height: 61,
-          borderRadius: 14,
+          minHeight: rowMinHeight,
+          borderRadius: radiusMd,
           backgroundColor: colors.bgSurface,
           borderWidth: 1,
           borderColor: colors.bottomSheetBorder,
           flexDirection: 'row',
           alignItems: 'center',
-          paddingLeft: 13,
-          paddingRight: 16,
-          gap: 12,
+          paddingHorizontal: space16,
+          paddingVertical: space8,
+          gap: space12,
         }}
       >
         <StatusDot status={cardStatus} offline={offline} />
         <Animated.View style={[{ flex: 1, minWidth: 0 }, cardFade]}>
-          <RegText
-            numberOfLines={1}
-            style={{ fontSize: 15, lineHeight: 19, fontWeight: '600' }}
-          >
+          <Text variant="bodyStrong" numberOfLines={1}>
             {cardName}
-          </RegText>
-          <RegText
+          </Text>
+          <Text
             testID="server.card.sub"
+            variant="bodySmall"
+            tone="muted"
             numberOfLines={1}
-            style={{
-              fontSize: 12,
-              lineHeight: 16,
-              marginTop: 1,
-              color: colors.fgMuted,
-            }}
           >
             {cardSub}
-          </RegText>
+          </Text>
         </Animated.View>
       </View>
 
@@ -548,8 +564,8 @@ const Server: React.FunctionComponent<ServerProps> = ({
         style={[
           {
             position: 'absolute',
-            left: 22.5,
-            right: 22.5,
+            left: space20,
+            right: space20,
             top: `${SEGMENT_TOP * 100}%`,
             marginTop: -lift,
           },
@@ -589,29 +605,24 @@ const Server: React.FunctionComponent<ServerProps> = ({
             layout={layout()}
             style={{
               marginHorizontal: CARD_SIDE,
-              marginTop: 17,
-              minHeight: 66,
-              borderRadius: 14,
+              marginTop: space16,
+              minHeight: rowMinHeight,
+              borderRadius: radiusMd,
               backgroundColor: colors.bgSurface,
               borderWidth: 1,
               borderColor: colors.bottomSheetBorder,
               flexDirection: 'row',
               alignItems: 'center',
-              paddingVertical: 10,
-              paddingLeft: 16.5,
-              paddingRight: 16,
-              gap: 12,
+              paddingVertical: space8,
+              paddingHorizontal: space16,
+              gap: space12,
             }}
           >
             <View style={{ flex: 1 }}>
-              <BoldText style={{ fontSize: 15, lineHeight: 19 }}>
-                {t('offline')}
-              </BoldText>
-              <RegText
-                style={{ fontSize: 12, lineHeight: 17, color: colors.fgMuted }}
-              >
+              <Text variant="bodyStrong">{t('offline')}</Text>
+              <Text variant="bodySmall" tone="muted">
                 {t('offline-sub')}
-              </RegText>
+              </Text>
             </View>
             <Switch
               testID="server.offline"

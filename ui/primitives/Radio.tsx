@@ -6,7 +6,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { useTheme } from '@app/theme';
+import { useTheme, radiusPill } from '@app/theme';
 import { ease } from '@app/theme/motion';
 
 type RadioProps = { selected: boolean };
@@ -29,7 +29,7 @@ const Radio: React.FC<RadioProps> = ({ selected }) => {
       style={{
         width: 18,
         height: 18,
-        borderRadius: 9,
+        borderRadius: radiusPill,
         borderWidth: selected ? 2 : 1.5,
         borderColor: selected ? colors.fgAccent : colors.borderMuted,
         alignItems: 'center',
@@ -41,7 +41,7 @@ const Radio: React.FC<RadioProps> = ({ selected }) => {
           {
             width: 9,
             height: 9,
-            borderRadius: 4.5,
+            borderRadius: radiusPill,
             backgroundColor: colors.fgAccent,
           },
           dotStyle,
