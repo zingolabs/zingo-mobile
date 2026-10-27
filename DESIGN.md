@@ -146,6 +146,7 @@ typography:
     fontWeight: 400
     lineHeight: 18px
 rounded:
+  xs: 4px
   sm: 8px
   md: 12px
   sheet: 28px
@@ -595,7 +596,7 @@ inset), not from shadows or blur.
 
 ## Shapes
 
-**Radii.** `radiusSm` 8: tags and icon tiles. `radiusMd` 12: cards, groups of
+**Radii.** `radiusXs` 4: the checkbox. `radiusSm` 8: tags and icon tiles. `radiusMd` 12: cards, groups of
 rows, fields, notices, notes, detail rows, the QR plate. `radiusPill`: buttons,
 chips, toggles, avatars, the tab bar and its capsule. `radiusSheet` 28: the top
 corners of every panel and sheet. Nothing else.
@@ -628,6 +629,7 @@ Use the shared component; never build a second one that looks the same.
 | A list row | `ListRow`; a choice is a `RadioRow` in a `RadioList` |
 | A filter | `Chip` (it never navigates) |
 | An on/off setting | `Switch` (exception D), the only toggle in the app |
+| A checkbox | `Checkbox`: box 16 × 16 (`iconSizeSm`), radius 4 as `radiusXs` (`radiusSm` 8 would read as a radio at that size), border 1.5 in `borderMuted` when off; `bgAccent` with the tick in `fgOnAccent` when on. The label next to it is part of the tap area, at least 44 high |
 | An amount to type | `AmountCard` (exception C) |
 | A short status | `Tag` (read, not tapped) |
 | A person or the wallet | `Avatar` |
