@@ -1083,7 +1083,6 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       <AppSheetModal
         ref={bottomSheetRef}
         header={filtersXHeader}
-        contentStyle={{ paddingBottom: 30 }}
         onDismiss={() => setShowFilters(false)}
       >
         {showFilters && (

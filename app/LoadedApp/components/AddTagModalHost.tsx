@@ -1,6 +1,5 @@
 import React, { forwardRef, useCallback, useContext } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   AddressBookFileClass,
@@ -36,7 +35,6 @@ const AddTagModalHost = forwardRef<
 >(({ target, setAddressBook, translate }, ref) => {
   const { addressBook, walletChainName, server, addLastSnackbar } =
     useContext(ContextAppLoaded);
-  const insets = useSafeAreaInsets();
   const keyboardHeight = useKeyboardHeight();
   const walletChain = walletChainName || server.chainName;
 
@@ -67,10 +65,9 @@ const AddTagModalHost = forwardRef<
     <AppSheetModal
       ref={ref}
       handle
-      contentStyle={{
-        paddingBottom:
-          keyboardHeight > 0 ? keyboardHeight + 20 : insets.bottom + 24,
-      }}
+      contentStyle={
+        keyboardHeight > 0 ? { paddingBottom: keyboardHeight + 20 } : undefined
+      }
     >
       {target?.own && (
         <NewAddressTag

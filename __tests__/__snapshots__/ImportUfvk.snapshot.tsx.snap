@@ -74,36 +74,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           ]
         }
         testID="import.back"
-      >
-        <View
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "bottom": 0,
-              "justifyContent": "center",
-              "left": 0,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-            }
-          }
-        >
-          <View
-            style={
-              [
-                {
-                  "backgroundColor": "#8888881F",
-                  "borderRadius": 999,
-                  "height": 44,
-                  "width": 44,
-                },
-                {},
-              ]
-            }
-          />
-        </View>
-      </View>
+      />
     </View>
     <View
       style={
@@ -213,36 +184,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
             ]
           }
           testID="import.scan"
-        >
-          <View
-            pointerEvents="none"
-            style={
-              {
-                "alignItems": "center",
-                "bottom": 0,
-                "justifyContent": "center",
-                "left": 0,
-                "position": "absolute",
-                "right": 0,
-                "top": 0,
-              }
-            }
-          >
-            <View
-              style={
-                [
-                  {
-                    "backgroundColor": "#8888881F",
-                    "borderRadius": 999,
-                    "height": 44,
-                    "width": 44,
-                  },
-                  {},
-                ]
-              }
-            />
-          </View>
-        </View>
+        />
       </View>
     </View>
   </View>
@@ -485,34 +427,6 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
             }
             testID="import.birthdayinfo"
           >
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "alignItems": "center",
-                  "bottom": 0,
-                  "justifyContent": "center",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                }
-              }
-            >
-              <View
-                style={
-                  [
-                    {
-                      "backgroundColor": "#8888881F",
-                      "borderRadius": 999,
-                      "height": 44,
-                      "width": 44,
-                    },
-                    {},
-                  ]
-                }
-              />
-            </View>
             <View
               style={{}}
             />

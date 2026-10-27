@@ -58,7 +58,6 @@ const InsufficientFundsSheet = forwardRef<
           closeLabel={translate('swap.close') as string}
         />
       }
-      contentStyle={{ paddingBottom: 32 }}
     >
       <View style={{ paddingHorizontal: space20 }}>
         <View style={{ alignItems: 'center', marginBottom: space12 }}>

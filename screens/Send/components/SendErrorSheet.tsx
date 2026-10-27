@@ -11,7 +11,6 @@ import {
   space12,
   space16,
   space20,
-  space24,
 } from '@app/theme';
 import type { BottomSheetModal } from '@gorhom/bottom-sheet';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
@@ -113,7 +112,6 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
         contentStyle={{
           paddingHorizontal: space20,
           paddingTop: space8,
-          paddingBottom: space24,
           rowGap: space16,
         }}
       >

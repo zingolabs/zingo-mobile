@@ -83,7 +83,7 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
           />
         }
       >
-        <BottomSheetScrollView contentContainerStyle={{ paddingBottom: 32 }}>
+        <BottomSheetScrollView>
           <Text
             variant="caption"
             tone="muted"

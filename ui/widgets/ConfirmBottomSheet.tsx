@@ -2,7 +2,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { space4, space8 } from '@app/theme';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
@@ -17,7 +16,6 @@ import {
 // The confirmation sheet behind showConfirm: title, message, the actions as
 // full-width pills (red when destructive) and Cancel as a link under them.
 const ConfirmBottomSheet: React.FC = () => {
-  const insets = useSafeAreaInsets();
   const ref = useRef<BottomSheetModal>(null);
   const [options, setOptions] = useState<ConfirmOptions | null>(null);
   const resolvedRef = useRef<boolean>(false);
@@ -62,7 +60,6 @@ const ConfirmBottomSheet: React.FC = () => {
       onDismiss={handleSheetDismissed}
       contentStyle={{
         paddingHorizontal: 20,
-        paddingBottom: insets.bottom + 24,
       }}
     >
       <Text

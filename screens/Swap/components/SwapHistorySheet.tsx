@@ -168,7 +168,7 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
           />
         }
       >
-        <BottomSheetScrollView contentContainerStyle={{ paddingBottom: 32 }}>
+        <BottomSheetScrollView>
           {sorted.length === 0 && (
             <View style={{ alignItems: 'center', paddingVertical: 48 }}>
               <Text variant="body" tone="muted">

@@ -235,10 +235,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
         ref={bottomSheetRef}
         header={sheetType === 'NAT' ? undefined : xHeader}
         handle={sheetType === 'NAT'}
-        contentStyle={{
-          paddingBottom:
-            keyboardHeight > 0 ? keyboardHeight + space20 : space32,
-        }}
+        contentStyle={
+          keyboardHeight > 0
+            ? { paddingBottom: keyboardHeight + space20 }
+            : undefined
+        }
       >
         {sheetType === 'NA' && (
           <NewAddress closeSheet={hide} setAddressBook={setAddressBook} />

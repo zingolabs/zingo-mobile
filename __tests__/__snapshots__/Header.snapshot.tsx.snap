@@ -181,34 +181,6 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
           }
         >
           <View
-            pointerEvents="none"
-            style={
-              {
-                "alignItems": "center",
-                "bottom": 0,
-                "justifyContent": "center",
-                "left": 0,
-                "position": "absolute",
-                "right": 0,
-                "top": 0,
-              }
-            }
-          >
-            <View
-              style={
-                [
-                  {
-                    "backgroundColor": "#8888881F",
-                    "borderRadius": 999,
-                    "height": 44,
-                    "width": 44,
-                  },
-                  {},
-                ]
-              }
-            />
-          </View>
-          <View
             style={
               {
                 "alignItems": "center",
@@ -377,36 +349,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
             ]
           }
           testID="header.drawmenu"
-        >
-          <View
-            pointerEvents="none"
-            style={
-              {
-                "alignItems": "center",
-                "bottom": 0,
-                "justifyContent": "center",
-                "left": 0,
-                "position": "absolute",
-                "right": 0,
-                "top": 0,
-              }
-            }
-          >
-            <View
-              style={
-                [
-                  {
-                    "backgroundColor": "#8888881F",
-                    "borderRadius": 999,
-                    "height": 44,
-                    "width": 44,
-                  },
-                  {},
-                ]
-              }
-            />
-          </View>
-        </View>
+        />
       </View>
     </View>
     <View
@@ -645,36 +588,7 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
             {},
           ]
         }
-      >
-        <View
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "bottom": 0,
-              "justifyContent": "center",
-              "left": 0,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-            }
-          }
-        >
-          <View
-            style={
-              [
-                {
-                  "backgroundColor": "#8888881F",
-                  "borderRadius": 999,
-                  "height": 44,
-                  "width": 44,
-                },
-                {},
-              ]
-            }
-          />
-        </View>
-      </View>
+      />
     </View>
     <View
       style={

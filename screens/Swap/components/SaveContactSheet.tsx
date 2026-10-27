@@ -1,6 +1,5 @@
 import React, { forwardRef, useCallback, useContext, useState } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ContextAppLoaded } from '@app/context';
 import type { AddressBookFileClass } from '@app/AppState';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
@@ -23,7 +22,6 @@ type SaveContactSheetProps = {
 const SaveContactSheet = forwardRef<BottomSheetModal, SaveContactSheetProps>(
   ({ address, chain, book, onSave }, ref) => {
     const { walletChainName, server } = useContext(ContextAppLoaded);
-    const insets = useSafeAreaInsets();
     const keyboardHeight = useKeyboardHeight();
     /** A fresh form each time the sheet opens. */
     const [nonce, setNonce] = useState<number>(0);
@@ -37,10 +35,11 @@ const SaveContactSheet = forwardRef<BottomSheetModal, SaveContactSheetProps>(
         ref={ref}
         handle
         onDismiss={() => setNonce(n => n + 1)}
-        contentStyle={{
-          paddingBottom:
-            keyboardHeight > 0 ? keyboardHeight + 20 : insets.bottom + 24,
-        }}
+        contentStyle={
+          keyboardHeight > 0
+            ? { paddingBottom: keyboardHeight + 20 }
+            : undefined
+        }
       >
         <ContactSheet
           key={`${nonce}:${chain}:${address}`}

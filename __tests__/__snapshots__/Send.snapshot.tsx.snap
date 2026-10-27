@@ -120,36 +120,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                 ]
               }
               testID="header.drawmenu"
-            >
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "alignItems": "center",
-                    "bottom": 0,
-                    "justifyContent": "center",
-                    "left": 0,
-                    "position": "absolute",
-                    "right": 0,
-                    "top": 0,
-                  }
-                }
-              >
-                <View
-                  style={
-                    [
-                      {
-                        "backgroundColor": "#8888881F",
-                        "borderRadius": 999,
-                        "height": 44,
-                        "width": 44,
-                      },
-                      {},
-                    ]
-                  }
-                />
-              </View>
-            </View>
+            />
           </View>
         </View>
         <View
@@ -222,36 +193,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                 ]
               }
               testID="header.messages"
-            >
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "alignItems": "center",
-                    "bottom": 0,
-                    "justifyContent": "center",
-                    "left": 0,
-                    "position": "absolute",
-                    "right": 0,
-                    "top": 0,
-                  }
-                }
-              >
-                <View
-                  style={
-                    [
-                      {
-                        "backgroundColor": "#8888881F",
-                        "borderRadius": 999,
-                        "height": 44,
-                        "width": 44,
-                      },
-                      {},
-                    ]
-                  }
-                />
-              </View>
-            </View>
+            />
           </View>
         </View>
       </View>
@@ -449,36 +391,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                           ]
                         }
                         testID="send.address.clear"
-                      >
-                        <View
-                          pointerEvents="none"
-                          style={
-                            {
-                              "alignItems": "center",
-                              "bottom": 0,
-                              "justifyContent": "center",
-                              "left": 0,
-                              "position": "absolute",
-                              "right": 0,
-                              "top": 0,
-                            }
-                          }
-                        >
-                          <View
-                            style={
-                              [
-                                {
-                                  "backgroundColor": "#8888881F",
-                                  "borderRadius": 999,
-                                  "height": 44,
-                                  "width": 44,
-                                },
-                                {},
-                              ]
-                            }
-                          />
-                        </View>
-                      </View>
+                      />
                       <View
                         accessibilityLabel="text translated"
                         accessibilityRole="button"
@@ -524,36 +437,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                           ]
                         }
                         testID="send.address-book"
-                      >
-                        <View
-                          pointerEvents="none"
-                          style={
-                            {
-                              "alignItems": "center",
-                              "bottom": 0,
-                              "justifyContent": "center",
-                              "left": 0,
-                              "position": "absolute",
-                              "right": 0,
-                              "top": 0,
-                            }
-                          }
-                        >
-                          <View
-                            style={
-                              [
-                                {
-                                  "backgroundColor": "#8888881F",
-                                  "borderRadius": 999,
-                                  "height": 44,
-                                  "width": 44,
-                                },
-                                {},
-                              ]
-                            }
-                          />
-                        </View>
-                      </View>
+                      />
                       <View
                         accessibilityLabel="text translated"
                         accessibilityRole="button"
@@ -599,36 +483,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                           ]
                         }
                         testID="send.scan-button"
-                      >
-                        <View
-                          pointerEvents="none"
-                          style={
-                            {
-                              "alignItems": "center",
-                              "bottom": 0,
-                              "justifyContent": "center",
-                              "left": 0,
-                              "position": "absolute",
-                              "right": 0,
-                              "top": 0,
-                            }
-                          }
-                        >
-                          <View
-                            style={
-                              [
-                                {
-                                  "backgroundColor": "#8888881F",
-                                  "borderRadius": 999,
-                                  "height": 44,
-                                  "width": 44,
-                                },
-                                {},
-                              ]
-                            }
-                          />
-                        </View>
-                      </View>
+                      />
                     </View>
                   </View>
                 </View>
@@ -1012,9 +867,9 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
         },
         {
           "backgroundColor": "#031124",
+          "paddingBottom": 24,
         },
         {
-          "paddingBottom": 24,
           "paddingHorizontal": 20,
           "paddingTop": 8,
           "rowGap": 16,
@@ -1128,36 +983,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                 {},
               ]
             }
-          >
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "alignItems": "center",
-                  "bottom": 0,
-                  "justifyContent": "center",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                }
-              }
-            >
-              <View
-                style={
-                  [
-                    {
-                      "backgroundColor": "#8888881F",
-                      "borderRadius": 999,
-                      "height": 44,
-                      "width": 44,
-                    },
-                    {},
-                  ]
-                }
-              />
-            </View>
-          </View>
+          />
         </View>
       </View>
       <View
@@ -1370,36 +1196,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                 ]
               }
               testID="header.drawmenu"
-            >
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "alignItems": "center",
-                    "bottom": 0,
-                    "justifyContent": "center",
-                    "left": 0,
-                    "position": "absolute",
-                    "right": 0,
-                    "top": 0,
-                  }
-                }
-              >
-                <View
-                  style={
-                    [
-                      {
-                        "backgroundColor": "#8888881F",
-                        "borderRadius": 999,
-                        "height": 44,
-                        "width": 44,
-                      },
-                      {},
-                    ]
-                  }
-                />
-              </View>
-            </View>
+            />
           </View>
         </View>
         <View
@@ -1472,36 +1269,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                 ]
               }
               testID="header.messages"
-            >
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "alignItems": "center",
-                    "bottom": 0,
-                    "justifyContent": "center",
-                    "left": 0,
-                    "position": "absolute",
-                    "right": 0,
-                    "top": 0,
-                  }
-                }
-              >
-                <View
-                  style={
-                    [
-                      {
-                        "backgroundColor": "#8888881F",
-                        "borderRadius": 999,
-                        "height": 44,
-                        "width": 44,
-                      },
-                      {},
-                    ]
-                  }
-                />
-              </View>
-            </View>
+            />
           </View>
         </View>
       </View>
@@ -1699,36 +1467,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                           ]
                         }
                         testID="send.address.clear"
-                      >
-                        <View
-                          pointerEvents="none"
-                          style={
-                            {
-                              "alignItems": "center",
-                              "bottom": 0,
-                              "justifyContent": "center",
-                              "left": 0,
-                              "position": "absolute",
-                              "right": 0,
-                              "top": 0,
-                            }
-                          }
-                        >
-                          <View
-                            style={
-                              [
-                                {
-                                  "backgroundColor": "#8888881F",
-                                  "borderRadius": 999,
-                                  "height": 44,
-                                  "width": 44,
-                                },
-                                {},
-                              ]
-                            }
-                          />
-                        </View>
-                      </View>
+                      />
                       <View
                         accessibilityLabel="text translated"
                         accessibilityRole="button"
@@ -1774,36 +1513,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                           ]
                         }
                         testID="send.address-book"
-                      >
-                        <View
-                          pointerEvents="none"
-                          style={
-                            {
-                              "alignItems": "center",
-                              "bottom": 0,
-                              "justifyContent": "center",
-                              "left": 0,
-                              "position": "absolute",
-                              "right": 0,
-                              "top": 0,
-                            }
-                          }
-                        >
-                          <View
-                            style={
-                              [
-                                {
-                                  "backgroundColor": "#8888881F",
-                                  "borderRadius": 999,
-                                  "height": 44,
-                                  "width": 44,
-                                },
-                                {},
-                              ]
-                            }
-                          />
-                        </View>
-                      </View>
+                      />
                       <View
                         accessibilityLabel="text translated"
                         accessibilityRole="button"
@@ -1849,36 +1559,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                           ]
                         }
                         testID="send.scan-button"
-                      >
-                        <View
-                          pointerEvents="none"
-                          style={
-                            {
-                              "alignItems": "center",
-                              "bottom": 0,
-                              "justifyContent": "center",
-                              "left": 0,
-                              "position": "absolute",
-                              "right": 0,
-                              "top": 0,
-                            }
-                          }
-                        >
-                          <View
-                            style={
-                              [
-                                {
-                                  "backgroundColor": "#8888881F",
-                                  "borderRadius": 999,
-                                  "height": 44,
-                                  "width": 44,
-                                },
-                                {},
-                              ]
-                            }
-                          />
-                        </View>
-                      </View>
+                      />
                     </View>
                   </View>
                 </View>
@@ -2222,9 +1903,9 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
         },
         {
           "backgroundColor": "#031124",
+          "paddingBottom": 24,
         },
         {
-          "paddingBottom": 24,
           "paddingHorizontal": 20,
           "paddingTop": 8,
           "rowGap": 16,
@@ -2338,36 +2019,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                 {},
               ]
             }
-          >
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "alignItems": "center",
-                  "bottom": 0,
-                  "justifyContent": "center",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                }
-              }
-            >
-              <View
-                style={
-                  [
-                    {
-                      "backgroundColor": "#8888881F",
-                      "borderRadius": 999,
-                      "height": 44,
-                      "width": 44,
-                    },
-                    {},
-                  ]
-                }
-              />
-            </View>
-          </View>
+          />
         </View>
       </View>
       <View

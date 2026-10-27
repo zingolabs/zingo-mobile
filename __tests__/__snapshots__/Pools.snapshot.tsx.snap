@@ -158,36 +158,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
           ]
         }
         testID="pools.back"
-      >
-        <View
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "bottom": 0,
-              "justifyContent": "center",
-              "left": 0,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-            }
-          }
-        >
-          <View
-            style={
-              [
-                {
-                  "backgroundColor": "#8888881F",
-                  "borderRadius": 999,
-                  "height": 44,
-                  "width": 44,
-                },
-                {},
-              ]
-            }
-          />
-        </View>
-      </View>
+      />
     </View>
     <View
       style={
@@ -1143,10 +1114,9 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
         },
         {
           "backgroundColor": "#031124",
-        },
-        {
           "paddingBottom": 24,
         },
+        undefined,
       ]
     }
   >

@@ -8,7 +8,8 @@ import {
   BottomSheetModal,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import { radiusSheet, useTheme, radiusPill } from '@app/theme';
+import { radiusSheet, useTheme, radiusPill, space24 } from '@app/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SurfaceContext } from './Surface';
 import TooltipHost from '@ui/widgets/TooltipHost';
 import { duration, ease } from '@app/theme/motion';
@@ -21,6 +22,10 @@ import { SheetPresence } from './SheetPresence';
 type AppSheetModalProps = {
   header?: React.ReactNode;
   children: React.ReactNode;
+  /**
+   * The content ends `space24` above the navigation bar; a sheet sets its own
+   * `paddingBottom` here only to clear the keyboard.
+   */
   contentStyle?: StyleProp<ViewStyle>;
   snapPoints?: (string | number)[];
   onDismiss?: () => void;
@@ -76,6 +81,7 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
   ) => {
     const { colors } = useTheme();
     const fixed = snapPoints !== undefined;
+    const insets = useSafeAreaInsets();
     const presence = useContext(SheetPresence);
     const wasOpen = useRef(false);
     /** Reports opening and closing once each, not every snap in between. */
@@ -93,7 +99,10 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
         <View
           style={[
             fixed ? styles.maskFill : styles.mask,
-            { backgroundColor: colors.bgSurface },
+            {
+              backgroundColor: colors.bgSurface,
+              paddingBottom: insets.bottom + space24,
+            },
             contentStyle,
           ]}
         >

@@ -4,7 +4,6 @@ import DetailRows from '@screens/Swap/components/DetailRows';
 import { formatAmount } from '@app/utils/formatAmount';
 import { View } from 'react-native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme, iconSize, radiusPill, space20 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import { isIronwoodActive } from '@app/AppState';
@@ -35,7 +34,6 @@ const ShieldSheet = forwardRef<BottomSheetModal, ShieldSheetProps>(
   ({ amount, fee, mixnetView, onShield }, ref) => {
     const { translate, info } = useContext(ContextAppLoaded);
     const { colors } = useTheme();
-    const insets = useSafeAreaInsets();
     const t = (key: string) => translate(key) as string;
     const [busy, setBusy] = useState<boolean>(false);
     const open = sendGateOpen(mixnetView);
@@ -48,12 +46,7 @@ const ShieldSheet = forwardRef<BottomSheetModal, ShieldSheetProps>(
     }, [ref]);
 
     return (
-      <AppSheetModal
-        ref={ref}
-        handle
-        onDismiss={() => setBusy(false)}
-        contentStyle={{ paddingBottom: insets.bottom + 24 }}
-      >
+      <AppSheetModal ref={ref} handle onDismiss={() => setBusy(false)}>
         <View testID="shield.sheet" style={{ paddingHorizontal: 20 }}>
           <View style={{ alignItems: 'center', marginTop: 4 }}>
             <View

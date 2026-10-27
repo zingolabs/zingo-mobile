@@ -547,10 +547,11 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       <AppSheetModal
         ref={contactSheet}
         handle
-        contentStyle={{
-          paddingBottom:
-            keyboardHeight > 0 ? keyboardHeight + 20 : insets.bottom + 24,
-        }}
+        contentStyle={
+          keyboardHeight > 0
+            ? { paddingBottom: keyboardHeight + 20 }
+            : undefined
+        }
       >
         <ContactSheet
           key={`contact-${editNonce}`}
