@@ -366,7 +366,8 @@ Refresh the fixture wallets in these cases.
 - The range from the birthday to the tip passes the budget. The budget is
   100,000 blocks for now, about 19 days. On 2026-10-02 the CI emulator synced
   the shared wallet over 53,500 blocks from an earlier birthday in under 90
-  seconds, inside a deadline of 5 minutes, and a later run sets the final
+  seconds, inside a deadline of 5 minutes (10 since 2026-10-27, when ranges
+  past the budget, about 114,000 blocks, took over 5), and a later run sets the final
   number.
 - A deposit or a sweep breaks a fixture test.
 
