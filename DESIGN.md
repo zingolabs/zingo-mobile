@@ -195,6 +195,10 @@ components:
     textColor: "{colors.fgMuted}"
     typography: "{typography.button}"
     height: 44px
+  button-danger-text:
+    textColor: "{colors.fgDanger}"
+    typography: "{typography.button}"
+    height: 44px
   button-danger:
     backgroundColor: "{colors.bgDanger}"
     textColor: "{colors.fgOnAccent}"
@@ -510,6 +514,7 @@ One variant per role. Weight overrides are limited to the cases listed here.
 | Lead under a sheet title, note, hint, counter | `caption`, `fgMuted` |
 | Text of a compact note (warnings outside Home) | `caption`, regular, never bold |
 | Link inside content ("Save contact", "See why", "Clear") | `caption` 700 |
+| A tappable text that isn't green (a link in a warning, "Flashnet", "Add tag", Available) | Underlined, in its own colour. Green text buttons are not |
 | Month label in History | `caption` 600, `fgMuted`, uppercase |
 | Mixnet wait lines | `bodySmall` `fgMuted` + `body` 500 for the state |
 | Address, key, transaction id | `address` (mono 13/18) |
@@ -562,6 +567,9 @@ and the notice stack.
 - Content starts `space8` under the `TitleBar`.
 - The `TitleBar` keeps its own inset: 16 from the edge plus each action's 14,
   as History's bar draws it. `space20` is the gutter for the content under it.
+- A bottom sheet's content ends `space24` above the navigation bar
+  (`insets.bottom + space24`), set once in `AppSheetModal`. A sheet pads its
+  own bottom only to clear the keyboard.
 
 **Menu screens.** What the options panel (the side menu) opens (Settings,
 Pools, Server, the seed, the Address Book…) is a full screen on the canvas,
@@ -628,13 +636,14 @@ Use the shared component; never build a second one that looks the same.
 | For | Use |
 |---|---|
 | Any text | `Text` with a variant and a tone. `BoldText`, `RegText` and `FadeText` are legacy and leave the screens they are found in |
-| Any button | `Button`: `primary` (the one main action of a view), `secondary` (outlined, beside others of the same weight: Copy, Verify), `text` (green: Back, Skip, secondary moves), `quiet` (grey: only Cancel and a Close that leaves a flow), `danger` (deletes or cannot be undone), `nym` (only through the mixnet), `viewOnly` (the view-only notice). `small` only inside notices and rows |
+| Any button | `Button`: `primary` (the one main action of a view), `secondary` (outlined, beside others of the same weight: Copy, Verify), `text` (green: Back, Skip, secondary moves), `quiet` (grey: only Cancel and a Close that leaves a flow), `danger` (the filled confirm of a delete, or of what cannot be undone, in its sheet), `dangerText` (Delete on a screen: the red label with no fill, which opens that sheet), `nym` (only through the mixnet), `viewOnly` (the view-only notice). `small` only inside notices and rows |
 | A field | `TextField` with `FieldAction`s. With a prefix and a suffix (the custom server): same measures as every field, `fieldMinHeight` 48, `radiusMd` 12, the value's text variant; the prefix ("https://") and the suffix (":" and the port) in `fgMuted` |
 | A card | `Card` (tones `default`, `selected`, pools) |
 | Label and value rows | `DetailRows` |
 | A list row | `ListRow`; a choice is a `RadioRow` in a `RadioList` |
 | A filter | `Chip` (it never navigates) |
-| Anything pressed that none of these covers | `Pressable` with its `kind`: `button`, `row`, `icon` or `link` (see Motion, Pressing) |
+| Anything pressed that none of these covers | `Pressable` with its `kind`: `button`, `row`, `icon`, `link` or `tile` (see Motion, Pressing) |
+| A delete | `dangerText` "Delete" on the screen; the confirmation sheet titled "Delete", with its own message, a filled `danger` "Delete" and Cancel under it. Every delete says "Delete", on the screen and in the sheet, the same word in every language. The Address Book's red bin opens the same sheet |
 | An on/off setting | `Switch` (exception D), the only toggle in the app |
 | A checkbox | `Checkbox`: box 16 × 16 (`iconSizeSm`), radius 4 as `radiusXs` (`radiusSm` 8 would read as a radio at that size), border 1.5 in `borderMuted` when off; `bgAccent` with the tick in `fgOnAccent` when on. The label next to it is part of the tap area, at least 44 high |
 | An amount to type | `AmountCard` (exception C) |
@@ -715,15 +724,17 @@ through the shared `Pressable` and its `kind`, in `duration.fast` (140 ms) on
   coin button, the flip button, the round scroll-to-top and scroll-to-bottom
   buttons): scale to 0.97. Their opacity stays.
 - Rows and tappable cards (`ListRow`, `RadioRow`, History's rows, swap rows,
-  Messages' rows, Server's rows, the options panel's tiles, a tappable
-  `Card`, the pending swap card): their background takes `bgMutedSubtle`.
+  Messages' rows, Server's rows, a tappable `Card`, the pending swap card):
+  their background takes `bgMutedSubtle`.
 - Icon-only buttons (the `TitleBar`'s and the `Header`'s actions, back
   included, `FieldAction`s, the close X, the eye, an info icon, copy, the
-  Address Book's action circles): a circle of `bgMutedSubtle` appears
-  behind the icon, the size of its tap area. Never a square.
+  Address Book's action circles, the options panel's chevron, gear and
+  socials, the tab bar's icons): the icon scales to 0.88, never a background.
+- The options panel's tiles: the 56 tile scales to 0.94 (`kind="tile"`, the
+  tile in a `PressTile`); its label stays still. The cell is the tap target,
+  with no background.
 - Text links ("Save contact", "See why", "Clear", "Add tag", Available): fade
   to 0.6.
-- The tab bar keeps its own press (the icon scales to 0.88, exception A).
 - `TouchableOpacity` is not used: its default fades a control to 0.2.
 
 **Expanding.** A row that opens in place (a contact in the Address Book)
@@ -771,7 +782,7 @@ switch (D) and the brand (E).
 - Idle: strokes and leaf `fgTabIdle`, veins `bgTabBar`. Selected: strokes
   `fgTabSelected`, leaf `fgAccent`, veins `bottomSheetBorder`.
 - One capsule (`bgTabCapsule`) slides to the selected tab. On press the icon
-  scales to 0.88.
+  scales to 0.88, as every icon-only button (Motion, Pressing).
 - Scrolling a tab's list down shrinks the bar to 250 × 50 (padding 4, icons at
   0.86); scrolling up or changing tab brings it back.
 
