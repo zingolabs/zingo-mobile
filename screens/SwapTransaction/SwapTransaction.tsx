@@ -163,7 +163,7 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
         tone={received ? 'positive' : 'default'}
         line={price > 0 ? `≈ ${formatUsd(leg.amount * price)}` : ''}
         pill={t(confirmed ? 'swap.tx-confirmed' : 'swap.tx-pending')}
-        pillTone={confirmed ? 'accent' : 'neutral'}
+        pillTone={confirmed ? 'accent' : 'warning'}
       />
       <DetailRows rows={rows} />
       <Text variant="caption" tone="muted" style={{ marginTop: space12 }}>

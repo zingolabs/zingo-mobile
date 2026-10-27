@@ -20,6 +20,7 @@ import {
   space4,
   space8,
   useTheme,
+  radiusPill,
 } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
@@ -303,7 +304,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       style={{
                         width: 8,
                         height: 8,
-                        borderRadius: 3,
+                        borderRadius: radiusPill,
                         backgroundColor: paint[pool.key].fg,
                       }}
                     />
@@ -426,7 +427,7 @@ const ShareBar: React.FunctionComponent<{ shares: Share[]; track: string }> = ({
       onLayout={e => setWidth(e.nativeEvent.layout.width)}
       style={{
         height: BAR_H,
-        borderRadius: BAR_H / 2,
+        borderRadius: radiusPill,
         overflow: 'hidden',
         flexDirection: 'row',
         gap: BAR_GAP,

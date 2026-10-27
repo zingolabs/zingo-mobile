@@ -1,3 +1,4 @@
+/* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useContext } from 'react';
 import { Image, Text, View } from 'react-native';
@@ -17,7 +18,7 @@ import { radiusSheet, useTheme } from '@app/theme';
 import { NymGateState } from './nymGateState';
 import { themeTokens } from '@app/theme';
 
-const NYM_GREEN = themeTokens.bgNym;
+const NYM_GREEN = themeTokens.fgNym;
 
 type NymGateSheetProps = {
   // The one gate state to present: connecting waits, failed shows its key.

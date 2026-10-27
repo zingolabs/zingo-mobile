@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
   ReduceMotion,
   useAnimatedStyle,
@@ -10,7 +10,21 @@ import { useIsFocused } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useTheme, slopFor } from '@app/theme';
+import {
+  iconSizeSm,
+  radiusMd,
+  radiusPill,
+  radiusSm,
+  rowMinHeight,
+  slopFor,
+  space8,
+  space12,
+  space16,
+  useTheme,
+} from '@app/theme';
+import Text from '@ui/primitives/Text';
+import Button from '@ui/primitives/Button';
+import { duration } from '@app/theme/motion';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { Route, SnackbarDurationEnum } from '@app/AppState';
@@ -37,8 +51,8 @@ import ScreenshotSheet from '@screens/SeedBackup/components/ScreenshotSheet';
 import KeyCard from '@screens/ViewingKey/components/KeyCard';
 
 const PUSHED_DIM = 0.55;
-const PUSH_IN_MS = 380;
-const PUSH_OUT_MS = 320;
+const PUSH_IN_MS = duration.screen;
+const PUSH_OUT_MS = duration.emphasized;
 const VK_HEAD = 10;
 const VK_TAIL = 6;
 const KEY_QR = 190;
@@ -268,13 +282,12 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
         {action && (
           <Text
             testID="walletseed.leaving"
+            variant="body"
+            tone="muted"
             style={{
               marginHorizontal: SIDE,
-              marginBottom: 16,
+              marginBottom: space16,
               textAlign: 'center',
-              color: colors.fgMuted,
-              fontSize: 15,
-              lineHeight: 20,
             }}
           >
             {
@@ -290,13 +303,13 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              gap: 12,
-              height: 58,
+              gap: space12,
+              minHeight: rowMinHeight,
               marginHorizontal: SIDE,
-              marginBottom: 14,
-              paddingLeft: 13,
-              paddingRight: 12,
-              borderRadius: 16,
+              marginBottom: space12,
+              paddingHorizontal: space12,
+              paddingVertical: space8,
+              borderRadius: radiusMd,
               borderWidth: 1,
               borderColor: strip.border,
               backgroundColor: strip.bg,
@@ -304,27 +317,24 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
           >
             <View
               style={{
-                width: 34,
-                height: 34,
-                borderRadius: 10,
+                width: 36,
+                height: 36,
+                borderRadius: radiusSm,
                 backgroundColor: strip.tile,
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
               {seedBackedUp ? (
-                <ShieldCheckIcon size={16} color={colors.fgAccent} />
+                <ShieldCheckIcon size={iconSizeSm} color={colors.fgAccent} />
               ) : (
-                <TriangleAlert size={16} color={colors.fgWarning} />
+                <TriangleAlert size={iconSizeSm} color={colors.fgWarning} />
               )}
             </View>
             <View style={{ flex: 1 }}>
               <Text
-                style={{
-                  color: seedBackedUp ? colors.fgAccent : colors.fgWarning,
-                  fontSize: 15,
-                  fontWeight: '700',
-                }}
+                variant="bodyStrong"
+                tone={seedBackedUp ? 'accent' : 'warning'}
               >
                 {
                   translate(
@@ -334,36 +344,21 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
                   ) as string
                 }
               </Text>
-              <Text style={{ color: colors.fgMuted, fontSize: 12 }}>
+              <Text variant="caption" tone="muted">
                 {seedBackedUp
                   ? backedUpOn
                   : (translate('walletseed.no-sub') as string)}
               </Text>
             </View>
             {!seedBackedUp && (
-              <Pressable
+              <Button
                 testID="walletseed.backup"
-                accessibilityRole="button"
+                variant="primary"
+                size="small"
+                inline
+                title={translate('seednotice.button') as string}
                 onPress={() => openFlow('push')}
-                style={({ pressed }) => ({
-                  height: 30,
-                  paddingHorizontal: 14,
-                  borderRadius: 15,
-                  justifyContent: 'center',
-                  backgroundColor: colors.bgAccent,
-                  transform: [{ scale: pressed ? 0.95 : 1 }],
-                })}
-              >
-                <Text
-                  style={{
-                    color: colors.fgOnAccent,
-                    fontSize: 13,
-                    fontWeight: '700',
-                  }}
-                >
-                  {translate('seednotice.button') as string}
-                </Text>
-              </Pressable>
+              />
             )}
           </View>
         )}
@@ -378,7 +373,9 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
         ) : (
           <WordGrid testID="walletseed.words" words={words} veiled={veiled} />
         )}
-        <View style={{ marginTop: 12, zIndex: tip === 'birthday' ? 3 : 2 }}>
+        <View
+          style={{ marginTop: space12, zIndex: tip === 'birthday' ? 3 : 2 }}
+        >
           <InfoRow
             testID="walletseed.birthday"
             label={translate('seedbackup.birthday') as string}
@@ -390,7 +387,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
           />
         </View>
         {!readOnly && (
-          <View style={{ marginTop: 8, zIndex: tip === 'vk' ? 3 : 1 }}>
+          <View style={{ marginTop: space8, zIndex: tip === 'vk' ? 3 : 1 }}>
             <InfoRow
               testID="walletseed.vk"
               label={translate('walletseed.vk') as string}
@@ -401,29 +398,29 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               value={vkShort}
               trailing={
                 <Pressable
-                  hitSlop={slopFor(16)}
+                  hitSlop={slopFor(28)}
                   testID="walletseed.vk-copy"
                   accessibilityRole="button"
                   accessibilityLabel={translate('walletseed.vk-copy') as string}
                   onPress={copyVk}
                   style={({ pressed }) => ({
-                    width: 26,
-                    height: 26,
-                    marginLeft: 6,
-                    marginRight: -6,
-                    borderRadius: 8,
+                    width: 28,
+                    height: 28,
+                    marginLeft: space8,
+                    marginRight: -space8,
+                    borderRadius: radiusPill,
                     alignItems: 'center',
                     justifyContent: 'center',
                     backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
                   })}
                 >
-                  <CopyIcon size={16} color={colors.fgDefault} />
+                  <CopyIcon size={iconSizeSm} color={colors.fgDefault} />
                 </Pressable>
               }
             />
           </View>
         )}
-        <View style={{ marginTop: 12 }}>
+        <View style={{ marginTop: space12 }}>
           <CopyShowButtons
             testID="walletseed"
             hidden={hidden}
@@ -437,37 +434,19 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
             position: 'absolute',
             left: 0,
             right: 0,
-            bottom: insets.bottom + 16,
+            bottom: insets.bottom + space16,
           }}
         >
           {action ? (
-            <Pressable
-              testID="walletseed.go"
-              accessibilityRole="button"
-              disabled={!ready}
-              onPress={() => confirm(action)}
-              style={({ pressed }) => ({
-                height: 44,
-                marginHorizontal: SIDE,
-                borderRadius: 22,
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: ready
-                  ? colors.bgAccent
-                  : colors.bgAccentDisabled,
-                transform: [{ scale: pressed ? 0.97 : 1 }],
-              })}
-            >
-              <Text
-                style={{
-                  color: colors.fgOnAccent,
-                  fontSize: 15,
-                  fontWeight: '700',
-                }}
-              >
-                {translate(`walletseed.go-${action}`) as string}
-              </Text>
-            </Pressable>
+            <View style={{ marginHorizontal: SIDE }}>
+              <Button
+                testID="walletseed.go"
+                variant="primary"
+                disabled={!ready}
+                title={translate(`walletseed.go-${action}`) as string}
+                onPress={() => confirm(action)}
+              />
+            </View>
           ) : seedBackedUp ? (
             <StepActions
               testID="walletseed.actions"
@@ -477,30 +456,14 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               onPrimary={() => navigation.goBack()}
             />
           ) : (
-            <Pressable
-              testID="walletseed.done"
-              accessibilityRole="button"
-              onPress={() => navigation.goBack()}
-              style={({ pressed }) => ({
-                height: 44,
-                marginHorizontal: SIDE,
-                borderRadius: 22,
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: colors.bgAccent,
-                transform: [{ scale: pressed ? 0.97 : 1 }],
-              })}
-            >
-              <Text
-                style={{
-                  color: colors.fgOnAccent,
-                  fontSize: 15,
-                  fontWeight: '700',
-                }}
-              >
-                {translate('seedbackup.done') as string}
-              </Text>
-            </Pressable>
+            <View style={{ marginHorizontal: SIDE }}>
+              <Button
+                testID="walletseed.done"
+                variant="primary"
+                title={translate('seedbackup.done') as string}
+                onPress={() => navigation.goBack()}
+              />
+            </View>
           )}
         </View>
       </Animated.View>

@@ -1,7 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
 import { View, Keyboard } from 'react-native';
-import { space8, space20, useTheme } from '@app/theme';
+import {
+  space8,
+  space20,
+  useTheme,
+  space4,
+  space16,
+  iconSizeSm,
+} from '@app/theme';
 
 import { GlobalConst, SnackbarDurationEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
@@ -88,20 +95,11 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
   };
 
   return (
-    <View
-      style={{
-        backgroundColor: colors.bgSurface,
-        paddingHorizontal: 10,
-      }}
-    >
+    <View style={{ paddingHorizontal: space20 }}>
       <Text
         variant="caption"
         tone="muted"
-        style={{
-          textAlign: 'center',
-          marginHorizontal: space20,
-          marginBottom: space8,
-        }}
+        style={{ textAlign: 'center', marginBottom: space8 }}
       >
         {translate('receive.verify-sub') as string}
       </Text>
@@ -114,11 +112,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
         scanRequest="receive.address"
       />
       {!!errorAddress && (
-        <Text
-          variant="bodySmall"
-          tone="danger"
-          style={{ marginTop: space8, marginHorizontal: space20 }}
-        >
+        <Text variant="bodySmall" tone="danger" style={{ marginTop: space8 }}>
           {errorAddress}
         </Text>
       )}
@@ -129,8 +123,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
-            marginVertical: 5,
-            paddingHorizontal: 10,
+            marginVertical: space4,
           }}
         >
           {verifyOK ? (
@@ -143,8 +136,9 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
               }}
             >
               <VerifyCheckIcon
+                size={iconSizeSm}
                 color={colors.fgAccent}
-                style={{ marginRight: 10 }}
+                style={{ marginRight: space8 }}
               />
               <Text
                 testID="receive.verify-mine"
@@ -165,8 +159,9 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
               }}
             >
               <VerifyXIcon
+                size={iconSizeSm}
                 color={colors.fgDanger}
-                style={{ marginRight: 10 }}
+                style={{ marginRight: space8 }}
               />
               <Text
                 testID="receive.verify-not-mine"
@@ -187,10 +182,8 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
-            gap: 10,
-            marginVertical: 5,
-            marginTop: 15,
-            paddingHorizontal: 10,
+            marginTop: space16,
+            marginBottom: space4,
           }}
         >
           <ButtonStack>

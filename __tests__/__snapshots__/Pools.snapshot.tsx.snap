@@ -271,7 +271,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
           style={
             {
               "backgroundColor": "#8888881F",
-              "borderRadius": 7,
+              "borderRadius": 999,
               "flexDirection": "row",
               "gap": 2,
               "height": 14,
@@ -302,7 +302,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#E4C28F",
-                  "borderRadius": 3,
+                  "borderRadius": 999,
                   "height": 8,
                   "width": 8,
                 }
@@ -335,7 +335,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#4E8E96",
-                  "borderRadius": 3,
+                  "borderRadius": 999,
                   "height": 8,
                   "width": 8,
                 }
@@ -368,7 +368,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#8DBF7A",
-                  "borderRadius": 3,
+                  "borderRadius": 999,
                   "height": 8,
                   "width": 8,
                 }
@@ -401,7 +401,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#E6C46A",
-                  "borderRadius": 3,
+                  "borderRadius": 999,
                   "height": 8,
                   "width": 8,
                 }

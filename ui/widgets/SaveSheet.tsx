@@ -8,10 +8,9 @@ import Animated, {
   ReduceMotion,
 } from 'react-native-reanimated';
 
-import { radiusSheet, useTheme } from '@app/theme';
+import { radiusSheet, useTheme, radiusPill, space8, space20 } from '@app/theme';
 import { ease } from '@app/theme/motion';
-import RegText from '@ui/primitives/RegText';
-import BoldText from '@ui/primitives/BoldText';
+import Text from '@ui/primitives/Text';
 import SheetRim from '@ui/primitives/SheetRim';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
@@ -113,25 +112,24 @@ const SaveSheet: React.FC<SaveSheetProps> = ({
             alignSelf: 'center',
             width: 36,
             height: 4,
-            borderRadius: 2,
+            borderRadius: radiusPill,
             backgroundColor: colors.bottomSheetBorder,
           }}
         />
-        <BoldText style={{ fontSize: 15, textAlign: 'center' }}>
+        <Text variant="bodyStrong" style={{ textAlign: 'center' }}>
           {title}
-        </BoldText>
-        <RegText
+        </Text>
+        <Text
+          variant="caption"
+          tone="muted"
           style={{
-            marginTop: 8,
-            marginBottom: 20,
-            fontSize: 11.5,
-            lineHeight: 17,
+            marginTop: space8,
+            marginBottom: space20,
             textAlign: 'center',
-            color: colors.fgMuted,
           }}
         >
           {body}
-        </RegText>
+        </Text>
         <ButtonStack>
           <Button
             testID={`${testID}.keep`}

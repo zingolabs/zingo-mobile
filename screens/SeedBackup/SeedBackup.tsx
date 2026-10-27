@@ -14,6 +14,7 @@ import {
   View,
 } from 'react-native';
 import Animated, {
+  interpolate,
   FadeIn,
   FadeOut,
   interpolateColor,
@@ -27,7 +28,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { useTheme, iconSizeMd } from '@app/theme';
+import { useTheme, iconSizeMd, radiusPill } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { SnackbarDurationEnum } from '@app/AppState';
@@ -366,7 +367,7 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
       width: from.width + (screen.width - from.width) * g,
       height: from.height + (screen.height - from.height) * g,
       opacity: whole.value,
-      borderRadius: RADIUS * (1 - g),
+      borderRadius: interpolate(g, [0, 1], [RADIUS, 0]),
       backgroundColor: interpolateColor(
         g,
         [0, 0.12, 1],
@@ -525,7 +526,7 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
                   style={({ pressed }) => ({
                     width: 44,
                     height: 44,
-                    borderRadius: 12,
+                    borderRadius: radiusPill,
                     alignItems: 'center',
                     justifyContent: 'center',
                     backgroundColor: pressed ? colors.bgMutedSubtle : undefined,

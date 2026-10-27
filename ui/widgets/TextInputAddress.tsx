@@ -1,10 +1,6 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { FieldAction, FieldActions } from '@ui/primitives/TextField';
-import { useInsetFill } from '@ui/primitives/Surface';
-import { View, TextInput } from 'react-native';
+import TextField, { FieldAction } from '@ui/primitives/TextField';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useTheme, radiusMd, space4 } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
@@ -13,14 +9,9 @@ import { ContactIcon } from '@ui/primitives/Icons/ContactIcon';
 import { ContextAppLoaded } from '@app/context';
 import { Request, useResult } from '@app/navigation/results';
 import { openScanner } from '@app/navigation/navigate';
-import ErrorText from '@ui/primitives/ErrorText';
-import RegText from '@ui/primitives/RegText';
 import { addressFromPaymentUri, validateAddressForChain } from '@app/swap';
 import { GlobalConst } from '@app/AppState';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
-import { fieldBorder } from '@ui/primitives/fieldBorder';
-import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
-import { XIcon } from '@ui/primitives/Icons/XIcon';
 
 type TextInputAddressProps = {
   address: string;
@@ -44,8 +35,6 @@ type TextInputAddressProps = {
   /** Opens the address book to choose a contact; no handler, no button. */
   onPickContact?: () => void;
   pickContactLabel?: string;
-  /** Sits flush under a label of its own: no outer padding, 48 pt tall. */
-  flush?: boolean;
 };
 const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   address,
@@ -61,16 +50,10 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   saveContactLabel,
   onPickContact,
   pickContactLabel,
-  flush,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server } = context;
-  const { colors } = useTheme();
-  /** An action inside the field, as in Send's recipient field: 44 pt, muted. */
-  const inset = useInsetFill();
-
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
-  const [focused, setFocused] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -135,131 +118,58 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
     });
   };
 
-  //console.log('render input text address');
-
   return (
-    <View style={{ display: 'flex', flexDirection: 'column' }}>
-      <View
-        style={{
-          display: 'flex',
-          padding: flush ? 0 : 10,
-          marginTop: flush ? 0 : 10,
-        }}
-      >
-        {showLabel && (
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}
-          >
-            <RegText>{translate('send.toaddress') as string}</RegText>
-            {validAddress === 1 && (
-              <CheckIcon size={16} color={colors.fgAccent} />
-            )}
-            {validAddress === -1 && (
-              <ErrorText>
-                {translate('send.invalidaddress') as string}
-              </ErrorText>
-            )}
-          </View>
-        )}
-        <View
-          style={{
-            backgroundColor: inset,
-            borderWidth: 1,
-            borderRadius: radiusMd,
-            borderColor: fieldBorder(
-              colors,
-              focused,
-              validAddress === 1
-                ? 'valid'
-                : validAddress === -1
-                  ? 'invalid'
-                  : 'unknown',
-            ),
-            marginTop: flush ? 0 : space4,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: 'row',
-              ...(flush && { minHeight: 48 }),
-            }}
-          >
-            <View
-              accessible={true}
-              accessibilityLabel={translate('send.address-acc') as string}
-              style={{
-                flex: 1,
-                justifyContent: 'center',
-              }}
-            >
-              <TextInput
-                testID="send.addressplaceholder"
-                onFocus={() => setFocused(true)}
-                onBlur={() => setFocused(false)}
-                placeholder={
-                  placeholder ??
-                  (translate('send.addressplaceholder') as string)
-                }
-                placeholderTextColor={colors.fgMuted}
-                style={{
-                  color: colors.fgDefault,
-                  fontWeight: '600',
-                  fontSize: 15,
-                  padding: 10,
-                }}
-                value={address}
-                onChangeText={take}
-                editable={!disabled}
-              />
-            </View>
-            <FieldActions>
-              {!!address && !disabled && (
-                <FieldAction
-                  icon={XIcon}
-                  label={translate('clear') as string}
-                  onPress={() => setAddress('')}
-                />
-              )}
-              {validAddress === 1 && !disabled && !!onSaveContact && (
-                <FieldAction
-                  testID="send.save-contact-button"
-                  icon={UserPlusIcon}
-                  label={saveContactLabel ?? ''}
-                  onPress={onSaveContact}
-                />
-              )}
-              {!address && !disabled && !!pasteLabel && (
-                <FieldAction
-                  testID="send.paste-button"
-                  icon={ClipboardPasteIcon}
-                  label={pasteLabel}
-                  onPress={async () => take(await Clipboard.getString())}
-                />
-              )}
-              {!disabled && !!onPickContact && (
-                <FieldAction
-                  testID="send.address-book"
-                  icon={ContactIcon}
-                  label={pickContactLabel ?? ''}
-                  onPress={onPickContact}
-                />
-              )}
-              <FieldAction
-                testID="send.scan-button"
-                icon={ScanIcon}
-                label={translate('send.scan-acc') as string}
-                onPress={() => setQrcodeModalShow()}
-                disabled={disabled}
-              />
-            </FieldActions>
-          </View>
-        </View>
-      </View>
-    </View>
+    <TextField
+      testID="send.addressplaceholder"
+      label={showLabel ? (translate('send.toaddress') as string) : ''}
+      accessibilityLabel={translate('send.address-acc') as string}
+      value={address}
+      onChangeText={take}
+      placeholder={
+        placeholder ?? (translate('send.addressplaceholder') as string)
+      }
+      mono
+      disabled={disabled}
+      valid={validAddress === 1}
+      invalid={validAddress === -1}
+      clearable
+      clearLabel={translate('clear') as string}
+      trailing={
+        <>
+          {validAddress === 1 && !disabled && !!onSaveContact && (
+            <FieldAction
+              testID="send.save-contact-button"
+              icon={UserPlusIcon}
+              label={saveContactLabel ?? ''}
+              onPress={onSaveContact}
+            />
+          )}
+          {!address && !disabled && !!pasteLabel && (
+            <FieldAction
+              testID="send.paste-button"
+              icon={ClipboardPasteIcon}
+              label={pasteLabel}
+              onPress={async () => take(await Clipboard.getString())}
+            />
+          )}
+          {!disabled && !!onPickContact && (
+            <FieldAction
+              testID="send.address-book"
+              icon={ContactIcon}
+              label={pickContactLabel ?? ''}
+              onPress={onPickContact}
+            />
+          )}
+          <FieldAction
+            testID="send.scan-button"
+            icon={ScanIcon}
+            label={translate('send.scan-acc') as string}
+            onPress={() => setQrcodeModalShow()}
+            disabled={disabled}
+          />
+        </>
+      }
+    />
   );
 };
 

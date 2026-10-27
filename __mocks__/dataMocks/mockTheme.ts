@@ -58,6 +58,7 @@ const colors: ThemeColors = {
   bgViewOnlySubtle: '#8FB4E61F',
 
   bgNym: '#07FF94',
+  fgNym: '#07FF94',
   bgNymSubtle: '#07FF941F',
   bgSwitchOff: '#7E7E7E',
   bgSwitchOnDeep: '#0A4004',
