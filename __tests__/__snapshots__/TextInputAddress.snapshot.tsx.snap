@@ -92,15 +92,47 @@ exports[`TextInputAddress - snapshots TextInputAddress disabled without label 1`
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          {
-            "alignItems": "center",
-            "height": 36,
-            "justifyContent": "center",
-            "width": 36,
-          }
+          [
+            {
+              "alignItems": "center",
+              "height": 36,
+              "justifyContent": "center",
+              "width": 36,
+            },
+            {},
+          ]
         }
         testID="send.scan-button"
-      />
+      >
+        <View
+          pointerEvents="none"
+          style={
+            {
+              "alignItems": "center",
+              "bottom": 0,
+              "justifyContent": "center",
+              "left": 0,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+            }
+          }
+        >
+          <View
+            style={
+              [
+                {
+                  "backgroundColor": "#8888881F",
+                  "borderRadius": 999,
+                  "height": 44,
+                  "width": 44,
+                },
+                {},
+              ]
+            }
+          />
+        </View>
+      </View>
     </View>
   </View>
 </View>
@@ -221,15 +253,47 @@ exports[`TextInputAddress - snapshots TextInputAddress empty, enabled, with labe
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          {
-            "alignItems": "center",
-            "height": 36,
-            "justifyContent": "center",
-            "width": 36,
-          }
+          [
+            {
+              "alignItems": "center",
+              "height": 36,
+              "justifyContent": "center",
+              "width": 36,
+            },
+            {},
+          ]
         }
         testID="send.scan-button"
-      />
+      >
+        <View
+          pointerEvents="none"
+          style={
+            {
+              "alignItems": "center",
+              "bottom": 0,
+              "justifyContent": "center",
+              "left": 0,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+            }
+          }
+        >
+          <View
+            style={
+              [
+                {
+                  "backgroundColor": "#8888881F",
+                  "borderRadius": 999,
+                  "height": 44,
+                  "width": 44,
+                },
+                {},
+              ]
+            }
+          />
+        </View>
+      </View>
     </View>
   </View>
 </View>

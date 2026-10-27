@@ -1,12 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {
-  ActivityIndicator,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-  TextStyle,
-} from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
+import { ActivityIndicator, View, ViewStyle, TextStyle } from 'react-native';
 import {
   buttonMinHeight,
   fontScaleTitle,
@@ -110,7 +105,8 @@ const Button: React.FunctionComponent<ButtonProps> = ({
               : colors.fgAccent;
 
   return (
-    <TouchableOpacity
+    <Pressable
+      kind="button"
       testID={testID}
       accessible={accessible}
       accessibilityRole="button"
@@ -178,7 +174,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
           {title}
         </Text>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 

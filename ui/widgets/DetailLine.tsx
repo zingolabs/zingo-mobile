@@ -1,8 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { ReactNode, useContext } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 
 import FadeText from '@ui/primitives/FadeText';
 import RegText from '@ui/primitives/RegText';
@@ -30,7 +31,8 @@ const DetailLine: React.FunctionComponent<DetailLineProps> = ({
     <View style={{ display: 'flex', marginTop: 20 }}>
       <FadeText>{label}</FadeText>
       {!!value && (
-        <TouchableOpacity
+        <Pressable
+          kind="link"
           onPress={() => {
             Clipboard.setString(value);
             addLastSnackbar(
@@ -42,7 +44,7 @@ const DetailLine: React.FunctionComponent<DetailLineProps> = ({
           <RegText testID={testID} color={colors.fgDefault}>
             {value}
           </RegText>
-        </TouchableOpacity>
+        </Pressable>
       )}
       {children}
     </View>

@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { Pressable } from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
+
 import {
   chipMinHeight,
   radiusPill,
@@ -28,12 +29,13 @@ const Chip: React.FunctionComponent<ChipProps> = ({
   const slop = (touchTarget - chipMinHeight) / 2;
   return (
     <Pressable
+      kind="button"
       testID={testID}
       accessibilityRole="button"
       accessibilityState={{ selected }}
       hitSlop={{ top: slop, bottom: slop }}
       onPress={onPress}
-      style={({ pressed }) => ({
+      style={{
         minHeight: chipMinHeight,
         paddingHorizontal: space12,
         borderRadius: radiusPill,
@@ -42,8 +44,7 @@ const Chip: React.FunctionComponent<ChipProps> = ({
         backgroundColor: selected ? colors.bgAccentSubtle : undefined,
         alignItems: 'center',
         justifyContent: 'center',
-        opacity: pressed ? 0.7 : 1,
-      })}
+      }}
     >
       <Text
         variant="bodySmall"

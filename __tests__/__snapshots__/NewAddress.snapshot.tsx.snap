@@ -92,20 +92,41 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "columnGap": 12,
-            "flex": 1,
-            "flexDirection": "row",
-            "minHeight": 56,
-            "paddingLeft": 16,
-            "paddingRight": 16,
-            "paddingVertical": 12,
-          }
+          [
+            {
+              "alignItems": "center",
+              "columnGap": 12,
+              "flex": 1,
+              "flexDirection": "row",
+              "minHeight": 56,
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingVertical": 12,
+            },
+            {},
+          ]
         }
         testID="receive.new-kind.orchard"
       >
+        <View
+          pointerEvents="none"
+          style={
+            [
+              {
+                "bottom": 0,
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+              {
+                "backgroundColor": "#8888881F",
+                "borderRadius": undefined,
+              },
+              {},
+            ]
+          }
+        />
         <View
           style={
             {
@@ -249,21 +270,42 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "columnGap": 12,
-            "flex": 1,
-            "flexDirection": "row",
-            "minHeight": 56,
-            "paddingLeft": 16,
-            "paddingRight": 16,
-            "paddingVertical": 12,
-          }
+          [
+            {
+              "alignItems": "center",
+              "columnGap": 12,
+              "flex": 1,
+              "flexDirection": "row",
+              "minHeight": 56,
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingVertical": 12,
+            },
+            {},
+          ]
         }
         testID="receive.new-kind.orchardSapling"
       >
         <View
+          pointerEvents="none"
+          style={
+            [
+              {
+                "bottom": 0,
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+              {
+                "backgroundColor": "#8888881F",
+                "borderRadius": undefined,
+              },
+              {},
+            ]
+          }
+        />
+        <View
           style={
             {
               "alignItems": "center",
@@ -381,21 +423,42 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "columnGap": 12,
-            "flex": 1,
-            "flexDirection": "row",
-            "minHeight": 56,
-            "paddingLeft": 16,
-            "paddingRight": 16,
-            "paddingVertical": 12,
-          }
+          [
+            {
+              "alignItems": "center",
+              "columnGap": 12,
+              "flex": 1,
+              "flexDirection": "row",
+              "minHeight": 56,
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingVertical": 12,
+            },
+            {},
+          ]
         }
         testID="receive.new-kind.sapling"
       >
         <View
+          pointerEvents="none"
+          style={
+            [
+              {
+                "bottom": 0,
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+              {
+                "backgroundColor": "#8888881F",
+                "borderRadius": undefined,
+              },
+              {},
+            ]
+          }
+        />
+        <View
           style={
             {
               "alignItems": "center",
@@ -513,20 +576,41 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "columnGap": 12,
-            "flex": 1,
-            "flexDirection": "row",
-            "minHeight": 56,
-            "paddingLeft": 16,
-            "paddingRight": 16,
-            "paddingVertical": 12,
-          }
+          [
+            {
+              "alignItems": "center",
+              "columnGap": 12,
+              "flex": 1,
+              "flexDirection": "row",
+              "minHeight": 56,
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingVertical": 12,
+            },
+            {},
+          ]
         }
         testID="receive.new-kind.transparent"
       >
+        <View
+          pointerEvents="none"
+          style={
+            [
+              {
+                "bottom": 0,
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+              {
+                "backgroundColor": "#8888881F",
+                "borderRadius": undefined,
+              },
+              {},
+            ]
+          }
+        />
         <View
           style={
             {
@@ -760,7 +844,9 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
         accessible={true}
         collapsable={false}
         focusable={true}
+        onBlur={[Function]}
         onClick={[Function]}
+        onFocus={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -768,19 +854,21 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          {
-            "alignItems": "center",
-            "alignSelf": "stretch",
-            "backgroundColor": undefined,
-            "borderRadius": 999,
-            "justifyContent": "center",
-            "maxWidth": "100%",
-            "minHeight": 44,
-            "opacity": 1,
-            "paddingHorizontal": 24,
-            "paddingVertical": 8,
-            "width": "100%",
-          }
+          [
+            {
+              "alignItems": "center",
+              "alignSelf": "stretch",
+              "backgroundColor": undefined,
+              "borderRadius": 999,
+              "justifyContent": "center",
+              "maxWidth": "100%",
+              "minHeight": 44,
+              "paddingHorizontal": 24,
+              "paddingVertical": 8,
+              "width": "100%",
+            },
+            {},
+          ]
         }
       >
         <Text
@@ -820,7 +908,9 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
         accessible={true}
         collapsable={false}
         focusable={true}
+        onBlur={[Function]}
         onClick={[Function]}
+        onFocus={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -828,19 +918,21 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          {
-            "alignItems": "center",
-            "alignSelf": "stretch",
-            "backgroundColor": "#18bd18",
-            "borderRadius": 999,
-            "justifyContent": "center",
-            "maxWidth": "100%",
-            "minHeight": 44,
-            "opacity": 1,
-            "paddingHorizontal": 24,
-            "paddingVertical": 8,
-            "width": "100%",
-          }
+          [
+            {
+              "alignItems": "center",
+              "alignSelf": "stretch",
+              "backgroundColor": "#18bd18",
+              "borderRadius": 999,
+              "justifyContent": "center",
+              "maxWidth": "100%",
+              "minHeight": 44,
+              "paddingHorizontal": 24,
+              "paddingVertical": 8,
+              "width": "100%",
+            },
+            {},
+          ]
         }
         testID="receive.new-create"
       >

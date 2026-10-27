@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { ActivityIndicator, Pressable, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { iconSizeSm, space4, space8, space12, useTheme } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { AddressBookFileClass } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils';
@@ -101,6 +102,7 @@ export default function RecipientField({
   const shortened =
     valid === 1 && !token && !!text && !focused && !editing ? (
       <Pressable
+        kind="row"
         // The input's own id: Maestro taps it and types into the input it brings back.
         testID="send.addressplaceholder"
         accessibilityRole="button"

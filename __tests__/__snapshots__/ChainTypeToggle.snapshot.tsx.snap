@@ -34,7 +34,9 @@ exports[`Component ChainTypeToggle - test ChainTypeToggle - snapshot 1`] = `
     accessible={true}
     collapsable={false}
     focusable={true}
+    onBlur={[Function]}
     onClick={[Function]}
+    onFocus={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -42,16 +44,18 @@ exports[`Component ChainTypeToggle - test ChainTypeToggle - snapshot 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "alignItems": "center",
-        "backgroundColor": "#18bd18",
-        "borderColor": "#18bd18",
-        "borderRadius": 8,
-        "borderWidth": 1,
-        "flex": 1,
-        "opacity": 1,
-        "paddingVertical": 8,
-      }
+      [
+        {
+          "alignItems": "center",
+          "backgroundColor": "#18bd18",
+          "borderColor": "#18bd18",
+          "borderRadius": 8,
+          "borderWidth": 1,
+          "flex": 1,
+          "paddingVertical": 8,
+        },
+        {},
+      ]
     }
     testID="settings.custom-server-chain.mainnet"
   >
@@ -89,7 +93,9 @@ exports[`Component ChainTypeToggle - test ChainTypeToggle - snapshot 1`] = `
     accessible={true}
     collapsable={false}
     focusable={true}
+    onBlur={[Function]}
     onClick={[Function]}
+    onFocus={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -97,16 +103,18 @@ exports[`Component ChainTypeToggle - test ChainTypeToggle - snapshot 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "alignItems": "center",
-        "backgroundColor": undefined,
-        "borderColor": "#18bd18",
-        "borderRadius": 8,
-        "borderWidth": 0,
-        "flex": 1,
-        "opacity": 1,
-        "paddingVertical": 8,
-      }
+      [
+        {
+          "alignItems": "center",
+          "backgroundColor": undefined,
+          "borderColor": "#18bd18",
+          "borderRadius": 8,
+          "borderWidth": 0,
+          "flex": 1,
+          "paddingVertical": 8,
+        },
+        {},
+      ]
     }
     testID="settings.custom-server-chain.testnet"
   >
@@ -144,7 +152,9 @@ exports[`Component ChainTypeToggle - test ChainTypeToggle - snapshot 1`] = `
     accessible={true}
     collapsable={false}
     focusable={true}
+    onBlur={[Function]}
     onClick={[Function]}
+    onFocus={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -152,16 +162,18 @@ exports[`Component ChainTypeToggle - test ChainTypeToggle - snapshot 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "alignItems": "center",
-        "backgroundColor": undefined,
-        "borderColor": "#18bd18",
-        "borderRadius": 8,
-        "borderWidth": 0,
-        "flex": 1,
-        "opacity": 1,
-        "paddingVertical": 8,
-      }
+      [
+        {
+          "alignItems": "center",
+          "backgroundColor": undefined,
+          "borderColor": "#18bd18",
+          "borderRadius": 8,
+          "borderWidth": 0,
+          "flex": 1,
+          "paddingVertical": 8,
+        },
+        {},
+      ]
     }
     testID="settings.custom-server-chain.regtestnet"
   >

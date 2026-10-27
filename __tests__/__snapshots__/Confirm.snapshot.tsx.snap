@@ -101,15 +101,47 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "paddingHorizontal": 14,
-                "paddingVertical": 4,
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "paddingHorizontal": 14,
+                  "paddingVertical": 4,
+                },
+                {},
+              ]
             }
             testID="send.confirm.scroll-view.back"
-          />
+          >
+            <View
+              pointerEvents="none"
+              style={
+                {
+                  "alignItems": "center",
+                  "bottom": 0,
+                  "justifyContent": "center",
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                }
+              }
+            >
+              <View
+                style={
+                  [
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": 999,
+                      "height": 44,
+                      "width": 44,
+                    },
+                    {},
+                  ]
+                }
+              />
+            </View>
+          </View>
         </View>
         <View
           style={
@@ -701,7 +733,9 @@ memo10
             accessible={true}
             collapsable={false}
             focusable={true}
+            onBlur={[Function]}
             onClick={[Function]}
+            onFocus={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -709,19 +743,21 @@ memo10
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "alignSelf": "stretch",
-                "backgroundColor": undefined,
-                "borderRadius": 999,
-                "justifyContent": "center",
-                "maxWidth": "100%",
-                "minHeight": 44,
-                "opacity": 1,
-                "paddingHorizontal": 24,
-                "paddingVertical": 8,
-                "width": "100%",
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "alignSelf": "stretch",
+                  "backgroundColor": undefined,
+                  "borderRadius": 999,
+                  "justifyContent": "center",
+                  "maxWidth": "100%",
+                  "minHeight": 44,
+                  "paddingHorizontal": 24,
+                  "paddingVertical": 8,
+                  "width": "100%",
+                },
+                {},
+              ]
             }
           >
             <Text
@@ -761,7 +797,9 @@ memo10
             accessible={true}
             collapsable={false}
             focusable={true}
+            onBlur={[Function]}
             onClick={[Function]}
+            onFocus={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -769,19 +807,21 @@ memo10
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "alignSelf": "stretch",
-                "backgroundColor": "#07FF94",
-                "borderRadius": 999,
-                "justifyContent": "center",
-                "maxWidth": "100%",
-                "minHeight": 44,
-                "opacity": 1,
-                "paddingHorizontal": 24,
-                "paddingVertical": 8,
-                "width": "100%",
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "alignSelf": "stretch",
+                  "backgroundColor": "#07FF94",
+                  "borderRadius": 999,
+                  "justifyContent": "center",
+                  "maxWidth": "100%",
+                  "minHeight": 44,
+                  "paddingHorizontal": 24,
+                  "paddingVertical": 8,
+                  "width": "100%",
+                },
+                {},
+              ]
             }
             testID="send.confirm.button"
           >
@@ -908,15 +948,47 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "paddingHorizontal": 14,
-                "paddingVertical": 4,
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "paddingHorizontal": 14,
+                  "paddingVertical": 4,
+                },
+                {},
+              ]
             }
             testID="send.confirm.scroll-view.back"
-          />
+          >
+            <View
+              pointerEvents="none"
+              style={
+                {
+                  "alignItems": "center",
+                  "bottom": 0,
+                  "justifyContent": "center",
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                }
+              }
+            >
+              <View
+                style={
+                  [
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": 999,
+                      "height": 44,
+                      "width": 44,
+                    },
+                    {},
+                  ]
+                }
+              />
+            </View>
+          </View>
         </View>
         <View
           style={
@@ -1508,7 +1580,9 @@ memo10
             accessible={true}
             collapsable={false}
             focusable={true}
+            onBlur={[Function]}
             onClick={[Function]}
+            onFocus={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -1516,19 +1590,21 @@ memo10
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "alignSelf": "stretch",
-                "backgroundColor": undefined,
-                "borderRadius": 999,
-                "justifyContent": "center",
-                "maxWidth": "100%",
-                "minHeight": 44,
-                "opacity": 1,
-                "paddingHorizontal": 24,
-                "paddingVertical": 8,
-                "width": "100%",
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "alignSelf": "stretch",
+                  "backgroundColor": undefined,
+                  "borderRadius": 999,
+                  "justifyContent": "center",
+                  "maxWidth": "100%",
+                  "minHeight": 44,
+                  "paddingHorizontal": 24,
+                  "paddingVertical": 8,
+                  "width": "100%",
+                },
+                {},
+              ]
             }
           >
             <Text
@@ -1568,7 +1644,9 @@ memo10
             accessible={true}
             collapsable={false}
             focusable={true}
+            onBlur={[Function]}
             onClick={[Function]}
+            onFocus={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -1576,19 +1654,21 @@ memo10
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "alignSelf": "stretch",
-                "backgroundColor": "#07FF94",
-                "borderRadius": 999,
-                "justifyContent": "center",
-                "maxWidth": "100%",
-                "minHeight": 44,
-                "opacity": 1,
-                "paddingHorizontal": 24,
-                "paddingVertical": 8,
-                "width": "100%",
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "alignSelf": "stretch",
+                  "backgroundColor": "#07FF94",
+                  "borderRadius": 999,
+                  "justifyContent": "center",
+                  "maxWidth": "100%",
+                  "minHeight": 44,
+                  "paddingHorizontal": 24,
+                  "paddingVertical": 8,
+                  "width": "100%",
+                },
+                {},
+              ]
             }
             testID="send.confirm.button"
           >

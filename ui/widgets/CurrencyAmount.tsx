@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect } from 'react';
-import { Text, View, TextStyle, TouchableOpacity } from 'react-native';
+import { Text, View, TextStyle } from 'react-native';
 import { useTheme, fontScaleBody } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { getNumberFormatSettings } from 'react-native-localize';
 import Animated, {
   ReduceMotion,
@@ -115,7 +116,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
 
   return (
     <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-      <TouchableOpacity disabled={!privacyHigh} onPress={reveal}>
+      <Pressable kind="link" disabled={!privacyHigh} onPress={reveal}>
         <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
           {privacyHigh ? (
             <Text
@@ -153,7 +154,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
             </Text>
           )}
         </View>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };

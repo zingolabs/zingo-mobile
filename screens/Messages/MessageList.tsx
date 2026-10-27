@@ -7,6 +7,7 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
+import Pressable from '@ui/primitives/Pressable';
 import {
   View,
   RefreshControl,
@@ -14,7 +15,6 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   ActivityIndicator,
-  Pressable,
 } from 'react-native';
 
 import { useNavigation } from '@react-navigation/native';
@@ -277,11 +277,12 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
       </ScrollView>
       {!isAtBottom && !loading && (
         <Pressable
+          kind="button"
           hitSlop={slopFor(36)}
           onPress={handleScrollToBottom}
           accessibilityRole="button"
           accessibilityLabel={translate('messages.bottom-acc') as string}
-          style={({ pressed }) => ({
+          style={{
             position: 'absolute',
             bottom: space32,
             right: space20,
@@ -291,10 +292,9 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
             justifyContent: 'center',
             backgroundColor: colors.bgSurface,
             borderRadius: radiusPill,
-            transform: [{ scale: pressed ? 0.9 : 1 }],
             borderWidth: 1,
             borderColor: colors.borderMuted,
-          })}
+          }}
         >
           <ChevronDown size={iconSizeMd} color={colors.fgMuted} />
         </Pressable>

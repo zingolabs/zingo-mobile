@@ -101,15 +101,47 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "paddingHorizontal": 14,
-                "paddingVertical": 4,
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "paddingHorizontal": 14,
+                  "paddingVertical": 4,
+                },
+                {},
+              ]
             }
             testID="valuetransferdetail.scroll-view.back"
-          />
+          >
+            <View
+              pointerEvents="none"
+              style={
+                {
+                  "alignItems": "center",
+                  "bottom": 0,
+                  "justifyContent": "center",
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                }
+              }
+            >
+              <View
+                style={
+                  [
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": 999,
+                      "height": 44,
+                      "width": 44,
+                    },
+                    {},
+                  ]
+                }
+              />
+            </View>
+          </View>
         </View>
         <View
           style={
@@ -235,6 +267,12 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            style={
+              [
+                undefined,
+                {},
+              ]
+            }
           >
             <Text
               maxFontSizeMultiplier={1.3}
@@ -691,6 +729,12 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            style={
+              [
+                undefined,
+                {},
+              ]
+            }
             testID="valuetransferdetail.memo"
           >
             <Text
@@ -756,7 +800,9 @@ hello
           accessible={true}
           collapsable={false}
           focusable={true}
+          onBlur={[Function]}
           onClick={[Function]}
+          onFocus={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -764,19 +810,21 @@ hello
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "alignItems": "center",
-              "alignSelf": "stretch",
-              "backgroundColor": undefined,
-              "borderRadius": 999,
-              "justifyContent": "center",
-              "maxWidth": "100%",
-              "minHeight": 44,
-              "opacity": 1,
-              "paddingHorizontal": 24,
-              "paddingVertical": 8,
-              "width": "100%",
-            }
+            [
+              {
+                "alignItems": "center",
+                "alignSelf": "stretch",
+                "backgroundColor": undefined,
+                "borderRadius": 999,
+                "justifyContent": "center",
+                "maxWidth": "100%",
+                "minHeight": 44,
+                "paddingHorizontal": 24,
+                "paddingVertical": 8,
+                "width": "100%",
+              },
+              {},
+            ]
           }
           testID="valuetransferdetail.explorer"
         >
@@ -902,15 +950,47 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "paddingHorizontal": 14,
-                "paddingVertical": 4,
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "paddingHorizontal": 14,
+                  "paddingVertical": 4,
+                },
+                {},
+              ]
             }
             testID="valuetransferdetail.scroll-view.back"
-          />
+          >
+            <View
+              pointerEvents="none"
+              style={
+                {
+                  "alignItems": "center",
+                  "bottom": 0,
+                  "justifyContent": "center",
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                }
+              }
+            >
+              <View
+                style={
+                  [
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": 999,
+                      "height": 44,
+                      "width": 44,
+                    },
+                    {},
+                  ]
+                }
+              />
+            </View>
+          </View>
         </View>
         <View
           style={
@@ -1036,6 +1116,12 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            style={
+              [
+                undefined,
+                {},
+              ]
+            }
           >
             <Text
               maxFontSizeMultiplier={1.3}
@@ -1579,14 +1665,17 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "alignItems": "center",
-              "columnGap": 8,
-              "flexDirection": "row",
-              "justifyContent": "center",
-              "marginTop": 8,
-              "minHeight": 44,
-            }
+            [
+              {
+                "alignItems": "center",
+                "columnGap": 8,
+                "flexDirection": "row",
+                "justifyContent": "center",
+                "marginTop": 8,
+                "minHeight": 44,
+              },
+              {},
+            ]
           }
           testID="valuetransferdetail.save-contact"
         >
@@ -1662,6 +1751,12 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            style={
+              [
+                undefined,
+                {},
+              ]
+            }
             testID="valuetransferdetail.memo"
           >
             <Text
@@ -1727,7 +1822,9 @@ hello
           accessible={true}
           collapsable={false}
           focusable={true}
+          onBlur={[Function]}
           onClick={[Function]}
+          onFocus={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1735,19 +1832,21 @@ hello
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "alignItems": "center",
-              "alignSelf": "stretch",
-              "backgroundColor": undefined,
-              "borderRadius": 999,
-              "justifyContent": "center",
-              "maxWidth": "100%",
-              "minHeight": 44,
-              "opacity": 1,
-              "paddingHorizontal": 24,
-              "paddingVertical": 8,
-              "width": "100%",
-            }
+            [
+              {
+                "alignItems": "center",
+                "alignSelf": "stretch",
+                "backgroundColor": undefined,
+                "borderRadius": 999,
+                "justifyContent": "center",
+                "maxWidth": "100%",
+                "minHeight": 44,
+                "paddingHorizontal": 24,
+                "paddingVertical": 8,
+                "width": "100%",
+              },
+              {},
+            ]
           }
           testID="valuetransferdetail.explorer"
         >

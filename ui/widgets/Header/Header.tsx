@@ -3,6 +3,7 @@
 import { SnowflakeIcon } from '@ui/primitives/Icons/SnowflakeIcon';
 import { REVEAL_OPEN_MS } from '@ui/widgets/CircularReveal';
 import { ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import {
   StackActions,
   useNavigation,
@@ -11,7 +12,7 @@ import {
 import { WalletNavigation } from '@app/types';
 import { useTheme, iconSize, slopFor } from '@app/theme';
 import React, { useContext, useEffect, useRef } from 'react';
-import { Image, TouchableOpacity, View } from 'react-native';
+import { Image, View } from 'react-native';
 import Animated, {
   Easing,
   ReduceMotion,
@@ -228,7 +229,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             }}
           >
             {mixnetPhase !== 'absent' && (
-              <TouchableOpacity
+              <Pressable
+                kind="icon"
                 testID="header.mixnet-status"
                 hitSlop={slopFor(22)}
                 accessibilityRole="button"
@@ -238,7 +240,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 onPress={() => navigation.navigate(Route.MixnetDoctor)}
               >
                 <MixnetIcon phase={mixnetPhase} />
-              </TouchableOpacity>
+              </Pressable>
             )}
           </View>
 
@@ -290,7 +292,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         >
           <View style={{ alignItems: 'center', flexDirection: 'row', gap: 14 }}>
             {!noDrawMenu && (
-              <TouchableOpacity
+              <Pressable
+                kind="icon"
                 hitSlop={slopFor(24)}
                 testID="header.drawmenu"
                 accessible={true}
@@ -316,11 +319,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     }}
                   />
                 )}
-              </TouchableOpacity>
+              </Pressable>
             )}
             {readOnly && !noUfvkIcon && (
               <Animated.View style={headerAnimatedStyle}>
-                <TouchableOpacity
+                <Pressable
+                  kind="icon"
                   hitSlop={slopFor(24)}
                   testID="header.snowflake"
                   accessibilityRole="button"
@@ -330,7 +334,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   <Animated.View ref={snowflake} style={snowStyle}>
                     <SnowflakeIcon size={iconSize} color={colors.fgViewOnly} />
                   </Animated.View>
-                </TouchableOpacity>
+                </Pressable>
               </Animated.View>
             )}
           </View>
@@ -360,14 +364,15 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   corner pads 13, so an 11 half-box lands at 24 without the
                   4.5 below. The nudge rides on the icon alone, leaving the
                   logo this corner falls back to where it already sat. */}
-              <TouchableOpacity
+              <Pressable
+                kind="icon"
                 hitSlop={slopFor(24)}
                 style={{ marginRight: 5, marginTop: 4.5 }}
                 testID="header.messages"
                 onPress={() => navigation.navigate(Route.Messages)}
               >
                 <MessagesIcon size={iconSize} color={colors.fgMuted} />
-              </TouchableOpacity>
+              </Pressable>
             </View>
           ) : (
             <Image

@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
-import { Platform, Pressable, TextInput, View } from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
+import { Platform, TextInput, View } from 'react-native';
 import {
   fieldMinHeight,
   fontScaleBody,
@@ -44,6 +45,7 @@ export const FieldAction = React.forwardRef<
   const { colors } = useTheme();
   return (
     <Pressable
+      kind="icon"
       ref={ref}
       testID={testID}
       accessibilityRole="button"

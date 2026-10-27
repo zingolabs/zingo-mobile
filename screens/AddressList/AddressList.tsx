@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useRef, useState } from 'react';
-import { Keyboard, Pressable, View } from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
+import { Keyboard, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import {
@@ -122,19 +123,19 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
               onPress={() => togglePin(address.address)}
             />
             <Pressable
+              kind="icon"
               accessibilityRole="button"
               accessibilityLabel={t(
                 tag ? 'receive.edit-tag' : 'addressbook.add-tag',
               )}
               onPress={() => openTag(address.address)}
-              style={({ pressed }) => ({
+              style={{
                 width: touchTarget,
                 height: touchTarget,
                 borderRadius: radiusPill,
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: pressed ? colors.bgMutedSubtle : 'transparent',
-              })}
+              }}
             >
               {tag ? (
                 <PencilIcon size={iconSizeMd} color={colors.fgMuted} />

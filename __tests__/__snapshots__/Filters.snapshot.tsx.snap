@@ -72,17 +72,19 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "alignItems": "center",
-          "backgroundColor": undefined,
-          "borderColor": "#4A6487",
-          "borderRadius": 999,
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "minHeight": 32,
-          "opacity": 1,
-          "paddingHorizontal": 12,
-        }
+        [
+          {
+            "alignItems": "center",
+            "backgroundColor": undefined,
+            "borderColor": "#4A6487",
+            "borderRadius": 999,
+            "borderWidth": 1,
+            "justifyContent": "center",
+            "minHeight": 32,
+            "paddingHorizontal": 12,
+          },
+          {},
+        ]
       }
       testID="history.filter.all"
     >
@@ -138,17 +140,19 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "alignItems": "center",
-          "backgroundColor": undefined,
-          "borderColor": "#4A6487",
-          "borderRadius": 999,
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "minHeight": 32,
-          "opacity": 1,
-          "paddingHorizontal": 12,
-        }
+        [
+          {
+            "alignItems": "center",
+            "backgroundColor": undefined,
+            "borderColor": "#4A6487",
+            "borderRadius": 999,
+            "borderWidth": 1,
+            "justifyContent": "center",
+            "minHeight": 32,
+            "paddingHorizontal": 12,
+          },
+          {},
+        ]
       }
       testID="history.filter.received"
     >
@@ -204,17 +208,19 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "alignItems": "center",
-          "backgroundColor": undefined,
-          "borderColor": "#4A6487",
-          "borderRadius": 999,
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "minHeight": 32,
-          "opacity": 1,
-          "paddingHorizontal": 12,
-        }
+        [
+          {
+            "alignItems": "center",
+            "backgroundColor": undefined,
+            "borderColor": "#4A6487",
+            "borderRadius": 999,
+            "borderWidth": 1,
+            "justifyContent": "center",
+            "minHeight": 32,
+            "paddingHorizontal": 12,
+          },
+          {},
+        ]
       }
       testID="history.filter.sent"
     >
@@ -270,17 +276,19 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "alignItems": "center",
-          "backgroundColor": undefined,
-          "borderColor": "#4A6487",
-          "borderRadius": 999,
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "minHeight": 32,
-          "opacity": 1,
-          "paddingHorizontal": 12,
-        }
+        [
+          {
+            "alignItems": "center",
+            "backgroundColor": undefined,
+            "borderColor": "#4A6487",
+            "borderRadius": 999,
+            "borderWidth": 1,
+            "justifyContent": "center",
+            "minHeight": 32,
+            "paddingHorizontal": 12,
+          },
+          {},
+        ]
       }
       testID="history.filter.shielded"
     >
@@ -336,17 +344,19 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "alignItems": "center",
-          "backgroundColor": "#18bd181F",
-          "borderColor": "#18bd18",
-          "borderRadius": 999,
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "minHeight": 32,
-          "opacity": 1,
-          "paddingHorizontal": 12,
-        }
+        [
+          {
+            "alignItems": "center",
+            "backgroundColor": "#18bd181F",
+            "borderColor": "#18bd18",
+            "borderRadius": 999,
+            "borderWidth": 1,
+            "justifyContent": "center",
+            "minHeight": 32,
+            "paddingHorizontal": 12,
+          },
+          {},
+        ]
       }
       testID="history.filter.failed"
     >
@@ -402,17 +412,19 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "alignItems": "center",
-          "backgroundColor": undefined,
-          "borderColor": "#4A6487",
-          "borderRadius": 999,
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "minHeight": 32,
-          "opacity": 1,
-          "paddingHorizontal": 12,
-        }
+        [
+          {
+            "alignItems": "center",
+            "backgroundColor": undefined,
+            "borderColor": "#4A6487",
+            "borderRadius": 999,
+            "borderWidth": 1,
+            "justifyContent": "center",
+            "minHeight": 32,
+            "paddingHorizontal": 12,
+          },
+          {},
+        ]
       }
       testID="history.filter.memo"
     >
@@ -468,17 +480,19 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "alignItems": "center",
-          "backgroundColor": undefined,
-          "borderColor": "#4A6487",
-          "borderRadius": 999,
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "minHeight": 32,
-          "opacity": 1,
-          "paddingHorizontal": 12,
-        }
+        [
+          {
+            "alignItems": "center",
+            "backgroundColor": undefined,
+            "borderColor": "#4A6487",
+            "borderRadius": 999,
+            "borderWidth": 1,
+            "justifyContent": "center",
+            "minHeight": 32,
+            "paddingHorizontal": 12,
+          },
+          {},
+        ]
       }
       testID="history.filter.swaps"
     >
@@ -527,7 +541,9 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
       accessible={true}
       collapsable={false}
       focusable={true}
+      onBlur={[Function]}
       onClick={[Function]}
+      onFocus={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -535,19 +551,21 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "alignItems": "center",
-          "alignSelf": "stretch",
-          "backgroundColor": "#18bd18",
-          "borderRadius": 999,
-          "justifyContent": "center",
-          "maxWidth": "100%",
-          "minHeight": 44,
-          "opacity": 1,
-          "paddingHorizontal": 24,
-          "paddingVertical": 8,
-          "width": "100%",
-        }
+        [
+          {
+            "alignItems": "center",
+            "alignSelf": "stretch",
+            "backgroundColor": "#18bd18",
+            "borderRadius": 999,
+            "justifyContent": "center",
+            "maxWidth": "100%",
+            "minHeight": 44,
+            "paddingHorizontal": 24,
+            "paddingVertical": 8,
+            "width": "100%",
+          },
+          {},
+        ]
       }
       testID="history.filter.apply"
     >
@@ -588,7 +606,9 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
       accessible={true}
       collapsable={false}
       focusable={true}
+      onBlur={[Function]}
       onClick={[Function]}
+      onFocus={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -596,19 +616,21 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "alignItems": "center",
-          "alignSelf": "stretch",
-          "backgroundColor": undefined,
-          "borderRadius": 999,
-          "justifyContent": "center",
-          "maxWidth": "100%",
-          "minHeight": 44,
-          "opacity": 1,
-          "paddingHorizontal": 24,
-          "paddingVertical": 8,
-          "width": "100%",
-        }
+        [
+          {
+            "alignItems": "center",
+            "alignSelf": "stretch",
+            "backgroundColor": undefined,
+            "borderRadius": 999,
+            "justifyContent": "center",
+            "maxWidth": "100%",
+            "minHeight": 44,
+            "paddingHorizontal": 24,
+            "paddingVertical": 8,
+            "width": "100%",
+          },
+          {},
+        ]
       }
     >
       <Text
@@ -702,17 +724,19 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "alignItems": "center",
-          "backgroundColor": "#18bd181F",
-          "borderColor": "#18bd18",
-          "borderRadius": 999,
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "minHeight": 32,
-          "opacity": 1,
-          "paddingHorizontal": 12,
-        }
+        [
+          {
+            "alignItems": "center",
+            "backgroundColor": "#18bd181F",
+            "borderColor": "#18bd18",
+            "borderRadius": 999,
+            "borderWidth": 1,
+            "justifyContent": "center",
+            "minHeight": 32,
+            "paddingHorizontal": 12,
+          },
+          {},
+        ]
       }
       testID="history.filter.all"
     >
@@ -768,17 +792,19 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "alignItems": "center",
-          "backgroundColor": undefined,
-          "borderColor": "#4A6487",
-          "borderRadius": 999,
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "minHeight": 32,
-          "opacity": 1,
-          "paddingHorizontal": 12,
-        }
+        [
+          {
+            "alignItems": "center",
+            "backgroundColor": undefined,
+            "borderColor": "#4A6487",
+            "borderRadius": 999,
+            "borderWidth": 1,
+            "justifyContent": "center",
+            "minHeight": 32,
+            "paddingHorizontal": 12,
+          },
+          {},
+        ]
       }
       testID="history.filter.received"
     >
@@ -834,17 +860,19 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "alignItems": "center",
-          "backgroundColor": undefined,
-          "borderColor": "#4A6487",
-          "borderRadius": 999,
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "minHeight": 32,
-          "opacity": 1,
-          "paddingHorizontal": 12,
-        }
+        [
+          {
+            "alignItems": "center",
+            "backgroundColor": undefined,
+            "borderColor": "#4A6487",
+            "borderRadius": 999,
+            "borderWidth": 1,
+            "justifyContent": "center",
+            "minHeight": 32,
+            "paddingHorizontal": 12,
+          },
+          {},
+        ]
       }
       testID="history.filter.sent"
     >
@@ -900,17 +928,19 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "alignItems": "center",
-          "backgroundColor": undefined,
-          "borderColor": "#4A6487",
-          "borderRadius": 999,
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "minHeight": 32,
-          "opacity": 1,
-          "paddingHorizontal": 12,
-        }
+        [
+          {
+            "alignItems": "center",
+            "backgroundColor": undefined,
+            "borderColor": "#4A6487",
+            "borderRadius": 999,
+            "borderWidth": 1,
+            "justifyContent": "center",
+            "minHeight": 32,
+            "paddingHorizontal": 12,
+          },
+          {},
+        ]
       }
       testID="history.filter.shielded"
     >
@@ -966,17 +996,19 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "alignItems": "center",
-          "backgroundColor": undefined,
-          "borderColor": "#4A6487",
-          "borderRadius": 999,
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "minHeight": 32,
-          "opacity": 1,
-          "paddingHorizontal": 12,
-        }
+        [
+          {
+            "alignItems": "center",
+            "backgroundColor": undefined,
+            "borderColor": "#4A6487",
+            "borderRadius": 999,
+            "borderWidth": 1,
+            "justifyContent": "center",
+            "minHeight": 32,
+            "paddingHorizontal": 12,
+          },
+          {},
+        ]
       }
       testID="history.filter.failed"
     >
@@ -1032,17 +1064,19 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "alignItems": "center",
-          "backgroundColor": undefined,
-          "borderColor": "#4A6487",
-          "borderRadius": 999,
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "minHeight": 32,
-          "opacity": 1,
-          "paddingHorizontal": 12,
-        }
+        [
+          {
+            "alignItems": "center",
+            "backgroundColor": undefined,
+            "borderColor": "#4A6487",
+            "borderRadius": 999,
+            "borderWidth": 1,
+            "justifyContent": "center",
+            "minHeight": 32,
+            "paddingHorizontal": 12,
+          },
+          {},
+        ]
       }
       testID="history.filter.memo"
     >
@@ -1098,17 +1132,19 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "alignItems": "center",
-          "backgroundColor": undefined,
-          "borderColor": "#4A6487",
-          "borderRadius": 999,
-          "borderWidth": 1,
-          "justifyContent": "center",
-          "minHeight": 32,
-          "opacity": 1,
-          "paddingHorizontal": 12,
-        }
+        [
+          {
+            "alignItems": "center",
+            "backgroundColor": undefined,
+            "borderColor": "#4A6487",
+            "borderRadius": 999,
+            "borderWidth": 1,
+            "justifyContent": "center",
+            "minHeight": 32,
+            "paddingHorizontal": 12,
+          },
+          {},
+        ]
       }
       testID="history.filter.swaps"
     >
@@ -1157,7 +1193,9 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
       accessible={true}
       collapsable={false}
       focusable={true}
+      onBlur={[Function]}
       onClick={[Function]}
+      onFocus={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -1165,19 +1203,21 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "alignItems": "center",
-          "alignSelf": "stretch",
-          "backgroundColor": "#18bd18",
-          "borderRadius": 999,
-          "justifyContent": "center",
-          "maxWidth": "100%",
-          "minHeight": 44,
-          "opacity": 1,
-          "paddingHorizontal": 24,
-          "paddingVertical": 8,
-          "width": "100%",
-        }
+        [
+          {
+            "alignItems": "center",
+            "alignSelf": "stretch",
+            "backgroundColor": "#18bd18",
+            "borderRadius": 999,
+            "justifyContent": "center",
+            "maxWidth": "100%",
+            "minHeight": 44,
+            "paddingHorizontal": 24,
+            "paddingVertical": 8,
+            "width": "100%",
+          },
+          {},
+        ]
       }
       testID="history.filter.apply"
     >
@@ -1218,7 +1258,9 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
       accessible={true}
       collapsable={false}
       focusable={true}
+      onBlur={[Function]}
       onClick={[Function]}
+      onFocus={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -1226,19 +1268,21 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "alignItems": "center",
-          "alignSelf": "stretch",
-          "backgroundColor": undefined,
-          "borderRadius": 999,
-          "justifyContent": "center",
-          "maxWidth": "100%",
-          "minHeight": 44,
-          "opacity": 1,
-          "paddingHorizontal": 24,
-          "paddingVertical": 8,
-          "width": "100%",
-        }
+        [
+          {
+            "alignItems": "center",
+            "alignSelf": "stretch",
+            "backgroundColor": undefined,
+            "borderRadius": 999,
+            "justifyContent": "center",
+            "maxWidth": "100%",
+            "minHeight": 44,
+            "paddingHorizontal": 24,
+            "paddingVertical": 8,
+            "width": "100%",
+          },
+          {},
+        ]
       }
     >
       <Text

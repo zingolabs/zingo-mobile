@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { BannerPlainContext } from '@ui/widgets/Banner';
-import { Pressable, View } from 'react-native';
+import { Pressable as RNPressable, View } from 'react-native';
 import Text from '@ui/primitives/Text';
 import Animated, {
   Keyframe,
@@ -14,6 +14,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useTheme, radiusMd, space20, iconSizeSm, slopFor } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { duration, ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { ChevronDown } from '@ui/primitives/Icons/Chevron';
@@ -287,7 +288,7 @@ const NoticeStack: React.FunctionComponent<NoticeStackProps> = ({
           </Card>
         ))}
         {more > 0 && !expanded && (
-          <Pressable
+          <RNPressable
             testID="noticestack.peek"
             accessible={false}
             onPress={() => setOpen(true)}
@@ -315,6 +316,7 @@ const NoticeStack: React.FunctionComponent<NoticeStackProps> = ({
             ]}
           >
             <Pressable
+              kind="link"
               testID="noticestack.toggle"
               accessibilityRole="button"
               accessibilityState={{ expanded }}

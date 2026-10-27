@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { iconSizeMd, space4, space8, space16, useTheme } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import Text from '@ui/primitives/Text';
 
 /** An icon button at one end of the bar. */
@@ -55,6 +56,7 @@ export default function TitleBar({
     const Icon = a.icon;
     return (
       <Pressable
+        kind="icon"
         testID={a.testID}
         accessibilityRole="button"
         accessibilityLabel={a.accessibilityLabel}

@@ -1,10 +1,11 @@
 import React, { useContext } from 'react';
-import { Pressable } from 'react-native';
+
 import Animated from 'react-native-reanimated';
 import { useUnfold } from '@app/hooks/useUnfold';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
 import { useTheme } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { Route } from '@app/AppState';
 import type { ValueTransferType } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
@@ -49,6 +50,7 @@ function LegLine({
   return (
     <Animated.View style={unfold}>
       <Pressable
+        kind="row"
         testID={`leg-${vt.txid}`}
         accessibilityRole="button"
         onPress={() =>
@@ -58,9 +60,9 @@ function LegLine({
             kind: vt.kind,
           })
         }
-        style={({ pressed }) => ({
-          backgroundColor: pressed ? colors.bgMutedSubtle : colors.bgSurface,
-        })}
+        style={{
+          backgroundColor: colors.bgSurface,
+        }}
       >
         <HistoryRowBody text={text} hairline={false} compact />
       </Pressable>

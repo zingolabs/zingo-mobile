@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback } from 'react';
-import { Keyboard, Pressable, View } from 'react-native';
+import { Keyboard, View } from 'react-native';
 import { radiusSheet, useTheme, iconSizeMd } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -78,6 +79,7 @@ const ActionMenuBottomSheet = forwardRef<
             {title ?? ''}
           </Text>
           <Pressable
+            kind="icon"
             onPress={dismiss}
             hitSlop={8}
             style={{ paddingHorizontal: 14, paddingVertical: 4 }}
@@ -123,6 +125,7 @@ const ActionMenuBottomSheet = forwardRef<
       >
         {actions.map((action, idx) => (
           <Pressable
+            kind="row"
             key={`${idx}-${action.label}`}
             onPress={() => {
               dismiss();
@@ -130,11 +133,10 @@ const ActionMenuBottomSheet = forwardRef<
               // resolved stack, not racing the close animation.
               setTimeout(() => action.onPress(), 0);
             }}
-            style={({ pressed }) => ({
+            style={{
               paddingHorizontal: 24,
               paddingVertical: 14,
-              opacity: pressed ? 0.6 : 1,
-            })}
+            }}
           >
             <Text
               variant="body"

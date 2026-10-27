@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, {
   Keyframe,
   ReduceMotion,
@@ -27,6 +27,7 @@ import {
   useTheme,
 } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import { ContextAppLoading } from '@app/context';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
@@ -308,6 +309,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
   return (
     <View style={{ flex: 1 }}>
       <Pressable
+        kind="icon"
         testID="walleterror.server"
         onPress={onServer}
         disabled={busy}
@@ -459,6 +461,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
           </View>
         )}
         <Pressable
+          kind="link"
           testID="walleterror.details"
           onPress={() => setOpen(o => !o)}
           hitSlop={slopFor(iconSizeSm)}

@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { Pressable, View } from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
+import { View } from 'react-native';
 import {
   iconSizeMd,
   rowMinHeight,
@@ -87,10 +88,11 @@ const ListRow: React.FunctionComponent<ListRowProps> = ({
   };
   return onPress ? (
     <Pressable
+      kind="row"
       testID={testID}
       accessibilityRole="button"
       onPress={onPress}
-      style={({ pressed }) => ({ ...rowStyle, opacity: pressed ? 0.7 : 1 })}
+      style={rowStyle}
     >
       {body}
     </Pressable>

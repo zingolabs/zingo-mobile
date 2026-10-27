@@ -9,7 +9,7 @@ import React, {
 import {
   NativeSyntheticEvent,
   Platform,
-  Pressable,
+  Pressable as RNPressable,
   Text as RNText,
   TextInput,
   TextInputKeyPressEventData,
@@ -37,6 +37,7 @@ import {
 } from '@app/theme';
 import Text from '@ui/primitives/Text';
 import { duration, ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import { TranslateType } from '@app/AppState';
 import {
   SEED_WORD_COUNT,
@@ -427,7 +428,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
             pulseStyle,
           ]}
         />
-        <Pressable
+        <RNPressable
           accessible={false}
           onPress={() => inputRef.current?.focus()}
           style={{
@@ -480,6 +481,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
                   layout={chipLayout()}
                 >
                   <Pressable
+                    kind="button"
                     onPress={() => removeWordAt(i)}
                     accessibilityRole="button"
                     accessibilityLabel={word}
@@ -561,7 +563,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
               />
             </Animated.View>
           )}
-        </Pressable>
+        </RNPressable>
         {!!draftHint && (
           <Text
             testID={testID ? `${testID}.hint` : undefined}
@@ -584,6 +586,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
           >
             {suggestions.map((s, i) => (
               <Pressable
+                kind="button"
                 key={s}
                 onPress={() => acceptWord(s, nativeRef.current)}
                 accessibilityRole="button"

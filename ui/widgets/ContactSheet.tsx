@@ -1,9 +1,10 @@
 /* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
+import { Keyboard, TextInput, View } from 'react-native';
 
 import { useTheme, slopFor, iconSizeMd } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { AddressBookFileClass, ChainNameEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { openScanner } from '@app/navigation/navigate';
@@ -373,13 +374,17 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             }}
           />
           {!!name && (
-            <TouchableOpacity hitSlop={slopFor(20)} onPress={() => setName('')}>
+            <Pressable
+              kind="icon"
+              hitSlop={slopFor(20)}
+              onPress={() => setName('')}
+            >
               <XIcon
                 style={{ marginRight: 10 }}
                 size={iconSizeMd}
                 color={colors.fgMuted}
               />
-            </TouchableOpacity>
+            </Pressable>
           )}
         </View>
       </View>
@@ -444,7 +449,8 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             }}
           />
           <View style={{ alignItems: 'center', paddingVertical: 6, gap: 6 }}>
-            <TouchableOpacity
+            <Pressable
+              kind="icon"
               ref={scanButton}
               testID="addressbook.scan-button"
               accessibilityLabel={translate('scanner.title') as string}
@@ -456,9 +462,10 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
                 size={24}
                 color={colors.fgMuted}
               />
-            </TouchableOpacity>
+            </Pressable>
             {!!address && (
-              <TouchableOpacity
+              <Pressable
+                kind="icon"
                 hitSlop={slopFor(20)}
                 testID="addressbook.address-clear"
                 onPress={() => setAddress('')}
@@ -468,7 +475,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
                   size={iconSizeMd}
                   color={colors.fgMuted}
                 />
-              </TouchableOpacity>
+              </Pressable>
             )}
           </View>
         </View>

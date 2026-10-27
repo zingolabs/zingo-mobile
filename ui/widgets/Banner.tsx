@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { createContext, forwardRef, useContext } from 'react';
-import { Pressable, StyleProp, View, ViewStyle } from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
+import { StyleProp, View, ViewStyle } from 'react-native';
 import Animated, { AnimatedStyle } from 'react-native-reanimated';
 import {
   iconSizeMd,
@@ -188,6 +189,7 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
           )}
           {onDismiss && (
             <Pressable
+              kind="icon"
               testID={dismissTestID}
               accessibilityRole="button"
               accessibilityLabel={dismissLabel}
@@ -265,6 +267,7 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
             {action}
             {xBeside && (
               <Pressable
+                kind="icon"
                 testID={dismissTestID}
                 accessibilityRole="button"
                 accessibilityLabel={dismissLabel}
@@ -280,6 +283,7 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
       {/* In the card's corner, outside the row, so the action keeps its place. */}
       {onDismiss && !xBeside && (
         <Pressable
+          kind="icon"
           testID={dismissTestID}
           accessibilityRole="button"
           accessibilityLabel={dismissLabel}

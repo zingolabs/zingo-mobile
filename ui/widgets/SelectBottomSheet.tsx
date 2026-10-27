@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useMemo, useState } from 'react';
-import { Keyboard, Pressable, View } from 'react-native';
+import { Keyboard, View } from 'react-native';
 import { radiusSheet, useTheme, iconSizeMd, iconSizeSm } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -122,6 +123,7 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
               {title}
             </Text>
             <Pressable
+              kind="icon"
               onPress={dismiss}
               hitSlop={8}
               style={{ paddingHorizontal: 14, paddingVertical: 4 }}
@@ -147,19 +149,19 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
           const selected = item.value === value;
           return (
             <Pressable
+              kind="row"
               key={item.value}
               onPress={() => {
                 onChange(item.value);
                 dismiss();
               }}
-              style={({ pressed }) => ({
+              style={{
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 paddingHorizontal: 24,
                 paddingVertical: 14,
-                opacity: pressed ? 0.6 : 1,
-              })}
+              }}
             >
               <Text
                 variant={selected ? 'bodyStrong' : 'body'}
@@ -239,6 +241,7 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
                   {title}
                 </BoldText>
                 <Pressable
+                  kind="icon"
                   onPress={dismiss}
                   accessibilityRole="button"
                   hitSlop={8}
