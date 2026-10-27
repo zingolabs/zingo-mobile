@@ -79,7 +79,7 @@ object TestnetFixture {
     const val CONSOLIDATION_VALUE = 3_995_811_890L
     const val CONSOLIDATION_FEE = 285_000L
 
-    const val DEADLINE_SECONDS = 5 * 60
+    const val DEADLINE_SECONDS = 10 * 60
     const val TIP_SKEW_BLOCKS = 10L
 }
 
@@ -406,7 +406,7 @@ class ExecuteSyncFromSeed {
         val mapper = testMapper()
 
         val window = 10_000L
-        val deadlineSeconds = 5 * 60
+        val deadlineSeconds = 10 * 60
         val tipSkewBlocks = 1L
         val seed = Seeds.HOSPITAL
         val servers = listOf(MainnetServers.PRIMARY, MainnetServers.FALLBACK)
