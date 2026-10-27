@@ -622,7 +622,7 @@ Use the shared component; never build a second one that looks the same.
 |---|---|
 | Any text | `Text` with a variant and a tone. `BoldText`, `RegText` and `FadeText` are legacy and leave the screens they are found in |
 | Any button | `Button`: `primary` (the one main action of a view), `secondary` (outlined, beside others of the same weight: Copy, Verify), `text` (green: Back, Skip, secondary moves), `quiet` (grey: only Cancel and a Close that leaves a flow), `danger` (deletes or cannot be undone), `nym` (only through the mixnet), `viewOnly` (the view-only notice). `small` only inside notices and rows |
-| A field | `TextField` with `FieldAction`s |
+| A field | `TextField` with `FieldAction`s. With a prefix and a suffix (the custom server): same measures as every field, `fieldMinHeight` 48, `radiusMd` 12, the value's text variant; the prefix ("https://") and the suffix (":" and the port) in `fgMuted` |
 | A card | `Card` (tones `default`, `selected`, pools) |
 | Label and value rows | `DetailRows` |
 | A list row | `ListRow`; a choice is a `RadioRow` in a `RadioList` |

@@ -109,6 +109,7 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
               "flex": 1,
               "fontSize": 15,
               "fontWeight": "600",
+              "minWidth": 0,
               "paddingRight": 0,
               "paddingVertical": 8,
             }
