@@ -19,6 +19,9 @@ import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
 import { samplePath } from './pathPoints';
 import MixNode, { NODE_DIM } from './MixNode';
 
+/** Drawn art, not UI: the leaf's two round corners and the plane. */
+const LEAF_CORNER = 9;
+const PLANE = 26;
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -93,8 +96,8 @@ const Leaf = ({
           top,
           width: 9,
           height: 13,
-          borderTopRightRadius: 9,
-          borderBottomLeftRadius: 9,
+          borderTopRightRadius: LEAF_CORNER,
+          borderBottomLeftRadius: LEAF_CORNER,
           backgroundColor: themeTokens.bgAccent,
         },
         style,
@@ -195,7 +198,7 @@ export default function SendFlight({ width = 300 }: { width?: number }) {
           <AnimatedPath
             d={FLY}
             fill="none"
-            stroke={colors.bgNym}
+            stroke={colors.fgNym}
             strokeWidth={2.5}
             strokeLinecap="round"
             strokeDasharray={[ROUTE.length, ROUTE.length]}
@@ -205,7 +208,7 @@ export default function SendFlight({ width = 300 }: { width?: number }) {
             cx={276}
             cy={18}
             fill="none"
-            stroke={colors.bgNym}
+            stroke={colors.fgNym}
             strokeWidth={2}
             animatedProps={dest}
           />
@@ -227,7 +230,7 @@ export default function SendFlight({ width = 300 }: { width?: number }) {
             plane,
           ]}
         >
-          <PlaneIcon size={26} color={colors.fgDefault} />
+          <PlaneIcon size={PLANE} color={colors.fgDefault} />
         </Animated.View>
         {LEAVES.map(leaf => (
           <Leaf key={leaf.at} {...leaf} clock={clock} />

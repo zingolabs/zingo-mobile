@@ -36,6 +36,7 @@
   "syncing": "Syncing",
   "synced": "Synced",
   "messages": {
+    "bottom-acc": "Go to the newest message",
     "title": "Messages",
     "title-chats": "Messages",
     "empty": "No Messages yet.",
@@ -1173,6 +1174,7 @@
     "done": "Done"
   },
   "import": {
+    "back-acc": "Back",
     "scan-hint": "Point the camera at a seed phrase or viewing key QR code.",
     "scan-miss": "That code isn't a seed phrase or a viewing key.",
     "scan-found-seed": "Seed phrase found",
@@ -1211,6 +1213,7 @@
     "birthday-tip-body": "It's fine if you don't know it."
   },
   "about": {
+    "back-acc": "Back",
     "copyright": [
       "Copyright (c) 2026, ZingoLabs.",
       "Built with React Native.",
@@ -1492,5 +1495,11 @@
     "sheet-incomplete": "Balance and history can look incomplete until it finishes",
     "rescan": "Rescan",
     "rescan-started": "Rescan started"
+  },
+  "errorboundary": {
+    "title": "Something went wrong",
+    "message": "An unexpected error occurred. Please restart the app.",
+    "report": "Report",
+    "restart": "Restart"
   }
 }

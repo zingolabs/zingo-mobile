@@ -411,7 +411,6 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
             >
               {!!pending && (
                 <Card
-                  tone="selected"
                   testID="swap.pending"
                   onPress={() => openRecord(pending)}
                 >
@@ -427,7 +426,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                         width: 8,
                         height: 8,
                         borderRadius: radiusPill,
-                        backgroundColor: colors.bgAccent,
+                        backgroundColor: colors.fgWarning,
                       }}
                     />
                     <View style={{ flex: 1 }}>
@@ -620,13 +619,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                         hitSlop={8}
                         style={{ minHeight: 32, justifyContent: 'center' }}
                       >
-                        <Text
-                          variant="caption"
-                          style={{
-                            fontWeight: '700',
-                            textDecorationLine: 'underline',
-                          }}
-                        >
+                        <Text variant="caption" style={{ fontWeight: '700' }}>
                           {providerShortLabel(form.chosenRoute.provider)}
                         </Text>
                       </Pressable>
@@ -650,17 +643,16 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                 </View>
               )}
               {form.rateLimited && (
-                <Text variant="caption" tone="warning">
-                  {renderSwapText(
+                <Banner
+                  tone="warning"
+                  title={renderSwapText(
                     rateLimitedNotice(form.rateLimitedUntilMs - form.nowMs),
                     key => (translate(key) as string).trim(),
                   )}
-                </Text>
+                />
               )}
               {!!form.quoteNotice && (
-                <Text variant="caption" tone="warning">
-                  {noticeText()}
-                </Text>
+                <Banner tone="warning" title={noticeText()} />
               )}
 
               {!!form.selectedToken && (
@@ -718,7 +710,6 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                     showLabel={false}
                     swapChain={form.counterpartyChain}
                     scanRequest="swap.address"
-                    flush
                     pasteLabel={translate('swap.paste') as string}
                     onPickContact={() =>
                       navigation.navigate(Route.AddressBook, {
@@ -794,25 +785,18 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                               translate('swap.address-valid') as string
                             ).replace('{asset}', chainLabel)}
                           </Text>
-                          <Pressable
-                            testID="swap.save-contact"
-                            accessibilityRole="button"
-                            hitSlop={8}
-                            onPress={() =>
-                              saveContactSheetRef.current?.present()
-                            }
-                            style={{ marginLeft: 'auto' }}
-                          >
-                            <Text
-                              variant="caption"
-                              style={{
-                                fontWeight: '700',
-                                color: colors.fgAccent,
-                              }}
-                            >
-                              {translate('swap.save-contact') as string}
-                            </Text>
-                          </Pressable>
+                          <View style={{ marginLeft: 'auto' }}>
+                            <Button
+                              testID="swap.save-contact"
+                              variant="text"
+                              size="small"
+                              inline
+                              title={translate('swap.save-contact') as string}
+                              onPress={() =>
+                                saveContactSheetRef.current?.present()
+                              }
+                            />
+                          </View>
                         </>
                       )}
                     </View>
@@ -842,7 +826,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
                         <Text
                           variant="caption"
                           tone="warning"
-                          style={{ textDecorationLine: 'underline' }}
+                          style={{ fontWeight: '700' }}
                         >
                           {translate('swap.see-why') as string}
                         </Text>

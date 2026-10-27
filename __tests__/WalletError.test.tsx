@@ -62,10 +62,10 @@ test('Tests that each action reaches its handler when the screen is idle', () =>
   expect(h.onServer).toHaveBeenCalledTimes(1);
 });
 
-test('Tests that the button shows dots and ignores presses while a retry is running', () => {
+test('Tests that the button shows a spinner and ignores presses while a retry is running', () => {
   const h = handlers();
   mount({ busy: true }, h);
-  expect(screen.getByTestId('walleterror.open.dots')).toBeOnTheScreen();
+  expect(screen.getByTestId('walleterror.open.spinner')).toBeOnTheScreen();
   fireEvent.press(screen.getByTestId('walleterror.open'));
   fireEvent.press(screen.getByTestId('walleterror.import'));
   expect(h.onRetry).not.toHaveBeenCalled();

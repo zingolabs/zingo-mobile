@@ -197,7 +197,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
         <Text
           variant="caption"
           style={{
-            color: colors.bgNym,
+            color: colors.fgNym,
             fontWeight: '600',
             textTransform: 'uppercase',
             marginBottom: 8,

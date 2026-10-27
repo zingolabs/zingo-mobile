@@ -1,37 +1,34 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { Text, View, ViewStyle } from 'react-native';
+import { View, ViewStyle } from 'react-native';
 import Animated, { AnimatedStyle } from 'react-native-reanimated';
 
-import { useTheme } from '@app/theme';
+import { space12, space20, space24, space32 } from '@app/theme';
+import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
 
-export const SIDE = 22;
+export const SIDE = space20;
 
 export const StepTitle: React.FunctionComponent<{
   title: string;
   sub?: string;
 }> = ({ title, sub }) => {
-  const { colors } = useTheme();
   return (
-    <View style={{ paddingHorizontal: SIDE, marginBottom: 22 }}>
+    <View style={{ paddingHorizontal: SIDE, marginBottom: space24 }}>
       <Text
         accessibilityRole="header"
+        variant="subtitle"
         style={{
-          color: colors.fgDefault,
-          fontSize: 18,
-          lineHeight: 24,
-          fontWeight: '700',
           textAlign: 'center',
-          marginHorizontal: 30,
-          marginBottom: 14,
+          marginHorizontal: space32,
+          marginBottom: space12,
         }}
       >
         {title}
       </Text>
       {!!sub && (
-        <Text style={{ color: colors.fgMuted, fontSize: 15, lineHeight: 20 }}>
+        <Text variant="body" tone="muted">
           {sub}
         </Text>
       )}
