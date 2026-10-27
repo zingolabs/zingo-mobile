@@ -102,15 +102,47 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "paddingHorizontal": 14,
-                "paddingVertical": 4,
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "paddingHorizontal": 14,
+                  "paddingVertical": 4,
+                },
+                {},
+              ]
             }
             testID="addresslist.back"
-          />
+          >
+            <View
+              pointerEvents="none"
+              style={
+                {
+                  "alignItems": "center",
+                  "bottom": 0,
+                  "justifyContent": "center",
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                }
+              }
+            >
+              <View
+                style={
+                  [
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": 999,
+                      "height": 44,
+                      "width": 44,
+                    },
+                    {},
+                  ]
+                }
+              />
+            </View>
+          </View>
         </View>
         <View
           style={
@@ -271,20 +303,41 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "backgroundColor": "transparent",
-                  "columnGap": 12,
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "minHeight": 56,
-                  "paddingLeft": 16,
-                  "paddingRight": 0,
-                  "paddingVertical": 12,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "columnGap": 12,
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "minHeight": 56,
+                    "paddingLeft": 16,
+                    "paddingRight": 0,
+                    "paddingVertical": 12,
+                  },
+                  {},
+                ]
               }
               testID="addresslist.row.UA-orchard-sapling12345678901234567890"
             >
+              <View
+                pointerEvents="none"
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": undefined,
+                    },
+                    {},
+                  ]
+                }
+              />
               <View
                 style={
                   {
@@ -516,20 +569,41 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "backgroundColor": "transparent",
-                  "columnGap": 12,
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "minHeight": 56,
-                  "paddingLeft": 16,
-                  "paddingRight": 0,
-                  "paddingVertical": 12,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "columnGap": 12,
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "minHeight": 56,
+                    "paddingLeft": 16,
+                    "paddingRight": 0,
+                    "paddingVertical": 12,
+                  },
+                  {},
+                ]
               }
               testID="addresslist.row.UA-sapling-12345678901234567890"
             >
+              <View
+                pointerEvents="none"
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": undefined,
+                    },
+                    {},
+                  ]
+                }
+              />
               <View
                 style={
                   {
@@ -761,20 +835,41 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "backgroundColor": "transparent",
-                  "columnGap": 12,
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "minHeight": 56,
-                  "paddingLeft": 16,
-                  "paddingRight": 0,
-                  "paddingVertical": 12,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "columnGap": 12,
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "minHeight": 56,
+                    "paddingLeft": 16,
+                    "paddingRight": 0,
+                    "paddingVertical": 12,
+                  },
+                  {},
+                ]
               }
               testID="addresslist.row.UA-orchard-12345678901234567890"
             >
+              <View
+                pointerEvents="none"
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": undefined,
+                    },
+                    {},
+                  ]
+                }
+              />
               <View
                 style={
                   {
@@ -1059,20 +1154,41 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "backgroundColor": "transparent",
-                  "columnGap": 12,
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "minHeight": 56,
-                  "paddingLeft": 16,
-                  "paddingRight": 0,
-                  "paddingVertical": 12,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "columnGap": 12,
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "minHeight": 56,
+                    "paddingLeft": 16,
+                    "paddingRight": 0,
+                    "paddingVertical": 12,
+                  },
+                  {},
+                ]
               }
               testID="addresslist.row.transparent-1-12345678901234567890"
             >
+              <View
+                pointerEvents="none"
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": undefined,
+                    },
+                    {},
+                  ]
+                }
+              />
               <View
                 style={
                   {
@@ -1329,20 +1445,41 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "backgroundColor": "transparent",
-                  "columnGap": 12,
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "minHeight": 56,
-                  "paddingLeft": 16,
-                  "paddingRight": 0,
-                  "paddingVertical": 12,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "columnGap": 12,
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "minHeight": 56,
+                    "paddingLeft": 16,
+                    "paddingRight": 0,
+                    "paddingVertical": 12,
+                  },
+                  {},
+                ]
               }
               testID="addresslist.row.transparent-2-12345678901234567890"
             >
+              <View
+                pointerEvents="none"
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": undefined,
+                    },
+                    {},
+                  ]
+                }
+              />
               <View
                 style={
                   {

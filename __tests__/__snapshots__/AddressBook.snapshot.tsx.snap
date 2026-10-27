@@ -147,15 +147,47 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          {
-            "alignItems": "center",
-            "flexDirection": "row",
-            "paddingHorizontal": 14,
-            "paddingVertical": 4,
-          }
+          [
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "paddingHorizontal": 14,
+              "paddingVertical": 4,
+            },
+            {},
+          ]
         }
         testID="addressbook.back"
-      />
+      >
+        <View
+          pointerEvents="none"
+          style={
+            {
+              "alignItems": "center",
+              "bottom": 0,
+              "justifyContent": "center",
+              "left": 0,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+            }
+          }
+        >
+          <View
+            style={
+              [
+                {
+                  "backgroundColor": "#8888881F",
+                  "borderRadius": 999,
+                  "height": 44,
+                  "width": 44,
+                },
+                {},
+              ]
+            }
+          />
+        </View>
+      </View>
     </View>
     <View
       style={
@@ -301,7 +333,9 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
       accessible={true}
       collapsable={false}
       focusable={true}
+      onBlur={[Function]}
       onClick={[Function]}
+      onFocus={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -309,19 +343,21 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "alignItems": "center",
-          "alignSelf": "stretch",
-          "backgroundColor": "#18bd18",
-          "borderRadius": 999,
-          "justifyContent": "center",
-          "maxWidth": "100%",
-          "minHeight": 44,
-          "opacity": 1,
-          "paddingHorizontal": 24,
-          "paddingVertical": 8,
-          "width": "100%",
-        }
+        [
+          {
+            "alignItems": "center",
+            "alignSelf": "stretch",
+            "backgroundColor": "#18bd18",
+            "borderRadius": 999,
+            "justifyContent": "center",
+            "maxWidth": "100%",
+            "minHeight": 44,
+            "paddingHorizontal": 24,
+            "paddingVertical": 8,
+            "width": "100%",
+          },
+          {},
+        ]
       }
       testID="addressbook.new"
     >
@@ -489,7 +525,9 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
               accessible={true}
               collapsable={false}
               focusable={true}
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -497,21 +535,42 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "borderColor": "#05234C",
-                  "borderRadius": 12,
-                  "borderWidth": 1,
-                  "columnGap": 10,
-                  "flexDirection": "row",
-                  "marginTop": 10,
-                  "minHeight": 48,
-                  "opacity": 1,
-                  "paddingHorizontal": 10,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "borderColor": "#05234C",
+                    "borderRadius": 12,
+                    "borderWidth": 1,
+                    "columnGap": 10,
+                    "flexDirection": "row",
+                    "marginTop": 10,
+                    "minHeight": 48,
+                    "paddingHorizontal": 10,
+                  },
+                  {},
+                ]
               }
               testID="chainselect.field"
             >
+              <View
+                pointerEvents="none"
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": 12,
+                    },
+                    {},
+                  ]
+                }
+              />
               <Image
                 resizeMode="contain"
                 source={
@@ -651,11 +710,43 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                     onResponderTerminationRequest={[Function]}
                     onStartShouldSetResponder={[Function]}
                     style={
-                      {
-                        "padding": 14,
-                      }
+                      [
+                        {
+                          "padding": 14,
+                        },
+                        {},
+                      ]
                     }
-                  />
+                  >
+                    <View
+                      pointerEvents="none"
+                      style={
+                        {
+                          "alignItems": "center",
+                          "bottom": 0,
+                          "justifyContent": "center",
+                          "left": 0,
+                          "position": "absolute",
+                          "right": 0,
+                          "top": 0,
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          [
+                            {
+                              "backgroundColor": "#8888881F",
+                              "borderRadius": 999,
+                              "height": 44,
+                              "width": 44,
+                            },
+                            {},
+                          ]
+                        }
+                      />
+                    </View>
+                  </View>
                 </View>
                 <View
                   style={
@@ -733,18 +824,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -824,18 +936,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -915,18 +1048,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -1006,18 +1160,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -1097,18 +1272,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -1188,18 +1384,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <View
                   style={
                     {
@@ -1289,18 +1506,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -1380,18 +1618,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -1471,18 +1730,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -1562,18 +1842,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -1653,18 +1954,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -1744,18 +2066,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -1835,18 +2178,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -1926,18 +2290,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <View
                   style={
                     {
@@ -2027,18 +2412,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <View
                   style={
                     {
@@ -2128,18 +2534,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <View
                   style={
                     {
@@ -2229,18 +2656,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -2320,18 +2768,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -2411,18 +2880,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -2502,18 +2992,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -2593,18 +3104,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -2684,18 +3216,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -2775,18 +3328,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -2866,18 +3440,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -2957,18 +3552,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -3048,18 +3664,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -3139,18 +3776,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -3230,18 +3888,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -3321,18 +4000,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -3412,18 +4112,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -3503,18 +4224,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -3594,18 +4336,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -3685,18 +4448,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -3776,18 +4560,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -3867,18 +4672,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -3958,18 +4784,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -4049,18 +4896,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -4140,18 +5008,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <View
                   style={
                     {
@@ -4241,18 +5130,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -4332,18 +5242,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -4423,18 +5354,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <View
                   style={
                     {
@@ -4524,18 +5476,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomColor": "#FFFFFF0F",
-                    "borderBottomWidth": 1.5,
-                    "columnGap": 12,
-                    "flexDirection": "row",
-                    "opacity": 1,
-                    "paddingHorizontal": 20,
-                    "paddingVertical": 12,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderBottomColor": "#FFFFFF0F",
+                      "borderBottomWidth": 1.5,
+                      "columnGap": 12,
+                      "flexDirection": "row",
+                      "paddingHorizontal": 20,
+                      "paddingVertical": 12,
+                    },
+                    {},
+                  ]
                 }
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": undefined,
+                      },
+                      {},
+                    ]
+                  }
+                />
                 <Image
                   resizeMode="contain"
                   source={
@@ -4675,7 +5648,9 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 collapsable={false}
                 focusable={true}
                 hitSlop={8}
+                onBlur={[Function]}
                 onClick={[Function]}
+                onFocus={[Function]}
                 onResponderGrant={[Function]}
                 onResponderMove={[Function]}
                 onResponderRelease={[Function]}
@@ -4683,12 +5658,42 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "opacity": 1,
-                  }
+                  [
+                    undefined,
+                    {},
+                  ]
                 }
                 testID="addressbook.scan-button"
-              />
+              >
+                <View
+                  pointerEvents="none"
+                  style={
+                    {
+                      "alignItems": "center",
+                      "bottom": 0,
+                      "justifyContent": "center",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      [
+                        {
+                          "backgroundColor": "#8888881F",
+                          "borderRadius": 999,
+                          "height": 44,
+                          "width": 44,
+                        },
+                        {},
+                      ]
+                    }
+                  />
+                </View>
+              </View>
             </View>
           </View>
           <View
@@ -4725,8 +5730,10 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
           }
           accessible={true}
           collapsable={false}
-          focusable={false}
+          focusable={true}
+          onBlur={[Function]}
           onClick={[Function]}
+          onFocus={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -4734,20 +5741,22 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "alignItems": "center",
-              "alignSelf": "stretch",
-              "backgroundColor": "#5a8c5a",
-              "borderRadius": 999,
-              "justifyContent": "center",
-              "marginTop": 20,
-              "maxWidth": "100%",
-              "minHeight": 44,
-              "opacity": 1,
-              "paddingHorizontal": 24,
-              "paddingVertical": 8,
-              "width": "100%",
-            }
+            [
+              {
+                "alignItems": "center",
+                "alignSelf": "stretch",
+                "backgroundColor": "#5a8c5a",
+                "borderRadius": 999,
+                "justifyContent": "center",
+                "marginTop": 20,
+                "maxWidth": "100%",
+                "minHeight": 44,
+                "paddingHorizontal": 24,
+                "paddingVertical": 8,
+                "width": "100%",
+              },
+              {},
+            ]
           }
           testID="addressbook.save"
         >
@@ -4788,7 +5797,9 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
           accessible={true}
           collapsable={false}
           focusable={true}
+          onBlur={[Function]}
           onClick={[Function]}
+          onFocus={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -4796,20 +5807,22 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "alignItems": "center",
-              "alignSelf": "stretch",
-              "backgroundColor": undefined,
-              "borderRadius": 999,
-              "justifyContent": "center",
-              "marginTop": 8,
-              "maxWidth": "100%",
-              "minHeight": 44,
-              "opacity": 1,
-              "paddingHorizontal": 24,
-              "paddingVertical": 8,
-              "width": "100%",
-            }
+            [
+              {
+                "alignItems": "center",
+                "alignSelf": "stretch",
+                "backgroundColor": undefined,
+                "borderRadius": 999,
+                "justifyContent": "center",
+                "marginTop": 8,
+                "maxWidth": "100%",
+                "minHeight": 44,
+                "paddingHorizontal": 24,
+                "paddingVertical": 8,
+                "width": "100%",
+              },
+              {},
+            ]
           }
           testID="addressbook.cancel"
         >

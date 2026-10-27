@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useMemo } from 'react';
-import { TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { TextStyle, View, ViewStyle } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ContextAppLoaded } from '@app/context';
 import RegText from '@ui/primitives/RegText';
@@ -23,6 +23,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
 import { useTheme, slopFor, iconSize, iconSizeMd } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
 import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
 
@@ -130,25 +131,26 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
         }}
       >
         {!!contact && (
-          <TouchableOpacity onPress={contactReveal.reveal}>
+          <Pressable kind="link" onPress={contactReveal.reveal}>
             <View style={column}>
               <Lines
                 view={textView(contactField, privacy, contactReveal.revealed)}
               />
             </View>
-          </TouchableOpacity>
+          </Pressable>
         )}
         {!contact &&
           !!znsAlias &&
           (privacy ? (
-            <TouchableOpacity onPress={aliasReveal.reveal}>
+            <Pressable kind="link" onPress={aliasReveal.reveal}>
               {alias}
-            </TouchableOpacity>
+            </Pressable>
           ) : (
             alias
           ))}
         {(!oneLine || (oneLine && !contact)) && !onlyContact && (
-          <TouchableOpacity
+          <Pressable
+            kind="link"
             onPress={() => {
               if (address && !oneLine) {
                 Clipboard.setString(address);
@@ -171,11 +173,12 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                 <RegText>{'Unknown'}</RegText>
               )}
             </View>
-          </TouchableOpacity>
+          </Pressable>
         )}
       </View>
       {withIcon && !contact && oneLine && (
-        <TouchableOpacity
+        <Pressable
+          kind="icon"
           hitSlop={slopFor(20)}
           testID="addressitem.add-contact"
           onPress={() => launchAddTagModal(address, undefined, znsAlias)}
@@ -195,10 +198,11 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               color={colors.fgAccent}
             />
           </View>
-        </TouchableOpacity>
+        </Pressable>
       )}
       {withIcon && !contact && !oneLine && (
-        <TouchableOpacity
+        <Pressable
+          kind="icon"
           hitSlop={slopFor(24)}
           testID="addressitem.add-contact"
           onPress={() => launchAddTagModal(address, undefined, znsAlias)}
@@ -208,10 +212,11 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
             size={iconSize}
             color={colors.fgAccent}
           />
-        </TouchableOpacity>
+        </Pressable>
       )}
       {withSendIcon && !!contact && !readOnly && server.kind !== 'offline' && (
-        <TouchableOpacity
+        <Pressable
+          kind="icon"
           hitSlop={slopFor(24)}
           style={{ marginLeft: 10 }}
           onPress={() => {
@@ -229,7 +234,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
             size={iconSize}
             color={colors.fgAccent}
           />
-        </TouchableOpacity>
+        </Pressable>
       )}
     </View>
   );

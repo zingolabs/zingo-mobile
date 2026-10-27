@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Platform, Pressable, StyleSheet, Vibration, View } from 'react-native';
+import { Platform, StyleSheet, Vibration, View } from 'react-native';
 import Animated, {
   Easing,
   Keyframe,
@@ -30,6 +30,7 @@ import {
 } from '@app/theme';
 import Text from '@ui/primitives/Text';
 import { ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import CircularReveal, { RevealOrigin } from '@ui/widgets/CircularReveal';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
@@ -293,6 +294,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
             }}
           >
             <Pressable
+              kind="icon"
               testID={`${testID}.back`}
               accessibilityRole="button"
               accessibilityLabel={texts.back}
@@ -353,6 +355,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
           </View>
 
           <Pressable
+            kind="icon"
             testID={`${testID}.torch`}
             accessibilityRole="button"
             accessibilityLabel={texts.torch}

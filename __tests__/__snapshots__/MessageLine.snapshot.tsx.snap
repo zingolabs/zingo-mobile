@@ -163,8 +163,10 @@ hello
             }
             accessible={true}
             collapsable={false}
-            focusable={false}
+            focusable={true}
+            onBlur={[Function]}
             onClick={[Function]}
+            onFocus={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -172,9 +174,10 @@ hello
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "opacity": 1,
-              }
+              [
+                undefined,
+                {},
+              ]
             }
           >
             <View
@@ -402,7 +405,9 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
               accessible={true}
               collapsable={false}
               focusable={true}
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -410,9 +415,10 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "opacity": 1,
-                }
+                [
+                  undefined,
+                  {},
+                ]
               }
             >
               <View
@@ -541,8 +547,10 @@ hello
             }
             accessible={true}
             collapsable={false}
-            focusable={false}
+            focusable={true}
+            onBlur={[Function]}
             onClick={[Function]}
+            onFocus={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -550,9 +558,10 @@ hello
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "opacity": 1,
-              }
+              [
+                undefined,
+                {},
+              ]
             }
           >
             <View

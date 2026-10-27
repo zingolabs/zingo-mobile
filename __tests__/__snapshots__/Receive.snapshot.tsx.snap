@@ -101,7 +101,9 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
                 "top": 10,
               }
             }
+            onBlur={[Function]}
             onClick={[Function]}
+            onFocus={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -109,12 +111,42 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "opacity": 1,
-              }
+              [
+                undefined,
+                {},
+              ]
             }
             testID="header.drawmenu"
-          />
+          >
+            <View
+              pointerEvents="none"
+              style={
+                {
+                  "alignItems": "center",
+                  "bottom": 0,
+                  "justifyContent": "center",
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                }
+              }
+            >
+              <View
+                style={
+                  [
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": 999,
+                      "height": 44,
+                      "width": 44,
+                    },
+                    {},
+                  ]
+                }
+              />
+            </View>
+          </View>
         </View>
       </View>
       <View
@@ -168,7 +200,9 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
                 "top": 10,
               }
             }
+            onBlur={[Function]}
             onClick={[Function]}
+            onFocus={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -176,14 +210,45 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "marginRight": 5,
-                "marginTop": 4.5,
-                "opacity": 1,
-              }
+              [
+                {
+                  "marginRight": 5,
+                  "marginTop": 4.5,
+                },
+                {},
+              ]
             }
             testID="header.messages"
-          />
+          >
+            <View
+              pointerEvents="none"
+              style={
+                {
+                  "alignItems": "center",
+                  "bottom": 0,
+                  "justifyContent": "center",
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                }
+              }
+            >
+              <View
+                style={
+                  [
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": 999,
+                      "height": 44,
+                      "width": 44,
+                    },
+                    {},
+                  ]
+                }
+              />
+            </View>
+          </View>
         </View>
       </View>
     </View>
@@ -314,14 +379,46 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "paddingHorizontal": 14,
-                "paddingVertical": 4,
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "paddingHorizontal": 14,
+                  "paddingVertical": 4,
+                },
+                {},
+              ]
             }
-          />
+          >
+            <View
+              pointerEvents="none"
+              style={
+                {
+                  "alignItems": "center",
+                  "bottom": 0,
+                  "justifyContent": "center",
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                }
+              }
+            >
+              <View
+                style={
+                  [
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": 999,
+                      "height": 44,
+                      "width": 44,
+                    },
+                    {},
+                  ]
+                }
+              />
+            </View>
+          </View>
         </View>
       </View>
     </View>

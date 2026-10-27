@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, {
   Easing,
   ReduceMotion,
@@ -14,6 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import { WalletNavigation } from '@app/types';
 import { radiusPill, useTheme, iconSizeSm } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { Route, ServerType, TranslateType } from '@app/AppState';
 import NetInfoType from '@app/AppState/types/NetInfoType';
 import { useSyncFreshness } from '@app/hooks/lastSynced';
@@ -280,11 +281,12 @@ export default function SyncLine({
 
   return (
     <Pressable
+      kind="row"
       testID="header.syncline"
       accessibilityRole="button"
       accessibilityLabel={`${label}. ${t('header.sync-open-report')}`}
       onPress={() => navigation.navigate(Route.SyncReport)}
-      style={({ pressed }) => ({
+      style={{
         flexDirection: 'row',
         alignItems: 'center',
         columnGap: 8,
@@ -293,8 +295,7 @@ export default function SyncLine({
         marginTop: CARD_MARGIN_TOP,
         paddingHorizontal: 12,
         borderRadius: radiusPill,
-        backgroundColor: pressed ? colors.bgMutedSubtle : 'transparent',
-      })}
+      }}
     >
       {body}
       {metered && (

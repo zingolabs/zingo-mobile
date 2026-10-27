@@ -6,8 +6,10 @@ import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
 import { showConfirm } from '@app/services/showConfirm';
 import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 
+/** The style may be an array: the shared Pressable adds its pressed style. */
 const fill = (testID: string) =>
-  screen.getByTestId(testID).props.style.backgroundColor;
+  Object.assign({}, ...[screen.getByTestId(testID).props.style].flat(Infinity))
+    .backgroundColor;
 
 test('Tests that a destructive action is a red pill and a plain one green when both kinds are confirmed.', () => {
   render(<ConfirmBottomSheet />);

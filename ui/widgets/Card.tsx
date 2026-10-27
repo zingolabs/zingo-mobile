@@ -1,6 +1,7 @@
 import React from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { radiusMd, space12, space16, touchTarget, useTheme } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { SurfaceContext, useInsetFill } from '@ui/primitives/Surface';
 
 export type CardTone =
@@ -53,15 +54,15 @@ const Card: React.FunctionComponent<CardProps> = ({
   };
   return onPress ? (
     <Pressable
+      kind="row"
       testID={testID}
       accessibilityRole="button"
       accessibilityState={{ selected: tone === 'selected' }}
       onPress={onPress}
-      style={({ pressed }) => ({
+      style={{
         ...style,
         minHeight: touchTarget,
-        opacity: pressed ? 0.8 : 1,
-      })}
+      }}
     >
       {body}
     </Pressable>

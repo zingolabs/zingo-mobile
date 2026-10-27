@@ -19,7 +19,7 @@ const other =
   'zs14mccpahrfc65hzy0sxntz04rxmwm0fnmkzdqu68f608m8ysssv028g5khgy6jgsxplfckyxhys5';
 
 beforeEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
   jest.mocked(RPCModule.parseAddressInfo).mockResolvedValue(
     JSON.stringify({
       status: 'success',
