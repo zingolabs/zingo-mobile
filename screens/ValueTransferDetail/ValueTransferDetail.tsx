@@ -7,12 +7,13 @@ import {
   toAmountInput,
 } from '@app/utils/formatAmount';
 import Tag from '@ui/widgets/Tag';
-import { Linking, Pressable, View } from 'react-native';
+import { Linking, View } from 'react-native';
 import { useAmountReveal } from '@ui/widgets/PrivateAmount';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { radiusMd, useTheme, iconSizeSm } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import {
   BlockExplorerEnum,
   ChainNameEnum,
@@ -327,6 +328,7 @@ const ValueTransferDetail: React.FunctionComponent<
           {head}
         </Text>
         <Pressable
+          kind="link"
           accessibilityRole="button"
           disabled={!amounts.hidden}
           onPress={amounts.reveal}
@@ -392,6 +394,7 @@ const ValueTransferDetail: React.FunctionComponent<
           </Text>
           {!!memo && (
             <Pressable
+              kind="link"
               testID="valuetransferdetail.memo"
               onPress={() => {
                 Clipboard.setString(memo);
@@ -408,6 +411,7 @@ const ValueTransferDetail: React.FunctionComponent<
           )}
           {!!memoUA && (
             <Pressable
+              kind="link"
               onPress={() => {
                 Clipboard.setString(memoUA);
                 if (!ownAddress(memoUA)) {

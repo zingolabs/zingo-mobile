@@ -1,14 +1,9 @@
 /* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import {
-  Image,
-  Keyboard,
-  Pressable,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Image, Keyboard, View } from 'react-native';
 import { radiusSheet, useTheme, iconSizeMd } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -159,7 +154,8 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
           form fields on the screen: chain logo + name inside, and a down
           chevron only when it is actually a list (more than one option). */}
       <RegText>{label}</RegText>
-      <TouchableOpacity
+      <Pressable
+        kind="row"
         testID="chainselect.field"
         disabled={!canPick}
         onPress={() => {
@@ -196,7 +192,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
           {(value || '').toUpperCase()}
         </FadeText>
         {canPick ? <ChevronDown size={16} color={colors.fgMuted} /> : null}
-      </TouchableOpacity>
+      </Pressable>
 
       <BottomSheetModal
         ref={sheetRef}
@@ -257,6 +253,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
                 {translate('addressbook.select-chain-placeholder') as string}
               </BoldText>
               <Pressable
+                kind="icon"
                 onPress={dismiss}
                 accessibilityRole="button"
                 hitSlop={8}
@@ -286,6 +283,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
               const selected = chain === value;
               return (
                 <Pressable
+                  kind="row"
                   key={chain}
                   onPress={() => {
                     onChange(chain);
@@ -293,16 +291,15 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
                   }}
                   // Separator colour matches the other list components in the
                   // app (address book, address list, history, asset picker).
-                  style={({ pressed }) => ({
+                  style={{
                     flexDirection: 'row',
                     alignItems: 'center',
                     paddingHorizontal: 20,
                     paddingVertical: 12,
                     columnGap: 12,
-                    opacity: pressed ? 0.6 : 1,
                     borderBottomWidth: 1.5,
                     borderBottomColor: colors.borderSubtle,
-                  })}
+                  }}
                 >
                   <ChainLogo chain={chain} size={36} />
                   <View style={{ flex: 1 }}>

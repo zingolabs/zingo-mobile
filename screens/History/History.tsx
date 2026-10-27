@@ -13,11 +13,11 @@ import {
   RefreshControl,
   ActivityIndicator,
   Dimensions,
-  Pressable,
   StyleSheet,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { duration } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import {
   useTheme,
@@ -940,6 +940,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                       </Text>
                     </Text>
                     <Pressable
+                      kind="link"
                       testID="history.filter.clear"
                       accessibilityRole="button"
                       hitSlop={space8}
@@ -1052,10 +1053,11 @@ const History: React.FunctionComponent<HistoryProps> = () => {
             platforms. */}
         {!isAtTop && (
           <Pressable
+            kind="button"
             hitSlop={slopFor(36)}
             onPress={handleScrollToTop}
             disabled={isScrollingToTop}
-            style={({ pressed }) => ({
+            style={{
               position: 'absolute',
               // Raised so the button clears the bottom tab bar on every
               // platform — matches the offset used by AddressList. The
@@ -1068,11 +1070,10 @@ const History: React.FunctionComponent<HistoryProps> = () => {
               justifyContent: 'center',
               backgroundColor: colors.bgSurface,
               borderRadius: radiusPill,
-              transform: [{ scale: pressed ? 0.9 : 1 }],
               opacity: isScrollingToTop ? 0.5 : 1,
               borderWidth: 1,
               borderColor: colors.bottomSheetBorder,
-            })}
+            }}
           >
             <RingBorder size={36} />
             <ChevronUp size={iconSizeMd} color={colors.fgMuted} />

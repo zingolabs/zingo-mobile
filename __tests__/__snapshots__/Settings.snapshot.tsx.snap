@@ -160,15 +160,47 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "paddingHorizontal": 14,
-              "paddingVertical": 4,
-            }
+            [
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "paddingHorizontal": 14,
+                "paddingVertical": 4,
+              },
+              {},
+            ]
           }
           testID="settings.back"
-        />
+        >
+          <View
+            pointerEvents="none"
+            style={
+              {
+                "alignItems": "center",
+                "bottom": 0,
+                "justifyContent": "center",
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              }
+            }
+          >
+            <View
+              style={
+                [
+                  {
+                    "backgroundColor": "#8888881F",
+                    "borderRadius": 999,
+                    "height": 44,
+                    "width": 44,
+                  },
+                  {},
+                ]
+              }
+            />
+          </View>
+        </View>
       </View>
       <View
         style={
@@ -279,7 +311,9 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               accessible={true}
               collapsable={false}
               focusable={true}
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -287,19 +321,40 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "borderTopColor": "#FFFFFF0F",
-                  "borderTopWidth": 0,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "minHeight": 56,
-                  "opacity": 1,
-                  "paddingHorizontal": 16,
-                  "paddingVertical": 8,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "borderTopColor": "#FFFFFF0F",
+                    "borderTopWidth": 0,
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "minHeight": 56,
+                    "paddingHorizontal": 16,
+                    "paddingVertical": 8,
+                  },
+                  {},
+                ]
               }
             >
+              <View
+                pointerEvents="none"
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": undefined,
+                    },
+                    {},
+                  ]
+                }
+              />
               <Text
                 maxFontSizeMultiplier={2}
                 style={
@@ -433,8 +488,10 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                       }
                       accessible={true}
                       collapsable={false}
-                      focusable={false}
+                      focusable={true}
+                      onBlur={[Function]}
                       onClick={[Function]}
+                      onFocus={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -442,11 +499,31 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
                       style={
-                        {
-                          "opacity": 1,
-                        }
+                        [
+                          undefined,
+                          {},
+                        ]
                       }
                     >
+                      <View
+                        pointerEvents="none"
+                        style={
+                          [
+                            {
+                              "bottom": 0,
+                              "left": 0,
+                              "position": "absolute",
+                              "right": 0,
+                              "top": 0,
+                            },
+                            {
+                              "backgroundColor": "#8888881F",
+                              "borderRadius": undefined,
+                            },
+                            {},
+                          ]
+                        }
+                      />
                       <Text
                         maxFontSizeMultiplier={2}
                         style={
@@ -497,8 +574,42 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                         onResponderTerminate={[Function]}
                         onResponderTerminationRequest={[Function]}
                         onStartShouldSetResponder={[Function]}
+                        style={
+                          [
+                            undefined,
+                            {},
+                          ]
+                        }
                         testID="settings.privacy-info"
                       >
+                        <View
+                          pointerEvents="none"
+                          style={
+                            {
+                              "alignItems": "center",
+                              "bottom": 0,
+                              "justifyContent": "center",
+                              "left": 0,
+                              "position": "absolute",
+                              "right": 0,
+                              "top": 0,
+                            }
+                          }
+                        >
+                          <View
+                            style={
+                              [
+                                {
+                                  "backgroundColor": "#8888881F",
+                                  "borderRadius": 999,
+                                  "height": 44,
+                                  "width": 44,
+                                },
+                                {},
+                              ]
+                            }
+                          />
+                        </View>
                         <View
                           style={{}}
                         />
@@ -773,7 +884,9 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               accessible={true}
               collapsable={false}
               focusable={true}
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -781,19 +894,40 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "borderTopColor": "#FFFFFF0F",
-                  "borderTopWidth": 0,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "minHeight": 56,
-                  "opacity": 1,
-                  "paddingHorizontal": 16,
-                  "paddingVertical": 8,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "borderTopColor": "#FFFFFF0F",
+                    "borderTopWidth": 0,
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "minHeight": 56,
+                    "paddingHorizontal": 16,
+                    "paddingVertical": 8,
+                  },
+                  {},
+                ]
               }
             >
+              <View
+                pointerEvents="none"
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": undefined,
+                    },
+                    {},
+                  ]
+                }
+              />
               <Text
                 maxFontSizeMultiplier={2}
                 style={
@@ -888,7 +1022,9 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               accessible={true}
               collapsable={false}
               focusable={true}
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -896,20 +1032,41 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "borderTopColor": "#FFFFFF0F",
-                  "borderTopWidth": 0,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "minHeight": 56,
-                  "opacity": 1,
-                  "paddingHorizontal": 16,
-                  "paddingVertical": 8,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "borderTopColor": "#FFFFFF0F",
+                    "borderTopWidth": 0,
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "minHeight": 56,
+                    "paddingHorizontal": 16,
+                    "paddingVertical": 8,
+                  },
+                  {},
+                ]
               }
               testID="settings.about"
             >
+              <View
+                pointerEvents="none"
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": undefined,
+                    },
+                    {},
+                  ]
+                }
+              />
               <Text
                 maxFontSizeMultiplier={2}
                 style={
@@ -961,8 +1118,10 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         }
         accessible={true}
         collapsable={false}
-        focusable={false}
+        focusable={true}
+        onBlur={[Function]}
         onClick={[Function]}
+        onFocus={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -970,19 +1129,21 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          {
-            "alignItems": "center",
-            "alignSelf": "stretch",
-            "backgroundColor": "#5a8c5a",
-            "borderRadius": 999,
-            "justifyContent": "center",
-            "maxWidth": "100%",
-            "minHeight": 44,
-            "opacity": 1,
-            "paddingHorizontal": 24,
-            "paddingVertical": 8,
-            "width": "100%",
-          }
+          [
+            {
+              "alignItems": "center",
+              "alignSelf": "stretch",
+              "backgroundColor": "#5a8c5a",
+              "borderRadius": 999,
+              "justifyContent": "center",
+              "maxWidth": "100%",
+              "minHeight": 44,
+              "paddingHorizontal": 24,
+              "paddingVertical": 8,
+              "width": "100%",
+            },
+            {},
+          ]
         }
         testID="settings.button.save"
       >
@@ -1034,16 +1195,37 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "alignItems": "center",
-        "flexDirection": "row",
-        "justifyContent": "space-between",
-        "opacity": 1,
-        "paddingHorizontal": 24,
-        "paddingVertical": 14,
-      }
+      [
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "paddingHorizontal": 24,
+          "paddingVertical": 14,
+        },
+        {},
+      ]
     }
   >
+    <View
+      pointerEvents="none"
+      style={
+        [
+          {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          },
+          {
+            "backgroundColor": "#8888881F",
+            "borderRadius": undefined,
+          },
+          {},
+        ]
+      }
+    />
     <Text
       maxFontSizeMultiplier={2}
       style={
@@ -1089,16 +1271,37 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "alignItems": "center",
-        "flexDirection": "row",
-        "justifyContent": "space-between",
-        "opacity": 1,
-        "paddingHorizontal": 24,
-        "paddingVertical": 14,
-      }
+      [
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "paddingHorizontal": 24,
+          "paddingVertical": 14,
+        },
+        {},
+      ]
     }
   >
+    <View
+      pointerEvents="none"
+      style={
+        [
+          {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          },
+          {
+            "backgroundColor": "#8888881F",
+            "borderRadius": undefined,
+          },
+          {},
+        ]
+      }
+    />
     <Text
       maxFontSizeMultiplier={2}
       style={
@@ -1144,16 +1347,37 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "alignItems": "center",
-        "flexDirection": "row",
-        "justifyContent": "space-between",
-        "opacity": 1,
-        "paddingHorizontal": 24,
-        "paddingVertical": 14,
-      }
+      [
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "paddingHorizontal": 24,
+          "paddingVertical": 14,
+        },
+        {},
+      ]
     }
   >
+    <View
+      pointerEvents="none"
+      style={
+        [
+          {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          },
+          {
+            "backgroundColor": "#8888881F",
+            "borderRadius": undefined,
+          },
+          {},
+        ]
+      }
+    />
     <Text
       maxFontSizeMultiplier={2}
       style={
@@ -1199,16 +1423,37 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "alignItems": "center",
-        "flexDirection": "row",
-        "justifyContent": "space-between",
-        "opacity": 1,
-        "paddingHorizontal": 24,
-        "paddingVertical": 14,
-      }
+      [
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "paddingHorizontal": 24,
+          "paddingVertical": 14,
+        },
+        {},
+      ]
     }
   >
+    <View
+      pointerEvents="none"
+      style={
+        [
+          {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          },
+          {
+            "backgroundColor": "#8888881F",
+            "borderRadius": undefined,
+          },
+          {},
+        ]
+      }
+    />
     <Text
       maxFontSizeMultiplier={2}
       style={
@@ -1254,16 +1499,37 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "alignItems": "center",
-        "flexDirection": "row",
-        "justifyContent": "space-between",
-        "opacity": 1,
-        "paddingHorizontal": 24,
-        "paddingVertical": 14,
-      }
+      [
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "paddingHorizontal": 24,
+          "paddingVertical": 14,
+        },
+        {},
+      ]
     }
   >
+    <View
+      pointerEvents="none"
+      style={
+        [
+          {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          },
+          {
+            "backgroundColor": "#8888881F",
+            "borderRadius": undefined,
+          },
+          {},
+        ]
+      }
+    />
     <Text
       maxFontSizeMultiplier={2}
       style={
@@ -1309,16 +1575,37 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "alignItems": "center",
-        "flexDirection": "row",
-        "justifyContent": "space-between",
-        "opacity": 1,
-        "paddingHorizontal": 24,
-        "paddingVertical": 14,
-      }
+      [
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "paddingHorizontal": 24,
+          "paddingVertical": 14,
+        },
+        {},
+      ]
     }
   >
+    <View
+      pointerEvents="none"
+      style={
+        [
+          {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          },
+          {
+            "backgroundColor": "#8888881F",
+            "borderRadius": undefined,
+          },
+          {},
+        ]
+      }
+    />
     <Text
       maxFontSizeMultiplier={2}
       style={
@@ -1364,16 +1651,37 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "alignItems": "center",
-        "flexDirection": "row",
-        "justifyContent": "space-between",
-        "opacity": 1,
-        "paddingHorizontal": 24,
-        "paddingVertical": 14,
-      }
+      [
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "paddingHorizontal": 24,
+          "paddingVertical": 14,
+        },
+        {},
+      ]
     }
   >
+    <View
+      pointerEvents="none"
+      style={
+        [
+          {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          },
+          {
+            "backgroundColor": "#8888881F",
+            "borderRadius": undefined,
+          },
+          {},
+        ]
+      }
+    />
     <Text
       maxFontSizeMultiplier={2}
       style={
@@ -1419,16 +1727,37 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "alignItems": "center",
-        "flexDirection": "row",
-        "justifyContent": "space-between",
-        "opacity": 1,
-        "paddingHorizontal": 24,
-        "paddingVertical": 14,
-      }
+      [
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "paddingHorizontal": 24,
+          "paddingVertical": 14,
+        },
+        {},
+      ]
     }
   >
+    <View
+      pointerEvents="none"
+      style={
+        [
+          {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          },
+          {
+            "backgroundColor": "#8888881F",
+            "borderRadius": undefined,
+          },
+          {},
+        ]
+      }
+    />
     <Text
       maxFontSizeMultiplier={2}
       style={
@@ -1474,16 +1803,37 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "alignItems": "center",
-        "flexDirection": "row",
-        "justifyContent": "space-between",
-        "opacity": 1,
-        "paddingHorizontal": 24,
-        "paddingVertical": 14,
-      }
+      [
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "paddingHorizontal": 24,
+          "paddingVertical": 14,
+        },
+        {},
+      ]
     }
   >
+    <View
+      pointerEvents="none"
+      style={
+        [
+          {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          },
+          {
+            "backgroundColor": "#8888881F",
+            "borderRadius": undefined,
+          },
+          {},
+        ]
+      }
+    />
     <Text
       maxFontSizeMultiplier={2}
       style={

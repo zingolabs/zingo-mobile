@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Animated, {
   ReduceMotion,
@@ -9,6 +9,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { duration, ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import {
   iconSizeMd,
   iconSizeSm,
@@ -73,6 +74,7 @@ export function PinButton({
   const color = pinned ? colors.fgAccent : colors.fgMuted;
   return (
     <Pressable
+      kind="icon"
       testID={testID}
       accessibilityRole="button"
       accessibilityState={{ selected: pinned }}
@@ -81,14 +83,13 @@ export function PinButton({
       }
 
       onPress={onPress}
-      style={({ pressed }) => ({
+      style={{
         width: touchTarget,
         height: touchTarget,
         borderRadius: radiusPill,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: pressed ? colors.bgMutedSubtle : 'transparent',
-      })}
+      }}
     >
       <Animated.View style={style}>
         <PinIcon size={iconSizeMd} color={color} filled={pinned} />
@@ -188,6 +189,7 @@ export default function AddressCard({
                 </Text>
               ) : (
                 <Pressable
+                  kind="link"
                   testID="receive.add-tag"
                   accessibilityRole="button"
                   onPress={onAddTag}
@@ -199,6 +201,7 @@ export default function AddressCard({
                 </Pressable>
               )}
               <Pressable
+                kind="link"
                 testID={
                   transparent
                     ? 'receive.transparent-address'

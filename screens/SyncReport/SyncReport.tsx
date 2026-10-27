@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import Animated, {
   ReduceMotion,
   useAnimatedStyle,
@@ -30,6 +30,7 @@ import {
 } from '@app/theme';
 import Text from '@ui/primitives/Text';
 import { ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import { SnackbarDurationEnum } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
@@ -432,6 +433,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
         backAccessibilityLabel={translate('sync.back-acc') as string}
         right={
           <Pressable
+            kind="icon"
             testID="syncreport.rescan"
             accessibilityRole="button"
             accessibilityLabel={translate('sync.rescan-acc') as string}
@@ -672,6 +674,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
 
         {bgStart > 0 && (
           <Pressable
+            kind="row"
             testID="syncreport.background"
             disabled={!backgroundSyncInfo.error}
             onPress={reportError}

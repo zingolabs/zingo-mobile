@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Easing } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
@@ -11,6 +11,7 @@ import { ContextAppLoaded, useSwapService } from '@app/context';
 import { AppDrawerParamList, HomeTabParamList } from '@app/types';
 import CustomTabBar from './CustomTabBar';
 import { skipExitingWithScreen } from './screenLayout';
+import { lazyScreen, preloadScreens } from './lazyScreen';
 import { duration } from '@app/theme/motion';
 import LoadedAppOptionsPanelHost from '@app/LoadedApp/LoadedAppOptionsPanelHost';
 
@@ -26,29 +27,55 @@ import { AddressList } from '@screens/AddressList';
 import ValueTransferDetail from '@screens/ValueTransferDetail';
 import Confirm from '@screens/Confirm';
 
-const About = React.lazy(() => import('@screens/About'));
-const MixnetDoctor = React.lazy(() => import('@screens/MixnetDoctor'));
-const SyncReport = React.lazy(() => import('@screens/SyncReport'));
-const Pools = React.lazy(() => import('@screens/Pools'));
-const MeetIronwood = React.lazy(() => import('@screens/MeetIronwood'));
-const SeedBackup = React.lazy(() => import('@screens/SeedBackup'));
-const WalletSeed = React.lazy(() => import('@screens/WalletSeed'));
-const ViewingKey = React.lazy(() => import('@screens/ViewingKey'));
-const MigrationStrategy = React.lazy(
+const About = lazyScreen(() => import('@screens/About'));
+const MixnetDoctor = lazyScreen(() => import('@screens/MixnetDoctor'));
+const SyncReport = lazyScreen(() => import('@screens/SyncReport'));
+const Pools = lazyScreen(() => import('@screens/Pools'));
+const MeetIronwood = lazyScreen(() => import('@screens/MeetIronwood'));
+const SeedBackup = lazyScreen(() => import('@screens/SeedBackup'));
+const WalletSeed = lazyScreen(() => import('@screens/WalletSeed'));
+const ViewingKey = lazyScreen(() => import('@screens/ViewingKey'));
+const MigrationStrategy = lazyScreen(
   () => import('@screens/MigrationStrategy'),
 );
-const MigrationTransactions = React.lazy(
+const MigrationTransactions = lazyScreen(
   () => import('@screens/MigrationTransactions'),
 );
-const MigrationSending = React.lazy(() => import('@screens/MigrationSending'));
-const Insight = React.lazy(() => import('@screens/Insight'));
-const ComputingTxContent = React.lazy(() => import('@screens/Computing'));
-const SwapReview = React.lazy(() => import('@screens/SwapReview'));
-const SwapDeposit = React.lazy(() => import('@screens/SwapDeposit'));
-const SwapTracking = React.lazy(() => import('@screens/SwapTracking'));
-const SwapResult = React.lazy(() => import('@screens/SwapResult'));
-const SwapDetail = React.lazy(() => import('@screens/SwapDetail'));
-const SwapTransaction = React.lazy(() => import('@screens/SwapTransaction'));
+const MigrationSending = lazyScreen(() => import('@screens/MigrationSending'));
+const Insight = lazyScreen(() => import('@screens/Insight'));
+const ComputingTxContent = lazyScreen(() => import('@screens/Computing'));
+const SwapReview = lazyScreen(() => import('@screens/SwapReview'));
+const SwapDeposit = lazyScreen(() => import('@screens/SwapDeposit'));
+const SwapTracking = lazyScreen(() => import('@screens/SwapTracking'));
+const SwapResult = lazyScreen(() => import('@screens/SwapResult'));
+const SwapDetail = lazyScreen(() => import('@screens/SwapDetail'));
+const SwapTransaction = lazyScreen(() => import('@screens/SwapTransaction'));
+
+/**
+ * Every lazy screen, loaded one by one once the wallet is up, so no press
+ * opens one on an empty frame. The swap screens first, then the menu ones.
+ */
+const PRELOAD = [
+  SwapReview,
+  SwapDeposit,
+  SwapTracking,
+  SwapResult,
+  SwapDetail,
+  SwapTransaction,
+  ComputingTxContent,
+  About,
+  MixnetDoctor,
+  SyncReport,
+  Pools,
+  WalletSeed,
+  Insight,
+  SeedBackup,
+  ViewingKey,
+  MeetIronwood,
+  MigrationStrategy,
+  MigrationTransactions,
+  MigrationSending,
+];
 
 const Stack = createNativeStackNavigator<AppDrawerParamList>();
 
@@ -82,6 +109,9 @@ const PANEL = {
 
 /** A step inside a full panel (sending, sent): the panel is up already. */
 const STEP = PANEL;
+
+/** A screen the options panel opens, and Settings: it slides in from the right and back. */
+const MENU = { animation: 'slide_from_right' } as const;
 const Tab = createBottomTabNavigator<HomeTabParamList>();
 
 const renderTabBar = (props: BottomTabBarProps) => <CustomTabBar {...props} />;
@@ -126,6 +156,7 @@ function Home() {
 // The wallet section: the home with its options panel, the screens pushed
 // over them, the one-way flows, and the overlays.
 export function WalletNavigator() {
+  useEffect(() => preloadScreens(PRELOAD), []);
   return (
     <Stack.Navigator
       initialRouteName={Route.Home}
@@ -142,28 +173,36 @@ export function WalletNavigator() {
         <Stack.Screen
           name={Route.Settings}
           component={Settings}
-          options={{ animation: 'slide_from_right' }}
+          options={MENU}
         />
         <Stack.Screen
           name={Route.Server}
           component={WalletServer}
-          options={{ animation: 'slide_from_right' }}
+          options={MENU}
         />
-        <Stack.Screen name={Route.About} component={About} />
-        <Stack.Screen name={Route.MixnetDoctor} component={MixnetDoctor} />
-        <Stack.Screen name={Route.Insight} component={Insight} />
-        <Stack.Screen name={Route.SyncReport} component={SyncReport} />
+        <Stack.Screen name={Route.About} component={About} options={MENU} />
         <Stack.Screen
-          name={Route.Pools}
-          component={Pools}
-          options={{ animation: 'slide_from_right' }}
+          name={Route.MixnetDoctor}
+          component={MixnetDoctor}
+          options={MENU}
         />
+        <Stack.Screen name={Route.Insight} component={Insight} options={MENU} />
+        <Stack.Screen
+          name={Route.SyncReport}
+          component={SyncReport}
+          options={MENU}
+        />
+        <Stack.Screen name={Route.Pools} component={Pools} options={MENU} />
         <Stack.Screen
           name={Route.WalletSeed}
           component={WalletSeed}
-          options={{ animation: 'slide_from_right' }}
+          options={MENU}
         />
-        <Stack.Screen name={Route.AddressBook} component={AddressBook} />
+        <Stack.Screen
+          name={Route.AddressBook}
+          component={AddressBook}
+          options={MENU}
+        />
         <Stack.Screen
           name={Route.ValueTransferDetail}
           component={ValueTransferDetail}

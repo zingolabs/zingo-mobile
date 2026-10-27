@@ -147,15 +147,47 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          {
-            "alignItems": "center",
-            "flexDirection": "row",
-            "paddingHorizontal": 14,
-            "paddingVertical": 4,
-          }
+          [
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "paddingHorizontal": 14,
+              "paddingVertical": 4,
+            },
+            {},
+          ]
         }
         testID="pools.back"
-      />
+      >
+        <View
+          pointerEvents="none"
+          style={
+            {
+              "alignItems": "center",
+              "bottom": 0,
+              "justifyContent": "center",
+              "left": 0,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+            }
+          }
+        >
+          <View
+            style={
+              [
+                {
+                  "backgroundColor": "#8888881F",
+                  "borderRadius": 999,
+                  "height": 44,
+                  "width": 44,
+                },
+                {},
+              ]
+            }
+          />
+        </View>
+      </View>
     </View>
     <View
       style={
@@ -1503,7 +1535,9 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
+            onBlur={[Function]}
             onClick={[Function]}
+            onFocus={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -1511,19 +1545,21 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "alignSelf": "stretch",
-                "backgroundColor": "#18bd18",
-                "borderRadius": 999,
-                "justifyContent": "center",
-                "maxWidth": "100%",
-                "minHeight": 44,
-                "opacity": 1,
-                "paddingHorizontal": 24,
-                "paddingVertical": 8,
-                "width": "100%",
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "alignSelf": "stretch",
+                  "backgroundColor": "#18bd18",
+                  "borderRadius": 999,
+                  "justifyContent": "center",
+                  "maxWidth": "100%",
+                  "minHeight": 44,
+                  "paddingHorizontal": 24,
+                  "paddingVertical": 8,
+                  "width": "100%",
+                },
+                {},
+              ]
             }
             testID="shield.confirm"
           >
@@ -1564,7 +1600,9 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
+            onBlur={[Function]}
             onClick={[Function]}
+            onFocus={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -1572,19 +1610,21 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "alignSelf": "stretch",
-                "backgroundColor": undefined,
-                "borderRadius": 999,
-                "justifyContent": "center",
-                "maxWidth": "100%",
-                "minHeight": 44,
-                "opacity": 1,
-                "paddingHorizontal": 24,
-                "paddingVertical": 8,
-                "width": "100%",
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "alignSelf": "stretch",
+                  "backgroundColor": undefined,
+                  "borderRadius": 999,
+                  "justifyContent": "center",
+                  "maxWidth": "100%",
+                  "minHeight": 44,
+                  "paddingHorizontal": 24,
+                  "paddingVertical": 8,
+                  "width": "100%",
+                },
+                {},
+              ]
             }
             testID="shield.cancel"
           >

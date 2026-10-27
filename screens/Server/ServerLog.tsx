@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, { FadeIn, ReduceMotion } from 'react-native-reanimated';
 
 import {
@@ -16,6 +16,7 @@ import {
 import { ChainNameEnum } from '@app/AppState';
 import Text from '@ui/primitives/Text';
 import { duration } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { ChevronRight } from '@ui/primitives/Icons/Chevron';
@@ -156,6 +157,7 @@ const ServerLog: React.FC<ServerLogProps> = ({
           {!!line.details && (
             <View style={{ marginTop: space8 }}>
               <Pressable
+                kind="link"
                 testID="server.custom.details"
                 onPress={() => setOpen(o => ({ ...o, [i]: !o[i] }))}
                 accessibilityRole="button"

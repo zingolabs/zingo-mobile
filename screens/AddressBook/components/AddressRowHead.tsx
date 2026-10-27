@@ -1,9 +1,10 @@
 /* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { Platform, Pressable, Text, View } from 'react-native';
+import { Platform, Text, View } from 'react-native';
 
 import { useTheme } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils';
 import { ChainLogo } from '@ui/widgets/ChainSelect';
@@ -57,6 +58,7 @@ const AddressRowHead: React.FunctionComponent<AddressRowHeadProps> = ({
 
   return (
     <Pressable
+      kind="row"
       testID={`${testID}.head`}
       accessibilityRole="button"
       accessibilityState={

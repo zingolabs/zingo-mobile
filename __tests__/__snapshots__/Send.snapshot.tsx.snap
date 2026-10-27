@@ -8,6 +8,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
       "flex": 1,
     }
   }
+  testID="send.container"
 >
   <View
     accessibilityLabel="text translated"
@@ -103,7 +104,9 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                   "top": 10,
                 }
               }
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -111,12 +114,42 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "opacity": 1,
-                }
+                [
+                  undefined,
+                  {},
+                ]
               }
               testID="header.drawmenu"
-            />
+            >
+              <View
+                pointerEvents="none"
+                style={
+                  {
+                    "alignItems": "center",
+                    "bottom": 0,
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    [
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": 999,
+                        "height": 44,
+                        "width": 44,
+                      },
+                      {},
+                    ]
+                  }
+                />
+              </View>
+            </View>
           </View>
         </View>
         <View
@@ -170,7 +203,9 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                   "top": 10,
                 }
               }
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -178,14 +213,45 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "marginRight": 5,
-                  "marginTop": 4.5,
-                  "opacity": 1,
-                }
+                [
+                  {
+                    "marginRight": 5,
+                    "marginTop": 4.5,
+                  },
+                  {},
+                ]
               }
               testID="header.messages"
-            />
+            >
+              <View
+                pointerEvents="none"
+                style={
+                  {
+                    "alignItems": "center",
+                    "bottom": 0,
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    [
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": 999,
+                        "height": 44,
+                        "width": 44,
+                      },
+                      {},
+                    ]
+                  }
+                />
+              </View>
+            </View>
           </View>
         </View>
       </View>
@@ -371,15 +437,47 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                         onResponderTerminationRequest={[Function]}
                         onStartShouldSetResponder={[Function]}
                         style={
-                          {
-                            "alignItems": "center",
-                            "height": 36,
-                            "justifyContent": "center",
-                            "width": 36,
-                          }
+                          [
+                            {
+                              "alignItems": "center",
+                              "height": 36,
+                              "justifyContent": "center",
+                              "width": 36,
+                            },
+                            {},
+                          ]
                         }
                         testID="send.address.clear"
-                      />
+                      >
+                        <View
+                          pointerEvents="none"
+                          style={
+                            {
+                              "alignItems": "center",
+                              "bottom": 0,
+                              "justifyContent": "center",
+                              "left": 0,
+                              "position": "absolute",
+                              "right": 0,
+                              "top": 0,
+                            }
+                          }
+                        >
+                          <View
+                            style={
+                              [
+                                {
+                                  "backgroundColor": "#8888881F",
+                                  "borderRadius": 999,
+                                  "height": 44,
+                                  "width": 44,
+                                },
+                                {},
+                              ]
+                            }
+                          />
+                        </View>
+                      </View>
                       <View
                         accessibilityLabel="text translated"
                         accessibilityRole="button"
@@ -414,15 +512,47 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                         onResponderTerminationRequest={[Function]}
                         onStartShouldSetResponder={[Function]}
                         style={
-                          {
-                            "alignItems": "center",
-                            "height": 36,
-                            "justifyContent": "center",
-                            "width": 36,
-                          }
+                          [
+                            {
+                              "alignItems": "center",
+                              "height": 36,
+                              "justifyContent": "center",
+                              "width": 36,
+                            },
+                            {},
+                          ]
                         }
                         testID="send.address-book"
-                      />
+                      >
+                        <View
+                          pointerEvents="none"
+                          style={
+                            {
+                              "alignItems": "center",
+                              "bottom": 0,
+                              "justifyContent": "center",
+                              "left": 0,
+                              "position": "absolute",
+                              "right": 0,
+                              "top": 0,
+                            }
+                          }
+                        >
+                          <View
+                            style={
+                              [
+                                {
+                                  "backgroundColor": "#8888881F",
+                                  "borderRadius": 999,
+                                  "height": 44,
+                                  "width": 44,
+                                },
+                                {},
+                              ]
+                            }
+                          />
+                        </View>
+                      </View>
                       <View
                         accessibilityLabel="text translated"
                         accessibilityRole="button"
@@ -457,15 +587,47 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                         onResponderTerminationRequest={[Function]}
                         onStartShouldSetResponder={[Function]}
                         style={
-                          {
-                            "alignItems": "center",
-                            "height": 36,
-                            "justifyContent": "center",
-                            "width": 36,
-                          }
+                          [
+                            {
+                              "alignItems": "center",
+                              "height": 36,
+                              "justifyContent": "center",
+                              "width": 36,
+                            },
+                            {},
+                          ]
                         }
                         testID="send.scan-button"
-                      />
+                      >
+                        <View
+                          pointerEvents="none"
+                          style={
+                            {
+                              "alignItems": "center",
+                              "bottom": 0,
+                              "justifyContent": "center",
+                              "left": 0,
+                              "position": "absolute",
+                              "right": 0,
+                              "top": 0,
+                            }
+                          }
+                        >
+                          <View
+                            style={
+                              [
+                                {
+                                  "backgroundColor": "#8888881F",
+                                  "borderRadius": 999,
+                                  "height": 44,
+                                  "width": 44,
+                                },
+                                {},
+                              ]
+                            }
+                          />
+                        </View>
+                      </View>
                     </View>
                   </View>
                 </View>
@@ -581,16 +743,19 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
                       style={
-                        {
-                          "alignItems": "center",
-                          "borderColor": "#05234C",
-                          "borderRadius": 999,
-                          "borderWidth": 1,
-                          "flexDirection": "row",
-                          "gap": 4,
-                          "minHeight": 32,
-                          "paddingHorizontal": 12,
-                        }
+                        [
+                          {
+                            "alignItems": "center",
+                            "borderColor": "#05234C",
+                            "borderRadius": 999,
+                            "borderWidth": 1,
+                            "flexDirection": "row",
+                            "gap": 4,
+                            "minHeight": 32,
+                            "paddingHorizontal": 12,
+                          },
+                          {},
+                        ]
                       }
                       testID="send.swap-entry"
                     >
@@ -675,10 +840,13 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
                       style={
-                        {
-                          "flexDirection": "row",
-                          "gap": 4,
-                        }
+                        [
+                          {
+                            "flexDirection": "row",
+                            "gap": 4,
+                          },
+                          {},
+                        ]
                       }
                       testID="send.max"
                     >
@@ -727,6 +895,12 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                         onResponderTerminate={[Function]}
                         onResponderTerminationRequest={[Function]}
                         onStartShouldSetResponder={[Function]}
+                        style={
+                          [
+                            undefined,
+                            {},
+                          ]
+                        }
                       >
                         <Text
                           maxFontSizeMultiplier={2}
@@ -776,8 +950,10 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                   }
                   accessible={true}
                   collapsable={false}
-                  focusable={false}
+                  focusable={true}
+                  onBlur={[Function]}
                   onClick={[Function]}
+                  onFocus={[Function]}
                   onResponderGrant={[Function]}
                   onResponderMove={[Function]}
                   onResponderRelease={[Function]}
@@ -785,19 +961,21 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
                   style={
-                    {
-                      "alignItems": "center",
-                      "alignSelf": "stretch",
-                      "backgroundColor": "#5a8c5a",
-                      "borderRadius": 999,
-                      "justifyContent": "center",
-                      "maxWidth": "100%",
-                      "minHeight": 44,
-                      "opacity": 1,
-                      "paddingHorizontal": 24,
-                      "paddingVertical": 8,
-                      "width": "100%",
-                    }
+                    [
+                      {
+                        "alignItems": "center",
+                        "alignSelf": "stretch",
+                        "backgroundColor": "#5a8c5a",
+                        "borderRadius": 999,
+                        "justifyContent": "center",
+                        "maxWidth": "100%",
+                        "minHeight": 44,
+                        "paddingHorizontal": 24,
+                        "paddingVertical": 8,
+                        "width": "100%",
+                      },
+                      {},
+                    ]
                   }
                   testID="send.button-disabled"
                 >
@@ -939,14 +1117,46 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "paddingHorizontal": 14,
-                "paddingVertical": 4,
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "paddingHorizontal": 14,
+                  "paddingVertical": 4,
+                },
+                {},
+              ]
             }
-          />
+          >
+            <View
+              pointerEvents="none"
+              style={
+                {
+                  "alignItems": "center",
+                  "bottom": 0,
+                  "justifyContent": "center",
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                }
+              }
+            >
+              <View
+                style={
+                  [
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": 999,
+                      "height": 44,
+                      "width": 44,
+                    },
+                    {},
+                  ]
+                }
+              />
+            </View>
+          </View>
         </View>
       </View>
       <View
@@ -978,7 +1188,9 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
           accessible={true}
           collapsable={false}
           focusable={true}
+          onBlur={[Function]}
           onClick={[Function]}
+          onFocus={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -986,19 +1198,21 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "alignItems": "center",
-              "alignSelf": "stretch",
-              "backgroundColor": "#18bd18",
-              "borderRadius": 999,
-              "justifyContent": "center",
-              "maxWidth": "100%",
-              "minHeight": 44,
-              "opacity": 1,
-              "paddingHorizontal": 24,
-              "paddingVertical": 8,
-              "width": "100%",
-            }
+            [
+              {
+                "alignItems": "center",
+                "alignSelf": "stretch",
+                "backgroundColor": "#18bd18",
+                "borderRadius": 999,
+                "justifyContent": "center",
+                "maxWidth": "100%",
+                "minHeight": 44,
+                "paddingHorizontal": 24,
+                "paddingVertical": 8,
+                "width": "100%",
+              },
+              {},
+            ]
           }
           testID="send.error.support"
         >
@@ -1043,6 +1257,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
       "flex": 1,
     }
   }
+  testID="send.container"
 >
   <View
     accessibilityLabel="text translated"
@@ -1138,7 +1353,9 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                   "top": 10,
                 }
               }
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -1146,12 +1363,42 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "opacity": 1,
-                }
+                [
+                  undefined,
+                  {},
+                ]
               }
               testID="header.drawmenu"
-            />
+            >
+              <View
+                pointerEvents="none"
+                style={
+                  {
+                    "alignItems": "center",
+                    "bottom": 0,
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    [
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": 999,
+                        "height": 44,
+                        "width": 44,
+                      },
+                      {},
+                    ]
+                  }
+                />
+              </View>
+            </View>
           </View>
         </View>
         <View
@@ -1205,7 +1452,9 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                   "top": 10,
                 }
               }
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -1213,14 +1462,45 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "marginRight": 5,
-                  "marginTop": 4.5,
-                  "opacity": 1,
-                }
+                [
+                  {
+                    "marginRight": 5,
+                    "marginTop": 4.5,
+                  },
+                  {},
+                ]
               }
               testID="header.messages"
-            />
+            >
+              <View
+                pointerEvents="none"
+                style={
+                  {
+                    "alignItems": "center",
+                    "bottom": 0,
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    [
+                      {
+                        "backgroundColor": "#8888881F",
+                        "borderRadius": 999,
+                        "height": 44,
+                        "width": 44,
+                      },
+                      {},
+                    ]
+                  }
+                />
+              </View>
+            </View>
           </View>
         </View>
       </View>
@@ -1406,15 +1686,47 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                         onResponderTerminationRequest={[Function]}
                         onStartShouldSetResponder={[Function]}
                         style={
-                          {
-                            "alignItems": "center",
-                            "height": 36,
-                            "justifyContent": "center",
-                            "width": 36,
-                          }
+                          [
+                            {
+                              "alignItems": "center",
+                              "height": 36,
+                              "justifyContent": "center",
+                              "width": 36,
+                            },
+                            {},
+                          ]
                         }
                         testID="send.address.clear"
-                      />
+                      >
+                        <View
+                          pointerEvents="none"
+                          style={
+                            {
+                              "alignItems": "center",
+                              "bottom": 0,
+                              "justifyContent": "center",
+                              "left": 0,
+                              "position": "absolute",
+                              "right": 0,
+                              "top": 0,
+                            }
+                          }
+                        >
+                          <View
+                            style={
+                              [
+                                {
+                                  "backgroundColor": "#8888881F",
+                                  "borderRadius": 999,
+                                  "height": 44,
+                                  "width": 44,
+                                },
+                                {},
+                              ]
+                            }
+                          />
+                        </View>
+                      </View>
                       <View
                         accessibilityLabel="text translated"
                         accessibilityRole="button"
@@ -1449,15 +1761,47 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                         onResponderTerminationRequest={[Function]}
                         onStartShouldSetResponder={[Function]}
                         style={
-                          {
-                            "alignItems": "center",
-                            "height": 36,
-                            "justifyContent": "center",
-                            "width": 36,
-                          }
+                          [
+                            {
+                              "alignItems": "center",
+                              "height": 36,
+                              "justifyContent": "center",
+                              "width": 36,
+                            },
+                            {},
+                          ]
                         }
                         testID="send.address-book"
-                      />
+                      >
+                        <View
+                          pointerEvents="none"
+                          style={
+                            {
+                              "alignItems": "center",
+                              "bottom": 0,
+                              "justifyContent": "center",
+                              "left": 0,
+                              "position": "absolute",
+                              "right": 0,
+                              "top": 0,
+                            }
+                          }
+                        >
+                          <View
+                            style={
+                              [
+                                {
+                                  "backgroundColor": "#8888881F",
+                                  "borderRadius": 999,
+                                  "height": 44,
+                                  "width": 44,
+                                },
+                                {},
+                              ]
+                            }
+                          />
+                        </View>
+                      </View>
                       <View
                         accessibilityLabel="text translated"
                         accessibilityRole="button"
@@ -1492,15 +1836,47 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                         onResponderTerminationRequest={[Function]}
                         onStartShouldSetResponder={[Function]}
                         style={
-                          {
-                            "alignItems": "center",
-                            "height": 36,
-                            "justifyContent": "center",
-                            "width": 36,
-                          }
+                          [
+                            {
+                              "alignItems": "center",
+                              "height": 36,
+                              "justifyContent": "center",
+                              "width": 36,
+                            },
+                            {},
+                          ]
                         }
                         testID="send.scan-button"
-                      />
+                      >
+                        <View
+                          pointerEvents="none"
+                          style={
+                            {
+                              "alignItems": "center",
+                              "bottom": 0,
+                              "justifyContent": "center",
+                              "left": 0,
+                              "position": "absolute",
+                              "right": 0,
+                              "top": 0,
+                            }
+                          }
+                        >
+                          <View
+                            style={
+                              [
+                                {
+                                  "backgroundColor": "#8888881F",
+                                  "borderRadius": 999,
+                                  "height": 44,
+                                  "width": 44,
+                                },
+                                {},
+                              ]
+                            }
+                          />
+                        </View>
+                      </View>
                     </View>
                   </View>
                 </View>
@@ -1616,16 +1992,19 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
                       style={
-                        {
-                          "alignItems": "center",
-                          "borderColor": "#05234C",
-                          "borderRadius": 999,
-                          "borderWidth": 1,
-                          "flexDirection": "row",
-                          "gap": 4,
-                          "minHeight": 32,
-                          "paddingHorizontal": 12,
-                        }
+                        [
+                          {
+                            "alignItems": "center",
+                            "borderColor": "#05234C",
+                            "borderRadius": 999,
+                            "borderWidth": 1,
+                            "flexDirection": "row",
+                            "gap": 4,
+                            "minHeight": 32,
+                            "paddingHorizontal": 12,
+                          },
+                          {},
+                        ]
                       }
                       testID="send.swap-entry"
                     >
@@ -1710,10 +2089,13 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
                       style={
-                        {
-                          "flexDirection": "row",
-                          "gap": 4,
-                        }
+                        [
+                          {
+                            "flexDirection": "row",
+                            "gap": 4,
+                          },
+                          {},
+                        ]
                       }
                       testID="send.max"
                     >
@@ -1777,8 +2159,10 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                   }
                   accessible={true}
                   collapsable={false}
-                  focusable={false}
+                  focusable={true}
+                  onBlur={[Function]}
                   onClick={[Function]}
+                  onFocus={[Function]}
                   onResponderGrant={[Function]}
                   onResponderMove={[Function]}
                   onResponderRelease={[Function]}
@@ -1786,19 +2170,21 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
                   style={
-                    {
-                      "alignItems": "center",
-                      "alignSelf": "stretch",
-                      "backgroundColor": "#5a8c5a",
-                      "borderRadius": 999,
-                      "justifyContent": "center",
-                      "maxWidth": "100%",
-                      "minHeight": 44,
-                      "opacity": 1,
-                      "paddingHorizontal": 24,
-                      "paddingVertical": 8,
-                      "width": "100%",
-                    }
+                    [
+                      {
+                        "alignItems": "center",
+                        "alignSelf": "stretch",
+                        "backgroundColor": "#5a8c5a",
+                        "borderRadius": 999,
+                        "justifyContent": "center",
+                        "maxWidth": "100%",
+                        "minHeight": 44,
+                        "paddingHorizontal": 24,
+                        "paddingVertical": 8,
+                        "width": "100%",
+                      },
+                      {},
+                    ]
                   }
                   testID="send.button-disabled"
                 >
@@ -1940,14 +2326,46 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "paddingHorizontal": 14,
-                "paddingVertical": 4,
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "paddingHorizontal": 14,
+                  "paddingVertical": 4,
+                },
+                {},
+              ]
             }
-          />
+          >
+            <View
+              pointerEvents="none"
+              style={
+                {
+                  "alignItems": "center",
+                  "bottom": 0,
+                  "justifyContent": "center",
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                }
+              }
+            >
+              <View
+                style={
+                  [
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": 999,
+                      "height": 44,
+                      "width": 44,
+                    },
+                    {},
+                  ]
+                }
+              />
+            </View>
+          </View>
         </View>
       </View>
       <View
@@ -1979,7 +2397,9 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
           accessible={true}
           collapsable={false}
           focusable={true}
+          onBlur={[Function]}
           onClick={[Function]}
+          onFocus={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1987,19 +2407,21 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "alignItems": "center",
-              "alignSelf": "stretch",
-              "backgroundColor": "#18bd18",
-              "borderRadius": 999,
-              "justifyContent": "center",
-              "maxWidth": "100%",
-              "minHeight": 44,
-              "opacity": 1,
-              "paddingHorizontal": 24,
-              "paddingVertical": 8,
-              "width": "100%",
-            }
+            [
+              {
+                "alignItems": "center",
+                "alignSelf": "stretch",
+                "backgroundColor": "#18bd18",
+                "borderRadius": 999,
+                "justifyContent": "center",
+                "maxWidth": "100%",
+                "minHeight": 44,
+                "paddingHorizontal": 24,
+                "paddingVertical": 8,
+                "width": "100%",
+              },
+              {},
+            ]
           }
           testID="send.error.support"
         >

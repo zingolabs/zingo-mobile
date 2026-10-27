@@ -8,8 +8,9 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { useTheme, iconSizeMd } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import BoldText from '@ui/primitives/BoldText';
@@ -129,8 +130,8 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
   colors,
   accent,
 }) => (
-  <TouchableOpacity
-    activeOpacity={0.8}
+  <Pressable
+    kind="row"
     onPress={onPress}
     style={{
       borderWidth: 1.5,
@@ -171,7 +172,7 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
       fontSize={14}
       lineHeight={21}
     />
-  </TouchableOpacity>
+  </Pressable>
 );
 
 const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
@@ -241,7 +242,8 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
     <>
       <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         {/* Escape hatch: exit the migration flow back to Home. */}
-        <TouchableOpacity
+        <Pressable
+          kind="icon"
           testID="migrationstrategy.close"
           onPress={closeMigration}
           accessibilityLabel={translate('migrationstrategy.close') as string}
@@ -259,7 +261,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
           }}
         >
           <XIcon size={iconSizeMd} color={colors.fgMuted} />
-        </TouchableOpacity>
+        </Pressable>
         <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={{

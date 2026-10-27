@@ -1,11 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import {
-  View,
-  TouchableOpacity,
-  ActivityIndicator,
-  Platform,
-} from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
+import { View, ActivityIndicator, Platform } from 'react-native';
 import {
   iconSizeSm,
   radiusMd,
@@ -136,7 +132,8 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
           </Text>
         </View>
       )}
-      <TouchableOpacity
+      <Pressable
+        kind="row"
         style={{ zIndex: 999 }}
         onPress={() => {
           setValueTransferDetailModalShow(index, vt);
@@ -177,7 +174,8 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
           {(!!memo || !!memoUA) && (
             <View style={{ marginTop: 0 }}>
               {!!memo && (
-                <TouchableOpacity
+                <Pressable
+                  kind="link"
                   style={{ zIndex: 999 }}
                   onPress={() => {
                     Clipboard.setString(memo);
@@ -190,10 +188,11 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                   <Text variant="body" selectable={true}>
                     {memo}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               )}
               {!!memoUA && (
-                <TouchableOpacity
+                <Pressable
+                  kind="link"
                   style={{ zIndex: 999 }}
                   onPress={() => {
                     Clipboard.setString(memoUA);
@@ -231,7 +230,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                       )}
                     </>
                   )}
-                </TouchableOpacity>
+                </Pressable>
               )}
             </View>
           )}
@@ -344,7 +343,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
             </View>
           </View>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };

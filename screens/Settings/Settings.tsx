@@ -6,14 +6,14 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import Pressable from '@ui/primitives/Pressable';
 import {
   View,
-  TouchableOpacity,
   Platform,
   KeyboardAvoidingView,
   Keyboard,
   StyleSheet,
-  Pressable,
+  Pressable as RNPressable,
   ScrollView,
 } from 'react-native';
 
@@ -471,7 +471,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
               onToggle={open => setOpenInfoSection(open ? infoSection : null)}
               alignStart
             >
-              <TouchableOpacity
+              <Pressable
+                kind="row"
                 testID={`settings.${label}-${item.value}`}
                 disabled={disabled}
                 style={{ flexDirection: 'row', alignItems: 'center' }}
@@ -485,7 +486,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                 <Text variant="body" style={{ marginLeft: space12 }}>
                   {translate(`settings.value-${label}-${item.value}`) as string}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             </InfoTooltip>
           </View>
         </View>
@@ -596,7 +597,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
         >
           {/* An open tip closes on a tap anywhere else. */}
           {!!openInfoSection && (
-            <Pressable
+            <RNPressable
               onPress={() => setOpenInfoSection(null)}
               style={[StyleSheet.absoluteFill, { zIndex: 1 }]}
             />
@@ -604,7 +605,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
           {/* SECTION: Preferences */}
           {section(
             'settings.section-preferences',
-            <TouchableOpacity
+            <Pressable
+              kind="row"
               disabled={disabled}
               onPress={() => languageSelectRef.current?.present()}
               style={rowStyle(true)}
@@ -622,7 +624,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                 </Text>
                 <ChevronRight size={iconSizeMd} color={colors.fgMuted} />
               </View>
-            </TouchableOpacity>,
+            </Pressable>,
           )}
 
           {/* SECTION: Privacy & Security */}
@@ -645,13 +647,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                   >
                     {/* A long press on the title opens the developer
                           options. */}
-                    <TouchableOpacity
+                    <Pressable
+                      kind="row"
                       onLongPress={() => setShowDeveloperOptions(true)}
                     >
                       <Text variant="bodyStrong">
                         {translate('settings.privacy-title') as string}
                       </Text>
-                    </TouchableOpacity>
+                    </Pressable>
                   </InfoTooltip>
                 </View>
                 <Switch
@@ -720,7 +723,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                   and its green says the network is the one carrying the
                   wallet's traffic. */}
               {mixnetView.kind === 'transport' && (
-                <TouchableOpacity
+                <Pressable
+                  kind="row"
                   testID="settings.mixnet"
                   onPress={() => navigation.navigate(Route.MixnetDoctor)}
                   style={rowStyle(true)}
@@ -729,10 +733,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                     {translate('settings.nym-network') as string}
                   </Text>
                   <ChevronRight size={iconSizeMd} color={colors.fgMuted} />
-                </TouchableOpacity>
+                </Pressable>
               )}
 
-              <TouchableOpacity
+              <Pressable
+                kind="row"
                 disabled={disabled}
                 onPress={() => blockExplorerSelectRef.current?.present()}
                 style={rowStyle(mixnetView.kind !== 'transport')}
@@ -754,14 +759,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                   </Text>
                   <ChevronRight size={iconSizeMd} color={colors.fgMuted} />
                 </View>
-              </TouchableOpacity>
+              </Pressable>
             </>,
           )}
 
           {/* SECTION: Other */}
           {section(
             'settings.section-other',
-            <TouchableOpacity
+            <Pressable
+              kind="row"
               testID="settings.about"
               disabled={disabled}
               onPress={() => navigation.navigate(Route.About)}
@@ -771,13 +777,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                 {translate('loadedapp.about') as string}
               </Text>
               <ChevronRight size={iconSizeMd} color={colors.fgMuted} />
-            </TouchableOpacity>,
+            </Pressable>,
           )}
 
           {(!recoveryInfoStored || recoveryInfoSave) && (
             <View style={{ marginHorizontal: space20, marginTop: space16 }}>
               {!recoveryInfoStored && (
-                <TouchableOpacity
+                <Pressable
+                  kind="link"
                   testID="settings.recoveryinfo.save"
                   disabled={savingRecoveryInfo}
                   onPress={saveRecoveryInfoNow}
@@ -794,7 +801,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                       ) as string
                     }
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               )}
               {(savingRecoveryInfo || recoveryInfoSave) && (
                 <Text

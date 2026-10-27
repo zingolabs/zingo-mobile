@@ -1,8 +1,9 @@
 /* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { View } from 'react-native';
 import { useTheme } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 
 import { ChainNameEnum, TranslateType } from '@app/AppState';
 import RegText from '@ui/primitives/RegText';
@@ -42,7 +43,8 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
       {CHAINS.map(c => {
         const selected = customServerChainName === c.value;
         return (
-          <TouchableOpacity
+          <Pressable
+            kind="button"
             key={c.value}
             testID={`settings.custom-server-chain.${c.key}net`}
             disabled={disabled}
@@ -65,7 +67,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
             >
               {translate(`settings.value-chainname-${c.key}`) as string}
             </RegText>
-          </TouchableOpacity>
+          </Pressable>
         );
       })}
     </View>

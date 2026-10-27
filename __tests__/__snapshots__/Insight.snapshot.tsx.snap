@@ -147,15 +147,47 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          {
-            "alignItems": "center",
-            "flexDirection": "row",
-            "paddingHorizontal": 14,
-            "paddingVertical": 4,
-          }
+          [
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "paddingHorizontal": 14,
+              "paddingVertical": 4,
+            },
+            {},
+          ]
         }
         testID="insight.back"
-      />
+      >
+        <View
+          pointerEvents="none"
+          style={
+            {
+              "alignItems": "center",
+              "bottom": 0,
+              "justifyContent": "center",
+              "left": 0,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+            }
+          }
+        >
+          <View
+            style={
+              [
+                {
+                  "backgroundColor": "#8888881F",
+                  "borderRadius": 999,
+                  "height": 44,
+                  "width": 44,
+                },
+                {},
+              ]
+            }
+          />
+        </View>
+      </View>
     </View>
     <View
       style={
@@ -267,11 +299,14 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "alignItems": "center",
-              "flex": 1,
-              "justifyContent": "center",
-            }
+            [
+              {
+                "alignItems": "center",
+                "flex": 1,
+                "justifyContent": "center",
+              },
+              {},
+            ]
           }
           testID="insight.metric.amount"
         >
@@ -321,11 +356,14 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "alignItems": "center",
-              "flex": 1,
-              "justifyContent": "center",
-            }
+            [
+              {
+                "alignItems": "center",
+                "flex": 1,
+                "justifyContent": "center",
+              },
+              {},
+            ]
           }
           testID="insight.metric.sends"
         >
@@ -500,17 +538,19 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "backgroundColor": "#18bd181F",
-                  "borderColor": "#18bd18",
-                  "borderRadius": 999,
-                  "borderWidth": 1,
-                  "justifyContent": "center",
-                  "minHeight": 32,
-                  "opacity": 1,
-                  "paddingHorizontal": 12,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "backgroundColor": "#18bd181F",
+                    "borderColor": "#18bd18",
+                    "borderRadius": 999,
+                    "borderWidth": 1,
+                    "justifyContent": "center",
+                    "minHeight": 32,
+                    "paddingHorizontal": 12,
+                  },
+                  {},
+                ]
               }
               testID="insight.preset-4w"
             >
@@ -574,17 +614,19 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "backgroundColor": "#18bd181F",
-                  "borderColor": "#18bd18",
-                  "borderRadius": 999,
-                  "borderWidth": 1,
-                  "justifyContent": "center",
-                  "minHeight": 32,
-                  "opacity": 1,
-                  "paddingHorizontal": 12,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "backgroundColor": "#18bd181F",
+                    "borderColor": "#18bd18",
+                    "borderRadius": 999,
+                    "borderWidth": 1,
+                    "justifyContent": "center",
+                    "minHeight": 32,
+                    "paddingHorizontal": 12,
+                  },
+                  {},
+                ]
               }
               testID="insight.preset-3m"
             >
@@ -648,17 +690,19 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "backgroundColor": "#18bd181F",
-                  "borderColor": "#18bd18",
-                  "borderRadius": 999,
-                  "borderWidth": 1,
-                  "justifyContent": "center",
-                  "minHeight": 32,
-                  "opacity": 1,
-                  "paddingHorizontal": 12,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "backgroundColor": "#18bd181F",
+                    "borderColor": "#18bd18",
+                    "borderRadius": 999,
+                    "borderWidth": 1,
+                    "justifyContent": "center",
+                    "minHeight": 32,
+                    "paddingHorizontal": 12,
+                  },
+                  {},
+                ]
               }
               testID="insight.preset-6m"
             >
@@ -722,17 +766,19 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "backgroundColor": "#18bd181F",
-                  "borderColor": "#18bd18",
-                  "borderRadius": 999,
-                  "borderWidth": 1,
-                  "justifyContent": "center",
-                  "minHeight": 32,
-                  "opacity": 1,
-                  "paddingHorizontal": 12,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "backgroundColor": "#18bd181F",
+                    "borderColor": "#18bd18",
+                    "borderRadius": 999,
+                    "borderWidth": 1,
+                    "justifyContent": "center",
+                    "minHeight": 32,
+                    "paddingHorizontal": 12,
+                  },
+                  {},
+                ]
               }
               testID="insight.preset-all"
             >

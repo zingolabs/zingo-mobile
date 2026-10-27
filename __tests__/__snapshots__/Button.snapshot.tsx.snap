@@ -23,7 +23,9 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
   accessible={true}
   collapsable={false}
   focusable={true}
+  onBlur={[Function]}
   onClick={[Function]}
+  onFocus={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -31,19 +33,21 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
   onResponderTerminationRequest={[Function]}
   onStartShouldSetResponder={[Function]}
   style={
-    {
-      "alignItems": "center",
-      "alignSelf": "stretch",
-      "backgroundColor": "#18bd18",
-      "borderRadius": 999,
-      "justifyContent": "center",
-      "maxWidth": "100%",
-      "minHeight": 44,
-      "opacity": 1,
-      "paddingHorizontal": 24,
-      "paddingVertical": 8,
-      "width": "100%",
-    }
+    [
+      {
+        "alignItems": "center",
+        "alignSelf": "stretch",
+        "backgroundColor": "#18bd18",
+        "borderRadius": 999,
+        "justifyContent": "center",
+        "maxWidth": "100%",
+        "minHeight": 44,
+        "paddingHorizontal": 24,
+        "paddingVertical": 8,
+        "width": "100%",
+      },
+      {},
+    ]
   }
 >
   <Text
@@ -86,7 +90,9 @@ exports[`Component Button - test Button Text - snapshot 1`] = `
   accessible={true}
   collapsable={false}
   focusable={true}
+  onBlur={[Function]}
   onClick={[Function]}
+  onFocus={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -94,19 +100,21 @@ exports[`Component Button - test Button Text - snapshot 1`] = `
   onResponderTerminationRequest={[Function]}
   onStartShouldSetResponder={[Function]}
   style={
-    {
-      "alignItems": "center",
-      "alignSelf": "stretch",
-      "backgroundColor": undefined,
-      "borderRadius": 999,
-      "justifyContent": "center",
-      "maxWidth": "100%",
-      "minHeight": 44,
-      "opacity": 1,
-      "paddingHorizontal": 24,
-      "paddingVertical": 8,
-      "width": "100%",
-    }
+    [
+      {
+        "alignItems": "center",
+        "alignSelf": "stretch",
+        "backgroundColor": undefined,
+        "borderRadius": 999,
+        "justifyContent": "center",
+        "maxWidth": "100%",
+        "minHeight": 44,
+        "paddingHorizontal": 24,
+        "paddingVertical": 8,
+        "width": "100%",
+      },
+      {},
+    ]
   }
 >
   <Text

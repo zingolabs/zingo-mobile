@@ -41,7 +41,9 @@ exports[`AddressItem - snapshots AddressItem known contact from address book wit
       accessible={true}
       collapsable={false}
       focusable={true}
+      onBlur={[Function]}
       onClick={[Function]}
+      onFocus={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -49,9 +51,10 @@ exports[`AddressItem - snapshots AddressItem known contact from address book wit
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "opacity": 1,
-        }
+        [
+          undefined,
+          {},
+        ]
       }
     >
       <View
@@ -99,7 +102,9 @@ exports[`AddressItem - snapshots AddressItem known contact from address book wit
       accessible={true}
       collapsable={false}
       focusable={true}
+      onBlur={[Function]}
       onClick={[Function]}
+      onFocus={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -107,9 +112,10 @@ exports[`AddressItem - snapshots AddressItem known contact from address book wit
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "opacity": 1,
-        }
+        [
+          undefined,
+          {},
+        ]
       }
     >
       <View
@@ -166,7 +172,9 @@ exports[`AddressItem - snapshots AddressItem known contact from address book wit
         "top": 10,
       }
     }
+    onBlur={[Function]}
     onClick={[Function]}
+    onFocus={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -174,12 +182,43 @@ exports[`AddressItem - snapshots AddressItem known contact from address book wit
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "marginLeft": 10,
-        "opacity": 1,
-      }
+      [
+        {
+          "marginLeft": 10,
+        },
+        {},
+      ]
     }
-  />
+  >
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "center",
+          "bottom": 0,
+          "justifyContent": "center",
+          "left": 0,
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
+        }
+      }
+    >
+      <View
+        style={
+          [
+            {
+              "backgroundColor": "#8888881F",
+              "borderRadius": 999,
+              "height": 44,
+              "width": 44,
+            },
+            {},
+          ]
+        }
+      />
+    </View>
+  </View>
 </View>
 `;
 
@@ -224,7 +263,9 @@ exports[`AddressItem - snapshots AddressItem oneLine mode 1`] = `
       accessible={true}
       collapsable={false}
       focusable={true}
+      onBlur={[Function]}
       onClick={[Function]}
+      onFocus={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -232,9 +273,10 @@ exports[`AddressItem - snapshots AddressItem oneLine mode 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "opacity": 1,
-        }
+        [
+          undefined,
+          {},
+        ]
       }
     >
       <View
@@ -306,7 +348,9 @@ exports[`AddressItem - snapshots AddressItem privacy mode 1`] = `
       accessible={true}
       collapsable={false}
       focusable={true}
+      onBlur={[Function]}
       onClick={[Function]}
+      onFocus={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -314,9 +358,10 @@ exports[`AddressItem - snapshots AddressItem privacy mode 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "opacity": 1,
-        }
+        [
+          undefined,
+          {},
+        ]
       }
     >
       <View
@@ -388,7 +433,9 @@ exports[`AddressItem - snapshots AddressItem unknown address, no contact 1`] = `
       accessible={true}
       collapsable={false}
       focusable={true}
+      onBlur={[Function]}
       onClick={[Function]}
+      onFocus={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -396,9 +443,10 @@ exports[`AddressItem - snapshots AddressItem unknown address, no contact 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
-          "opacity": 1,
-        }
+        [
+          undefined,
+          {},
+        ]
       }
     >
       <View

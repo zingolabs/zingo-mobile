@@ -8,7 +8,6 @@ import React, {
 } from 'react';
 import {
   BackHandler,
-  Pressable,
   StyleSheet,
   useWindowDimensions,
   View,
@@ -29,6 +28,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { useTheme, iconSizeMd, radiusPill } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { SnackbarDurationEnum } from '@app/AppState';
@@ -519,18 +519,18 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
                 }}
               >
                 <Pressable
+                  kind="icon"
                   testID="seedbackup.close"
                   accessibilityRole="button"
                   accessibilityLabel={translate('seedbackup.close') as string}
                   onPress={close}
-                  style={({ pressed }) => ({
+                  style={{
                     width: 44,
                     height: 44,
                     borderRadius: radiusPill,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
-                  })}
+                  }}
                 >
                   <XIcon size={iconSizeMd} color={colors.fgMuted} />
                 </Pressable>

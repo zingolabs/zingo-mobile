@@ -1,9 +1,10 @@
 /* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
-import { Pressable, TextInput, View } from 'react-native';
+import { TextInput, View } from 'react-native';
 
 import { useTheme, iconSizeMd } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { SearchIcon } from '@ui/primitives/Icons/SearchIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
@@ -62,6 +63,7 @@ const SearchField: React.FunctionComponent<SearchFieldProps> = ({
       />
       {value.length > 0 && (
         <Pressable
+          kind="icon"
           testID={testID ? `${testID}-clear` : undefined}
           accessibilityRole="button"
           accessibilityLabel={clearLabel}

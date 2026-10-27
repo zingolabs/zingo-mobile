@@ -150,17 +150,39 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "gap": 12,
-              "minHeight": 62,
-              "paddingHorizontal": 13,
-              "paddingVertical": 8,
-            }
+            [
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 12,
+                "minHeight": 62,
+                "paddingHorizontal": 13,
+                "paddingVertical": 8,
+              },
+              {},
+            ]
           }
           testID="addressbook.row.u1alice.head"
         >
+          <View
+            pointerEvents="none"
+            style={
+              [
+                {
+                  "bottom": 0,
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                },
+                {
+                  "backgroundColor": "#8888881F",
+                  "borderRadius": undefined,
+                },
+                {},
+              ]
+            }
+          />
           <View
             style={
               {
@@ -312,37 +334,6 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
             }
           >
             <View
-              accessibilityLabel="text translated"
-              accessibilityRole="button"
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
               style={
                 {
                   "alignItems": "center",
@@ -350,31 +341,101 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
                   "width": 68,
                 }
               }
-              testID="addressbook.row.u1alice.send"
             >
               <View
-                style={
+                accessibilityLabel="text translated"
+                accessibilityRole="button"
+                accessibilityState={
                   {
-                    "alignItems": "center",
-                    "backgroundColor": "#011401",
-                    "borderRadius": 26,
-                    "height": 52,
-                    "justifyContent": "center",
-                    "width": 52,
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": undefined,
+                    "expanded": undefined,
+                    "selected": undefined,
                   }
                 }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                hitSlop={
+                  {
+                    "bottom": 23,
+                    "left": 8,
+                    "right": 8,
+                  }
+                }
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  [
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "#011401",
+                      "borderRadius": 26,
+                      "height": 52,
+                      "justifyContent": "center",
+                      "width": 52,
+                    },
+                    {},
+                  ]
+                }
+                testID="addressbook.row.u1alice.send"
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    {
+                      "alignItems": "center",
+                      "bottom": 0,
+                      "justifyContent": "center",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      [
+                        {
+                          "backgroundColor": "#8888881F",
+                          "borderRadius": 999,
+                          "height": 52,
+                          "width": 52,
+                        },
+                        {},
+                      ]
+                    }
+                  />
+                </View>
                 <View
                   style={{}}
                 />
               </View>
               <Text
+                maxFontSizeMultiplier={2}
                 style={
                   {
                     "color": "#c3c3c3",
                     "fontSize": 12,
                     "fontWeight": "400",
-                    "lineHeight": 15,
+                    "lineHeight": 16,
                   }
                 }
               >
@@ -382,37 +443,6 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
               </Text>
             </View>
             <View
-              accessibilityLabel="text translated"
-              accessibilityRole="button"
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
               style={
                 {
                   "alignItems": "center",
@@ -420,31 +450,101 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
                   "width": 68,
                 }
               }
-              testID="addressbook.row.u1alice.copy"
             >
               <View
-                style={
+                accessibilityLabel="text translated"
+                accessibilityRole="button"
+                accessibilityState={
                   {
-                    "alignItems": "center",
-                    "backgroundColor": "#011401",
-                    "borderRadius": 26,
-                    "height": 52,
-                    "justifyContent": "center",
-                    "width": 52,
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": undefined,
+                    "expanded": undefined,
+                    "selected": undefined,
                   }
                 }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                hitSlop={
+                  {
+                    "bottom": 23,
+                    "left": 8,
+                    "right": 8,
+                  }
+                }
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  [
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "#011401",
+                      "borderRadius": 26,
+                      "height": 52,
+                      "justifyContent": "center",
+                      "width": 52,
+                    },
+                    {},
+                  ]
+                }
+                testID="addressbook.row.u1alice.copy"
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    {
+                      "alignItems": "center",
+                      "bottom": 0,
+                      "justifyContent": "center",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      [
+                        {
+                          "backgroundColor": "#8888881F",
+                          "borderRadius": 999,
+                          "height": 52,
+                          "width": 52,
+                        },
+                        {},
+                      ]
+                    }
+                  />
+                </View>
                 <View
                   style={{}}
                 />
               </View>
               <Text
+                maxFontSizeMultiplier={2}
                 style={
                   {
                     "color": "#c3c3c3",
                     "fontSize": 12,
                     "fontWeight": "400",
-                    "lineHeight": 15,
+                    "lineHeight": 16,
                   }
                 }
               >
@@ -452,37 +552,6 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
               </Text>
             </View>
             <View
-              accessibilityLabel="text translated"
-              accessibilityRole="button"
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
               style={
                 {
                   "alignItems": "center",
@@ -490,20 +559,89 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
                   "width": 68,
                 }
               }
-              testID="addressbook.row.u1alice.edit"
             >
               <View
-                style={
+                accessibilityLabel="text translated"
+                accessibilityRole="button"
+                accessibilityState={
                   {
-                    "alignItems": "center",
-                    "backgroundColor": "#011401",
-                    "borderRadius": 26,
-                    "height": 52,
-                    "justifyContent": "center",
-                    "width": 52,
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": undefined,
+                    "expanded": undefined,
+                    "selected": undefined,
                   }
                 }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                hitSlop={
+                  {
+                    "bottom": 23,
+                    "left": 8,
+                    "right": 8,
+                  }
+                }
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  [
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "#011401",
+                      "borderRadius": 26,
+                      "height": 52,
+                      "justifyContent": "center",
+                      "width": 52,
+                    },
+                    {},
+                  ]
+                }
+                testID="addressbook.row.u1alice.edit"
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    {
+                      "alignItems": "center",
+                      "bottom": 0,
+                      "justifyContent": "center",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      [
+                        {
+                          "backgroundColor": "#8888881F",
+                          "borderRadius": 999,
+                          "height": 52,
+                          "width": 52,
+                        },
+                        {},
+                      ]
+                    }
+                  />
+                </View>
                 <View
                   style={{}}
                 />
@@ -526,12 +664,13 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
                 />
               </View>
               <Text
+                maxFontSizeMultiplier={2}
                 style={
                   {
                     "color": "#c3c3c3",
                     "fontSize": 12,
                     "fontWeight": "400",
-                    "lineHeight": 15,
+                    "lineHeight": 16,
                   }
                 }
               >
@@ -539,37 +678,6 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
               </Text>
             </View>
             <View
-              accessibilityLabel="text translated"
-              accessibilityRole="button"
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
               style={
                 {
                   "alignItems": "center",
@@ -577,20 +685,89 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
                   "width": 68,
                 }
               }
-              testID="addressbook.row.u1alice.delete"
             >
               <View
-                style={
+                accessibilityLabel="text translated"
+                accessibilityRole="button"
+                accessibilityState={
                   {
-                    "alignItems": "center",
-                    "backgroundColor": "#011401",
-                    "borderRadius": 26,
-                    "height": 52,
-                    "justifyContent": "center",
-                    "width": 52,
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": undefined,
+                    "expanded": undefined,
+                    "selected": undefined,
                   }
                 }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                hitSlop={
+                  {
+                    "bottom": 23,
+                    "left": 8,
+                    "right": 8,
+                  }
+                }
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  [
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "#011401",
+                      "borderRadius": 26,
+                      "height": 52,
+                      "justifyContent": "center",
+                      "width": 52,
+                    },
+                    {},
+                  ]
+                }
+                testID="addressbook.row.u1alice.delete"
               >
+                <View
+                  pointerEvents="none"
+                  style={
+                    {
+                      "alignItems": "center",
+                      "bottom": 0,
+                      "justifyContent": "center",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      [
+                        {
+                          "backgroundColor": "#8888881F",
+                          "borderRadius": 999,
+                          "height": 52,
+                          "width": 52,
+                        },
+                        {},
+                      ]
+                    }
+                  />
+                </View>
                 <View
                   style={
                     {
@@ -619,12 +796,13 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
                 </View>
               </View>
               <Text
+                maxFontSizeMultiplier={2}
                 style={
                   {
                     "color": "#E5484D",
                     "fontSize": 12,
                     "fontWeight": "400",
-                    "lineHeight": 15,
+                    "lineHeight": 16,
                   }
                 }
               >

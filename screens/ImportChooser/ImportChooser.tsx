@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { Platform, Pressable, View } from 'react-native';
+import { Platform, View } from 'react-native';
 import Animated, {
   interpolateColor,
   useAnimatedStyle,
@@ -21,6 +21,7 @@ import {
   useTheme,
 } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import { ContextAppLoading } from '@app/context';
 import Text from '@ui/primitives/Text';
 import TitleBar from '@ui/widgets/TitleBar';
@@ -81,6 +82,7 @@ const Option: React.FC<OptionProps> = ({
   }));
   return (
     <Pressable
+      kind="row"
       testID={testID}
       onPress={onPress}
       onPressIn={() => to(1)}
