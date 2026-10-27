@@ -147,6 +147,8 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
         ref={ref}
         testID={testID}
         style={{
+          // The text column flexes into the row, so a centred parent must not shrink it.
+          alignSelf: 'stretch',
           padding: space12,
           borderRadius: radiusMd,
           borderWidth: 1,
@@ -209,6 +211,7 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
       ref={ref}
       testID={testID}
       style={{
+        alignSelf: 'stretch',
         padding: space16,
         borderRadius: radiusMd,
         borderWidth: 1,

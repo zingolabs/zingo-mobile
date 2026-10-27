@@ -665,6 +665,7 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                 <View
                   style={
                     {
+                      "alignSelf": "stretch",
                       "backgroundColor": "#031124",
                       "borderColor": "#05234C",
                       "borderRadius": 12,
@@ -2521,6 +2522,7 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                 <View
                   style={
                     {
+                      "alignSelf": "stretch",
                       "backgroundColor": "#031124",
                       "borderColor": "#05234C",
                       "borderRadius": 12,
