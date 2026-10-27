@@ -2,7 +2,12 @@ import { useContext, useEffect, useRef } from 'react';
 import { Route, SnackbarDurationEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { navigationRef } from '@app/navigation/navigate';
-import { SwapStatusEnum, SwapStore, newlyExpired } from '@app/swap';
+import {
+  SwapStatusEnum,
+  SwapStore,
+  newlyExpired,
+  newlyRefunding,
+} from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
 
 /** Whether the swap's own deposit, tracking or detail is the screen in front. */
@@ -22,8 +27,9 @@ function onScreen(recordId: string): boolean {
 }
 
 /**
- * Says when a swap's deposit ran out of time while the user was elsewhere:
- * "Your BTC quote expired. Nothing was sent." The swap's own screens say it
+ * Says what happened to a purchase while the user was elsewhere: its deposit
+ * ran out of time ("Your BTC quote expired. Nothing was sent."), or a payment
+ * came after that and is going back. The swap's own screens say it
  * themselves, so a swap in front gets no toast.
  */
 export default function SwapExpiryNotice() {
@@ -33,24 +39,29 @@ export default function SwapExpiryNotice() {
   useEffect(() => {
     const statuses = (records: ReadonlyArray<SwapRecordType>) =>
       new Map(records.map(record => [record.recordId, record.status]));
+    const coin = (record: SwapRecordType) =>
+      record.sellAsset.ticker ?? record.sellAsset.symbol;
+    const say = (key: string, record: SwapRecordType) => {
+      if (onScreen(record.recordId)) {
+        return;
+      }
+      addLastSnackbar(
+        (translate(key) as string).replace('{coin}', coin(record)),
+        SnackbarDurationEnum.long,
+      );
+    };
     const unsubscribe = SwapStore.subscribe(records => {
       const before = seen.current;
       seen.current = statuses(records);
       if (!before) {
         return;
       }
-      for (const record of newlyExpired(before, records)) {
-        if (onScreen(record.recordId)) {
-          continue;
-        }
-        addLastSnackbar(
-          (translate('swap.expired-toast') as string).replace(
-            '{coin}',
-            record.sellAsset.ticker ?? record.sellAsset.symbol,
-          ),
-          SnackbarDurationEnum.long,
-        );
-      }
+      newlyExpired(before, records).forEach(record =>
+        say('swap.expired-toast', record),
+      );
+      newlyRefunding(before, records).forEach(record =>
+        say('swap.late-toast', record),
+      );
     });
     SwapStore.readAll()
       .then(records => {

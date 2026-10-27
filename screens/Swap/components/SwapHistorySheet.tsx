@@ -7,6 +7,7 @@ import { ContextAppLoaded } from '@app/context';
 import {
   SwapStatusEnum,
   formatAmountForDisplay,
+  isRefunding,
   isTerminalStatus,
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
@@ -136,6 +137,16 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
             live: false,
           };
         default:
+          if (isRefunding(record)) {
+            return {
+              label: t('swap.history-refunding'),
+              icon: tile(
+                <RefreshIcon size={iconSizeMd} color={colors.fgWarning} />,
+                colors.bgWarningSubtle,
+              ),
+              live: false,
+            };
+          }
           return {
             label: pendingSwapLabel(record, nowMs, t).text,
             icon: tile(
