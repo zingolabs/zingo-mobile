@@ -10,90 +10,90 @@ description: >-
 # app/theme and CI fails when the two disagree; edit only the prose by hand.
 colors:
   # Surfaces
-  bgCanvas: '#060B12'
-  bgSurface: '#031124'
-  bgChrome: '#031124'
-  bottomSheetBorder: '#05234C'
-  borderFocus: '#0B3A75'
-  borderSubtle: '#FFFFFF0F'
-  sheetHandle: '#1B3C6B'
-  bgScrim: '#02060C9E'
+  bgCanvas: "#060B12"
+  bgSurface: "#031124"
+  bgChrome: "#031124"
+  bottomSheetBorder: "#05234C"
+  borderFocus: "#0B3A75"
+  borderSubtle: "#FFFFFF0F"
+  sheetHandle: "#1B3C6B"
+  bgScrim: "#02060C9E"
   # Text and neutrals
-  fgDefault: '#D3E2F8'
-  fgMuted: '#8DA0B8'
-  fgOptionIcon: '#B1BBC5'
-  borderMuted: '#4A6487'
-  bgMuted: '#8DA0B8'
-  bgMutedSubtle: '#8DA0B81F'
+  fgDefault: "#D3E2F8"
+  fgMuted: "#8DA0B8"
+  fgOptionIcon: "#B1BBC5"
+  borderMuted: "#4A6487"
+  bgMuted: "#8DA0B8"
+  bgMutedSubtle: "#8DA0B81F"
   # Accent (the one green)
-  fgAccent: '#149D05'
-  borderAccent: '#149D05'
-  bgAccent: '#149D05'
-  bgAccentSubtle: '#149D051F'
-  fgOnAccent: '#060B12'
-  fgAccentDisabled: '#16700B'
-  borderAccentDisabled: '#0D540C'
-  bgAccentDisabled: '#0D540C'
+  fgAccent: "#149D05"
+  borderAccent: "#149D05"
+  bgAccent: "#149D05"
+  bgAccentSubtle: "#149D051F"
+  fgOnAccent: "#060B12"
+  fgAccentDisabled: "#16700B"
+  borderAccentDisabled: "#0D540C"
+  bgAccentDisabled: "#0D540C"
   # Status
-  fgSyncing: '#EBFF5A'
-  borderSyncing: '#EBFF5A'
-  fgWarning: '#F99D00'
-  borderWarning: '#65491C'
-  bgWarning: '#1E1A10'
-  bgWarningSubtle: '#F99D001F'
-  fgDanger: '#E5484D'
-  borderDanger: '#E5484D'
-  bgDanger: '#E5484D'
-  bgDangerSubtle: '#E5484D1F'
+  fgSyncing: "#EBFF5A"
+  borderSyncing: "#EBFF5A"
+  fgWarning: "#F99D00"
+  borderWarning: "#65491C"
+  bgWarning: "#1E1A10"
+  bgWarningSubtle: "#F99D001F"
+  fgDanger: "#E5484D"
+  borderDanger: "#E5484D"
+  bgDanger: "#E5484D"
+  bgDangerSubtle: "#E5484D1F"
   # Special roles
-  fgViewOnly: '#8FB4E6'
-  bgViewOnlySubtle: '#8FB4E61F'
-  bgNym: '#07FF94'
-  fgNym: '#07FF94'
-  bgNymSubtle: '#07FF941F'
+  fgViewOnly: "#8FB4E6"
+  bgViewOnlySubtle: "#8FB4E61F"
+  bgNym: "#07FF94"
+  fgNym: "#07FF94"
+  bgNymSubtle: "#07FF941F"
   # Switch (exception D): the off track, the deep end of the on gradient
   # (which starts at bgAccent), the nym variant's gradient, the thumb
-  bgSwitchOff: '#7E7E7E'
-  bgSwitchOnDeep: '#0A4004'
-  bgSwitchNym: '#14E76F'
-  bgSwitchNymDeep: '#049959'
-  fgSwitchThumb: '#FFFFFF'
-  fgPriceUp: '#3CC52A'
-  fgPriceDown: '#F2878A'
+  bgSwitchOff: "#7E7E7E"
+  bgSwitchOnDeep: "#0A4004"
+  bgSwitchNym: "#14E76F"
+  bgSwitchNymDeep: "#049959"
+  fgSwitchThumb: "#FFFFFF"
+  fgPriceUp: "#3CC52A"
+  fgPriceDown: "#F2878A"
   # Pools
-  fgOrchard: '#4E8E96'
-  borderOrchard: '#2E5E66'
-  bgOrchard: '#0B1D26'
-  fgSapling: '#8DBF7A'
-  borderSapling: '#314533'
-  bgSapling: '#141D1C'
-  fgIronwood: '#E4C28F'
-  borderIronwood: '#5A4630'
-  bgIronwood: '#241A12'
-  fgTransparent: '#E6C46A'
-  bgTransparent: '#E6C46A1F'
+  fgOrchard: "#4E8E96"
+  borderOrchard: "#2E5E66"
+  bgOrchard: "#0B1D26"
+  fgSapling: "#8DBF7A"
+  borderSapling: "#314533"
+  bgSapling: "#141D1C"
+  fgIronwood: "#E4C28F"
+  borderIronwood: "#5A4630"
+  bgIronwood: "#241A12"
+  fgTransparent: "#E6C46A"
+  bgTransparent: "#E6C46A1F"
   # Brand and QR
-  bgSproutPot: '#5A3A1E'
-  fgQrInk: '#060B12'
-  bgQrPaper: '#FFFFFF'
+  bgSproutPot: "#5A3A1E"
+  fgQrInk: "#060B12"
+  bgQrPaper: "#FFFFFF"
   # Contact avatars and chart series
-  fgCategory1: '#149D05'
-  bgCategory1: '#149D051F'
-  fgCategory2: '#8FB4E6'
-  bgCategory2: '#8FB4E61F'
-  fgCategory3: '#E6C46A'
-  bgCategory3: '#E6C46A1F'
-  fgCategory4: '#F07A86'
-  bgCategory4: '#F07A861F'
-  fgCategory5: '#B79CF2'
-  bgCategory5: '#B79CF21F'
+  fgCategory1: "#149D05"
+  bgCategory1: "#149D051F"
+  fgCategory2: "#8FB4E6"
+  bgCategory2: "#8FB4E61F"
+  fgCategory3: "#E6C46A"
+  bgCategory3: "#E6C46A1F"
+  fgCategory4: "#F07A86"
+  bgCategory4: "#F07A861F"
+  fgCategory5: "#B79CF2"
+  bgCategory5: "#B79CF21F"
   # Tab bar (exception A)
-  bgTabBar: '#040C17'
-  borderTabBar: '#0B1D36'
-  bgTabCapsule: '#D3E2F81A'
-  fgTabIdle: '#BABBBE'
-  fgTabSelected: '#F7F8FA'
-  shadowTabBar: '#00000073'
+  bgTabBar: "#040C17"
+  borderTabBar: "#0B1D36"
+  bgTabCapsule: "#D3E2F81A"
+  fgTabIdle: "#BABBBE"
+  fgTabSelected: "#F7F8FA"
+  shadowTabBar: "#00000073"
 typography:
   balance:
     fontFamily: system-ui
@@ -161,245 +161,245 @@ spacing:
   space32: 32px
 components:
   button-primary:
-    backgroundColor: '{colors.bgAccent}'
-    textColor: '{colors.fgOnAccent}'
-    typography: '{typography.button}'
-    rounded: '{rounded.pill}'
+    backgroundColor: "{colors.bgAccent}"
+    textColor: "{colors.fgOnAccent}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
     height: 44px
     padding: 24px
   button-primary-small:
-    backgroundColor: '{colors.bgAccent}'
-    textColor: '{colors.fgOnAccent}'
-    typography: '{typography.bodySmall}'
-    rounded: '{rounded.pill}'
+    backgroundColor: "{colors.bgAccent}"
+    textColor: "{colors.fgOnAccent}"
+    typography: "{typography.bodySmall}"
+    rounded: "{rounded.pill}"
     height: 32px
     padding: 16px
   button-primary-disabled:
-    backgroundColor: '{colors.bgAccentDisabled}'
-    textColor: '{colors.fgOnAccent}'
-    typography: '{typography.button}'
-    rounded: '{rounded.pill}'
+    backgroundColor: "{colors.bgAccentDisabled}"
+    textColor: "{colors.fgOnAccent}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
     height: 44px
   button-secondary:
-    backgroundColor: '{colors.bgCanvas}'
-    textColor: '{colors.fgDefault}'
-    typography: '{typography.button}'
-    rounded: '{rounded.pill}'
+    backgroundColor: "{colors.bgCanvas}"
+    textColor: "{colors.fgDefault}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
     height: 44px
     padding: 24px
   button-text:
-    textColor: '{colors.fgAccent}'
-    typography: '{typography.button}'
+    textColor: "{colors.fgAccent}"
+    typography: "{typography.button}"
     height: 44px
   button-quiet:
-    textColor: '{colors.fgMuted}'
-    typography: '{typography.button}'
+    textColor: "{colors.fgMuted}"
+    typography: "{typography.button}"
     height: 44px
   button-danger:
-    backgroundColor: '{colors.bgDanger}'
-    textColor: '{colors.fgOnAccent}'
-    typography: '{typography.button}'
-    rounded: '{rounded.pill}'
+    backgroundColor: "{colors.bgDanger}"
+    textColor: "{colors.fgOnAccent}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
     height: 44px
   button-nym:
-    backgroundColor: '{colors.bgNym}'
-    textColor: '{colors.fgOnAccent}'
-    typography: '{typography.button}'
-    rounded: '{rounded.pill}'
+    backgroundColor: "{colors.bgNym}"
+    textColor: "{colors.fgOnAccent}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
     height: 44px
   button-view-only:
-    backgroundColor: '{colors.bgViewOnlySubtle}'
-    textColor: '{colors.fgDefault}'
-    typography: '{typography.bodySmall}'
-    rounded: '{rounded.pill}'
+    backgroundColor: "{colors.bgViewOnlySubtle}"
+    textColor: "{colors.fgDefault}"
+    typography: "{typography.bodySmall}"
+    rounded: "{rounded.pill}"
     height: 32px
     padding: 16px
   text-field:
-    backgroundColor: '{colors.bgSurface}'
-    textColor: '{colors.fgDefault}'
-    typography: '{typography.bodyStrong}'
-    rounded: '{rounded.md}'
+    backgroundColor: "{colors.bgSurface}"
+    textColor: "{colors.fgDefault}"
+    typography: "{typography.bodyStrong}"
+    rounded: "{rounded.md}"
     height: 48px
     padding: 12px
   text-field-on-surface:
-    backgroundColor: '{colors.bgCanvas}'
-    textColor: '{colors.fgDefault}'
-    typography: '{typography.bodyStrong}'
-    rounded: '{rounded.md}'
+    backgroundColor: "{colors.bgCanvas}"
+    textColor: "{colors.fgDefault}"
+    typography: "{typography.bodyStrong}"
+    rounded: "{rounded.md}"
     height: 48px
     padding: 12px
   field-label:
-    textColor: '{colors.fgMuted}'
-    typography: '{typography.bodySmall}'
+    textColor: "{colors.fgMuted}"
+    typography: "{typography.bodySmall}"
   field-error:
-    textColor: '{colors.fgDanger}'
-    typography: '{typography.bodySmall}'
+    textColor: "{colors.fgDanger}"
+    typography: "{typography.bodySmall}"
   card:
-    backgroundColor: '{colors.bgSurface}'
-    textColor: '{colors.fgDefault}'
-    rounded: '{rounded.md}'
+    backgroundColor: "{colors.bgSurface}"
+    textColor: "{colors.fgDefault}"
+    rounded: "{rounded.md}"
     padding: 16px
   card-on-surface:
-    backgroundColor: '{colors.bgCanvas}'
-    textColor: '{colors.fgDefault}'
-    rounded: '{rounded.md}'
+    backgroundColor: "{colors.bgCanvas}"
+    textColor: "{colors.fgDefault}"
+    rounded: "{rounded.md}"
     padding: 16px
   card-selected:
-    backgroundColor: '{colors.bgAccentSubtle}'
-    textColor: '{colors.fgDefault}'
-    rounded: '{rounded.md}'
+    backgroundColor: "{colors.bgAccentSubtle}"
+    textColor: "{colors.fgDefault}"
+    rounded: "{rounded.md}"
     padding: 16px
   detail-rows:
-    backgroundColor: '{colors.bgCanvas}'
-    textColor: '{colors.fgDefault}'
-    typography: '{typography.bodySmall}'
-    rounded: '{rounded.md}'
+    backgroundColor: "{colors.bgCanvas}"
+    textColor: "{colors.fgDefault}"
+    typography: "{typography.bodySmall}"
+    rounded: "{rounded.md}"
     padding: 16px
   detail-row-label:
-    textColor: '{colors.fgMuted}'
-    typography: '{typography.caption}'
+    textColor: "{colors.fgMuted}"
+    typography: "{typography.caption}"
   list-row:
-    textColor: '{colors.fgDefault}'
-    typography: '{typography.bodyStrong}'
+    textColor: "{colors.fgDefault}"
+    typography: "{typography.bodyStrong}"
     height: 56px
     padding: 20px
   radio-row:
-    textColor: '{colors.fgDefault}'
-    typography: '{typography.bodyStrong}'
+    textColor: "{colors.fgDefault}"
+    typography: "{typography.bodyStrong}"
     height: 56px
     padding: 16px
   chip:
-    textColor: '{colors.fgMuted}'
-    typography: '{typography.bodySmall}'
-    rounded: '{rounded.pill}'
+    textColor: "{colors.fgMuted}"
+    typography: "{typography.bodySmall}"
+    rounded: "{rounded.pill}"
     height: 32px
     padding: 12px
   chip-selected:
-    backgroundColor: '{colors.bgAccentSubtle}'
-    textColor: '{colors.fgAccent}'
-    typography: '{typography.bodySmall}'
-    rounded: '{rounded.pill}'
+    backgroundColor: "{colors.bgAccentSubtle}"
+    textColor: "{colors.fgAccent}"
+    typography: "{typography.bodySmall}"
+    rounded: "{rounded.pill}"
     height: 32px
     padding: 12px
   tag-accent:
-    backgroundColor: '{colors.bgAccentSubtle}'
-    textColor: '{colors.fgAccent}'
-    typography: '{typography.caption}'
-    rounded: '{rounded.sm}'
+    backgroundColor: "{colors.bgAccentSubtle}"
+    textColor: "{colors.fgAccent}"
+    typography: "{typography.caption}"
+    rounded: "{rounded.sm}"
     padding: 8px
   tag-warning:
-    backgroundColor: '{colors.bgWarningSubtle}'
-    textColor: '{colors.fgWarning}'
-    typography: '{typography.caption}'
-    rounded: '{rounded.sm}'
+    backgroundColor: "{colors.bgWarningSubtle}"
+    textColor: "{colors.fgWarning}"
+    typography: "{typography.caption}"
+    rounded: "{rounded.sm}"
     padding: 8px
   tag-transparent:
-    backgroundColor: '{colors.bgTransparent}'
-    textColor: '{colors.fgTransparent}'
-    typography: '{typography.caption}'
-    rounded: '{rounded.sm}'
+    backgroundColor: "{colors.bgTransparent}"
+    textColor: "{colors.fgTransparent}"
+    typography: "{typography.caption}"
+    rounded: "{rounded.sm}"
     padding: 8px
   tag-view-only:
-    backgroundColor: '{colors.bgViewOnlySubtle}'
-    textColor: '{colors.fgViewOnly}'
-    typography: '{typography.caption}'
-    rounded: '{rounded.sm}'
+    backgroundColor: "{colors.bgViewOnlySubtle}"
+    textColor: "{colors.fgViewOnly}"
+    typography: "{typography.caption}"
+    rounded: "{rounded.sm}"
     padding: 8px
   notice:
-    backgroundColor: '{colors.bgSurface}'
-    textColor: '{colors.fgDefault}'
-    typography: '{typography.bodyStrong}'
-    rounded: '{rounded.md}'
+    backgroundColor: "{colors.bgSurface}"
+    textColor: "{colors.fgDefault}"
+    typography: "{typography.bodyStrong}"
+    rounded: "{rounded.md}"
     padding: 16px
   notice-body:
-    textColor: '{colors.fgMuted}'
-    typography: '{typography.bodySmall}'
+    textColor: "{colors.fgMuted}"
+    typography: "{typography.bodySmall}"
   note-warning:
-    backgroundColor: '{colors.bgWarning}'
-    textColor: '{colors.fgDefault}'
-    typography: '{typography.caption}'
-    rounded: '{rounded.md}'
+    backgroundColor: "{colors.bgWarning}"
+    textColor: "{colors.fgDefault}"
+    typography: "{typography.caption}"
+    rounded: "{rounded.md}"
     padding: 12px
   title-bar:
-    textColor: '{colors.fgDefault}'
-    typography: '{typography.barTitle}'
+    textColor: "{colors.fgDefault}"
+    typography: "{typography.barTitle}"
     padding: 16px
   panel:
-    backgroundColor: '{colors.bgSurface}'
-    textColor: '{colors.fgDefault}'
-    rounded: '{rounded.sheet}'
+    backgroundColor: "{colors.bgSurface}"
+    textColor: "{colors.fgDefault}"
+    rounded: "{rounded.sheet}"
     padding: 20px
   scrim:
-    backgroundColor: '{colors.bgScrim}'
+    backgroundColor: "{colors.bgScrim}"
   toast-action:
-    backgroundColor: '{colors.bgSurface}'
-    textColor: '{colors.fgDefault}'
-    typography: '{typography.bodySmall}'
-    rounded: '{rounded.md}'
+    backgroundColor: "{colors.bgSurface}"
+    textColor: "{colors.fgDefault}"
+    typography: "{typography.bodySmall}"
+    rounded: "{rounded.md}"
     height: 44px
     padding: 16px
   option-icon:
-    textColor: '{colors.fgOptionIcon}'
+    textColor: "{colors.fgOptionIcon}"
     size: 30px
   avatar-md:
-    backgroundColor: '{colors.bgCategory1}'
-    textColor: '{colors.fgCategory1}'
-    typography: '{typography.bodyStrong}'
-    rounded: '{rounded.pill}'
+    backgroundColor: "{colors.bgCategory1}"
+    textColor: "{colors.fgCategory1}"
+    typography: "{typography.bodyStrong}"
+    rounded: "{rounded.pill}"
     size: 36px
   avatar-lg:
-    backgroundColor: '{colors.bgCategory1}'
-    textColor: '{colors.fgCategory1}'
-    typography: '{typography.subtitle}'
-    rounded: '{rounded.pill}'
+    backgroundColor: "{colors.bgCategory1}"
+    textColor: "{colors.fgCategory1}"
+    typography: "{typography.subtitle}"
+    rounded: "{rounded.pill}"
     size: 48px
   balance:
-    textColor: '{colors.fgDefault}'
-    typography: '{typography.balance}'
+    textColor: "{colors.fgDefault}"
+    typography: "{typography.balance}"
   address:
-    textColor: '{colors.fgDefault}'
-    typography: '{typography.address}'
+    textColor: "{colors.fgDefault}"
+    typography: "{typography.address}"
   qr:
-    backgroundColor: '{colors.bgQrPaper}'
-    textColor: '{colors.fgQrInk}'
-    rounded: '{rounded.md}'
+    backgroundColor: "{colors.bgQrPaper}"
+    textColor: "{colors.fgQrInk}"
+    rounded: "{rounded.md}"
   tab-bar:
-    backgroundColor: '{colors.bgTabBar}'
-    textColor: '{colors.fgTabIdle}'
-    rounded: '{rounded.pill}'
+    backgroundColor: "{colors.bgTabBar}"
+    textColor: "{colors.fgTabIdle}"
+    rounded: "{rounded.pill}"
     width: 366px
     height: 60px
     padding: 5px
   tab-bar-shrunk:
-    backgroundColor: '{colors.bgTabBar}'
-    textColor: '{colors.fgTabIdle}'
-    rounded: '{rounded.pill}'
+    backgroundColor: "{colors.bgTabBar}"
+    textColor: "{colors.fgTabIdle}"
+    rounded: "{rounded.pill}"
     width: 250px
     height: 50px
     padding: 4px
   tab-selected:
-    backgroundColor: '{colors.bgTabCapsule}'
-    textColor: '{colors.fgTabSelected}'
-    rounded: '{rounded.pill}'
+    backgroundColor: "{colors.bgTabCapsule}"
+    textColor: "{colors.fgTabSelected}"
+    rounded: "{rounded.pill}"
   # Exception D. On, the track is a vertical gradient from bgAccent (top)
   # to bgSwitchOnDeep.
   switch-on:
-    backgroundColor: '{colors.bgAccent}'
-    textColor: '{colors.fgSwitchThumb}'
-    rounded: '{rounded.pill}'
+    backgroundColor: "{colors.bgAccent}"
+    textColor: "{colors.fgSwitchThumb}"
+    rounded: "{rounded.pill}"
     width: 40px
     height: 19px
   # The nym variant's on track runs from bgSwitchNym (top) to bgSwitchNymDeep.
   switch-on-nym:
-    backgroundColor: '{colors.bgSwitchNym}'
-    textColor: '{colors.fgSwitchThumb}'
-    rounded: '{rounded.pill}'
+    backgroundColor: "{colors.bgSwitchNym}"
+    textColor: "{colors.fgSwitchThumb}"
+    rounded: "{rounded.pill}"
     width: 40px
     height: 19px
   switch-off:
-    backgroundColor: '{colors.bgSwitchOff}'
-    textColor: '{colors.fgSwitchThumb}'
-    rounded: '{rounded.pill}'
+    backgroundColor: "{colors.bgSwitchOff}"
+    textColor: "{colors.fgSwitchThumb}"
+    rounded: "{rounded.pill}"
     width: 40px
     height: 19px
 ---
@@ -465,7 +465,6 @@ never painted with it.
 actions only, never decoration.
 
 **Roles that own their colour.**
-
 - `bgNym` (#07FF94): only actions and marks that go through the Nym mixnet.
   `fgNym`, the same green, is for text and icons that say something goes
   through the mixnet.
@@ -487,31 +486,31 @@ a yellow eye); the pool's name is `fgDefault`.
 
 One variant per role. Weight overrides are limited to the cases listed here.
 
-| Role                                                      | Style                                                                                                                      |
-| --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Balance, the hero amount of a detail or review            | `balance` 36/40; the unit after it in `subtitle`, `fgMuted`                                                                |
-| State title (sending, tracking, a result)                 | `subtitle` 18/24                                                                                                           |
-| Title of any bar: panels, sheets and menu screens         | `barTitle` 16/28, through `TitleBar` or the menu screens' header                                                           |
-| Title of a dialog-like sheet (Shield, Confirm, Authorize) | `bodyStrong` 700                                                                                                           |
-| Button label                                              | `button` 16/20; a `small` button uses `bodySmall` 700. A disabled filled button keeps its dark label on `bgAccentDisabled` |
-| Value typed in a field                                    | `bodyStrong` (`address` for an address or a key)                                                                           |
-| Chip label                                                | `bodySmall` 600: `fgMuted`, `fgAccent` when selected                                                                       |
-| Tag                                                       | `caption` 600 in the tone's colour                                                                                         |
-| Avatar initial                                            | `bodyStrong` 700 (md), `subtitle` (lg); the own wallet's avatar is the wallet icon in `fgViewOnly`                         |
-| Row title, notice title, what happened in a detail hero   | `bodyStrong` 15/21                                                                                                         |
-| Body text, empty state                                    | `body` 15/21 (empty state in `fgMuted`)                                                                                    |
-| Label over a field or a card                              | `bodySmall` 600, `fgMuted`                                                                                                 |
-| Converted value under an amount                           | `bodySmall`, `fgMuted`                                                                                                     |
-| Row subtitle, notice body                                 | `bodySmall`, `fgMuted`                                                                                                     |
-| Error under a field                                       | `bodySmall`, `fgDanger` (as `TextField`'s error)                                                                           |
-| Detail row                                                | label `caption` `fgMuted`; value `bodySmall` 600 (700 for a total)                                                         |
-| Available / fee line                                      | `caption`                                                                                                                  |
-| Lead under a sheet title, note, hint, counter             | `caption`, `fgMuted`                                                                                                       |
-| Text of a compact note (warnings outside Home)            | `caption`, regular, never bold                                                                                             |
-| Link inside content ("Save contact", "See why", "Clear")  | `caption` 700                                                                                                              |
-| Month label in History                                    | `caption` 600, `fgMuted`, uppercase                                                                                        |
-| Mixnet wait lines                                         | `bodySmall` `fgMuted` + `body` 500 for the state                                                                           |
-| Address, key, transaction id                              | `address` (mono 13/18)                                                                                                     |
+| Role | Style |
+|---|---|
+| Balance, the hero amount of a detail or review | `balance` 36/40; the unit after it in `subtitle`, `fgMuted` |
+| State title (sending, tracking, a result) | `subtitle` 18/24 |
+| Title of any bar: panels, sheets and menu screens | `barTitle` 16/28, through `TitleBar` or the menu screens' header |
+| Title of a dialog-like sheet (Shield, Confirm, Authorize) | `bodyStrong` 700 |
+| Button label | `button` 16/20; a `small` button uses `bodySmall` 700. A disabled filled button keeps its dark label on `bgAccentDisabled` |
+| Value typed in a field | `bodyStrong` (`address` for an address or a key) |
+| Chip label | `bodySmall` 600: `fgMuted`, `fgAccent` when selected |
+| Tag | `caption` 600 in the tone's colour |
+| Avatar initial | `bodyStrong` 700 (md), `subtitle` (lg); the own wallet's avatar is the wallet icon in `fgViewOnly` |
+| Row title, notice title, what happened in a detail hero | `bodyStrong` 15/21 |
+| Body text, empty state | `body` 15/21 (empty state in `fgMuted`) |
+| Label over a field or a card | `bodySmall` 600, `fgMuted` |
+| Converted value under an amount | `bodySmall`, `fgMuted` |
+| Row subtitle, notice body | `bodySmall`, `fgMuted` |
+| Error under a field | `bodySmall`, `fgDanger` (as `TextField`'s error) |
+| Detail row | label `caption` `fgMuted`; value `bodySmall` 600 (700 for a total) |
+| Available / fee line | `caption` |
+| Lead under a sheet title, note, hint, counter | `caption`, `fgMuted` |
+| Text of a compact note (warnings outside Home) | `caption`, regular, never bold |
+| Link inside content ("Save contact", "See why", "Clear") | `caption` 700 |
+| Month label in History | `caption` 600, `fgMuted`, uppercase |
+| Mixnet wait lines | `bodySmall` `fgMuted` + `body` 500 for the state |
+| Address, key, transaction id | `address` (mono 13/18) |
 
 **Amounts.** Every ZEC amount shows at least one decimal and no trailing
 zeros (0.1, 2.0, 1.6234): up to 4 decimals from 1 ZEC and 8 under it, cut,
@@ -519,7 +518,8 @@ never rounded up. Fiat shows two decimals. Only money in or out carries a
 sign: "+" on a receipt, "−" on a send, no sign on a move within the wallet
 (a shield, a send to oneself, a migration), in History and in the detail.
 
-**Short addresses.** In rows, detail rows, tokens and fields: first 6 … last 6. On Receive's address card: first 10 … last 10. A field that holds an
+**Short addresses.** In rows, detail rows, tokens and fields: first 6 … last
+6. On Receive's address card: first 10 … last 10. A field that holds an
 address stays one line and shortens it in the middle when not focused.
 
 **Large text.** Variants grow with the OS text size up to their cap (body ×2,
@@ -543,7 +543,6 @@ balance block (Total balance with the eye, the amount, fiat, the sync line)
 and the notice stack.
 
 **Panels.**
-
 - Home's panel (History) has its stops and can be dragged over the balance.
 - Send, Receive and Swap have one fixed stop under the top bar (`PANEL_TOP`).
   Behind them only the top bar is drawn, and the panel is in place on its
@@ -620,23 +619,24 @@ matters.
 
 Use the shared component; never build a second one that looks the same.
 
-| For                         | Use                                                                                                                                                                                                                                                                                                                                                                                    |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Any text                    | `Text` with a variant and a tone. `BoldText`, `RegText` and `FadeText` are legacy and leave the screens they are found in                                                                                                                                                                                                                                                              |
-| Any button                  | `Button`: `primary` (the one main action of a view), `secondary` (outlined, beside others of the same weight: Copy, Verify), `text` (green: Back, Skip, secondary moves), `quiet` (grey: only Cancel and a Close that leaves a flow), `danger` (deletes or cannot be undone), `nym` (only through the mixnet), `viewOnly` (the view-only notice). `small` only inside notices and rows |
-| A field                     | `TextField` with `FieldAction`s                                                                                                                                                                                                                                                                                                                                                        |
-| A card                      | `Card` (tones `default`, `selected`, pools)                                                                                                                                                                                                                                                                                                                                            |
-| Label and value rows        | `DetailRows`                                                                                                                                                                                                                                                                                                                                                                           |
-| A list row                  | `ListRow`; a choice is a `RadioRow` in a `RadioList`                                                                                                                                                                                                                                                                                                                                   |
-| A filter                    | `Chip` (it never navigates)                                                                                                                                                                                                                                                                                                                                                            |
-| An on/off setting           | `Switch` (exception D), the only toggle in the app                                                                                                                                                                                                                                                                                                                                     |
-| An amount to type           | `AmountCard` (exception C)                                                                                                                                                                                                                                                                                                                                                             |
-| A short status              | `Tag` (read, not tapped)                                                                                                                                                                                                                                                                                                                                                               |
-| A person or the wallet      | `Avatar`                                                                                                                                                                                                                                                                                                                                                                               |
-| The bar of a panel or sheet | `TitleBar`                                                                                                                                                                                                                                                                                                                                                                             |
-| Anything opened in depth    | `FullPanel`                                                                                                                                                                                                                                                                                                                                                                            |
-| An "i" explanation          | `InfoTooltip`                                                                                                                                                                                                                                                                                                                                                                          |
-| Saving an outside address   | `SaveContactButton` ("Save contact", `UserPlusIcon` 20, `fgAccent`, centred, 44 tall), opening the Address Book's `ContactSheet`                                                                                                                                                                                                                                                       |
+| For | Use |
+|---|---|
+| Any text | `Text` with a variant and a tone. `BoldText`, `RegText` and `FadeText` are legacy and leave the screens they are found in |
+| Any button | `Button`: `primary` (the one main action of a view), `secondary` (outlined, beside others of the same weight: Copy, Verify), `text` (green: Back, Skip, secondary moves), `quiet` (grey: only Cancel and a Close that leaves a flow), `danger` (deletes or cannot be undone), `nym` (only through the mixnet), `viewOnly` (the view-only notice). `small` only inside notices and rows |
+| A field | `TextField` with `FieldAction`s |
+| A card | `Card` (tones `default`, `selected`, pools) |
+| Label and value rows | `DetailRows` |
+| A list row | `ListRow`; a choice is a `RadioRow` in a `RadioList` |
+| A filter | `Chip` (it never navigates) |
+| An on/off setting | `Switch` (exception D), the only toggle in the app |
+| A checkbox | `Checkbox`: box 16 × 16 (`iconSizeSm`), radius 4 as `radiusXs` (`radiusSm` 8 would read as a radio at that size), border 1.5 in `borderMuted` when off; `bgAccent` with the tick in `fgOnAccent` when on. The label next to it is part of the tap area, at least 44 high |
+| An amount to type | `AmountCard` (exception C) |
+| A short status | `Tag` (read, not tapped) |
+| A person or the wallet | `Avatar` |
+| The bar of a panel or sheet | `TitleBar` |
+| Anything opened in depth | `FullPanel` |
+| An "i" explanation | `InfoTooltip` |
+| Saving an outside address | `SaveContactButton` ("Save contact", `UserPlusIcon` 20, `fgAccent`, centred, 44 tall), opening the Address Book's `ContactSheet` |
 
 **Notices on Home.** The notice stack shows `Banner`s that all share one
 background and edge (`bgSurface`, `bottomSheetBorder`), whatever the notice:
@@ -674,7 +674,6 @@ at 16 with no tile, the text in `caption` regular with no bold, padding 12,
 ## Do's and Don'ts
 
 **Do**
-
 - Map every value of a prototype to the nearest token, variant and component.
 - Build a rule into the component (the contrast rule, the notice background)
   so a screen cannot get it wrong.
@@ -684,7 +683,6 @@ at 16 with no tile, the text in `caption` regular with no bold, padding 12,
 - Write every new string in the five catalogs.
 
 **Don't**
-
 - Don't set `fontSize`, `lineHeight`, `letterSpacing`, `borderRadius`, a
   colour or an icon size by hand.
 - Don't change a token's value to match a prototype.
@@ -718,7 +716,6 @@ four: the tab bar (A), Swap's two cards (B), the amount card (C) and the
 switch (D).
 
 **A. The tab bar** is drawn at the prototype's own values:
-
 - 366 wide, 60 tall (icon 28 with 10 above and below), radius 33, padding 5,
   `bgTabBar` with `borderTabBar`, `shadowTabBar`, 22 from the bottom.
 - Icons only, no names. Zingo's own marks, drawn from the prototype's SVGs.
@@ -739,7 +736,6 @@ a 44 tap area, icon 20 in `fgAccent`.
 system's values: the inset fill, `radiusMd`, padding 16 at the top and sides
 and 4 at the bottom, the edge in `borderFocus` when focused and
 `borderDanger` when invalid. Inside it:
-
 - the amount in `balance` (36/40), with the unit pill on the right: 32 tall,
   `radiusPill`, a `bottomSheetBorder` edge with no fill, `bodySmall` 700,
   and the swap icon at 16 in `fgMuted`;
@@ -747,11 +743,10 @@ and 4 at the bottom, the edge in `borderFocus` when focused and
 - a `borderSubtle` hairline 8 below, then the row at least 32 tall in
   `caption`: "Available" muted with the amount in 700 and underlined (tap for
   the maximum) on the left, the fee muted on the right.
-  Send uses it, and Swap's "You send" card follows the same build.
+Send uses it, and Swap's "You send" card follows the same build.
 
 **D. The switch** is one primitive, `Switch`, drawn as Settings draws it
 today, and every toggle in the app uses it:
-
 - 40 × 19, fully rounded, with a white thumb of 15 (2 inside the track).
 - On: the track is a vertical gradient from the accent green, `bgAccent`
   (#149D05), at the top to `#0A4004` at the bottom, and the thumb sits on the
@@ -784,7 +779,6 @@ in zingo-adrs (`zingo-mobile/0024`). `AGENTS.md` points every UI change here.
 internals, the Address Book, the server list, `ChainSelect`, the migration
 screens) still hold some hand-set values and legacy text components; they move
 onto the system as each is redesigned. Also open:
-
 - `AuthorizeSheet`'s title is `subtitle`; dialog-like sheets use
   `bodyStrong` 700.
 - `DetailRows` lives in `screens/Swap/components` but is shared, and belongs
