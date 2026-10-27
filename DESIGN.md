@@ -824,6 +824,11 @@ exception. It is the wordmark, used once, not text.
    commit.
 3. Only then use it on the screen.
 
+CI holds step 2: a PR that changes a value in `app/theme` (tokens, radii,
+sizes, spacing, typography, motion) without changing this file fails the
+static checks. The `design-md-unchanged` label lets through a change with
+nothing visible, such as a comment. The PR template asks the same.
+
 The decision that this file and `app/theme` govern the interface is recorded
 in zingo-adrs (`zingo-mobile/0024`). `AGENTS.md` points every UI change here.
 
