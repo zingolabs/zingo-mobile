@@ -658,16 +658,48 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
                   style={
-                    {
-                      "alignItems": "center",
-                      "height": 28,
-                      "justifyContent": "center",
-                      "marginRight": -8,
-                      "marginVertical": -6,
-                      "width": 28,
-                    }
+                    [
+                      {
+                        "alignItems": "center",
+                        "height": 28,
+                        "justifyContent": "center",
+                        "marginRight": -8,
+                        "marginVertical": -6,
+                        "width": 28,
+                      },
+                      {},
+                    ]
                   }
-                />
+                >
+                  <View
+                    pointerEvents="none"
+                    style={
+                      {
+                        "alignItems": "center",
+                        "bottom": 0,
+                        "justifyContent": "center",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        [
+                          {
+                            "backgroundColor": "#8888881F",
+                            "borderRadius": 999,
+                            "height": 28,
+                            "width": 28,
+                          },
+                          {},
+                        ]
+                      }
+                    />
+                  </View>
+                </View>
               </View>
             </View>
           </View>
@@ -1373,16 +1405,48 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
                   style={
-                    {
-                      "alignItems": "center",
-                      "height": 28,
-                      "justifyContent": "center",
-                      "marginRight": -8,
-                      "marginVertical": -6,
-                      "width": 28,
-                    }
+                    [
+                      {
+                        "alignItems": "center",
+                        "height": 28,
+                        "justifyContent": "center",
+                        "marginRight": -8,
+                        "marginVertical": -6,
+                        "width": 28,
+                      },
+                      {},
+                    ]
                   }
-                />
+                >
+                  <View
+                    pointerEvents="none"
+                    style={
+                      {
+                        "alignItems": "center",
+                        "bottom": 0,
+                        "justifyContent": "center",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        [
+                          {
+                            "backgroundColor": "#8888881F",
+                            "borderRadius": 999,
+                            "height": 28,
+                            "width": 28,
+                          },
+                          {},
+                        ]
+                      }
+                    />
+                  </View>
+                </View>
               </View>
             </View>
             <View
@@ -1619,16 +1683,48 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
                   style={
-                    {
-                      "alignItems": "center",
-                      "height": 28,
-                      "justifyContent": "center",
-                      "marginRight": -8,
-                      "marginVertical": -6,
-                      "width": 28,
-                    }
+                    [
+                      {
+                        "alignItems": "center",
+                        "height": 28,
+                        "justifyContent": "center",
+                        "marginRight": -8,
+                        "marginVertical": -6,
+                        "width": 28,
+                      },
+                      {},
+                    ]
                   }
-                />
+                >
+                  <View
+                    pointerEvents="none"
+                    style={
+                      {
+                        "alignItems": "center",
+                        "bottom": 0,
+                        "justifyContent": "center",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        [
+                          {
+                            "backgroundColor": "#8888881F",
+                            "borderRadius": 999,
+                            "height": 28,
+                            "width": 28,
+                          },
+                          {},
+                        ]
+                      }
+                    />
+                  </View>
+                </View>
               </View>
             </View>
           </View>
