@@ -758,7 +758,7 @@
     "deposit-sent": "Ya lo he enviado",
     "deposit-leave-note": "Si sales, se queda arriba en Swap.",
     "deposit-already-paid": "¿Ya lo has pagado? Pega el hash de la transacción y lo seguimos.",
-    "deposit-paid-elsewhere": "¿Lo has pagado desde otro monedero? Pega el hash de la transacción para retomar el seguimiento.",
+    "deposit-left-anyway": "¿Al final el ZEC sí salió de este monedero? Pega el hash de la transacción para retomar el seguimiento.",
     "deposit-hash": "Hash de la transacción",
     "deposit-hash-placeholder": "Pega el hash",
     "deposit-follow": "Seguir este pago",

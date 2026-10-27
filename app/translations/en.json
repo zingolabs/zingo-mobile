@@ -758,7 +758,7 @@
     "deposit-sent": "I sent it",
     "deposit-leave-note": "If you leave, it stays at the top of Swap.",
     "deposit-already-paid": "Already paid it? Paste the transaction hash and we will follow it.",
-    "deposit-paid-elsewhere": "Paid it from another wallet? Paste the transaction hash so tracking can resume.",
+    "deposit-left-anyway": "Did the ZEC leave this wallet after all? Paste its transaction hash so tracking can resume.",
     "deposit-hash": "Transaction hash",
     "deposit-hash-placeholder": "Paste the hash",
     "deposit-follow": "Track this payment",

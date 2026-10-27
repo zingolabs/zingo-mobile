@@ -758,7 +758,7 @@
     "deposit-sent": "Gönderdim",
     "deposit-leave-note": "Çıkarsanız Takas’ın en üstünde kalır.",
     "deposit-already-paid": "Ödediniz mi? İşlem hash’ini yapıştırın, takip edelim.",
-    "deposit-paid-elsewhere": "Başka bir cüzdandan mı ödediniz? Takibi sürdürmek için işlem hash’ini yapıştırın.",
+    "deposit-left-anyway": "ZEC sonunda bu cüzdandan çıktı mı? Takibin sürmesi için işlem hash’ini yapıştırın.",
     "deposit-hash": "İşlem hash’i",
     "deposit-hash-placeholder": "Hash’i yapıştırın",
     "deposit-follow": "Bu ödemeyi takip et",

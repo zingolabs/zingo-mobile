@@ -425,7 +425,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
           <Text variant="bodySmall" tone="muted">
             {t(
               sell
-                ? 'swap.deposit-paid-elsewhere'
+                ? 'swap.deposit-left-anyway'
                 : 'swap.deposit-already-paid',
             )}
           </Text>

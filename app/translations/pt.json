@@ -758,7 +758,7 @@
     "deposit-sent": "Já enviei",
     "deposit-leave-note": "Se você sair, ele fica no topo de Swap.",
     "deposit-already-paid": "Já pagou? Cole o hash da transação e nós acompanhamos.",
-    "deposit-paid-elsewhere": "Pagou de outra carteira? Cole o hash da transação para retomar o acompanhamento.",
+    "deposit-left-anyway": "No fim, o ZEC saiu desta carteira? Cole o hash da transação para retomar o acompanhamento.",
     "deposit-hash": "Hash da transação",
     "deposit-hash-placeholder": "Cole o hash",
     "deposit-follow": "Acompanhar este pagamento",
