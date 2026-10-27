@@ -1,9 +1,17 @@
-/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { Platform, Text, View } from 'react-native';
+import { Platform, View } from 'react-native';
 
-import { useTheme } from '@app/theme';
+import {
+  iconSizeMd,
+  iconSizeSm,
+  radiusMd,
+  radiusSm,
+  space12,
+  space16,
+  useTheme,
+} from '@app/theme';
+import Text from '@ui/primitives/Text';
 import { ContextAppLoaded } from '@app/context';
 import { KeyIcon } from '@ui/primitives/Icons/KeyIcon';
 import { PencilIcon } from '@ui/primitives/Icons/PencilIcon';
@@ -21,9 +29,9 @@ const Tile: React.FunctionComponent<{
 }> = ({ bg, children }) => (
   <View
     style={{
-      width: 34,
-      height: 34,
-      borderRadius: 9,
+      width: 36,
+      height: 36,
+      borderRadius: radiusSm,
       backgroundColor: bg,
       alignItems: 'center',
       justifyContent: 'center',
@@ -42,12 +50,6 @@ const InfoStep: React.FunctionComponent<InfoStepProps> = ({ keychainNote }) => {
     { key: 'paper', Icon: PencilIcon },
     { key: 'private', Icon: EyeOffIcon },
   ];
-  const text = {
-    color: colors.fgDefault,
-    fontSize: 13,
-    lineHeight: 19,
-    flex: 1,
-  };
   return (
     <View>
       <StepTitle
@@ -57,7 +59,7 @@ const InfoStep: React.FunctionComponent<InfoStepProps> = ({ keychainNote }) => {
       <View
         style={{
           marginHorizontal: SIDE,
-          borderRadius: 16,
+          borderRadius: radiusMd,
           borderWidth: 1,
           borderColor: colors.bottomSheetBorder,
           backgroundColor: colors.bgSurface,
@@ -69,17 +71,17 @@ const InfoStep: React.FunctionComponent<InfoStepProps> = ({ keychainNote }) => {
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              gap: 12,
-              paddingHorizontal: 18,
-              paddingVertical: 15,
+              gap: space12,
+              paddingHorizontal: space16,
+              paddingVertical: space12,
               borderTopWidth: i > 0 ? 1 : 0,
-              borderTopColor: colors.bottomSheetBorder,
+              borderTopColor: colors.borderSubtle,
             }}
           >
             <Tile bg={colors.bgMutedSubtle}>
-              <Icon size={20} color={colors.fgMuted} />
+              <Icon size={iconSizeMd} color={colors.fgMuted} />
             </Tile>
-            <Text style={text}>
+            <Text variant="bodySmall" style={{ flex: 1 }}>
               {translate(`seedbackup.info-${key}`) as string}
             </Text>
           </View>
@@ -91,20 +93,16 @@ const InfoStep: React.FunctionComponent<InfoStepProps> = ({ keychainNote }) => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 12,
+            gap: space12,
             marginHorizontal: SIDE,
-            marginTop: 12,
-            paddingHorizontal: 18,
-            paddingVertical: 12,
-            borderRadius: 16,
-            borderWidth: 1,
-            borderColor: colors.bottomSheetBorder,
+            marginTop: space12,
+            padding: space12,
+            borderRadius: radiusMd,
+            backgroundColor: colors.bgMutedSubtle,
           }}
         >
-          <Tile bg={colors.bgViewOnlySubtle}>
-            <ShieldCheckIcon size={16} color={colors.fgViewOnly} />
-          </Tile>
-          <Text style={text}>
+          <ShieldCheckIcon size={iconSizeSm} color={colors.fgMuted} />
+          <Text variant="caption" style={{ flex: 1 }}>
             {
               translate(
                 Platform.OS === 'ios'

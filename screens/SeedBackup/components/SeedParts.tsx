@@ -1,7 +1,6 @@
-/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { PixelRatio, Platform, Pressable, Text, View } from 'react-native';
+import { PixelRatio, Platform, Pressable, View } from 'react-native';
 import Animated, {
   Keyframe,
   ReduceMotion,
@@ -16,7 +15,20 @@ import Svg, {
   Text as SvgText,
 } from 'react-native-svg';
 
-import { useTheme } from '@app/theme';
+import {
+  buttonMinHeight,
+  fontScaleBody,
+  iconSizeSm,
+  radiusMd,
+  radiusPill,
+  radiusSm,
+  space8,
+  space12,
+  textVariants,
+  useTheme,
+} from '@app/theme';
+import Text from '@ui/primitives/Text';
+import { useInsetFill } from '@ui/primitives/Surface';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
@@ -85,7 +97,7 @@ const BlurredWord = React.memo<{ word: string; color: string }>(
         x={BLUR_PAD}
         y={20.5}
         fill={color}
-        fontSize={13}
+        fontSize={textVariants.bodySmall.fontSize}
         fontWeight="700"
         filter="url(#wordblur)"
       >
@@ -102,6 +114,7 @@ export const WordGrid: React.FunctionComponent<{
   testID: string;
 }> = ({ words, veiled, testID }) => {
   const { colors } = useTheme();
+  const tile = useInsetFill();
   const veil = useSharedValue(veiled ? 1 : 0);
   useEffect(() => {
     veil.value = withTiming(veiled ? 1 : 0, {
@@ -119,16 +132,16 @@ export const WordGrid: React.FunctionComponent<{
       testID={testID}
       style={{
         marginHorizontal: SIDE,
-        padding: 12,
-        borderRadius: 16,
+        padding: space12,
+        borderRadius: radiusMd,
         borderWidth: 1,
         borderColor: colors.bottomSheetBorder,
         backgroundColor: colors.bgSurface,
-        gap: 7,
+        gap: space8,
       }}
     >
       {Array.from({ length: rows }, (_, r) => (
-        <View key={r} style={{ flexDirection: 'row', gap: 9 }}>
+        <View key={r} style={{ flexDirection: 'row', gap: space8 }}>
           {words.slice(r * COLUMNS, r * COLUMNS + COLUMNS).map((w, c) => {
             const n = r * COLUMNS + c + 1;
             return (
@@ -137,31 +150,29 @@ export const WordGrid: React.FunctionComponent<{
                 style={{
                   flex: 1,
                   height: WORD_H,
-                  borderRadius: 8,
-                  backgroundColor: colors.bgSurface,
+                  borderRadius: radiusSm,
+                  backgroundColor:
+                    tile === colors.bgSurface ? colors.bgCanvas : tile,
                   flexDirection: 'row',
                   alignItems: 'center',
                 }}
               >
                 <Text
-                  style={{
-                    width: 24,
-                    marginRight: 6,
-                    textAlign: 'right',
-                    color: colors.fgMuted,
-                    fontSize: 12,
-                    fontWeight: '400',
-                  }}
+                  variant="caption"
+                  tone="muted"
+                  style={{ width: 24, marginRight: space8, textAlign: 'right' }}
                 >
                   {n}
                 </Text>
                 <View style={{ flex: 1, justifyContent: 'center' }}>
                   <Animated.Text
                     numberOfLines={1}
+                    maxFontSizeMultiplier={fontScaleBody}
                     style={[
                       {
                         color: colors.fgDefault,
-                        fontSize: 13,
+                        fontSize: textVariants.bodySmall.fontSize,
+                        lineHeight: textVariants.bodySmall.lineHeight,
                         fontWeight: '700',
                       },
                       wordInk,
@@ -217,11 +228,10 @@ export const InfoRow: React.FunctionComponent<{
       style={{
         flexDirection: 'row',
         alignItems: 'center',
-        height: 36,
+        minHeight: 36,
         marginHorizontal: SIDE,
-        paddingLeft: 14,
-        paddingRight: 12,
-        borderRadius: 10,
+        paddingHorizontal: space12,
+        borderRadius: radiusMd,
         borderWidth: 1,
         borderColor: colors.bottomSheetBorder,
         backgroundColor: colors.bgSurface,
@@ -232,18 +242,21 @@ export const InfoRow: React.FunctionComponent<{
         testID={`${testID}-info`}
         alignStart
         label={label}
-        labelStyle={{ fontSize: 12, fontWeight: '600', color: colors.fgMuted }}
+        labelStyle={{
+          fontSize: textVariants.caption.fontSize,
+          fontWeight: '600',
+          color: colors.fgMuted,
+        }}
         title={tipTitle}
         text={tipBody}
         open={open}
         onToggle={onToggle}
       />
       <Text
+        variant="bodySmall"
         numberOfLines={1}
         style={{
           marginLeft: 'auto',
-          color: colors.fgDefault,
-          fontSize: 13,
           fontWeight: '700',
           fontVariant: ['tabular-nums'],
         }}
@@ -264,6 +277,7 @@ export const CopyShowButtons: React.FunctionComponent<{
 }> = ({ hidden, onToggleHide, onCopy, testID }) => {
   const { translate } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
+  const fill = useInsetFill();
   const [copied, setCopied] = useState(false);
   // The eye turns as feedback to a tap, not when the screen mounts.
   const [turned, setTurned] = useState(false);
@@ -280,24 +294,21 @@ export const CopyShowButtons: React.FunctionComponent<{
 
   const outline = {
     flex: 1,
-    height: 42,
-    borderRadius: 21,
+    minHeight: buttonMinHeight,
+    borderRadius: radiusPill,
     borderWidth: 1,
     borderColor: colors.bottomSheetBorder,
-    backgroundColor: colors.bgSurface,
+    backgroundColor: fill,
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
-    gap: 9,
-  };
-  const outlineText = {
-    color: colors.fgDefault,
-    fontSize: 13,
-    fontWeight: '700' as const,
+    gap: space8,
   };
 
   return (
-    <View style={{ flexDirection: 'row', gap: 11, marginHorizontal: SIDE }}>
+    <View
+      style={{ flexDirection: 'row', gap: space12, marginHorizontal: SIDE }}
+    >
       <Pressable
         testID={`${testID}.copy`}
         accessibilityRole="button"
@@ -307,19 +318,19 @@ export const CopyShowButtons: React.FunctionComponent<{
           transform: [{ scale: pressed ? 0.97 : 1 }],
         })}
       >
-        <View style={{ width: 15, height: 15 }}>
+        <View style={{ width: iconSizeSm, height: iconSizeSm }}>
           <Animated.View
             key={copied ? 'copied' : 'copy'}
             entering={copied ? iconPop() : undefined}
           >
             {copied ? (
-              <CheckIcon size={16} color={colors.fgAccent} />
+              <CheckIcon size={iconSizeSm} color={colors.fgAccent} />
             ) : (
-              <CopyIcon size={16} color={colors.fgDefault} />
+              <CopyIcon size={iconSizeSm} color={colors.fgDefault} />
             )}
           </Animated.View>
         </View>
-        <Text style={outlineText}>
+        <Text variant="button">
           {translate(copied ? 'seedbackup.copied' : 'copy') as string}
         </Text>
       </Pressable>
@@ -335,19 +346,19 @@ export const CopyShowButtons: React.FunctionComponent<{
           transform: [{ scale: pressed ? 0.97 : 1 }],
         })}
       >
-        <View style={{ width: 15, height: 15 }}>
+        <View style={{ width: iconSizeSm, height: iconSizeSm }}>
           <Animated.View
             key={hidden ? 'show' : 'hide'}
             entering={turned ? iconTurn() : undefined}
           >
             {hidden ? (
-              <EyeIcon size={16} color={colors.fgDefault} />
+              <EyeIcon size={iconSizeSm} color={colors.fgDefault} />
             ) : (
-              <EyeOffIcon size={16} color={colors.fgDefault} />
+              <EyeOffIcon size={iconSizeSm} color={colors.fgDefault} />
             )}
           </Animated.View>
         </View>
-        <Text style={outlineText}>
+        <Text variant="button">
           {translate(hidden ? 'seedbackup.show' : 'seedbackup.hide') as string}
         </Text>
       </Pressable>
