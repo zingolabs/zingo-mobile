@@ -1187,6 +1187,7 @@
     "birthday-tip-body": "It's fine if you don't know it."
   },
   "about": {
+    "back-acc": "Back",
     "copyright": [
       "Copyright (c) 2026, ZingoLabs.",
       "Built with React Native.",

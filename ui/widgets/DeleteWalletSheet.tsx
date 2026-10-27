@@ -1,4 +1,3 @@
-/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useRef } from 'react';
 import { Pressable, View } from 'react-native';
@@ -18,14 +17,22 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 
-import { radiusSheet, useTheme } from '@app/theme';
+import {
+  radiusSheet,
+  useTheme,
+  iconSizeMd,
+  radiusPill,
+  space4,
+  space12,
+  space16,
+  space24,
+} from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
 import { TranslateType } from '@app/AppState';
 import { DeleteWalletContext } from '@app/AppState/types/DeleteWalletContext';
-import BoldText from '@ui/primitives/BoldText';
-import RegText from '@ui/primitives/RegText';
+import Text from '@ui/primitives/Text';
 import SheetRim from '@ui/primitives/SheetRim';
-import { BUTTON_HEIGHT } from '@ui/primitives/Button';
+import Button, { BUTTON_HEIGHT } from '@ui/primitives/Button';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 
 type DeleteWalletSheetProps = {
@@ -179,7 +186,7 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
             style={{
               width: 52,
               height: 52,
-              borderRadius: 26,
+              borderRadius: radiusPill,
               backgroundColor: colors.bgDangerSubtle,
               borderWidth: 1,
               borderColor: colors.borderDanger,
@@ -187,15 +194,11 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
               justifyContent: 'center',
             }}
           >
-            <TriangleAlert size={20} color={colors.fgDanger} />
+            <TriangleAlert size={iconSizeMd} color={colors.fgDanger} />
           </View>
-          <BoldText
-            style={{
-              marginTop: 16,
-              fontSize: 15,
-              lineHeight: 20,
-              textAlign: 'center',
-            }}
+          <Text
+            variant="bodyStrong"
+            style={{ marginTop: space16, textAlign: 'center' }}
           >
             {
               translate(
@@ -204,18 +207,14 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
                   : 'deletesheet.title',
               ) as string
             }
-          </BoldText>
-          <RegText
-            style={{
-              marginTop: 5,
-              fontSize: 12,
-              lineHeight: 16,
-              textAlign: 'center',
-              color: colors.fgMuted,
-            }}
+          </Text>
+          <Text
+            variant="caption"
+            tone="muted"
+            style={{ marginTop: space4, textAlign: 'center' }}
           >
             {sub}
-          </RegText>
+          </Text>
           <Animated.View style={[{ alignSelf: 'stretch' }, holdStyle]}>
             <Pressable
               testID="deletesheet.hold"
@@ -223,9 +222,9 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
               onPressOut={release}
               accessibilityRole="button"
               style={{
-                marginTop: 24,
+                marginTop: space24,
                 height: BUTTON_HEIGHT,
-                borderRadius: 999,
+                borderRadius: radiusPill,
                 borderWidth: 1.5,
                 borderColor: colors.borderDanger,
                 overflow: 'hidden',
@@ -248,7 +247,7 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
                   fillStyle,
                 ]}
               />
-              <RegText style={{ fontSize: 15, color: colors.fgDefault }}>
+              <Text variant="button">
                 {
                   translate(
                     context === 'replace'
@@ -256,32 +255,18 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
                       : 'deletesheet.hold',
                   ) as string
                 }
-              </RegText>
+              </Text>
             </Pressable>
           </Animated.View>
-          <Pressable
-            testID="deletesheet.cancel"
-            onPress={dismiss}
-            hitSlop={8}
-            accessibilityRole="button"
-            style={({ pressed }) => ({
-              marginTop: 14,
-              height: 26,
-              paddingHorizontal: 20,
-              justifyContent: 'center',
-              opacity: pressed ? 0.6 : 1,
-            })}
-          >
-            <RegText
-              style={{
-                fontSize: 13,
-                fontWeight: '700',
-                color: colors.fgMuted,
-              }}
-            >
-              {translate('cancel') as string}
-            </RegText>
-          </Pressable>
+          <View style={{ marginTop: space12 }}>
+            <Button
+              testID="deletesheet.cancel"
+              variant="quiet"
+              inline
+              title={translate('cancel') as string}
+              onPress={dismiss}
+            />
+          </View>
         </BottomSheetView>
       </BottomSheetModal>
     );

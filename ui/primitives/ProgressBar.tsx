@@ -1,8 +1,7 @@
-/* geometry-gap: not yet on the system */
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
-import { useTheme } from '@app/theme';
+import { useTheme, radiusPill } from '@app/theme';
 
 type ProgressBarProps = {
   // 0..1, driven frame for frame.
@@ -26,7 +25,7 @@ const ProgressBar: React.FunctionComponent<ProgressBarProps> = ({
     <View
       style={{
         height,
-        borderRadius: height / 2,
+        borderRadius: radiusPill,
         backgroundColor: colors.bottomSheetBorder,
         overflow: 'hidden',
       }}
