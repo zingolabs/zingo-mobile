@@ -6,7 +6,7 @@ import Animated, { AnimatedStyle } from 'react-native-reanimated';
 import {
   iconSizeMd,
   radiusMd,
-  radiusSm,
+  radiusXs,
   space12,
   space16,
   space4,
@@ -69,7 +69,8 @@ type BannerProps = {
   testID?: string;
 };
 
-const TILE = 36;
+/** The icon's tile, in the title row. */
+const TILE = 24;
 
 /**
  * A notice at the top of a screen. One at a time: when several are pending,
@@ -103,25 +104,25 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
       bg: colors.bgSurface,
       edge: colors.bottomSheetBorder,
       tile: colors.bgAccentSubtle,
-      icon: <SproutIcon size={iconSizeMd} color={colors.fgAccent} />,
+      icon: <SproutIcon size={iconSizeSm} color={colors.fgAccent} />,
     },
     warning: {
       bg: colors.bgWarning,
       edge: colors.borderWarning,
       tile: colors.bgWarningSubtle,
-      icon: <TriangleAlert size={iconSizeMd} color={colors.fgWarning} />,
+      icon: <TriangleAlert size={iconSizeSm} color={colors.fgWarning} />,
     },
     viewOnly: {
       bg: colors.bgSurface,
       edge: colors.bottomSheetBorder,
       tile: colors.bgViewOnlySubtle,
-      icon: <SnowflakeIcon size={iconSizeMd} color={colors.fgViewOnly} />,
+      icon: <SnowflakeIcon size={iconSizeSm} color={colors.fgViewOnly} />,
     },
     info: {
       bg: colors.bgSurface,
       edge: colors.bottomSheetBorder,
       tile: colors.bgMutedSubtle,
-      icon: <InfoIcon size={iconSizeMd} color={colors.fgMuted} />,
+      icon: <InfoIcon size={iconSizeSm} color={colors.fgMuted} />,
     },
   }[tone];
 
@@ -222,30 +223,31 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
       <Animated.View
         style={[{ flexDirection: 'row', gap: space12 }, contentStyle]}
       >
-        <View
-          style={{
-            width: TILE,
-            height: TILE,
-            borderRadius: radiusSm,
-            backgroundColor: paint.tile,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {paint.icon}
-        </View>
         <View style={{ flex: 1, gap: space4 }}>
           <View
             style={{
               flexDirection: 'row',
               flexWrap: 'wrap',
               alignItems: 'center',
-              gap: space4,
+              columnGap: space8,
+              rowGap: space4,
               /** Clear of the corner X when nothing sits beside the text. */
               paddingRight:
                 onDismiss && !actionBeside ? touchTarget - space16 : 0,
             }}
           >
+            <View
+              style={{
+                width: TILE,
+                height: TILE,
+                borderRadius: radiusXs,
+                backgroundColor: paint.tile,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {paint.icon}
+            </View>
             <Text variant="bodyStrong">{title}</Text>
             {tag}
           </View>

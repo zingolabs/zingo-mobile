@@ -14,7 +14,8 @@ import {
   iconSizeSm,
   radiusMd,
   radiusPill,
-  radiusSm,
+  radiusXs,
+  space4,
   rowMinHeight,
   slopFor,
   space8,
@@ -316,35 +317,48 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               backgroundColor: strip.bg,
             }}
           >
-            <View
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: radiusSm,
-                backgroundColor: strip.tile,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              {seedBackedUp ? (
-                <ShieldCheckIcon size={iconSizeSm} color={colors.fgAccent} />
-              ) : (
-                <TriangleAlert size={iconSizeSm} color={colors.fgWarning} />
-              )}
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text
-                variant="bodyStrong"
-                tone={seedBackedUp ? 'accent' : 'warning'}
+            <View style={{ flex: 1, gap: space4 }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  columnGap: space8,
+                  rowGap: space4,
+                }}
               >
-                {
-                  translate(
-                    seedBackedUp
-                      ? 'walletseed.ok-title'
-                      : 'walletseed.no-title',
-                  ) as string
-                }
-              </Text>
+                <View
+                  style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: radiusXs,
+                    backgroundColor: strip.tile,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {seedBackedUp ? (
+                    <ShieldCheckIcon
+                      size={iconSizeSm}
+                      color={colors.fgAccent}
+                    />
+                  ) : (
+                    <TriangleAlert size={iconSizeSm} color={colors.fgWarning} />
+                  )}
+                </View>
+                <Text
+                  variant="bodyStrong"
+                  tone={seedBackedUp ? 'accent' : 'warning'}
+                >
+                  {
+                    translate(
+                      seedBackedUp
+                        ? 'walletseed.ok-title'
+                        : 'walletseed.no-title',
+                    ) as string
+                  }
+                </Text>
+              </View>
               <Text variant="caption" tone="muted">
                 {seedBackedUp
                   ? backedUpOn

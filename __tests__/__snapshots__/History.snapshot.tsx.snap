@@ -585,18 +585,6 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                     <View
                       style={
                         {
-                          "alignItems": "center",
-                          "backgroundColor": "#F99D001F",
-                          "borderRadius": 8,
-                          "height": 36,
-                          "justifyContent": "center",
-                          "width": 36,
-                        }
-                      }
-                    />
-                    <View
-                      style={
-                        {
                           "flex": 1,
                           "gap": 4,
                         }
@@ -606,13 +594,26 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                         style={
                           {
                             "alignItems": "center",
+                            "columnGap": 8,
                             "flexDirection": "row",
                             "flexWrap": "wrap",
-                            "gap": 4,
                             "paddingRight": 0,
+                            "rowGap": 4,
                           }
                         }
                       >
+                        <View
+                          style={
+                            {
+                              "alignItems": "center",
+                              "backgroundColor": "#F99D001F",
+                              "borderRadius": 4,
+                              "height": 24,
+                              "justifyContent": "center",
+                              "width": 24,
+                            }
+                          }
+                        />
                         <Text
                           maxFontSizeMultiplier={2}
                           style={
@@ -2310,18 +2311,6 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                     <View
                       style={
                         {
-                          "alignItems": "center",
-                          "backgroundColor": "#F99D001F",
-                          "borderRadius": 8,
-                          "height": 36,
-                          "justifyContent": "center",
-                          "width": 36,
-                        }
-                      }
-                    />
-                    <View
-                      style={
-                        {
                           "flex": 1,
                           "gap": 4,
                         }
@@ -2331,13 +2320,26 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                         style={
                           {
                             "alignItems": "center",
+                            "columnGap": 8,
                             "flexDirection": "row",
                             "flexWrap": "wrap",
-                            "gap": 4,
                             "paddingRight": 0,
+                            "rowGap": 4,
                           }
                         }
                       >
+                        <View
+                          style={
+                            {
+                              "alignItems": "center",
+                              "backgroundColor": "#F99D001F",
+                              "borderRadius": 4,
+                              "height": 24,
+                              "justifyContent": "center",
+                              "width": 24,
+                            }
+                          }
+                        />
                         <Text
                           maxFontSizeMultiplier={2}
                           style={

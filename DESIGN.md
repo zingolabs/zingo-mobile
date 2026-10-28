@@ -670,10 +670,16 @@ Use the shared component; never build a second one that looks the same.
 
 **Notices on Home.** The notice stack shows `Banner`s that all share one
 background and edge (`bgSurface`, `bottomSheetBorder`), whatever the notice:
-transparent funds, seed backup, view-only, Ironwood. Only the content changes:
-the icon in its 36 tile, the title (`bodyStrong`), the tag, the body
-(`bodySmall` muted) and the action, a `small` button beside the text,
-vertically centred. A notice the user can hide has an X: in the card's
+transparent funds, seed backup, view-only, Ironwood. Only the content changes.
+The first row holds the icon in a 24 tile (`radiusXs`, the tone's subtle fill,
+the icon at `iconSizeSm` in the tone's colour), the title (`bodyStrong`) and
+its tag, vertically centred; at large text it wraps and the tag moves down.
+The body (`bodySmall` muted) goes under it from the notice's left edge. The
+action, a `small` button, stays on the right, vertically centred on the
+notice. Wallet Seed's backup strip is built the same way. A 36 tile stays for
+a list row's leading image (Import, Your swaps, Pools), titleless lists of
+points and a sheet's centred hero icon; the compact notes outside Home have
+no tile. A notice the user can hide has an X: in the card's
 top-right corner, outside the row (the view-only notice, whose button is
 `viewOnly`), or beside the button (`dismissBeside`) when the card is too short
 for a corner X (Ironwood, once only a residual is left in Orchard). Hiding a
