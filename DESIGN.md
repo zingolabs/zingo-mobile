@@ -462,7 +462,9 @@ confirming, in mempool, offline, no routes, refunds, and every warning note.
 **The transparent pool keeps its yellow.** `fgTransparent` / `bgTransparent`
 (#E6C46A) marks the transparent pool and nothing else, always next to the
 pool's name: the eye icon in Receive, the "public" tag, the line under a field
-when the address is transparent, the Address Book's public rows. A state is
+when the address is transparent, the Address Book's public rows. In Pools its
+total is yellow only while it holds funds; at zero it looks like the other
+pools. A state is
 never painted with it.
 
 **Errors.** `fgDanger` / `bgDanger` (#E5484D) is for errors and destructive

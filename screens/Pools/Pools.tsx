@@ -375,7 +375,11 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                             variant="bodyStrong"
                             testID={`pools.${pool.key}.total`}
                             onPress={onAmount}
-                            style={transparent ? { color: fg } : undefined}
+                            style={
+                              transparent && pool.total > 0
+                                ? { color: fg }
+                                : undefined
+                            }
                           >
                             {zec(pool.total)}{' '}
                             <Text variant="bodyStrong" tone="muted">
