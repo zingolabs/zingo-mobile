@@ -373,7 +373,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                     ? 'loadingapp.card-words'
                     : 'loadingapp.card-key',
                 ) as string
-              }  ·  ${(translate('loadingapp.card-birthday') as string).replace(
+              } · ${(translate('loadingapp.card-birthday') as string).replace(
                 '{height}',
                 formatInteger(recoveryWallet.birthday),
               )}`}

@@ -1,6 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View } from 'react-native';
 import Pressable from '@ui/primitives/Pressable';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
@@ -130,9 +129,7 @@ function SwapLine({
             >
               <Chevron size={iconSizeSm} color={colors.fgMuted} />
             </Pressable>
-          ) : (
-            <View style={{ width: 20 }} />
-          )
+          ) : undefined
         }
       />
     </Pressable>

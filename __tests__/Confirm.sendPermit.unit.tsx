@@ -19,7 +19,8 @@ jest.mock('@gorhom/bottom-sheet', () => {
 import 'react-native';
 import React from 'react';
 
-import { render } from '@testing-library/react-native';
+import { fireEvent, render } from '@testing-library/react-native';
+import { useResult } from '@app/navigation/results';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Confirm from '@screens/Confirm';
 import {
@@ -108,5 +109,31 @@ describe('Confirm send permit', () => {
     expect(view.getByTestId('send.confirm.refusal')).toHaveTextContent(
       /loadedapp\.connection-error/,
     );
+  });
+});
+
+describe('Confirm leaving for the sending screen', () => {
+  test('Tests that confirming replaces the review with the sending screen before the send starts, when the permit is granted.', () => {
+    const order: string[] = [];
+    (mockNavigation.replace as jest.Mock).mockImplementation(() =>
+      order.push('replace'),
+    );
+    const Listener = () => {
+      useResult('send.confirm', () => order.push('confirm'));
+      return null;
+    };
+    const view = render(
+      <>
+        <Listener />
+        {confirmUi(online)}
+      </>,
+    );
+
+    fireEvent.press(view.getByTestId('send.confirm.button'));
+
+    expect(mockNavigation.replace).toHaveBeenCalledWith(Route.Computing, {
+      subject: expect.objectContaining({ who: expect.any(String) }),
+    });
+    expect(order).toEqual(['replace', 'confirm']);
   });
 });

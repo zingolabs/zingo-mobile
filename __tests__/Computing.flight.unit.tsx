@@ -88,9 +88,14 @@ describe('Computing flight', () => {
     );
     expect(view.getByText('send.sent-line')).toBeTruthy();
     fireEvent.press(view.getByTestId('computing.done'));
-    expect(mockNavigation.navigate).toHaveBeenCalledWith(Route.Home, {
-      screen: Route.History,
-    });
+    // Back to the home under it, not a new one on top (React Navigation 7).
+    expect(mockNavigation.navigate).toHaveBeenCalledWith(
+      Route.Home,
+      {
+        screen: Route.History,
+      },
+      { pop: true },
+    );
   });
 
   test('Tests that View transaction opens the new transaction when History already lists it', () => {

@@ -59,8 +59,21 @@ export function shortWhen(
 const shortAddress = (address: string): string =>
   address.length > 15 ? `${address.slice(0, 6)}…${address.slice(-6)}` : address;
 
-/** A transfer's row: what it was, when, and the ZEC with its dollars. */
-export function transferRowText(args: {
+/**
+ * A transfer's row: what it was, when, and the ZEC with its dollars. A
+ * transfer that failed, whatever its kind (a send, a shield, a send to
+ * oneself), reads its amount struck through in grey.
+ */
+export function transferRowText(
+  args: Parameters<typeof transferRowTextOf>[0],
+): RowText {
+  const text = transferRowTextOf(args);
+  return args.vt.status === RPCValueTransfersStatusEnum.failed
+    ? { ...text, topTone: 'muted', topStrike: true }
+    : text;
+}
+
+function transferRowTextOf(args: {
   vt: ValueTransferType;
   when: string;
   currency: string;
@@ -158,7 +171,10 @@ export function swapRowText(args: {
     record.actualReceiveAmount ?? record.expectedReceiveAmount,
   );
   const line = `${providerShortLabel(record.provider)} · ${when}`;
-  const toward = `${t(sell ? 'history.swap-to' : 'history.swap-from')} ${other}`;
+  /** Both coins in the swap's order, what goes out → what comes in. */
+  const pair = (key: string) =>
+    t(key).replace('{from}', sellSym).replace('{to}', getSym);
+  const toward = pair('history.swap-pair');
   const base = { titleMono: false, line };
 
   switch (record.status) {
@@ -171,7 +187,7 @@ export function swapRowText(args: {
               line: `${t('history.swapped-to')} ${other} · ${line}`,
             }
           : {
-              title: `${t(sell ? 'history.swapped-to' : 'history.swapped-from')} ${other}`,
+              title: pair('history.swapped-pair'),
             }),
         top: `+${got} ${getSym}`,
         topTone: 'positive',
@@ -212,6 +228,7 @@ export function swapRowText(args: {
         state: { text: t('history.state-failed'), tone: 'danger' },
         top: sold,
         topTone: 'muted',
+        topStrike: true,
         bottom: '',
       };
     default:

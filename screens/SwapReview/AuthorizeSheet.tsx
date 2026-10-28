@@ -53,7 +53,7 @@ const AuthorizeSheet = forwardRef<BottomSheetModal, AuthorizeSheetProps>(
     }, [translate, addLastSnackbar, dismiss, onAuthorized]);
 
     return (
-      <AppSheetModal ref={ref} handle contentStyle={{ paddingBottom: 32 }}>
+      <AppSheetModal ref={ref} handle>
         <View
           style={{
             alignItems: 'center',

@@ -9,11 +9,12 @@ import {
   space12,
   space16,
   space24,
+  space8,
   touchTarget,
   useTheme,
 } from '@app/theme';
 import Text from './Text';
-import Pressable from './Pressable';
+import Pressable, { PressTile } from './Pressable';
 import { XIcon } from './Icons/XIcon';
 
 /** One control of each kind; press and hold each to see its reaction. */
@@ -70,6 +71,26 @@ const Kinds = () => {
         <Text variant="bodyStrong" tone="accent">
           Save contact
         </Text>
+      </Pressable>
+      <Pressable
+        kind="tile"
+        accessibilityRole="button"
+        onPress={() => {}}
+        style={{ alignItems: 'center', gap: space8 }}
+      >
+        <PressTile
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: radiusMd,
+            backgroundColor: colors.bgSurface,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <XIcon size={iconSizeMd} color={colors.fgDefault} />
+        </PressTile>
+        <Text variant="caption">Tile</Text>
       </Pressable>
     </View>
   );

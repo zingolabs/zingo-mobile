@@ -96,12 +96,20 @@ export type SwapRecordType = {
   status: SwapStatusEnum;
   trackingStatus?: TrackingStatusEnum;
   /**
-   * When Zingo stops waiting for an inbound deposit: 24 hours after the
-   * payment address was made. Once it passes with no deposit seen, the swap
-   * closes locally as "Deposit not detected". Absent on outbound swaps and on
-   * records made before it was kept.
+   * When Zingo stops waiting for an inbound deposit: 12 hours after the
+   * payment address was made (24 on older records), or earlier at the
+   * quote's deadline; `depositDeadlineMs()` takes the earliest. Once it
+   * passes with no deposit seen, the swap closes locally as "Deposit not
+   * detected". Absent on outbound swaps and on records made before it was
+   * kept.
    */
   depositDeadlineMs?: number;
+  /**
+   * Until when the provider holds the quote the swap was made at. A sale
+   * whose ZEC did not leave can be sent again only before it. Absent when
+   * the provider gave none, and on records made before it was kept.
+   */
+  quoteExpiresAtMs?: number;
   /** When the user said the inbound deposit was sent. */
   depositSentAtMs?: number;
   /**

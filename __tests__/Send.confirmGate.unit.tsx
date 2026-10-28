@@ -210,7 +210,15 @@ describe('Send confirm send permit', () => {
     await confirmSend();
 
     expect(sendTransaction).not.toHaveBeenCalled();
-    expect(addLastSnackbar).toHaveBeenCalledWith('send.nym-blocked');
+    // Confirm has already replaced itself with the sending screen, which
+    // shows the refusal.
+    expect(navigate).toHaveBeenLastCalledWith(
+      Route.Computing,
+      expect.objectContaining({
+        phase: 'failed',
+        failure: { kind: 'verbatim', text: 'send.nym-blocked' },
+      }),
+    );
   });
 
   test('Tests that confirming does not send when the device disconnects while the Confirm screen is open. The screen opened on a connected device.', async () => {
@@ -230,7 +238,15 @@ describe('Send confirm send permit', () => {
     await confirmSend();
 
     expect(sendTransaction).not.toHaveBeenCalled();
-    expect(addLastSnackbar).toHaveBeenCalledWith('loadedapp.connection-error');
+    // Confirm has already replaced itself with the sending screen, which
+    // shows the refusal.
+    expect(navigate).toHaveBeenLastCalledWith(
+      Route.Computing,
+      expect.objectContaining({
+        phase: 'failed',
+        failure: { kind: 'verbatim', text: 'loadedapp.connection-error' },
+      }),
+    );
   });
 
   test('Tests that confirming does not send when the server goes offline while the Confirm screen is open. The screen opened on a remote server.', async () => {
@@ -250,7 +266,15 @@ describe('Send confirm send permit', () => {
     await confirmSend();
 
     expect(sendTransaction).not.toHaveBeenCalled();
-    expect(addLastSnackbar).toHaveBeenCalledWith('loadedapp.connection-error');
+    // Confirm has already replaced itself with the sending screen, which
+    // shows the refusal.
+    expect(navigate).toHaveBeenLastCalledWith(
+      Route.Computing,
+      expect.objectContaining({
+        phase: 'failed',
+        failure: { kind: 'verbatim', text: 'loadedapp.connection-error' },
+      }),
+    );
   });
 
   test('Tests that the Computing screen receives the refusal when the retry on another server is refused. The first attempt fails with a server error, and the live list holds one other server.', async () => {

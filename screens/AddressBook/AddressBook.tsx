@@ -35,7 +35,12 @@ import ContactRow, { ROW_LINE } from './components/ContactRow';
 import AddressRowHead from './components/AddressRowHead';
 import SegmentedSwitch from '@ui/widgets/SegmentedSwitch';
 import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
-import ContactSheet, { ContactEdit } from '@ui/widgets/ContactSheet';
+import ContactSheet, {
+  ContactEdit,
+  contactSheetTitleKey,
+} from '@ui/widgets/ContactSheet';
+import TitleBar from '@ui/widgets/TitleBar';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { themeTokens } from '@app/theme';
 
 const SIDE = 22;
@@ -241,7 +246,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     // The book was opened from the options panel, which waits under it for
     // the pop. Sending leaves for the Send tab, not back to the panel.
     optionsPanel.close();
-    navigation.navigate(Route.Home, { screen: Route.Send });
+    navigation.navigate(Route.Home, { screen: Route.Send }, { pop: true });
   };
 
   const copy = (contact: AddressBookFileClass) => {
@@ -546,11 +551,21 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
 
       <AppSheetModal
         ref={contactSheet}
-        handle
-        contentStyle={{
-          paddingBottom:
-            keyboardHeight > 0 ? keyboardHeight + 20 : insets.bottom + 24,
-        }}
+        header={
+          <TitleBar
+            title={translate(contactSheetTitleKey(edit)) as string}
+            right={{
+              icon: XIcon,
+              accessibilityLabel: translate('close') as string,
+              onPress: () => contactSheet.current?.dismiss(),
+            }}
+          />
+        }
+        contentStyle={
+          keyboardHeight > 0
+            ? { paddingBottom: keyboardHeight + 20 }
+            : undefined
+        }
       >
         <ContactSheet
           key={`contact-${editNonce}`}
@@ -558,7 +573,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           book={addressBook}
           walletChain={walletChain}
           onSave={save}
-          onCancel={() => contactSheet.current?.dismiss()}
         />
       </AppSheetModal>
     </View>

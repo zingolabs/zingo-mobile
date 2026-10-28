@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useContext, useMemo } from 'react';
 import { View } from 'react-native';
-import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { space8, space20 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
@@ -12,7 +12,7 @@ import {
 import type { SwapTextType } from '@app/swap';
 import { formatUsd } from '@app/utils/formatAmount';
 import type { RouteOptionType, UnavailableProviderType } from '@app/swap';
-import AppSheetModal from '@ui/primitives/AppSheetModal';
+import AppSheetModal, { SheetScrollView } from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
 import ListRow from '@ui/primitives/ListRow';
 import Tag from '@ui/widgets/Tag';
@@ -83,7 +83,7 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
           />
         }
       >
-        <BottomSheetScrollView contentContainerStyle={{ paddingBottom: 32 }}>
+        <SheetScrollView>
           <Text
             variant="caption"
             tone="muted"
@@ -163,7 +163,7 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
               subtitle={say(entry.reason)}
             />
           ))}
-        </BottomSheetScrollView>
+        </SheetScrollView>
       </AppSheetModal>
     );
   },

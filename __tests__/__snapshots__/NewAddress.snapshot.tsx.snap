@@ -199,6 +199,7 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
             >
               <Text
                 maxFontSizeMultiplier={2}
+                numberOfLines={1}
                 style={
                   {
                     "color": "#18bd18",
@@ -683,6 +684,7 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
             >
               <Text
                 maxFontSizeMultiplier={2}
+                numberOfLines={1}
                 style={
                   {
                     "color": "#E6C46A",
@@ -783,6 +785,7 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
           maxFontSizeMultiplier={2}
           maxLength={50}
           multiline={false}
+          numberOfLines={1}
           onBlur={[Function]}
           onChangeText={[Function]}
           onFocus={[Function]}
@@ -793,7 +796,7 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
               "color": "#c3c3c3",
               "flex": 1,
               "fontSize": 15,
-              "fontWeight": "600",
+              "fontWeight": "400",
               "minWidth": 0,
               "paddingRight": 0,
               "paddingVertical": 8,
@@ -822,70 +825,6 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
         }
       }
     >
-      <View
-        accessibilityRole="button"
-        accessibilityState={
-          {
-            "busy": false,
-            "checked": undefined,
-            "disabled": false,
-            "expanded": undefined,
-            "selected": undefined,
-          }
-        }
-        accessibilityValue={
-          {
-            "max": undefined,
-            "min": undefined,
-            "now": undefined,
-            "text": undefined,
-          }
-        }
-        accessible={true}
-        collapsable={false}
-        focusable={true}
-        onBlur={[Function]}
-        onClick={[Function]}
-        onFocus={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          [
-            {
-              "alignItems": "center",
-              "alignSelf": "stretch",
-              "backgroundColor": undefined,
-              "borderRadius": 999,
-              "justifyContent": "center",
-              "maxWidth": "100%",
-              "minHeight": 44,
-              "paddingHorizontal": 24,
-              "paddingVertical": 8,
-              "width": "100%",
-            },
-            {},
-          ]
-        }
-      >
-        <Text
-          maxFontSizeMultiplier={1.5}
-          style={
-            {
-              "color": "#888888",
-              "fontSize": 16,
-              "fontWeight": "700",
-              "lineHeight": 20,
-              "textAlign": "center",
-            }
-          }
-        >
-          text translated
-        </Text>
-      </View>
       <View
         accessibilityRole="button"
         accessibilityState={

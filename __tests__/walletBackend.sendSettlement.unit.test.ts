@@ -11,6 +11,16 @@ const serverError = 'Error: server unreachable';
 const dust = '64: dust';
 
 describe('settleSend', () => {
+  test('Tests that a send in two steps settles with its payment, the last txid, when the receipt lists the hop first.', async () => {
+    const attempt = jest
+      .fn()
+      .mockResolvedValue({ kind: 'sent', receipt: 'hop, payment' });
+
+    const settlement = await settleSend(attempt, jest.fn(), true);
+
+    expect(settlement).toEqual({ kind: 'sent', txid: 'payment' });
+  });
+
   test('Tests that the send settles as sent when the first attempt sends.', async () => {
     const attempt = jest.fn().mockResolvedValue(sent);
     const switchServer = jest.fn();
@@ -116,8 +126,14 @@ describe('shieldEnd', () => {
     failure: { kind: 'verbatim', text },
   });
 
-  test('Tests that the end is the created phase when the shield returns transaction ids.', () => {
-    expect(shieldEnd({ ok: true, value: '{"txids":["txid"]}' })).toEqual({
+  test('Tests that the end is the created phase with the shielding transaction id when the shield returns transaction ids.', () => {
+    expect(
+      shieldEnd({ ok: true, value: '{"txids":["first","shield"]}' }),
+    ).toEqual({ phase: 'created', txid: 'shield' });
+  });
+
+  test('Tests that the end is the created phase without an id when the shield returns an empty list.', () => {
+    expect(shieldEnd({ ok: true, value: '{"txids":[]}' })).toEqual({
       phase: 'created',
     });
   });

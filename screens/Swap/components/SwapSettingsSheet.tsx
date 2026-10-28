@@ -99,9 +99,11 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
             closeLabel={translate('swap.close') as string}
           />
         }
-        contentStyle={{
-          paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
-        }}
+        contentStyle={
+          keyboardHeight > 0
+            ? { paddingBottom: keyboardHeight + 20 }
+            : undefined
+        }
       >
         <View style={{ paddingHorizontal: space20 }}>
           {/* One row when it fits; the chips drop under the label when not. */}

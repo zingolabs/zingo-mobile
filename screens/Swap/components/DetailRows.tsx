@@ -139,7 +139,6 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
               {!!row.copy && (
                 <Pressable
                   kind="icon"
-                  circle={28}
                   accessibilityRole="button"
                   accessibilityLabel={translate('swap.copy') as string}
                   hitSlop={8}

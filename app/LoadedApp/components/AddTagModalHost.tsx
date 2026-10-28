@@ -1,6 +1,5 @@
-import React, { forwardRef, useCallback, useContext } from 'react';
+import React, { forwardRef, useCallback, useContext, useState } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   AddressBookFileClass,
@@ -12,7 +11,11 @@ import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import ContactSheet from '@ui/widgets/ContactSheet';
-import NewAddressTag from '@ui/widgets/NewAddressTag';
+import NewAddressTag, {
+  newAddressTagTitleKey,
+} from '@ui/widgets/NewAddressTag';
+import TitleBar from '@ui/widgets/TitleBar';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
 
 type AddTagModalHostProps = {
   // Latest target the host should render. Pass `null` while the modal is
@@ -36,8 +39,9 @@ const AddTagModalHost = forwardRef<
 >(({ target, setAddressBook, translate }, ref) => {
   const { addressBook, walletChainName, server, addLastSnackbar } =
     useContext(ContextAppLoaded);
-  const insets = useSafeAreaInsets();
   const keyboardHeight = useKeyboardHeight();
+  /** A fresh form each time the sheet closes, however it closes. */
+  const [nonce, setNonce] = useState<number>(0);
   const walletChain = walletChainName || server.chainName;
 
   const dismiss = useCallback(() => {
@@ -66,15 +70,28 @@ const AddTagModalHost = forwardRef<
   return (
     <AppSheetModal
       ref={ref}
-      handle
-      contentStyle={{
-        paddingBottom:
-          keyboardHeight > 0 ? keyboardHeight + 20 : insets.bottom + 24,
-      }}
+      onDismiss={() => setNonce(n => n + 1)}
+      header={
+        <TitleBar
+          title={
+            translate(
+              target?.own ? newAddressTagTitleKey() : 'addressbook.new-contact',
+            ) as string
+          }
+          right={{
+            icon: XIcon,
+            accessibilityLabel: translate('close') as string,
+            onPress: dismiss,
+          }}
+        />
+      }
+      contentStyle={
+        keyboardHeight > 0 ? { paddingBottom: keyboardHeight + 20 } : undefined
+      }
     >
       {target?.own && (
         <NewAddressTag
-          key={target.address}
+          key={`${nonce}:${target.address}`}
           address={target.address}
           closeSheet={dismiss}
           setAddressBook={setAddressBook}
@@ -82,7 +99,7 @@ const AddTagModalHost = forwardRef<
       )}
       {target && !target.own && (
         <ContactSheet
-          key={`${target.address}-${target.initialLabel ?? ''}`}
+          key={`${nonce}:${target.address}-${target.initialLabel ?? ''}`}
           edit={{
             kind: 'new',
             preset: target.address,
@@ -91,7 +108,6 @@ const AddTagModalHost = forwardRef<
           book={addressBook}
           walletChain={walletChain}
           onSave={save}
-          onCancel={dismiss}
         />
       )}
     </AppSheetModal>

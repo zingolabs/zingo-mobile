@@ -15,6 +15,7 @@ jest.mock('react-native-keyboard-controller', () => {
 jest.mock('@react-navigation/native', () => ({
   ...jest.requireActual('@react-navigation/native'),
   useNavigation: () => ({ addListener: jest.fn(() => jest.fn()) }),
+  useRoute: () => ({ key: 'panel-1', name: 'Panel' }),
 }));
 
 const open = (fit: boolean) =>

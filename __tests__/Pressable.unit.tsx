@@ -2,10 +2,10 @@ import 'react-native';
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import Text from '@ui/primitives/Text';
-import Pressable from '@ui/primitives/Pressable';
+import Pressable, { PressTile } from '@ui/primitives/Pressable';
 import type { PressKind } from '@ui/primitives/Pressable';
 
-const kinds: PressKind[] = ['button', 'row', 'icon', 'link'];
+const kinds: PressKind[] = ['button', 'row', 'icon', 'link', 'tile'];
 
 describe('Pressable', () => {
   test.each(kinds)(
@@ -34,6 +34,26 @@ describe('Pressable', () => {
       expect(screen.getByText('Label')).toBeTruthy();
     },
   );
+
+  test('Tests that a tile cell draws its tile and its still label, and a tile alone draws outside a cell', () => {
+    render(
+      <>
+        <Pressable kind="tile" testID="cell" onPress={() => {}}>
+          <PressTile>
+            <Text>Tile</Text>
+          </PressTile>
+          <Text>Label</Text>
+        </Pressable>
+        <PressTile>
+          <Text>Alone</Text>
+        </PressTile>
+      </>,
+    );
+    fireEvent(screen.getByTestId('cell'), 'pressIn');
+    expect(screen.getByText('Tile')).toBeTruthy();
+    expect(screen.getByText('Label')).toBeTruthy();
+    expect(screen.getByText('Alone')).toBeTruthy();
+  });
 
   test('Tests that nothing fires when the control is disabled', () => {
     const onPress = jest.fn();

@@ -1,9 +1,7 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
-import { Pressable, View } from 'react-native';
-import { iconSizeSm, radiusSm, space8, useTheme } from '@app/theme';
-import Text from '@ui/primitives/Text';
-import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
+import { View } from 'react-native';
+import { space8 } from '@app/theme';
+import Checkbox from '@ui/primitives/Checkbox';
 
 /**
  * The "Don’t show this again" row of a warning sheet. It keeps its own tick,
@@ -19,44 +17,18 @@ export default function DontShowAgain({
   onChange: (checked: boolean) => void;
   testID?: string;
 }) {
-  const { colors } = useTheme();
   const [checked, setChecked] = useState<boolean>(false);
   return (
-    <Pressable
-      testID={testID}
-      accessibilityRole="checkbox"
-      accessibilityState={{ checked }}
-      onPress={() => {
-        const next = !checked;
-        setChecked(next);
-        onChange(next);
-      }}
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        alignSelf: 'center',
-        columnGap: space8,
-        paddingVertical: 4,
-        marginBottom: space8,
-      }}
-    >
-      <View
-        style={{
-          width: iconSizeSm + 4,
-          height: iconSizeSm + 4,
-          borderRadius: radiusSm,
-          borderWidth: 1.5,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: checked ? colors.bgAccent : colors.bgSurface,
-          borderColor: checked ? colors.bgAccent : colors.borderMuted,
+    <View style={{ marginBottom: space8 }}>
+      <Checkbox
+        testID={testID}
+        label={label}
+        checked={checked}
+        onChange={next => {
+          setChecked(next);
+          onChange(next);
         }}
-      >
-        {checked && <CheckIcon size={iconSizeSm} color={colors.fgOnAccent} />}
-      </View>
-      <Text variant="bodySmall" tone="muted">
-        {label}
-      </Text>
-    </Pressable>
+      />
+    </View>
   );
 }

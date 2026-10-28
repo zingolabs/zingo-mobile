@@ -1,12 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { createContext, forwardRef, useContext } from 'react';
 import Pressable from '@ui/primitives/Pressable';
-import { StyleProp, View, ViewStyle } from 'react-native';
+import { StyleProp, View, ViewStyle, useWindowDimensions } from 'react-native';
 import Animated, { AnimatedStyle } from 'react-native-reanimated';
 import {
   iconSizeMd,
   radiusMd,
-  radiusSm,
+  radiusXs,
   space12,
   space16,
   space4,
@@ -15,8 +15,10 @@ import {
   iconSizeSm,
   space8,
   slopFor,
+  fontScaleBody,
+  textVariants,
 } from '@app/theme';
-import Text from '@ui/primitives/Text';
+import Text, { TextScaleContext } from '@ui/primitives/Text';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import { SnowflakeIcon } from '@ui/primitives/Icons/SnowflakeIcon';
 import { SproutIcon } from '@ui/primitives/Icons/SproutIcon';
@@ -69,7 +71,8 @@ type BannerProps = {
   testID?: string;
 };
 
-const TILE = 36;
+/** The icon's tile, in the title row. */
+const TILE = 24;
 
 /**
  * A notice at the top of a screen. One at a time: when several are pending,
@@ -95,6 +98,13 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
 ) {
   const { colors } = useTheme();
   const inStack = useContext(BannerPlainContext);
+  /** The compact note's first caption line, as tall as the OS text size makes it. */
+  const firstLine =
+    textVariants.caption.lineHeight *
+    Math.min(
+      Math.max(useWindowDimensions().fontScale, useContext(TextScaleContext)),
+      fontScaleBody,
+    );
   const xBeside =
     !!onDismiss && dismissBeside && actionBeside && action !== undefined;
   const flat = plain || inStack;
@@ -103,25 +113,25 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
       bg: colors.bgSurface,
       edge: colors.bottomSheetBorder,
       tile: colors.bgAccentSubtle,
-      icon: <SproutIcon size={iconSizeMd} color={colors.fgAccent} />,
+      icon: <SproutIcon size={iconSizeSm} color={colors.fgAccent} />,
     },
     warning: {
       bg: colors.bgWarning,
       edge: colors.borderWarning,
       tile: colors.bgWarningSubtle,
-      icon: <TriangleAlert size={iconSizeMd} color={colors.fgWarning} />,
+      icon: <TriangleAlert size={iconSizeSm} color={colors.fgWarning} />,
     },
     viewOnly: {
       bg: colors.bgSurface,
       edge: colors.bottomSheetBorder,
       tile: colors.bgViewOnlySubtle,
-      icon: <SnowflakeIcon size={iconSizeMd} color={colors.fgViewOnly} />,
+      icon: <SnowflakeIcon size={iconSizeSm} color={colors.fgViewOnly} />,
     },
     info: {
       bg: colors.bgSurface,
       edge: colors.bottomSheetBorder,
       tile: colors.bgMutedSubtle,
-      icon: <InfoIcon size={iconSizeMd} color={colors.fgMuted} />,
+      icon: <InfoIcon size={iconSizeSm} color={colors.fgMuted} />,
     },
   }[tone];
 
@@ -147,6 +157,8 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
         ref={ref}
         testID={testID}
         style={{
+          // The text column flexes into the row, so a centred parent must not shrink it.
+          alignSelf: 'stretch',
           padding: space12,
           borderRadius: radiusMd,
           borderWidth: 1,
@@ -154,39 +166,47 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
           backgroundColor: plain ? colors.bgSurface : paint.bg,
         }}
       >
+        {/* Beside a button the text block centres on it; the icon keeps to the first line. */}
         <Animated.View
-          style={[{ flexDirection: 'row', gap: space8 }, contentStyle]}
+          style={[
+            {
+              flexDirection: 'row',
+              alignItems: actionBeside ? 'center' : 'flex-start',
+              gap: space8,
+            },
+            contentStyle,
+          ]}
         >
-          <View style={{ paddingTop: 0 }}>
-            <CompactIcon size={iconSizeSm} color={iconColor} />
-          </View>
-          <View style={{ flex: 1, gap: space4 }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                alignItems: 'center',
-                gap: space4,
-              }}
-            >
-              <Text variant="caption" style={{ flexShrink: 1 }}>
-                {title}
-              </Text>
-              {tag}
+          <View style={{ flex: 1, flexDirection: 'row', gap: space8 }}>
+            <View style={{ height: firstLine, justifyContent: 'center' }}>
+              <CompactIcon size={iconSizeSm} color={iconColor} />
             </View>
-            {children !== undefined &&
-              (typeof children === 'string' ? (
-                <Text variant="caption" tone="muted">
-                  {children}
+            <View style={{ flex: 1, gap: space4 }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  gap: space4,
+                }}
+              >
+                <Text variant="caption" style={{ flexShrink: 1 }}>
+                  {title}
                 </Text>
-              ) : (
-                children
-              ))}
-            {action !== undefined && !actionBeside && <View>{action}</View>}
+                {tag}
+              </View>
+              {children !== undefined &&
+                (typeof children === 'string' ? (
+                  <Text variant="caption" tone="muted">
+                    {children}
+                  </Text>
+                ) : (
+                  children
+                ))}
+              {action !== undefined && !actionBeside && <View>{action}</View>}
+            </View>
           </View>
-          {action !== undefined && actionBeside && (
-            <View style={{ alignSelf: 'center' }}>{action}</View>
-          )}
+          {action !== undefined && actionBeside && <View>{action}</View>}
           {onDismiss && (
             <Pressable
               kind="icon"
@@ -209,6 +229,7 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
       ref={ref}
       testID={testID}
       style={{
+        alignSelf: 'stretch',
         padding: space16,
         borderRadius: radiusMd,
         borderWidth: 1,
@@ -219,30 +240,31 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
       <Animated.View
         style={[{ flexDirection: 'row', gap: space12 }, contentStyle]}
       >
-        <View
-          style={{
-            width: TILE,
-            height: TILE,
-            borderRadius: radiusSm,
-            backgroundColor: paint.tile,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {paint.icon}
-        </View>
         <View style={{ flex: 1, gap: space4 }}>
           <View
             style={{
               flexDirection: 'row',
               flexWrap: 'wrap',
               alignItems: 'center',
-              gap: space4,
+              columnGap: space8,
+              rowGap: space4,
               /** Clear of the corner X when nothing sits beside the text. */
               paddingRight:
                 onDismiss && !actionBeside ? touchTarget - space16 : 0,
             }}
           >
+            <View
+              style={{
+                width: TILE,
+                height: TILE,
+                borderRadius: radiusXs,
+                backgroundColor: paint.tile,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {paint.icon}
+            </View>
             <Text variant="bodyStrong">{title}</Text>
             {tag}
           </View>

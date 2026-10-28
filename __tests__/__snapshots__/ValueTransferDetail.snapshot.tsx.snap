@@ -11,6 +11,191 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
 >
   <View
     style={
+      {
+        "height": 59,
+        "left": 0,
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+      }
+    }
+  >
+    <View>
+      <View
+        style={
+          [
+            {},
+            {
+              "alignItems": "center",
+              "backgroundColor": "#011401",
+              "display": "flex",
+              "minHeight": 50,
+              "paddingBottom": 10,
+              "paddingTop": 0,
+            },
+          ]
+        }
+        testID="header"
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "height": 57,
+              "justifyContent": "center",
+              "paddingTop": 12,
+            }
+          }
+        />
+      </View>
+      <View
+        style={
+          {
+            "left": 0,
+            "paddingBottom": 11.5,
+            "paddingLeft": 20,
+            "paddingRight": 11.5,
+            "paddingTop": 16,
+            "position": "absolute",
+            "top": 0,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 14,
+            }
+          }
+        >
+          <View
+            accessibilityLabel="text translated"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            hitSlop={
+              {
+                "bottom": 10,
+                "left": 10,
+                "right": 10,
+                "top": 10,
+              }
+            }
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                undefined,
+                {},
+              ]
+            }
+            testID="header.drawmenu"
+          />
+        </View>
+      </View>
+      <View
+        style={
+          [
+            {},
+            {
+              "padding": 13,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+            },
+          ]
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 14,
+            }
+          }
+        >
+          <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            hitSlop={
+              {
+                "bottom": 10,
+                "left": 10,
+                "right": 10,
+                "top": 10,
+              }
+            }
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                {
+                  "marginRight": 5,
+                  "marginTop": 4.5,
+                },
+                {},
+              ]
+            }
+            testID="header.messages"
+          />
+        </View>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
       [
         {
           "backgroundColor": "#031124",
@@ -63,7 +248,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
           style={
             {
               "alignItems": "flex-start",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         >
@@ -112,42 +298,13 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
               ]
             }
             testID="valuetransferdetail.scroll-view.back"
-          >
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "alignItems": "center",
-                  "bottom": 0,
-                  "justifyContent": "center",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                }
-              }
-            >
-              <View
-                style={
-                  [
-                    {
-                      "backgroundColor": "#8888881F",
-                      "borderRadius": 999,
-                      "height": 44,
-                      "width": 44,
-                    },
-                    {},
-                  ]
-                }
-              />
-            </View>
-          </View>
+          />
         </View>
         <View
           style={
             {
               "alignItems": "center",
-              "flex": 1,
+              "flexShrink": 1,
             }
           }
         >
@@ -171,7 +328,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
           style={
             {
               "alignItems": "flex-end",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         />
@@ -326,6 +484,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
             >
               <Text
                 maxFontSizeMultiplier={2}
+                numberOfLines={1}
                 style={
                   {
                     "color": "#18bd18",
@@ -670,36 +829,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                       {},
                     ]
                   }
-                >
-                  <View
-                    pointerEvents="none"
-                    style={
-                      {
-                        "alignItems": "center",
-                        "bottom": 0,
-                        "justifyContent": "center",
-                        "left": 0,
-                        "position": "absolute",
-                        "right": 0,
-                        "top": 0,
-                      }
-                    }
-                  >
-                    <View
-                      style={
-                        [
-                          {
-                            "backgroundColor": "#8888881F",
-                            "borderRadius": 999,
-                            "height": 28,
-                            "width": 28,
-                          },
-                          {},
-                        ]
-                      }
-                    />
-                  </View>
-                </View>
+                />
               </View>
             </View>
           </View>
@@ -892,6 +1022,191 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
 >
   <View
     style={
+      {
+        "height": 59,
+        "left": 0,
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+      }
+    }
+  >
+    <View>
+      <View
+        style={
+          [
+            {},
+            {
+              "alignItems": "center",
+              "backgroundColor": "#011401",
+              "display": "flex",
+              "minHeight": 50,
+              "paddingBottom": 10,
+              "paddingTop": 0,
+            },
+          ]
+        }
+        testID="header"
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "height": 57,
+              "justifyContent": "center",
+              "paddingTop": 12,
+            }
+          }
+        />
+      </View>
+      <View
+        style={
+          {
+            "left": 0,
+            "paddingBottom": 11.5,
+            "paddingLeft": 20,
+            "paddingRight": 11.5,
+            "paddingTop": 16,
+            "position": "absolute",
+            "top": 0,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 14,
+            }
+          }
+        >
+          <View
+            accessibilityLabel="text translated"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            hitSlop={
+              {
+                "bottom": 10,
+                "left": 10,
+                "right": 10,
+                "top": 10,
+              }
+            }
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                undefined,
+                {},
+              ]
+            }
+            testID="header.drawmenu"
+          />
+        </View>
+      </View>
+      <View
+        style={
+          [
+            {},
+            {
+              "padding": 13,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+            },
+          ]
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 14,
+            }
+          }
+        >
+          <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            hitSlop={
+              {
+                "bottom": 10,
+                "left": 10,
+                "right": 10,
+                "top": 10,
+              }
+            }
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                {
+                  "marginRight": 5,
+                  "marginTop": 4.5,
+                },
+                {},
+              ]
+            }
+            testID="header.messages"
+          />
+        </View>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
       [
         {
           "backgroundColor": "#031124",
@@ -944,7 +1259,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
           style={
             {
               "alignItems": "flex-start",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         >
@@ -993,42 +1309,13 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
               ]
             }
             testID="valuetransferdetail.scroll-view.back"
-          >
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "alignItems": "center",
-                  "bottom": 0,
-                  "justifyContent": "center",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                }
-              }
-            >
-              <View
-                style={
-                  [
-                    {
-                      "backgroundColor": "#8888881F",
-                      "borderRadius": 999,
-                      "height": 44,
-                      "width": 44,
-                    },
-                    {},
-                  ]
-                }
-              />
-            </View>
-          </View>
+          />
         </View>
         <View
           style={
             {
               "alignItems": "center",
-              "flex": 1,
+              "flexShrink": 1,
             }
           }
         >
@@ -1052,7 +1339,8 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
           style={
             {
               "alignItems": "flex-end",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         />
@@ -1207,6 +1495,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
             >
               <Text
                 maxFontSizeMultiplier={2}
+                numberOfLines={1}
                 style={
                   {
                     "color": "#18bd18",
@@ -1417,36 +1706,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                       {},
                     ]
                   }
-                >
-                  <View
-                    pointerEvents="none"
-                    style={
-                      {
-                        "alignItems": "center",
-                        "bottom": 0,
-                        "justifyContent": "center",
-                        "left": 0,
-                        "position": "absolute",
-                        "right": 0,
-                        "top": 0,
-                      }
-                    }
-                  >
-                    <View
-                      style={
-                        [
-                          {
-                            "backgroundColor": "#8888881F",
-                            "borderRadius": 999,
-                            "height": 28,
-                            "width": 28,
-                          },
-                          {},
-                        ]
-                      }
-                    />
-                  </View>
-                </View>
+                />
               </View>
             </View>
             <View
@@ -1695,36 +1955,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                       {},
                     ]
                   }
-                >
-                  <View
-                    pointerEvents="none"
-                    style={
-                      {
-                        "alignItems": "center",
-                        "bottom": 0,
-                        "justifyContent": "center",
-                        "left": 0,
-                        "position": "absolute",
-                        "right": 0,
-                        "top": 0,
-                      }
-                    }
-                  >
-                    <View
-                      style={
-                        [
-                          {
-                            "backgroundColor": "#8888881F",
-                            "borderRadius": 999,
-                            "height": 28,
-                            "width": 28,
-                          },
-                          {},
-                        ]
-                      }
-                    />
-                  </View>
-                </View>
+                />
               </View>
             </View>
           </View>

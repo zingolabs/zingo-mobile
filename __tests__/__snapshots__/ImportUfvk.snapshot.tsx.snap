@@ -25,7 +25,8 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
       style={
         {
           "alignItems": "flex-start",
-          "width": 48,
+          "flex": 1,
+          "minWidth": 48,
         }
       }
     >
@@ -74,42 +75,13 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           ]
         }
         testID="import.back"
-      >
-        <View
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "bottom": 0,
-              "justifyContent": "center",
-              "left": 0,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-            }
-          }
-        >
-          <View
-            style={
-              [
-                {
-                  "backgroundColor": "#8888881F",
-                  "borderRadius": 999,
-                  "height": 44,
-                  "width": 44,
-                },
-                {},
-              ]
-            }
-          />
-        </View>
-      </View>
+      />
     </View>
     <View
       style={
         {
           "alignItems": "center",
-          "flex": 1,
+          "flexShrink": 1,
         }
       }
     >
@@ -131,7 +103,8 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
       style={
         {
           "alignItems": "flex-end",
-          "width": 48,
+          "flex": 1,
+          "minWidth": 48,
         }
       }
     />
@@ -213,36 +186,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
             ]
           }
           testID="import.scan"
-        >
-          <View
-            pointerEvents="none"
-            style={
-              {
-                "alignItems": "center",
-                "bottom": 0,
-                "justifyContent": "center",
-                "left": 0,
-                "position": "absolute",
-                "right": 0,
-                "top": 0,
-              }
-            }
-          >
-            <View
-              style={
-                [
-                  {
-                    "backgroundColor": "#8888881F",
-                    "borderRadius": 999,
-                    "height": 44,
-                    "width": 44,
-                  },
-                  {},
-                ]
-              }
-            />
-          </View>
-        </View>
+        />
       </View>
     </View>
   </View>
@@ -486,34 +430,6 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
             testID="import.birthdayinfo"
           >
             <View
-              pointerEvents="none"
-              style={
-                {
-                  "alignItems": "center",
-                  "bottom": 0,
-                  "justifyContent": "center",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                }
-              }
-            >
-              <View
-                style={
-                  [
-                    {
-                      "backgroundColor": "#8888881F",
-                      "borderRadius": 999,
-                      "height": 44,
-                      "width": 44,
-                    },
-                    {},
-                  ]
-                }
-              />
-            </View>
-            <View
               style={{}}
             />
           </View>
@@ -556,6 +472,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
             keyboardType="number-pad"
             maxFontSizeMultiplier={2}
             multiline={false}
+            numberOfLines={1}
             onBlur={[Function]}
             onChangeText={[Function]}
             onFocus={[Function]}
@@ -566,7 +483,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
                 "color": "#c3c3c3",
                 "flex": 1,
                 "fontSize": 15,
-                "fontWeight": "600",
+                "fontWeight": "400",
                 "minWidth": 0,
                 "paddingRight": 0,
                 "paddingVertical": 8,

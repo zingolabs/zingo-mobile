@@ -127,12 +127,54 @@ test('Tests that an open swap shows its transactions under it, oldest first, whe
   ]);
 });
 
+test('Tests that a shielded memo deposit shows its vault payment and its memo note as two legs, each with its own data and key, when the swap is open', () => {
+  const r = record();
+  const rows = [
+    swapRow(r),
+    vt(DEPOSIT, 2_000_010, ValueTransferKindEnum.Sent, {
+      amount: 0,
+      address: 'u1mayamemo',
+    }),
+    vt(DEPOSIT, 2_000_010, ValueTransferKindEnum.Sent, {
+      amount: 0.01,
+      address: 't1vault',
+    }),
+  ];
+
+  const items = buildHistoryItems({
+    rows,
+    all: rows,
+    records: [r],
+    open: new Set(['rec-1']),
+    monthOf,
+  });
+
+  expect(items.map(i => i.kind)).toEqual(['month', 'swap', 'leg', 'leg']);
+  const swap = items[1];
+  expect(swap.kind === 'swap' && swap.legCount).toBe(2);
+  const legs = items
+    .slice(2)
+    .map(i => (i.kind === 'leg' ? [i.vt.amount, i.vt.address, i.slot] : []));
+  expect(legs).toEqual([
+    [0, 'u1mayamemo', 0],
+    [0.01, 't1vault', 1],
+  ]);
+  expect(new Set(items.map(i => i.key)).size).toBe(items.length);
+});
+
 const t = (key: string) => key;
+/** The pair titles as English writes them, the rest as keys. */
+const pairs = (key: string) =>
+  key === 'history.swap-pair'
+    ? 'Swap {from} → {to}'
+    : key === 'history.swapped-pair'
+      ? 'Swapped {from} → {to}'
+      : key;
 
 test('Tests that a completed sell shows what it got on top and the ZEC that left under it', () => {
-  const text = swapRowText({ record: record(), when: 'Oct 17', t });
+  const text = swapRowText({ record: record(), when: 'Oct 17', t: pairs });
 
-  expect(text.title).toBe('history.swapped-to BTC');
+  expect(text.title).toBe('Swapped ZEC → BTC');
   expect(text.top).toBe('+0.0095 BTC');
   expect(text.topTone).toBe('positive');
   expect(text.bottom).toBe('−1.5 ZEC');
@@ -316,4 +358,69 @@ test('Tests that a purchase paid after its quote expired reads refunding in ambe
   });
   expect(text.top).toBe('1.5 ZEC');
   expect(text.bottom).toBe('history.going-back');
+});
+
+test('Tests that a failed swap reads its amount struck through and grey, as a deposit not detected does', () => {
+  const text = swapRowText({
+    record: record({ status: SwapStatusEnum.Failed }),
+    when: 'Oct 17',
+    t,
+  });
+
+  expect(text.state).toEqual({ text: 'history.state-failed', tone: 'danger' });
+  expect(text.topTone).toBe('muted');
+  expect(text.topStrike).toBe(true);
+});
+
+test('Tests that a failed send reads its amount struck through and grey, and a sent one does not', () => {
+  const failed = transferRowText({
+    vt: vt(DEPOSIT, 2_000_010, ValueTransferKindEnum.Sent, {
+      status: RPCValueTransfersStatusEnum.failed,
+    }),
+    when: 'Oct 17',
+    currency: 'ZEC',
+    usd: '',
+    t,
+  });
+  const sent = transferRowText({
+    vt: vt(DEPOSIT, 2_000_010),
+    when: 'Oct 17',
+    currency: 'ZEC',
+    usd: '',
+    t,
+  });
+
+  expect(failed.topTone).toBe('muted');
+  expect(failed.topStrike).toBe(true);
+  expect(sent.topStrike).toBeFalsy();
+});
+
+test('Tests that a failed shield reads its amount struck through and grey too', () => {
+  const text = transferRowText({
+    vt: vt(DEPOSIT, 2_000_010, ValueTransferKindEnum.Shield, {
+      status: RPCValueTransfersStatusEnum.failed,
+    }),
+    when: 'Oct 17',
+    currency: 'ZEC',
+    usd: '',
+    t,
+  });
+
+  expect(text.topTone).toBe('muted');
+  expect(text.topStrike).toBe(true);
+});
+
+test('Tests that a swap not completed is titled with both coins in its order, what goes out first', () => {
+  const text = swapRowText({
+    record: record({
+      direction: SwapDirectionEnum.Inbound,
+      status: SwapStatusEnum.Pending,
+      sellAsset: record().receiveAsset,
+      receiveAsset: record().sellAsset,
+    }),
+    when: 'Oct 17',
+    t: pairs,
+  });
+
+  expect(text.title).toBe('Swap BTC → ZEC');
 });

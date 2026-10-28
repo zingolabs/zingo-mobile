@@ -1,11 +1,12 @@
 import React, { forwardRef, useCallback, useContext, useState } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ContextAppLoaded } from '@app/context';
 import type { AddressBookFileClass } from '@app/AppState';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import ContactSheet from '@ui/widgets/ContactSheet';
+import TitleBar from '@ui/widgets/TitleBar';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
 
 type SaveContactSheetProps = {
   address: string;
@@ -22,8 +23,7 @@ type SaveContactSheetProps = {
  */
 const SaveContactSheet = forwardRef<BottomSheetModal, SaveContactSheetProps>(
   ({ address, chain, book, onSave }, ref) => {
-    const { walletChainName, server } = useContext(ContextAppLoaded);
-    const insets = useSafeAreaInsets();
+    const { walletChainName, server, translate } = useContext(ContextAppLoaded);
     const keyboardHeight = useKeyboardHeight();
     /** A fresh form each time the sheet opens. */
     const [nonce, setNonce] = useState<number>(0);
@@ -35,12 +35,22 @@ const SaveContactSheet = forwardRef<BottomSheetModal, SaveContactSheetProps>(
     return (
       <AppSheetModal
         ref={ref}
-        handle
+        header={
+          <TitleBar
+            title={translate('addressbook.new-contact') as string}
+            right={{
+              icon: XIcon,
+              accessibilityLabel: translate('close') as string,
+              onPress: dismiss,
+            }}
+          />
+        }
         onDismiss={() => setNonce(n => n + 1)}
-        contentStyle={{
-          paddingBottom:
-            keyboardHeight > 0 ? keyboardHeight + 20 : insets.bottom + 24,
-        }}
+        contentStyle={
+          keyboardHeight > 0
+            ? { paddingBottom: keyboardHeight + 20 }
+            : undefined
+        }
       >
         <ContactSheet
           key={`${nonce}:${chain}:${address}`}
@@ -51,7 +61,6 @@ const SaveContactSheet = forwardRef<BottomSheetModal, SaveContactSheetProps>(
             onSave(name);
             dismiss();
           }}
-          onCancel={dismiss}
         />
       </AppSheetModal>
     );

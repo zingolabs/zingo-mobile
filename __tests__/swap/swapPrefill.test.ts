@@ -49,9 +49,30 @@ const record: SwapRecordType = {
 
 test('Tests that a new quote starts from the expired purchase’s coin, amount and refund address', () => {
   expect(prefillFromRecord(record, 42)).toEqual({
-    sellAsset: BTC,
+    direction: SwapDirectionEnum.Inbound,
+    asset: BTC,
     sellAmountHumanDecimal: '0.03',
-    refundAddress: 'bc1qrefund',
+    address: 'bc1qrefund',
+    requestedAtMs: 42,
+  });
+});
+
+test('Tests that a new quote starts from the unsent sale’s coin received, amount and destination', () => {
+  const sale: SwapRecordType = {
+    ...record,
+    direction: SwapDirectionEnum.Outbound,
+    sellAsset: record.receiveAsset,
+    receiveAsset: BTC,
+    sellAmountHumanDecimal: '0.01',
+    destinationAddress: 'bc1qdestination',
+    sourceAddress: 'u1refund',
+    status: SwapStatusEnum.PendingDeposit,
+  };
+  expect(prefillFromRecord(sale, 42)).toEqual({
+    direction: SwapDirectionEnum.Outbound,
+    asset: BTC,
+    sellAmountHumanDecimal: '0.01',
+    address: 'bc1qdestination',
     requestedAtMs: 42,
   });
 });

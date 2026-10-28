@@ -25,7 +25,9 @@ import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import NewAddress from './components/NewAddress';
 import VerifyAddress from './components/VerifyAddress';
 import AddressCard from './components/AddressCard';
-import NewAddressTag from '@ui/widgets/NewAddressTag';
+import NewAddressTag, {
+  newAddressTagTitleKey,
+} from '@ui/widgets/NewAddressTag';
 import { useResult } from '@app/navigation/results';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
@@ -133,7 +135,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
       ? t('receive.new-title')
       : sheetType === 'VA'
         ? t('receive.verify-title')
-        : '';
+        : sheetType === 'NAT'
+          ? t(newAddressTagTitleKey())
+          : '';
 
   const xHeader = (
     <TitleBar
@@ -233,12 +237,14 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
       </Animated.View>
       <AppSheetModal
         ref={bottomSheetRef}
-        header={sheetType === 'NAT' ? undefined : xHeader}
-        handle={sheetType === 'NAT'}
-        contentStyle={{
-          paddingBottom:
-            keyboardHeight > 0 ? keyboardHeight + space20 : space32,
-        }}
+        // However it closes (the X, a swipe, the backdrop), its content unmounts and opens empty next time.
+        onDismiss={() => setSheetType(null)}
+        header={xHeader}
+        contentStyle={
+          keyboardHeight > 0
+            ? { paddingBottom: keyboardHeight + space20 }
+            : undefined
+        }
       >
         {sheetType === 'NA' && (
           <NewAddress closeSheet={hide} setAddressBook={setAddressBook} />
@@ -250,7 +256,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
             setAddressBook={setAddressBook}
           />
         )}
-        {sheetType === 'VA' && <VerifyAddress closeSheet={hide} />}
+        {sheetType === 'VA' && <VerifyAddress />}
       </AppSheetModal>
     </View>
   );

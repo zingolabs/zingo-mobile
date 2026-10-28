@@ -22,6 +22,7 @@ export { canRemoveSwap } from './canRemoveSwap';
 export { hasDepositEvidence } from './depositEvidence';
 export { newlyExpired, newlyRefunding } from './swapTransitions';
 export { prefillFromRecord } from './swapPrefill';
+export { canResendSale, unsentSale } from './unsentSale';
 export { NEAR_NO_REFUND_USD, nearRefusesSmallRefunds } from './nearSmallSwap';
 export type { SwapPrefillType } from './types/SwapPrefillType';
 export {

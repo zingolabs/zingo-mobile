@@ -3,7 +3,7 @@ import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { Linking, ScrollView, View, useWindowDimensions } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme, iconSize, radiusMd, radiusPill, space4 } from '@app/theme';
-import Pressable from '@ui/primitives/Pressable';
+import Pressable, { PressTile } from '@ui/primitives/Pressable';
 
 import Text from '@ui/primitives/Text';
 import { TextScaleContext } from '@ui/primitives/Text';
@@ -177,7 +177,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
         >
           {actions.map(action => (
             <Pressable
-              kind="row"
+              kind="tile"
               key={action.id}
               testID={action.testID}
               onPress={action.disabled ? undefined : action.onPress}
@@ -188,7 +188,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
                 opacity: action.disabled ? 0.35 : 1,
               }}
             >
-              <View
+              <PressTile
                 style={{
                   width: 56,
                   height: 56,
@@ -218,7 +218,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
                     }}
                   />
                 )}
-              </View>
+              </PressTile>
               <Text
                 variant="caption"
                 numberOfLines={columns === 4 ? 2 : 3}

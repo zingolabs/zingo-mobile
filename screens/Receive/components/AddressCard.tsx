@@ -195,7 +195,13 @@ export default function AddressCard({
                   onPress={onAddTag}
                   hitSlop={slopFor(LINE_H)}
                 >
-                  <Text variant="caption" style={{ fontWeight: '700' }}>
+                  <Text
+                    variant="caption"
+                    style={{
+                      fontWeight: '700',
+                      textDecorationLine: 'underline',
+                    }}
+                  >
                     {t('receive.add-tag')}
                   </Text>
                 </Pressable>

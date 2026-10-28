@@ -181,34 +181,6 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
           }
         >
           <View
-            pointerEvents="none"
-            style={
-              {
-                "alignItems": "center",
-                "bottom": 0,
-                "justifyContent": "center",
-                "left": 0,
-                "position": "absolute",
-                "right": 0,
-                "top": 0,
-              }
-            }
-          >
-            <View
-              style={
-                [
-                  {
-                    "backgroundColor": "#8888881F",
-                    "borderRadius": 999,
-                    "height": 44,
-                    "width": 44,
-                  },
-                  {},
-                ]
-              }
-            />
-          </View>
-          <View
             style={
               {
                 "alignItems": "center",
@@ -264,7 +236,6 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
             {
               "alignItems": "center",
               "borderRadius": 999,
-              "columnGap": 8,
               "flexDirection": "row",
               "height": 28,
               "marginTop": 10,
@@ -294,18 +265,37 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
             ]
           }
         />
+        <View
+          style={
+            {
+              "marginRight": 8,
+            }
+          }
+        />
         <Text
           maxFontSizeMultiplier={2}
           style={
             {
-              "color": "#F99D00",
+              "color": "#888888",
               "fontSize": 12,
-              "fontWeight": "600",
+              "fontWeight": "400",
               "lineHeight": 16,
             }
           }
         >
-          text translated
+          <Text
+            maxFontSizeMultiplier={2}
+            style={
+              {
+                "color": "#F99D00",
+                "fontSize": 12,
+                "fontWeight": "600",
+                "lineHeight": 16,
+              }
+            }
+          >
+            text translated
+          </Text>
         </Text>
       </View>
     </View>
@@ -377,36 +367,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
             ]
           }
           testID="header.drawmenu"
-        >
-          <View
-            pointerEvents="none"
-            style={
-              {
-                "alignItems": "center",
-                "bottom": 0,
-                "justifyContent": "center",
-                "left": 0,
-                "position": "absolute",
-                "right": 0,
-                "top": 0,
-              }
-            }
-          >
-            <View
-              style={
-                [
-                  {
-                    "backgroundColor": "#8888881F",
-                    "borderRadius": 999,
-                    "height": 44,
-                    "width": 44,
-                  },
-                  {},
-                ]
-              }
-            />
-          </View>
-        </View>
+        />
       </View>
     </View>
     <View
@@ -457,7 +418,8 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
       style={
         {
           "alignItems": "flex-start",
-          "width": 48,
+          "flex": 1,
+          "minWidth": 48,
         }
       }
     />
@@ -465,7 +427,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "flex": 1,
+          "flexShrink": 1,
         }
       }
     >
@@ -489,7 +451,8 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
       style={
         {
           "alignItems": "flex-end",
-          "width": 48,
+          "flex": 1,
+          "minWidth": 48,
         }
       }
     />
@@ -597,7 +560,8 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
       style={
         {
           "alignItems": "flex-start",
-          "width": 48,
+          "flex": 1,
+          "minWidth": 48,
         }
       }
     >
@@ -645,42 +609,13 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
             {},
           ]
         }
-      >
-        <View
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "bottom": 0,
-              "justifyContent": "center",
-              "left": 0,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-            }
-          }
-        >
-          <View
-            style={
-              [
-                {
-                  "backgroundColor": "#8888881F",
-                  "borderRadius": 999,
-                  "height": 44,
-                  "width": 44,
-                },
-                {},
-              ]
-            }
-          />
-        </View>
-      </View>
+      />
     </View>
     <View
       style={
         {
           "alignItems": "center",
-          "flex": 1,
+          "flexShrink": 1,
         }
       }
     >
@@ -704,7 +639,8 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
       style={
         {
           "alignItems": "flex-end",
-          "width": 48,
+          "flex": 1,
+          "minWidth": 48,
         }
       }
     />

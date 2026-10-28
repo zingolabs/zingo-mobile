@@ -3,7 +3,6 @@ import { ContextAppLoaded } from '@app/context';
 import { formatAmount } from '@app/utils/formatAmount';
 import Button from '@ui/primitives/Button';
 import Banner from '@ui/widgets/Banner';
-import Tag from '@ui/widgets/Tag';
 import PrivateAmount from '@ui/widgets/PrivateAmount';
 
 /**
@@ -25,7 +24,6 @@ export default function TransparentNotice({
       testID="transparent.notice"
       tone="warning"
       title={t('shield.notice-title')}
-      tag={<Tag tone="transparent">{t('shield.notice-public')}</Tag>}
       actionBeside
       action={
         <Button

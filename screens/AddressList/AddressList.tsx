@@ -22,7 +22,11 @@ import Utils from '@app/utils';
 import Text from '@ui/primitives/Text';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import FullPanel from '@ui/widgets/FullPanel';
-import NewAddressTag from '@ui/widgets/NewAddressTag';
+import NewAddressTag, {
+  newAddressTagTitleKey,
+} from '@ui/widgets/NewAddressTag';
+import TitleBar from '@ui/widgets/TitleBar';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
 import RadioRow, { RadioList } from '@ui/widgets/RadioRow';
 import { PencilIcon } from '@ui/primitives/Icons/PencilIcon';
 import { TagIcon } from '@ui/primitives/Icons/TagIcon';
@@ -202,7 +206,20 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
           </RadioList>
         </>
       )}
-      <AppSheetModal ref={tagSheetRef} handle>
+      <AppSheetModal
+        ref={tagSheetRef}
+        onDismiss={() => setTagging('')}
+        header={
+          <TitleBar
+            title={t(newAddressTagTitleKey(tagOf(tagging)))}
+            right={{
+              icon: XIcon,
+              accessibilityLabel: t('close'),
+              onPress: closeTag,
+            }}
+          />
+        }
+      >
         {!!tagging && (
           <NewAddressTag
             address={tagging}

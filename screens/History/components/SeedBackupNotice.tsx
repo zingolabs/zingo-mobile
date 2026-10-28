@@ -49,12 +49,12 @@ const SeedBackupNotice: React.FunctionComponent<SeedBackupNoticeProps> = ({
       testID="seedbackup.notice"
       tone="seed"
       title={translate('seednotice.title') as string}
+      // Only the green pill a finished backup shows before the notice leaves:
+      // the tile and the text already say it is not backed up.
       tag={
         backedUp ? (
           <Tag tone="accent">{translate('seednotice.done') as string}</Tag>
-        ) : (
-          <Tag tone="warning">{translate('seednotice.pending') as string}</Tag>
-        )
+        ) : undefined
       }
       contentStyle={contents}
       actionBeside

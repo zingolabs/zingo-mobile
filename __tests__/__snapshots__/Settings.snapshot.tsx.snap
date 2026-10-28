@@ -122,7 +122,8 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         style={
           {
             "alignItems": "flex-start",
-            "width": 48,
+            "flex": 1,
+            "minWidth": 48,
           }
         }
       >
@@ -171,42 +172,13 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             ]
           }
           testID="settings.back"
-        >
-          <View
-            pointerEvents="none"
-            style={
-              {
-                "alignItems": "center",
-                "bottom": 0,
-                "justifyContent": "center",
-                "left": 0,
-                "position": "absolute",
-                "right": 0,
-                "top": 0,
-              }
-            }
-          >
-            <View
-              style={
-                [
-                  {
-                    "backgroundColor": "#8888881F",
-                    "borderRadius": 999,
-                    "height": 44,
-                    "width": 44,
-                  },
-                  {},
-                ]
-              }
-            />
-          </View>
-        </View>
+        />
       </View>
       <View
         style={
           {
             "alignItems": "center",
-            "flex": 1,
+            "flexShrink": 1,
           }
         }
       >
@@ -230,7 +202,8 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         style={
           {
             "alignItems": "flex-end",
-            "width": 48,
+            "flex": 1,
+            "minWidth": 48,
           }
         }
       />
@@ -582,34 +555,6 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                         }
                         testID="settings.privacy-info"
                       >
-                        <View
-                          pointerEvents="none"
-                          style={
-                            {
-                              "alignItems": "center",
-                              "bottom": 0,
-                              "justifyContent": "center",
-                              "left": 0,
-                              "position": "absolute",
-                              "right": 0,
-                              "top": 0,
-                            }
-                          }
-                        >
-                          <View
-                            style={
-                              [
-                                {
-                                  "backgroundColor": "#8888881F",
-                                  "borderRadius": 999,
-                                  "height": 44,
-                                  "width": 44,
-                                },
-                                {},
-                              ]
-                            }
-                          />
-                        </View>
                         <View
                           style={{}}
                         />

@@ -65,7 +65,12 @@ const Tag: React.FunctionComponent<TagProps> = ({
         ...(edge ? { borderWidth: 1, borderColor: edge } : {}),
       }}
     >
-      <Text variant="caption" color={paint.fg} style={{ fontWeight: '600' }}>
+      <Text
+        variant="caption"
+        color={paint.fg}
+        numberOfLines={1}
+        style={{ fontWeight: '600' }}
+      >
         {children}
       </Text>
     </View>

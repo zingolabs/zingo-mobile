@@ -793,7 +793,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                   <Text
                     variant="caption"
                     tone="warning"
-                    style={{ textAlign: 'center', fontWeight: '700' }}
+                    style={{
+                      textAlign: 'center',
+                      fontWeight: '700',
+                      textDecorationLine: 'underline',
+                    }}
                   >
                     {
                       translate(

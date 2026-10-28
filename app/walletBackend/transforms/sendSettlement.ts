@@ -28,9 +28,20 @@ export type ComputingParams = { subject?: ComputingSubject } & (
 type Attempted =
   SendSettlement | { kind: 'rejected'; failure: SendFailureClass };
 
-/** The receipt of a send lists its txids joined by commas. */
+/**
+ * The receipt of a send lists its txids joined by commas. A send in two
+ * steps (to a TEX address) lists the hop first and the payment last; the
+ * payment is the one "View transaction" opens.
+ */
 const sentWith = (receipt: unknown): SendSettlement => {
-  const txid = typeof receipt === 'string' ? receipt.split(',')[0].trim() : '';
+  const txid =
+    typeof receipt === 'string'
+      ? (receipt
+          .split(',')
+          .map(id => id.trim())
+          .filter(Boolean)
+          .pop() ?? '')
+      : '';
   return txid ? { kind: 'sent', txid } : { kind: 'sent' };
 };
 const CREATED: ComputingEnd = { phase: 'created' };
@@ -88,7 +99,12 @@ export function shieldEnd(shield: FfiResult<string>): ComputingEnd {
         failure: { kind: 'verbatim', text: parsed.error },
       };
     }
-    return parsed.txids ? CREATED : { phase: 'failed' };
+    if (!parsed.txids) {
+      return { phase: 'failed' };
+    }
+    // The last is the one that shields, the one "View transaction" opens.
+    const txid = parsed.txids[parsed.txids.length - 1];
+    return txid ? { phase: 'created', txid } : CREATED;
   } catch {
     // An unparseable success payload is most likely a quirky success form.
     return CREATED;

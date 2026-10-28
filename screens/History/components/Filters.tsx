@@ -133,7 +133,6 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
           title={t('history.filter-apply')}
           onPress={apply}
         />
-        <Button variant="quiet" title={t('cancel')} onPress={closeSheet} />
       </View>
     </View>
   );

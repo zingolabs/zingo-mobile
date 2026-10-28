@@ -23,9 +23,11 @@ import { usdText } from './ValueTransferLine';
 function LegLine({
   vt,
   recordId,
+  slot,
 }: {
   vt: ValueTransferType;
   recordId: string;
+  slot: number;
 }) {
   const navigation = useNavigation<WalletNavigation>();
   const { translate, language, info, zecPrice, server } =
@@ -51,13 +53,14 @@ function LegLine({
     <Animated.View style={unfold}>
       <Pressable
         kind="row"
-        testID={`leg-${vt.txid}`}
+        testID={`leg-${vt.txid}${slot ? `-${slot}` : ''}`}
         accessibilityRole="button"
         onPress={() =>
           navigation.navigate(Route.SwapTransaction, {
             recordId,
             txid: vt.txid,
             kind: vt.kind,
+            slot,
           })
         }
         style={{

@@ -30,6 +30,7 @@ import Utils from '@app/utils';
 import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { transferStatus } from '@app/utils/transferStatus';
 import { removeTransaction } from '@app/walletBackend';
 import { createAlert } from '@app/services/createAlert';
 import { showConfirm } from '@app/services/showConfirm';
@@ -149,27 +150,7 @@ const ValueTransferDetail: React.FunctionComponent<
     return <Avatar kind="icon" icon={icon} danger={failed} size="lg" />;
   })();
 
-  const status = failed
-    ? {
-        text: t('history.state-failed'),
-        tone: 'danger' as const,
-      }
-    : vt.confirmations === 0
-      ? {
-          text: t('history.in-mempool'),
-          tone: 'warning' as const,
-        }
-      : pending
-        ? {
-            text: t('history.confirming')
-              .replace('{n}', String(vt.confirmations))
-              .replace('{of}', String(GlobalConst.minConfirmations)),
-            tone: 'warning' as const,
-          }
-        : {
-            text: t('swap.tx-confirmed'),
-            tone: 'accent' as const,
-          };
+  const status = transferStatus(vt, t);
 
   const quote = fiatQuote(zecPrice, server, info.chainName);
   const todayUsd =
@@ -245,7 +226,7 @@ const ValueTransferDetail: React.FunctionComponent<
     state.toaddr.amount = toAmountInput(vt.amount);
     state.toaddr.memo = memo ?? '';
     setSendPageState(state);
-    navigation.navigate(Route.Home, { screen: Route.Send });
+    navigation.navigate(Route.Home, { screen: Route.Send }, { pop: true });
   };
 
   const remove = () =>
@@ -254,7 +235,8 @@ const ValueTransferDetail: React.FunctionComponent<
       message: t('history.remove-alert'),
       buttons: [
         {
-          text: t('confirm'),
+          text: t('history.remove'),
+          style: 'destructive',
           onPress: async () => {
             if (!setBackgroundError || !addLastSnackbar) {
               return;
@@ -276,7 +258,11 @@ const ValueTransferDetail: React.FunctionComponent<
               result.ok,
               translate,
             );
-            navigation.navigate(Route.Home, { screen: Route.History });
+            navigation.navigate(
+              Route.Home,
+              { screen: Route.History },
+              { pop: true },
+            );
           },
         },
         { text: t('cancel'), style: 'cancel' },
@@ -291,6 +277,15 @@ const ValueTransferDetail: React.FunctionComponent<
       footer={
         failed || explorerUrl ? (
           <View style={{ rowGap: 8 }}>
+            {/* As the swap detail: explorer, Try again, Delete, from the top. */}
+            {!!explorerUrl && (
+              <Button
+                testID="valuetransferdetail.explorer"
+                variant="text"
+                title={t('history.tx-explorer')}
+                onPress={() => Linking.openURL(explorerUrl)}
+              />
+            )}
             {failed && sent && (
               <Button
                 testID="valuetransferdetail.try-again"
@@ -302,17 +297,9 @@ const ValueTransferDetail: React.FunctionComponent<
             {failed && vt.confirmations === 0 && (
               <Button
                 testID="valuetransferdetail.remove"
-                variant="quiet"
+                variant="dangerText"
                 title={t('history.remove')}
                 onPress={remove}
-              />
-            )}
-            {!!explorerUrl && (
-              <Button
-                testID="valuetransferdetail.explorer"
-                variant="text"
-                title={t('history.tx-explorer')}
-                onPress={() => Linking.openURL(explorerUrl)}
               />
             )}
           </View>
@@ -336,6 +323,7 @@ const ValueTransferDetail: React.FunctionComponent<
           <Text
             testID="valuetransferdetail.amount"
             variant="balance"
+            strike={failed}
             color={
               failed
                 ? colors.fgMuted

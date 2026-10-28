@@ -23,13 +23,22 @@ export const BUTTON_HEIGHT = buttonMinHeight;
 /**
  * primary: the one main action of a view · text: green, Back, Skip and
  * secondary moves · quiet: gray, only Cancel and a Close that leaves a flow ·
- * danger: deletes or cannot be undone · nym: only actions through the mixnet ·
+ * danger: confirms a delete or what cannot be undone, in its sheet ·
+ * dangerText: Delete on a screen, a red label with no fill, which opens that
+ * sheet · nym: only actions through the mixnet ·
  * secondary: an outlined action beside others of the same weight (Copy,
  * Verify), on the inset fill of the surface it sits on · viewOnly: the
  * view-only notice's action, a pill in the view-only blue.
  */
 export type ButtonVariant =
-  'primary' | 'text' | 'quiet' | 'danger' | 'nym' | 'secondary' | 'viewOnly';
+  | 'primary'
+  | 'text'
+  | 'quiet'
+  | 'danger'
+  | 'dangerText'
+  | 'nym'
+  | 'secondary'
+  | 'viewOnly';
 
 /** small: inside banners and rows only. */
 export type ButtonSize = 'regular' | 'small';
@@ -86,6 +95,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     nym: colors.bgNym,
     text: undefined,
     quiet: undefined,
+    dangerText: undefined,
     secondary: undefined,
     viewOnly: undefined,
   }[variant];
@@ -96,13 +106,17 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         ? colors.fgDefault
         : variant === 'quiet'
           ? colors.fgMuted
-          : outlined
+          : variant === 'dangerText'
             ? disabled
               ? colors.fgMuted
-              : colors.fgDefault
-            : disabled
-              ? colors.fgAccentDisabled
-              : colors.fgAccent;
+              : colors.fgDanger
+            : outlined
+              ? disabled
+                ? colors.fgMuted
+                : colors.fgDefault
+              : disabled
+                ? colors.fgAccentDisabled
+                : colors.fgAccent;
 
   return (
     <Pressable

@@ -401,7 +401,12 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
             noneLabel={translate('insight.no-sends') as string}
           />
           <View
-            style={{ flexDirection: 'row', gap: space8, marginTop: space12 }}
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              gap: space8,
+              marginTop: space12,
+            }}
           >
             {PRESETS.map(p => {
               const n =
@@ -410,15 +415,14 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                   : Math.min(p.weeks, insight.weeks);
               const on = to === last && span === n;
               return (
-                <View key={p.key} style={{ flex: 1 }}>
-                  <Chip
-                    testID={`insight.${p.key.split('.')[1]}`}
-                    selected={on}
-                    onPress={() => !on && goTo(insight.weeks - n, last)}
-                  >
-                    {translate(p.key) as string}
-                  </Chip>
-                </View>
+                <Chip
+                  key={p.key}
+                  testID={`insight.${p.key.split('.')[1]}`}
+                  selected={on}
+                  onPress={() => !on && goTo(insight.weeks - n, last)}
+                >
+                  {translate(p.key) as string}
+                </Chip>
               );
             })}
           </View>

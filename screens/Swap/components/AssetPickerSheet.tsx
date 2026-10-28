@@ -283,7 +283,6 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
             contentContainerStyle={{
               paddingHorizontal: space20,
               paddingTop: space8,
-              paddingBottom: 32,
             }}
           >
             <Banner
@@ -314,7 +313,6 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
             contentContainerStyle={{
               paddingHorizontal: space20,
               paddingTop: space8,
-              paddingBottom: 32,
             }}
           >
             <SearchField
