@@ -108,13 +108,19 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
     });
   }, [messagesData, language]);
 
-  // Auto-scroll to end on first content layout so the newest message is
-  // visible. Re-scroll on later content size changes only if the user
-  // is already pinned at the bottom (don't yank them away while they
-  // read older messages).
+  // Auto-scroll to end on the first layout of the messages themselves (not
+  // the loading spinner before them) so the newest message is visible.
+  // Re-scroll on later content or viewport size changes only if the user
+  // is already pinned at the bottom (don't yank them away while they read
+  // older messages); the panel still rising changes the viewport.
   const didInitialScrollRef = useRef<boolean>(false);
   const isAtBottomRef = useRef<boolean>(true);
+  const loadingRef = useRef<boolean>(true);
+  loadingRef.current = loading;
   const onContentSizeChange = useCallback(() => {
+    if (loadingRef.current) {
+      return;
+    }
     if (!didInitialScrollRef.current) {
       scrollViewRef.current?.scrollToEnd({ animated: false });
       didInitialScrollRef.current = true;
@@ -186,6 +192,11 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
         ref={scrollViewRef}
         onScroll={handleScroll}
         onContentSizeChange={onContentSizeChange}
+        onLayout={() => {
+          if (!loadingRef.current && isAtBottomRef.current) {
+            scrollViewRef.current?.scrollToEnd({ animated: false });
+          }
+        }}
         scrollEventThrottle={100}
         bounces={false}
         alwaysBounceVertical={false}
