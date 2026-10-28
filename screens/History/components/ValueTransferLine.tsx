@@ -8,7 +8,6 @@ import Pressable from '@ui/primitives/Pressable';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import {
   ValueTransferType,
-  ValueTransferKindEnum,
   SendPageStateClass,
   ToAddrClass,
   Route,
@@ -20,11 +19,8 @@ import Utils from '@app/utils';
 import { formatUsd } from '@app/utils/formatAmount';
 import { FileTextIcon } from '@ui/primitives/Icons/FileTextIcon';
 import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
-import { ArrowDownIcon } from '@ui/primitives/Icons/ArrowDownIcon';
-import { ArrowUpIcon } from '@ui/primitives/Icons/ArrowUpIcon';
-import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
-import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
 import { shortWhen, transferRowText } from '@screens/History/historyRowText';
+import { transferIcon } from '@screens/History/transferIcon';
 import HistoryAvatar from './HistoryAvatar';
 import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import HistoryRowBody from './HistoryRowBody';
@@ -112,17 +108,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     t,
     contactName: contact?.label,
   });
-  const iconColor = colors.fgDefault;
-  const icon =
-    vt.kind === ValueTransferKindEnum.Received ? (
-      <ArrowDownIcon size={iconSizeMd} color={iconColor} />
-    ) : vt.kind === ValueTransferKindEnum.Shield ? (
-      <ShieldIcon size={iconSizeMd} color={iconColor} />
-    ) : vt.kind === ValueTransferKindEnum.Migration ? (
-      <SwapIcon size={iconSizeMd} color={iconColor} />
-    ) : (
-      <ArrowUpIcon size={iconSizeMd} color={iconColor} />
-    );
+  const { icon: KindIcon, danger } = transferIcon(vt);
   const haveMemo = !!vt.memos && vt.memos.length > 0 && !!vt.memos.join('');
 
   const handleRenderLeftActions = (
@@ -229,10 +215,15 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   kind="contact"
                   name={contact.label}
                   category={avatarCategoryOf(contact.color)}
+                  chain={GlobalConst.zecSwapChain}
                   size="md"
                 />
+              ) : danger ? (
+                <Avatar kind="icon" icon={KindIcon} danger size="md" />
               ) : (
-                <HistoryAvatar icon={icon} />
+                <HistoryAvatar
+                  icon={<KindIcon size={iconSizeMd} color={colors.fgDefault} />}
+                />
               )
             }
             text={text}
