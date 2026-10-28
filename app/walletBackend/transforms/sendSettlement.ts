@@ -88,7 +88,12 @@ export function shieldEnd(shield: FfiResult<string>): ComputingEnd {
         failure: { kind: 'verbatim', text: parsed.error },
       };
     }
-    return parsed.txids ? CREATED : { phase: 'failed' };
+    if (!parsed.txids) {
+      return { phase: 'failed' };
+    }
+    // The last is the one that shields, the one "View transaction" opens.
+    const txid = parsed.txids[parsed.txids.length - 1];
+    return txid ? { phase: 'created', txid } : CREATED;
   } catch {
     // An unparseable success payload is most likely a quirky success form.
     return CREATED;

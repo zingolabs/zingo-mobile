@@ -116,8 +116,14 @@ describe('shieldEnd', () => {
     failure: { kind: 'verbatim', text },
   });
 
-  test('Tests that the end is the created phase when the shield returns transaction ids.', () => {
-    expect(shieldEnd({ ok: true, value: '{"txids":["txid"]}' })).toEqual({
+  test('Tests that the end is the created phase with the shielding transaction id when the shield returns transaction ids.', () => {
+    expect(
+      shieldEnd({ ok: true, value: '{"txids":["first","shield"]}' }),
+    ).toEqual({ phase: 'created', txid: 'shield' });
+  });
+
+  test('Tests that the end is the created phase without an id when the shield returns an empty list.', () => {
+    expect(shieldEnd({ ok: true, value: '{"txids":[]}' })).toEqual({
       phase: 'created',
     });
   });
