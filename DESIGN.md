@@ -548,6 +548,11 @@ space around it adapts:
 - Rows of information can truncate with "…" (a contact's name), never a
   button or an amount.
 - Text keeps growing up to its variant's cap; scaling is never turned off.
+- Words are cut at the end ("tail"). Only an address, a key or a transaction
+  id is cut in the middle, where both ends matter.
+- A field's placeholder is an instruction, not a value: one line, in `body`
+  regular `fgMuted`, never mono, cut at the end if it does not fit, at any
+  text size. The value keeps its own style (mono for an address).
 
 ## Layout
 
