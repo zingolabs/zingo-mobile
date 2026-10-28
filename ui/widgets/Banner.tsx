@@ -220,70 +220,72 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
         backgroundColor: flat ? colors.bgSurface : paint.bg,
       }}
     >
-      <Animated.View
-        style={[{ flexDirection: 'row', gap: space12 }, contentStyle]}
-      >
-        <View style={{ flex: 1, gap: space4 }}>
+      <Animated.View style={[{ gap: space4 }, contentStyle]}>
+        {/* The first row, across the whole notice: the icon, the title, its tag. */}
+        <View
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            columnGap: space8,
+            rowGap: space4,
+            /** Clear of the corner X. */
+            paddingRight: onDismiss && !xBeside ? touchTarget - space16 : 0,
+          }}
+        >
           <View
             style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
+              width: TILE,
+              height: TILE,
+              borderRadius: radiusXs,
+              backgroundColor: paint.tile,
               alignItems: 'center',
-              columnGap: space8,
-              rowGap: space4,
-              /** Clear of the corner X when nothing sits beside the text. */
-              paddingRight:
-                onDismiss && !actionBeside ? touchTarget - space16 : 0,
+              justifyContent: 'center',
             }}
           >
-            <View
-              style={{
-                width: TILE,
-                height: TILE,
-                borderRadius: radiusXs,
-                backgroundColor: paint.tile,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              {paint.icon}
-            </View>
-            <Text variant="bodyStrong">{title}</Text>
-            {tag}
+            {paint.icon}
           </View>
-          {children !== undefined && (
-            <Text variant="bodySmall" tone="muted">
-              {children}
-            </Text>
-          )}
-          {action !== undefined && !actionBeside && (
-            <View style={{ marginTop: space4 }}>{action}</View>
-          )}
+          <Text variant="bodyStrong">{title}</Text>
+          {tag}
         </View>
-        {action !== undefined && actionBeside && (
-          <View
-            style={{
-              alignSelf: 'center',
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: space8,
-            }}
-          >
-            {action}
-            {xBeside && (
-              <Pressable
-                kind="icon"
-                testID={dismissTestID}
-                accessibilityRole="button"
-                accessibilityLabel={dismissLabel}
-                onPress={onDismiss}
-                hitSlop={slopFor(iconSizeMd)}
-              >
-                <XIcon size={iconSizeMd} color={colors.fgMuted} />
-              </Pressable>
+        {/* Under it, the text on the left and the button on the right. */}
+        <View
+          style={{ flexDirection: 'row', alignItems: 'center', gap: space12 }}
+        >
+          <View style={{ flex: 1, gap: space4 }}>
+            {children !== undefined && (
+              <Text variant="bodySmall" tone="muted">
+                {children}
+              </Text>
+            )}
+            {action !== undefined && !actionBeside && (
+              <View style={{ marginTop: space4 }}>{action}</View>
             )}
           </View>
-        )}
+          {action !== undefined && actionBeside && (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: space8,
+              }}
+            >
+              {action}
+              {xBeside && (
+                <Pressable
+                  kind="icon"
+                  testID={dismissTestID}
+                  accessibilityRole="button"
+                  accessibilityLabel={dismissLabel}
+                  onPress={onDismiss}
+                  hitSlop={slopFor(iconSizeMd)}
+                >
+                  <XIcon size={iconSizeMd} color={colors.fgMuted} />
+                </Pressable>
+              )}
+            </View>
+          )}
+        </View>
       </Animated.View>
       {/* In the card's corner, outside the row, so the action keeps its place. */}
       {onDismiss && !xBeside && (

@@ -676,9 +676,9 @@ transparent funds, seed backup, view-only, Ironwood. Only the content changes.
 The first row holds the icon in a 24 tile (`radiusXs`, the tone's subtle fill,
 the icon at `iconSizeSm` in the tone's colour), the title (`bodyStrong`) and
 its tag, vertically centred; at large text it wraps and the tag moves down.
-The body (`bodySmall` muted) goes under it from the notice's left edge. The
-action, a `small` button, stays on the right, vertically centred on the
-notice. Wallet Seed's backup strip is built the same way. A 36 tile stays for
+That first row runs across the whole notice, so a tag never wraps for the
+button. Under it, the body (`bodySmall` muted) on the left from the notice's
+edge, and the action, a `small` button, on the right, centred on the body. Wallet Seed's backup strip is built the same way. A 36 tile stays for
 a list row's leading image (Import, Your swaps, Pools), titleless lists of
 points and a sheet's centred hero icon; the compact notes outside Home have
 no tile. A notice the user can hide has an X: in the card's
