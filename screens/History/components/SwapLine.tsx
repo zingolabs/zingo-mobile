@@ -12,8 +12,8 @@ import {
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
 import Utils from '@app/utils';
-import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
-import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
+import { TxSwapIcon } from '@ui/primitives/Icons/TxSwapIcon';
+import { TxPendingIcon } from '@ui/primitives/Icons/TxPendingIcon';
 import { ChevronDown, ChevronUp } from '@ui/primitives/Icons/Chevron';
 import { swapScreenFor } from '@screens/Swap/swapRoute';
 import {
@@ -79,9 +79,9 @@ function SwapLine({
       ? record.receiveAsset
       : record.sellAsset;
   const icon = swapInFlight(record) ? (
-    <ClockIcon size={iconSizeMd} color={colors.fgDefault} />
+    <TxPendingIcon size={iconSizeMd} color={colors.fgDefault} />
   ) : (
-    <SwapIcon size={iconSizeMd} color={colors.fgDefault} />
+    <TxSwapIcon size={iconSizeMd} color={colors.fgDefault} />
   );
   const Chevron = open ? ChevronUp : ChevronDown;
 

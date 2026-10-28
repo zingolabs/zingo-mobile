@@ -529,8 +529,8 @@ sign: "+" on a receipt, "−" on a send, no sign on a move within the wallet
 
 **Struck text.** What never happened is struck through (`Text`'s `strike`),
 in `fgMuted`: the amount of a swap that is Failed or Deposit not detected,
-with every provider, and of a Zingo transaction that failed, in its History
-row and its detail; and the deposit address nobody should pay anymore.
+with every provider, and of a Zingo transaction that failed or was rejected,
+in its History row and its detail; and the deposit address nobody should pay anymore.
 Nothing else.
 
 **Short addresses.** In rows, detail rows, tokens and fields: first 6 … last
@@ -606,7 +606,17 @@ pool always shows with its own colour and its name.
 **Lists.** History is a flat list on the panel, no cards: rows of 64 with a
 hairline that starts at the text. Month labels scroll with their rows; nothing
 is pinned over the list. While a filter is on, its "Showing … · Clear" bar
-stays above the list. Lists
+stays above the list.
+
+**History's icons.** A row leads with its kind's icon (`screens/History/transferIcon.ts`):
+received, sent, sent to yourself (a memo to yourself too), shielded, migration,
+swap. Until a transaction has the wallet's minimum confirmations it shows the
+clock instead, and its state word from `transferStatus` ("In mempool",
+"Confirming 1 of 3") before the time, as its detail's pill says it. A failed
+or rejected one keeps its kind's icon, in red on the red tint. A send to a
+saved contact shows the contact's Avatar with the ZEC badge, pending or not.
+A swap shows its icon, or the clock while it moves, with the other coin's
+badge. Lists
 of choices (routes, coins, networks, addresses, servers) are `RadioRow`s
 inside one `RadioList` card.
 
