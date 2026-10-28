@@ -164,7 +164,6 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
   const sellSym = record.sellAsset.ticker ?? record.sellAsset.symbol;
   const getSym = record.receiveAsset.ticker ?? record.receiveAsset.symbol;
   const other = sell ? record.receiveAsset : record.sellAsset;
-  const otherSym = sell ? getSym : sellSym;
   const got = record.actualReceiveAmount ?? record.expectedReceiveAmount;
   const back = record.refundInfo?.refundedAmountText;
   const usd = (amount: string, unit: number) => {
@@ -172,7 +171,9 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
     return unit > 0 && Number.isFinite(v) ? `≈ ${formatUsd(v)}` : '';
   };
 
-  const title = `${t(sell ? 'history.swap-to' : 'history.swap-from')} ${otherSym}`;
+  const title = t(done ? 'history.swapped-pair' : 'history.swap-pair')
+    .replace('{from}', sellSym)
+    .replace('{to}', getSym);
   const hero =
     outcome === 'refunded'
       ? {

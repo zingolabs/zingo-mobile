@@ -171,7 +171,10 @@ export function swapRowText(args: {
     record.actualReceiveAmount ?? record.expectedReceiveAmount,
   );
   const line = `${providerShortLabel(record.provider)} · ${when}`;
-  const toward = `${t(sell ? 'history.swap-to' : 'history.swap-from')} ${other}`;
+  /** Both coins in the swap's order, what goes out → what comes in. */
+  const pair = (key: string) =>
+    t(key).replace('{from}', sellSym).replace('{to}', getSym);
+  const toward = pair('history.swap-pair');
   const base = { titleMono: false, line };
 
   switch (record.status) {
@@ -184,7 +187,7 @@ export function swapRowText(args: {
               line: `${t('history.swapped-to')} ${other} · ${line}`,
             }
           : {
-              title: `${t(sell ? 'history.swapped-to' : 'history.swapped-from')} ${other}`,
+              title: pair('history.swapped-pair'),
             }),
         top: `+${got} ${getSym}`,
         topTone: 'positive',
