@@ -21,7 +21,6 @@ import {
   isValidChainAddress,
 } from '@app/swap';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
-import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
 import RegText from '@ui/primitives/RegText';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
@@ -69,8 +68,11 @@ type ContactSheetProps = {
   walletChain: ChainNameEnum;
   /** `chain` is the SwapKit code the contact is filed under ('ZEC', 'BTC'…). */
   onSave: (name: string, address: string, chain: string) => Promise<void>;
-  onCancel: () => void;
 };
+
+/** The title of the sheet it opens in, which the host puts in its bar with the X. */
+export const contactSheetTitleKey = (edit: ContactEdit): string =>
+  edit.kind === 'edit' ? 'addressbook.edit-contact' : 'addressbook.new-contact';
 
 /** The catalog key naming a Zcash address kind, from its prefix. */
 const kindKey = (address: string): string =>
@@ -93,7 +95,6 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
   book,
   walletChain,
   onSave,
-  onCancel,
 }) => {
   const { translate } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
@@ -326,23 +327,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
       testID={`addressbook.sheet.${edit.kind}`}
       style={{ paddingHorizontal: 20 }}
     >
-      <BoldText
-        style={{
-          marginTop: 4,
-          textAlign: 'center',
-          fontSize: 15,
-          lineHeight: 21,
-        }}
-      >
-        {
-          translate(
-            edit.kind === 'edit'
-              ? 'addressbook.edit-contact'
-              : 'addressbook.new-contact',
-          ) as string
-        }
-      </BoldText>
-      <View style={{ marginTop: 10 }}>
+      <View>
         <RegText>{translate('addressbook.name') as string}</RegText>
         <View
           style={{
@@ -539,16 +524,6 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
         style={{
           marginTop: 20,
         }}
-      />
-      <Button
-        testID="addressbook.cancel"
-        variant="quiet"
-        title={translate('cancel') as string}
-        onPress={() => {
-          Keyboard.dismiss();
-          onCancel();
-        }}
-        style={{ marginTop: 8 }}
       />
     </View>
   );

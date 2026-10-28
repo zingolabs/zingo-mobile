@@ -35,7 +35,12 @@ import ContactRow, { ROW_LINE } from './components/ContactRow';
 import AddressRowHead from './components/AddressRowHead';
 import SegmentedSwitch from '@ui/widgets/SegmentedSwitch';
 import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
-import ContactSheet, { ContactEdit } from '@ui/widgets/ContactSheet';
+import ContactSheet, {
+  ContactEdit,
+  contactSheetTitleKey,
+} from '@ui/widgets/ContactSheet';
+import TitleBar from '@ui/widgets/TitleBar';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { themeTokens } from '@app/theme';
 
 const SIDE = 22;
@@ -546,7 +551,16 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
 
       <AppSheetModal
         ref={contactSheet}
-        handle
+        header={
+          <TitleBar
+            title={translate(contactSheetTitleKey(edit)) as string}
+            right={{
+              icon: XIcon,
+              accessibilityLabel: translate('close') as string,
+              onPress: () => contactSheet.current?.dismiss(),
+            }}
+          />
+        }
         contentStyle={
           keyboardHeight > 0
             ? { paddingBottom: keyboardHeight + 20 }
@@ -559,7 +573,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           book={addressBook}
           walletChain={walletChain}
           onSave={save}
-          onCancel={() => contactSheet.current?.dismiss()}
         />
       </AppSheetModal>
     </View>
