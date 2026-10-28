@@ -20,7 +20,7 @@ import { ContextAppLoaded } from '@app/context';
 import { contentTopPad } from '@app/navigation/safeArea';
 import TitleBar from '@ui/widgets/TitleBar';
 import TooltipHost from '@ui/widgets/TooltipHost';
-import { PANEL_TOP } from '@ui/widgets/Header/Header';
+import Header, { PANEL_TOP } from '@ui/widgets/Header/Header';
 import SheetRim from '@ui/primitives/SheetRim';
 import { SurfaceContext } from '@ui/primitives/Surface';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
@@ -179,6 +179,29 @@ export default function FullPanel({
 
   return (
     <View style={{ flex: 1 }} pointerEvents="box-none">
+      {/*
+        The top bar of the screen behind stays in sight above the panel, but
+        a modal route takes every touch, so its menu, mixnet and messages
+        icons did nothing. The panel draws the same bar over it, exactly in
+        its place, so they answer.
+      */}
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: PANEL_TOP,
+        }}
+      >
+        <Header
+          title={''}
+          noBalance={true}
+          noSyncingStatus={true}
+          noPrivacy={true}
+          showMessagesIcon={true}
+        />
+      </View>
       <Animated.View
         style={[
           {
