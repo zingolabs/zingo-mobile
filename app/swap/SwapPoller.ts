@@ -338,6 +338,10 @@ export class SwapPoller {
     this.midgardFailureCounts.delete(record.recordId);
     if (!discovery) return null;
 
+    // A payment found on an expired purchase came late: it reads as
+    // refunding from now on, as a hash the user pastes does, so the record
+    // stays polled whatever this tick's /track answers.
+    const late = record.status === SwapStatusEnum.Expired;
     const updated: SwapRecordType = {
       ...record,
       observedDepositTxHash: discovery.sourceTxHash,
@@ -346,9 +350,12 @@ export class SwapPoller {
       // state we use right after our own outbound broadcast. Subsequent
       // /track responses promote it further (Processing → Completed).
       status:
-        record.status === SwapStatusEnum.AwaitingExternalDeposit
+        record.status === SwapStatusEnum.AwaitingExternalDeposit || late
           ? SwapStatusEnum.Pending
           : record.status,
+      lateDepositAtMs: late
+        ? (record.lateDepositAtMs ?? Date.now())
+        : record.lateDepositAtMs,
       updatedAtMs: Date.now(),
     };
     try {
