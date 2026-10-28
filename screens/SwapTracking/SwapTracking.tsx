@@ -110,16 +110,6 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
             title={t('swap.back-to-zingo')}
             onPress={() => leaveFlow(navigation)}
           />
-          {awaiting && (
-            <Button
-              testID="swap.tracking.details"
-              variant="text"
-              title={t('swap.show-payment-details')}
-              onPress={() =>
-                navigation.push(Route.SwapDeposit, { recordId })
-              }
-            />
-          )}
           <Text
             variant="caption"
             tone="muted"

@@ -798,7 +798,6 @@
     "step-buy-4": "ZEC received",
     "not-detected-title": "We haven’t detected your payment yet",
     "not-detected-body": "Check that you sent exactly {amount} {coin} to the address of this swap.",
-    "show-payment-details": "Show payment details",
     "result-received": "You got {amount}",
     "result-at-your-address": "It’s already at {who}.",
     "result-in-your-wallet": "It is already in your wallet.",

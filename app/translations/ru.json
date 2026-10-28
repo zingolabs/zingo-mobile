@@ -798,7 +798,6 @@
     "step-buy-4": "ZEC получен",
     "not-detected-title": "Мы пока не обнаружили ваш платёж",
     "not-detected-body": "Проверьте, что вы отправили ровно {amount} {coin} на адрес этого обмена.",
-    "show-payment-details": "Показать данные платежа",
     "result-received": "Вы получили {amount}",
     "result-at-your-address": "Уже на {who}.",
     "result-in-your-wallet": "Уже в вашем кошельке.",
