@@ -13,7 +13,7 @@ import Animated, {
 import { useNavigation } from '@react-navigation/native';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import { WalletNavigation } from '@app/types';
-import { radiusPill, useTheme, iconSizeSm } from '@app/theme';
+import { iconSizeSm, radiusPill, space4, space8, useTheme } from '@app/theme';
 import Pressable from '@ui/primitives/Pressable';
 import { Route, ServerType, TranslateType } from '@app/AppState';
 import NetInfoType from '@app/AppState/types/NetInfoType';
@@ -251,7 +251,6 @@ export default function SyncLine({
       style={{
         flexDirection: 'row',
         alignItems: 'center',
-        columnGap: 8,
         height: 28,
         /** The price card sits this far below; the same above centres the line. */
         marginTop: CARD_MARGIN_TOP,
@@ -259,21 +258,20 @@ export default function SyncLine({
         borderRadius: radiusPill,
       }}
     >
-      {lead}
-      {/* One Text, so " · " is plain spaces; the gap is only after the lead. */}
+      <View style={{ marginRight: space8 }}>{lead}</View>
+      {/* The words in one Text, so " · " is plain spaces. An icon never goes in a Text. */}
       <Text variant="caption" tone="muted">
         {words}
-        {metered && (
-          <>
-            {' · '}
-            <CloudDownloadIcon
-              size={iconSizeSm}
-              color={colors.fgWarning}
-            />{' '}
-            {strong(t('header.sync-mobile-data'), colors.fgWarning)}
-          </>
-        )}
+        {metered && ' · '}
       </Text>
+      {metered && (
+        <>
+          <CloudDownloadIcon size={iconSizeSm} color={colors.fgWarning} />
+          <View style={{ marginLeft: space4 }}>
+            {strong(t('header.sync-mobile-data'), colors.fgWarning)}
+          </View>
+        </>
+      )}
     </Pressable>
   );
 }
