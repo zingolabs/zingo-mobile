@@ -221,7 +221,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
         mono
         error={attachError || undefined}
         trailingIcon={ClipboardPasteIcon}
-        trailingLabel={translate('swap.paste') as string}
+        trailingLabel={translate('paste') as string}
         onTrailingPress={async () =>
           setHash((await Clipboard.getString()).trim())
         }

@@ -87,6 +87,52 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
             {
               "busy": undefined,
               "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          hitSlop={4}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            [
+              {
+                "alignItems": "center",
+                "height": 36,
+                "justifyContent": "center",
+                "width": 36,
+              },
+              {},
+            ]
+          }
+          testID="send.paste-button"
+        />
+        <View
+          accessibilityLabel="text translated"
+          accessibilityRole="button"
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
               "disabled": false,
               "expanded": undefined,
               "selected": undefined,

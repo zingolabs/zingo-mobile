@@ -2,6 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Keyboard, TextInput, View } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 import { useTheme, slopFor, iconSizeMd } from '@app/theme';
 import Pressable from '@ui/primitives/Pressable';
@@ -27,6 +28,7 @@ import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import ChainSelect from '@ui/widgets/ChainSelect';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 
 const ZEC = 'ZEC';
@@ -463,6 +465,23 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
                 color={colors.fgMuted}
               />
             </Pressable>
+            {!address && (
+              <Pressable
+                kind="icon"
+                hitSlop={slopFor(20)}
+                testID="addressbook.address-paste"
+                accessibilityLabel={translate('paste') as string}
+                onPress={async () =>
+                  setAddress((await Clipboard.getString()).replace(/\s+/g, ''))
+                }
+              >
+                <ClipboardPasteIcon
+                  style={{ marginRight: 5 }}
+                  size={iconSizeMd}
+                  color={colors.fgMuted}
+                />
+              </Pressable>
+            )}
             {!!address && (
               <Pressable
                 kind="icon"

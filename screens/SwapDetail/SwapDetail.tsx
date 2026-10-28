@@ -434,7 +434,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
             mono
             error={attachError || undefined}
             trailingIcon={ClipboardPasteIcon}
-            trailingLabel={t('swap.paste')}
+            trailingLabel={t('paste')}
             onTrailingPress={async () =>
               setHash((await Clipboard.getString()).trim())
             }
@@ -500,7 +500,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
                   mono
                   error={attachError || undefined}
                   trailingIcon={ClipboardPasteIcon}
-                  trailingLabel={t('swap.paste')}
+                  trailingLabel={t('paste')}
                   onTrailingPress={async () =>
                     setHash((await Clipboard.getString()).trim())
                   }

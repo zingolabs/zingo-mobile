@@ -110,6 +110,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
         disabled={false}
         showLabel={false}
         scanRequest="receive.address"
+        pasteLabel={translate('paste') as string}
       />
       {!!errorAddress && (
         <Text variant="bodySmall" tone="danger" style={{ marginTop: space8 }}>

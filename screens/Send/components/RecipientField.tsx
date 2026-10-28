@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { iconSizeSm, space4, space8, space12, useTheme } from '@app/theme';
 import Pressable from '@ui/primitives/Pressable';
 import { AddressBookFileClass } from '@app/AppState';
@@ -14,6 +15,7 @@ import Card from '@ui/widgets/Card';
 import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
+import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 import { ContactIcon } from '@ui/primitives/Icons/ContactIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
@@ -283,6 +285,15 @@ export default function RecipientField({
                 icon={XIcon}
                 label={t('clear')}
                 onPress={onClear}
+              />
+            )}
+            {!text && !token && (
+              <FieldAction
+                testID="send.paste-button"
+                icon={ClipboardPasteIcon}
+                label={t('paste')}
+                onPress={async () => onChangeText(await Clipboard.getString())}
+                disabled={busy}
               />
             )}
             {!token && (

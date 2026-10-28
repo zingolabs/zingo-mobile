@@ -782,7 +782,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                       showLabel={false}
                       swapChain={form.counterpartyChain}
                       scanRequest="swap.address"
-                      pasteLabel={translate('swap.paste') as string}
+                      pasteLabel={translate('paste') as string}
                       onPickContact={() =>
                         navigation.navigate(Route.AddressBook, {
                           pick: 'swap.contact',

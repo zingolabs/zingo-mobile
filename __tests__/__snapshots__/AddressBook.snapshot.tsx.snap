@@ -5606,6 +5606,53 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 }
                 testID="addressbook.scan-button"
               />
+              <View
+                accessibilityLabel="text translated"
+                accessibilityState={
+                  {
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": undefined,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                hitSlop={
+                  {
+                    "bottom": 12,
+                    "left": 12,
+                    "right": 12,
+                    "top": 12,
+                  }
+                }
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  [
+                    undefined,
+                    {},
+                  ]
+                }
+                testID="addressbook.address-paste"
+              />
             </View>
           </View>
           <View
