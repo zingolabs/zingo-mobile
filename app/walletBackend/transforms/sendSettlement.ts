@@ -28,9 +28,20 @@ export type ComputingParams = { subject?: ComputingSubject } & (
 type Attempted =
   SendSettlement | { kind: 'rejected'; failure: SendFailureClass };
 
-/** The receipt of a send lists its txids joined by commas. */
+/**
+ * The receipt of a send lists its txids joined by commas. A send in two
+ * steps (to a TEX address) lists the hop first and the payment last; the
+ * payment is the one "View transaction" opens.
+ */
 const sentWith = (receipt: unknown): SendSettlement => {
-  const txid = typeof receipt === 'string' ? receipt.split(',')[0].trim() : '';
+  const txid =
+    typeof receipt === 'string'
+      ? (receipt
+          .split(',')
+          .map(id => id.trim())
+          .filter(Boolean)
+          .pop() ?? '')
+      : '';
   return txid ? { kind: 'sent', txid } : { kind: 'sent' };
 };
 const CREATED: ComputingEnd = { phase: 'created' };

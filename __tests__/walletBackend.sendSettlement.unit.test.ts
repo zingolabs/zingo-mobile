@@ -11,6 +11,16 @@ const serverError = 'Error: server unreachable';
 const dust = '64: dust';
 
 describe('settleSend', () => {
+  test('Tests that a send in two steps settles with its payment, the last txid, when the receipt lists the hop first.', async () => {
+    const attempt = jest
+      .fn()
+      .mockResolvedValue({ kind: 'sent', receipt: 'hop, payment' });
+
+    const settlement = await settleSend(attempt, jest.fn(), true);
+
+    expect(settlement).toEqual({ kind: 'sent', txid: 'payment' });
+  });
+
   test('Tests that the send settles as sent when the first attempt sends.', async () => {
     const attempt = jest.fn().mockResolvedValue(sent);
     const switchServer = jest.fn();
