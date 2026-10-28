@@ -5,20 +5,30 @@ import { SwapRecordType } from './types/SwapRecordType';
 
 /**
  * How long Zingo waits for an inbound deposit, from the moment the payment
- * address is made. Internal: it never shows on screen. Past it with nothing
- * seen, the swap closes as "Deposit not detected".
+ * address is made. Internal: it never shows on screen. Past it, or past the
+ * provider's quote deadline if that comes first, with nothing seen, the swap
+ * closes as "Deposit not detected".
  */
-export const DEPOSIT_WAIT_MS = 24 * 60 * 60 * 1000;
+export const DEPOSIT_WAIT_MS = 12 * 60 * 60 * 1000;
 
 /** How long after the payment address is made the wait turns to a warning. */
 export const DEPOSIT_WARN_AFTER_MS = 30 * 60 * 1000;
 
-/** When the wait for the deposit ends: the record's own, or the wait from its creation. */
+/**
+ * When the wait for the deposit ends: the wait from its creation, cut short
+ * by the deadline the record kept (records from before the wait was 12 hours
+ * kept 24) and by the quote's own deadline.
+ */
 export function depositDeadlineMs(record: {
   createdAtMs: number;
   depositDeadlineMs?: number;
+  quoteExpiresAtMs?: number;
 }): number {
-  return record.depositDeadlineMs ?? record.createdAtMs + DEPOSIT_WAIT_MS;
+  return Math.min(
+    record.createdAtMs + DEPOSIT_WAIT_MS,
+    record.depositDeadlineMs ?? Infinity,
+    record.quoteExpiresAtMs ?? Infinity,
+  );
 }
 
 /** An inbound swap whose deposit the provider has not seen. */

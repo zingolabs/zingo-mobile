@@ -66,9 +66,26 @@ const makeRecord = (
   ...overrides,
 });
 
-test('Tests that the wait ends at the record’s own deadline, or 24 hours after creation when it has none', () => {
+test('Tests that the wait ends at the record’s own deadline, or 12 hours after creation when it has none', () => {
   expect(depositDeadlineMs(makeRecord())).toBe(T0 + 600_000);
   expect(depositDeadlineMs({ createdAtMs: T0 })).toBe(T0 + DEPOSIT_WAIT_MS);
+  expect(DEPOSIT_WAIT_MS).toBe(12 * 60 * 60 * 1000);
+});
+
+test('Tests that the wait ends at the quote’s deadline when that comes first, and that a record kept from a 24 hour wait waits 12', () => {
+  expect(
+    depositDeadlineMs({
+      createdAtMs: T0,
+      depositDeadlineMs: T0 + DEPOSIT_WAIT_MS,
+      quoteExpiresAtMs: T0 + 900_000,
+    }),
+  ).toBe(T0 + 900_000);
+  expect(
+    depositDeadlineMs({
+      createdAtMs: T0,
+      depositDeadlineMs: T0 + 2 * DEPOSIT_WAIT_MS,
+    }),
+  ).toBe(T0 + DEPOSIT_WAIT_MS);
 });
 
 test('Tests that only an inbound deposit the provider has not seen is awaited', () => {

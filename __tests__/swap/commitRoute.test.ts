@@ -131,11 +131,11 @@ describe('SwapService.commitRoute deposit deadline', () => {
     });
   };
 
-  it('waits 24 hours from the commit, whatever the quote’s expiry', async () => {
+  it('waits 12 hours from the commit', async () => {
     const { record } = await commitInbound(1_800_000_000_000);
 
     expect(record.depositDeadlineMs).toBe(
-      record.createdAtMs + 24 * 60 * 60 * 1000,
+      record.createdAtMs + 12 * 60 * 60 * 1000,
     );
   });
 
