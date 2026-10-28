@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { Pressable as RNPressable, ScrollView, View } from 'react-native';
 import Animated, {
   ReduceMotion,
   useAnimatedStyle,
@@ -133,6 +133,8 @@ const RESCAN_ICON = iconSize;
 const ARROWS_DX = (RESCAN_ICON * 25.333) / 32 - RESCAN_ICON / 2;
 const ARROWS_DY = (RESCAN_ICON * 23.333) / 32 - RESCAN_ICON / 2;
 const PULSE_MS = 550;
+/** The bar not picked, while the other is. */
+const BAR_DIM = 0.35;
 const TL_W = 315;
 const TL_H = 88;
 const MAP_H = 63;
@@ -174,6 +176,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
 
   const [tip, setTip] = useState(false);
   const [cardW, setCardW] = useState(TL_W);
+  /** The bar and its card picked, as Insight's chart and its rows. */
+  const [focus, setFocus] = useState<'server' | 'wallet' | null>(null);
+  const toggle = (next: 'server' | 'wallet' | null) =>
+    setFocus(prev => (next === null || prev === next ? null : next));
 
   const serverTip = chainTip(syncingStatus, birthday, info.latestBlock || 0);
   const synced = !syncInProgress && percentageOutputsScanned > 0;
@@ -521,35 +527,49 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             { key: 'sync.server', dot: BLUE, value: h.server },
             { key: 'sync.wallet', dot: GREEN, value: h.wallet },
             { key: 'sync.behind', dot: AMBER, value: h.behind },
-          ].map(t => (
-            <View
-              key={t.key}
-              testID={`syncreport.${t.key.split('.')[1]}`}
-              style={[card, { flex: 1, marginTop: 0, padding: space12 }]}
-            >
-              <View
-                style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+          ].map(t => {
+            const which = t.key.split('.')[1];
+            const pickable = which === 'server' || which === 'wallet';
+            const picked = focus === which;
+            const Box = pickable ? Pressable : View;
+            return (
+              <Box
+                kind="row"
+                key={t.key}
+                testID={`syncreport.${which}`}
+                accessibilityRole={pickable ? 'button' : undefined}
+                accessibilityState={pickable ? { selected: picked } : undefined}
+                onPress={pickable ? () => toggle(which) : undefined}
+                style={[
+                  card,
+                  { flex: 1, marginTop: 0, padding: space12 },
+                  picked ? { borderColor: t.dot } : null,
+                ]}
               >
                 <View
-                  style={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: radiusPill,
-                    backgroundColor: t.dot,
-                  }}
-                />
-                <Text variant="caption" tone="muted">
-                  {translate(t.key) as string}
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+                >
+                  <View
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: radiusPill,
+                      backgroundColor: t.dot,
+                    }}
+                  />
+                  <Text variant="caption" tone="muted">
+                    {translate(t.key) as string}
+                  </Text>
+                </View>
+                <Text
+                  variant="bodySmall"
+                  style={{ marginTop: space4, fontWeight: '700' }}
+                >
+                  {formatInteger(t.value)}
                 </Text>
-              </View>
-              <Text
-                variant="bodySmall"
-                style={{ marginTop: space4, fontWeight: '700' }}
-              >
-                {formatInteger(t.value)}
-              </Text>
-            </View>
-          ))}
+              </Box>
+            );
+          })}
         </View>
 
         <View
@@ -562,60 +582,97 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               n: formatInteger(h.scanned),
             }),
           )}
-          <Svg
-            width={cardW}
-            height={(TL_H * cardW) / TL_W}
-            viewBox={`0 0 ${TL_W} ${TL_H}`}
-          >
-            <Rect x={0} y={22} width={TL_W} height={14} rx={7} fill={TRACK} />
-            <Rect x={0} y={22} width={xTip} height={14} rx={7} fill={BLUE} />
-            {ticks.map((v, i) => (
+          <View>
+            <Svg
+              width={cardW}
+              height={(TL_H * cardW) / TL_W}
+              viewBox={`0 0 ${TL_W} ${TL_H}`}
+            >
+              <Rect x={0} y={22} width={TL_W} height={14} rx={7} fill={TRACK} />
+              <Rect
+                x={0}
+                y={22}
+                width={xTip}
+                height={14}
+                rx={7}
+                fill={BLUE}
+                opacity={focus === 'wallet' ? BAR_DIM : 1}
+              />
+              {ticks.map((v, i) => (
+                <SvgText
+                  key={v}
+                  x={i === 0 ? 0 : x(v)}
+                  y={12}
+                  fontSize={textVariants.caption.fontSize}
+                  fill={AXIS_INK}
+                  textAnchor={i === 0 ? 'start' : 'middle'}
+                >
+                  {v ? `${v / 1_000_000}M` : '0'}
+                </SvgText>
+              ))}
+              <Rect
+                x={x0}
+                y={20}
+                width={x1 - x0 + (h.scanned > 0 ? 2 : 0)}
+                height={18}
+                rx={4}
+                fill={GREEN}
+                stroke={colors.bgSurface}
+                strokeWidth={2}
+                opacity={focus === 'server' ? BAR_DIM : 1}
+              />
+              <Path d={`M${x0} 42V54`} stroke={GREEN} strokeWidth={1.5} />
               <SvgText
-                key={v}
-                x={i === 0 ? 0 : x(v)}
-                y={12}
+                x={birthdayLeft ? x0 + 5 : x0 - 5}
+                y={58}
                 fontSize={textVariants.caption.fontSize}
-                fill={AXIS_INK}
-                textAnchor={i === 0 ? 'start' : 'middle'}
+                fill={CODE_INK}
+                textAnchor={birthdayLeft ? 'start' : 'end'}
               >
-                {v ? `${v / 1_000_000}M` : '0'}
+                {fill(translate('sync.birthday-at') as string, {
+                  n: formatInteger(birthday),
+                })}
               </SvgText>
-            ))}
-            <Rect
-              x={x0}
-              y={20}
-              width={x1 - x0 + (h.scanned > 0 ? 2 : 0)}
-              height={18}
-              rx={4}
-              fill={GREEN}
-              stroke={colors.bgSurface}
-              strokeWidth={2}
+              <Path d={`M${xTip} 42V68`} stroke={BLUE} strokeWidth={1.5} />
+              <SvgText
+                x={xTip - 5}
+                y={76}
+                fontSize={textVariants.caption.fontSize}
+                fill={CODE_INK}
+                textAnchor="end"
+              >
+                {fill(translate('sync.tip-at') as string, {
+                  n: formatInteger(serverTip),
+                })}
+              </SvgText>
+            </Svg>
+            {/* Over the chart: the wallet's green bar sits on the server's blue one. */}
+            <RNPressable
+              testID="syncreport.blocks.hit"
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                right: 0,
+                bottom: 0,
+              }}
+              onPress={e => {
+                const scale = TL_W / cardW;
+                const bx = e.nativeEvent.locationX * scale;
+                const by = e.nativeEvent.locationY * scale;
+                const onBars = by >= 12 && by <= 46;
+                toggle(
+                  !onBars
+                    ? null
+                    : bx >= x0 - 4 && bx <= x1 + 6
+                      ? 'wallet'
+                      : bx <= xTip
+                        ? 'server'
+                        : null,
+                );
+              }}
             />
-            <Path d={`M${x0} 42V54`} stroke={GREEN} strokeWidth={1.5} />
-            <SvgText
-              x={birthdayLeft ? x0 + 5 : x0 - 5}
-              y={58}
-              fontSize={textVariants.caption.fontSize}
-              fill={CODE_INK}
-              textAnchor={birthdayLeft ? 'start' : 'end'}
-            >
-              {fill(translate('sync.birthday-at') as string, {
-                n: formatInteger(birthday),
-              })}
-            </SvgText>
-            <Path d={`M${xTip} 42V68`} stroke={BLUE} strokeWidth={1.5} />
-            <SvgText
-              x={xTip - 5}
-              y={76}
-              fontSize={textVariants.caption.fontSize}
-              fill={CODE_INK}
-              textAnchor="end"
-            >
-              {fill(translate('sync.tip-at') as string, {
-                n: formatInteger(serverTip),
-              })}
-            </SvgText>
-          </Svg>
+          </View>
         </View>
 
         <View style={card}>
