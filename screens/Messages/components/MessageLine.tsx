@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import Pressable from '@ui/primitives/Pressable';
+import Pressable, { PressTile } from '@ui/primitives/Pressable';
 import { View, ActivityIndicator, Platform } from 'react-native';
 import {
   iconSizeSm,
@@ -132,14 +132,16 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
           </Text>
         </View>
       )}
+      {/* The row is the tap target; only the bubble answers the press. */}
       <Pressable
-        kind="row"
+        kind="tile"
         style={{ zIndex: 999 }}
         onPress={() => {
           setValueTransferDetailModalShow(index, vt);
         }}
       >
-        <View
+        <PressTile
+          large
           style={{
             display: 'flex',
             flexDirection: 'column',
@@ -342,7 +344,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
               </View>
             </View>
           </View>
-        </View>
+        </PressTile>
       </Pressable>
     </View>
   );

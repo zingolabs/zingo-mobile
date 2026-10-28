@@ -51,40 +51,24 @@ exports[`MessageLine - snapshots MessageLine received with messageAddress, no mo
     }
   >
     <View
-      pointerEvents="none"
       style={
         [
           {
-            "bottom": 0,
-            "left": 0,
-            "position": "absolute",
-            "right": 0,
-            "top": 0,
-          },
-          {
-            "backgroundColor": "#8888881F",
-            "borderRadius": undefined,
+            "alignItems": "flex-start",
+            "backgroundColor": "#18bd181F",
+            "borderBottomEndRadius": 12,
+            "borderBottomStartRadius": 0,
+            "borderRadius": 12,
+            "display": "flex",
+            "flexDirection": "column",
+            "justifyContent": "flex-start",
+            "marginBottom": 8,
+            "marginLeft": 0,
+            "marginRight": 48,
+            "padding": 12,
           },
           {},
         ]
-      }
-    />
-    <View
-      style={
-        {
-          "alignItems": "flex-start",
-          "backgroundColor": "#18bd181F",
-          "borderBottomEndRadius": 12,
-          "borderBottomStartRadius": 0,
-          "borderRadius": 12,
-          "display": "flex",
-          "flexDirection": "column",
-          "justifyContent": "flex-start",
-          "marginBottom": 8,
-          "marginLeft": 0,
-          "marginRight": 48,
-          "padding": 12,
-        }
       }
     >
       <View
@@ -372,40 +356,24 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
     }
   >
     <View
-      pointerEvents="none"
       style={
         [
           {
-            "bottom": 0,
-            "left": 0,
-            "position": "absolute",
-            "right": 0,
-            "top": 0,
-          },
-          {
-            "backgroundColor": "#8888881F",
-            "borderRadius": undefined,
+            "alignItems": "flex-start",
+            "backgroundColor": "#18bd181F",
+            "borderBottomEndRadius": 0,
+            "borderBottomStartRadius": 12,
+            "borderRadius": 12,
+            "display": "flex",
+            "flexDirection": "column",
+            "justifyContent": "flex-start",
+            "marginBottom": 8,
+            "marginLeft": 48,
+            "marginRight": 0,
+            "padding": 12,
           },
           {},
         ]
-      }
-    />
-    <View
-      style={
-        {
-          "alignItems": "flex-start",
-          "backgroundColor": "#18bd181F",
-          "borderBottomEndRadius": 0,
-          "borderBottomStartRadius": 12,
-          "borderRadius": 12,
-          "display": "flex",
-          "flexDirection": "column",
-          "justifyContent": "flex-start",
-          "marginBottom": 8,
-          "marginLeft": 48,
-          "marginRight": 0,
-          "padding": 12,
-        }
       }
     >
       <View

@@ -113,19 +113,24 @@ const Pressable = forwardRef<View, PressableProps>(
   },
 );
 
-/** The part of a `tile` cell that answers its press: it scales to 0.94. */
+/**
+ * The part of a `tile` cell that answers its press: it scales to 0.94, or
+ * to a button's 0.97 when `large` (a message bubble), so a wide surface
+ * does not shrink by much.
+ */
 export function PressTile({
   style,
+  large = false,
   children,
 }: {
   style?: StyleProp<ViewStyle>;
+  large?: boolean;
   children?: React.ReactNode;
 }) {
+  const target = large ? PRESSED_SCALE : PRESSED_TILE_SCALE;
   const pressed = useContext(PressProgress);
   const scaled = useAnimatedStyle(() => ({
-    transform: [
-      { scale: 1 - (1 - PRESSED_TILE_SCALE) * (pressed?.value ?? 0) },
-    ],
+    transform: [{ scale: 1 - (1 - target) * (pressed?.value ?? 0) }],
   }));
   return <Animated.View style={[style, scaled]}>{children}</Animated.View>;
 }

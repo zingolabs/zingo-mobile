@@ -765,6 +765,9 @@ through the shared `Pressable` and its `kind`, in `duration.fast` (140 ms) on
 - The options panel's tiles: the 56 tile scales to 0.94 (`kind="tile"`, the
   tile in a `PressTile`); its label stays still. The cell is the tap target,
   with no background.
+- A message bubble: the bubble scales to 0.97 (`kind="tile"`, the bubble in
+  a `PressTile large`) and keeps its colours and corners. The row is the tap
+  target, with no background.
 - Text links ("Save contact", "See why", "Clear", "Add tag", Available): fade
   to 0.6.
 - `TouchableOpacity` is not used: its default fades a control to 0.2.
