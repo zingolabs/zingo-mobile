@@ -1,12 +1,28 @@
-import React, { useContext, useRef } from 'react';
-import { Keyboard, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import {
+  Keyboard,
+  StyleProp,
+  StyleSheet,
+  View,
+  ViewStyle,
+  useWindowDimensions,
+} from 'react-native';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
   BottomSheetBackgroundProps,
   BottomSheetFooterProps,
   BottomSheetModal,
+  BottomSheetScrollView,
   BottomSheetView,
+  useBottomSheetInternal,
 } from '@gorhom/bottom-sheet';
 import { radiusSheet, useTheme, radiusPill, space24 } from '@app/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,6 +34,9 @@ import { duration, ease } from '@app/theme/motion';
 const SHEET_MOTION = { duration: duration.sheet, easing: ease.emphasized };
 import SheetRim from './SheetRim';
 import { SheetPresence } from './SheetPresence';
+
+/** The measured height of a dynamic sheet's whole body, for its `SheetScrollView`. */
+const SheetBodyHeight = createContext<number>(0);
 
 type AppSheetModalProps = {
   header?: React.ReactNode;
@@ -81,6 +100,7 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
   ) => {
     const { colors } = useTheme();
     const fixed = snapPoints !== undefined;
+    const [bodyHeight, setBodyHeight] = useState<number>(0);
     const insets = useSafeAreaInsets();
     const presence = useContext(SheetPresence);
     const wasOpen = useRef(false);
@@ -166,7 +186,13 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
           /** A fixed sheet holds a list: BottomSheetView measures static content and stops a scroll view inside it. */
           <View style={styles.fill}>{body}</View>
         ) : (
-          <BottomSheetView>{body}</BottomSheetView>
+          <BottomSheetView
+            onLayout={e => setBodyHeight(e.nativeEvent.layout.height)}
+          >
+            <SheetBodyHeight.Provider value={bodyHeight}>
+              {body}
+            </SheetBodyHeight.Provider>
+          </BottomSheetView>
         )}
       </BottomSheetModal>
     );
@@ -190,3 +216,66 @@ const styles = StyleSheet.create({
 });
 
 export default AppSheetModal;
+
+/**
+ * The list of a dynamic `AppSheetModal`, in place of `BottomSheetScrollView`.
+ * gorhom takes a scrollable's content height as the sheet's, which leaves out
+ * the title above the list and the bottom inset, so the sheet opened short.
+ * This one reports its content plus the rest of the body, and is capped at
+ * what the screen holds: the sheet opens at its full height and the list
+ * scrolls, under a fixed title, only when it does not fit.
+ */
+export function SheetScrollView({
+  children,
+  style,
+  contentContainerStyle,
+  keyboardShouldPersistTaps,
+}: {
+  children: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+  contentContainerStyle?: StyleProp<ViewStyle>;
+  keyboardShouldPersistTaps?: 'always' | 'never' | 'handled';
+}) {
+  const { animatedLayoutState } = useBottomSheetInternal();
+  const bodyHeight = useContext(SheetBodyHeight);
+  const insets = useSafeAreaInsets();
+  const { height: windowHeight } = useWindowDimensions();
+  const frame = useRef<number>(0);
+  const content = useRef<number>(0);
+  const [chrome, setChrome] = useState<number>(0);
+
+  /** Runs after gorhom's own report, so the sheet takes this height. */
+  const report = useCallback(() => {
+    if (!bodyHeight || !frame.current || !content.current) {
+      return;
+    }
+    const rest = Math.max(0, bodyHeight - frame.current);
+    setChrome(rest);
+    const total = content.current + rest;
+    animatedLayoutState.modify(state => {
+      'worklet';
+      state.contentHeight = total;
+      return state;
+    });
+  }, [animatedLayoutState, bodyHeight]);
+
+  useEffect(report, [report]);
+
+  return (
+    <BottomSheetScrollView
+      style={[style, { maxHeight: windowHeight - insets.top - chrome }]}
+      contentContainerStyle={contentContainerStyle}
+      keyboardShouldPersistTaps={keyboardShouldPersistTaps}
+      onLayout={e => {
+        frame.current = e.nativeEvent.layout.height;
+        report();
+      }}
+      onContentSizeChange={(_w: number, h: number) => {
+        content.current = h;
+        report();
+      }}
+    >
+      {children}
+    </BottomSheetScrollView>
+  );
+}

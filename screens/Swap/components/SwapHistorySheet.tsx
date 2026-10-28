@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useContext } from 'react';
 import { ActivityIndicator, View } from 'react-native';
-import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useTheme, iconSizeMd, radiusPill } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
@@ -11,7 +11,7 @@ import {
   isTerminalStatus,
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
-import AppSheetModal from '@ui/primitives/AppSheetModal';
+import AppSheetModal, { SheetScrollView } from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
 import ListRow from '@ui/primitives/ListRow';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
@@ -168,7 +168,7 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
           />
         }
       >
-        <BottomSheetScrollView>
+        <SheetScrollView>
           {sorted.length === 0 && (
             <View style={{ alignItems: 'center', paddingVertical: 48 }}>
               <Text variant="body" tone="muted">
@@ -194,7 +194,7 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
               />
             );
           })}
-        </BottomSheetScrollView>
+        </SheetScrollView>
       </AppSheetModal>
     );
   },

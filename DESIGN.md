@@ -570,6 +570,9 @@ and the notice stack.
 - A bottom sheet's content ends `space24` above the navigation bar
   (`insets.bottom + space24`), set once in `AppSheetModal`. A sheet pads its
   own bottom only to clear the keyboard.
+- A list in a sheet that sizes to its content is a `SheetScrollView`: the
+  sheet opens at the full height of its title, rows and bottom inset, and the
+  list scrolls under the fixed title only when that is taller than the screen.
 
 **Menu screens.** What the options panel (the side menu) opens (Settings,
 Pools, Server, the seed, the Address Book…) is a full screen on the canvas,
