@@ -860,7 +860,6 @@
     "leg-payment-note": "address made only for this swap.",
     "leg-refund-note-memo": "sent the ZEC back to the same address the payment came from.",
     "leg-refund-note": "Your ZEC came back to an address in your wallet.",
-    "leg-received-note": "The address in your wallet where the swap's ZEC arrived.",
     "tx-title": "Transaction",
     "tx-fee": "Network fee",
     "tx-confirmations": "Confirmations",

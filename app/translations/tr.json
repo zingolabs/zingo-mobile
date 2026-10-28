@@ -860,7 +860,6 @@
     "leg-payment-note": "yalnızca bu takas için oluşturulan adres.",
     "leg-refund-note-memo": "ZEC'i ödemenin çıktığı adrese geri gönderdi.",
     "leg-refund-note": "ZEC'iniz cüzdanınızdaki bir adrese döndü.",
-    "leg-received-note": "Takasın ZEC'inin geldiği cüzdan adresiniz.",
     "tx-title": "İşlem",
     "tx-fee": "Ağ ücreti",
     "tx-confirmations": "Onaylar",

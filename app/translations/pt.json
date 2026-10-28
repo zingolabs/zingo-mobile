@@ -860,7 +860,6 @@
     "leg-payment-note": "endereço criado só para este swap.",
     "leg-refund-note-memo": "devolveu o ZEC para o mesmo endereço de onde saiu o pagamento.",
     "leg-refund-note": "Seu ZEC voltou para um endereço da sua carteira.",
-    "leg-received-note": "O endereço da sua carteira onde chegou o ZEC do swap.",
     "tx-title": "Transação",
     "tx-fee": "Taxa de rede",
     "tx-confirmations": "Confirmações",

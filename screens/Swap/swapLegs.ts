@@ -70,7 +70,7 @@ export function legName(
   );
 }
 
-/** One line on what the leg's address is, and whether to warn off sending to it. */
+/** One line on what the leg's address is (none for the ZEC the swap brought in), and whether to warn off sending to it. */
 export function legRole(
   leg: ValueTransferType,
   record: SwapRecordType,
@@ -94,5 +94,5 @@ export function legRole(
       warn: false,
     };
   }
-  return { note: t('swap.leg-received-note'), warn: false };
+  return { note: '', warn: false };
 }

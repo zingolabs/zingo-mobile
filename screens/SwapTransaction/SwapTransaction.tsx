@@ -167,9 +167,11 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
         pillTone={status.tone}
       />
       <DetailRows rows={rows} />
-      <Text variant="caption" tone="muted" style={{ marginTop: space12 }}>
-        {role.note}
-      </Text>
+      {!!role.note && !!leg.address && (
+        <Text variant="caption" tone="muted" style={{ marginTop: space12 }}>
+          {role.note}
+        </Text>
+      )}
       {role.warn && (
         <View style={{ marginTop: space12 }}>
           <Banner tone="warning" title={t('swap.tx-dont-send')} />
