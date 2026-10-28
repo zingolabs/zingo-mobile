@@ -206,6 +206,8 @@ export type SwapTransactionNavigationState = {
   recordId: string;
   txid: string;
   kind: ValueTransferKindEnum;
+  /** Which of the transaction's transfers of that kind (`legSlot`). */
+  slot: number;
 };
 
 // A swap by its local record id; the screen reads the live record.

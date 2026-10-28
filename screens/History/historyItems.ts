@@ -3,7 +3,7 @@ import type { ValueTransferType } from '@app/AppState';
 import { swapTxidIndex } from '@app/swap/groupHistoryBySwap';
 import { isTerminalStatus } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
-import { mergeLegs } from '@screens/Swap/swapLegs';
+import { legSlot } from '@screens/Swap/swapLegs';
 
 /** One entry of the History list, in the order it draws. */
 export type HistoryItem =
@@ -30,6 +30,8 @@ export type HistoryItem =
       key: string;
       vt: ValueTransferType;
       recordId: string;
+      /** Which of its transaction's transfers of that kind it is. */
+      slot: number;
       /** Last leg of its swap: it closes the fold. */
       last: boolean;
     };
@@ -83,9 +85,7 @@ export function buildHistoryItems(args: {
     recordId: string,
     first: boolean,
   ) => {
-    const legs = mergeLegs(legsOf.get(recordId) ?? []).sort(
-      (a, b) => a.time - b.time,
-    );
+    const legs = (legsOf.get(recordId) ?? []).sort((a, b) => a.time - b.time);
     const isOpen = open.has(recordId) && legs.length > 0;
     items.push({
       kind: 'swap',
@@ -100,9 +100,10 @@ export function buildHistoryItems(args: {
       legs.forEach((leg, i) =>
         items.push({
           kind: 'leg',
-          key: `leg:${recordId}:${leg.txid}:${leg.kind}`,
+          key: `leg:${recordId}:${leg.txid}:${leg.kind}:${legSlot(legs, leg)}`,
           vt: leg,
           recordId,
+          slot: legSlot(legs, leg),
           last: i === legs.length - 1,
         }),
       );

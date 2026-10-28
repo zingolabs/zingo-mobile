@@ -753,7 +753,9 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       case 'month':
         return <MonthHeader label={item.label} />;
       case 'leg':
-        return <LegLine vt={item.vt} recordId={item.recordId} />;
+        return (
+          <LegLine vt={item.vt} recordId={item.recordId} slot={item.slot} />
+        );
       case 'swap':
         return item.record ? (
           <SwapLine

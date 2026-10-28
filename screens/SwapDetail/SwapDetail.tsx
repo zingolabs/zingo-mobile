@@ -70,7 +70,7 @@ import SaveContactButton from '@ui/widgets/SaveContactButton';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
 import { swapOutcome } from '@screens/Swap/swapProgress';
 import { useRemoveSwap } from '@screens/Swap/useRemoveSwap';
-import { legName, legsOf } from '@screens/Swap/swapLegs';
+import { legName, legSlot, legsOf } from '@screens/Swap/swapLegs';
 
 type SwapDetailProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -534,7 +534,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
                 return (
                   <Pressable
                     kind="row"
-                    key={`${leg.txid}:${leg.kind}`}
+                    key={`${leg.txid}:${leg.kind}:${legSlot(legs, leg)}`}
                     testID={`swap.detail.leg.${index}`}
                     accessibilityRole="button"
                     onPress={() =>
@@ -542,6 +542,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
                         recordId,
                         txid: leg.txid,
                         kind: leg.kind,
+                        slot: legSlot(legs, leg),
                       })
                     }
                     style={{

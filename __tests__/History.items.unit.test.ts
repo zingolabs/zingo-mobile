@@ -127,7 +127,7 @@ test('Tests that an open swap shows its transactions under it, oldest first, whe
   ]);
 });
 
-test('Tests that a shielded memo deposit is one transaction under the swap, its vault payment and memo note added up, when the swap is open', () => {
+test('Tests that a shielded memo deposit shows its vault payment and its memo note as two legs, each with its own data and key, when the swap is open', () => {
   const r = record();
   const rows = [
     swapRow(r),
@@ -149,14 +149,17 @@ test('Tests that a shielded memo deposit is one transaction under the swap, its 
     monthOf,
   });
 
-  expect(items.map(i => i.kind)).toEqual(['month', 'swap', 'leg']);
+  expect(items.map(i => i.kind)).toEqual(['month', 'swap', 'leg', 'leg']);
   const swap = items[1];
-  expect(swap.kind === 'swap' && swap.legCount).toBe(1);
-  const leg = items[2];
-  expect(leg.kind === 'leg' && [leg.vt.amount, leg.vt.address]).toEqual([
-    0.01,
-    't1vault',
+  expect(swap.kind === 'swap' && swap.legCount).toBe(2);
+  const legs = items
+    .slice(2)
+    .map(i => (i.kind === 'leg' ? [i.vt.amount, i.vt.address, i.slot] : []));
+  expect(legs).toEqual([
+    [0, 'u1mayamemo', 0],
+    [0.01, 't1vault', 1],
   ]);
+  expect(new Set(items.map(i => i.key)).size).toBe(items.length);
 });
 
 const t = (key: string) => key;
