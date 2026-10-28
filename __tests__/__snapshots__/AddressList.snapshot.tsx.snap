@@ -64,7 +64,8 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
           style={
             {
               "alignItems": "flex-start",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         >
@@ -119,7 +120,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
           style={
             {
               "alignItems": "center",
-              "flex": 1,
+              "flexShrink": 1,
             }
           }
         >
@@ -143,7 +144,8 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
           style={
             {
               "alignItems": "flex-end",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         />

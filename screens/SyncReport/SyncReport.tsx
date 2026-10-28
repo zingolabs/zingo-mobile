@@ -413,54 +413,56 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     >
       <Header
         title={translate('sync.title') as string}
-        titleElement={
-          <InfoTooltip
-            testID="syncreport.info"
-            below
-            label={translate('sync.info-acc') as string}
-            title={translate('sync.tip-title') as string}
-            text={translate('sync.tip-text') as string}
-            open={tip}
-            onToggle={setTip}
-          >
-            <Text variant="barTitle" numberOfLines={1}>
-              {translate('sync.title') as string}
-            </Text>
-          </InfoTooltip>
-        }
         closeScreen={() => navigation.goBack()}
         backTestID="syncreport.back"
         backAccessibilityLabel={translate('sync.back-acc') as string}
         right={
-          <Pressable
-            kind="icon"
-            testID="syncreport.rescan"
-            accessibilityRole="button"
-            accessibilityLabel={translate('sync.rescan-acc') as string}
-            onPress={openRescan}
-            hitSlop={slopFor(RESCAN_ICON)}
-            style={{ paddingHorizontal: space12 }}
-          >
-            <Animated.View
-              style={[{ width: RESCAN_ICON, height: RESCAN_ICON }, rescanStyle]}
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <InfoTooltip
+              testID="syncreport.info"
+              alignEnd
+              below
+              label={translate('sync.info-acc') as string}
+              title={translate('sync.tip-title') as string}
+              text={translate('sync.tip-text') as string}
+              open={tip}
+              onToggle={setTip}
             >
-              <RescanCloud size={RESCAN_ICON} color={colors.fgMuted} />
+              <View />
+            </InfoTooltip>
+            <Pressable
+              kind="icon"
+              testID="syncreport.rescan"
+              accessibilityRole="button"
+              accessibilityLabel={translate('sync.rescan-acc') as string}
+              onPress={openRescan}
+              hitSlop={slopFor(RESCAN_ICON)}
+              style={{ paddingHorizontal: space12 }}
+            >
               <Animated.View
                 style={[
-                  {
-                    position: 'absolute',
-                    left: 0,
-                    top: 0,
-                    width: RESCAN_ICON,
-                    height: RESCAN_ICON,
-                  },
-                  arrowsStyle,
+                  { width: RESCAN_ICON, height: RESCAN_ICON },
+                  rescanStyle,
                 ]}
               >
-                <RescanArrows size={RESCAN_ICON} color={colors.fgAccent} />
+                <RescanCloud size={RESCAN_ICON} color={colors.fgMuted} />
+                <Animated.View
+                  style={[
+                    {
+                      position: 'absolute',
+                      left: 0,
+                      top: 0,
+                      width: RESCAN_ICON,
+                      height: RESCAN_ICON,
+                    },
+                    arrowsStyle,
+                  ]}
+                >
+                  <RescanArrows size={RESCAN_ICON} color={colors.fgAccent} />
+                </Animated.View>
               </Animated.View>
-            </Animated.View>
-          </Pressable>
+            </Pressable>
+          </View>
         }
         noBalance={true}
         noSyncingStatus={true}

@@ -18,7 +18,11 @@ export type TitleBarAction = {
   badge?: React.ReactNode;
 };
 
-/** Each end keeps this width, so the title stays centred with one action or none. */
+/**
+ * Each end is at least this wide and the two share the space the title
+ * leaves, so the title stays centred with one action, two (SyncReport's
+ * info and rescan) or none.
+ */
 const SIDE = 48;
 /** History's bar in dev, the designer's reference: 8 over the title, 6 under. */
 const PAD_BOTTOM = 6;
@@ -91,10 +95,10 @@ export default function TitleBar({
         paddingHorizontal: space16,
       }}
     >
-      <View style={{ width: SIDE, alignItems: 'flex-start' }}>
+      <View style={{ flex: 1, minWidth: SIDE, alignItems: 'flex-start' }}>
         {action(left)}
       </View>
-      <View style={{ flex: 1, alignItems: 'center' }}>
+      <View style={{ flexShrink: 1, alignItems: 'center' }}>
         {typeof title === 'string' ? (
           <Text variant="barTitle" numberOfLines={1} accessibilityRole="header">
             {title}
@@ -103,7 +107,7 @@ export default function TitleBar({
           title
         )}
       </View>
-      <View style={{ width: SIDE, alignItems: 'flex-end' }}>
+      <View style={{ flex: 1, minWidth: SIDE, alignItems: 'flex-end' }}>
         {action(right)}
       </View>
     </View>

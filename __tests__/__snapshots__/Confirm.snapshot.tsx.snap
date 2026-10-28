@@ -63,7 +63,8 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
           style={
             {
               "alignItems": "flex-start",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         >
@@ -118,7 +119,7 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
           style={
             {
               "alignItems": "center",
-              "flex": 1,
+              "flexShrink": 1,
             }
           }
         >
@@ -142,7 +143,8 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
           style={
             {
               "alignItems": "flex-end",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         />
@@ -881,7 +883,8 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
           style={
             {
               "alignItems": "flex-start",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         >
@@ -936,7 +939,7 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
           style={
             {
               "alignItems": "center",
-              "flex": 1,
+              "flexShrink": 1,
             }
           }
         >
@@ -960,7 +963,8 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
           style={
             {
               "alignItems": "flex-end",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         />

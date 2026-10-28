@@ -1098,7 +1098,8 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
           style={
             {
               "alignItems": "flex-start",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         />
@@ -1106,7 +1107,7 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
           style={
             {
               "alignItems": "center",
-              "flex": 1,
+              "flexShrink": 1,
             }
           }
         >
@@ -1130,7 +1131,8 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
           style={
             {
               "alignItems": "flex-end",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         >
@@ -2808,7 +2810,8 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
           style={
             {
               "alignItems": "flex-start",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         />
@@ -2816,7 +2819,7 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
           style={
             {
               "alignItems": "center",
-              "flex": 1,
+              "flexShrink": 1,
             }
           }
         >
@@ -2840,7 +2843,8 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
           style={
             {
               "alignItems": "flex-end",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         >
