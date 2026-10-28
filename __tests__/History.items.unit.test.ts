@@ -349,3 +349,38 @@ test('Tests that a purchase paid after its quote expired reads refunding in ambe
   expect(text.top).toBe('1.5 ZEC');
   expect(text.bottom).toBe('history.going-back');
 });
+
+test('Tests that a failed swap reads its amount struck through and grey, as a deposit not detected does', () => {
+  const text = swapRowText({
+    record: record({ status: SwapStatusEnum.Failed }),
+    when: 'Oct 17',
+    t,
+  });
+
+  expect(text.state).toEqual({ text: 'history.state-failed', tone: 'danger' });
+  expect(text.topTone).toBe('muted');
+  expect(text.topStrike).toBe(true);
+});
+
+test('Tests that a failed send reads its amount struck through and grey, and a sent one does not', () => {
+  const failed = transferRowText({
+    vt: vt(DEPOSIT, 2_000_010, ValueTransferKindEnum.Sent, {
+      status: RPCValueTransfersStatusEnum.failed,
+    }),
+    when: 'Oct 17',
+    currency: 'ZEC',
+    usd: '',
+    t,
+  });
+  const sent = transferRowText({
+    vt: vt(DEPOSIT, 2_000_010),
+    when: 'Oct 17',
+    currency: 'ZEC',
+    usd: '',
+    t,
+  });
+
+  expect(failed.topTone).toBe('muted');
+  expect(failed.topStrike).toBe(true);
+  expect(sent.topStrike).toBe(false);
+});

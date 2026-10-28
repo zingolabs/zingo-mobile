@@ -92,6 +92,7 @@ export function transferRowText(args: {
         line: `${t('history.sent')} · ${when}`,
         top: `−${amount}`,
         topTone: failed ? 'muted' : 'default',
+        topStrike: failed,
       };
     case ValueTransferKindEnum.Received:
       return {
@@ -212,6 +213,7 @@ export function swapRowText(args: {
         state: { text: t('history.state-failed'), tone: 'danger' },
         top: sold,
         topTone: 'muted',
+        topStrike: true,
         bottom: '',
       };
     default:

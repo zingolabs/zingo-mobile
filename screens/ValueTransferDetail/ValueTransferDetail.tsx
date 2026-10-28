@@ -322,6 +322,7 @@ const ValueTransferDetail: React.FunctionComponent<
           <Text
             testID="valuetransferdetail.amount"
             variant="balance"
+            strike={failed}
             color={
               failed
                 ? colors.fgMuted

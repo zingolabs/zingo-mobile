@@ -201,7 +201,11 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         : {
             amount: `${done ? '+' : '≈ +'}${formatAmountForDisplay(got)}`,
             unit: getSym,
-            tone: done ? ('positive' as const) : ('default' as const),
+            tone: done
+              ? ('positive' as const)
+              : outcome === 'failed'
+                ? ('muted' as const)
+                : ('default' as const),
             line: `−${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}${usd(got, record.fiatValueBasis.receiveUsdUnitPrice) ? ` · ${usd(got, record.fiatValueBasis.receiveUsdUnitPrice)}` : ''}`,
           };
   const pill =
@@ -417,7 +421,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         line={view.hero.line}
         pill={view.pill.text}
         pillTone={view.pill.tone}
-        strike={expired}
+        strike={expired || outcome === 'failed'}
       />
 
       {awaitingDeposit && (
