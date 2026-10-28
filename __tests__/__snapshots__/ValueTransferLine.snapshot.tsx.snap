@@ -1040,7 +1040,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
             }
           >
             <Text
-              ellipsizeMode="middle"
+              ellipsizeMode="tail"
               maxFontSizeMultiplier={2}
               numberOfLines={1}
               style={

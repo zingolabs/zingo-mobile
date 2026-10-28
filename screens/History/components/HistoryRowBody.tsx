@@ -91,7 +91,8 @@ export default function HistoryRowBody({
             text.titleMono ? 'address' : compact ? 'bodySmall' : 'bodyStrong'
           }
           numberOfLines={1}
-          ellipsizeMode="middle"
+          // Words are cut at the end; only an address keeps both ends.
+          ellipsizeMode={text.titleMono ? 'middle' : 'tail'}
           style={compact && !text.titleMono ? { fontWeight: '600' } : undefined}
         >
           {text.title}
