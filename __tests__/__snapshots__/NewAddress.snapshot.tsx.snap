@@ -785,6 +785,7 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
           maxFontSizeMultiplier={2}
           maxLength={50}
           multiline={false}
+          numberOfLines={1}
           onBlur={[Function]}
           onChangeText={[Function]}
           onFocus={[Function]}
@@ -795,7 +796,7 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
               "color": "#c3c3c3",
               "flex": 1,
               "fontSize": 15,
-              "fontWeight": "600",
+              "fontWeight": "400",
               "minWidth": 0,
               "paddingRight": 0,
               "paddingVertical": 8,

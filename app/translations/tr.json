@@ -902,7 +902,7 @@
     "msg-needs-at-least": "En az {amount} gerekiyor.",
     "msg-needs-usd": "Şu anda bu takas için en az {amount} gerekiyor.",
     "msg-not-available": "Şu anda bu takas için kullanılamıyor.",
-    "address-placeholder": "{chain} adresini yapıştırın veya tarayın",
+    "address-placeholder": "{chain} adresi",
     "cta-noAddress-sell": "Hedef adresi ekleyin",
     "cta-noAddress-buy": "Bir iade adresi ekleyin",
     "over-balance": "Bu, takas edebileceğinizden fazla. En fazlasını takas etmek için Kullanılabilir’e dokunun.",

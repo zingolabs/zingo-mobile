@@ -902,7 +902,7 @@
     "msg-needs-at-least": "Нужно не меньше {amount}.",
     "msg-needs-usd": "Сейчас для этого обмена нужно не меньше {amount}.",
     "msg-not-available": "Сейчас недоступен для этого обмена.",
-    "address-placeholder": "Вставьте или отсканируйте адрес {chain}",
+    "address-placeholder": "Адрес {chain}",
     "cta-noAddress-sell": "Добавьте адрес получателя",
     "cta-noAddress-buy": "Добавьте адрес возврата",
     "over-balance": "Это больше, чем можно обменять. Нажмите «Доступно», чтобы обменять максимум.",

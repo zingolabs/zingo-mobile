@@ -902,7 +902,7 @@
     "msg-needs-at-least": "Needs at least {amount}.",
     "msg-needs-usd": "Needs at least {amount} for this swap right now.",
     "msg-not-available": "Not available for this swap right now.",
-    "address-placeholder": "Paste or scan the {chain} address",
+    "address-placeholder": "{chain} address",
     "cta-noAddress-sell": "Add the destination address",
     "cta-noAddress-buy": "Add a refund address",
     "over-balance": "That’s more than you can swap. Tap Available to swap the most you can.",

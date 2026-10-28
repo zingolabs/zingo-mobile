@@ -200,6 +200,12 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
   const validity: FieldValidity =
     error !== undefined || invalid ? 'invalid' : valid ? 'valid' : 'unknown';
   const valueStyle = mono ? textVariants.address : textVariants.bodyStrong;
+  /**
+   * The placeholder is an instruction, not a value: the body variant,
+   * regular, never mono, on one line. A TextInput draws its placeholder in
+   * its own font, so the empty field takes the body's.
+   */
+  const shown = value ? valueStyle : textVariants.body;
 
   return (
     <View style={{ gap: space8, opacity: disabled ? 0.5 : 1 }}>
@@ -257,6 +263,7 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
             placeholderTextColor={colors.fgMuted}
             editable={!disabled && !readOnly}
             multiline={multiline}
+            numberOfLines={multiline ? undefined : 1}
             onFocus={() => {
               setFocused(true);
               onFocus?.();
@@ -276,9 +283,9 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
               paddingRight:
                 TrailingIcon || trailing || clearable || suffix ? 0 : space12,
               color: colors.fgDefault,
-              fontSize: valueStyle.fontSize,
-              fontWeight: valueStyle.fontWeight,
-              ...(mono ? { fontFamily: monoFamily } : {}),
+              fontSize: shown.fontSize,
+              fontWeight: shown.fontWeight,
+              ...(mono && value ? { fontFamily: monoFamily } : {}),
             }}
           />
         )}
