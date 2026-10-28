@@ -340,14 +340,13 @@ export function useSwapForm({
   // A prefill lands in three steps, each a render after the last: the
   // direction, then the coin once that direction's catalog is in, then the
   // amount and the address once the coin's chain has cleared the fields.
-  // Armed at the end, the review opens by itself when the quote is ready.
+  // The prefill only fills the form: the user sees the new quote and goes on.
   const [pendingPrefill, setPendingPrefill] = useState<SwapPrefillType | null>(
     null,
   );
   const [prefillStage, setPrefillStage] = useState<'coin' | 'fields' | null>(
     null,
   );
-  const [prefillArmed, setPrefillArmed] = useState<boolean>(false);
   const handledPrefillAt = useRef<number | null>(null);
   useEffect(() => {
     if (!prefill || handledPrefillAt.current === prefill.requestedAtMs) {
@@ -357,7 +356,6 @@ export function useSwapForm({
     setDirection(prefill.direction);
     setPendingPrefill(prefill);
     setPrefillStage('coin');
-    setPrefillArmed(false);
   }, [prefill]);
   useEffect(() => {
     if (
@@ -392,9 +390,7 @@ export function useSwapForm({
     }
     setPrefillStage(null);
     setPendingPrefill(null);
-    setPrefillArmed(true);
   }, [prefillStage, pendingPrefill, selectedToken]);
-  const disarmPrefill = useCallback(() => setPrefillArmed(false), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -956,7 +952,5 @@ export function useSwapForm({
     cancelReview,
     refuseRoute,
     finish,
-    prefillArmed,
-    disarmPrefill,
   };
 }

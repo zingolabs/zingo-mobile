@@ -219,7 +219,7 @@ const PREFILL = {
   requestedAtMs: 1,
 };
 
-test('Tests that a purchase asked about again fills the coin, the amount and the refund address, buying ZEC, and arms the review', async () => {
+test('Tests that a purchase asked about again fills the coin, the amount and the refund address, buying ZEC, and leaves the review to the user', async () => {
   const { swapService } = service();
   const { result } = renderHook(() =>
     useSwapForm({
@@ -232,17 +232,14 @@ test('Tests that a purchase asked about again fills the coin, the amount and the
     }),
   );
 
-  await waitFor(() => expect(result.current.prefillArmed).toBe(true));
+  await waitFor(() => expect(result.current.amount).not.toBe(''));
   expect(result.current.isOutbound).toBe(false);
   expect(result.current.selectedToken).toEqual(BTC);
   expect(result.current.amount).toBe('0.03');
   expect(result.current.activeAddress).toBe(BTC_ADDRESS);
-
-  act(() => result.current.disarmPrefill());
-  expect(result.current.prefillArmed).toBe(false);
 });
 
-test('Tests that a sale asked about again fills the coin received, the amount and the destination, selling ZEC, and arms the review', async () => {
+test('Tests that a sale asked about again fills the coin received, the amount and the destination, selling ZEC, and leaves the review to the user', async () => {
   const { swapService } = service();
   const { result } = renderHook(() =>
     useSwapForm({
@@ -259,7 +256,7 @@ test('Tests that a sale asked about again fills the coin received, the amount an
     }),
   );
 
-  await waitFor(() => expect(result.current.prefillArmed).toBe(true));
+  await waitFor(() => expect(result.current.amount).not.toBe(''));
   expect(result.current.isOutbound).toBe(true);
   expect(result.current.selectedToken).toEqual(BTC);
   expect(result.current.amount).toBe('0.01');

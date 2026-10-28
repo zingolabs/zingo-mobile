@@ -405,14 +405,6 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
     proceed();
   };
 
-  // A new quote asked from an expired swap goes straight to the review.
-  useEffect(() => {
-    if (form.prefillArmed && form.cta === 'ready') {
-      form.disarmPrefill();
-      onContinue();
-    }
-  });
-
   const noticeText = (): string => {
     const notice = form.quoteNotice;
     if (!notice) {
