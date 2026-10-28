@@ -418,18 +418,21 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
         backAccessibilityLabel={translate('sync.back-acc') as string}
         right={
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <InfoTooltip
-              testID="syncreport.info"
-              alignEnd
-              below
-              label={translate('sync.info-acc') as string}
-              title={translate('sync.tip-title') as string}
-              text={translate('sync.tip-text') as string}
-              open={tip}
-              onToggle={setTip}
-            >
-              <View />
-            </InfoTooltip>
+            {/* Its own box: a stretching tooltip in the row would sit at the top. */}
+            <View>
+              <InfoTooltip
+                testID="syncreport.info"
+                alignEnd
+                below
+                label={translate('sync.info-acc') as string}
+                title={translate('sync.tip-title') as string}
+                text={translate('sync.tip-text') as string}
+                open={tip}
+                onToggle={setTip}
+              >
+                <View />
+              </InfoTooltip>
+            </View>
             <Pressable
               kind="icon"
               testID="syncreport.rescan"
