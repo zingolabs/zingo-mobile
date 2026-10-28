@@ -59,8 +59,21 @@ export function shortWhen(
 const shortAddress = (address: string): string =>
   address.length > 15 ? `${address.slice(0, 6)}…${address.slice(-6)}` : address;
 
-/** A transfer's row: what it was, when, and the ZEC with its dollars. */
-export function transferRowText(args: {
+/**
+ * A transfer's row: what it was, when, and the ZEC with its dollars. A
+ * transfer that failed, whatever its kind (a send, a shield, a send to
+ * oneself), reads its amount struck through in grey.
+ */
+export function transferRowText(
+  args: Parameters<typeof transferRowTextOf>[0],
+): RowText {
+  const text = transferRowTextOf(args);
+  return args.vt.status === RPCValueTransfersStatusEnum.failed
+    ? { ...text, topTone: 'muted', topStrike: true }
+    : text;
+}
+
+function transferRowTextOf(args: {
   vt: ValueTransferType;
   when: string;
   currency: string;
@@ -92,7 +105,6 @@ export function transferRowText(args: {
         line: `${t('history.sent')} · ${when}`,
         top: `−${amount}`,
         topTone: failed ? 'muted' : 'default',
-        topStrike: failed,
       };
     case ValueTransferKindEnum.Received:
       return {

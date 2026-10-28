@@ -382,5 +382,20 @@ test('Tests that a failed send reads its amount struck through and grey, and a s
 
   expect(failed.topTone).toBe('muted');
   expect(failed.topStrike).toBe(true);
-  expect(sent.topStrike).toBe(false);
+  expect(sent.topStrike).toBeFalsy();
+});
+
+test('Tests that a failed shield reads its amount struck through and grey too', () => {
+  const text = transferRowText({
+    vt: vt(DEPOSIT, 2_000_010, ValueTransferKindEnum.Shield, {
+      status: RPCValueTransfersStatusEnum.failed,
+    }),
+    when: 'Oct 17',
+    currency: 'ZEC',
+    usd: '',
+    t,
+  });
+
+  expect(text.topTone).toBe('muted');
+  expect(text.topStrike).toBe(true);
 });
