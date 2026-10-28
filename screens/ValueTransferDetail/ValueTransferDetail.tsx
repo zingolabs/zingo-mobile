@@ -277,6 +277,15 @@ const ValueTransferDetail: React.FunctionComponent<
       footer={
         failed || explorerUrl ? (
           <View style={{ rowGap: 8 }}>
+            {/* As the swap detail: explorer, Try again, Delete, from the top. */}
+            {!!explorerUrl && (
+              <Button
+                testID="valuetransferdetail.explorer"
+                variant="text"
+                title={t('history.tx-explorer')}
+                onPress={() => Linking.openURL(explorerUrl)}
+              />
+            )}
             {failed && sent && (
               <Button
                 testID="valuetransferdetail.try-again"
@@ -291,14 +300,6 @@ const ValueTransferDetail: React.FunctionComponent<
                 variant="dangerText"
                 title={t('history.remove')}
                 onPress={remove}
-              />
-            )}
-            {!!explorerUrl && (
-              <Button
-                testID="valuetransferdetail.explorer"
-                variant="text"
-                title={t('history.tx-explorer')}
-                onPress={() => Linking.openURL(explorerUrl)}
               />
             )}
           </View>
