@@ -7,6 +7,7 @@ import {
   NavigationProp,
   NavigationRouteContext,
   ParamListBase,
+  PreventRemoveContext,
   Route as NavigationRoute,
 } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -80,10 +81,19 @@ const storyRoute = (args: Record<string, unknown>): NavigationRoute<string> => {
   return { key: 'story', name: 'Story' };
 };
 
+// What usePreventRemove asks of a navigator; the sink never removes a screen.
+const mockPreventRemove = {
+  preventedRoutes: {},
+  setPreventRemove: () => {},
+  notifyPreventRemove: () => {},
+};
+
 export const withNavigation: Decorator = (Story, { args }) => (
   <NavigationContext.Provider value={mockNavigation}>
     <NavigationRouteContext.Provider value={storyRoute(args)}>
-      <Story />
+      <PreventRemoveContext.Provider value={mockPreventRemove}>
+        <Story />
+      </PreventRemoveContext.Provider>
     </NavigationRouteContext.Provider>
   </NavigationContext.Provider>
 );
