@@ -137,122 +137,88 @@ export default function SyncLine({
           ago(lastSynced, nowMs, t),
         )
       : '';
-  const sep = (
-    <Text variant="caption" tone="muted">
-      ·
-    </Text>
-  );
   const strong = (text: string, color: string) => (
     <Text variant="caption" style={{ color, fontWeight: '600' }}>
       {text}
     </Text>
   );
+  /** What the line says, the strong part first; " · " and the age follow. */
+  const aged = (head: React.ReactNode): React.ReactNode => (
+    <>
+      {head}
+      {!!balanceAge && ` · ${balanceAge}`}
+    </>
+  );
 
-  let body: React.ReactNode;
+  let lead: React.ReactNode;
+  let words: React.ReactNode;
   let label: string;
   switch (state) {
     case 'noInternet':
-      body = (
-        <>
-          <CloudDownloadIcon size={iconSizeSm} color={colors.fgWarning} />
-          {strong(t('header.sync-no-internet'), colors.fgWarning)}
-          {!!balanceAge && sep}
-          {!!balanceAge && (
-            <Text variant="caption" tone="muted">
-              {balanceAge}
-            </Text>
-          )}
-        </>
-      );
+      lead = <CloudDownloadIcon size={iconSizeSm} color={colors.fgWarning} />;
+      words = aged(strong(t('header.sync-no-internet'), colors.fgWarning));
       label = [t('header.sync-no-internet'), balanceAge]
         .filter(Boolean)
         .join('. ');
       break;
     case 'offline':
-      body = (
-        <>
-          <View
-            style={{
-              width: 7,
-              height: 7,
-              borderRadius: radiusPill,
-              backgroundColor: colors.borderMuted,
-            }}
-          />
-          {strong(t('header.sync-offline'), colors.fgWarning)}
-          {!!balanceAge && sep}
-          {!!balanceAge && (
-            <Text variant="caption" tone="muted">
-              {balanceAge}
-            </Text>
-          )}
-        </>
+      lead = (
+        <View
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: radiusPill,
+            backgroundColor: colors.borderMuted,
+          }}
+        />
       );
+      words = aged(strong(t('header.sync-offline'), colors.fgWarning));
       label = [t('header.sync-offline'), balanceAge].filter(Boolean).join('. ');
       break;
     case 'behind':
-      body = (
-        <>
-          <View
-            testID="header.sync-behind"
-            style={{
-              width: 7,
-              height: 7,
-              borderRadius: radiusPill,
-              backgroundColor: colors.fgWarning,
-            }}
-          />
-          {strong(t('header.sync-behind'), colors.fgWarning)}
-          {!!balanceAge && sep}
-          {!!balanceAge && (
-            <Text variant="caption" tone="muted">
-              {balanceAge}
-            </Text>
-          )}
-        </>
+      lead = (
+        <View
+          testID="header.sync-behind"
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: radiusPill,
+            backgroundColor: colors.fgWarning,
+          }}
+        />
       );
+      words = aged(strong(t('header.sync-behind'), colors.fgWarning));
       label = [t('header.sync-behind'), balanceAge].filter(Boolean).join('. ');
       break;
     case 'starting':
-      body = (
-        <>
-          <Spinner track={colors.sheetHandle} arc={colors.fgMuted} />
-          <Text variant="caption" tone="muted">
-            {t('header.sync-connecting').replace('{host}', hostOf(server))}
-          </Text>
-        </>
-      );
+      lead = <Spinner track={colors.sheetHandle} arc={colors.fgMuted} />;
+      words = t('header.sync-connecting').replace('{host}', hostOf(server));
       label = t('header.sync-connecting').replace('{host}', hostOf(server));
       break;
     case 'syncing':
-      body = (
-        <>
+      lead = (
+        <View
+          style={{
+            width: 56,
+            height: 4,
+            borderRadius: radiusPill,
+            backgroundColor: colors.sheetHandle,
+            overflow: 'hidden',
+          }}
+        >
           <View
             style={{
-              width: 56,
+              width: `${Math.min(100, Math.max(0, percentage))}%`,
               height: 4,
               borderRadius: radiusPill,
-              backgroundColor: colors.sheetHandle,
-              overflow: 'hidden',
+              backgroundColor: colors.fgSyncing,
             }}
-          >
-            <View
-              style={{
-                width: `${Math.min(100, Math.max(0, percentage))}%`,
-                height: 4,
-                borderRadius: radiusPill,
-                backgroundColor: colors.fgSyncing,
-              }}
-            />
-          </View>
-          {strong(
-            t('header.sync-syncing').replace(
-              '{n}',
-              String(Math.floor(percentage)),
-            ),
-            colors.fgSyncing,
-          )}
-        </>
+          />
+        </View>
+      );
+      words = strong(
+        t('header.sync-syncing').replace('{n}', String(Math.floor(percentage))),
+        colors.fgSyncing,
       );
       label = t('header.sync-syncing').replace(
         '{n}',
@@ -260,22 +226,18 @@ export default function SyncLine({
       );
       break;
     default:
-      body = (
-        <>
-          <View
-            testID="header.checkicon"
-            style={{
-              width: 7,
-              height: 7,
-              borderRadius: radiusPill,
-              backgroundColor: colors.fgAccent,
-            }}
-          />
-          <Text variant="caption" tone="muted">
-            {t('header.sync-synced')}
-          </Text>
-        </>
+      lead = (
+        <View
+          testID="header.checkicon"
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: radiusPill,
+            backgroundColor: colors.fgAccent,
+          }}
+        />
       );
+      words = t('header.sync-synced');
       label = t('header.sync-synced');
   }
 
@@ -297,14 +259,21 @@ export default function SyncLine({
         borderRadius: radiusPill,
       }}
     >
-      {body}
-      {metered && (
-        <>
-          {sep}
-          <CloudDownloadIcon size={iconSizeSm} color={colors.fgWarning} />
-          {strong(t('header.sync-mobile-data'), colors.fgWarning)}
-        </>
-      )}
+      {lead}
+      {/* One Text, so " · " is plain spaces; the gap is only after the lead. */}
+      <Text variant="caption" tone="muted">
+        {words}
+        {metered && (
+          <>
+            {' · '}
+            <CloudDownloadIcon
+              size={iconSizeSm}
+              color={colors.fgWarning}
+            />{' '}
+            {strong(t('header.sync-mobile-data'), colors.fgWarning)}
+          </>
+        )}
+      </Text>
     </Pressable>
   );
 }

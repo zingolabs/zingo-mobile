@@ -104,21 +104,21 @@ export default function HistoryRowBody({
             marginTop: 4,
           }}
         >
-          {!!text.state && (
-            <Text
-              variant="caption"
-              numberOfLines={1}
-              style={{ color: stateColor }}
-            >
-              {`${text.state.text} ·`}
-            </Text>
-          )}
+          {/* One Text, so " · " is plain spaces and the line truncates as one. */}
           <Text
             variant="caption"
             tone="muted"
             numberOfLines={1}
             style={{ flexShrink: 1 }}
           >
+            {!!text.state && (
+              <>
+                <Text variant="caption" style={{ color: stateColor }}>
+                  {text.state.text}
+                </Text>
+                {' · '}
+              </>
+            )}
             {text.line}
             {!!text.lineAmount && amounts.show(text.lineAmount)}
           </Text>

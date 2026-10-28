@@ -329,20 +329,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                 numberOfLines={1}
                 style={
                   {
-                    "color": "#E5484D",
-                    "fontSize": 12,
-                    "fontWeight": "400",
-                    "lineHeight": 16,
-                  }
-                }
-              >
-                text translated ·
-              </Text>
-              <Text
-                maxFontSizeMultiplier={2}
-                numberOfLines={1}
-                style={
-                  {
                     "color": "#888888",
                     "flexShrink": 1,
                     "fontSize": 12,
@@ -351,6 +337,20 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                   }
                 }
               >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#E5484D",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                      "lineHeight": 16,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+                 · 
                 text translated · Jan 1
               </Text>
             </View>
@@ -728,20 +728,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                 numberOfLines={1}
                 style={
                   {
-                    "color": "#F99D00",
-                    "fontSize": 12,
-                    "fontWeight": "400",
-                    "lineHeight": 16,
-                  }
-                }
-              >
-                text translated ·
-              </Text>
-              <Text
-                maxFontSizeMultiplier={2}
-                numberOfLines={1}
-                style={
-                  {
                     "color": "#888888",
                     "flexShrink": 1,
                     "fontSize": 12,
@@ -750,6 +736,20 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                   }
                 }
               >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#F99D00",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                      "lineHeight": 16,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+                 · 
                 text translated · Jan 1
               </Text>
             </View>
