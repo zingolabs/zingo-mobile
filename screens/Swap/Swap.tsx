@@ -158,28 +158,55 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
     [containerH],
   );
 
-  // The amount can be typed in USD; the swap is always quoted and sent in
-  // the coin. Selling ZEC, the price is the wallet's ZEC price. Buying, it is
-  // the coin's USD price from SwapKit, which only comes with a quote: the
-  // last one seen for each coin is kept, so USD is offered from the first
-  // quote on, and a requote does not rewrite what was typed.
+  // The amount can be typed in USD from the start; the swap is always quoted
+  // and sent in the coin. Selling ZEC, the price is the wallet's ZEC price.
+  // Buying, it is the coin's USD price: asked of SwapKit on its own as soon
+  // as the coin is picked, else the last quote's. USD typed before any price
+  // waits, and turns into the coin amount (and so a quote) once one comes.
   const quote = fiatQuote(zecPrice, server, walletChainName);
+  const coinId = form.selectedToken
+    ? tokenToSwapAsset(form.selectedToken).swapKitId
+    : undefined;
   const sellCoinPrice = useCoinPrice(
     form.quoteContext?.quoteInput.sellAsset.swapKitId,
     form.quoteContext?.fiatValueBasis.sellUsdUnitPrice ?? 0,
-    form.selectedToken
-      ? tokenToSwapAsset(form.selectedToken).swapKitId
-      : undefined,
+    coinId,
   );
+  const [askedPrices, setAskedPrices] = useState<Record<string, number>>({});
+  useEffect(() => {
+    if (
+      form.isOutbound ||
+      !coinId ||
+      !swapService ||
+      askedPrices[coinId] !== undefined
+    ) {
+      return;
+    }
+    let live = true;
+    swapService
+      .usdPrice(coinId)
+      .then(found => {
+        if (live) {
+          setAskedPrices(known => ({ ...known, [coinId]: found ?? 0 }));
+        }
+      })
+      .catch(() => {
+        if (live) {
+          setAskedPrices(known => ({ ...known, [coinId]: 0 }));
+        }
+      });
+    return () => {
+      live = false;
+    };
+  }, [form.isOutbound, coinId, swapService, askedPrices]);
   const price = form.isOutbound
     ? quote.kind === 'quote' && info.currencyName === GlobalConst.zecSwapChain
       ? quote.price
       : 0
-    : sellCoinPrice;
-  const usdAvailable = price > 0;
+    : sellCoinPrice || (coinId ? (askedPrices[coinId] ?? 0) : 0);
   const [unit, setUnit] = useState<'coin' | 'usd'>('coin');
   const [usdText, setUsdText] = useState<string>('');
-  const usdMode = usdAvailable && unit === 'usd';
+  const usdMode = unit === 'usd';
   /** What the amount is typed in, when not in USD. */
   const sellSymbol = form.isOutbound
     ? info.currencyName
@@ -187,23 +214,40 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
   const onChangeAmountText = (text: string) => {
     if (usdMode) {
       setUsdText(text);
-      form.setAmount(toZecText(text, price));
+      // Without a price the coin amount waits; the effect below fills it.
+      form.setAmount(price > 0 ? toZecText(text, price) : '');
     } else {
       form.setAmount(text);
     }
   };
+  /** USD typed before the price was known becomes the coin amount once it is. */
+  useEffect(() => {
+    if (usdMode && price > 0 && usdText && !form.amount) {
+      form.setAmount(toZecText(usdText, price));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [price]);
   const toggleUnit = () => {
     if (usdMode) {
       setUnit('coin');
     } else {
-      setUsdText(toFiatText(form.amount, price));
+      setUsdText(price > 0 ? toFiatText(form.amount, price) : '');
+      if (price <= 0) {
+        form.setAmount('');
+      }
       setUnit('usd');
     }
   };
-  const usdOf = (zecText: string): string => {
-    const text = toFiatText(zecText, price);
-    return text ? `≈ $${text}` : '';
-  };
+  /** The line under the field: the other unit, there from the start. */
+  const altText = usdMode
+    ? price > 0
+      ? `≈ ${formatAmount(parseAmountInput(form.amount))} ${sellSymbol}`
+      : `≈ … ${sellSymbol}`
+    : price > 0
+      ? `≈ $${toFiatText(form.amount || '0', price) || Utils.parseNumberFloatToStringLocale(0, 2)}`
+      : form.amount
+        ? '≈ $…'
+        : `≈ $${Utils.parseNumberFloatToStringLocale(0, 2)}`;
 
   const counterpartyTicker =
     form.selectedToken?.ticker || form.selectedToken?.symbol || '';
@@ -541,12 +585,8 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                   onChangeAmountText={onChangeAmountText}
                   amountPlaceholder="0"
                   unit={usdMode ? 'usd' : 'coin'}
-                  onToggleUnit={usdAvailable ? toggleUnit : undefined}
-                  altText={
-                    usdMode
-                      ? `≈ ${formatAmount(parseAmountInput(form.amount))} ${sellSymbol}`
-                      : usdOf(form.amount)
-                  }
+                  onToggleUnit={toggleUnit}
+                  altText={altText}
                   availableText={
                     !form.isOutbound
                       ? undefined

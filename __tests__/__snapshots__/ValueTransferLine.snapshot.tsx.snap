@@ -371,6 +371,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                   "fontSize": 15,
                   "fontWeight": "600",
                   "lineHeight": 21,
+                  "textDecorationLine": "line-through",
                 }
               }
             >

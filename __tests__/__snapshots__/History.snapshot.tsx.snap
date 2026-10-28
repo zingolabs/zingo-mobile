@@ -315,7 +315,6 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                 {
                   "alignItems": "center",
                   "borderRadius": 999,
-                  "columnGap": 8,
                   "flexDirection": "row",
                   "height": 28,
                   "marginTop": 10,
@@ -343,6 +342,13 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                   },
                   {},
                 ]
+              }
+            />
+            <View
+              style={
+                {
+                  "marginRight": 8,
+                }
               }
             />
             <Text
@@ -2041,7 +2047,6 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                 {
                   "alignItems": "center",
                   "borderRadius": 999,
-                  "columnGap": 8,
                   "flexDirection": "row",
                   "height": 28,
                   "marginTop": 10,
@@ -2069,6 +2074,13 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                   },
                   {},
                 ]
+              }
+            />
+            <View
+              style={
+                {
+                  "marginRight": 8,
+                }
               }
             />
             <Text
