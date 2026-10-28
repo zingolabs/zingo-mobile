@@ -32,6 +32,8 @@ import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 import Banner from '@ui/widgets/Banner';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import DepositSlip from '@screens/Swap/components/DepositSlip';
+import DepositSentSheet from '@screens/Swap/components/DepositSentSheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
 import { useRemoveSwap } from '@screens/Swap/useRemoveSwap';
 
@@ -68,6 +70,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   const [attachError, setAttachError] = useState<string>('');
   const [retryError, setRetryError] = useState<string>(broadcastError ?? '');
   const [retrying, setRetrying] = useState<boolean>(false);
+  const sentSheetRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
     const timer = setInterval(() => setNowMs(Date.now()), 30_000);
@@ -313,14 +316,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
               testID="swap.deposit.sent"
               variant="primary"
               title={translate('swap.deposit-sent') as string}
-              onPress={async () => {
-                await swapService
-                  ?.markDepositSent({ recordId })
-                  .catch(e =>
-                    console.log(`SwapDeposit: markDepositSent failed ${e}`),
-                  );
-                toTracking();
-              }}
+              onPress={() => sentSheetRef.current?.present()}
             />
             <Text
               variant="caption"
@@ -334,6 +330,18 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
       }
     >
       <DepositSlip record={record} />
+      <DepositSentSheet
+        ref={sentSheetRef}
+        record={record}
+        onConfirm={async () => {
+          await swapService
+            ?.markDepositSent({ recordId })
+            .catch(e =>
+              console.log(`SwapDeposit: markDepositSent failed ${e}`),
+            );
+        }}
+        onConfirmed={toTracking}
+      />
     </SwapFlowScreen>
   );
 };
