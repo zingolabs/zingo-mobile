@@ -67,6 +67,7 @@ import {
 /** After utils: the uris barrel and utils import each other, and this order resolves it. */
 import { parseZcashURI } from '@app/uris';
 import { useResult } from '@app/navigation/results';
+import { sendSubject } from './sendSubject';
 import {
   fiatEligible,
   fiatQuote,
@@ -803,24 +804,22 @@ const Send: React.FunctionComponent<SendProps> = () => {
     } as SendPageStateClass;
   };
 
+  // Confirm has already replaced itself with the sending screen, so a send
+  // that went never has its review under it.
   const confirmSend = async (sendPageStatePar: SendPageStateClass) => {
+    const subject = sendSubject(sendPageStatePar.toaddr, addressBook);
     const permit = sendPermitNow();
     if (permit.kind === 'error') {
-      addLastSnackbar(translate(permit.errorKey) as string);
+      navigation.navigate(Route.Computing, {
+        phase: 'failed',
+        failure: {
+          kind: 'verbatim',
+          text: translate(permit.errorKey) as string,
+        },
+        subject,
+      });
       return;
     }
-
-    // The sending screen says how much goes and to whom: the contact, the
-    // Zcash Name, or the short address.
-    const to = sendPageStatePar.toaddr;
-    const subject = {
-      amount: formatAmount(Utils.parseStringLocaleToNumberFloat(to.amount)),
-      who:
-        addressBook.find(entry => entry.address === to.to)?.label ||
-        to.znsAlias ||
-        Utils.trimToSmall(to.to, 6),
-    };
-    navigation.navigate(Route.Computing, { subject });
 
     // The MAX send travels the send-all path all the way: quoted and sent by
     // the same proposal, so the amount confirmed is the amount broadcast.

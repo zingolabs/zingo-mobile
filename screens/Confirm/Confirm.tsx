@@ -19,10 +19,11 @@ import { kindKey } from '@screens/Send/components/RecipientField';
 import { AppDrawerParamList } from '@app/types';
 import Utils from '@app/utils';
 import { deliver } from '@app/navigation/results';
+import { sendSubject } from '@screens/Send/sendSubject';
 import { fiatQuote } from '@app/price/fiatQuote';
 import { formatAmount, formatUsd } from '@app/utils/formatAmount';
 import { sendPermit } from '@app/walletBackend/transforms/sendPermit';
-import { SendPageStateClass, ProposalPoolsType } from '@app/AppState';
+import { Route, SendPageStateClass, ProposalPoolsType } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type ConfirmProps = NativeStackScreenProps<AppDrawerParamList, 'Confirm'>;
@@ -185,7 +186,14 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                   ? t('send.confirm-nym-all')
                   : t('send.confirm-nym')
               }
-              onPress={() => deliver('send.confirm', '')}
+              onPress={() => {
+                // The review leaves the stack: back from the sending screen
+                // never reopens a send that has gone.
+                navigation.replace(Route.Computing, {
+                  subject: sendSubject(to, addressBook),
+                });
+                deliver('send.confirm', '');
+              }}
               disabled={permit.kind === 'error'}
             />
           </ButtonStack>

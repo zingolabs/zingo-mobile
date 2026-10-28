@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
 import { View, useWindowDimensions } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, usePreventRemove } from '@react-navigation/native';
 import Animated, {
   ReduceMotion,
   useAnimatedStyle,
@@ -89,6 +89,19 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
 
   const toHistory = () =>
     navigation.navigate(Route.Home, { screen: Route.History }, { pop: true });
+  /**
+   * Whatever takes this screen away (the back gesture, Android's back,
+   * Done) lands on History: under it is the screen a send or shield started
+   * from, never the review of a send that has gone.
+   */
+  const [leaving, setLeaving] = useState<boolean>(false);
+  usePreventRemove(!leaving, () => setLeaving(true));
+  useEffect(() => {
+    if (leaving) {
+      toHistory();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leaving]);
   const sent = txid
     ? (valueTransfers ?? []).find(vt => vt.txid === txid)
     : undefined;
