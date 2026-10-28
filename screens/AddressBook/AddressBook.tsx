@@ -241,7 +241,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     // The book was opened from the options panel, which waits under it for
     // the pop. Sending leaves for the Send tab, not back to the panel.
     optionsPanel.close();
-    navigation.navigate(Route.Home, { screen: Route.Send });
+    navigation.navigate(Route.Home, { screen: Route.Send }, { pop: true });
   };
 
   const copy = (contact: AddressBookFileClass) => {

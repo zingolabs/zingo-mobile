@@ -371,10 +371,14 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
               variant="primary"
               title={t('swap.get-new-quote')}
               onPress={() =>
-                navigation.navigate(Route.Home, {
-                  screen: Route.Swap,
-                  params: { prefill: prefillFromRecord(record, Date.now()) },
-                })
+                navigation.navigate(
+                  Route.Home,
+                  {
+                    screen: Route.Swap,
+                    params: { prefill: prefillFromRecord(record, Date.now()) },
+                  },
+                  { pop: true },
+                )
               }
             />
           )}

@@ -226,7 +226,7 @@ const ValueTransferDetail: React.FunctionComponent<
     state.toaddr.amount = toAmountInput(vt.amount);
     state.toaddr.memo = memo ?? '';
     setSendPageState(state);
-    navigation.navigate(Route.Home, { screen: Route.Send });
+    navigation.navigate(Route.Home, { screen: Route.Send }, { pop: true });
   };
 
   const remove = () =>
@@ -258,7 +258,11 @@ const ValueTransferDetail: React.FunctionComponent<
               result.ok,
               translate,
             );
-            navigation.navigate(Route.Home, { screen: Route.History });
+            navigation.navigate(
+              Route.Home,
+              { screen: Route.History },
+              { pop: true },
+            );
           },
         },
         { text: t('cancel'), style: 'cancel' },

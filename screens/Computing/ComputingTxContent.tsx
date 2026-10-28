@@ -88,7 +88,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
   const stepStyle = useAnimatedStyle(() => ({ opacity: fade.value }));
 
   const toHistory = () =>
-    navigation.navigate(Route.Home, { screen: Route.History });
+    navigation.navigate(Route.Home, { screen: Route.History }, { pop: true });
   const sent = txid
     ? (valueTransfers ?? []).find(vt => vt.txid === txid)
     : undefined;

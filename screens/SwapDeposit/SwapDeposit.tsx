@@ -270,10 +270,16 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
                 variant="primary"
                 title={translate('swap.get-new-quote') as string}
                 onPress={() =>
-                  navigation.navigate(Route.Home, {
-                    screen: Route.Swap,
-                    params: { prefill: prefillFromRecord(record, Date.now()) },
-                  })
+                  navigation.navigate(
+                    Route.Home,
+                    {
+                      screen: Route.Swap,
+                      params: {
+                        prefill: prefillFromRecord(record, Date.now()),
+                      },
+                    },
+                    { pop: true },
+                  )
                 }
               />
             )}

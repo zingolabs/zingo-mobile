@@ -224,9 +224,13 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
             const sendPageState = new SendPageStateClass(new ToAddrClass(0));
             sendPageState.toaddr.to = address;
             setSendPageState(sendPageState);
-            navigation.navigate(Route.Home, {
-              screen: Route.Send,
-            });
+            navigation.navigate(
+              Route.Home,
+              {
+                screen: Route.Send,
+              },
+              { pop: true },
+            );
           }}
         >
           <PlaneIcon

@@ -91,9 +91,14 @@ describe('AddressBook send', () => {
       jest.runOnlyPendingTimers();
     });
 
-    expect(mockNavigation.navigate).toHaveBeenCalledWith(Route.Home, {
-      screen: Route.Send,
-    });
+    // Back to the home under it, not a new one on top (React Navigation 7).
+    expect(mockNavigation.navigate).toHaveBeenCalledWith(
+      Route.Home,
+      {
+        screen: Route.Send,
+      },
+      { pop: true },
+    );
     expect(kind()).toBe('closed');
   });
 });
