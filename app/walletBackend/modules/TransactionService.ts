@@ -13,6 +13,11 @@ import { RPCSendProposeType } from '@app/walletBackend/types/RPCSendProposeType'
 import { RPCSendType } from '@app/walletBackend/types/RPCSendType';
 import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
 import { depositSpendsSourceAddress } from '@app/swap/depositRouting';
+import {
+  depositAfterDeshieldError,
+  holdDeshield,
+} from '@app/swap/depositAfterDeshield';
+import { toFfiError } from '@app/walletBackend/ffi';
 import { SyncCoordinator } from './SyncCoordinator';
 import { withSyncStopped } from '@app/walletBackend/utils/syncBracket';
 import { Buffer } from 'buffer';
@@ -160,7 +165,9 @@ export class TransactionService {
           String(args.amountAtomic),
           args.memoBytes && carriesMemo ? bytesToHex(args.memoBytes) : '',
         ),
-      );
+      ).catch(rejection => {
+        throw asDepositAfterDeshield(rejection);
+      });
       const parsed: RPCSendType = JSON.parse(answer);
       if (parsed.error) {
         throw new Error(parsed.error);
@@ -181,17 +188,36 @@ export class TransactionService {
     this.config.keepAwake(true);
     try {
       const parsed: RPCSendType = JSON.parse(
-        await withSyncStopped(() => RPCModule.confirmProcess()),
+        await withSyncStopped(() => RPCModule.confirmProcess()).catch(
+          rejection => {
+            throw asDepositAfterDeshield(rejection);
+          },
+        ),
       );
       if (parsed.error) {
         throw new Error(parsed.error);
       }
+      holdDeshield(undefined);
       return parsed.txids ?? [];
     } finally {
       await this.syncCoordinator.configure();
       this.setInSend(false);
     }
   }
+}
+
+/**
+ * A deposit rejection as zingolib's held-deposit case when the FFI code says
+ * so, remembering which deshield it holds; any other rejection as it came.
+ */
+function asDepositAfterDeshield(rejection: unknown): unknown {
+  const error = toFfiError(rejection);
+  if (error.code !== 'SendAfterDeshield') {
+    return rejection;
+  }
+  const typed = depositAfterDeshieldError(error.message);
+  holdDeshield(typed.deshieldTxId);
+  return typed;
 }
 
 function bytesToHex(bytes: Uint8Array): string {

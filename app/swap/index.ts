@@ -23,6 +23,12 @@ export { hasDepositEvidence } from './depositEvidence';
 export { newlyExpired, newlyRefunding } from './swapTransitions';
 export { prefillFromRecord } from './swapPrefill';
 export { canResendSale, unsentSale } from './unsentSale';
+export { saleDepositRequest } from './saleDepositRequest';
+export type { SaleDepositRequestType } from './saleDepositRequest';
+export {
+  DepositAfterDeshieldError,
+  heldDeshield,
+} from './depositAfterDeshield';
 export { NEAR_NO_REFUND_USD, nearRefusesSmallRefunds } from './nearSmallSwap';
 export type { SwapPrefillType } from './types/SwapPrefillType';
 export {

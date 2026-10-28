@@ -14,13 +14,18 @@ import { AppDrawerParamList } from '@app/types';
 import { Route } from '@app/AppState';
 import { ContextAppLoaded, useSwapService } from '@app/context';
 import {
+  DepositAfterDeshieldError,
   SwapDirectionEnum,
   SwapStatusEnum,
   canResendSale,
   depositDeadlineMs,
+  formatAmountForDisplay,
+  heldDeshield,
   isRefunding,
   isTerminalStatus,
   prefillFromRecord,
+  providerShortLabel,
+  saleDepositRequest,
   unsentSale,
 } from '@app/swap';
 import { leaveFlow } from '@app/navigation/navigate';
@@ -36,14 +41,12 @@ import DepositSentSheet from '@screens/Swap/components/DepositSentSheet';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
 import { useRemoveSwap } from '@screens/Swap/useRemoveSwap';
+import AuthorizeSheet from '@screens/SwapReview/AuthorizeSheet';
 
 type SwapDepositProps = NativeStackScreenProps<
   AppDrawerParamList,
   typeof Route.SwapDeposit
 >;
-
-/** The error text zingolib answers when the deshield went out and the vault payment did not. */
-const AFTER_DESHIELD = 'send after deshield';
 
 /**
  * The deposit a swap waits for. Buying ZEC, it is paid from the other wallet:
@@ -58,7 +61,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   route,
 }) => {
   const { recordId, broadcastError } = route.params;
-  const { translate, sendSwapDeposit, resumeSwapDeposit } =
+  const { translate, biometrics, sendSwapDeposit, resumeSwapDeposit } =
     useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const swapService = useSwapService();
@@ -71,6 +74,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   const [retryError, setRetryError] = useState<string>(broadcastError ?? '');
   const [retrying, setRetrying] = useState<boolean>(false);
   const sentSheetRef = useRef<BottomSheetModal>(null);
+  const authSheetRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
     const timer = setInterval(() => setNowMs(Date.now()), 30_000);
@@ -147,29 +151,33 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
     }
     setRetrying(true);
     setRetryError('');
+    // Once this sale's deshield went out, zingolib holds its vault payment
+    // for a resume until the app restarts; after that it is sent anew.
+    const deshieldTxId =
+      record.broadcast?.txId === undefined
+        ? record.broadcast?.allTxIds?.[0]
+        : undefined;
+    const resume = heldDeshield(deshieldTxId);
     try {
-      // Once the deshield went out, zingolib keeps the vault payment for a
-      // resume; proposing again would drop it.
-      const resume = retryError.toLowerCase().includes(AFTER_DESHIELD);
-      const txIds = resume
-        ? await resumeSwapDeposit()
-        : await sendSwapDeposit({
-            depositAddress: record.depositAddress,
-            amountAtomic: Math.round(
-              parseFloat(record.sellAmountHumanDecimal) * 1e8,
-            ),
-            memoBytes: (record.providerData as { memo?: string }).memo
-              ? new TextEncoder().encode(
-                  (record.providerData as { memo?: string }).memo,
-                )
-              : undefined,
-            viaSourceAddress:
-              !!record.sourceAddress &&
-              !!(record.providerData as { memo?: string }).memo,
-            shieldedMemoAddress: (
-              record.providerData as { shieldedMemoAddress?: string }
-            ).shieldedMemoAddress,
+      let txIds: string[];
+      try {
+        txIds = resume
+          ? await resumeSwapDeposit()
+          : await sendSwapDeposit(saleDepositRequest(record));
+      } catch (e) {
+        if (
+          e instanceof DepositAfterDeshieldError &&
+          e.kind === 'failed' &&
+          e.deshieldTxId &&
+          !resume
+        ) {
+          await swapService.markDeshielded({
+            recordId,
+            deshieldTxId: e.deshieldTxId,
           });
+        }
+        throw e;
+      }
       await swapService.markBroadcasted({
         recordId,
         txId: txIds[txIds.length - 1],
@@ -180,19 +188,33 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
       });
       navigation.replace(Route.SwapTracking, { recordId });
     } catch (e) {
-      setRetryError(`${e}`);
+      // Another sale's held deposit refuses this one before anything leaves.
+      setRetryError(
+        e instanceof DepositAfterDeshieldError &&
+          e.kind === 'pending' &&
+          e.deshieldTxId !== deshieldTxId
+          ? (translate('swap.deposit-other-held') as string)
+          : `${e}`,
+      );
     } finally {
       setRetrying(false);
     }
   }, [
     record,
     swapService,
-    retryError,
     resumeSwapDeposit,
     sendSwapDeposit,
     recordId,
     navigation,
+    translate,
   ]);
+  const onRetry = () => {
+    if (biometrics) {
+      authSheetRef.current?.present();
+      return;
+    }
+    retry();
+  };
   const leave = useCallback(() => leaveFlow(navigation), [navigation]);
   const removeSwap = useRemoveSwap(leave);
 
@@ -252,7 +274,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
                 title={translate('swap.deposit-retry') as string}
                 busy={retrying}
                 disabled={retrying}
-                onPress={retry}
+                onPress={onRetry}
               />
             ) : (
               <Button
@@ -297,6 +319,11 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
           <View style={{ height: space8 }} />
           {hashBox}
         </View>
+        <AuthorizeSheet
+          ref={authSheetRef}
+          summary={`${translate('swap.auth-line-1') as string} ${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${record.sellAsset.symbol} ${translate('swap.auth-line-2') as string} ${providerShortLabel(record.provider)}.`}
+          onAuthorized={retry}
+        />
       </SwapFlowScreen>
     );
   }
