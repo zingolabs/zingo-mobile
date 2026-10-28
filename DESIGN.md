@@ -715,6 +715,9 @@ deposit, Confirm, Receive, the swap sheets) is a compact note: the icon inline
 at 16 with no tile, the text in `caption` regular with no bold, padding 12,
 `radiusMd`, in the tone's own colours. Long explanations hide behind a link
 ("See why"). There is no danger note: errors sit next to what failed.
+With a button beside it, the text block is centred against the button and the
+icon stays on the first line of text: one line of text puts the icon, the text
+and the button on one centred line.
 
 ## Do's and Don'ts
 
