@@ -169,17 +169,6 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
       <View style={{ marginTop: space20 }}>
         <ButtonStack>
           <Button
-            variant="quiet"
-            title={t('cancel')}
-            onPress={() => {
-              setLabel('');
-              Keyboard.dismiss();
-              setTimeout(() => {
-                closeSheet();
-              }, 100);
-            }}
-          />
-          <Button
             testID="receive.new-create"
             variant="primary"
             title={t('receive.create')}

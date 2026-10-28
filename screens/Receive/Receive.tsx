@@ -233,6 +233,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
       </Animated.View>
       <AppSheetModal
         ref={bottomSheetRef}
+        // However it closes (the X, a swipe, the backdrop), its content unmounts and opens empty next time.
+        onDismiss={() => setSheetType(null)}
         header={sheetType === 'NAT' ? undefined : xHeader}
         handle={sheetType === 'NAT'}
         contentStyle={
@@ -251,7 +253,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
             setAddressBook={setAddressBook}
           />
         )}
-        {sheetType === 'VA' && <VerifyAddress closeSheet={hide} />}
+        {sheetType === 'VA' && <VerifyAddress />}
       </AppSheetModal>
     </View>
   );

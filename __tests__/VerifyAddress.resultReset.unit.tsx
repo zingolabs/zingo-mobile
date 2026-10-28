@@ -49,7 +49,7 @@ async function verified() {
   };
   const view = render(
     <ContextAppLoadedProvider value={context}>
-      <VerifyAddress closeSheet={jest.fn()} />
+      <VerifyAddress />
     </ContextAppLoadedProvider>,
   );
   await act(async () => {
@@ -76,10 +76,17 @@ test('Tests that the verification result is cleared when the address changes.', 
   expect(view.queryByText('receive.verification-success')).toBeNull();
 });
 
-test('Tests that the verification result is cleared when the sheet is cancelled.', async () => {
+test('Tests that the sheet opens empty again when it was closed after a verification.', async () => {
   const view = await verified();
-  await act(async () => {
-    fireEvent.press(view.getByText('cancel'));
-  });
-  expect(view.queryByText('receive.verification-success')).toBeNull();
+  // Receive unmounts the sheet's content however the sheet closes.
+  view.unmount();
+  const again = render(
+    <ContextAppLoadedProvider
+      value={{ ...defaultAppContextLoaded, translate: (key: string) => key }}
+    >
+      <VerifyAddress />
+    </ContextAppLoadedProvider>,
+  );
+  expect(again.queryByText('receive.verification-success')).toBeNull();
+  expect(again.getByTestId('send.addressplaceholder').props.value).toBe('');
 });

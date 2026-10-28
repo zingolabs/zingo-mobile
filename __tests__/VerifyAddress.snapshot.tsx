@@ -19,12 +19,11 @@ describe('VerifyAddress - snapshot', () => {
     const state = { ...defaultAppContextLoaded };
     state.translate = mockTranslate;
     state.server = mockServer;
-    const onFn = jest.fn();
 
     expect(
       render(
         <ContextAppLoadedProvider value={state}>
-          <VerifyAddress closeSheet={onFn} />
+          <VerifyAddress />
         </ContextAppLoadedProvider>,
       ).toJSON(),
     ).toMatchSnapshot();

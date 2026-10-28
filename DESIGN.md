@@ -647,6 +647,7 @@ Use the shared component; never build a second one that looks the same.
 | A filter | `Chip` (it never navigates) |
 | Anything pressed that none of these covers | `Pressable` with its `kind`: `button`, `row`, `icon`, `link` or `tile` (see Motion, Pressing) |
 | A delete | `dangerText` "Delete" on the screen; the confirmation sheet titled "Delete", with its own message, a filled `danger` "Delete" and Cancel under it. Every delete says "Delete", on the screen and in the sheet, the same word in every language. The Address Book's red bin opens the same sheet |
+| Leaving a sheet | A sheet with an X in its `TitleBar` has no Cancel or Close button: the X closes it, and closing it any way (the X, a swipe, the backdrop) leaves it empty for next time. A sheet with a handle and no X (Shield, Authorize, Delete wallet, Add tag, Contact, every confirmation) keeps Cancel, its only way out. Confirm and the swap review keep the back arrow with Cancel: the arrow steps back, Cancel leaves the flow |
 | An on/off setting | `Switch` (exception D), the only toggle in the app |
 | A checkbox | `Checkbox`: box 16 × 16 (`iconSizeSm`), radius 4 as `radiusXs` (`radiusSm` 8 would read as a radio at that size), border 1.5 in `borderMuted` when off; `bgAccent` with the tick in `fgOnAccent` when on. The label next to it is part of the tap area, at least 44 high |
 | An amount to type | `AmountCard` (exception C) |

@@ -23,12 +23,7 @@ import { RPCCheckAddressType } from '@app/walletBackend/types/RPCCheckAddressTyp
 import { VerifyCheckIcon } from '@ui/primitives/Icons/VerifyCheckIcon';
 import { VerifyXIcon } from '@ui/primitives/Icons/VerifyXIcon';
 
-type VerifyAddressProps = {
-  closeSheet: () => void;
-};
-const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
-  closeSheet,
-}) => {
+const VerifyAddress: React.FunctionComponent = () => {
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar, server } = context;
   const { colors } = useTheme();
@@ -188,18 +183,6 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
           }}
         >
           <ButtonStack>
-            <Button
-              variant="quiet"
-              title={translate('cancel') as string}
-              onPress={() => {
-                setAddress('');
-                setVerifyOK(null);
-                Keyboard.dismiss();
-                setTimeout(() => {
-                  closeSheet();
-                }, 100);
-              }}
-            />
             <Button
               variant="primary"
               title={translate('verify') as string}
