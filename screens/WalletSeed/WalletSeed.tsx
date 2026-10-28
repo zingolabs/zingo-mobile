@@ -303,7 +303,9 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
           <View
             testID={seedBackedUp ? 'walletseed.ok' : 'walletseed.no'}
             style={{
-              gap: space4,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: space12,
               minHeight: rowMinHeight,
               marginHorizontal: SIDE,
               marginBottom: space12,
@@ -315,67 +317,64 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               backgroundColor: strip.bg,
             }}
           >
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                alignItems: 'center',
-                columnGap: space8,
-                rowGap: space4,
-              }}
-            >
+            <View style={{ flex: 1, gap: space4 }}>
               <View
                 style={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: radiusXs,
-                  backgroundColor: strip.tile,
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
                   alignItems: 'center',
-                  justifyContent: 'center',
+                  columnGap: space8,
+                  rowGap: space4,
                 }}
               >
-                {seedBackedUp ? (
-                  <ShieldCheckIcon size={iconSizeSm} color={colors.fgAccent} />
-                ) : (
-                  <TriangleAlert size={iconSizeSm} color={colors.fgWarning} />
-                )}
+                <View
+                  style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: radiusXs,
+                    backgroundColor: strip.tile,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {seedBackedUp ? (
+                    <ShieldCheckIcon
+                      size={iconSizeSm}
+                      color={colors.fgAccent}
+                    />
+                  ) : (
+                    <TriangleAlert size={iconSizeSm} color={colors.fgWarning} />
+                  )}
+                </View>
+                <Text
+                  variant="bodyStrong"
+                  tone={seedBackedUp ? 'accent' : 'warning'}
+                >
+                  {
+                    translate(
+                      seedBackedUp
+                        ? 'walletseed.ok-title'
+                        : 'walletseed.no-title',
+                    ) as string
+                  }
+                </Text>
               </View>
-              <Text
-                variant="bodyStrong"
-                tone={seedBackedUp ? 'accent' : 'warning'}
-              >
-                {
-                  translate(
-                    seedBackedUp
-                      ? 'walletseed.ok-title'
-                      : 'walletseed.no-title',
-                  ) as string
-                }
-              </Text>
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: space12,
-              }}
-            >
-              <Text variant="caption" tone="muted" style={{ flex: 1 }}>
+              <Text variant="caption" tone="muted">
                 {seedBackedUp
                   ? backedUpOn
                   : (translate('walletseed.no-sub') as string)}
               </Text>
-              {!seedBackedUp && (
-                <Button
-                  testID="walletseed.backup"
-                  variant="primary"
-                  size="small"
-                  inline
-                  title={translate('seednotice.button') as string}
-                  onPress={() => openFlow('push')}
-                />
-              )}
             </View>
+            {!seedBackedUp && (
+              <Button
+                testID="walletseed.backup"
+                variant="primary"
+                size="small"
+                inline
+                title={translate('seednotice.button') as string}
+                onPress={() => openFlow('push')}
+              />
+            )}
           </View>
         )}
 

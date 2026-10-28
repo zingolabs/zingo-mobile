@@ -1352,7 +1352,6 @@
   },
   "seednotice": {
     "title": "Frase semilla",
-    "pending": "sin respaldo",
     "body-pending": "Si pierdes el teléfono, es la única forma de recuperar tus fondos.",
     "button": "Respaldar",
     "done": "copia hecha"
@@ -1368,7 +1367,6 @@
     "you-get-ironwood": "Recibes en Ironwood",
     "button": "Proteger",
     "notice-title": "Fondos transparentes",
-    "notice-public": "público",
     "notice-body": "Cualquiera puede ver {amount}. Protégelo para que sea privado."
   },
   "seedbackup": {

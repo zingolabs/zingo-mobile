@@ -1352,7 +1352,6 @@
   },
   "seednotice": {
     "title": "Kurtarma ifadesi",
-    "pending": "yedeklenmedi",
     "body-pending": "Telefonunuzu kaybederseniz fonlarınızı kurtarmanın tek yolu budur.",
     "button": "Yedekle",
     "done": "yedeklendi"
@@ -1368,7 +1367,6 @@
     "you-get-ironwood": "Ironwood’da alacağınız",
     "button": "Korumaya al",
     "notice-title": "Şeffaf fonlar",
-    "notice-public": "herkese açık",
     "notice-body": "{amount} herkes tarafından görülebilir. Gizli tutmak için korumaya alın."
   },
   "seedbackup": {

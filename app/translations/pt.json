@@ -1352,7 +1352,6 @@
   },
   "seednotice": {
     "title": "Frase semente",
-    "pending": "sem backup",
     "body-pending": "Se você perder o celular, esta é a única forma de recuperar seus fundos.",
     "button": "Fazer backup",
     "done": "backup feito"
@@ -1368,7 +1367,6 @@
     "you-get-ironwood": "Você recebe no Ironwood",
     "button": "Proteger",
     "notice-title": "Fundos transparentes",
-    "notice-public": "público",
     "notice-body": "Qualquer pessoa pode ver {amount}. Proteja para mantê-lo privado."
   },
   "seedbackup": {

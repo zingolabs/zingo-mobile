@@ -1352,7 +1352,6 @@
   },
   "seednotice": {
     "title": "Seed phrase",
-    "pending": "not backed up",
     "body-pending": "If you lose your phone, this is the only way to recover your funds.",
     "button": "Back up",
     "done": "backed up"
@@ -1368,7 +1367,6 @@
     "you-get-ironwood": "You get in Ironwood",
     "button": "Shield",
     "notice-title": "Transparent funds",
-    "notice-public": "public",
     "notice-body": "{amount} can be seen by anyone. Shield it to keep it private."
   },
   "seedbackup": {
