@@ -90,6 +90,7 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
     >
       <Text
         maxFontSizeMultiplier={2}
+        numberOfLines={1}
         style={
           {
             "color": "#888888",
@@ -158,6 +159,7 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
     >
       <Text
         maxFontSizeMultiplier={2}
+        numberOfLines={1}
         style={
           {
             "color": "#888888",
@@ -226,6 +228,7 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
     >
       <Text
         maxFontSizeMultiplier={2}
+        numberOfLines={1}
         style={
           {
             "color": "#888888",
@@ -294,6 +297,7 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
     >
       <Text
         maxFontSizeMultiplier={2}
+        numberOfLines={1}
         style={
           {
             "color": "#888888",
@@ -362,6 +366,7 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
     >
       <Text
         maxFontSizeMultiplier={2}
+        numberOfLines={1}
         style={
           {
             "color": "#18bd18",
@@ -430,6 +435,7 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
     >
       <Text
         maxFontSizeMultiplier={2}
+        numberOfLines={1}
         style={
           {
             "color": "#888888",
@@ -498,6 +504,7 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
     >
       <Text
         maxFontSizeMultiplier={2}
+        numberOfLines={1}
         style={
           {
             "color": "#888888",
@@ -678,6 +685,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
     >
       <Text
         maxFontSizeMultiplier={2}
+        numberOfLines={1}
         style={
           {
             "color": "#18bd18",
@@ -746,6 +754,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
     >
       <Text
         maxFontSizeMultiplier={2}
+        numberOfLines={1}
         style={
           {
             "color": "#888888",
@@ -814,6 +823,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
     >
       <Text
         maxFontSizeMultiplier={2}
+        numberOfLines={1}
         style={
           {
             "color": "#888888",
@@ -882,6 +892,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
     >
       <Text
         maxFontSizeMultiplier={2}
+        numberOfLines={1}
         style={
           {
             "color": "#888888",
@@ -950,6 +961,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
     >
       <Text
         maxFontSizeMultiplier={2}
+        numberOfLines={1}
         style={
           {
             "color": "#888888",
@@ -1018,6 +1030,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
     >
       <Text
         maxFontSizeMultiplier={2}
+        numberOfLines={1}
         style={
           {
             "color": "#888888",
@@ -1086,6 +1099,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
     >
       <Text
         maxFontSizeMultiplier={2}
+        numberOfLines={1}
         style={
           {
             "color": "#888888",

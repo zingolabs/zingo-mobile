@@ -199,6 +199,7 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
             >
               <Text
                 maxFontSizeMultiplier={2}
+                numberOfLines={1}
                 style={
                   {
                     "color": "#18bd18",
@@ -683,6 +684,7 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
             >
               <Text
                 maxFontSizeMultiplier={2}
+                numberOfLines={1}
                 style={
                   {
                     "color": "#E6C46A",

@@ -1246,6 +1246,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                   >
                     <Text
                       maxFontSizeMultiplier={2}
+                      numberOfLines={1}
                       style={
                         {
                           "color": "#E6C46A",
@@ -1541,6 +1542,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                   >
                     <Text
                       maxFontSizeMultiplier={2}
+                      numberOfLines={1}
                       style={
                         {
                           "color": "#E6C46A",

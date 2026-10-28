@@ -461,314 +461,287 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           style={
             {
               "flexDirection": "row",
+              "flexWrap": "wrap",
               "gap": 8,
               "marginTop": 12,
             }
           }
         >
           <View
-            style={
+            accessibilityRole="button"
+            accessibilityState={
               {
-                "flex": 1,
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": true,
               }
             }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            hitSlop={
+              {
+                "bottom": 6,
+                "top": 6,
+              }
+            }
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                {
+                  "alignItems": "center",
+                  "backgroundColor": "#18bd181F",
+                  "borderColor": "#18bd18",
+                  "borderRadius": 999,
+                  "borderWidth": 1,
+                  "justifyContent": "center",
+                  "minHeight": 32,
+                  "paddingHorizontal": 12,
+                },
+                {},
+              ]
+            }
+            testID="insight.preset-4w"
           >
-            <View
-              accessibilityRole="button"
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": true,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              hitSlop={
-                {
-                  "bottom": 6,
-                  "top": 6,
-                }
-              }
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
+            <Text
+              maxFontSizeMultiplier={2}
+              numberOfLines={1}
               style={
-                [
-                  {
-                    "alignItems": "center",
-                    "backgroundColor": "#18bd181F",
-                    "borderColor": "#18bd18",
-                    "borderRadius": 999,
-                    "borderWidth": 1,
-                    "justifyContent": "center",
-                    "minHeight": 32,
-                    "paddingHorizontal": 12,
-                  },
-                  {},
-                ]
-              }
-              testID="insight.preset-4w"
-            >
-              <Text
-                maxFontSizeMultiplier={2}
-                style={
-                  {
-                    "color": "#18bd18",
-                    "fontSize": 13,
-                    "fontWeight": "600",
-                    "lineHeight": 18,
-                  }
+                {
+                  "color": "#18bd18",
+                  "fontSize": 13,
+                  "fontWeight": "600",
+                  "lineHeight": 18,
                 }
-              >
-                text translated
-              </Text>
-            </View>
+              }
+            >
+              text translated
+            </Text>
           </View>
           <View
-            style={
+            accessibilityRole="button"
+            accessibilityState={
               {
-                "flex": 1,
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": true,
               }
             }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            hitSlop={
+              {
+                "bottom": 6,
+                "top": 6,
+              }
+            }
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                {
+                  "alignItems": "center",
+                  "backgroundColor": "#18bd181F",
+                  "borderColor": "#18bd18",
+                  "borderRadius": 999,
+                  "borderWidth": 1,
+                  "justifyContent": "center",
+                  "minHeight": 32,
+                  "paddingHorizontal": 12,
+                },
+                {},
+              ]
+            }
+            testID="insight.preset-3m"
           >
-            <View
-              accessibilityRole="button"
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": true,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              hitSlop={
-                {
-                  "bottom": 6,
-                  "top": 6,
-                }
-              }
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
+            <Text
+              maxFontSizeMultiplier={2}
+              numberOfLines={1}
               style={
-                [
-                  {
-                    "alignItems": "center",
-                    "backgroundColor": "#18bd181F",
-                    "borderColor": "#18bd18",
-                    "borderRadius": 999,
-                    "borderWidth": 1,
-                    "justifyContent": "center",
-                    "minHeight": 32,
-                    "paddingHorizontal": 12,
-                  },
-                  {},
-                ]
-              }
-              testID="insight.preset-3m"
-            >
-              <Text
-                maxFontSizeMultiplier={2}
-                style={
-                  {
-                    "color": "#18bd18",
-                    "fontSize": 13,
-                    "fontWeight": "600",
-                    "lineHeight": 18,
-                  }
+                {
+                  "color": "#18bd18",
+                  "fontSize": 13,
+                  "fontWeight": "600",
+                  "lineHeight": 18,
                 }
-              >
-                text translated
-              </Text>
-            </View>
+              }
+            >
+              text translated
+            </Text>
           </View>
           <View
-            style={
+            accessibilityRole="button"
+            accessibilityState={
               {
-                "flex": 1,
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": true,
               }
             }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            hitSlop={
+              {
+                "bottom": 6,
+                "top": 6,
+              }
+            }
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                {
+                  "alignItems": "center",
+                  "backgroundColor": "#18bd181F",
+                  "borderColor": "#18bd18",
+                  "borderRadius": 999,
+                  "borderWidth": 1,
+                  "justifyContent": "center",
+                  "minHeight": 32,
+                  "paddingHorizontal": 12,
+                },
+                {},
+              ]
+            }
+            testID="insight.preset-6m"
           >
-            <View
-              accessibilityRole="button"
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": true,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              hitSlop={
-                {
-                  "bottom": 6,
-                  "top": 6,
-                }
-              }
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
+            <Text
+              maxFontSizeMultiplier={2}
+              numberOfLines={1}
               style={
-                [
-                  {
-                    "alignItems": "center",
-                    "backgroundColor": "#18bd181F",
-                    "borderColor": "#18bd18",
-                    "borderRadius": 999,
-                    "borderWidth": 1,
-                    "justifyContent": "center",
-                    "minHeight": 32,
-                    "paddingHorizontal": 12,
-                  },
-                  {},
-                ]
-              }
-              testID="insight.preset-6m"
-            >
-              <Text
-                maxFontSizeMultiplier={2}
-                style={
-                  {
-                    "color": "#18bd18",
-                    "fontSize": 13,
-                    "fontWeight": "600",
-                    "lineHeight": 18,
-                  }
+                {
+                  "color": "#18bd18",
+                  "fontSize": 13,
+                  "fontWeight": "600",
+                  "lineHeight": 18,
                 }
-              >
-                text translated
-              </Text>
-            </View>
+              }
+            >
+              text translated
+            </Text>
           </View>
           <View
-            style={
+            accessibilityRole="button"
+            accessibilityState={
               {
-                "flex": 1,
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": true,
               }
             }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            hitSlop={
+              {
+                "bottom": 6,
+                "top": 6,
+              }
+            }
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                {
+                  "alignItems": "center",
+                  "backgroundColor": "#18bd181F",
+                  "borderColor": "#18bd18",
+                  "borderRadius": 999,
+                  "borderWidth": 1,
+                  "justifyContent": "center",
+                  "minHeight": 32,
+                  "paddingHorizontal": 12,
+                },
+                {},
+              ]
+            }
+            testID="insight.preset-all"
           >
-            <View
-              accessibilityRole="button"
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": true,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              hitSlop={
-                {
-                  "bottom": 6,
-                  "top": 6,
-                }
-              }
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
+            <Text
+              maxFontSizeMultiplier={2}
+              numberOfLines={1}
               style={
-                [
-                  {
-                    "alignItems": "center",
-                    "backgroundColor": "#18bd181F",
-                    "borderColor": "#18bd18",
-                    "borderRadius": 999,
-                    "borderWidth": 1,
-                    "justifyContent": "center",
-                    "minHeight": 32,
-                    "paddingHorizontal": 12,
-                  },
-                  {},
-                ]
-              }
-              testID="insight.preset-all"
-            >
-              <Text
-                maxFontSizeMultiplier={2}
-                style={
-                  {
-                    "color": "#18bd18",
-                    "fontSize": 13,
-                    "fontWeight": "600",
-                    "lineHeight": 18,
-                  }
+                {
+                  "color": "#18bd18",
+                  "fontSize": 13,
+                  "fontWeight": "600",
+                  "lineHeight": 18,
                 }
-              >
-                text translated
-              </Text>
-            </View>
+              }
+            >
+              text translated
+            </Text>
           </View>
         </View>
       </View>

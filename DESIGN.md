@@ -537,7 +537,15 @@ address stays one line and shortens it in the middle when not focused.
 
 **Large text.** Variants grow with the OS text size up to their cap (body ×2,
 titles ×1.5, the balance ×1.3). Layouts wrap instead of clipping: text beside
-an icon has `flexShrink: 1`.
+an icon has `flexShrink: 1`. A label never breaks inside a control; the
+space around it adapts:
+- Buttons, chips, tags and pills stay on one line (`numberOfLines={1}`); the
+  control grows in width to fit its label.
+- A row of controls that no longer fits wraps to the next line (History's
+  filters, Insight's range chips).
+- Rows of information can truncate with "…" (a contact's name), never a
+  button or an amount.
+- Text keeps growing up to its variant's cap; scaling is never turned off.
 
 ## Layout
 

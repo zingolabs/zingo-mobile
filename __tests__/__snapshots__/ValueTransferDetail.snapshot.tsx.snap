@@ -299,6 +299,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
             >
               <Text
                 maxFontSizeMultiplier={2}
+                numberOfLines={1}
                 style={
                   {
                     "color": "#18bd18",
@@ -1124,6 +1125,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
             >
               <Text
                 maxFontSizeMultiplier={2}
+                numberOfLines={1}
                 style={
                   {
                     "color": "#18bd18",

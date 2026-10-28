@@ -49,6 +49,7 @@ const Chip: React.FunctionComponent<ChipProps> = ({
       <Text
         variant="bodySmall"
         tone={selected ? 'accent' : 'muted'}
+        numberOfLines={1}
         style={{ fontWeight: '600' }}
       >
         {children}
