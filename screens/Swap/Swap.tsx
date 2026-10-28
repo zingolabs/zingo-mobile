@@ -14,6 +14,7 @@ import {
   space8,
   space20,
   useTheme,
+  iconSizeMd,
   iconSizeSm,
   radiusPill,
 } from '@app/theme';
@@ -70,7 +71,11 @@ import { HistoryIcon } from '@ui/primitives/Icons/HistoryIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
 import { SheetPresence } from '@ui/primitives/SheetPresence';
-import { ChevronDown, ChevronUp } from '@ui/primitives/Icons/Chevron';
+import {
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
+} from '@ui/primitives/Icons/Chevron';
 import {
   DEFAULT_SLIPPAGE_BPS,
   QUOTE_REFRESH_MS,
@@ -495,6 +500,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                           {pendingState?.text}
                         </Text>
                       </View>
+                      <ChevronRight size={iconSizeMd} color={colors.fgMuted} />
                     </View>
                   </Card>
                 )}
