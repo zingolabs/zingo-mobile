@@ -41,7 +41,6 @@ import {
   isRealLegHash,
   isRefunding,
   isTerminalStatus,
-  isThorchainFamily,
   prefillFromRecord,
   providerLongLabel,
 } from '@app/swap';
@@ -299,8 +298,6 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
       ? [{ label: t('swap.result-reason'), value: reason, wrap: true }]
       : []),
   ];
-  /** Maya and THORChain track a payment by its hash, so a late one is handed over by hand. */
-  const lateHashWanted = expired && isThorchainFamily(record.provider);
   const sold = `${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}`;
   /** A payment that came after the quote expired, on its way back. */
   const view = refunding
@@ -369,7 +366,16 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
       onBack={close}
       footer={
         <ButtonStack>
-          {expired && (
+          {/* The last child shows on top: explorer, new quote, Delete. */}
+          {canRemoveSwap(record) && (
+            <Button
+              testID="swap.detail.remove"
+              variant="dangerText"
+              title={t('swap.delete')}
+              onPress={() => removeSwap(record)}
+            />
+          )}
+          {(expired || outcome === 'failed') && (
             <Button
               testID="swap.detail.new-quote"
               variant="primary"
@@ -384,14 +390,6 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
                   { pop: true },
                 )
               }
-            />
-          )}
-          {canRemoveSwap(record) && (
-            <Button
-              testID="swap.detail.remove"
-              variant="dangerText"
-              title={t('swap.delete')}
-              onPress={() => removeSwap(record)}
             />
           )}
           {!!explorerUrl && (
@@ -476,54 +474,6 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
             tone="warning"
             title={t('swap.expired-dont-send')}
           />
-          <View
-            style={{
-              borderWidth: 1,
-              borderColor: colors.bottomSheetBorder,
-              borderRadius: radiusMd,
-              padding: 16,
-              rowGap: space8,
-            }}
-          >
-            <Text variant="bodyStrong">{t('swap.result-already-paid')}</Text>
-            <Text variant="bodySmall" tone="muted">
-              {t('swap.expired-late-refund')
-                .replace('{provider}', providerLongLabel(record.provider))
-                .replace(
-                  '{address}',
-                  Utils.trimToSmall(record.sourceAddress, 5),
-                )}
-            </Text>
-            {lateHashWanted && (
-              <>
-                <Text variant="bodySmall" tone="muted">
-                  {t('swap.result-paste-hash')}
-                </Text>
-                <TextField
-                  testID="swap.detail.late-hash"
-                  label={t('swap.deposit-hash')}
-                  value={hash}
-                  onChangeText={setHash}
-                  placeholder={t('swap.deposit-hash-placeholder')}
-                  mono
-                  error={attachError || undefined}
-                  trailingIcon={ClipboardPasteIcon}
-                  trailingLabel={t('paste')}
-                  onTrailingPress={async () =>
-                    setHash((await Clipboard.getString()).trim())
-                  }
-                />
-                <Button
-                  inline
-                  variant="text"
-                  title={t('swap.deposit-follow')}
-                  disabled={attaching || hash.trim().length === 0}
-                  busy={attaching}
-                  onPress={attach}
-                />
-              </>
-            )}
-          </View>
         </View>
       )}
 
