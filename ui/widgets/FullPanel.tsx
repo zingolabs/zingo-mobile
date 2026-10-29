@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import {
   useSafeAreaFrame,
@@ -188,12 +188,7 @@ export default function FullPanel({
       <View
         style={{
           position: 'absolute',
-          /**
-           * iOS presents a transparent modal over the whole window, outside
-           * the app's top pad; Android keeps it inside, where 0 is already
-           * under the pad.
-           */
-          top: Platform.OS === 'ios' ? contentTopPad(insets.top) : 0,
+          top: 0,
           left: 0,
           right: 0,
           height: PANEL_TOP,

@@ -10,7 +10,7 @@ import { Route } from '@app/AppState';
 import { ContextAppLoaded, useSwapService } from '@app/context';
 import { AppDrawerParamList, HomeTabParamList } from '@app/types';
 import CustomTabBar from './CustomTabBar';
-import { skipExitingWithScreen } from './screenLayout';
+import { skipExitingWithScreen, walletScreenLayout } from './screenLayout';
 import { lazyScreen, preloadScreens } from './lazyScreen';
 import { duration } from '@app/theme/motion';
 import LoadedAppOptionsPanelHost from '@app/LoadedApp/LoadedAppOptionsPanelHost';
@@ -160,7 +160,7 @@ export function WalletNavigator() {
   return (
     <Stack.Navigator
       initialRouteName={Route.Home}
-      screenLayout={skipExitingWithScreen}
+      screenLayout={walletScreenLayout}
       screenOptions={{
         headerShown: false,
         // Each screen extends edge-to-edge (BottomSheets handle their own
