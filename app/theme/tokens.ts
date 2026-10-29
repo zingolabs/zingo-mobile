@@ -95,6 +95,8 @@ export type ThemeColors = {
   fgTransparent: string;
   /** The brown pot of the sprout mark, part of the brand. */
   bgSproutPot: string;
+  /** SwapKit's emblem, in the white version they publish for dark backgrounds. */
+  fgSwapKitMark: string;
   /** A QR code needs dark on white to scan, whatever the theme. */
   fgQrInk: string;
   bgQrPaper: string;
@@ -194,6 +196,7 @@ export const themeTokens: ThemeColors = {
   bgIronwood: '#241A12',
   fgTransparent: '#E6C46A',
   bgSproutPot: '#5A3A1E',
+  fgSwapKitMark: '#FFFFFF',
   fgQrInk: '#060B12',
   bgQrPaper: '#FFFFFF',
   bgTransparent: '#E6C46A1F',

@@ -106,7 +106,9 @@ describe('a refunded swap', () => {
 
     expect(entries.some(e => e.url.includes('solscan'))).toBe(false);
     expect(entries.find(e => e.key === 'refund-explorer')).toMatchObject({
-      label: 'Refund explorer',
+      name: 'ZcashExplorer',
+      what: { kind: 'refund', chain: 'ZEC' },
+      id: REFUND_HASH,
       onZcash: true,
     });
     expect(entries.find(e => e.key === 'refund-explorer')?.url).toContain(
@@ -175,9 +177,10 @@ describe('buildTrackerEntries', () => {
         `https://solscan.io/tx/${SOLANA_DELIVERY_SIGNATURE}`,
       ]),
     );
-    expect(entries.find(e => e.url.includes('nearblocks'))?.label).toBe(
-      'NEAR explorer',
-    );
+    expect(entries.find(e => e.url.includes('nearblocks'))).toMatchObject({
+      name: 'NearBlocks',
+      what: { kind: 'leg', chain: 'NEAR' },
+    });
   });
 
   it('lists each leg once, under the name of what it is', () => {
@@ -232,6 +235,7 @@ describe('buildTrackerEntries', () => {
 
     expect(onZcash).toEqual({
       swapkit: false,
+      provider: false,
       'source-explorer': true,
       'leg-0': false,
       'dest-explorer': false,
@@ -262,9 +266,82 @@ describe('buildTrackerEntries', () => {
 
     expect(entries).toContainEqual({
       key: 'dest-explorer',
-      label: 'Destination chain explorer',
+      name: 'Solscan',
+      what: { kind: 'delivery', coin: 'USDC', chain: 'SOL' },
       url: 'https://solscan.io/tx/5solanasignature',
+      id: '5solanasignature',
       onZcash: false,
+    });
+  });
+
+  it('puts SwapKit first and the Zcash links last', () => {
+    const entries = buildTrackerEntries({
+      record: record({
+        broadcast: { txId: DEPOSIT_HASH } as SwapRecordType['broadcast'],
+        destinationTxHash: '5solanasignature',
+      }),
+      ...explorer,
+    });
+
+    expect(entries.map(e => e.key)).toEqual([
+      'swapkit',
+      'provider',
+      'dest-explorer',
+      'source-explorer',
+    ]);
+  });
+
+  it('opens a NEAR Intents swap by its deposit address and the address on its chain when no deposit was seen', () => {
+    const entries = buildTrackerEntries({
+      record: record({
+        direction: SwapDirectionEnum.Inbound,
+        status: SwapStatusEnum.Expired,
+        sellAsset: {
+          swapKitId: 'BTC.BTC',
+          chain: 'BTC',
+          symbol: 'BTC',
+          ticker: 'BTC',
+          chainId: 'bitcoin',
+          decimals: 8,
+        },
+        receiveAsset: ZEC,
+        depositAddress: 'bc1qdeposit',
+      }),
+      ...explorer,
+    });
+
+    expect(entries).toEqual([
+      {
+        key: 'provider',
+        name: 'NEAR Intents Explorer',
+        what: { kind: 'provider', provider: 'NEAR' },
+        url: 'https://explorer.near-intents.org/transactions/bc1qdeposit',
+        id: 'bc1qdeposit',
+        onZcash: false,
+      },
+      {
+        key: 'deposit-address',
+        name: 'mempool.space',
+        what: { kind: 'depositAddress', chain: 'BTC' },
+        url: 'https://mempool.space/address/bc1qdeposit',
+        id: 'bc1qdeposit',
+        onZcash: false,
+      },
+    ]);
+  });
+
+  it('links the Maya explorer by the deposit hash', () => {
+    const entries = buildTrackerEntries({
+      record: record({
+        provider: SwapKitProviderEnum.MayachainStreaming,
+        broadcast: { txId: DEPOSIT_HASH } as SwapRecordType['broadcast'],
+      }),
+      ...explorer,
+    });
+
+    expect(entries.find(e => e.key === 'provider')).toMatchObject({
+      name: 'Maya Explorer',
+      url: `https://explorer.mayachain.info/tx/${DEPOSIT_HASH}`,
     });
   });
 });
