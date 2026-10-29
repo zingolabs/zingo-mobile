@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import Animated, {
   Keyframe,
   ReduceMotion,
@@ -280,13 +280,24 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
     </View>
   );
 
+  /**
+   * The column scrolls above the footer's top, so open details or a large
+   * font never run under its buttons.
+   */
+  const [rootH, setRootH] = useState<number>(0);
+  const [footerTop, setFooterTop] = useState<number>(0);
+  const columnBottom =
+    rootH > 0 && footerTop > 0 ? rootH - footerTop + space16 : undefined;
+
   const link = (
     label: string,
     onPress: () => void,
     bottom: number,
     testID: string,
+    top = false,
   ) => (
     <View
+      onLayout={top ? e => setFooterTop(e.nativeEvent.layout.y) : undefined}
       style={{
         position: 'absolute',
         left: 0,
@@ -307,7 +318,10 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
   );
 
   return (
-    <View style={{ flex: 1 }}>
+    <View
+      style={{ flex: 1 }}
+      onLayout={e => setRootH(e.nativeEvent.layout.height)}
+    >
       <Pressable
         kind="icon"
         testID="walleterror.server"
@@ -413,14 +427,15 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         </Animated.View>
       </Animated.View>
 
-      <View
+      <ScrollView
         style={{
           position: 'absolute',
           left: space20,
           right: space20,
           top: `${COLUMN_TOP * 100}%`,
-          alignItems: 'center',
+          bottom: columnBottom,
         }}
+        contentContainerStyle={{ alignItems: 'center' }}
       >
         <Text variant="subtitle" style={{ textAlign: 'center' }}>
           {title}
@@ -501,7 +516,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
             </View>
           </DetailsBox>
         </View>
-      </View>
+      </ScrollView>
 
       {chain
         ? link(
@@ -509,12 +524,14 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
             moreOptions,
             140,
             'walleterror.more',
+            true,
           )
         : link(
             translate('walleterror.import') as string,
             onImport,
             140,
             'walleterror.import',
+            true,
           )}
       <View
         style={{

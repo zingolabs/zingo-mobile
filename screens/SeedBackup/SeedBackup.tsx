@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import {
   BackHandler,
+  ScrollView,
   StyleSheet,
   useWindowDimensions,
   View,
@@ -27,7 +28,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { useTheme, iconSizeMd, radiusPill } from '@app/theme';
+import { useTheme, iconSizeMd, radiusPill, space8, space16 } from '@app/theme';
 import Pressable from '@ui/primitives/Pressable';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
@@ -105,6 +106,32 @@ const exitFor = (move: Move) =>
         .reduceMotion(ReduceMotion.System)
     : axisExit(-AXIS_PT * move.dir);
 
+/**
+ * A step's content scrolls in the room above its actions, which sit below
+ * it in the flow, so 24 words or a large font never end up under them.
+ */
+const StepPage: React.FunctionComponent<{
+  children: React.ReactNode;
+  footer: React.ReactNode;
+  bottom: number;
+  center?: boolean;
+}> = ({ children, footer, bottom, center = false }) => (
+  <>
+    <ScrollView
+      style={{ flex: 1 }}
+      contentContainerStyle={
+        center
+          ? { flexGrow: 1, justifyContent: 'center', paddingBottom: space16 }
+          : { paddingBottom: space16 }
+      }
+      keyboardShouldPersistTaps="handled"
+    >
+      {children}
+    </ScrollView>
+    <View style={{ paddingTop: space8, paddingBottom: bottom }}>{footer}</View>
+  </>
+);
+
 // The confirm step and its actions, remounted for every new attempt.
 const ConfirmPage: React.FunctionComponent<{
   words: string[];
@@ -115,9 +142,9 @@ const ConfirmPage: React.FunctionComponent<{
   const { translate } = useContext(ContextAppLoaded);
   const check = useWordCheck(words, onPassed);
   return (
-    <>
-      <ConfirmStep check={check} />
-      <View style={{ position: 'absolute', left: 0, right: 0, bottom }}>
+    <StepPage
+      bottom={bottom}
+      footer={
         <StepActions
           testID="seedbackup.confirm"
           link={translate('seedbackup.view-phrase') as string}
@@ -126,8 +153,10 @@ const ConfirmPage: React.FunctionComponent<{
           disabled={!check.value}
           onPrimary={check.submit}
         />
-      </View>
-    </>
+      }
+    >
+      <ConfirmStep check={check} />
+    </StepPage>
   );
 };
 
@@ -388,9 +417,9 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
     switch (step) {
       case 'info':
         return (
-          <>
-            <InfoStep keychainNote={keychainNote} />
-            <View style={{ position: 'absolute', left: 0, right: 0, bottom }}>
+          <StepPage
+            bottom={bottom}
+            footer={
               <StepActions
                 testID="seedbackup.info"
                 link={translate('seedbackup.not-now') as string}
@@ -399,12 +428,26 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
                 disabled={loading}
                 onPrimary={toWords}
               />
-            </View>
-          </>
+            }
+          >
+            <InfoStep keychainNote={keychainNote} />
+          </StepPage>
         );
       case 'words':
         return (
-          <>
+          <StepPage
+            bottom={bottom}
+            footer={
+              <StepActions
+                testID="seedbackup.words"
+                link={translate('seedbackup.back') as string}
+                onLink={() => go('info', -1)}
+                primary={translate('seedbackup.saved') as string}
+                disabled={!checked}
+                onPrimary={saved}
+              />
+            }
+          >
             {secured && (
               <WordsStep
                 words={words}
@@ -417,17 +460,7 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
                 onCheck={() => setChecked(c => !c)}
               />
             )}
-            <View style={{ position: 'absolute', left: 0, right: 0, bottom }}>
-              <StepActions
-                testID="seedbackup.words"
-                link={translate('seedbackup.back') as string}
-                onLink={() => go('info', -1)}
-                primary={translate('seedbackup.saved') as string}
-                disabled={!checked}
-                onPrimary={saved}
-              />
-            </View>
-          </>
+          </StepPage>
         );
       case 'confirm':
         return words.length > 0 ? (
@@ -443,26 +476,22 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
         ) : null;
       case 'done':
         return (
-          <>
-            <View style={{ flex: 1, justifyContent: 'center' }}>
-              <DoneStep />
-            </View>
-            <View
-              style={{
-                position: 'absolute',
-                left: SIDE,
-                right: SIDE,
-                bottom: insets.bottom + 28,
-              }}
-            >
-              <Button
-                testID="seedbackup.done"
-                variant="primary"
-                title={translate('seedbackup.done') as string}
-                onPress={finish}
-              />
-            </View>
-          </>
+          <StepPage
+            center
+            bottom={insets.bottom + 28}
+            footer={
+              <View style={{ marginHorizontal: SIDE }}>
+                <Button
+                  testID="seedbackup.done"
+                  variant="primary"
+                  title={translate('seedbackup.done') as string}
+                  onPress={finish}
+                />
+              </View>
+            }
+          >
+            <DoneStep />
+          </StepPage>
         );
     }
   };

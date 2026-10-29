@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import Animated, {
   ReduceMotion,
   useAnimatedStyle,
@@ -281,175 +281,185 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
           noPrivacy={true}
           noUfvkIcon={true}
         />
-        {action && (
-          <Text
-            testID="walletseed.leaving"
-            variant="body"
-            tone="muted"
-            style={{
-              marginHorizontal: SIDE,
-              marginBottom: space16,
-              textAlign: 'center',
-            }}
-          >
-            {
-              translate(
-                `walletseed.sub-${action}${readOnly ? '-vo' : ''}`,
-              ) as string
-            }
-          </Text>
-        )}
-        {!action && (
-          <View
-            testID={seedBackedUp ? 'walletseed.ok' : 'walletseed.no'}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: space12,
-              minHeight: rowMinHeight,
-              marginHorizontal: SIDE,
-              marginBottom: space12,
-              paddingHorizontal: space12,
-              paddingVertical: space8,
-              borderRadius: radiusMd,
-              borderWidth: 1,
-              borderColor: strip.border,
-              backgroundColor: strip.bg,
-            }}
-          >
-            <View style={{ flex: 1, gap: space4 }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  flexWrap: 'wrap',
-                  alignItems: 'center',
-                  columnGap: space8,
-                  rowGap: space4,
-                }}
-              >
+        {/** The content scrolls above the footer, never under it. */}
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingBottom: space16 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          {action && (
+            <Text
+              testID="walletseed.leaving"
+              variant="body"
+              tone="muted"
+              style={{
+                marginHorizontal: SIDE,
+                marginBottom: space16,
+                textAlign: 'center',
+              }}
+            >
+              {
+                translate(
+                  `walletseed.sub-${action}${readOnly ? '-vo' : ''}`,
+                ) as string
+              }
+            </Text>
+          )}
+          {!action && (
+            <View
+              testID={seedBackedUp ? 'walletseed.ok' : 'walletseed.no'}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: space12,
+                minHeight: rowMinHeight,
+                marginHorizontal: SIDE,
+                marginBottom: space12,
+                paddingHorizontal: space12,
+                paddingVertical: space8,
+                borderRadius: radiusMd,
+                borderWidth: 1,
+                borderColor: strip.border,
+                backgroundColor: strip.bg,
+              }}
+            >
+              <View style={{ flex: 1, gap: space4 }}>
                 <View
                   style={{
-                    width: 24,
-                    height: 24,
-                    borderRadius: radiusXs,
-                    backgroundColor: strip.tile,
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
                     alignItems: 'center',
-                    justifyContent: 'center',
+                    columnGap: space8,
+                    rowGap: space4,
                   }}
                 >
-                  {seedBackedUp ? (
-                    <ShieldCheckIcon
-                      size={iconSizeSm}
-                      color={colors.fgAccent}
-                    />
-                  ) : (
-                    <TriangleAlert size={iconSizeSm} color={colors.fgWarning} />
-                  )}
+                  <View
+                    style={{
+                      width: 24,
+                      height: 24,
+                      borderRadius: radiusXs,
+                      backgroundColor: strip.tile,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {seedBackedUp ? (
+                      <ShieldCheckIcon
+                        size={iconSizeSm}
+                        color={colors.fgAccent}
+                      />
+                    ) : (
+                      <TriangleAlert
+                        size={iconSizeSm}
+                        color={colors.fgWarning}
+                      />
+                    )}
+                  </View>
+                  <Text
+                    variant="bodyStrong"
+                    tone={seedBackedUp ? 'accent' : 'warning'}
+                  >
+                    {
+                      translate(
+                        seedBackedUp
+                          ? 'walletseed.ok-title'
+                          : 'walletseed.no-title',
+                      ) as string
+                    }
+                  </Text>
                 </View>
-                <Text
-                  variant="bodyStrong"
-                  tone={seedBackedUp ? 'accent' : 'warning'}
-                >
-                  {
-                    translate(
-                      seedBackedUp
-                        ? 'walletseed.ok-title'
-                        : 'walletseed.no-title',
-                    ) as string
-                  }
+                <Text variant="caption" tone="muted">
+                  {seedBackedUp
+                    ? backedUpOn
+                    : (translate('walletseed.no-sub') as string)}
                 </Text>
               </View>
-              <Text variant="caption" tone="muted">
-                {seedBackedUp
-                  ? backedUpOn
-                  : (translate('walletseed.no-sub') as string)}
-              </Text>
+              {!seedBackedUp && (
+                <Button
+                  testID="walletseed.backup"
+                  variant="primary"
+                  size="small"
+                  inline
+                  title={translate('seednotice.button') as string}
+                  onPress={() => openFlow('push')}
+                />
+              )}
             </View>
-            {!seedBackedUp && (
-              <Button
-                testID="walletseed.backup"
-                variant="primary"
-                size="small"
-                inline
-                title={translate('seednotice.button') as string}
-                onPress={() => openFlow('push')}
-              />
-            )}
-          </View>
-        )}
+          )}
 
-        {readOnly ? (
-          <KeyCard
-            testID="walletseed.vkcard"
-            value={vk}
-            hidden={veiled}
-            qrSize={KEY_QR}
-          />
-        ) : (
-          <WordGrid testID="walletseed.words" words={words} veiled={veiled} />
-        )}
-        <View
-          style={{ marginTop: space12, zIndex: tip === 'birthday' ? 3 : 2 }}
-        >
-          <InfoRow
-            testID="walletseed.birthday"
-            label={translate('seedbackup.birthday') as string}
-            tipTitle={translate('seedbackup.birthday-tip-title') as string}
-            tipBody={translate('seedbackup.birthday-tip-body') as string}
-            open={tip === 'birthday'}
-            onToggle={toggle('birthday')}
-            value={formatInteger(birthday)}
-          />
-        </View>
-        {!readOnly && (
-          <View style={{ marginTop: space8, zIndex: tip === 'vk' ? 3 : 1 }}>
+          {readOnly ? (
+            <KeyCard
+              testID="walletseed.vkcard"
+              value={vk}
+              hidden={veiled}
+              qrSize={KEY_QR}
+            />
+          ) : (
+            <WordGrid testID="walletseed.words" words={words} veiled={veiled} />
+          )}
+          <View
+            style={{ marginTop: space12, zIndex: tip === 'birthday' ? 3 : 2 }}
+          >
             <InfoRow
-              testID="walletseed.vk"
-              label={translate('walletseed.vk') as string}
-              tipTitle={translate('walletseed.vk-tip-title') as string}
-              tipBody={translate('walletseed.vk-tip-body') as string}
-              open={tip === 'vk'}
-              onToggle={toggle('vk')}
-              value={vkShort}
-              trailing={
-                <Pressable
-                  kind="icon"
-                  hitSlop={slopFor(28)}
-                  testID="walletseed.vk-copy"
-                  accessibilityRole="button"
-                  accessibilityLabel={translate('walletseed.vk-copy') as string}
-                  onPress={copyVk}
-                  style={{
-                    width: 28,
-                    height: 28,
-                    marginLeft: space8,
-                    marginRight: -space8,
-                    borderRadius: radiusPill,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <CopyIcon size={iconSizeSm} color={colors.fgDefault} />
-                </Pressable>
-              }
+              testID="walletseed.birthday"
+              label={translate('seedbackup.birthday') as string}
+              tipTitle={translate('seedbackup.birthday-tip-title') as string}
+              tipBody={translate('seedbackup.birthday-tip-body') as string}
+              open={tip === 'birthday'}
+              onToggle={toggle('birthday')}
+              value={formatInteger(birthday)}
             />
           </View>
-        )}
-        <View style={{ marginTop: space12 }}>
-          <CopyShowButtons
-            testID="walletseed"
-            hidden={hidden}
-            onToggleHide={() => setHidden(h => !h)}
-            onCopy={copyWords}
-          />
-        </View>
+          {!readOnly && (
+            <View style={{ marginTop: space8, zIndex: tip === 'vk' ? 3 : 1 }}>
+              <InfoRow
+                testID="walletseed.vk"
+                label={translate('walletseed.vk') as string}
+                tipTitle={translate('walletseed.vk-tip-title') as string}
+                tipBody={translate('walletseed.vk-tip-body') as string}
+                open={tip === 'vk'}
+                onToggle={toggle('vk')}
+                value={vkShort}
+                trailing={
+                  <Pressable
+                    kind="icon"
+                    hitSlop={slopFor(28)}
+                    testID="walletseed.vk-copy"
+                    accessibilityRole="button"
+                    accessibilityLabel={
+                      translate('walletseed.vk-copy') as string
+                    }
+                    onPress={copyVk}
+                    style={{
+                      width: 28,
+                      height: 28,
+                      marginLeft: space8,
+                      marginRight: -space8,
+                      borderRadius: radiusPill,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <CopyIcon size={iconSizeSm} color={colors.fgDefault} />
+                  </Pressable>
+                }
+              />
+            </View>
+          )}
+          <View style={{ marginTop: space12 }}>
+            <CopyShowButtons
+              testID="walletseed"
+              hidden={hidden}
+              onToggleHide={() => setHidden(h => !h)}
+              onCopy={copyWords}
+            />
+          </View>
+        </ScrollView>
 
         <View
           style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            bottom: insets.bottom + space16,
+            paddingTop: space8,
+            paddingBottom: insets.bottom + space16,
           }}
         >
           {action ? (
