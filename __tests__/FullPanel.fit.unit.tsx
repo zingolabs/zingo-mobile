@@ -64,3 +64,14 @@ test('Tests that a panel draws no bottom sheet when it opens', () => {
     screen.UNSAFE_queryAllByProps({ snapPoints: expect.anything() }),
   ).toEqual([]);
 });
+
+test('Tests that a tap outside a fitting panel goes back when the panel can', () => {
+  const onBack = jest.fn();
+  render(
+    <FullPanel title="Your addresses" fit onBack={onBack} testID="panel">
+      <Text>rows</Text>
+    </FullPanel>,
+  );
+  fireEvent.press(screen.getByTestId('panel.outside'));
+  expect(onBack).toHaveBeenCalledTimes(1);
+});

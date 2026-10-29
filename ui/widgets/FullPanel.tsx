@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { View } from 'react-native';
+import { Pressable as RNPressable, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import {
   useSafeAreaFrame,
@@ -61,6 +61,7 @@ type FullPanelProps = {
   /**
    * Sizes the panel to its content, up to the full height, and scrolls past
    * that. It waits out of sight until the content is measured, then rises.
+   * A tap above it, outside the panel, goes back or closes as its bar does.
    */
   fit?: boolean;
   /**
@@ -179,6 +180,14 @@ export default function FullPanel({
 
   return (
     <View style={{ flex: 1 }} pointerEvents="box-none">
+      {fit && (onClose ?? onBack) && (
+        <RNPressable
+          testID={`${testID ?? 'swap.flow'}.outside`}
+          accessible={false}
+          onPress={onClose ?? onBack}
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+        />
+      )}
       {/*
         The top bar of the screen behind stays in sight above the panel, but
         a modal route takes every touch, so its menu, mixnet and messages
