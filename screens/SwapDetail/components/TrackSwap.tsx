@@ -140,6 +140,7 @@ export default function TrackSwap({
           <Button
             testID="swap.detail.track.copy-all"
             variant="text"
+            inline
             icon={copied ? CheckIcon : CopyIcon}
             title={t(copied ? 'swap.copied' : 'swap.track-copy-all')}
             onPress={copyAll}
