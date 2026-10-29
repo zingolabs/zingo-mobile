@@ -283,6 +283,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
               "overflow": "hidden",
             }
           }
+          testID="pools.bar"
         />
         <View
           style={
@@ -436,17 +437,70 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
         }
       >
         <View
-          style={
+          accessibilityRole="button"
+          accessibilityState={
             {
-              "backgroundColor": "#031124",
-              "borderColor": "#05234C",
-              "borderRadius": 12,
-              "borderWidth": 1,
-              "overflow": "hidden",
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": false,
             }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            [
+              {
+                "backgroundColor": "#031124",
+                "borderColor": "#05234C",
+                "borderRadius": 12,
+                "borderWidth": 1,
+                "minHeight": 44,
+                "overflow": "hidden",
+              },
+              {},
+            ]
           }
           testID="pools.ironwood"
         >
+          <View
+            pointerEvents="none"
+            style={
+              [
+                {
+                  "bottom": 0,
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                },
+                {
+                  "backgroundColor": "#8888881F",
+                  "borderRadius": 12,
+                },
+                {},
+              ]
+            }
+          />
           <View
             style={
               {
@@ -582,17 +636,70 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
           </View>
         </View>
         <View
-          style={
+          accessibilityRole="button"
+          accessibilityState={
             {
-              "backgroundColor": "#031124",
-              "borderColor": "#05234C",
-              "borderRadius": 12,
-              "borderWidth": 1,
-              "overflow": "hidden",
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": false,
             }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            [
+              {
+                "backgroundColor": "#031124",
+                "borderColor": "#05234C",
+                "borderRadius": 12,
+                "borderWidth": 1,
+                "minHeight": 44,
+                "overflow": "hidden",
+              },
+              {},
+            ]
           }
           testID="pools.orchard"
         >
+          <View
+            pointerEvents="none"
+            style={
+              [
+                {
+                  "bottom": 0,
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                },
+                {
+                  "backgroundColor": "#8888881F",
+                  "borderRadius": 12,
+                },
+                {},
+              ]
+            }
+          />
           <View
             style={
               {
@@ -756,17 +863,70 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
           </View>
         </View>
         <View
-          style={
+          accessibilityRole="button"
+          accessibilityState={
             {
-              "backgroundColor": "#031124",
-              "borderColor": "#05234C",
-              "borderRadius": 12,
-              "borderWidth": 1,
-              "overflow": "hidden",
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": false,
             }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            [
+              {
+                "backgroundColor": "#031124",
+                "borderColor": "#05234C",
+                "borderRadius": 12,
+                "borderWidth": 1,
+                "minHeight": 44,
+                "overflow": "hidden",
+              },
+              {},
+            ]
           }
           testID="pools.sapling"
         >
+          <View
+            pointerEvents="none"
+            style={
+              [
+                {
+                  "bottom": 0,
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                },
+                {
+                  "backgroundColor": "#8888881F",
+                  "borderRadius": 12,
+                },
+                {},
+              ]
+            }
+          />
           <View
             style={
               {
@@ -930,17 +1090,70 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
           </View>
         </View>
         <View
-          style={
+          accessibilityRole="button"
+          accessibilityState={
             {
-              "backgroundColor": "#031124",
-              "borderColor": "#05234C",
-              "borderRadius": 12,
-              "borderWidth": 1,
-              "overflow": "hidden",
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": false,
             }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            [
+              {
+                "backgroundColor": "#031124",
+                "borderColor": "#05234C",
+                "borderRadius": 12,
+                "borderWidth": 1,
+                "minHeight": 44,
+                "overflow": "hidden",
+              },
+              {},
+            ]
           }
           testID="pools.transparent"
         >
+          <View
+            pointerEvents="none"
+            style={
+              [
+                {
+                  "bottom": 0,
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                },
+                {
+                  "backgroundColor": "#8888881F",
+                  "borderRadius": 12,
+                },
+                {},
+              ]
+            }
+          />
           <View
             style={
               {
