@@ -31,8 +31,9 @@ import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import Pressable from '@ui/primitives/Pressable';
 import Banner from '@ui/widgets/Banner';
-import { ArrowDownIcon } from '@ui/primitives/Icons/ArrowDownIcon';
-import { ArrowUpIcon } from '@ui/primitives/Icons/ArrowUpIcon';
+import { TxPendingIcon } from '@ui/primitives/Icons/TxPendingIcon';
+import { TxReceivedIcon } from '@ui/primitives/Icons/TxReceivedIcon';
+import { TxSentIcon } from '@ui/primitives/Icons/TxSentIcon';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import DetailHero from '@screens/Swap/components/DetailHero';
 import DetailRows from '@screens/Swap/components/DetailRows';
@@ -167,10 +168,13 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
     >
       <DetailHero
         icon={
-          received ? (
-            <ArrowDownIcon size={iconSizeMd} color={colors.fgDefault} />
+          /* The same drawings as History: the clock until it is confirmed. */
+          status.tone === 'warning' ? (
+            <TxPendingIcon size={iconSizeMd} color={colors.fgDefault} />
+          ) : received ? (
+            <TxReceivedIcon size={iconSizeMd} color={colors.fgDefault} />
           ) : (
-            <ArrowUpIcon size={iconSizeMd} color={colors.fgDefault} />
+            <TxSentIcon size={iconSizeMd} color={colors.fgDefault} />
           )
         }
         title={legName(leg, record, t)}

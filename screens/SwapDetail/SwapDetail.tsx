@@ -40,8 +40,9 @@ import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
 import TextField from '@ui/primitives/TextField';
 import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
-import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
-import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
+import { TxSwapIcon } from '@ui/primitives/Icons/TxSwapIcon';
+import { TxPendingIcon } from '@ui/primitives/Icons/TxPendingIcon';
+import { swapInFlight } from '@screens/History/historyRowText';
 import { ChevronRight } from '@ui/primitives/Icons/Chevron';
 import Banner from '@ui/widgets/Banner';
 import FoldSection from './components/FoldSection';
@@ -379,10 +380,10 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
     >
       <DetailHero
         icon={
-          isTerminalStatus(record.status) ? (
-            <SwapIcon size={iconSizeMd} color={colors.fgDefault} />
+          swapInFlight(record) ? (
+            <TxPendingIcon size={iconSizeMd} color={colors.fgDefault} />
           ) : (
-            <ClockIcon size={iconSizeMd} color={colors.fgDefault} />
+            <TxSwapIcon size={iconSizeMd} color={colors.fgDefault} />
           )
         }
         badge={other}

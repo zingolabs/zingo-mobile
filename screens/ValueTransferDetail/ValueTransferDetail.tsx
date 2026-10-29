@@ -38,15 +38,11 @@ import { fiatQuote } from '@app/price/fiatQuote';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import FullPanel from '@ui/widgets/FullPanel';
-import { ArrowDownIcon } from '@ui/primitives/Icons/ArrowDownIcon';
-import { ArrowUpIcon } from '@ui/primitives/Icons/ArrowUpIcon';
-import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
-import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
-import { RefreshIcon } from '@ui/primitives/Icons/RefreshIcon';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import SaveContactButton from '@ui/widgets/SaveContactButton';
 import DetailRows from '@screens/Swap/components/DetailRows';
 import type { DetailRow } from '@screens/Swap/components/DetailRows';
+import { transferIcon } from '@screens/History/transferIcon';
 import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 
 type ValueTransferDetailProps = NativeStackScreenProps<
@@ -89,10 +85,6 @@ const ValueTransferDetail: React.FunctionComponent<
   const failed = vt.status === RPCValueTransfersStatusEnum.failed;
   const received = vt.kind === ValueTransferKindEnum.Received;
   const sent = vt.kind === ValueTransferKindEnum.Sent;
-  const pending =
-    !failed &&
-    vt.confirmations >= 0 &&
-    vt.confirmations < GlobalConst.minConfirmations;
   const contact = vt.address
     ? addressBook.find(entry => entry.address === vt.address)
     : undefined;
@@ -134,20 +126,14 @@ const ValueTransferDetail: React.FunctionComponent<
           kind="contact"
           name={contact.label}
           category={avatarCategoryOf(contact.color)}
+          chain={GlobalConst.zecSwapChain}
           size="lg"
         />
       );
     }
-    const icon = pending
-      ? ClockIcon
-      : received
-        ? ArrowDownIcon
-        : vt.kind === ValueTransferKindEnum.Shield
-          ? ShieldIcon
-          : vt.kind === ValueTransferKindEnum.SendToSelf
-            ? RefreshIcon
-            : ArrowUpIcon;
-    return <Avatar kind="icon" icon={icon} danger={failed} size="lg" />;
+    /** The same drawing as the transaction's History row. */
+    const { icon, danger } = transferIcon(vt);
+    return <Avatar kind="icon" icon={icon} danger={danger} size="lg" />;
   })();
 
   const status = transferStatus(vt, t);
