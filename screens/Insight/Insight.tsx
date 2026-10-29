@@ -404,6 +404,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
             style={{
               flexDirection: 'row',
               flexWrap: 'wrap',
+              justifyContent: 'space-between',
               gap: space8,
               marginTop: space12,
             }}
@@ -413,7 +414,9 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                 p.weeks === 'all'
                   ? insight.weeks
                   : Math.min(p.weeks, insight.weeks);
-              const on = to === last && span === n;
+              /** A preset as long as the history or longer is All: only All lights. */
+              const covered = p.weeks !== 'all' && p.weeks >= insight.weeks;
+              const on = to === last && span === n && !covered;
               return (
                 <Chip
                   key={p.key}
