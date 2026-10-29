@@ -1274,6 +1274,46 @@ class RPCModule: NSObject {
       }
   }
 
+  /// `sendProcess`'s answer without storing a proposal or pausing sync: a fee read.
+  @objc(previewSendProcess:resolve:reject:)
+  func previewSendProcess(_ send_json: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try previewSend(sendJson: send_json)
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  /// `sendAllProcess`'s answer without storing a proposal or pausing sync.
+  @objc(previewSendAllProcess:memo:resolve:reject:)
+  func previewSendAllProcess(_ address: String, memo: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try previewSendAll(address: address, memo: memo)
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  /// `shieldProcess`'s answer without storing a proposal or pausing sync.
+  @objc(previewShieldProcess:reject:)
+  func previewShieldProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try previewShield()
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  /// Drops the stored proposal without sending it, and lets sync resume.
+  @objc(declineProcess:reject:)
+  func declineProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try decline()
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
   @objc(sendSwapDepositProcess:amount:memo_hex:resolve:reject:)
   func sendSwapDepositProcess(_ vault_address: String, amount: String, memo_hex: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {

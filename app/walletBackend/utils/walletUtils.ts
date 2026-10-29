@@ -237,26 +237,26 @@ export async function getWalletKind(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.walletKindInfo());
 }
 
-// Pre-calculates the fee and validates a send without broadcasting. Mirrors
-// the native `sendProcess` (propose phase). `proposeJson` is a stringified
-// SendJson zingolib expects, with recipients/amounts/memos.
-export async function sendPropose(
+// The fee and validation of a send, without broadcasting, storing a proposal
+// or pausing sync (#3104). `proposeJson` is a stringified SendJson zingolib
+// expects, with recipients/amounts/memos. The send itself proposes again.
+export async function sendPreview(
   proposeJson: string,
 ): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.sendProcess(proposeJson));
+  return callFfi(RPCModule.previewSendProcess(proposeJson));
 }
 
-// The propose phase of a MAX send, mirroring the native `sendAllProcess`. The
-// amount `getSpendableBalanceWithAddress` reports is sized by zingolib's
-// send-max proposal, which an ordinary `sendPropose` request can be refused
-// for, so the whole balance travels this way instead. The success value is raw
-// JSON (parseable as RPCSendProposeType) and carries `amount`: what the
-// recipient really receives, for the caller to show. `memo` is '' when none.
-export async function sendAllPropose(
+// The same read for a MAX send. The amount `getSpendableBalanceWithAddress`
+// reports is sized by zingolib's send-max proposal, which an ordinary send
+// request can be refused for, so the whole balance is read (and sent) this
+// way. The success value is raw JSON (parseable as RPCSendProposeType) and
+// carries `amount`: what the recipient really receives, for the caller to
+// show. `memo` is '' when none.
+export async function sendAllPreview(
   address: string,
   memo: string,
 ): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.sendAllProcess(address, memo));
+  return callFfi(RPCModule.previewSendAllProcess(address, memo));
 }
 
 // Plans the immediate Orchard -> Ironwood drain without broadcasting. Mirrors
@@ -589,9 +589,14 @@ export async function probeServer(
   };
 }
 
-// Pre-calculates the shielding fee and shieldable amount without broadcasting.
-// Mirrors the native `shieldProcess` (propose phase). Pair with `shieldConfirm`
-// to actually execute the shield.
+// The shielding fee and shieldable amount, storing no proposal and pausing no
+// sync (#3104): for showing them whenever transparent funds confirm.
+export async function shieldPreview(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.previewShieldProcess());
+}
+
+// Proposes the shield for `shieldConfirm` to execute. The stored proposal
+// pauses sync until it is confirmed or declined.
 export async function shieldPropose(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.shieldProcess());
 }

@@ -99,7 +99,7 @@ const layoutSend = () => {
 
 const FEE_ZATOSHIS = 10_000;
 const SPENDABLE_ZATOSHIS = 100_000_000;
-const proposeMock = RPCModule.sendProcess as jest.Mock;
+const previewMock = RPCModule.previewSendProcess as jest.Mock;
 const spendableMock = RPCModule.getSpendableBalanceWithAddressInfo as jest.Mock;
 const navigate = mockNavigation.navigate as jest.Mock;
 
@@ -180,7 +180,7 @@ beforeEach(() => {
   jest
     .spyOn(Utils, 'isValidAddress')
     .mockResolvedValue({ isValid: true, shieldedOnlyUA: '' });
-  proposeMock.mockResolvedValue(JSON.stringify({ fee: FEE_ZATOSHIS }));
+  previewMock.mockResolvedValue(JSON.stringify({ fee: FEE_ZATOSHIS }));
   spendableMock.mockResolvedValue(
     JSON.stringify({ spendable_balance: SPENDABLE_ZATOSHIS }),
   );
