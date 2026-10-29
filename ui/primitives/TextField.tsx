@@ -19,6 +19,7 @@ import Text from './Text';
 import { fieldBorder, FieldValidity } from './fieldBorder';
 import { Icon } from './Icons/Icon';
 import { XIcon } from './Icons/XIcon';
+import { singleLineInput } from '@ui/primitives/singleLineInput';
 
 /** An action inside a field: 36 on screen, its tap area grown to 44. */
 const ACTION = 36;
@@ -276,14 +277,7 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
             style={{
               flex: 1,
               paddingVertical: space8,
-              /**
-               * iOS centres a single line in the input's own box but drew
-               * the placeholder low in it; filling the field's height
-               * centres it on the actions beside it.
-               */
-              ...(Platform.OS === 'ios' && !multiline
-                ? { alignSelf: 'stretch', paddingVertical: 0 }
-                : {}),
+              ...(multiline ? {} : singleLineInput()),
               ...(multiline && maxLines
                 ? { maxHeight: valueStyle.lineHeight * maxLines + space8 * 2 }
                 : {}),
