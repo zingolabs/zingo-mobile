@@ -35,7 +35,11 @@ const meta: Meta<typeof SyncLine> = {
 export default meta;
 type Story = StoryObj<typeof SyncLine>;
 
-/** Every state on mobile data: the words give way, the lead and "Mobile data" stay whole. */
+/**
+ * Every state on mobile data: the calm ones add "Mobile data", whole, and
+ * their words give way; a warning (Offline, No internet; Behind too, which needs a real clock
+ * and is covered by the unit test) shows alone.
+ */
 export const Connecting: Story = { args: { percentage: 0 } };
 export const Syncing: Story = {
   args: { percentage: 42.7, syncInProgress: true },

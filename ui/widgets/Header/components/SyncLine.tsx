@@ -131,6 +131,10 @@ export default function SyncLine({
     !!netInfo.isConnected &&
     (netInfo.type === NetInfoStateType.cellular ||
       !!netInfo.isConnectionExpensive);
+  /** One thing at a time: mobile data only when the line warns about nothing else. */
+  const showMetered =
+    metered &&
+    (state === 'synced' || state === 'syncing' || state === 'starting');
 
   useEffect(() => {
     const timer = setInterval(() => setNowMs(Date.now()), 30 * 1000);
@@ -255,7 +259,13 @@ export default function SyncLine({
       kind="row"
       testID="header.syncline"
       accessibilityRole="button"
-      accessibilityLabel={`${label}. ${t('header.sync-open-report')}`}
+      accessibilityLabel={[
+        label,
+        showMetered ? t('header.sync-mobile-data') : '',
+        t('header.sync-open-report'),
+      ]
+        .filter(Boolean)
+        .join('. ')}
       onPress={() => navigation.navigate(Route.SyncReport)}
       style={{
         flexDirection: 'row',
@@ -279,14 +289,17 @@ export default function SyncLine({
       >
         {words}
       </Text>
-      {metered && (
+      {showMetered && (
         <View
           style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 0 }}
         >
           <Text variant="caption" tone="muted">
             {' · '}
           </Text>
-          <CloudDownloadIcon size={iconSizeSm} color={colors.fgWarning} />
+          {/* 1, off the spacing scale on purpose: the icon clears the " · " in this line only. */}
+          <View style={{ marginLeft: 1 }}>
+            <CloudDownloadIcon size={iconSizeSm} color={colors.fgWarning} />
+          </View>
           <View style={{ marginLeft: space4 }}>
             {strong(t('header.sync-mobile-data'), colors.fgWarning)}
           </View>
