@@ -427,7 +427,9 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
             onStartShouldSetResponder={[Function]}
             style={
               [
-                undefined,
+                {
+                  "alignItems": "center",
+                },
                 {},
               ]
             }
@@ -1438,7 +1440,9 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
             onStartShouldSetResponder={[Function]}
             style={
               [
-                undefined,
+                {
+                  "alignItems": "center",
+                },
                 {},
               ]
             }
