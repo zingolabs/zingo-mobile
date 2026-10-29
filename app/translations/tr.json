@@ -227,7 +227,6 @@
     "tryingnewserver-error": "Yeni sunucu 15 saniye içinde yanıt vermedi.",
     "readingwallet": "Cüzdan sunucuyla başarıyla okundu:",
     "restorewallet-title": "Gelişmiş Seçenekler",
-    "restorewallet-alert": "Yeni bir cüzdanı kurtarma ifadenizle geri yüklemek üzeresiniz. Devam etmek istiyor musunuz?",
     "selectingserversame": "Mevcut sunucunuz zaten en iyi şekilde optimize edilmiştir.",
     "selectingserverbest": "Şu anda bu, en iyi şekilde optimize edilmiş sunucudur:",
     "incoming-funds": "Gelen fonlar\n",
@@ -555,7 +554,7 @@
     "private": "Gizli",
     "amountrevealed": "Açıklanan Tutar",
     "deshielded": "Korumasız",
-    "lose-address-title": "YENİ BİR ADRES SEÇ",
+    "lose-address-title": "Yeni bir adres seç",
     "lose-address-alert": "Adres alanında zaten geçerli bir adresiniz var. Onu değiştirmek istiyor musunuz?",
     "nym-processing-title": "NYM üzerinden işleniyor",
     "nym-enhanced": "NYM Gelişmiş",
@@ -606,7 +605,6 @@
     "noaddress": "Adres Yok",
     "title-address": "Adresim",
     "newu-option": "Yeni adres al",
-    "danger-zone": "TEHLİKE BÖLGESİ",
     "go-to-transparent": "gizliliği kaldırılmış açık adres",
     "title-acc": "Alım Ekranı",
     "shielded-orchard": "Orchard (Ironwood)",
@@ -616,7 +614,6 @@
     "copy-address-button": "Adresi Kopyala",
     "modal-transparent": {
       "title": "Gizlilik uyarısı",
-      "message": "Şeffaf adresler, işlem detaylarınızı herkese açık blok zincirinde ifşa eder. Bu, gizliliğinizi ortadan kaldırır ve çoğu işlem için önerilmez.",
       "recommendation": "Korumalı adresler, en yüksek gizlilik düzeyini sağladıkları için önerilir.",
       "button": "Riskleri anlıyorum, şeffaf adresleri göster."
     },

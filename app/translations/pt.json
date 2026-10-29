@@ -227,7 +227,6 @@
     "tryingnewserver-error": "Após 15 segundos o novo servidor não responde.",
     "readingwallet": "Lendo com sucesso a carteira atual com o servidor:",
     "restorewallet-title": "Opção Avançada",
-    "restorewallet-alert": "Confirme que você deseja restaurar uma nova carteira usando as suas frases de recuperação.",
     "selectingserversame": "Seu servidor atual já é o mais otimizado.",
     "selectingserverbest": "Neste momento ele é o servidor mais otimizado:",
     "incoming-funds": "Fundos recebidos\n",
@@ -555,7 +554,7 @@
     "private": "Privado",
     "amountrevealed": "Quantia Revelada",
     "deshielded": "Desblindada",
-    "lose-address-title": "SELECIONE UM NOVO ENDEREÇO",
+    "lose-address-title": "Selecione um novo endereço",
     "lose-address-alert": "Você já possui um endereço válido no campo de endereço. Deseja substituí-lo?",
     "nym-processing-title": "Processando via NYM",
     "nym-enhanced": "NYM Aprimorado",
@@ -606,7 +605,6 @@
     "noaddress": "Sem Endereço",
     "title-address": "Meu Endereço",
     "newu-option": "Novo Endereço Unificado Diversificado",
-    "danger-zone": "ZONA DE PERIGO",
     "go-to-transparent": "Ver endereço transparente",
     "title-acc": "Tela de Recebimento",
     "shielded-orchard": "Apenas Orchard (Ironwood)",
@@ -616,7 +614,6 @@
     "copy-address-button": "Copiar endereço",
     "modal-transparent": {
       "title": "Aviso de Privacidade",
-      "message": "Endereços transparentes expõem os detalhes das suas transações na blockchain pública. Isso compromete sua privacidade e não é recomendado para a maioria das transações.",
       "recommendation": "Endereços blindados são recomendados pois oferecem o mais alto nível de privacidade.",
       "button": "Entendo os riscos, mostrar endereços transparentes"
     },

@@ -404,7 +404,6 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
             style={{
               flexDirection: 'row',
               flexWrap: 'wrap',
-              justifyContent: 'space-between',
               gap: space8,
               marginTop: space12,
             }}
@@ -419,6 +418,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
               const on = to === last && span === n && !covered;
               return (
                 <Chip
+                  grow
                   key={p.key}
                   testID={`insight.${p.key.split('.')[1]}`}
                   selected={on}

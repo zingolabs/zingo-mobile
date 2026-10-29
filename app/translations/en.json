@@ -227,7 +227,6 @@
     "tryingnewserver-error": "After 15 seconds the new server doesn't respond.",
     "readingwallet": "Reading successfully the wallet with the server:",
     "restorewallet-title": "Advanced Option",
-    "restorewallet-alert": "Confirm that you want to restore a new wallet using your seed phrase.",
     "selectingserversame": "Your actual server is the most optimized one already.",
     "selectingserverbest": "In this moment this is the most optimized server:",
     "incoming-funds": "Incoming funds\n",
@@ -555,7 +554,7 @@
     "private": "Private",
     "amountrevealed": "Amount Revealed",
     "deshielded": "Deshielded",
-    "lose-address-title": "SELECT A NEW ADDRESS",
+    "lose-address-title": "Select a new address",
     "lose-address-alert": "You already have a valid address in the address field. Do you want to replace it?",
     "nym-processing-title": "Processing via NYM",
     "nym-enhanced": "NYM Enhanced",
@@ -606,7 +605,6 @@
     "noaddress": "No Address",
     "title-address": "My Address",
     "newu-option": "Get new address",
-    "danger-zone": "DANGER ZONE",
     "go-to-transparent": "Exposed transparent address",
     "title-acc": "Receive Screen",
     "shielded-orchard": "Orchard (Ironwood)",
@@ -616,7 +614,6 @@
     "copy-address-button": "Copy address",
     "modal-transparent": {
       "title": "Privacy Warning",
-      "message": "Transparent addresses expose your transaction details on the public blockchain. This disintegrates your privacy and is not recommended for most transactions.",
       "recommendation": "Shielded addresses are recommended as they provide the highest level of privacy.",
       "button": "I understand the risks, show tranparent addresses"
     },
