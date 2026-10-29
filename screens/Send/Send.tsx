@@ -51,8 +51,8 @@ import { hasUnconfirmedFunds } from '@app/AppState/classes/TotalBalanceClass';
 import { isZnsAlias, resolveZnsName } from '@app/uris/resolveZnsName';
 import {
   getSpendableBalanceWithAddress,
-  sendAllPropose,
-  sendPropose,
+  sendAllPreview,
+  sendPreview,
 } from '@app/walletBackend';
 import {
   computingEnd,
@@ -218,7 +218,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
   const sendSheetRef = useRef<BottomSheet>(null);
   const sendErrorSheetRef = useRef<BottomSheetModal>(null);
 
-  // Fee (`sendPropose`) and/or spendable-balance RPC error → the CTA turns into
+  // Fee (`sendPreview`) and/or spendable-balance RPC error → the CTA turns into
   // a tappable "calculation error" button that opens SendErrorSheet, which
   // lists BOTH errors (they are often the same failure, shown under each label
   // so that is explicit).
@@ -334,7 +334,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
       // balance reports is sized by zingolib's send-max proposal, which an
       // ordinary send request for the same amount can be refused for.
       const runPropose = isSendAllAmount(amountPar)
-        ? await sendAllPropose(
+        ? await sendAllPreview(
             addressPar,
             memoEnabled
               ? Utils.buildMemo(
@@ -344,7 +344,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                 )
               : '',
           )
-        : await sendPropose(JSON.stringify(sendJson));
+        : await sendPreview(JSON.stringify(sendJson));
 
       // discard result if a newer calculation (or a clear) has superseded this one
       if (feeCalculationGenRef.current !== generation) {
