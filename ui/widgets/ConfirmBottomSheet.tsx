@@ -21,12 +21,11 @@ const ConfirmBottomSheet: React.FC = () => {
   const resolvedRef = useRef<boolean>(false);
 
   useEffect(() => {
-    registerConfirmListener(opts => {
+    return registerConfirmListener(opts => {
       resolvedRef.current = false;
       setOptions(opts);
       ref.current?.present();
     });
-    return () => registerConfirmListener(null);
   }, []);
 
   const handleButton = useCallback((button: ConfirmButton) => {
