@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { View, useWindowDimensions } from 'react-native';
 import Animated, {
   Easing,
   ReduceMotion,
@@ -13,7 +13,14 @@ import Animated, {
 import { useNavigation } from '@react-navigation/native';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import { WalletNavigation } from '@app/types';
-import { iconSizeSm, radiusPill, space4, space8, useTheme } from '@app/theme';
+import {
+  iconSizeSm,
+  radiusPill,
+  space20,
+  space4,
+  space8,
+  useTheme,
+} from '@app/theme';
 import Pressable from '@ui/primitives/Pressable';
 import { Route, ServerType, TranslateType } from '@app/AppState';
 import NetInfoType from '@app/AppState/types/NetInfoType';
@@ -105,6 +112,8 @@ export default function SyncLine({
   const { colors } = useTheme();
   const t = (key: string) => translate(key) as string;
   const freshness = useSyncFreshness();
+  /** Never wider than the screen inside its gutters; the words give way. */
+  const maxWidth = useWindowDimensions().width - 2 * space20;
   const [nowMs, setNowMs] = useState<number>(Date.now());
 
   const state: SyncState = !netInfo.isConnected
@@ -251,26 +260,37 @@ export default function SyncLine({
       style={{
         flexDirection: 'row',
         alignItems: 'center',
-        height: 28,
+        minHeight: 28,
+        maxWidth,
         /** The price card sits this far below; the same above centres the line. */
         marginTop: CARD_MARGIN_TOP,
         paddingHorizontal: 12,
         borderRadius: radiusPill,
       }}
     >
-      <View style={{ marginRight: space8 }}>{lead}</View>
-      {/* The words in one Text, so " · " is plain spaces. An icon never goes in a Text. */}
-      <Text variant="caption" tone="muted">
+      <View style={{ marginRight: space8, flexShrink: 0 }}>{lead}</View>
+      {/* The words in one Text, cut at the end when the line runs out of room. */}
+      <Text
+        variant="caption"
+        tone="muted"
+        numberOfLines={1}
+        ellipsizeMode="tail"
+        style={{ flexShrink: 1 }}
+      >
         {words}
-        {metered && ' · '}
       </Text>
       {metered && (
-        <>
+        <View
+          style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 0 }}
+        >
+          <Text variant="caption" tone="muted">
+            {' · '}
+          </Text>
           <CloudDownloadIcon size={iconSizeSm} color={colors.fgWarning} />
           <View style={{ marginLeft: space4 }}>
             {strong(t('header.sync-mobile-data'), colors.fgWarning)}
           </View>
-        </>
+        </View>
       )}
     </Pressable>
   );
