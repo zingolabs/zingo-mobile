@@ -67,6 +67,8 @@ export class TransactionService {
 
       let sendError: string = '';
       let sendTxids: string = '';
+      /** A proposal is stored and `confirm`, which always consumes it, has not run. */
+      let stored = false;
       try {
         await withSyncStopped(async () => {
           // sendProcess and confirmProcess reject on failure (typed FFI
@@ -78,6 +80,7 @@ export class TransactionService {
                 sendJson[0].memo ?? '',
               )
             : await RPCModule.sendProcess(JSON.stringify(sendJson));
+          stored = true;
           if (!proposeStr) {
             console.log('Internal Error propose');
             sendError = 'Error: Internal RPC Error: propose';
@@ -90,6 +93,7 @@ export class TransactionService {
               sendError = proposeJSON.error;
             }
             if (!sendError) {
+              stored = false;
               const sendStr: string = await RPCModule.confirmProcess();
               if (!sendStr) {
                 console.log('Internal Error confirm');
@@ -110,6 +114,12 @@ export class TransactionService {
       } catch (error) {
         console.log(`Critical Error send ${error}`);
         sendError = `Error: send ${error}`;
+      }
+      // Left stored, the proposal would hold continuous sync paused (#3104).
+      if (stored) {
+        await RPCModule.declineProcess().catch(error =>
+          console.log(`Error decline ${error}`),
+        );
       }
 
       await this.syncCoordinator.configure();

@@ -10,7 +10,11 @@ import {
   TranslateType,
 } from '@app/AppState';
 import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
-import { shieldConfirm, shieldPropose } from '@app/walletBackend';
+import {
+  shieldConfirm,
+  shieldPreview,
+  shieldPropose,
+} from '@app/walletBackend';
 import type { FfiResult } from '@app/walletBackend';
 import { RPCShieldProposeType } from '@app/walletBackend/types/RPCShieldProposeType';
 import { shieldEnd } from '@app/walletBackend/transforms/sendSettlement';
@@ -88,7 +92,7 @@ export function useShieldFunds({
         };
       }
       shieldProposeLockRef.current = true;
-      const propose = await shieldPropose();
+      const propose = await shieldPreview();
       shieldProposeLockRef.current = false;
       return propose;
     };

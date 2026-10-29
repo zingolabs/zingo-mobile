@@ -23,7 +23,7 @@ import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 
 /**
  * Informational sheet that surfaces the raw error(s) returned by the fee
- * (`sendPropose`) and/or spendable-balance RPC. Both are shown when present —
+ * (`sendPreview`) and/or spendable-balance RPC. Both are shown when present —
  * they are frequently the same underlying failure, but showing each under its
  * own label makes that explicit rather than hiding one. Title bar with a
  * close X, the error text, and a one-tap "Support" affordance (opens a
@@ -33,7 +33,7 @@ import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 type SendErrorSheetProps = {
   /** Sheet title. */
   title: string;
-  /** Raw fee (`sendPropose`) RPC error, or '' when none. */
+  /** Raw fee (`sendPreview`) RPC error, or '' when none. */
   feeError: string;
   /** Raw spendable-balance RPC error, or '' when none. */
   spendableError: string;
