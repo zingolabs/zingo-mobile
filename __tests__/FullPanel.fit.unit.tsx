@@ -45,8 +45,16 @@ const measure = (header: number, content: number) => {
 
 test('Tests that a fitting panel takes its header and content height when they are shorter than the screen', () => {
   open(true);
-  act(() => measure(50, 100));
-  expect(panelHeight()).toBe(150);
+  act(() => measure(50, 50));
+  expect(panelHeight()).toBe(100);
+});
+
+test('Tests that a fitting panel takes the full height when it would leave less than a title bar of the screen behind', () => {
+  open(false);
+  const full = panelHeight()!;
+  open(true);
+  act(() => measure(50, full - 50 - 20));
+  expect(panelHeight()).toBe(full);
 });
 
 test('Tests that a fitting panel stops at the full height when its content is taller', () => {

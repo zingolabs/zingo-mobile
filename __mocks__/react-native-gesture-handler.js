@@ -1,5 +1,10 @@
 export const GestureHandlerRootView = ({ children }) => children;
 
+/** Any gesture, with every builder method returning itself. */
+const gesture = new Proxy({}, { get: () => () => gesture });
+export const Gesture = new Proxy({}, { get: () => () => gesture });
+export const GestureDetector = ({ children }) => children;
+
 export default {
   Swipeable: jest.fn().mockImplementation(({ children }) => children),
   RNGestureHandlerModule: {
