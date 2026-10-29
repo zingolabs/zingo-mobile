@@ -769,6 +769,7 @@
     "deposit-unsent-title": "The deposit did not leave",
     "deposit-unsent": "The swap is reserved but nothing has been sent. Try the deposit again, or pay it from another wallet and paste its hash.",
     "deposit-unsent-expired": "The quote this swap was reserved at has expired, and nothing was sent. Get a new quote to swap at today’s price.",
+    "deposit-other-held": "Another sale’s deposit is halfway out, and the wallet holds its payment until it is finished. Try that sale again first, or restart the app to release it.",
     "deposit-retry": "Try the deposit again",
     "qr-carries-amount": "The QR has the address and the exact amount",
     "qr-carries-memo": "The QR has the address, the amount and the memo",

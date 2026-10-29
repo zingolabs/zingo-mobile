@@ -128,6 +128,13 @@ export type SwapRecordType = {
 
   // Outbound-only fields
   /**
+   * Whether the deposit is paid through the source address, as the
+   * instructions said at commit (`requiresDepositFromSourceAddress`). A
+   * retry rebuilds the deposit with it. Absent on inbound records and on
+   * records made before it was kept.
+   */
+  depositFromSourceAddress?: boolean;
+  /**
    * Broadcast bookkeeping for the ZEC deposit transaction we constructed.
    * Undefined for inbound records. `txId` is populated as soon as zingolib
    * returns it; status updates progress through PendingBroadcast → Broadcasted.

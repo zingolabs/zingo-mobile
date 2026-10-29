@@ -769,6 +769,7 @@
     "deposit-unsent-title": "El depósito no ha salido",
     "deposit-unsent": "El swap está reservado pero no se ha enviado nada. Vuelve a intentar el depósito, o págalo desde otro monedero y pega su hash.",
     "deposit-unsent-expired": "La cotización con la que se reservó este swap ha caducado y no se ha enviado nada. Pide una nueva para hacer el swap al precio de hoy.",
+    "deposit-other-held": "El depósito de otra venta se quedó a medias y el monedero retiene su pago hasta terminarlo. Vuelve a intentar esa venta primero, o reinicia la app para liberarlo.",
     "deposit-retry": "Reintentar el depósito",
     "qr-carries-amount": "El QR lleva la dirección y el importe exacto",
     "qr-carries-memo": "El QR lleva la dirección, el importe y el memo",

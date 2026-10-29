@@ -6,6 +6,7 @@ import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
 import { ProviderRegistry } from '@app/swap/providers/ProviderRegistry';
 import type { MidgardClient } from '@app/swap/MidgardClient';
 import { FlashnetExecutor } from '@app/swap/providers/FlashnetExecutor';
+import { MayaExecutor } from '@app/swap/providers/MayaExecutor';
 import { NearIntentsExecutor } from '@app/swap/providers/NearIntentsExecutor';
 import type { SwapKitClient } from '@app/swap/SwapKitClient';
 import type { SwapStore } from '@app/swap/SwapStore';
@@ -553,5 +554,66 @@ describe('SwapPoller on an expired purchase', () => {
     await poller.tickOnce();
     expect(track).not.toHaveBeenCalled();
     expect(poller.isRunning()).toBe(false);
+  });
+});
+
+describe('SwapPoller on an expired Maya purchase Midgard finds a payment for', () => {
+  const T0 = 1_700_000_000_000;
+  const expiredAt = T0 + 600_000;
+  const now = expiredAt + 60_000;
+  const expired = makeRecord({
+    recordId: 'rec-maya-late',
+    direction: SwapDirectionEnum.Inbound,
+    sellAsset: BTC,
+    receiveAsset: ZEC,
+    depositAddress: 'bc1qmayavault',
+    destinationAddress: 't1wallet',
+    broadcast: undefined,
+    status: SwapStatusEnum.Expired,
+    createdAtMs: T0,
+    updatedAtMs: T0,
+    depositDeadlineMs: expiredAt,
+    terminalAtMs: expiredAt,
+  });
+
+  const harness = (track: jest.Mock) => {
+    jest.useFakeTimers({ now });
+    const upsert = jest.fn(async (_record: SwapRecordType) => undefined);
+    const poller = new SwapPoller({
+      client: { track } as unknown as SwapKitClient,
+      registry: new ProviderRegistry([new MayaExecutor()]),
+      store: {
+        readAll: jest.fn(async () => [expired]),
+        upsert,
+      } as unknown as typeof SwapStore,
+      midgardClient: {
+        findInboundActionByMemo: jest.fn(async () => ({
+          sourceTxHash: 'cd'.repeat(32),
+          sourceChainPrefix: 'BTC',
+        })),
+      } as unknown as MidgardClient,
+      config: {
+        tickIntervalMs: 10_000,
+        activePollIntervalMs: 0,
+        idlePollIntervalMs: 0,
+      },
+    });
+    return { poller, upsert };
+  };
+
+  it('reads as refunding even when that tick cannot ask /track', async () => {
+    const { poller, upsert } = harness(
+      jest.fn(async () => {
+        throw new Error('offline');
+      }),
+    );
+    await poller.tickOnce();
+    expect(upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: SwapStatusEnum.Pending,
+        observedDepositTxHash: 'cd'.repeat(32),
+        lateDepositAtMs: now,
+      }),
+    );
   });
 });

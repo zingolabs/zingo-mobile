@@ -344,6 +344,10 @@ export class SwapService {
           : undefined,
       quoteExpiresAtMs: chosenRoute.expiresAtMs,
       providerData: instructions.providerData,
+      depositFromSourceAddress:
+        direction === SwapDirectionEnum.Outbound
+          ? !!instructions.requiresDepositFromSourceAddress
+          : undefined,
       broadcast:
         direction === SwapDirectionEnum.Outbound
           ? { status: BroadcastStatusEnum.PendingBroadcast }
@@ -358,6 +362,34 @@ export class SwapService {
     // is idempotent so this is a no-op if it is already running.
     this.poller.start();
     return { record, instructions };
+  }
+
+  /**
+   * The deposit's first transaction, the deshield, went out and the second
+   * did not. The record keeps the deshield's txid, so a retry knows the
+   * held deposit is this sale's, and stays pending until the resumed
+   * deposit is marked broadcast.
+   */
+  async markDeshielded(args: {
+    recordId: string;
+    deshieldTxId: string;
+  }): Promise<SwapRecordType> {
+    const record = await this.store.getByRecordId(args.recordId);
+    if (!record) {
+      throw new Error(
+        `SwapService.markDeshielded: no record for ${args.recordId}`,
+      );
+    }
+    const updated: SwapRecordType = {
+      ...record,
+      broadcast: {
+        status: BroadcastStatusEnum.PendingBroadcast,
+        allTxIds: [args.deshieldTxId],
+      },
+      updatedAtMs: Date.now(),
+    };
+    await this.store.upsert(updated);
+    return updated;
   }
 
   async markBroadcasted(args: MarkBroadcastedArgs): Promise<SwapRecordType> {

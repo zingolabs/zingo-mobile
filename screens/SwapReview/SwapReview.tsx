@@ -7,6 +7,7 @@ import { AppDrawerParamList } from '@app/types';
 import { Route } from '@app/AppState';
 import { ContextAppLoaded, useSwapService } from '@app/context';
 import {
+  DepositAfterDeshieldError,
   SwapDirectionEnum,
   canonicalChainAddress,
   commitRefusalCondemnsRoute,
@@ -184,11 +185,26 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
       });
       navigation.replace(Route.SwapTracking, { recordId });
     } catch (e) {
+      // A deshield that went out belongs to this sale, so its retry resumes it.
+      if (
+        e instanceof DepositAfterDeshieldError &&
+        e.kind === 'failed' &&
+        e.deshieldTxId
+      ) {
+        await swapService
+          .markDeshielded({ recordId, deshieldTxId: e.deshieldTxId })
+          .catch(err =>
+            console.log(`SwapReview: markDeshielded failed ${err}`),
+          );
+      }
       // The swap is reserved and payable by hand, so the deposit screen takes
       // over with the address and the way to try again.
       navigation.replace(Route.SwapDeposit, {
         recordId,
-        broadcastError: `${e}`,
+        broadcastError:
+          e instanceof DepositAfterDeshieldError && e.kind === 'pending'
+            ? (translate('swap.deposit-other-held') as string)
+            : `${e}`,
       });
     }
   }, [
