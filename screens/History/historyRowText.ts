@@ -10,6 +10,7 @@ import {
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
 import { formatAmount } from '@app/utils/formatAmount';
+import { transferStatus } from '@app/utils/transferStatus';
 
 type Translate = (key: string) => string;
 
@@ -62,15 +63,30 @@ const shortAddress = (address: string): string =>
 /**
  * A transfer's row: what it was, when, and the ZEC with its dollars. A
  * transfer that failed, whatever its kind (a send, a shield, a send to
- * oneself), reads its amount struck through in grey.
+ * oneself), or was rejected, reads its amount struck through in grey. Until
+ * it is confirmed, or once it failed, the state word its detail shows comes
+ * before the time and stands for the rest of the line.
  */
 export function transferRowText(
   args: Parameters<typeof transferRowTextOf>[0],
 ): RowText {
   const text = transferRowTextOf(args);
-  return args.vt.status === RPCValueTransfersStatusEnum.failed
-    ? { ...text, topTone: 'muted', topStrike: true }
-    : text;
+  const status = transferStatus(args.vt, args.t);
+  const stated: RowText =
+    status.tone === 'accent'
+      ? text
+      : {
+          ...text,
+          state: {
+            text: status.text,
+            tone: status.tone === 'danger' ? 'danger' : 'warning',
+          },
+          line: args.when,
+        };
+  return args.vt.status === RPCValueTransfersStatusEnum.failed ||
+    args.vt.kind === ValueTransferKindEnum.Rejection
+    ? { ...stated, topTone: 'muted', topStrike: true }
+    : stated;
 }
 
 function transferRowTextOf(args: {
@@ -84,14 +100,8 @@ function transferRowTextOf(args: {
 }): RowText {
   const { vt, when, currency, usd, t, contactName } = args;
   const failed = vt.status === RPCValueTransfersStatusEnum.failed;
-  const pending = !failed && vt.confirmations === 0;
-  const state: RowState | undefined = failed
-    ? { text: t('history.state-failed'), tone: 'danger' }
-    : pending
-      ? { text: t(`history.${vt.status}`), tone: 'warning' }
-      : undefined;
   const amount = `${formatAmount(vt.amount)} ${currency}`;
-  const base = { state, bottom: usd, titleMono: false };
+  const base = { bottom: usd, titleMono: false };
   switch (vt.kind) {
     case ValueTransferKindEnum.Sent:
       return {

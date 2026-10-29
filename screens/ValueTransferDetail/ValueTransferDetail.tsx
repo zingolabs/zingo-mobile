@@ -319,6 +319,7 @@ const ValueTransferDetail: React.FunctionComponent<
           accessibilityRole="button"
           disabled={!amounts.hidden}
           onPress={amounts.reveal}
+          style={{ alignItems: 'center' }}
         >
           <Text
             testID="valuetransferdetail.amount"
@@ -339,7 +340,11 @@ const ValueTransferDetail: React.FunctionComponent<
             </Text>
           </Text>
           {!!todayUsd && (
-            <Text variant="bodySmall" tone="muted" style={{ marginTop: 4 }}>
+            <Text
+              variant="bodySmall"
+              tone="muted"
+              style={{ marginTop: 4, textAlign: 'center' }}
+            >
               {t('history.today-price').replace(
                 '{usd}',
                 amounts.show(todayUsd),

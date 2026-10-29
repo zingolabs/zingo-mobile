@@ -424,3 +424,27 @@ test('Tests that a swap not completed is titled with both coins in its order, wh
 
   expect(text.title).toBe('Swap BTC → ZEC');
 });
+
+test('Tests that a send says where it stands before the time when it is not confirmed yet', () => {
+  const row = (confirmations: number) =>
+    transferRowText({
+      vt: vt('a', 1, ValueTransferKindEnum.Sent, {
+        confirmations,
+        address: 'u1qx8fabcdefghijk3kd9a2',
+      }),
+      when: 'Just now',
+      currency: 'ZEC',
+      usd: '',
+      t,
+    });
+
+  expect([row(0).state, row(0).line]).toEqual([
+    { text: 'history.in-mempool', tone: 'warning' },
+    'Just now',
+  ]);
+  expect(row(1).state).toEqual({ text: 'history.confirming', tone: 'warning' });
+  expect([row(3).state, row(3).line]).toEqual([
+    undefined,
+    'history.sent · Just now',
+  ]);
+});

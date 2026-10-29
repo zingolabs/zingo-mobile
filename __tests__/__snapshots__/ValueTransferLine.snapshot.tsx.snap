@@ -282,7 +282,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
             style={
               {
                 "alignItems": "center",
-                "backgroundColor": "#8888881F",
+                "backgroundColor": "#E5484D1F",
                 "borderRadius": 999,
                 "height": 36,
                 "justifyContent": "center",
@@ -351,7 +351,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                   text translated
                 </Text>
                  · 
-                text translated · Jan 1
+                Jan 1
               </Text>
             </View>
           </View>
@@ -751,7 +751,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                   text translated
                 </Text>
                  · 
-                text translated · Jan 1
+                Jan 1
               </Text>
             </View>
           </View>
