@@ -809,6 +809,8 @@
     "step-buy-4": "ZEC получен",
     "not-detected-title": "Мы пока не обнаружили ваш платёж",
     "not-detected-body": "Проверьте, что вы отправили ровно {amount} {coin} на адрес этого обмена.",
+    "not-detected-review": "Проверить данные платежа",
+    "slow-deposit": "Обнаружение платежа в сети {chain} может занять до часа.",
     "result-received": "Вы получили {amount}",
     "result-at-your-address": "Уже на {who}.",
     "result-in-your-wallet": "Уже в вашем кошельке.",

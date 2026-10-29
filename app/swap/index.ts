@@ -41,6 +41,8 @@ export { isThorchainFamily } from './thorchainFamily';
 export {
   DEPOSIT_WAIT_MS,
   DEPOSIT_WARN_AFTER_MS,
+  SLOW_DEPOSIT_WARN_AFTER_MS,
+  slowDeposit,
   awaitsDeposit,
   depositDeadlineMs,
   depositOverdue,

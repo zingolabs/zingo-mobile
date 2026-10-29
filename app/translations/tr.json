@@ -809,6 +809,8 @@
     "step-buy-4": "ZEC alındı",
     "not-detected-title": "Ödemenizi henüz algılamadık",
     "not-detected-body": "Tam olarak {amount} {coin} tutarını bu takasın adresine gönderdiğinizi kontrol edin.",
+    "not-detected-review": "Ödeme bilgilerini kontrol et",
+    "slow-deposit": "{chain} ödemelerinin algılanması bir saati bulabilir.",
     "result-received": "{amount} aldınız",
     "result-at-your-address": "Şu anda {who} adresinde.",
     "result-in-your-wallet": "Cüzdanınızda.",

@@ -6,6 +6,7 @@ import {
   depositOverdue,
   depositPhase,
   depositWarnAtMs,
+  slowDeposit,
 } from '@app/swap/depositDeadline';
 import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
@@ -31,6 +32,15 @@ const BTC: SwapAssetType = {
   ticker: 'BTC',
   chainId: 'bitcoin',
   decimals: 8,
+};
+
+const ETH: SwapAssetType = {
+  swapKitId: 'ETH.ETH',
+  chain: 'ETH',
+  symbol: 'ETH',
+  ticker: 'ETH',
+  chainId: '1',
+  decimals: 18,
 };
 
 const T0 = 1_700_000_000_000;
@@ -164,14 +174,22 @@ describe('SwapService.markDepositSent', () => {
 });
 
 test('Tests that the wait turns to a warning half an hour after the payment address was made', () => {
-  expect(depositWarnAtMs(makeRecord())).toBe(T0 + 30 * 60 * 1000);
+  expect(depositWarnAtMs(makeRecord({ sellAsset: ETH }))).toBe(
+    T0 + 30 * 60 * 1000,
+  );
+  expect(slowDeposit(makeRecord({ sellAsset: ETH }))).toBe(false);
+});
+
+test('Tests that the wait turns to a warning after 90 minutes when the payment is in Bitcoin', () => {
+  expect(depositWarnAtMs(makeRecord())).toBe(T0 + 90 * 60 * 1000);
+  expect(slowDeposit(makeRecord())).toBe(true);
 });
 
 test('Tests that a purchase reads awaiting, looking, not detected, detected and swapping as it moves', () => {
   expect(depositPhase(makeRecord(), T0 + 1_000)).toBe('awaiting');
   const sent = makeRecord({ depositSentAtMs: T0 + 1_000 });
-  expect(depositPhase(sent, T0 + 30 * 60 * 1000 - 1)).toBe('looking');
-  expect(depositPhase(sent, T0 + 30 * 60 * 1000)).toBe('notDetected');
+  expect(depositPhase(sent, T0 + 90 * 60 * 1000 - 1)).toBe('looking');
+  expect(depositPhase(sent, T0 + 90 * 60 * 1000)).toBe('notDetected');
   expect(
     depositPhase(
       makeRecord({
