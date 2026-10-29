@@ -1,7 +1,7 @@
 {
   "wait": "Please wait...",
   "updating": {
-    "firstlaunchingmessage-title": "Optimizing {name}",
+    "firstlaunchingmessage-title": "Optimizing {app}",
     "firstlaunchingmessage-body": "This may take a while, depending on the transaction history. Please keep the app open until the process finishes.",
     "firstlaunchingmessage-footer": "Thanks."
   },
@@ -32,7 +32,7 @@
   "menudrawer-acc": "Open Menu Drawer",
   "change-privacy": "New privacy policy: ",
   "email": "support@zingolabs.org",
-  "subject": "{name} Support...",
+  "subject": "{app} Support...",
   "body": "I need help with...",
   "syncing": "Syncing",
   "synced": "Synced",
@@ -189,7 +189,7 @@
     "walletfile-state-unknown": "unknown format"
   },
   "loadedapp": {
-    "about": "About {name}",
+    "about": "About {app}",
     "info": "Server Info",
     "options": "Options",
     "walletseed": "Wallet Seed",
@@ -200,7 +200,7 @@
     "fundpools": "Pools",
     "insight": "Financial Insight",
     "addressbook": "Address Book",
-    "support": "{name} support email",
+    "support": "{app} support email",
     "changeservernew-error": "Error trying to change the server to the new one: ",
     "readingwallet-error": "Error trying to read the wallet with the new server:",
     "differentchain-error": "You are changing to a server with a different chain, you will no longer have access to this wallet without the seed phrase.",
@@ -1023,7 +1023,7 @@
     "details": "Transaction Details",
     "pool": "Pool",
     "contactcopied": "Copied Contact to Clipboard",
-    "address-http": "{name} has no idea who sent you this Address! It's entirely up to you to authenticate the Sender.",
+    "address-http": "{app} has no idea who sent you this Address! It's entirely up to you to authenticate the Sender.",
     "address-https": "Zingo-Authenticated Address",
     "type": "Type",
     "not-confirmed": "Transaction not yet confirmed",

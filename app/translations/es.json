@@ -1,7 +1,7 @@
 {
   "wait": "Por favor espere...",
   "updating": {
-    "firstlaunchingmessage-title": "Optimizando {name}",
+    "firstlaunchingmessage-title": "Optimizando {app}",
     "firstlaunchingmessage-body": "Esto puede tardar un poco, dependiendo del historial de transacciones. Mantenga la aplicación abierta hasta que finalice el proceso.",
     "firstlaunchingmessage-footer": "Gracias."
   },
@@ -32,7 +32,7 @@
   "menudrawer-acc": "Abrir Menú Lateral",
   "change-privacy": "Nueva Política de Privacidad: ",
   "email": "support@zingolabs.org",
-  "subject": "Soporte {name}...",
+  "subject": "Soporte {app}...",
   "body": "Necesito ayuda con...",
   "syncing": "Sincronizando",
   "synced": "Sincronizada",
@@ -189,7 +189,7 @@
     "walletfile-state-unknown": "formato desconocido"
   },
   "loadedapp": {
-    "about": "Sobre {name}",
+    "about": "Sobre {app}",
     "info": "Información del Servidor",
     "options": "Opciones",
     "walletseed": "Semilla del Monedero",
@@ -200,7 +200,7 @@
     "fundpools": "Pools",
     "insight": "Visión Financiera",
     "addressbook": "Libreta de Direcciones",
-    "support": "Email de soporte de {name}",
+    "support": "Email de soporte de {app}",
     "changeservernew-error": "Error al intentar cambiar al Servidor nuevo: ",
     "readingwallet-error": "Error al intentar leer el monedero activo usando el Servidor nuevo:",
     "differentchain-error": "Estás cambiando a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin tu frase semilla.",
@@ -1023,7 +1023,7 @@
     "details": "Detalles de la Transacción",
     "pool": "Pool",
     "contactcopied": "Contacto copiado al portapapeles",
-    "address-http": "¡{name} no tiene idea de quién te envió esta dirección! Depende totalmente de ti autenticar al remitente.",
+    "address-http": "¡{app} no tiene idea de quién te envió esta dirección! Depende totalmente de ti autenticar al remitente.",
     "address-https": "Dirección autenticada por Zingo",
     "type": "Tipo",
     "not-confirmed": "Transacción no confirmada todavía",

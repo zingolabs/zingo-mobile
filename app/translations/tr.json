@@ -1,7 +1,7 @@
 {
   "wait": "Lütfen bekleyin...",
   "updating": {
-    "firstlaunchingmessage-title": "{name} optimize ediliyor",
+    "firstlaunchingmessage-title": "{app} optimize ediliyor",
     "firstlaunchingmessage-body": "Bu işlem, işlem geçmişine bağlı olarak biraz zaman alabilir. Lütfen işlem tamamlanana kadar uygulamayı açık tutun.",
     "firstlaunchingmessage-footer": "Teşekkürler."
   },
@@ -32,7 +32,7 @@
   "menudrawer-acc": "Menü çekmecesini aç",
   "change-privacy": "Yeni gizlilik politikası ",
   "email": "support@zingolabs.org",
-  "subject": "{name} Destek...",
+  "subject": "{app} Destek...",
   "body": "… ile ilgili yardıma ihtiyacım var...",
   "syncing": "Senkronize ediliyor",
   "synced": "Senkronize edildi",
@@ -189,7 +189,7 @@
     "walletfile-state-unknown": "bilinmeyen biçim"
   },
   "loadedapp": {
-    "about": "{name} hakkında",
+    "about": "{app} hakkında",
     "info": "Sunucu bilgisi",
     "options": "Seçenekler",
     "walletseed": "Cüzdan Tohumu",
@@ -200,7 +200,7 @@
     "fundpools": "Havuzlar",
     "insight": "Finansal İçgörü",
     "addressbook": "Adres Defteri",
-    "support": "{name} destek mail",
+    "support": "{app} destek mail",
     "changeservernew-error": "Error Sunucuyu yenisiyle değiştirmeye çalışırken bir hata oluştu ",
     "readingwallet-error": "Error Yeni sunucuyla cüzdanı okuma girişiminde hata oluştu:",
     "differentchain-error": "Farklı bir zincire sahip bir sunucuya geçiyorsunuz, bu kurtarma ifadesi olmadan bu cüzdana artık erişiminiz olmayacak.",
@@ -1023,7 +1023,7 @@
     "details": "İşlem Detayları",
     "pool": "Havuz",
     "contactcopied": "Kişi panoya kopyalandı",
-    "address-http": "{name}, bu adresin size kim tarafından gönderildiğini bilmiyor! Gönderenin kimliğini doğrulamak tamamen size kalmış.",
+    "address-http": "{app}, bu adresin size kim tarafından gönderildiğini bilmiyor! Gönderenin kimliğini doğrulamak tamamen size kalmış.",
     "address-https": "Zingo Doğrulanmış Adres",
     "type": "Tür",
     "not-confirmed": "İşlem henüz onaylanmadı",

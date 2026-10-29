@@ -1,7 +1,7 @@
 {
   "wait": "Aguarde um momento...",
   "updating": {
-    "firstlaunchingmessage-title": "Otimizando a {name}",
+    "firstlaunchingmessage-title": "Otimizando a {app}",
     "firstlaunchingmessage-body": "Isso pode demorar um pouco, dependendo do histórico de transações. Por favor, mantenha o aplicativo aberto até que o processo termine.",
     "firstlaunchingmessage-footer": "Obrigado."
   },
@@ -32,7 +32,7 @@
   "menudrawer-acc": "Abrir Menu Lateral",
   "change-privacy": "Nova política de privacidade: ",
   "email": "support@zingolabs.org",
-  "subject": "Suporte {name}...",
+  "subject": "Suporte {app}...",
   "body": "Preciso de ajuda com...",
   "syncing": "Sincronizando",
   "synced": "Sincronizada",
@@ -189,7 +189,7 @@
     "walletfile-state-unknown": "formato desconhecido"
   },
   "loadedapp": {
-    "about": "Sobre a {name}",
+    "about": "Sobre a {app}",
     "info": "Informações do Servidor",
     "options": "Opções",
     "walletseed": "Frases da Carteira",
@@ -200,7 +200,7 @@
     "fundpools": "Pools",
     "insight": "Visão Financeira",
     "addressbook": "Agenda de Endereços",
-    "support": "E-mail de suporte do {name}",
+    "support": "E-mail de suporte do {app}",
     "changeservernew-error": "Error ao tentar alterar para um novo servidor: ",
     "readingwallet-error": "Error ao tentar ler a carteira com o novo servidor:",
     "differentchain-error": "Você está mudando para um servidor com uma rede diferente, você não terá mais acesso a essa carteira sem suas frases de recuperação.",
@@ -1023,7 +1023,7 @@
     "details": "Detalhes da Transação",
     "pool": "Pool",
     "contactcopied": "Contato copiado para a Área de Transparência",
-    "address-http": "{name} não tem ideia de quem lhe enviou este Endereço! Você deve autenticar o Remetente.",
+    "address-http": "{app} não tem ideia de quem lhe enviou este Endereço! Você deve autenticar o Remetente.",
     "address-https": "Endereço Zingo-Authenticated",
     "type": "Tipo",
     "not-confirmed": "Transação ainda não confirmada",
