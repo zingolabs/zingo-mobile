@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import { View } from 'react-native';
 import Animated from 'react-native-reanimated';
+import { usePreventRemove } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { useTheme } from '@app/theme';
@@ -59,7 +60,13 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
   const [lists, setLists] = useState<Record<string, ServerUrisType[]>>({});
   const [other, setOther] = useState<ChainNameEnum | null>(null);
   const backGuard = useRef<(() => boolean) | null>(null);
-  const leaving = useRef(false);
+  const [guarded, setGuarded] = useState(false);
+  /**
+   * 'back': the user leaves, and the effect below goes once the render that
+   * lowers the guard has landed (a discarded server is still dirty before it).
+   * 'away': a chain change took over the navigation.
+   */
+  const [leaving, setLeaving] = useState<'none' | 'back' | 'away'>('none');
   const mounted = useRef(true);
   const known = useRef(new Set<string>());
   // The first page shows without a transition; the stack push moves it.
@@ -136,7 +143,7 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
     }
     setBusy(false);
     if (result.kind === 'chain-changed') {
-      leaving.current = true;
+      setLeaving('away');
       if (readOnly) {
         navigation.navigate(Route.ViewingKey, {
           entry: { kind: 'push' },
@@ -173,31 +180,35 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
     await apply(remoteServer(pick.server.uri, chain), SelectServerEnum.auto);
   };
 
-  const close = () => {
-    leaving.current = true;
+  const close = () => setLeaving('back');
+
+  useEffect(() => {
+    if (leaving !== 'back') {
+      return;
+    }
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
       navigation.navigate(Route.Home);
     }
-  };
+  }, [leaving, navigation]);
 
-  useEffect(
-    () =>
-      navigation.addListener('beforeRemove', e => {
-        if (leaving.current) {
-          return;
-        }
-        if (other !== null) {
-          e.preventDefault();
-          setOther(null);
-          return;
-        }
-        if (busy || backGuard.current?.()) {
-          e.preventDefault();
-        }
-      }),
-    [navigation, other, busy],
+  /**
+   * The back arrow, Android's back and iOS's edge swipe: the other chains'
+   * list closes first, nothing leaves while a server is being set, and an
+   * unsaved custom server asks.
+   */
+  usePreventRemove(
+    leaving === 'none' && (other !== null || busy || guarded),
+    () => {
+      if (other !== null) {
+        setOther(null);
+        return;
+      }
+      if (!busy) {
+        backGuard.current?.();
+      }
+    },
   );
 
   const unreachable = () =>
@@ -255,6 +266,7 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
             onUnreachable={unreachable}
             onBack={close}
             backGuard={backGuard}
+            onGuard={setGuarded}
           />
         </Animated.View>
       ) : (

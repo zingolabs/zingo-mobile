@@ -77,6 +77,9 @@ export type ServerProps = {
   // Set to a guard the host calls on a system back; true when the screen
   // handled it (an unsaved custom server asks first).
   backGuard?: React.MutableRefObject<(() => boolean) | null>;
+  // Told whether a back must be held now (a test running, the question up,
+  // an unsaved custom server), so the host can block the iOS swipe too.
+  onGuard?: (guarded: boolean) => void;
   placement?: Placement;
 };
 
@@ -217,6 +220,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
   onUnreachable,
   onBack,
   backGuard,
+  onGuard,
   placement = 'screen',
 }) => {
   const { lift, onLayout } = useLift(placement, CARD_TOP);
@@ -346,6 +350,8 @@ const Server: React.FunctionComponent<ServerProps> = ({
     }
     onBack();
   };
+  const guarded = working || asking || dirty;
+  useEffect(() => onGuard?.(guarded), [guarded, onGuard]);
   if (backGuard) {
     backGuard.current = () => {
       if (working || asking || dirty) {
@@ -387,6 +393,17 @@ const Server: React.FunctionComponent<ServerProps> = ({
       onPick(s);
     }
   };
+
+  /**
+   * A network switch only cross-fades the lists: the cards under them take
+   * their new place at once. They glide only when the Custom box opens or
+   * closes on the same network.
+   */
+  const shownTab = React.useRef(tab);
+  useEffect(() => {
+    shownTab.current = tab;
+  }, [tab]);
+  const glide = shownTab.current === tab ? layout() : undefined;
 
   const customBlock = (
     <CustomServerBox
@@ -473,7 +490,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
           />
         ))}
       </RowCard>
-      <Animated.View layout={layout()} style={{ marginTop: 14 }}>
+      <Animated.View layout={glide} style={{ marginTop: 14 }}>
         <RowCard>
           <ServerRow
             testID="server.other"
@@ -602,7 +619,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
             {body}
           </Animated.View>
           <Animated.View
-            layout={layout()}
+            layout={glide}
             style={{
               marginHorizontal: CARD_SIDE,
               marginTop: space16,
