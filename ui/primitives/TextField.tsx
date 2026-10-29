@@ -276,6 +276,14 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
             style={{
               flex: 1,
               paddingVertical: space8,
+              /**
+               * iOS centres a single line in the input's own box but drew
+               * the placeholder low in it; filling the field's height
+               * centres it on the actions beside it.
+               */
+              ...(Platform.OS === 'ios' && !multiline
+                ? { alignSelf: 'stretch', paddingVertical: 0 }
+                : {}),
               ...(multiline && maxLines
                 ? { maxHeight: valueStyle.lineHeight * maxLines + space8 * 2 }
                 : {}),

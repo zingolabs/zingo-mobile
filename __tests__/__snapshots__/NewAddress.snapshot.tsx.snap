@@ -793,13 +793,14 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
           placeholderTextColor="#888888"
           style={
             {
+              "alignSelf": "stretch",
               "color": "#c3c3c3",
               "flex": 1,
               "fontSize": 15,
               "fontWeight": "400",
               "minWidth": 0,
               "paddingRight": 0,
-              "paddingVertical": 8,
+              "paddingVertical": 0,
             }
           }
           testID="receive.new-tag"
