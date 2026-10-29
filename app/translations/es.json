@@ -1,7 +1,7 @@
 {
   "wait": "Por favor espere...",
   "updating": {
-    "firstlaunchingmessage-title": "Optimizando {name}",
+    "firstlaunchingmessage-title": "Optimizando {app}",
     "firstlaunchingmessage-body": "Esto puede tardar un poco, dependiendo del historial de transacciones. Mantenga la aplicación abierta hasta que finalice el proceso.",
     "firstlaunchingmessage-footer": "Gracias."
   },
@@ -32,7 +32,7 @@
   "menudrawer-acc": "Abrir Menú Lateral",
   "change-privacy": "Nueva Política de Privacidad: ",
   "email": "support@zingolabs.org",
-  "subject": "Soporte {name}...",
+  "subject": "Soporte {app}...",
   "body": "Necesito ayuda con...",
   "syncing": "Sincronizando",
   "synced": "Sincronizada",
@@ -189,7 +189,7 @@
     "walletfile-state-unknown": "formato desconocido"
   },
   "loadedapp": {
-    "about": "Sobre {name}",
+    "about": "Sobre {app}",
     "info": "Información del Servidor",
     "options": "Opciones",
     "walletseed": "Semilla del Monedero",
@@ -200,7 +200,7 @@
     "fundpools": "Pools",
     "insight": "Visión Financiera",
     "addressbook": "Libreta de Direcciones",
-    "support": "Email de soporte de {name}",
+    "support": "Email de soporte de {app}",
     "changeservernew-error": "Error al intentar cambiar al Servidor nuevo: ",
     "readingwallet-error": "Error al intentar leer el monedero activo usando el Servidor nuevo:",
     "differentchain-error": "Estás cambiando a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin tu frase semilla.",
@@ -227,7 +227,6 @@
     "tryingnewserver-error": "Después de 15 segundos el nuevo Servidor no responde.",
     "readingwallet": "Leyendo satisfactoriamente el monedero activo usando el Servidor:",
     "restorewallet-title": "Opción Avanzada",
-    "restorewallet-alert": "Confirmar que quiere restaurar un nuevo monedero usando su frase semilla.",
     "selectingserversame": "Su servidor actual ya es el más optimizado.",
     "selectingserverbest": "En este momento este es el servidor más optimizado:",
     "incoming-funds": "Fondos entrantes\n",
@@ -555,8 +554,8 @@
     "private": "Privada",
     "amountrevealed": "Monto Revelado",
     "deshielded": "Desblindada",
-    "lose-address-title": "SELECCIONAR UNA NUEVA DIRECCIÓN",
-    "lose-address-alert": "Ya tienes una dirección válida en el campo de dirección. ¿Desea sustituirla?",
+    "lose-address-title": "Seleccionar una nueva dirección",
+    "lose-address-alert": "Ya tienes una dirección válida en el campo de dirección. ¿Quieres reemplazarla?",
     "nym-processing-title": "Procesando vía NYM",
     "nym-enhanced": "NYM Mejorado",
     "nym-warning": "Esta transacción será enrutada a través del mixnet de NYM para mayor privacidad. Puede tardar un poco más que las transacciones estándar.",
@@ -606,7 +605,6 @@
     "noaddress": "Sin Direcciones",
     "title-address": "Mi Dirección",
     "newu-option": "Nueva dirección",
-    "danger-zone": "ZONA DE RIESGO",
     "go-to-transparent": "Ir a dirección transparente expuesta",
     "title-acc": "Pantalla de Recibir",
     "shielded-orchard": "Solo Orchard (Ironwood)",
@@ -616,7 +614,6 @@
     "copy-address-button": "Copiar direccion",
     "modal-transparent": {
       "title": "Advertencia de Privacidad",
-      "message": "Las direcciones transparentes exponen los detalles de sus transacciones en la blockchain. Esto destruye su privacidad y no se recomienda para la mayoría de las transacciones.",
       "recommendation": "Se recomiendan las direcciones blindadas ya que brindan el mayor nivel de privacidad.",
       "button": "Entiendo los riesgos, mostrar direcciones transparentes"
     },
@@ -812,6 +809,8 @@
     "step-buy-4": "ZEC recibido",
     "not-detected-title": "Aún no hemos detectado tu pago",
     "not-detected-body": "Comprueba que enviaste exactamente {amount} {coin} a la dirección de este swap.",
+    "not-detected-review": "Revisar los datos del pago",
+    "slow-deposit": "Los pagos en {chain} pueden tardar hasta una hora en detectarse.",
     "result-received": "Has recibido {amount}",
     "result-at-your-address": "Ya está en {who}.",
     "result-in-your-wallet": "Ya está en tu monedero.",
@@ -1024,7 +1023,7 @@
     "details": "Detalles de la Transacción",
     "pool": "Pool",
     "contactcopied": "Contacto copiado al portapapeles",
-    "address-http": "¡{name} no tiene idea de quién te envió esta dirección! Depende totalmente de ti autenticar al remitente.",
+    "address-http": "¡{app} no tiene idea de quién te envió esta dirección! Depende totalmente de ti autenticar al remitente.",
     "address-https": "Dirección autenticada por Zingo",
     "type": "Tipo",
     "not-confirmed": "Transacción no confirmada todavía",

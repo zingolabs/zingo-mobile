@@ -29,6 +29,7 @@ import { fieldBorder } from '@ui/primitives/fieldBorder';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
+import { singleLineInput } from '@ui/primitives/singleLineInput';
 
 const ZEC = 'ZEC';
 const NAME_MAX = 32;
@@ -358,6 +359,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
               color: colors.fgDefault,
               fontWeight: '600',
               fontSize: 15,
+              ...singleLineInput(),
             }}
           />
           {!!name && (

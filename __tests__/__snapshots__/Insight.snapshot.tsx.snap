@@ -475,7 +475,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
                 "checked": undefined,
                 "disabled": undefined,
                 "expanded": undefined,
-                "selected": true,
+                "selected": false,
               }
             }
             accessibilityValue={
@@ -508,10 +508,11 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               [
                 {
                   "alignItems": "center",
-                  "backgroundColor": "#18bd181F",
-                  "borderColor": "#18bd18",
+                  "backgroundColor": undefined,
+                  "borderColor": "#4A6487",
                   "borderRadius": 999,
                   "borderWidth": 1,
+                  "flexGrow": 1,
                   "justifyContent": "center",
                   "minHeight": 32,
                   "paddingHorizontal": 12,
@@ -526,7 +527,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               numberOfLines={1}
               style={
                 {
-                  "color": "#18bd18",
+                  "color": "#888888",
                   "fontSize": 13,
                   "fontWeight": "600",
                   "lineHeight": 18,
@@ -544,7 +545,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
                 "checked": undefined,
                 "disabled": undefined,
                 "expanded": undefined,
-                "selected": true,
+                "selected": false,
               }
             }
             accessibilityValue={
@@ -577,10 +578,11 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               [
                 {
                   "alignItems": "center",
-                  "backgroundColor": "#18bd181F",
-                  "borderColor": "#18bd18",
+                  "backgroundColor": undefined,
+                  "borderColor": "#4A6487",
                   "borderRadius": 999,
                   "borderWidth": 1,
+                  "flexGrow": 1,
                   "justifyContent": "center",
                   "minHeight": 32,
                   "paddingHorizontal": 12,
@@ -595,7 +597,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               numberOfLines={1}
               style={
                 {
-                  "color": "#18bd18",
+                  "color": "#888888",
                   "fontSize": 13,
                   "fontWeight": "600",
                   "lineHeight": 18,
@@ -613,7 +615,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
                 "checked": undefined,
                 "disabled": undefined,
                 "expanded": undefined,
-                "selected": true,
+                "selected": false,
               }
             }
             accessibilityValue={
@@ -646,10 +648,11 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               [
                 {
                   "alignItems": "center",
-                  "backgroundColor": "#18bd181F",
-                  "borderColor": "#18bd18",
+                  "backgroundColor": undefined,
+                  "borderColor": "#4A6487",
                   "borderRadius": 999,
                   "borderWidth": 1,
+                  "flexGrow": 1,
                   "justifyContent": "center",
                   "minHeight": 32,
                   "paddingHorizontal": 12,
@@ -664,7 +667,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               numberOfLines={1}
               style={
                 {
-                  "color": "#18bd18",
+                  "color": "#888888",
                   "fontSize": 13,
                   "fontWeight": "600",
                   "lineHeight": 18,
@@ -719,6 +722,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
                   "borderColor": "#18bd18",
                   "borderRadius": 999,
                   "borderWidth": 1,
+                  "flexGrow": 1,
                   "justifyContent": "center",
                   "minHeight": 32,
                   "paddingHorizontal": 12,

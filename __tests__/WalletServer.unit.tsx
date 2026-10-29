@@ -1,6 +1,7 @@
 import 'react-native';
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { usePreventRemove } from '@react-navigation/native';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
@@ -107,4 +108,16 @@ test('Tests that a server on another network goes to the recovery screen', async
   expect(navigation.navigate).toHaveBeenCalledWith(Route.WalletSeed, {
     action: 'server',
   });
+});
+
+test('Tests that nothing holds the back when nothing is unsaved, and the back arrow leaves', async () => {
+  const preventRemove = usePreventRemove as jest.Mock;
+  preventRemove.mockClear();
+  const navigation = mount(jest.fn());
+  const calls = preventRemove.mock.calls;
+  expect(calls[calls.length - 1][0]).toBe(false);
+  await act(async () => {
+    fireEvent.press(screen.getByTestId('server.back'));
+  });
+  expect(navigation.goBack).toHaveBeenCalledTimes(1);
 });

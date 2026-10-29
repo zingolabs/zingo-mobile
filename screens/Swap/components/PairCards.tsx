@@ -29,6 +29,7 @@ import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
 import AssetButton from './AssetButton';
 import { ZEC_TOKEN_ENTRY } from '@screens/Swap/swapAssets';
+import { singleLineInput } from '@ui/primitives/singleLineInput';
 
 /** The flip: rows trade places while the words cross-fade. */
 const FLIP_MS = 360;
@@ -295,11 +296,11 @@ export default function PairCards({
                 minWidth: 0,
                 textAlign: 'right',
                 fontSize: textVariants.balance.fontSize,
-                lineHeight: textVariants.balance.lineHeight,
                 fontWeight: textVariants.balance.fontWeight,
                 fontVariant: ['tabular-nums'],
                 color: invalid ? colors.fgDanger : colors.fgDefault,
                 padding: 0,
+                ...singleLineInput(textVariants.balance.lineHeight),
               }}
             />
           </View>

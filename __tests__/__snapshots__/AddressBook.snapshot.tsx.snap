@@ -228,6 +228,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
         spellCheck={false}
         style={
           {
+            "alignSelf": "stretch",
             "color": "#c3c3c3",
             "flex": 1,
             "fontSize": 15,
@@ -524,11 +525,13 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
               placeholderTextColor="#888888"
               style={
                 {
+                  "alignSelf": "stretch",
                   "color": "#c3c3c3",
                   "flex": 1,
                   "fontSize": 15,
                   "fontWeight": "600",
                   "padding": 10,
+                  "paddingVertical": 0,
                 }
               }
               testID="addressbook.name-field"
@@ -798,6 +801,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                     spellCheck={false}
                     style={
                       {
+                        "alignSelf": "stretch",
                         "color": "#c3c3c3",
                         "flex": 1,
                         "fontSize": 15,

@@ -1,7 +1,7 @@
 {
   "wait": "Lütfen bekleyin...",
   "updating": {
-    "firstlaunchingmessage-title": "{name} optimize ediliyor",
+    "firstlaunchingmessage-title": "{app} optimize ediliyor",
     "firstlaunchingmessage-body": "Bu işlem, işlem geçmişine bağlı olarak biraz zaman alabilir. Lütfen işlem tamamlanana kadar uygulamayı açık tutun.",
     "firstlaunchingmessage-footer": "Teşekkürler."
   },
@@ -32,7 +32,7 @@
   "menudrawer-acc": "Menü çekmecesini aç",
   "change-privacy": "Yeni gizlilik politikası ",
   "email": "support@zingolabs.org",
-  "subject": "{name} Destek...",
+  "subject": "{app} Destek...",
   "body": "… ile ilgili yardıma ihtiyacım var...",
   "syncing": "Senkronize ediliyor",
   "synced": "Senkronize edildi",
@@ -189,7 +189,7 @@
     "walletfile-state-unknown": "bilinmeyen biçim"
   },
   "loadedapp": {
-    "about": "{name} hakkında",
+    "about": "{app} hakkında",
     "info": "Sunucu bilgisi",
     "options": "Seçenekler",
     "walletseed": "Cüzdan Tohumu",
@@ -200,7 +200,7 @@
     "fundpools": "Havuzlar",
     "insight": "Finansal İçgörü",
     "addressbook": "Adres Defteri",
-    "support": "{name} destek mail",
+    "support": "{app} destek mail",
     "changeservernew-error": "Error Sunucuyu yenisiyle değiştirmeye çalışırken bir hata oluştu ",
     "readingwallet-error": "Error Yeni sunucuyla cüzdanı okuma girişiminde hata oluştu:",
     "differentchain-error": "Farklı bir zincire sahip bir sunucuya geçiyorsunuz, bu kurtarma ifadesi olmadan bu cüzdana artık erişiminiz olmayacak.",
@@ -227,7 +227,6 @@
     "tryingnewserver-error": "Yeni sunucu 15 saniye içinde yanıt vermedi.",
     "readingwallet": "Cüzdan sunucuyla başarıyla okundu:",
     "restorewallet-title": "Gelişmiş Seçenekler",
-    "restorewallet-alert": "Yeni bir cüzdanı kurtarma ifadenizle geri yüklemek üzeresiniz. Devam etmek istiyor musunuz?",
     "selectingserversame": "Mevcut sunucunuz zaten en iyi şekilde optimize edilmiştir.",
     "selectingserverbest": "Şu anda bu, en iyi şekilde optimize edilmiş sunucudur:",
     "incoming-funds": "Gelen fonlar\n",
@@ -555,7 +554,7 @@
     "private": "Gizli",
     "amountrevealed": "Açıklanan Tutar",
     "deshielded": "Korumasız",
-    "lose-address-title": "YENİ BİR ADRES SEÇ",
+    "lose-address-title": "Yeni bir adres seç",
     "lose-address-alert": "Adres alanında zaten geçerli bir adresiniz var. Onu değiştirmek istiyor musunuz?",
     "nym-processing-title": "NYM üzerinden işleniyor",
     "nym-enhanced": "NYM Gelişmiş",
@@ -606,7 +605,6 @@
     "noaddress": "Adres Yok",
     "title-address": "Adresim",
     "newu-option": "Yeni adres al",
-    "danger-zone": "TEHLİKE BÖLGESİ",
     "go-to-transparent": "gizliliği kaldırılmış açık adres",
     "title-acc": "Alım Ekranı",
     "shielded-orchard": "Orchard (Ironwood)",
@@ -616,7 +614,6 @@
     "copy-address-button": "Adresi Kopyala",
     "modal-transparent": {
       "title": "Gizlilik uyarısı",
-      "message": "Şeffaf adresler, işlem detaylarınızı herkese açık blok zincirinde ifşa eder. Bu, gizliliğinizi ortadan kaldırır ve çoğu işlem için önerilmez.",
       "recommendation": "Korumalı adresler, en yüksek gizlilik düzeyini sağladıkları için önerilir.",
       "button": "Riskleri anlıyorum, şeffaf adresleri göster."
     },
@@ -812,6 +809,8 @@
     "step-buy-4": "ZEC alındı",
     "not-detected-title": "Ödemenizi henüz algılamadık",
     "not-detected-body": "Tam olarak {amount} {coin} tutarını bu takasın adresine gönderdiğinizi kontrol edin.",
+    "not-detected-review": "Ödeme bilgilerini kontrol et",
+    "slow-deposit": "{chain} ödemelerinin algılanması bir saati bulabilir.",
     "result-received": "{amount} aldınız",
     "result-at-your-address": "Şu anda {who} adresinde.",
     "result-in-your-wallet": "Cüzdanınızda.",
@@ -1024,7 +1023,7 @@
     "details": "İşlem Detayları",
     "pool": "Havuz",
     "contactcopied": "Kişi panoya kopyalandı",
-    "address-http": "{name}, bu adresin size kim tarafından gönderildiğini bilmiyor! Gönderenin kimliğini doğrulamak tamamen size kalmış.",
+    "address-http": "{app}, bu adresin size kim tarafından gönderildiğini bilmiyor! Gönderenin kimliğini doğrulamak tamamen size kalmış.",
     "address-https": "Zingo Doğrulanmış Adres",
     "type": "Tür",
     "not-confirmed": "İşlem henüz onaylanmadı",

@@ -10,7 +10,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { LoadedApp } from './LoadedApp';
 import { LoadingApp } from './LoadingApp';
-import { skipExitingWithScreen } from './navigation/screenLayout';
+import { rootScreenLayout } from './navigation/screenLayout';
 import Scanner from '@screens/Scanner';
 import { RootParamList } from './types';
 import { Route } from './AppState';
@@ -83,7 +83,7 @@ const AppShell: React.FunctionComponent = () => {
           <NavigationContainer ref={navigationRef} theme={theme}>
             <SafeArea background={colors.bgCanvas}>
               <Root.Navigator
-                screenLayout={skipExitingWithScreen}
+                screenLayout={rootScreenLayout}
                 screenOptions={{ headerShown: false, animation: 'none' }}
               >
                 {/* The session picks the section; the one it leaves is

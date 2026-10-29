@@ -8,6 +8,7 @@ import Pressable from '@ui/primitives/Pressable';
 import { SearchIcon } from '@ui/primitives/Icons/SearchIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
+import { singleLineInput } from '@ui/primitives/singleLineInput';
 
 type SearchFieldProps = {
   value: string;
@@ -59,6 +60,7 @@ const SearchField: React.FunctionComponent<SearchFieldProps> = ({
           paddingVertical: 0,
           color: colors.fgDefault,
           fontSize: 15,
+          ...singleLineInput(),
         }}
       />
       {value.length > 0 && (

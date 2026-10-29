@@ -60,22 +60,23 @@ export function getZingoLogo() {
 }
 
 /**
- * Substitute `{name}` placeholder with the runtime app name in any translation
- * result. Designed to be called from the `translate` wrapper so every i18n
- * lookup transparently picks up "Zingo Beta" when running the beta variant.
+ * Substitute the `{app}` placeholder with the runtime app name in any
+ * translation result. Called from the `translate` wrapper so every i18n
+ * lookup picks up "Zingo Beta" when running the beta variant. `{name}` is
+ * left alone: a screen fills it (a contact, an explorer).
  *
  * Handles strings, arrays and nested objects via a single JSON round-trip,
- * skipped when no `{name}` placeholder is present (the common case).
+ * skipped when no `{app}` placeholder is present (the common case).
  */
 export function substituteZingoName<T>(value: T): T {
   if (typeof value === 'string') {
-    return value.includes('{name}')
-      ? (value.replaceAll('{name}', getZingoName()) as unknown as T)
+    return value.includes('{app}')
+      ? (value.replaceAll('{app}', getZingoName()) as unknown as T)
       : value;
   }
   const serialized = JSON.stringify(value);
-  if (!serialized || !serialized.includes('{name}')) {
+  if (!serialized || !serialized.includes('{app}')) {
     return value;
   }
-  return JSON.parse(serialized.replaceAll('{name}', getZingoName())) as T;
+  return JSON.parse(serialized.replaceAll('{app}', getZingoName())) as T;
 }

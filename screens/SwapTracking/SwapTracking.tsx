@@ -15,11 +15,13 @@ import {
   isRefunding,
   isTerminalStatus,
   providerShortLabel,
+  slowDeposit,
 } from '@app/swap';
 import { leaveFlow } from '@app/navigation/navigate';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import Banner from '@ui/widgets/Banner';
+import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import SwapFlight from '@ui/widgets/Flight/SwapFlight';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
@@ -96,6 +98,8 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
   )} ${symbol(record.receiveAsset)} · ${provider}`;
 
   const notDetected = depositPhase(record, nowMs) === 'notDetected';
+  /** A slow chain's payment is seen late: the wait says so before it worries anyone. */
+  const slowWait = awaiting && !notDetected && slowDeposit(record);
 
   return (
     <SwapFlowScreen
@@ -150,6 +154,19 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
         >
           {line}
         </Text>
+        {slowWait && (
+          <Text
+            testID="swap.tracking.slow"
+            variant="bodySmall"
+            tone="muted"
+            style={{ marginTop: space8, textAlign: 'center' }}
+          >
+            {t('swap.slow-deposit').replace(
+              '{chain}',
+              chainDisplayName(record.sellAsset.chain),
+            )}
+          </Text>
+        )}
         <View
           testID="swap.tracking.steps"
           style={{ flexDirection: 'row', columnGap: 8, marginTop: 20 }}
@@ -177,6 +194,18 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
               testID="swap.tracking.not-detected"
               tone="warning"
               title={t('swap.not-detected-title')}
+              action={
+                <Button
+                  testID="swap.tracking.review-payment"
+                  variant="primary"
+                  size="small"
+                  inline
+                  title={t('swap.not-detected-review')}
+                  onPress={() =>
+                    navigation.replace(Route.SwapDeposit, { recordId })
+                  }
+                />
+              }
             >
               {t('swap.not-detected-body')
                 .replace(

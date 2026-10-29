@@ -1,7 +1,7 @@
 {
   "wait": "Please wait...",
   "updating": {
-    "firstlaunchingmessage-title": "Optimizing {name}",
+    "firstlaunchingmessage-title": "Optimizing {app}",
     "firstlaunchingmessage-body": "This may take a while, depending on the transaction history. Please keep the app open until the process finishes.",
     "firstlaunchingmessage-footer": "Thanks."
   },
@@ -32,7 +32,7 @@
   "menudrawer-acc": "Open Menu Drawer",
   "change-privacy": "New privacy policy: ",
   "email": "support@zingolabs.org",
-  "subject": "{name} Support...",
+  "subject": "{app} Support...",
   "body": "I need help with...",
   "syncing": "Syncing",
   "synced": "Synced",
@@ -189,7 +189,7 @@
     "walletfile-state-unknown": "unknown format"
   },
   "loadedapp": {
-    "about": "About {name}",
+    "about": "About {app}",
     "info": "Server Info",
     "options": "Options",
     "walletseed": "Wallet Seed",
@@ -200,7 +200,7 @@
     "fundpools": "Pools",
     "insight": "Financial Insight",
     "addressbook": "Address Book",
-    "support": "{name} support email",
+    "support": "{app} support email",
     "changeservernew-error": "Error trying to change the server to the new one: ",
     "readingwallet-error": "Error trying to read the wallet with the new server:",
     "differentchain-error": "You are changing to a server with a different chain, you will no longer have access to this wallet without the seed phrase.",
@@ -227,7 +227,6 @@
     "tryingnewserver-error": "After 15 seconds the new server doesn't respond.",
     "readingwallet": "Reading successfully the wallet with the server:",
     "restorewallet-title": "Advanced Option",
-    "restorewallet-alert": "Confirm that you want to restore a new wallet using your seed phrase.",
     "selectingserversame": "Your actual server is the most optimized one already.",
     "selectingserverbest": "In this moment this is the most optimized server:",
     "incoming-funds": "Incoming funds\n",
@@ -555,7 +554,7 @@
     "private": "Private",
     "amountrevealed": "Amount Revealed",
     "deshielded": "Deshielded",
-    "lose-address-title": "SELECT A NEW ADDRESS",
+    "lose-address-title": "Select a new address",
     "lose-address-alert": "You already have a valid address in the address field. Do you want to replace it?",
     "nym-processing-title": "Processing via NYM",
     "nym-enhanced": "NYM Enhanced",
@@ -606,7 +605,6 @@
     "noaddress": "No Address",
     "title-address": "My Address",
     "newu-option": "Get new address",
-    "danger-zone": "DANGER ZONE",
     "go-to-transparent": "Exposed transparent address",
     "title-acc": "Receive Screen",
     "shielded-orchard": "Orchard (Ironwood)",
@@ -616,7 +614,6 @@
     "copy-address-button": "Copy address",
     "modal-transparent": {
       "title": "Privacy Warning",
-      "message": "Transparent addresses expose your transaction details on the public blockchain. This disintegrates your privacy and is not recommended for most transactions.",
       "recommendation": "Shielded addresses are recommended as they provide the highest level of privacy.",
       "button": "I understand the risks, show tranparent addresses"
     },
@@ -812,6 +809,8 @@
     "step-buy-4": "ZEC received",
     "not-detected-title": "We haven’t detected your payment yet",
     "not-detected-body": "Check that you sent exactly {amount} {coin} to the address of this swap.",
+    "not-detected-review": "Review the payment details",
+    "slow-deposit": "{chain} payments can take up to an hour to be detected.",
     "result-received": "You got {amount}",
     "result-at-your-address": "It’s already at {who}.",
     "result-in-your-wallet": "It is already in your wallet.",
@@ -1024,7 +1023,7 @@
     "details": "Transaction Details",
     "pool": "Pool",
     "contactcopied": "Copied Contact to Clipboard",
-    "address-http": "{name} has no idea who sent you this Address! It's entirely up to you to authenticate the Sender.",
+    "address-http": "{app} has no idea who sent you this Address! It's entirely up to you to authenticate the Sender.",
     "address-https": "Zingo-Authenticated Address",
     "type": "Type",
     "not-confirmed": "Transaction not yet confirmed",

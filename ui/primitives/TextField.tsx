@@ -19,6 +19,7 @@ import Text from './Text';
 import { fieldBorder, FieldValidity } from './fieldBorder';
 import { Icon } from './Icons/Icon';
 import { XIcon } from './Icons/XIcon';
+import { singleLineInput } from '@ui/primitives/singleLineInput';
 
 /** An action inside a field: 36 on screen, its tap area grown to 44. */
 const ACTION = 36;
@@ -276,6 +277,7 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
             style={{
               flex: 1,
               paddingVertical: space8,
+              ...(multiline ? {} : singleLineInput()),
               ...(multiline && maxLines
                 ? { maxHeight: valueStyle.lineHeight * maxLines + space8 * 2 }
                 : {}),

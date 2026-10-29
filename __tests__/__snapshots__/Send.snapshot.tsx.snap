@@ -325,13 +325,14 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                       spellCheck={false}
                       style={
                         {
+                          "alignSelf": "stretch",
                           "color": "#c3c3c3",
                           "flex": 1,
                           "fontSize": 15,
                           "fontWeight": "600",
                           "minWidth": 0,
                           "paddingRight": 0,
-                          "paddingVertical": 8,
+                          "paddingVertical": 0,
                         }
                       }
                       testID="send.addressplaceholder"
@@ -544,6 +545,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                       placeholderTextColor="#0B3A75"
                       style={
                         {
+                          "alignSelf": "stretch",
                           "color": "#c3c3c3",
                           "flex": 1,
                           "fontSize": 36,
@@ -551,9 +553,9 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                             "tabular-nums",
                           ],
                           "fontWeight": "700",
-                          "lineHeight": 40,
                           "minWidth": 0,
                           "padding": 0,
+                          "paddingVertical": 0,
                         }
                       }
                       testID="send.amount"
@@ -1404,13 +1406,14 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                       spellCheck={false}
                       style={
                         {
+                          "alignSelf": "stretch",
                           "color": "#c3c3c3",
                           "flex": 1,
                           "fontSize": 15,
                           "fontWeight": "600",
                           "minWidth": 0,
                           "paddingRight": 0,
-                          "paddingVertical": 8,
+                          "paddingVertical": 0,
                         }
                       }
                       testID="send.addressplaceholder"
@@ -1623,6 +1626,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                       placeholderTextColor="#0B3A75"
                       style={
                         {
+                          "alignSelf": "stretch",
                           "color": "#c3c3c3",
                           "flex": 1,
                           "fontSize": 36,
@@ -1630,9 +1634,9 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                             "tabular-nums",
                           ],
                           "fontWeight": "700",
-                          "lineHeight": 40,
                           "minWidth": 0,
                           "padding": 0,
+                          "paddingVertical": 0,
                         }
                       }
                       testID="send.amount"

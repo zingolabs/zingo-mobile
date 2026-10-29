@@ -1,7 +1,7 @@
 {
   "wait": "Aguarde um momento...",
   "updating": {
-    "firstlaunchingmessage-title": "Otimizando a {name}",
+    "firstlaunchingmessage-title": "Otimizando a {app}",
     "firstlaunchingmessage-body": "Isso pode demorar um pouco, dependendo do histórico de transações. Por favor, mantenha o aplicativo aberto até que o processo termine.",
     "firstlaunchingmessage-footer": "Obrigado."
   },
@@ -32,7 +32,7 @@
   "menudrawer-acc": "Abrir Menu Lateral",
   "change-privacy": "Nova política de privacidade: ",
   "email": "support@zingolabs.org",
-  "subject": "Suporte {name}...",
+  "subject": "Suporte {app}...",
   "body": "Preciso de ajuda com...",
   "syncing": "Sincronizando",
   "synced": "Sincronizada",
@@ -189,7 +189,7 @@
     "walletfile-state-unknown": "formato desconhecido"
   },
   "loadedapp": {
-    "about": "Sobre a {name}",
+    "about": "Sobre a {app}",
     "info": "Informações do Servidor",
     "options": "Opções",
     "walletseed": "Frases da Carteira",
@@ -200,7 +200,7 @@
     "fundpools": "Pools",
     "insight": "Visão Financeira",
     "addressbook": "Agenda de Endereços",
-    "support": "E-mail de suporte do {name}",
+    "support": "E-mail de suporte do {app}",
     "changeservernew-error": "Error ao tentar alterar para um novo servidor: ",
     "readingwallet-error": "Error ao tentar ler a carteira com o novo servidor:",
     "differentchain-error": "Você está mudando para um servidor com uma rede diferente, você não terá mais acesso a essa carteira sem suas frases de recuperação.",
@@ -227,7 +227,6 @@
     "tryingnewserver-error": "Após 15 segundos o novo servidor não responde.",
     "readingwallet": "Lendo com sucesso a carteira atual com o servidor:",
     "restorewallet-title": "Opção Avançada",
-    "restorewallet-alert": "Confirme que você deseja restaurar uma nova carteira usando as suas frases de recuperação.",
     "selectingserversame": "Seu servidor atual já é o mais otimizado.",
     "selectingserverbest": "Neste momento ele é o servidor mais otimizado:",
     "incoming-funds": "Fundos recebidos\n",
@@ -555,7 +554,7 @@
     "private": "Privado",
     "amountrevealed": "Quantia Revelada",
     "deshielded": "Desblindada",
-    "lose-address-title": "SELECIONE UM NOVO ENDEREÇO",
+    "lose-address-title": "Selecione um novo endereço",
     "lose-address-alert": "Você já possui um endereço válido no campo de endereço. Deseja substituí-lo?",
     "nym-processing-title": "Processando via NYM",
     "nym-enhanced": "NYM Aprimorado",
@@ -606,7 +605,6 @@
     "noaddress": "Sem Endereço",
     "title-address": "Meu Endereço",
     "newu-option": "Novo Endereço Unificado Diversificado",
-    "danger-zone": "ZONA DE PERIGO",
     "go-to-transparent": "Ver endereço transparente",
     "title-acc": "Tela de Recebimento",
     "shielded-orchard": "Apenas Orchard (Ironwood)",
@@ -616,7 +614,6 @@
     "copy-address-button": "Copiar endereço",
     "modal-transparent": {
       "title": "Aviso de Privacidade",
-      "message": "Endereços transparentes expõem os detalhes das suas transações na blockchain pública. Isso compromete sua privacidade e não é recomendado para a maioria das transações.",
       "recommendation": "Endereços blindados são recomendados pois oferecem o mais alto nível de privacidade.",
       "button": "Entendo os riscos, mostrar endereços transparentes"
     },
@@ -812,6 +809,8 @@
     "step-buy-4": "ZEC recebido",
     "not-detected-title": "Ainda não detectamos seu pagamento",
     "not-detected-body": "Confira se você enviou exatamente {amount} {coin} para o endereço deste swap.",
+    "not-detected-review": "Revisar os dados do pagamento",
+    "slow-deposit": "Pagamentos em {chain} podem levar até uma hora para serem detectados.",
     "result-received": "Você recebeu {amount}",
     "result-at-your-address": "Já está em {who}.",
     "result-in-your-wallet": "Já está na sua carteira.",
@@ -1024,7 +1023,7 @@
     "details": "Detalhes da Transação",
     "pool": "Pool",
     "contactcopied": "Contato copiado para a Área de Transparência",
-    "address-http": "{name} não tem ideia de quem lhe enviou este Endereço! Você deve autenticar o Remetente.",
+    "address-http": "{app} não tem ideia de quem lhe enviou este Endereço! Você deve autenticar o Remetente.",
     "address-https": "Endereço Zingo-Authenticated",
     "type": "Tipo",
     "not-confirmed": "Transação ainda não confirmada",

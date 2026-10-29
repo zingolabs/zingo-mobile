@@ -14,6 +14,8 @@ type CardProps = {
   flush?: boolean;
   /** Only when the whole card is tappable; it then shows a pressed state. */
   onPress?: () => void;
+  /** The border of a card a chart picked, in that chart's colour for it. */
+  edge?: string;
   testID?: string;
 };
 
@@ -28,6 +30,7 @@ const Card: React.FunctionComponent<CardProps> = ({
   tone = 'default',
   flush = false,
   onPress,
+  edge,
   testID,
 }) => {
   const { colors } = useTheme();
@@ -46,7 +49,7 @@ const Card: React.FunctionComponent<CardProps> = ({
   }[tone];
   const style = {
     backgroundColor: paint.bg,
-    borderColor: paint.edge,
+    borderColor: edge ?? paint.edge,
     borderWidth: 1,
     borderRadius: radiusMd,
     overflow: 'hidden' as const,
@@ -57,7 +60,7 @@ const Card: React.FunctionComponent<CardProps> = ({
       kind="row"
       testID={testID}
       accessibilityRole="button"
-      accessibilityState={{ selected: tone === 'selected' }}
+      accessibilityState={{ selected: tone === 'selected' || !!edge }}
       onPress={onPress}
       style={{
         ...style,

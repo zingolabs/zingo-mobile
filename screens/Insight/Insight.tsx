@@ -413,9 +413,12 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                 p.weeks === 'all'
                   ? insight.weeks
                   : Math.min(p.weeks, insight.weeks);
-              const on = to === last && span === n;
+              /** A preset as long as the history or longer is All: only All lights. */
+              const covered = p.weeks !== 'all' && p.weeks >= insight.weeks;
+              const on = to === last && span === n && !covered;
               return (
                 <Chip
+                  grow
                   key={p.key}
                   testID={`insight.${p.key.split('.')[1]}`}
                   selected={on}

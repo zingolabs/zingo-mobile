@@ -21,6 +21,7 @@ import Text from '@ui/primitives/Text';
 import PrivateAmount from '@ui/widgets/PrivateAmount';
 import { useInsetFill } from '@ui/primitives/Surface';
 import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
+import { singleLineInput } from '@ui/primitives/singleLineInput';
 
 type AmountCardProps = {
   value: string;
@@ -110,11 +111,11 @@ export default function AmountCard({
               flex: 1,
               minWidth: 0,
               fontSize: amountStyle.fontSize,
-              lineHeight: amountStyle.lineHeight,
               fontWeight: amountStyle.fontWeight,
               fontVariant: ['tabular-nums'],
               color: invalid ? colors.fgDanger : colors.fgDefault,
               padding: 0,
+              ...singleLineInput(amountStyle.lineHeight),
             }}
           />
           <Pressable

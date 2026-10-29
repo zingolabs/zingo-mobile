@@ -15,6 +15,19 @@ export const DEPOSIT_WAIT_MS = 12 * 60 * 60 * 1000;
 export const DEPOSIT_WARN_AFTER_MS = 30 * 60 * 1000;
 
 /**
+ * Source chains whose deposit the providers see late, once blocks slower
+ * than the rest confirm it: the warning waits longer, and the wait says so.
+ */
+export const SLOW_DEPOSIT_WARN_AFTER_MS: Record<string, number> = {
+  BTC: 90 * 60 * 1000,
+};
+
+/** Whether this swap is paid on a chain whose deposit is seen late. */
+export function slowDeposit(record: { sellAsset: { chain: string } }): boolean {
+  return record.sellAsset.chain in SLOW_DEPOSIT_WARN_AFTER_MS;
+}
+
+/**
  * When the wait for the deposit ends: the wait from its creation, cut short
  * by the deadline the record kept (records from before the wait was 12 hours
  * kept 24) and by the quote's own deadline.
@@ -45,8 +58,15 @@ export function depositOverdue(record: SwapRecordType, nowMs: number): boolean {
 }
 
 /** When a deposit not seen yet turns to a warning. */
-export function depositWarnAtMs(record: { createdAtMs: number }): number {
-  return record.createdAtMs + DEPOSIT_WARN_AFTER_MS;
+export function depositWarnAtMs(record: {
+  createdAtMs: number;
+  sellAsset: { chain: string };
+}): number {
+  return (
+    record.createdAtMs +
+    (SLOW_DEPOSIT_WARN_AFTER_MS[record.sellAsset.chain] ??
+      DEPOSIT_WARN_AFTER_MS)
+  );
 }
 
 /**

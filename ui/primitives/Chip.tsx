@@ -15,6 +15,8 @@ type ChipProps = {
   children: string;
   selected: boolean;
   onPress: () => void;
+  /** Shares a row's leftover width with the chips beside it, from its own width up. */
+  grow?: boolean;
   testID?: string;
 };
 
@@ -23,6 +25,7 @@ const Chip: React.FunctionComponent<ChipProps> = ({
   children,
   selected,
   onPress,
+  grow = false,
   testID,
 }) => {
   const { colors } = useTheme();
@@ -37,6 +40,7 @@ const Chip: React.FunctionComponent<ChipProps> = ({
       onPress={onPress}
       style={{
         minHeight: chipMinHeight,
+        flexGrow: grow ? 1 : 0,
         paddingHorizontal: space12,
         borderRadius: radiusPill,
         borderWidth: 1,

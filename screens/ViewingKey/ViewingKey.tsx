@@ -2,6 +2,7 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   BackHandler,
+  ScrollView,
   StyleSheet,
   useWindowDimensions,
   View,
@@ -20,6 +21,7 @@ import {
   useTheme,
   iconSizeMd,
   radiusSm,
+  space8,
   space12,
   space16,
   space24,
@@ -224,7 +226,11 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
         noPrivacy={true}
         noUfvkIcon={true}
       />
-      <View style={{ flex: 1 }}>
+      {/** The content scrolls above the footer, never under it. */}
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: space16 }}
+      >
         <Text
           variant="body"
           tone="muted"
@@ -286,27 +292,26 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
             </View>
           ))}
         </View>
+      </ScrollView>
 
-        <View
-          style={{
-            position: 'absolute',
-            left: SIDE,
-            right: SIDE,
-            bottom: insets.bottom + space24,
-          }}
-        >
-          <Button
-            testID="viewingkey.done"
-            variant="primary"
-            disabled={!!switchTo && !key}
-            onPress={switchTo ? confirmSwitch : close}
-            title={
-              translate(
-                switchTo ? 'viewingkey.switch' : 'seedbackup.done',
-              ) as string
-            }
-          />
-        </View>
+      <View
+        style={{
+          marginHorizontal: SIDE,
+          paddingTop: space8,
+          paddingBottom: insets.bottom + space24,
+        }}
+      >
+        <Button
+          testID="viewingkey.done"
+          variant="primary"
+          disabled={!!switchTo && !key}
+          onPress={switchTo ? confirmSwitch : close}
+          title={
+            translate(
+              switchTo ? 'viewingkey.switch' : 'seedbackup.done',
+            ) as string
+          }
+        />
       </View>
     </View>
   );
