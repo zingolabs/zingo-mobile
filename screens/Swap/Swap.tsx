@@ -70,6 +70,7 @@ import { SlidersIcon } from '@ui/primitives/Icons/SlidersIcon';
 import { HistoryIcon } from '@ui/primitives/Icons/HistoryIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
+import SwapKitLogo from './components/SwapKitLogo';
 import { SheetPresence } from '@ui/primitives/SheetPresence';
 import {
   ChevronDown,
@@ -991,12 +992,21 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                     marginTop: space4,
                   }}
                 >
+                  {/* The service's credit, in English in every language. */}
                   <Text variant="caption" tone="muted">
-                    {translate('swap.privacy-note') as string}
+                    Powered by
+                  </Text>
+                  <SwapKitLogo />
+                  <Text
+                    variant="caption"
+                    color={colors.fgDefault}
+                    style={{ fontWeight: '600' }}
+                  >
+                    SwapKit
                   </Text>
                   <InfoTooltip
                     testID="swap.privacy-info"
-                    label={translate('swap.privacy-note') as string}
+                    label="Powered by SwapKit"
                     text={translate('swap.tip-privacy') as string}
                   >
                     <></>

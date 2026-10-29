@@ -80,6 +80,7 @@ const colors: ThemeColors = {
   bgIronwood: '#241A12',
   fgTransparent: '#E6C46A',
   bgSproutPot: '#5A3A1E',
+  fgSwapKitMark: '#FFFFFF',
   fgQrInk: '#060B12',
   bgQrPaper: '#FFFFFF',
   bgTransparent: '#E6C46A1F',

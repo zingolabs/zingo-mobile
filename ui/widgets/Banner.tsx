@@ -4,7 +4,6 @@ import Pressable from '@ui/primitives/Pressable';
 import { StyleProp, View, ViewStyle, useWindowDimensions } from 'react-native';
 import Animated, { AnimatedStyle } from 'react-native-reanimated';
 import {
-  iconSizeMd,
   radiusMd,
   radiusXs,
   space12,
@@ -214,9 +213,9 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
               accessibilityRole="button"
               accessibilityLabel={dismissLabel}
               onPress={onDismiss}
-              hitSlop={slopFor(iconSizeMd)}
+              hitSlop={slopFor(iconSizeSm)}
             >
-              <XIcon size={iconSizeMd} color={colors.fgMuted} />
+              <XIcon size={iconSizeSm} color={colors.fgMuted} />
             </Pressable>
           )}
         </Animated.View>
@@ -244,10 +243,9 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
           <View
             style={{
               flexDirection: 'row',
-              flexWrap: 'wrap',
+              flexWrap: 'nowrap',
               alignItems: 'center',
               columnGap: space8,
-              rowGap: space4,
               /** Clear of the corner X when nothing sits beside the text. */
               paddingRight:
                 onDismiss && !actionBeside ? touchTarget - space16 : 0,
@@ -257,6 +255,7 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
               style={{
                 width: TILE,
                 height: TILE,
+                flexShrink: 0,
                 borderRadius: radiusXs,
                 backgroundColor: paint.tile,
                 alignItems: 'center',
@@ -265,7 +264,14 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
             >
               {paint.icon}
             </View>
-            <Text variant="bodyStrong">{title}</Text>
+            <Text
+              variant="bodyStrong"
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={{ flexShrink: 1 }}
+            >
+              {title}
+            </Text>
             {tag}
           </View>
           {children !== undefined && (
@@ -283,7 +289,8 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
               alignSelf: 'center',
               flexDirection: 'row',
               alignItems: 'center',
-              gap: space8,
+              /** 5, off the spacing scale on purpose: the X sits close to the button it dismisses with, in this notice only. */
+              gap: 5,
             }}
           >
             {action}
@@ -294,9 +301,10 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
                 accessibilityRole="button"
                 accessibilityLabel={dismissLabel}
                 onPress={onDismiss}
-                hitSlop={slopFor(iconSizeMd)}
+                /** Only 5 toward the button, so a tap on its edge never dismisses the notice. */
+                hitSlop={{ top: 14, bottom: 14, left: 5, right: 14 }}
               >
-                <XIcon size={iconSizeMd} color={colors.fgMuted} />
+                <XIcon size={iconSizeSm} color={colors.fgMuted} />
               </Pressable>
             )}
           </View>
@@ -320,7 +328,7 @@ const Banner = forwardRef<View, BannerProps>(function BannerCard(
             justifyContent: 'center',
           }}
         >
-          <XIcon size={iconSizeMd} color={colors.fgMuted} />
+          <XIcon size={iconSizeSm} color={colors.fgMuted} />
         </Pressable>
       )}
     </View>

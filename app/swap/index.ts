@@ -144,7 +144,7 @@ export {
   buildSwapKitTrackerUrl,
   buildTrackerEntries,
 } from './explorerUrls';
-export type { TrackerEntryType } from './explorerUrls';
+export type { TrackerEntryType, TrackerWhatType } from './explorerUrls';
 export { TokenCatalog } from './TokenCatalog';
 
 export { SwapPoller, DEFAULT_SWAP_POLLER_CONFIG } from './SwapPoller';

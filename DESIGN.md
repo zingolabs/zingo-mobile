@@ -620,6 +620,8 @@ badge. Lists
 of choices (routes, coins, networks, addresses, servers) are `RadioRow`s
 inside one `RadioList` card.
 
+**Swaps and SwapKit.** The swap form credits the service in one centred line, "Powered by" + SwapKit's emblem (16 high, their white version) + "SwapKit" in 600 + ⓘ, in English in every language; the ⓘ names both services that see the swap. A swap detail's footer opens SwapKit Explorer once the swap has a deposit hash. A swap that did not finish well (Failed, Refunding, Refunded, Deposit not detected) gets a "Track this swap" fold instead, built like "Zcash transactions": every link from `buildTrackerEntries` (SwapKit, the provider, each leg's chain explorer, Zcash last), each row with the explorer's own name, what it shows, the id it opens and an external-link icon, and "Copy all links" under the card. It always opens closed.
+
 **Fields.** One line, `fieldMinHeight` 48, label above in `bodySmall` 600
 muted. Actions inside a field (clear, paste, book, scan) are `FieldAction`s:
 icon 20 in `fgMuted`, 36 wide on screen with the tap area grown to 44, 4
