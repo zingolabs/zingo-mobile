@@ -191,8 +191,8 @@ android {
         create("beta") {
             dimension = "channel"
             applicationIdSuffix = ".Beta"
-            versionCode = 341 // beta override
-            versionName = "2.0.23" // beta override
+            versionCode = 342 // beta override
+            versionName = "3.0.0" // beta override
             resValue("string", "app_name", "Zingo Beta")
         }
     }
