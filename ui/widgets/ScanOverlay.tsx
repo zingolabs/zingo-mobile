@@ -36,7 +36,7 @@ import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { FlashlightIcon } from '@ui/primitives/Icons/FlashlightIcon';
 import { themeTokens } from '@app/theme';
-import { contentTopPad } from '@app/navigation/safeArea';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 
 const FRAME = 240;
 const BRACKET = 28;
@@ -96,10 +96,12 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
   /** Where the overlay starts in the window: 0 when nothing pads it. */
   const [originY, setOriginY] = useState<number>(0);
   /**
-   * The top bar stays under the app's top pad wherever the overlay starts:
-   * on iOS the scanner is a modal over the whole window.
+   * The camera fills the screen, under the status bar too; the top bar sits
+   * below the status bar, notch or Dynamic Island wherever the overlay
+   * starts (on iOS the scanner is a modal over the whole window).
    */
-  const barTop = 2 + Math.max(0, contentTopPad(insets.top) - originY);
+  const barTop = Math.max(0, insets.top - originY);
+  const bottomPad = useBottomActionPad();
   const device = useCameraDevice('back');
   const { hasPermission, requestPermission } = useCameraPermission();
   const [open, setOpen] = useState(true);
@@ -375,7 +377,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
             style={{
               position: 'absolute',
               alignSelf: 'center',
-              bottom: insets.bottom + 40,
+              bottom: bottomPad,
               width: 52,
               height: 52,
               borderRadius: radiusPill,

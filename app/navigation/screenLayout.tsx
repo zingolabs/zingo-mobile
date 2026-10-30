@@ -46,11 +46,3 @@ export const ModalSafeArea = ({ children }: { children: React.ReactNode }) => {
     </View>
   );
 };
-
-/** skipExitingWithScreen, and the safe area for an iOS transparent modal (the scanner). */
-export const rootScreenLayout = ({ children, options }: ScreenLayoutProps) =>
-  isIosModal(options) ? (
-    <ModalSafeArea>{skipExitingWithScreen({ children })}</ModalSafeArea>
-  ) : (
-    skipExitingWithScreen({ children })
-  );
