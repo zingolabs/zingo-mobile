@@ -116,14 +116,21 @@ const OptionsPanelHost: React.FC<OptionsPanelHostProps> = ({
       {/* Active app surface — stays fixed. */}
       <View style={StyleSheet.absoluteFill}>{children}</View>
 
-      {/* Options panel — fades in over the home, ignores touches unless it
-          is in front so the screen behind stays interactive. */}
+      {/* Options panel — fades in over the home. Closed, it is out of the
+          touch tree. Under a screen it holds every touch without answering
+          it: while that screen pops it is in sight, and a tap must not reach
+          the home behind it. */}
       <Animated.View
         testID={`optionspanel.${kind}`}
-        pointerEvents={front ? 'auto' : 'none'}
+        pointerEvents={shown ? 'auto' : 'none'}
         style={[StyleSheet.absoluteFill, overlayStyle]}
       >
-        <OptionsPanel {...panelProps} />
+        <View
+          pointerEvents={front ? 'auto' : 'none'}
+          style={StyleSheet.absoluteFill}
+        >
+          <OptionsPanel {...panelProps} />
+        </View>
         <Animated.View
           pointerEvents="none"
           style={[

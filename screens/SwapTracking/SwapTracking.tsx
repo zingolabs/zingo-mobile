@@ -202,7 +202,7 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
               action={
                 <Button
                   testID="swap.tracking.review-payment"
-                  variant="primary"
+                  variant="text"
                   size="small"
                   inline
                   title={t('swap.not-detected-review')}
