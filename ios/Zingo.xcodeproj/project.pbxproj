@@ -247,8 +247,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Zingo" */;
 			buildPhases = (
-				A0161467000000000000C001 /* Check the Binding Layer */,
 				175DE3CE7A4FE94269419EDC /* [CP] Check Pods Manifest.lock */,
+				A0161467000000000000C001 /* Check the Binding Layer */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
