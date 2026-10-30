@@ -77,6 +77,8 @@ export interface OnboardingContext {
   viewRecoveryWallet: () => void;
   openServer: (chain?: ChainNameEnum) => void;
   closeServer: () => void;
+  /** What back does on the onboarding step in front: Android's back, iOS's edge swipe. */
+  stepBack: () => boolean;
   openCurrentWallet: () => void;
   createNewWallet: () => void;
   getwalletToRestore: () => void;
