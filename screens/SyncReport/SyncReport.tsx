@@ -63,8 +63,6 @@ import {
   MAP_COLS,
   MAP_ROWS,
   mapCells,
-  phase,
-  Phase,
   scaleMax,
 } from '@screens/SyncReport/syncModel';
 import { themeTokens } from '@app/theme';
@@ -83,18 +81,11 @@ const TILE_BG = themeTokens.bgMutedSubtle;
 
 const CELL_COLOR: Record<CellState, string> = {
   scanned: GREEN,
+  pending: themeTokens.fgScanPending,
   scanning: AMBER,
   refetching: themeTokens.fgSyncing,
   high: themeTokens.fgCategory2,
   low: themeTokens.borderMuted,
-};
-
-const PHASE_KEY: Record<Phase, string> = {
-  done: 'sync.all-scanned',
-  verifying: 'sync.phase-verifying',
-  tip: 'sync.phase-tip',
-  notes: 'sync.phase-notes',
-  historic: 'sync.phase-historic',
 };
 
 const BG_KEY: Record<BackgroundOutcome, string> = {
@@ -115,6 +106,7 @@ const BG_ICON = iconSizeMd;
 
 const LEGEND: { state: CellState; key: string }[] = [
   { state: 'scanned', key: 'sync.legend-scanned' },
+  { state: 'pending', key: 'sync.legend-scanned-pending' },
   { state: 'scanning', key: 'sync.legend-scanning' },
   { state: 'refetching', key: 'sync.legend-refetching' },
   { state: 'high', key: 'sync.legend-high' },
@@ -186,7 +178,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const pct = synced ? 100 : Math.floor(percentageOutputsScanned);
   const h = heights(syncingStatus, birthday, serverTip, synced);
   const cells = mapCells(syncingStatus, birthday, serverTip, synced);
-  const step = phase(syncingStatus, synced);
 
   const turn = useSharedValue(0);
   const pulse = useSharedValue(1);
@@ -678,9 +669,14 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
         <View style={card}>
           {cardHead(
             translate('sync.map') as string,
-            step === 'done'
-              ? (translate(PHASE_KEY.done) as string)
-              : `${translate(PHASE_KEY[step]) as string} · ${pct}%`,
+            /**
+             * zingolib reports what is scanning only as Scanning, without the
+             * priority it had (Verify, ChainTip, FoundNote…): the map names no
+             * phase it cannot know.
+             */
+            synced
+              ? (translate('sync.all-scanned') as string)
+              : `${translate('sync.legend-scanning') as string} · ${pct}%`,
           )}
           <Svg
             testID="syncreport.map"
