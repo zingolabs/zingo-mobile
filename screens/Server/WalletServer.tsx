@@ -234,7 +234,24 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
         style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}
       >
         <Header
-          title={''}
+          title={
+            translate(
+              other === null ? 'server.title' : 'server.other',
+            ) as string
+          }
+          /**
+           * As the old bar's back: Other servers closes first; then nothing
+           * while a server is being set, and an unsaved one asks.
+           */
+          closeScreen={() => {
+            if (other !== null) {
+              setOther(null);
+            } else if (!busy && !backGuard.current?.()) {
+              close();
+            }
+          }}
+          backDisabled={busy}
+          backTestID={other === null ? 'server.back' : 'serverlist.back'}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}

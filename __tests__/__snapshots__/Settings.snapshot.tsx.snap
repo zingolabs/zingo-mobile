@@ -34,7 +34,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "backgroundColor": "#011401",
               "display": "flex",
               "minHeight": 50,
-              "paddingBottom": 10,
+              "paddingBottom": 0,
               "paddingTop": 0,
             },
           ]
@@ -114,7 +114,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           "justifyContent": "space-between",
           "paddingBottom": 6,
           "paddingHorizontal": 16,
-          "paddingTop": 8,
+          "paddingTop": 4,
         }
       }
     >

@@ -39,6 +39,7 @@ export default function TitleBar({
   left,
   right,
   onLayout,
+  tight = false,
   testID,
 }: {
   /** A string takes the bar's title style; a node (a picker) is drawn as given. */
@@ -47,6 +48,8 @@ export default function TitleBar({
   right?: TitleBarAction | React.ReactElement;
   /** The bar's height, for a sheet that keeps its snap points under it. */
   onLayout?: (height: number) => void;
+  /** Under the Header's top row: 4 over the title instead of 8. */
+  tight?: boolean;
   testID?: string;
 }) {
   const { colors } = useTheme();
@@ -90,7 +93,7 @@ export default function TitleBar({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingTop: space8,
+        paddingTop: tight ? space4 : space8,
         paddingBottom: PAD_BOTTOM,
         paddingHorizontal: space16,
       }}
