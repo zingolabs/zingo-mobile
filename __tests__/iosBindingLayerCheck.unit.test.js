@@ -64,10 +64,11 @@ function buildPhases(targetName) {
 }
 
 describe('Zingo target', () => {
-  // Tests that the Binding Layer check runs before every other build phase, on every build, and runs no fetch when Xcode builds the Zingo target.
-  test('checks the Binding Layer first', () => {
-    const [first] = buildPhases('Zingo');
-    const phase = object(first);
+  // Tests that the Binding Layer check runs right after the Pods manifest check, before every other build phase, on every build, and runs no fetch when Xcode builds the Zingo target.
+  test('checks the Binding Layer after the Pods manifest, before the rest', () => {
+    const [pods, check] = buildPhases('Zingo');
+    expect(object(pods)).toContain('[CP] Check Pods Manifest.lock');
+    const phase = object(check);
     expect(phase).toContain('isa = PBXShellScriptBuildPhase;');
     expect(phase).toContain('alwaysOutOfDate = 1;');
     expect(phase).toContain('check_ios_binding_layer.mjs');

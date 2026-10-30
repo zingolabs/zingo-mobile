@@ -15,7 +15,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 
 import {
   useTheme,
@@ -115,7 +115,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
     cancelPendingServer: onCancel,
   } = context;
   const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
+  const bottomPad = useBottomActionPad();
   const { entry, switchTo } = route.params;
   const net = switchTo
     ? (translate(`settings.value-chainname-${switchTo}`) as string)
@@ -298,7 +298,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
         style={{
           marginHorizontal: SIDE,
           paddingTop: space8,
-          paddingBottom: insets.bottom + space24,
+          paddingBottom: bottomPad,
         }}
       >
         <Button

@@ -73,6 +73,7 @@ import Switch from '@ui/primitives/Switch';
 import { ChevronRight } from '@ui/primitives/Icons/Chevron';
 import { RadioOffIcon } from '@ui/primitives/Icons/RadioOffIcon';
 import { RadioOnIcon } from '@ui/primitives/Icons/RadioOnIcon';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 
 type Options = {
   value: string;
@@ -138,6 +139,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   }
 
   const { colors } = useTheme();
+  const bottomPad = useBottomActionPad();
 
   // The requirement is read once, at mount: this screen's own save
   // flips the switch, and that must not re-gate the open screen.
@@ -413,12 +415,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   };
   saveSettingsRef.current = saveSettings;
 
-  // The back arrow, Android's back and iOS's edge swipe all end in the
-  // save sheet while an edit is unsaved. A second back with the sheet up
-  // closes it.
+  // The back arrow and Android's back end in the save sheet while an edit
+  // is unsaved. A second back with the sheet up closes it.
   usePreventRemove(unsaved && !leaving, ({ data }) => {
     setHeld(current => (current ? undefined : data.action));
   });
+
+  /**
+   * iOS's native swipe would half-pop the screen and bounce back while an
+   * edit is unsaved, and would leave while a save runs: it is off then.
+   */
+  const swipeOff = (unsaved && !leaving) || disabled;
+  useEffect(() => {
+    navigation.setOptions({ gestureEnabled: !swipeOff });
+  }, [swipeOff, navigation]);
 
   const keepEditing = () => setHeld(undefined);
 
@@ -936,7 +946,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
           style={{
             paddingHorizontal: space20,
             paddingTop: space12,
-            paddingBottom: space24,
+            paddingBottom: bottomPad,
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',

@@ -32,6 +32,7 @@ import { Route, ValueTransferType } from '@app/AppState';
 import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import Text from '@ui/primitives/Text';
 import FullPanel from '@ui/widgets/FullPanel';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import Button from '@ui/primitives/Button';
 import MessageLine from './components/MessageLine';
 import { ContextAppLoaded } from '@app/context';
@@ -44,6 +45,7 @@ type MessageListProps = NativeStackScreenProps<AppDrawerParamList, 'Messages'>;
 const MessageList: React.FunctionComponent<MessageListProps> = () => {
   const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
+  const bottomPad = useBottomActionPad();
   const {
     setScrollToBottom,
     scrollToBottom,
@@ -295,7 +297,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
           accessibilityLabel={translate('messages.bottom-acc') as string}
           style={{
             position: 'absolute',
-            bottom: space32,
+            bottom: bottomPad,
             right: space20,
             width: 36,
             height: 36,

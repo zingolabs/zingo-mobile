@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Platform, Pressable as RNPressable, View } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { Pressable as RNPressable, View } from 'react-native';
+import { GestureDetector } from 'react-native-gesture-handler';
+import { useEdgeSwipeBack } from '@app/hooks/useEdgeSwipeBack';
 import { useNavigation } from '@react-navigation/native';
 import {
   useSafeAreaFrame,
@@ -21,6 +22,7 @@ import { radiusSheet, rowMinHeight, space20, useTheme } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { contentTopPad } from '@app/navigation/safeArea';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import TitleBar from '@ui/widgets/TitleBar';
 import TooltipHost from '@ui/widgets/TooltipHost';
 import Header, { PANEL_TOP } from '@ui/widgets/Header/Header';
@@ -43,10 +45,8 @@ const PANEL_OUT = {
 };
 /** The content fades in as the panel nears its place. */
 const CONTENT_DELAY = 160;
-/** iOS's back swipe: from this close to the left edge, this far or this fast. */
-const EDGE = 24;
-const SWIPE_BACK = 80;
-const SWIPE_FLING = 500;
+/** The footer's top pad and button, and the gap above them. */
+const FOOTER_CLEAR = 108;
 
 type FullPanelProps = {
   title: string;
@@ -108,6 +108,7 @@ export default function FullPanel({
   const navigation = useNavigation();
   const frame = useSafeAreaFrame();
   const insets = useSafeAreaInsets();
+  const bottomPad = useBottomActionPad();
   const rises = motion === 'rise';
 
   /** The screen under the app's top pad, less the top bar that stays above. */
@@ -152,17 +153,7 @@ export default function FullPanel({
    * the bar's back (or close) does, and the panel lowers as it leaves.
    */
   const leave = onBack ?? onClose;
-  const swipeBack = Gesture.Pan()
-    .enabled(Platform.OS === 'ios' && !!leave)
-    .hitSlop({ left: 0, width: EDGE })
-    .activeOffsetX(10)
-    .failOffsetY([-15, 15])
-    .runOnJS(true)
-    .onEnd(e => {
-      if (e.translationX > SWIPE_BACK || e.velocityX > SWIPE_FLING) {
-        leave?.();
-      }
-    });
+  const swipeBack = useEdgeSwipeBack(leave);
 
   const fade = useSharedValue(0);
   useEffect(() => {
@@ -330,7 +321,8 @@ export default function FullPanel({
                     justifyContent: center ? 'center' : 'flex-start',
                     paddingHorizontal: space20,
                     paddingTop: 8,
-                    paddingBottom: footer ? 140 : 60,
+                    /** Clears the footer (its top pad and button) and the bottom pad. */
+                    paddingBottom: bottomPad + (footer ? FOOTER_CLEAR : 28),
                   }}
                 >
                   <Animated.View
@@ -354,7 +346,7 @@ export default function FullPanel({
                 bottom: 0,
                 paddingHorizontal: space20,
                 paddingTop: 12,
-                paddingBottom: 32,
+                paddingBottom: bottomPad,
                 backgroundColor: colors.bgSurface,
               }}
             >

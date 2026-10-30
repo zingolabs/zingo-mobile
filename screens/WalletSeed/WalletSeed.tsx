@@ -1,5 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import Animated, {
   ReduceMotion,
@@ -8,7 +14,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useIsFocused } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 
 import {
   iconSizeSm,
@@ -107,13 +113,31 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
       await applyPendingServer();
     }
   };
+  /** The pending action was confirmed or cancelled already. */
+  const settled = useRef(false);
   const onCancel = async () => {
+    settled.current = true;
     if (action === 'server') {
       await cancelPendingServer();
     }
   };
+  /**
+   * Any other way out (iOS's swipe, Android's back) cancels a pending server
+   * change, as the back arrow does.
+   */
+  useEffect(
+    () =>
+      navigation.addListener('beforeRemove', () => {
+        if (!settled.current) {
+          onCancel();
+        }
+      }),
+    // onCancel reads only the route's action, fixed for this screen.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [navigation],
+  );
   const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
+  const bottomPad = useBottomActionPad();
   const focused = useIsFocused();
   const secured = useSecureScreen();
   const gate = useBiometricGate({
@@ -216,6 +240,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
         {
           text: translate('confirm') as string,
           onPress: async () => {
+            settled.current = true;
             await onConfirm();
             if (navigation.canGoBack()) {
               navigation.goBack();
@@ -459,7 +484,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
         <View
           style={{
             paddingTop: space8,
-            paddingBottom: insets.bottom + space16,
+            paddingBottom: bottomPad,
           }}
         >
           {action ? (

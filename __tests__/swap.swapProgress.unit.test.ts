@@ -69,3 +69,12 @@ test('Tests that a swap opens on its deposit, its tracking or its detail when ta
     swapScreenFor({ ...buy(SwapStatusEnum.Pending), lateDepositAtMs: 1 }),
   ).toBe(Route.SwapDetail);
 });
+
+test('Tests that a purchase reads payment detected when its deposit is seen before the status moves', () => {
+  expect(
+    swapStepIndex({
+      ...buy(SwapStatusEnum.AwaitingExternalDeposit),
+      depositSeen: true,
+    }),
+  ).toBe(1);
+});

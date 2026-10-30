@@ -56,9 +56,14 @@ test('Tests that the panel goes under when a grid item is dispatched and is in f
 
   fireEvent.press(screen.getByTestId('probe.sink'));
   expect(kind()).toBe('under');
-  expect(screen.getByTestId('optionspanel.under').props.pointerEvents).toBe(
-    'none',
-  );
+  // Under a screen it holds the touches, so none reaches the home, and its
+  // grid answers none of them.
+  const under = screen.getByTestId('optionspanel.under');
+  expect(under.props.pointerEvents).toBe('auto');
+  expect(
+    (under.children[0] as { props: { pointerEvents?: string } }).props
+      .pointerEvents,
+  ).toBe('none');
 
   jest.mocked(useIsFocused).mockReturnValue(false);
   act(() => host.rerender(renderTree()));

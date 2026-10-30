@@ -144,6 +144,8 @@ const Card: React.FunctionComponent<{
           ? to(slot.height, move)
           : slot.height
         : 'auto',
+  }));
+  const look = useAnimatedStyle(() => ({
     opacity: to(slot.opacity, fade),
     transform: [{ scale: to(slot.scale, move) }],
   }));
@@ -169,30 +171,38 @@ const Card: React.FunctionComponent<{
         frame,
       ]}
     >
-      <Animated.View style={content}>
-        <View onLayout={e => onMeasure(e.nativeEvent.layout.height)}>
-          <BannerPlainContext.Provider value={true}>
-            {children}
-          </BannerPlainContext.Provider>
-        </View>
-      </Animated.View>
       <Animated.View
-        pointerEvents="none"
+        pointerEvents="box-none"
         style={[
-          {
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-            borderRadius: RADIUS,
-            borderWidth: 1,
-            borderColor: colors.bottomSheetBorder,
-            backgroundColor: colors.bgSurface,
-          },
-          deck,
+          { flexGrow: 1, overflow: 'hidden', borderRadius: RADIUS },
+          look,
         ]}
-      />
+      >
+        <Animated.View style={content}>
+          <View onLayout={e => onMeasure(e.nativeEvent.layout.height)}>
+            <BannerPlainContext.Provider value={true}>
+              {children}
+            </BannerPlainContext.Provider>
+          </View>
+        </Animated.View>
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            {
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              borderRadius: RADIUS,
+              borderWidth: 1,
+              borderColor: colors.bottomSheetBorder,
+              backgroundColor: colors.bgSurface,
+            },
+            deck,
+          ]}
+        />
+      </Animated.View>
     </Animated.View>
   );
 };

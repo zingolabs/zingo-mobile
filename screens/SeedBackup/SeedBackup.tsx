@@ -25,7 +25,6 @@ import Animated, {
   withDelay,
   withTiming,
 } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { useTheme, iconSizeMd, radiusPill, space8, space16 } from '@app/theme';
@@ -36,7 +35,7 @@ import { SnackbarDurationEnum } from '@app/AppState';
 import Header from '@ui/widgets/Header';
 import { AppDrawerParamList, CardRect } from '@app/types';
 import { useSecureScreen } from '@app/hooks/useSecureScreen';
-import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { useScreenCapture } from '@app/hooks/useScreenCapture';
 import {
   enactGateAnswer,
@@ -175,7 +174,6 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
     birthday: walletBirthday,
   } = context;
   const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
   const root = useRef<View>(null);
   const [screen, setScreen] = useState<CardRect>({
     x: 0,
@@ -183,7 +181,8 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
     width: 0,
     height: 0,
   });
-  const keyboard = useKeyboardHeight();
+  /** Every step's actions end at the one bottom distance, above the keyboard too. */
+  const bottom = useBottomActionPad();
   const secured = useSecureScreen();
   const [shot, setShot] = useState<'none' | 'on' | 'leaving'>('none');
   const shotGone = useCallback(() => setShot('none'), []);
@@ -411,8 +410,6 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
     transform: [{ translateX: slide.value }],
   }));
 
-  const bottom = Math.max(insets.bottom + 16, keyboard + 12);
-
   const page = () => {
     switch (step) {
       case 'info':
@@ -478,7 +475,7 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
         return (
           <StepPage
             center
-            bottom={insets.bottom + 28}
+            bottom={bottom}
             footer={
               <View style={{ marginHorizontal: SIDE }}>
                 <Button

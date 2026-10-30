@@ -42,6 +42,7 @@ import { ContextAppLoaded } from '@app/context';
 import { Route, SettingsNameEnum } from '@app/AppState';
 import { ArrowRightIcon } from '@ui/primitives/Icons/ArrowRightIcon';
 import { themeTokens } from '@app/theme';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 
 // Pool artwork palette — Orchard teal and Ironwood gold are one-off brand
 // accents for this onboarding, not part of the app theme.
@@ -354,6 +355,8 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
   const { colors } = useTheme();
+  /** The footer's lowest action ends at the one bottom distance. */
+  const bottomPad = useBottomActionPad();
   const { width } = useWindowDimensions();
 
   // One shared value drives everything: the strip position, the per-page
@@ -643,7 +646,7 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
           .withInitialValues({ opacity: 0, transform: [{ translateY: 14 }] })
           .reduceMotion(ReduceMotion.System)}
         style={{
-          paddingBottom: 24,
+          paddingBottom: bottomPad,
           paddingHorizontal: 24,
         }}
       >

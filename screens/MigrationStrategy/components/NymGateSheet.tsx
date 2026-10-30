@@ -1,20 +1,15 @@
 /* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
-import React, { forwardRef, useCallback, useContext } from 'react';
+import React, { forwardRef, useContext } from 'react';
 import { Image, Text, View } from 'react-native';
-import {
-  BottomSheetBackdrop,
-  BottomSheetBackdropProps,
-  BottomSheetModal,
-  BottomSheetView,
-} from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
-import SheetRim from '@ui/primitives/SheetRim';
+import AppSheetModal from '@ui/primitives/AppSheetModal';
 import MixnetIcon from '@ui/primitives/Icons/MixnetIcon';
 import { ContextAppLoaded } from '@app/context';
-import { radiusSheet, useTheme } from '@app/theme';
+import { useTheme } from '@app/theme';
 import { NymGateState } from './nymGateState';
 import { themeTokens } from '@app/theme';
 
@@ -35,46 +30,15 @@ const NymGateSheet = forwardRef<BottomSheetModal, NymGateSheetProps>(
     const { translate } = useContext(ContextAppLoaded);
     const { colors } = useTheme();
 
-    const renderBackdrop = useCallback(
-      (props: BottomSheetBackdropProps) => (
-        <BottomSheetBackdrop
-          {...props}
-          disappearsOnIndex={-1}
-          appearsOnIndex={0}
-          style={{ backgroundColor: colors.bgScrim }}
-          opacity={1}
-        />
-      ),
-      [colors],
-    );
-
     return (
-      <BottomSheetModal
-        ref={ref}
-        enableDynamicSizing={true}
-        enablePanDownToClose
-        handleComponent={null}
-        stackBehavior="push"
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: radiusSheet,
-          borderTopRightRadius: radiusSheet,
-        }}
-        backdropComponent={renderBackdrop}
-        onDismiss={onDismiss}
-      >
-        <BottomSheetView
+      <AppSheetModal ref={ref} onDismiss={onDismiss}>
+        <View
           style={{
-            backgroundColor: colors.bgSurface,
-            borderTopLeftRadius: radiusSheet,
-            borderTopRightRadius: radiusSheet,
             paddingHorizontal: 28,
             paddingTop: 28,
-            paddingBottom: 40,
             alignItems: 'center',
           }}
         >
-          <SheetRim />
           <Image
             source={require('../../../assets/img/nym-mixnet.png')}
             style={{ width: 95, height: 95, marginBottom: 24 }}
@@ -150,8 +114,8 @@ const NymGateSheet = forwardRef<BottomSheetModal, NymGateSheetProps>(
               onPress={onEnable}
             />
           </ButtonStack>
-        </BottomSheetView>
-      </BottomSheetModal>
+        </View>
+      </AppSheetModal>
     );
   },
 );

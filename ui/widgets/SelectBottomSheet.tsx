@@ -1,20 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useMemo, useState } from 'react';
-import { Keyboard, View } from 'react-native';
-import { radiusSheet, useTheme, iconSizeMd, iconSizeSm } from '@app/theme';
+import { View } from 'react-native';
+import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { useTheme, iconSizeSm, space8, space16 } from '@app/theme';
 import Pressable from '@ui/primitives/Pressable';
-import {
-  BottomSheetBackdrop,
-  BottomSheetBackdropProps,
-  BottomSheetModal,
-  BottomSheetScrollView,
-} from '@gorhom/bottom-sheet';
-
+import AppSheetModal, { SheetScrollView } from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
-import BoldText from '@ui/primitives/BoldText';
-import SheetRim from '@ui/primitives/SheetRim';
 import SearchField from '@ui/widgets/SearchField';
-import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
+import TitleBar from '@ui/widgets/TitleBar';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 
@@ -34,6 +27,8 @@ type SelectBottomSheetProps = {
   // long contact pickers; left off for the short selects (server, scope, …).
   searchable?: boolean;
   searchPlaceholder?: string;
+  /** The X's label for screen readers. */
+  closeLabel?: string;
 };
 
 // Tall fixed sheet for the searchable variant so the list doesn't collapse to
@@ -42,38 +37,24 @@ const SNAP_POINTS: string[] = ['95%'];
 
 const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
   (
-    { title, items, value, onChange, testID, searchable, searchPlaceholder },
+    {
+      title,
+      items,
+      value,
+      onChange,
+      testID,
+      searchable,
+      searchPlaceholder,
+      closeLabel = '',
+    },
     ref,
   ) => {
     const { colors } = useTheme();
-    const keyboardHeight = useKeyboardHeight();
     const [query, setQuery] = useState<string>('');
 
     const dismiss = useCallback(() => {
       (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss();
     }, [ref]);
-
-    const renderBackdrop = useCallback(
-      (props: BottomSheetBackdropProps) => (
-        <BottomSheetBackdrop
-          {...props}
-          disappearsOnIndex={-1}
-          appearsOnIndex={0}
-          pressBehavior="close"
-          style={{ backgroundColor: colors.bgScrim }}
-          opacity={1}
-        />
-      ),
-      [colors],
-    );
-
-    // Reset the query on close (index -1), not on open, so the next open starts
-    // clean and renders unfiltered in one frame (no visible filter→unfilter jump).
-    const onSheetChange = useCallback((index: number) => {
-      if (index < 0) {
-        setQuery('');
-      }
-    }, []);
 
     // Search matches the on-screen label and the value (address), so a user can
     // type the start of an address too. Empty query returns the original list
@@ -93,178 +74,86 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
       );
     }, [items, query, searchable]);
 
-    const renderHandle = useCallback(
-      () => (
-        <View
+    const rows = filteredItems.map(item => {
+      const selected = item.value === value;
+      return (
+        <Pressable
+          kind="row"
+          key={item.value}
+          onPress={() => {
+            onChange(item.value);
+            dismiss();
+          }}
           style={{
-            paddingTop: 8,
-            paddingBottom: 6,
-            paddingHorizontal: 16,
-            backgroundColor: colors.bgSurface,
-            borderTopLeftRadius: radiusSheet,
-            borderTopRightRadius: radiusSheet,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingHorizontal: 24,
+            paddingVertical: 14,
           }}
         >
-          <SheetRim />
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
+          <Text
+            variant={selected ? 'bodyStrong' : 'body'}
+            tone={selected ? 'accent' : 'default'}
           >
-            {/* Left spacer matches the X Pressable's width (14×2 + 20 = 48). */}
-            <View style={{ width: 48 }} />
-            <Text
-              variant="barTitle"
-              numberOfLines={1}
-              style={{ flex: 1, textAlign: 'center' }}
-            >
-              {title}
-            </Text>
-            <Pressable
-              kind="icon"
-              onPress={dismiss}
-              hitSlop={8}
-              style={{ paddingHorizontal: 14, paddingVertical: 4 }}
-            >
-              <XIcon size={iconSizeMd} color={colors.fgMuted} />
-            </Pressable>
-          </View>
-        </View>
-      ),
-      [colors, dismiss, title],
-    );
+            {item.label}
+          </Text>
+          {selected && <CheckIcon size={iconSizeSm} color={colors.fgAccent} />}
+        </Pressable>
+      );
+    });
 
-    const list = (
-      <BottomSheetScrollView
-        testID={testID}
-        style={{ backgroundColor: colors.bgSurface }}
-        contentContainerStyle={{
-          paddingBottom:
-            searchable && keyboardHeight > 0 ? keyboardHeight + 20 : 30,
+    const titleBar = (
+      <TitleBar
+        title={title}
+        right={{
+          icon: XIcon,
+          accessibilityLabel: closeLabel,
+          onPress: dismiss,
         }}
-      >
-        {filteredItems.map(item => {
-          const selected = item.value === value;
-          return (
-            <Pressable
-              kind="row"
-              key={item.value}
-              onPress={() => {
-                onChange(item.value);
-                dismiss();
-              }}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingHorizontal: 24,
-                paddingVertical: 14,
-              }}
-            >
-              <Text
-                variant={selected ? 'bodyStrong' : 'body'}
-                tone={selected ? 'accent' : 'default'}
-              >
-                {item.label}
-              </Text>
-              {selected && (
-                <CheckIcon size={iconSizeSm} color={colors.fgAccent} />
-              )}
-            </Pressable>
-          );
-        })}
-      </BottomSheetScrollView>
+      />
     );
 
     return (
-      <BottomSheetModal
+      <AppSheetModal
         ref={ref}
-        accessible={false}
-        // Searchable: fixed tall sheet + title/search drawn as content (so the
-        // input survives keystroke re-renders without dismissing the keyboard).
-        // Otherwise: the compact handle + dynamic sizing as before.
-        enableDynamicSizing={!searchable}
+        // Searchable: a fixed tall sheet, its search field drawn with the
+        // title so the input survives keystroke re-renders. Otherwise the
+        // sheet takes its list's height.
         snapPoints={searchable ? SNAP_POINTS : undefined}
-        enablePanDownToClose
-        stackBehavior="push"
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        onAnimate={(from, to) => {
-          // Opening (from === -1) dismisses a keyboard left open by the
-          // underlying screen so the sheet never renders behind it. Guard
-          // avoids fighting a keyboard the sheet itself focuses later.
-          if (from === -1 && to >= 0) {
-            Keyboard.dismiss();
-          }
-        }}
-        onChange={onSheetChange}
-        handleComponent={searchable ? null : renderHandle}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: radiusSheet,
-          borderTopRightRadius: radiusSheet,
-        }}
-        backdropComponent={renderBackdrop}
+        // Reset the query on close, not on open, so the next open starts clean
+        // and renders unfiltered in one frame (no visible filter→unfilter jump).
+        onDismiss={() => setQuery('')}
+        header={
+          searchable ? (
+            <View style={{ paddingBottom: space8 }}>
+              {titleBar}
+              <View style={{ paddingHorizontal: space16 }}>
+                <SearchField
+                  value={query}
+                  onChangeText={setQuery}
+                  placeholder={searchPlaceholder ?? ''}
+                  testID={testID ? `${testID}.search` : undefined}
+                />
+              </View>
+            </View>
+          ) : (
+            titleBar
+          )
+        }
       >
         {searchable ? (
-          <View style={{ flex: 1 }}>
-            <View
-              style={{
-                paddingTop: 8,
-                paddingHorizontal: 16,
-                backgroundColor: colors.bgSurface,
-                borderTopLeftRadius: radiusSheet,
-                borderTopRightRadius: radiusSheet,
-              }}
-            >
-              <SheetRim />
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  paddingBottom: 6,
-                }}
-              >
-                <View style={{ width: 48 }} />
-                <BoldText
-                  numberOfLines={1}
-                  style={{
-                    flex: 1,
-                    textAlign: 'center',
-                    color: colors.fgDefault,
-                  }}
-                >
-                  {title}
-                </BoldText>
-                <Pressable
-                  kind="icon"
-                  onPress={dismiss}
-                  accessibilityRole="button"
-                  hitSlop={8}
-                  style={{ padding: 14 }}
-                >
-                  <XIcon size={iconSizeMd} color={colors.fgMuted} />
-                </Pressable>
-              </View>
-
-              <SearchField
-                value={query}
-                onChangeText={setQuery}
-                placeholder={searchPlaceholder ?? ''}
-                testID={testID ? `${testID}.search` : undefined}
-              />
-              <View style={{ height: 8 }} />
-            </View>
-            {list}
-          </View>
+          <BottomSheetScrollView
+            testID={testID}
+            keyboardShouldPersistTaps="handled"
+            style={{ flex: 1 }}
+          >
+            {rows}
+          </BottomSheetScrollView>
         ) : (
-          list
+          <SheetScrollView testID={testID}>{rows}</SheetScrollView>
         )}
-      </BottomSheetModal>
+      </AppSheetModal>
     );
   },
 );

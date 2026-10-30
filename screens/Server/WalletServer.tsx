@@ -9,6 +9,8 @@ import React, {
 import { View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { usePreventRemove } from '@react-navigation/native';
+import { GestureDetector } from 'react-native-gesture-handler';
+import { useEdgeSwipeBack } from '@app/hooks/useEdgeSwipeBack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { useTheme } from '@app/theme';
@@ -194,21 +196,30 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
   }, [leaving, navigation]);
 
   /**
-   * The back arrow, Android's back and iOS's edge swipe: the other chains'
-   * list closes first, nothing leaves while a server is being set, and an
-   * unsaved custom server asks.
+   * The back arrow and Android's back: the other servers' list closes first,
+   * nothing leaves while a server is being set, and an unsaved custom server
+   * asks.
    */
-  usePreventRemove(
-    leaving === 'none' && (other !== null || busy || guarded),
-    () => {
-      if (other !== null) {
-        setOther(null);
-        return;
-      }
-      if (!busy) {
-        backGuard.current?.();
-      }
-    },
+  const held = leaving === 'none' && (other !== null || busy || guarded);
+  usePreventRemove(held, () => {
+    if (other !== null) {
+      setOther(null);
+      return;
+    }
+    if (!busy) {
+      backGuard.current?.();
+    }
+  });
+  /**
+   * iOS's native swipe would half-pop the screen and bounce back while it is
+   * held: it is off then. From the other servers' list, a swipe from the
+   * left edge goes back to Server.
+   */
+  useEffect(() => {
+    navigation.setOptions({ gestureEnabled: !held });
+  }, [held, navigation]);
+  const swipeToServer = useEdgeSwipeBack(
+    other !== null ? () => setOther(null) : undefined,
   );
 
   const unreachable = () =>
@@ -218,87 +229,91 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
     );
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}>
-      <Header
-        title={''}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        noPrivacy={true}
-        noUfvkIcon={true}
-      />
-      {other === null ? (
-        <Animated.View
-          key="server"
-          entering={moved.current ? axisEnter(-AXIS_PT) : undefined}
-          exiting={axisExit(-AXIS_PT)}
-          style={{ flex: 1 }}
-        >
-          <Server
-            placement="belowHeader"
-            translate={translate}
-            server={server}
-            selectServer={selectServer}
-            status={status}
-            blockHeight={blockHeight}
-            busy={busy}
-            online={online}
-            recommended={serverUris(translate).filter(s => s.recommended)}
-            latencies={latencies}
-            onAuto={chooseAutomatic}
-            onPick={s =>
-              apply(remoteServer(s.uri, s.chainName), SelectServerEnum.list)
-            }
-            onSaveCustom={(chain, uri) =>
-              apply(remoteServer(uri, chain), SelectServerEnum.custom)
-            }
-            onOffline={(on, chain) =>
-              on
-                ? apply(offlineServer(walletChainName), selectServer)
-                : chooseAutomatic(
-                    chain === ChainNameEnum.regtestChainName
-                      ? ChainNameEnum.mainChainName
-                      : chain,
-                  )
-            }
-            onOther={setOther}
-            onProbe={probeChain}
-            onUnreachable={unreachable}
-            onBack={close}
-            backGuard={backGuard}
-            onGuard={setGuarded}
-          />
-        </Animated.View>
-      ) : (
-        <Animated.View
-          key="other"
-          entering={axisEnter(AXIS_PT)}
-          exiting={axisExit(AXIS_PT)}
-          style={{ flex: 1 }}
-        >
-          <ServerList
-            placement="belowHeader"
-            translate={translate}
-            servers={lists[other] ?? []}
-            loading={!lists[other]}
-            latencies={latencies}
-            selectedUri={
-              server.kind === 'remote' &&
-              server.chainName === other &&
-              selectServer === SelectServerEnum.list
-                ? server.uri
-                : null
-            }
-            busy={busy}
-            onPick={s =>
-              apply(remoteServer(s.uri, s.chainName), SelectServerEnum.list)
-            }
-            onUnreachable={unreachable}
-            onBack={() => setOther(null)}
-          />
-        </Animated.View>
-      )}
-    </View>
+    <GestureDetector gesture={swipeToServer}>
+      <View
+        style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}
+      >
+        <Header
+          title={''}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noPrivacy={true}
+          noUfvkIcon={true}
+        />
+        {other === null ? (
+          <Animated.View
+            key="server"
+            entering={moved.current ? axisEnter(-AXIS_PT) : undefined}
+            exiting={axisExit(-AXIS_PT)}
+            style={{ flex: 1 }}
+          >
+            <Server
+              placement="belowHeader"
+              translate={translate}
+              server={server}
+              selectServer={selectServer}
+              status={status}
+              blockHeight={blockHeight}
+              busy={busy}
+              online={online}
+              recommended={serverUris(translate).filter(s => s.recommended)}
+              latencies={latencies}
+              onAuto={chooseAutomatic}
+              onPick={s =>
+                apply(remoteServer(s.uri, s.chainName), SelectServerEnum.list)
+              }
+              onSaveCustom={(chain, uri) =>
+                apply(remoteServer(uri, chain), SelectServerEnum.custom)
+              }
+              onOffline={(on, chain) =>
+                on
+                  ? apply(offlineServer(walletChainName), selectServer)
+                  : chooseAutomatic(
+                      chain === ChainNameEnum.regtestChainName
+                        ? ChainNameEnum.mainChainName
+                        : chain,
+                    )
+              }
+              onOther={setOther}
+              onProbe={probeChain}
+              onUnreachable={unreachable}
+              onBack={close}
+              backGuard={backGuard}
+              onGuard={setGuarded}
+            />
+          </Animated.View>
+        ) : (
+          <Animated.View
+            key="other"
+            entering={axisEnter(AXIS_PT)}
+            exiting={axisExit(AXIS_PT)}
+            style={{ flex: 1 }}
+          >
+            <ServerList
+              placement="belowHeader"
+              translate={translate}
+              servers={lists[other] ?? []}
+              loading={!lists[other]}
+              latencies={latencies}
+              selectedUri={
+                server.kind === 'remote' &&
+                server.chainName === other &&
+                selectServer === SelectServerEnum.list
+                  ? server.uri
+                  : null
+              }
+              busy={busy}
+              onPick={s =>
+                apply(remoteServer(s.uri, s.chainName), SelectServerEnum.list)
+              }
+              onUnreachable={unreachable}
+              onBack={() => setOther(null)}
+            />
+          </Animated.View>
+        )}
+      </View>
+    </GestureDetector>
   );
 };
 

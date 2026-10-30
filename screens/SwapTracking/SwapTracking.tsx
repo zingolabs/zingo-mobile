@@ -11,6 +11,7 @@ import {
   SwapStatusEnum,
   awaitsDeposit,
   depositPhase,
+  hasDepositEvidence,
   formatAmountForDisplay,
   isRefunding,
   isTerminalStatus,
@@ -87,7 +88,11 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
 
   const isOutbound = record.direction === SwapDirectionEnum.Outbound;
   const steps = swapStepKeys(record.direction);
-  const current = Math.min(swapStepIndex(record), steps.length - 1);
+  /** One rule for the words and the flight: a payment seen is detected. */
+  const current = Math.min(
+    swapStepIndex({ ...record, depositSeen: hasDepositEvidence(record) }),
+    steps.length - 1,
+  );
   const symbol = (asset: typeof record.sellAsset) =>
     asset.ticker ?? asset.symbol;
   const provider = providerShortLabel(record.provider);
@@ -197,7 +202,7 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
               action={
                 <Button
                   testID="swap.tracking.review-payment"
-                  variant="primary"
+                  variant="text"
                   size="small"
                   inline
                   title={t('swap.not-detected-review')}

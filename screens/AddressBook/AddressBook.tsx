@@ -5,7 +5,7 @@ import { ScrollView, Text, View } from 'react-native';
 import { useScrollToTop } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import { useTheme } from '@app/theme';
@@ -23,7 +23,6 @@ import { ContextAppLoaded } from '@app/context';
 import { useOptionsPanel } from '@app/context/optionsPanel';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
-import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { showConfirm } from '@app/services/showConfirm';
 import { deliver } from '@app/navigation/results';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
@@ -153,8 +152,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   } = useContext(ContextAppLoaded);
   const optionsPanel = useOptionsPanel();
   const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
-  const keyboardHeight = useKeyboardHeight();
+  const bottomPad = useBottomActionPad();
   const walletChain = walletChainName || server.chainName;
 
   const [query, setQuery] = useState('');
@@ -371,7 +369,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
         style={{ flex: 1, marginTop: 12 }}
         contentContainerStyle={{
           paddingHorizontal: SIDE,
-          paddingBottom: pick ? insets.bottom + 16 : 16,
+          paddingBottom: pick ? bottomPad : 16,
         }}
       >
         {tab === 'wallet' && pickZcash ? (
@@ -536,7 +534,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           style={{
             paddingHorizontal: SIDE,
             paddingTop: 12,
-            paddingBottom: insets.bottom + 16,
+            paddingBottom: bottomPad,
             alignItems: 'center',
           }}
         >
@@ -560,11 +558,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               onPress: () => contactSheet.current?.dismiss(),
             }}
           />
-        }
-        contentStyle={
-          keyboardHeight > 0
-            ? { paddingBottom: keyboardHeight + 20 }
-            : undefined
         }
       >
         <ContactSheet

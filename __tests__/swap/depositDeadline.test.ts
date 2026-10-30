@@ -212,3 +212,12 @@ test('Tests that a purchase reads awaiting, looking, not detected, detected and 
     ),
   ).toBe('swapping');
 });
+
+test('Tests that a purchase reads detected when its deposit is seen before the status moves', () => {
+  expect(
+    depositPhase(
+      makeRecord({ observedDepositTxHash: 'ab'.repeat(32) }),
+      T0 + 1_000,
+    ),
+  ).toBe('detected');
+});

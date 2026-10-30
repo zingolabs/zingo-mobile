@@ -29,7 +29,6 @@ import NewAddressTag, {
   newAddressTagTitleKey,
 } from '@ui/widgets/NewAddressTag';
 import { useResult } from '@app/navigation/results';
-import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 import { usePinnedAddress } from '@app/hooks/usePinnedAddress';
@@ -78,7 +77,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const receiveSheetRef = useRef<BottomSheet>(null);
   const sheetSlideStyle = useOptionsPanelSheetSlide();
-  const keyboardHeight = useKeyboardHeight();
   useDismissSheetsOnBlur();
 
   // Fixed under the header's icons, as Swap: no stops to drag between.
@@ -240,11 +238,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
         // However it closes (the X, a swipe, the backdrop), its content unmounts and opens empty next time.
         onDismiss={() => setSheetType(null)}
         header={xHeader}
-        contentStyle={
-          keyboardHeight > 0
-            ? { paddingBottom: keyboardHeight + space20 }
-            : undefined
-        }
       >
         {sheetType === 'NA' && (
           <NewAddress closeSheet={hide} setAddressBook={setAddressBook} />

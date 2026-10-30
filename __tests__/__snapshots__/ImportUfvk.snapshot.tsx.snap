@@ -501,7 +501,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
     pointerEvents="none"
     style={
       {
-        "bottom": 96,
+        "bottom": 89,
         "flexDirection": "row",
         "gap": 12,
         "left": 20,
@@ -526,7 +526,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
   <View
     style={
       {
-        "bottom": 31,
+        "bottom": 24,
         "left": 20,
         "position": "absolute",
         "right": 20,

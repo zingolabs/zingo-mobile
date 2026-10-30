@@ -11,7 +11,6 @@ import { SnackbarDurationEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import { AddTagTarget, registerAddTagListener } from '@app/services/showAddTag';
-import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import ContactSheet from '@ui/widgets/ContactSheet';
 import NewAddressTag, {
@@ -34,7 +33,6 @@ const AddTagModalHost: React.FunctionComponent = () => {
   } = useContext(ContextAppLoaded);
   const ref = useRef<BottomSheetModal>(null);
   const [target, setTarget] = useState<AddTagTarget | null>(null);
-  const keyboardHeight = useKeyboardHeight();
   /** A fresh form each time the sheet closes, however it closes. */
   const [nonce, setNonce] = useState<number>(0);
   const walletChain = walletChainName || server.chainName;
@@ -83,9 +81,6 @@ const AddTagModalHost: React.FunctionComponent = () => {
             onPress: dismiss,
           }}
         />
-      }
-      contentStyle={
-        keyboardHeight > 0 ? { paddingBottom: keyboardHeight + 20 } : undefined
       }
     >
       {target?.own && (

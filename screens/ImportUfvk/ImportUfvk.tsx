@@ -38,11 +38,12 @@ import {
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 
 // Positions from the 402 x 874 design.
 const FIELD_WIDTH = 270;
-const BUTTON_BOTTOM = 31;
-const NOTE_BOTTOM = 96;
+/** The note's bottom, above the button's. */
+const NOTE_ABOVE_BUTTON = 65;
 
 type ImportUfvkProps = {
   busy: boolean;
@@ -63,6 +64,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   const context = useContext(ContextAppLoading);
   const { translate, netInfo, server, addLastSnackbar } = context;
   const { colors } = useTheme();
+  const bottomPad = useBottomActionPad();
 
   const [seedufvkText, setSeedufvkText] = useState<string>('');
   const [birthday, setBirthday] = useState<string>('');
@@ -238,8 +240,8 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
     );
   };
 
-  const buttonBottom =
-    keyboardHeight > 0 ? keyboardHeight + space12 : BUTTON_BOTTOM;
+  /** The one bottom distance, above the keyboard too. */
+  const buttonBottom = bottomPad;
 
   return (
     <View style={{ flex: 1 }}>
@@ -365,7 +367,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             position: 'absolute',
             left: space20,
             right: space20,
-            bottom: NOTE_BOTTOM,
+            bottom: bottomPad + NOTE_ABOVE_BUTTON,
             flexDirection: 'row',
             gap: space12,
           }}

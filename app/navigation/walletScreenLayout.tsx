@@ -16,19 +16,21 @@ import AddTagModalHost from '@app/LoadedApp/components/AddTagModalHost';
 
 /**
  * An iOS transparent modal sits above everything LoadedApp's root holds, so
- * it brings its own: the safe area, a home for its sheets, and the
- * confirmation, add-tag and snackbar hosts, which answer while it is on top.
+ * it brings its own: the safe area for the screen, a home for its sheets,
+ * and the confirmation, add-tag and snackbar hosts, which answer while it is
+ * on top. The sheets' home spans the whole window, as gorhom places a sheet
+ * against the window: inside the padding it sat that much too low.
  */
 const IosModal = ({ children }: { children: React.ReactNode }) => (
   <GestureHandlerRootView style={{ flex: 1 }}>
-    <ModalSafeArea>
-      <BottomSheetModalProvider>
+    <BottomSheetModalProvider>
+      <ModalSafeArea>
         <View style={{ flex: 1 }}>{children}</View>
-        <ConfirmBottomSheet />
-        <AddTagModalHost />
-      </BottomSheetModalProvider>
-      <Toast config={toastConfig} />
-    </ModalSafeArea>
+        <Toast config={toastConfig} />
+      </ModalSafeArea>
+      <ConfirmBottomSheet />
+      <AddTagModalHost />
+    </BottomSheetModalProvider>
   </GestureHandlerRootView>
 );
 
