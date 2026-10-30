@@ -112,6 +112,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   const { colors } = useTheme();
 
   const [containerH, setContainerH] = useState<number>(0);
+  const [titleH, setTitleH] = useState<number>(0);
   const [cardH, setCardH] = useState<number>(0);
   const [actionsH, setActionsH] = useState<number>(0);
   const [backOnline, setBackOnline] = useState<boolean>(false);
@@ -142,17 +143,27 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
 
   /**
    * On a short screen, or with large text, the card at its design height
-   * runs into the actions at the bottom: it rises to sit above them, and the
-   * title rises with it.
+   * runs into the actions at the bottom: it rises to sit above them. The
+   * title, tagline included, rises to sit above the card.
    */
-  const cardTop = containerH * CARD_TOP;
   const lift =
     recoveryWallet && cardH > 0 && actionsH > 0
       ? Math.max(
           0,
-          cardTop + cardH + space16 - (containerH - BOTTOM_MARGIN - actionsH),
+          containerH * CARD_TOP +
+            cardH +
+            space16 -
+            (containerH - BOTTOM_MARGIN - actionsH),
         )
       : 0;
+  const cardTop = containerH * CARD_TOP - lift;
+  const titleTop =
+    recoveryWallet && titleH > 0
+      ? Math.max(
+          0,
+          Math.min(containerH * TITLE_TOP, cardTop - space16 - titleH),
+        )
+      : containerH * TITLE_TOP;
 
   const offline = server.kind === 'offline';
   const noInternet = !netInfo.isConnected;
@@ -290,11 +301,12 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
 
       <View
         pointerEvents="none"
+        onLayout={e => setTitleH(e.nativeEvent.layout.height)}
         style={{
           position: 'absolute',
           left: 0,
           right: 0,
-          top: Math.max(0, containerH * TITLE_TOP - lift),
+          top: titleTop,
           alignItems: 'center',
         }}
       >
@@ -352,7 +364,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             position: 'absolute',
             left: space24,
             right: space24,
-            top: cardTop - lift,
+            top: cardTop,
           }}
         >
           <Card>
