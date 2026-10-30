@@ -18,6 +18,7 @@ import useTrickleProgress from '@app/hooks/useTrickleProgress';
 import { drainOrchard, drainStatus } from '@app/walletBackend';
 import { RPCDrainType } from '@app/walletBackend/types/RPCDrainType';
 import { RPCDrainStatusType } from '@app/walletBackend/types/RPCDrainStatusType';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 
 type MigrationSendingProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -75,6 +76,8 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar, info } = context;
   const { colors } = useTheme();
+  /** The footer's lowest action ends at the one bottom distance. */
+  const bottomPad = useBottomActionPad();
 
   const transactions = route.params?.transactions ?? [];
   const txCount = transactions.length;
@@ -264,7 +267,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
         </ScrollView>
         <View
           style={{
-            paddingBottom: 24,
+            paddingBottom: bottomPad,
             paddingHorizontal: 24,
             alignItems: 'center',
           }}
@@ -384,7 +387,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
 
       {/* Pinned above the hint. Proving reports no discrete steps, so the
           trickle keeps a continuous bar moving rather than counting pieces. */}
-      <View style={{ paddingHorizontal: 24, paddingBottom: 28 }}>
+      <View style={{ paddingHorizontal: 24, paddingBottom: bottomPad }}>
         <ProgressBar progress={trickle.progress} />
         <Text
           style={{

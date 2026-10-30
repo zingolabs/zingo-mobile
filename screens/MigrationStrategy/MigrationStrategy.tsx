@@ -24,6 +24,7 @@ import { ContextAppLoaded } from '@app/context';
 import { formatAmount } from '@app/utils/formatAmount';
 import { Route } from '@app/AppState';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 
 type MigrationStrategyProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -182,6 +183,8 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate, totalBalance, info, mixnetView, reenableMixnet } = context;
   const { colors } = useTheme();
+  /** The footer's lowest action ends at the one bottom distance. */
+  const bottomPad = useBottomActionPad();
   const [selected, setSelected] = useState<StrategyOption>('none');
 
   const nymSheetRef = useRef<BottomSheetModal>(null);
@@ -308,7 +311,8 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
             flexDirection: 'row',
             justifyContent: 'space-evenly',
             alignItems: 'center',
-            paddingVertical: 24,
+            paddingTop: 24,
+            paddingBottom: bottomPad,
             paddingHorizontal: 24,
           }}
         >

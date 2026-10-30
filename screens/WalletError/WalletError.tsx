@@ -35,6 +35,7 @@ import Tag from '@ui/widgets/Tag';
 import { WalletErrorKind } from '@app/AppState/types/WalletErrorInfo';
 import { ChainNameEnum } from '@app/AppState';
 import { showConfirm } from '@app/services/showConfirm';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { DatabaseIcon } from '@ui/primitives/Icons/DatabaseIcon';
 import { ChevronDown } from '@ui/primitives/Icons/Chevron';
 import { WalletIcon } from '@ui/primitives/Icons/WalletIcon';
@@ -65,6 +66,9 @@ const SHAKE_STEP_MS = 64;
 const BADGE_OUT_MS = 200;
 const DETAILS_OPEN_MS = 240;
 const DETAILS_CLOSE_MS = 180;
+/** From the Create link's bottom to the button's, and the button's to the top link's. */
+const LINK_TO_BUTTON = 46;
+const BUTTON_TO_LINK = 60;
 const SERVER_DOT = 8;
 const SUB_MAX = 310;
 
@@ -150,6 +154,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
 }) => {
   const { translate, netInfo, server } = useContext(ContextAppLoading);
   const { colors } = useTheme();
+  const bottomPad = useBottomActionPad();
   const [open, setOpen] = useState(false);
   const shakeX = useSharedValue(0);
   const chevron = useSharedValue(0);
@@ -288,6 +293,13 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
   const [footerTop, setFooterTop] = useState<number>(0);
   const columnBottom =
     rootH > 0 && footerTop > 0 ? rootH - footerTop + space16 : undefined;
+
+  /**
+   * The lowest action ends at the one bottom distance; the others keep
+   * their gaps above it.
+   */
+  const buttonBottom = chain ? bottomPad : bottomPad + LINK_TO_BUTTON;
+  const topLinkBottom = buttonBottom + BUTTON_TO_LINK;
 
   const link = (
     label: string,
@@ -522,21 +534,21 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         ? link(
             translate('walleterror.more') as string,
             moreOptions,
-            140,
+            topLinkBottom,
             'walleterror.more',
             true,
           )
         : link(
             translate('walleterror.import') as string,
             onImport,
-            140,
+            topLinkBottom,
             'walleterror.import',
             true,
           )}
       <View
         style={{
           position: 'absolute',
-          bottom: 80,
+          bottom: buttonBottom,
           left: space20,
           right: space20,
         }}
@@ -553,7 +565,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         link(
           translate('walleterror.create') as string,
           onCreate,
-          34,
+          bottomPad,
           'walleterror.create',
         )}
     </View>

@@ -14,7 +14,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useIsFocused } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 
 import {
   iconSizeSm,
@@ -137,7 +137,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
     [navigation],
   );
   const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
+  const bottomPad = useBottomActionPad();
   const focused = useIsFocused();
   const secured = useSecureScreen();
   const gate = useBiometricGate({
@@ -484,7 +484,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
         <View
           style={{
             paddingTop: space8,
-            paddingBottom: insets.bottom + space16,
+            paddingBottom: bottomPad,
           }}
         >
           {action ? (

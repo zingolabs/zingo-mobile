@@ -279,7 +279,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
     style={
       {
         "alignItems": "center",
-        "paddingBottom": 16,
+        "paddingBottom": 24,
         "paddingHorizontal": 22,
         "paddingTop": 12,
       }

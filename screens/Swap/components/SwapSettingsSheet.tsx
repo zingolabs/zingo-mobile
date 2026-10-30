@@ -10,7 +10,6 @@ import Chip from '@ui/primitives/Chip';
 import TextField from '@ui/primitives/TextField';
 import Button from '@ui/primitives/Button';
 import Banner from '@ui/widgets/Banner';
-import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { DEFAULT_SLIPPAGE_BPS } from '@screens/Swap/useSwapForm';
 import SheetTitle from './SheetTitle';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
@@ -46,7 +45,6 @@ export function formatSlippagePercent(bps: number): string {
 const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
   ({ slippageBps, onChange }, ref) => {
     const { translate } = useContext(ContextAppLoaded);
-    const keyboardHeight = useKeyboardHeight();
     const [editing, setEditing] = useState<boolean>(
       !PRESETS_BPS.includes(slippageBps),
     );
@@ -98,11 +96,6 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
             onClose={dismiss}
             closeLabel={translate('swap.close') as string}
           />
-        }
-        contentStyle={
-          keyboardHeight > 0
-            ? { paddingBottom: keyboardHeight + 20 }
-            : undefined
         }
       >
         <View style={{ paddingHorizontal: space20 }}>

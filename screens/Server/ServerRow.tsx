@@ -27,6 +27,7 @@ import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import { ChevronLeft, ChevronRight } from '@ui/primitives/Icons/Chevron';
 import Radio from '@ui/primitives/Radio';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 
 /** The side margin of the cards, which the Done button lines up with. */
 export const CARD_SIDE = space20;
@@ -252,23 +253,26 @@ export const DoneButton: React.FC<{
   onPress: () => void;
   disabled: boolean;
   testID: string;
-}> = ({ title, onPress, disabled, testID }) => (
-  <View
-    style={{
-      position: 'absolute',
-      bottom: 44,
-      left: CARD_SIDE,
-      right: CARD_SIDE,
-    }}
-  >
-    <Button
-      testID={testID}
-      variant="primary"
-      title={title}
-      onPress={onPress}
-      disabled={disabled}
-    />
-  </View>
-);
+}> = ({ title, onPress, disabled, testID }) => {
+  const bottomPad = useBottomActionPad();
+  return (
+    <View
+      style={{
+        position: 'absolute',
+        bottom: bottomPad,
+        left: CARD_SIDE,
+        right: CARD_SIDE,
+      }}
+    >
+      <Button
+        testID={testID}
+        variant="primary"
+        title={title}
+        onPress={onPress}
+        disabled={disabled}
+      />
+    </View>
+  );
+};
 
 export default ServerRow;
