@@ -1,10 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useMemo } from 'react';
-import { contentTopPad } from '@app/navigation/safeArea';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -28,32 +24,6 @@ LogBox.ignoreLogs([
 ]);
 
 const Root = createNativeStackNavigator<RootParamList>();
-
-/**
- * Pads the app inside the system's safe area. The top keeps the inset minus
- * TOP_RECLAIM and never less than zero: a device that lays the app out below
- * the status bar reports no inset, and a negative offset there would pull the
- * top of every screen under the bar.
- */
-const SafeArea: React.FunctionComponent<{
-  background: string;
-  children: React.ReactNode;
-}> = ({ background, children }) => {
-  const insets = useSafeAreaInsets();
-  return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: background,
-        paddingTop: contentTopPad(insets.top),
-        paddingLeft: insets.left,
-        paddingRight: insets.right,
-      }}
-    >
-      {children}
-    </View>
-  );
-};
 
 // The provider has to sit above every consumer, so App cannot read the theme it
 // renders. The shell is what consumes it.
@@ -81,7 +51,7 @@ const AppShell: React.FunctionComponent = () => {
           <StatusBar backgroundColor={colors.bgCanvas} />
           <BiometricBlankingOverlay />
           <NavigationContainer ref={navigationRef} theme={theme}>
-            <SafeArea background={colors.bgCanvas}>
+            <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
               <Root.Navigator
                 screenLayout={skipExitingWithScreen}
                 screenOptions={{ headerShown: false, animation: 'none' }}
@@ -111,7 +81,7 @@ const AppShell: React.FunctionComponent = () => {
                   }}
                 />
               </Root.Navigator>
-            </SafeArea>
+            </View>
           </NavigationContainer>
         </SafeAreaProvider>
       </KeyboardProvider>

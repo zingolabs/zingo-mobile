@@ -4,6 +4,7 @@ import { LaunchingModeEnum, Route } from '@app/AppState';
 import { ContextAppLoading } from '@app/context';
 import { useSession } from './session';
 import { LoadingStack, Onboarding } from './loadingStack';
+import { ScreenSafeArea } from './screenLayout';
 import {
   ImportChooserScreen,
   ImportWalletScreen,
@@ -72,6 +73,7 @@ export function LoadingNavigator() {
   const { session } = useSession();
   return (
     <LoadingStack.Navigator
+      screenLayout={ScreenSafeArea}
       screenOptions={{ headerShown: false, animation: 'none' }}
     >
       {session.kind === 'locked' ? (
