@@ -118,10 +118,10 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
         maxFontSizeMultiplier={2}
         style={
           {
-            "color": "#c3c3c3",
-            "fontSize": 15,
-            "fontWeight": "400",
-            "lineHeight": 21,
+            "color": "#888888",
+            "fontSize": 13,
+            "fontWeight": "600",
+            "lineHeight": 18,
           }
         }
       >
@@ -166,7 +166,7 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
               "borderWidth": 1,
               "columnGap": 10,
               "flexDirection": "row",
-              "marginTop": 10,
+              "marginTop": 8,
               "minHeight": 48,
               "paddingHorizontal": 10,
             },
@@ -246,62 +246,187 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
       >
         <View
           style={
-            {
-              "backgroundColor": "#031124",
-              "borderTopLeftRadius": 28,
-              "borderTopRightRadius": 28,
-              "paddingHorizontal": 16,
-              "paddingTop": 8,
-            }
+            [
+              {
+                "borderTopLeftRadius": 28,
+                "borderTopRightRadius": 28,
+                "flex": 1,
+                "overflow": "hidden",
+              },
+              {
+                "backgroundColor": "#031124",
+                "paddingBottom": 24,
+              },
+              undefined,
+            ]
           }
         >
           <View
+            collapsable={false}
             onLayout={[Function]}
-            pointerEvents="none"
             style={
               {
-                "left": 0,
-                "position": "absolute",
-                "right": 0,
-                "top": 0,
-              }
-            }
-          />
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "paddingBottom": 6,
+                "flexGrow": 1,
               }
             }
           >
             <View
               style={
                 {
-                  "width": 48,
-                }
-              }
-            />
-            <Text
-              maxFontSizeMultiplier={2}
-              numberOfLines={1}
-              style={
-                {
-                  "color": "#c3c3c3",
-                  "flex": 1,
-                  "fontSize": 15,
-                  "fontWeight": "600",
-                  "lineHeight": 21,
-                  "textAlign": "center",
+                  "paddingBottom": 8,
                 }
               }
             >
-              text translated
-            </Text>
+              <View
+                onLayout={[Function]}
+                style={
+                  {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "paddingBottom": 6,
+                    "paddingHorizontal": 16,
+                    "paddingTop": 8,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "flex-start",
+                      "flex": 1,
+                      "minWidth": 48,
+                    }
+                  }
+                />
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "flexShrink": 1,
+                    }
+                  }
+                >
+                  <Text
+                    accessibilityRole="header"
+                    maxFontSizeMultiplier={1.5}
+                    numberOfLines={1}
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "fontSize": 16,
+                        "fontWeight": "700",
+                        "lineHeight": 28,
+                      }
+                    }
+                  >
+                    text translated
+                  </Text>
+                </View>
+                <View
+                  style={
+                    {
+                      "alignItems": "flex-end",
+                      "flex": 1,
+                      "minWidth": 48,
+                    }
+                  }
+                >
+                  <View
+                    accessibilityLabel="text translated"
+                    accessibilityRole="button"
+                    accessibilityState={
+                      {
+                        "busy": undefined,
+                        "checked": undefined,
+                        "disabled": undefined,
+                        "expanded": undefined,
+                        "selected": undefined,
+                      }
+                    }
+                    accessibilityValue={
+                      {
+                        "max": undefined,
+                        "min": undefined,
+                        "now": undefined,
+                        "text": undefined,
+                      }
+                    }
+                    accessible={true}
+                    collapsable={false}
+                    focusable={true}
+                    hitSlop={8}
+                    onBlur={[Function]}
+                    onClick={[Function]}
+                    onFocus={[Function]}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
+                    style={
+                      [
+                        {
+                          "alignItems": "center",
+                          "flexDirection": "row",
+                          "paddingHorizontal": 14,
+                          "paddingVertical": 4,
+                        },
+                        {},
+                      ]
+                    }
+                  />
+                </View>
+              </View>
+              <View
+                style={
+                  {
+                    "paddingHorizontal": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "#031124",
+                      "borderColor": "#05234C",
+                      "borderRadius": 12,
+                      "borderWidth": 1,
+                      "flexDirection": "row",
+                      "gap": 9,
+                      "height": 42,
+                      "paddingHorizontal": 13,
+                    }
+                  }
+                >
+                  <TextInput
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    onBlur={[Function]}
+                    onChangeText={[Function]}
+                    onFocus={[Function]}
+                    placeholder="text translated"
+                    placeholderTextColor="#888888"
+                    spellCheck={false}
+                    style={
+                      {
+                        "alignSelf": "stretch",
+                        "color": "#c3c3c3",
+                        "flex": 1,
+                        "fontSize": 15,
+                        "minWidth": 0,
+                        "paddingVertical": 0,
+                      }
+                    }
+                    testID="chainselect.search"
+                    value=""
+                  />
+                </View>
+              </View>
+            </View>
             <View
-              accessibilityRole="button"
               accessibilityState={
                 {
                   "busy": undefined,
@@ -322,7 +447,6 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
               accessible={true}
               collapsable={false}
               focusable={true}
-              hitSlop={8}
               onBlur={[Function]}
               onClick={[Function]}
               onFocus={[Function]}
@@ -335,171 +459,99 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
               style={
                 [
                   {
-                    "padding": 14,
+                    "alignItems": "center",
+                    "borderBottomColor": "#FFFFFF0F",
+                    "borderBottomWidth": 1.5,
+                    "columnGap": 12,
+                    "flexDirection": "row",
+                    "paddingHorizontal": 20,
+                    "paddingVertical": 12,
                   },
                   {},
                 ]
               }
-            />
-          </View>
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "backgroundColor": "#031124",
-                "borderColor": "#05234C",
-                "borderRadius": 12,
-                "borderWidth": 1,
-                "flexDirection": "row",
-                "gap": 9,
-                "height": 42,
-                "paddingHorizontal": 13,
-              }
-            }
-          >
-            <TextInput
-              autoCapitalize="none"
-              autoCorrect={false}
-              onBlur={[Function]}
-              onChangeText={[Function]}
-              onFocus={[Function]}
-              placeholder="text translated"
-              placeholderTextColor="#888888"
-              spellCheck={false}
-              style={
-                {
-                  "alignSelf": "stretch",
-                  "color": "#c3c3c3",
-                  "flex": 1,
-                  "fontSize": 15,
-                  "minWidth": 0,
-                  "paddingVertical": 0,
+            >
+              <View
+                pointerEvents="none"
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": undefined,
+                    },
+                    {},
+                  ]
                 }
-              }
-              testID="chainselect.search"
-              value=""
-            />
+              />
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/img/zcash-yellow.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "flex": 1,
+                  }
+                }
+              >
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#18bd18",
+                      "fontSize": 16,
+                      "fontWeight": "600",
+                    }
+                  }
+                >
+                  Zcash
+                </Text>
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#888888",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                    }
+                  }
+                >
+                  ZEC
+                </Text>
+              </View>
+            </View>
           </View>
-          <View
-            style={
-              {
-                "height": 8,
-              }
-            }
-          />
         </View>
         <View
-          accessibilityState={
-            {
-              "busy": undefined,
-              "checked": undefined,
-              "disabled": undefined,
-              "expanded": undefined,
-              "selected": undefined,
-            }
-          }
-          accessibilityValue={
-            {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
-            }
-          }
-          accessible={true}
-          collapsable={false}
-          focusable={true}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onFocus={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
+          onLayout={[Function]}
+          pointerEvents="none"
           style={
-            [
-              {
-                "alignItems": "center",
-                "borderBottomColor": "#FFFFFF0F",
-                "borderBottomWidth": 1.5,
-                "columnGap": 12,
-                "flexDirection": "row",
-                "paddingHorizontal": 20,
-                "paddingVertical": 12,
-              },
-              {},
-            ]
+            {
+              "left": 0,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+            }
           }
-        >
-          <View
-            pointerEvents="none"
-            style={
-              [
-                {
-                  "bottom": 0,
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                },
-                {
-                  "backgroundColor": "#8888881F",
-                  "borderRadius": undefined,
-                },
-                {},
-              ]
-            }
-          />
-          <Image
-            resizeMode="contain"
-            source={
-              {
-                "testUri": "../../../assets/img/zcash-yellow.png",
-              }
-            }
-            style={
-              {
-                "borderRadius": 18,
-                "height": 36,
-                "width": 36,
-              }
-            }
-          />
-          <View
-            style={
-              {
-                "flex": 1,
-              }
-            }
-          >
-            <Text
-              maxFontSizeMultiplier={2}
-              style={
-                {
-                  "color": "#18bd18",
-                  "fontSize": 16,
-                  "fontWeight": "600",
-                }
-              }
-            >
-              Zcash
-            </Text>
-            <Text
-              maxFontSizeMultiplier={2}
-              style={
-                {
-                  "color": "#888888",
-                  "fontSize": 12,
-                  "fontWeight": "400",
-                }
-              }
-            >
-              ZEC
-            </Text>
-          </View>
-        </View>
+        />
       </View>
     </View>
   </View>

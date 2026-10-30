@@ -10,15 +10,9 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import {
-  BottomSheetBackdrop,
-  BottomSheetBackdropProps,
-  BottomSheetModal,
-  BottomSheetView,
-} from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 import {
-  radiusSheet,
   useTheme,
   iconSizeMd,
   radiusPill,
@@ -31,7 +25,7 @@ import { duration, ease } from '@app/theme/motion';
 import { TranslateType } from '@app/AppState';
 import { DeleteWalletContext } from '@app/AppState/types/DeleteWalletContext';
 import Text from '@ui/primitives/Text';
-import SheetRim from '@ui/primitives/SheetRim';
+import AppSheetModal from '@ui/primitives/AppSheetModal';
 import Button, { BUTTON_HEIGHT } from '@ui/primitives/Button';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 
@@ -46,22 +40,6 @@ const DRAIN_MS = 250;
 const PULSE_MS = 220;
 const SETTLE_MS = 260;
 const RELEASE_FLOOR = 0.02;
-
-const SheetHandle: React.FC = () => {
-  const { colors } = useTheme();
-  return (
-    <View
-      style={{
-        paddingTop: 8,
-        backgroundColor: colors.bgSurface,
-        borderTopLeftRadius: radiusSheet,
-        borderTopRightRadius: radiusSheet,
-      }}
-    >
-      <SheetRim />
-    </View>
-  );
-};
 
 const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
   ({ context, translate, onConfirmed, onReleasedEarly }, ref) => {
@@ -136,20 +114,6 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
       transform: [{ scale: pulse.value }],
     }));
 
-    const renderBackdrop = useCallback(
-      (props: BottomSheetBackdropProps) => (
-        <BottomSheetBackdrop
-          {...props}
-          disappearsOnIndex={-1}
-          appearsOnIndex={0}
-          pressBehavior="close"
-          style={{ backgroundColor: colors.bgScrim }}
-          opacity={1}
-        />
-      ),
-      [colors],
-    );
-
     const sub = translate(
       context === 'import'
         ? 'deletesheet.import-sub'
@@ -159,26 +123,11 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
     ) as string;
 
     return (
-      <BottomSheetModal
-        ref={ref}
-        accessible={false}
-        enableDynamicSizing
-        enablePanDownToClose
-        backdropComponent={renderBackdrop}
-        handleComponent={SheetHandle}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: radiusSheet,
-          borderTopRightRadius: radiusSheet,
-        }}
-        onDismiss={reset}
-      >
-        <BottomSheetView
+      <AppSheetModal ref={ref} onDismiss={reset}>
+        <View
           style={{
-            backgroundColor: colors.bgSurface,
             paddingHorizontal: 24,
-            paddingTop: 18,
-            paddingBottom: 40,
+            paddingTop: 26,
             alignItems: 'center',
           }}
         >
@@ -267,8 +216,8 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
               onPress={dismiss}
             />
           </View>
-        </BottomSheetView>
-      </BottomSheetModal>
+        </View>
+      </AppSheetModal>
     );
   },
 );

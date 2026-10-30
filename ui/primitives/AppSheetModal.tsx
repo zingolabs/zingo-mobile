@@ -231,11 +231,13 @@ export function SheetScrollView({
   style,
   contentContainerStyle,
   keyboardShouldPersistTaps,
+  testID,
 }: {
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;
   keyboardShouldPersistTaps?: 'always' | 'never' | 'handled';
+  testID?: string;
 }) {
   const { animatedLayoutState } = useBottomSheetInternal();
   const bodyHeight = useContext(SheetBodyHeight);
@@ -264,6 +266,7 @@ export function SheetScrollView({
 
   return (
     <BottomSheetScrollView
+      testID={testID}
       style={[style, { maxHeight: windowHeight - insets.top - chrome }]}
       contentContainerStyle={contentContainerStyle}
       keyboardShouldPersistTaps={keyboardShouldPersistTaps}

@@ -2,14 +2,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Image, Keyboard, View } from 'react-native';
-import { radiusSheet, useTheme, iconSizeMd } from '@app/theme';
+import { useTheme, space8, space16, space20 } from '@app/theme';
 import Pressable from '@ui/primitives/Pressable';
-import {
-  BottomSheetBackdrop,
-  BottomSheetBackdropProps,
-  BottomSheetModal,
-  BottomSheetScrollView,
-} from '@gorhom/bottom-sheet';
+import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import AppSheetModal from '@ui/primitives/AppSheetModal';
+import Text from '@ui/primitives/Text';
+import TitleBar from '@ui/widgets/TitleBar';
 
 import { TranslateType } from '@app/AppState';
 import Utils from '@app/utils';
@@ -17,7 +15,6 @@ import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import BoldText from '@ui/primitives/BoldText';
 import FadeText from '@ui/primitives/FadeText';
 import RegText from '@ui/primitives/RegText';
-import SheetRim from '@ui/primitives/SheetRim';
 import SearchField from '@ui/widgets/SearchField';
 import { chainDisplayName } from './chainDisplayName';
 import { getChainIcon } from './chainIcons';
@@ -111,28 +108,6 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
     sheetRef.current?.dismiss();
   }, []);
 
-  const renderBackdrop = useCallback(
-    (props: BottomSheetBackdropProps) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-        pressBehavior="close"
-        style={{ backgroundColor: colors.bgScrim }}
-        opacity={1}
-      />
-    ),
-    [colors],
-  );
-
-  // Reset the query on close (index -1), not on open — resetting on open makes
-  // the list flash filtered→unfiltered once the sheet is already on screen.
-  const onSheetChange = useCallback((index: number) => {
-    if (index < 0) {
-      setQuery('');
-    }
-  }, []);
-
   // Filter on the two strings each row renders: the display name and the raw
   // chain code (so `btc` finds Bitcoin, `sol` Solana, etc.). Empty query keeps
   // the original reference so React skips re-rendering unchanged rows.
@@ -153,7 +128,9 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
       {/* Label on the first line, then a bordered field matching the other
           form fields on the screen: chain logo + name inside, and a down
           chevron only when it is actually a list (more than one option). */}
-      <RegText>{label}</RegText>
+      <Text variant="bodySmall" tone="muted" style={{ fontWeight: '600' }}>
+        {label}
+      </Text>
       <Pressable
         kind="row"
         testID="chainselect.field"
@@ -171,7 +148,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
           borderWidth: 1,
           borderRadius: 12,
           borderColor: fieldBorder(colors, false),
-          marginTop: 10,
+          marginTop: space8,
         }}
       >
         <ChainLogo chain={value} size={24} />
@@ -194,135 +171,90 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
         {canPick ? <ChevronDown size={16} color={colors.fgMuted} /> : null}
       </Pressable>
 
-      <BottomSheetModal
+      <AppSheetModal
         ref={sheetRef}
-        accessible={false}
         // Fixed tall snap point so the sheet doesn't shrink to "1 row" when the
         // search query narrows the list.
-        enableDynamicSizing={false}
         snapPoints={SNAP_POINTS}
-        enablePanDownToClose
-        stackBehavior="push"
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        onAnimate={(from, to) => {
-          if (from === -1 && to >= 0) {
-            Keyboard.dismiss();
-          }
-        }}
-        onChange={onSheetChange}
-        handleComponent={null}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: radiusSheet,
-          borderTopRightRadius: radiusSheet,
-        }}
-        backdropComponent={renderBackdrop}
-      >
-        <View style={{ flex: 1 }}>
-          {/* Title bar drawn as content (not handleComponent) so the search
-              input below survives keystroke re-renders without losing focus. */}
-          <View
-            style={{
-              paddingTop: 8,
-              paddingHorizontal: 16,
-              backgroundColor: colors.bgSurface,
-              borderTopLeftRadius: radiusSheet,
-              borderTopRightRadius: radiusSheet,
-            }}
-          >
-            <SheetRim />
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingBottom: 6,
+        // Reset the query on close, not on open — resetting on open makes the
+        // list flash filtered→unfiltered once the sheet is already on screen.
+        onDismiss={() => setQuery('')}
+        contentStyle={
+          keyboardHeight > 0
+            ? { paddingBottom: keyboardHeight + space20 }
+            : undefined
+        }
+        header={
+          /* The title and search drawn as content, so the input survives keystroke re-renders. */
+          <View style={{ paddingBottom: space8 }}>
+            <TitleBar
+              title={
+                translate('addressbook.select-chain-placeholder') as string
+              }
+              right={{
+                icon: XIcon,
+                accessibilityLabel: t('close', ''),
+                onPress: dismiss,
               }}
-            >
-              <View style={{ width: 48 }} />
-              <BoldText
-                numberOfLines={1}
+            />
+            <View style={{ paddingHorizontal: space16 }}>
+              <SearchField
+                value={query}
+                onChangeText={setQuery}
+                placeholder={t('addressbook.search-placeholder', 'Search')}
+                testID={'chainselect.search'}
+              />
+            </View>
+          </View>
+        }
+      >
+        <BottomSheetScrollView
+          keyboardShouldPersistTaps="handled"
+          style={{ flex: 1 }}
+        >
+          {filteredOptions.map(chain => {
+            const selected = chain === value;
+            return (
+              <Pressable
+                kind="row"
+                key={chain}
+                onPress={() => {
+                  onChange(chain);
+                  dismiss();
+                }}
+                // Separator colour matches the other list components in the
+                // app (address book, address list, history, asset picker).
                 style={{
-                  flex: 1,
-                  textAlign: 'center',
-                  color: colors.fgDefault,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingHorizontal: 20,
+                  paddingVertical: 12,
+                  columnGap: 12,
+                  borderBottomWidth: 1.5,
+                  borderBottomColor: colors.borderSubtle,
                 }}
               >
-                {translate('addressbook.select-chain-placeholder') as string}
-              </BoldText>
-              <Pressable
-                kind="icon"
-                onPress={dismiss}
-                accessibilityRole="button"
-                hitSlop={8}
-                style={{ padding: 14 }}
-              >
-                <XIcon size={iconSizeMd} color={colors.fgMuted} />
+                <ChainLogo chain={chain} size={36} />
+                <View style={{ flex: 1 }}>
+                  <RegText
+                    style={{
+                      fontSize: 16,
+                      color: selected ? colors.fgAccent : colors.fgDefault,
+                      fontWeight: selected ? '600' : '500',
+                    }}
+                  >
+                    {chainDisplayName(chain)}
+                  </RegText>
+                  <FadeText style={{ fontSize: 12 }}>
+                    {(chain || '').toUpperCase()}
+                  </FadeText>
+                </View>
+                {selected && <CheckIcon size={16} color={colors.fgAccent} />}
               </Pressable>
-            </View>
-
-            {/* Search row */}
-            <SearchField
-              value={query}
-              onChangeText={setQuery}
-              placeholder={t('addressbook.search-placeholder', 'Search')}
-              testID={'chainselect.search'}
-            />
-            <View style={{ height: 8 }} />
-          </View>
-
-          <BottomSheetScrollView
-            style={{ backgroundColor: colors.bgSurface }}
-            contentContainerStyle={{
-              paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
-            }}
-          >
-            {filteredOptions.map(chain => {
-              const selected = chain === value;
-              return (
-                <Pressable
-                  kind="row"
-                  key={chain}
-                  onPress={() => {
-                    onChange(chain);
-                    dismiss();
-                  }}
-                  // Separator colour matches the other list components in the
-                  // app (address book, address list, history, asset picker).
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    paddingHorizontal: 20,
-                    paddingVertical: 12,
-                    columnGap: 12,
-                    borderBottomWidth: 1.5,
-                    borderBottomColor: colors.borderSubtle,
-                  }}
-                >
-                  <ChainLogo chain={chain} size={36} />
-                  <View style={{ flex: 1 }}>
-                    <RegText
-                      style={{
-                        fontSize: 16,
-                        color: selected ? colors.fgAccent : colors.fgDefault,
-                        fontWeight: selected ? '600' : '500',
-                      }}
-                    >
-                      {chainDisplayName(chain)}
-                    </RegText>
-                    <FadeText style={{ fontSize: 12 }}>
-                      {(chain || '').toUpperCase()}
-                    </FadeText>
-                  </View>
-                  {selected && <CheckIcon size={16} color={colors.fgAccent} />}
-                </Pressable>
-              );
-            })}
-          </BottomSheetScrollView>
-        </View>
-      </BottomSheetModal>
+            );
+          })}
+        </BottomSheetScrollView>
+      </AppSheetModal>
     </View>
   );
 };

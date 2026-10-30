@@ -8,6 +8,11 @@ const BottomSheetBackdrop = ({ children }) => <>{children}</>;
 const BottomSheetFooter = ({ children }) => <>{children}</>;
 const BottomSheetModalProvider = ({ children }) => <>{children}</>;
 
+/** SheetScrollView reports its height through the sheet's layout state. */
+const useBottomSheetInternal = () => ({
+  animatedLayoutState: { modify: () => {} },
+});
+
 const useBottomSheetModal = () => ({
   dismiss: () => false,
   dismissAll: () => {},
@@ -22,4 +27,5 @@ export {
   BottomSheetFooter,
   BottomSheetModalProvider,
   useBottomSheetModal,
+  useBottomSheetInternal,
 };
