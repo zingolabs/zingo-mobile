@@ -1,7 +1,13 @@
 import 'react-native';
 import React from 'react';
 import { act, fireEvent, render } from '@testing-library/react-native';
+import * as sheetLib from '@gorhom/bottom-sheet';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
+
+/** The mock's modal methods (__mocks__/@gorhom/bottom-sheet.js). */
+const { sheetMethods } = sheetLib as unknown as {
+  sheetMethods: { dismiss: jest.Mock };
+};
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
@@ -56,9 +62,8 @@ const record = {
 
 const sheet = () => {
   const order: string[] = [];
-  const ref = {
-    current: { dismiss: jest.fn(() => order.push('dismiss')) },
-  } as unknown as React.RefObject<BottomSheetModal>;
+  const ref = React.createRef<BottomSheetModal>();
+  sheetMethods.dismiss.mockImplementation(() => order.push('dismiss'));
   const view = render(
     <ContextAppLoadedProvider
       value={{
