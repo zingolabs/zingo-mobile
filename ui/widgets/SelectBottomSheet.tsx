@@ -2,8 +2,7 @@
 import React, { forwardRef, useCallback, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { useTheme, iconSizeSm, space8, space16, space20 } from '@app/theme';
-import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
+import { useTheme, iconSizeSm, space8, space16 } from '@app/theme';
 import Pressable from '@ui/primitives/Pressable';
 import AppSheetModal, { SheetScrollView } from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
@@ -52,7 +51,6 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
   ) => {
     const { colors } = useTheme();
     const [query, setQuery] = useState<string>('');
-    const keyboardHeight = useKeyboardHeight();
 
     const dismiss = useCallback(() => {
       (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss();
@@ -126,11 +124,6 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
         // Reset the query on close, not on open, so the next open starts clean
         // and renders unfiltered in one frame (no visible filter→unfilter jump).
         onDismiss={() => setQuery('')}
-        contentStyle={
-          searchable && keyboardHeight > 0
-            ? { paddingBottom: keyboardHeight + space20 }
-            : undefined
-        }
         header={
           searchable ? (
             <View style={{ paddingBottom: space8 }}>

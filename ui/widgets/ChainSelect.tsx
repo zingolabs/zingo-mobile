@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Image, Keyboard, View } from 'react-native';
-import { useTheme, space8, space16, space20 } from '@app/theme';
+import { useTheme, space8, space16 } from '@app/theme';
 import Pressable from '@ui/primitives/Pressable';
 import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
@@ -11,7 +11,6 @@ import TitleBar from '@ui/widgets/TitleBar';
 
 import { TranslateType } from '@app/AppState';
 import Utils from '@app/utils';
-import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import BoldText from '@ui/primitives/BoldText';
 import FadeText from '@ui/primitives/FadeText';
 import RegText from '@ui/primitives/RegText';
@@ -93,7 +92,6 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
   disabled,
 }) => {
   const { colors } = useTheme();
-  const keyboardHeight = useKeyboardHeight();
   const sheetRef = useRef<BottomSheetModal>(null);
   const [query, setQuery] = useState<string>('');
   const canPick = !disabled && options.length > 1;
@@ -179,11 +177,6 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
         // Reset the query on close, not on open — resetting on open makes the
         // list flash filtered→unfiltered once the sheet is already on screen.
         onDismiss={() => setQuery('')}
-        contentStyle={
-          keyboardHeight > 0
-            ? { paddingBottom: keyboardHeight + space20 }
-            : undefined
-        }
         header={
           /* The title and search drawn as content, so the input survives keystroke re-renders. */
           <View style={{ paddingBottom: space8 }}>
