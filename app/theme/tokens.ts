@@ -48,6 +48,8 @@ export type ThemeColors = {
 
   fgSyncing: string;
   borderSyncing: string;
+  /** Scanned, its spends still to be refetched: a lighter green than scanned. */
+  fgScanPending: string;
 
   fgWarning: string;
   borderWarning: string;
@@ -159,6 +161,7 @@ export const themeTokens: ThemeColors = {
 
   fgSyncing: syncing,
   borderSyncing: syncing,
+  fgScanPending: '#5DBB4C',
 
   fgWarning: '#F99D00',
   borderWarning: '#65491C',
