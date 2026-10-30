@@ -36,6 +36,7 @@ import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { FlashlightIcon } from '@ui/primitives/Icons/FlashlightIcon';
 import { themeTokens } from '@app/theme';
+import { contentTopPad } from '@app/navigation/safeArea';
 
 const FRAME = 240;
 const BRACKET = 28;
@@ -91,6 +92,14 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const [size, setSize] = useState({ width: 0, height: 0 });
+  const root = useRef<View>(null);
+  /** Where the overlay starts in the window: 0 when nothing pads it. */
+  const [originY, setOriginY] = useState<number>(0);
+  /**
+   * The top bar stays under the app's top pad wherever the overlay starts:
+   * on iOS the scanner is a modal over the whole window.
+   */
+  const barTop = 2 + Math.max(0, contentTopPad(insets.top) - originY);
   const device = useCameraDevice('back');
   const { hasPermission, requestPermission } = useCameraPermission();
   const [open, setOpen] = useState(true);
@@ -194,14 +203,16 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
 
   return (
     <View
+      ref={root}
       pointerEvents="box-none"
       style={StyleSheet.absoluteFill}
-      onLayout={e =>
+      onLayout={e => {
         setSize({
           width: e.nativeEvent.layout.width,
           height: e.nativeEvent.layout.height,
-        })
-      }
+        });
+        root.current?.measureInWindow((_x, y) => setOriginY(y));
+      }}
     >
       <CircularReveal origin={origin} open={open} onClosed={closed}>
         <View
@@ -285,7 +296,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
           <View
             style={{
               position: 'absolute',
-              top: 2,
+              top: barTop,
               left: 0,
               right: 0,
               height: 44,
