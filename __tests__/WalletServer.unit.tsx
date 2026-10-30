@@ -34,6 +34,7 @@ const mount = (setServerOption: jest.Mock) => {
     goBack: jest.fn(),
     canGoBack: jest.fn(() => true),
     addListener: jest.fn(() => () => {}),
+    setOptions: jest.fn(),
   };
   render(
     <ContextAppLoadedProvider
@@ -116,6 +117,10 @@ test('Tests that nothing holds the back when nothing is unsaved, and the back ar
   const navigation = mount(jest.fn());
   const calls = preventRemove.mock.calls;
   expect(calls[calls.length - 1][0]).toBe(false);
+  // Nothing held: iOS's native swipe stays on.
+  expect(navigation.setOptions).toHaveBeenLastCalledWith({
+    gestureEnabled: true,
+  });
   await act(async () => {
     fireEvent.press(screen.getByTestId('server.back'));
   });
