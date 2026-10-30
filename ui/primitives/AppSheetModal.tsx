@@ -3,6 +3,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useImperativeHandle,
   useRef,
   useState,
 } from 'react';
@@ -100,6 +101,35 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
     ref,
   ) => {
     const { colors } = useTheme();
+    const sheet = useRef<BottomSheetModal>(null);
+    /**
+     * present() waits a frame. A caller sets the sheet's content and
+     * presents it in the same press; presented at once, gorhom measured the
+     * content before it rendered and, on some phones, left the sheet at that
+     * shorter height, its last button below the screen's edge.
+     */
+    useImperativeHandle(
+      ref,
+      () =>
+        new Proxy({} as BottomSheetModal, {
+          get: (_, key: keyof BottomSheetModal) => {
+            if (key === 'present') {
+              return (...args: Parameters<BottomSheetModal['present']>) =>
+                requestAnimationFrame(() => sheet.current?.present(...args));
+            }
+            const current = sheet.current;
+            if (!current) {
+              /** Not mounted yet: a call does nothing, as on a null ref. */
+              return () => {};
+            }
+            const value = current[key];
+            return typeof value === 'function'
+              ? (value as (...a: unknown[]) => unknown).bind(current)
+              : value;
+          },
+        }),
+      [],
+    );
     const fixed = snapPoints !== undefined;
     const [bodyHeight, setBodyHeight] = useState<number>(0);
     const bottomPad = useBottomActionPad();
@@ -151,7 +181,7 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
 
     return (
       <BottomSheetModal
-        ref={ref}
+        ref={sheet}
         accessible={accessible}
         enableDynamicSizing={!fixed}
         snapPoints={snapPoints}
