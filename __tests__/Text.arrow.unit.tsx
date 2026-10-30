@@ -9,9 +9,7 @@ describe('Text arrows', () => {
     render(<Text testID="t">Swap GRAM → ZEC</Text>);
     expect(screen.UNSAFE_getAllByType(ArrowRightIcon)).toHaveLength(1);
     expect(screen.getByTestId('t')).not.toHaveTextContent('→');
-    expect(screen.getByTestId('t')).toHaveTextContent('Swap GRAM ZEC', {
-      normalizeWhitespace: true,
-    });
+    expect(screen.getByTestId('t')).toHaveTextContent(/Swap GRAM\s+ZEC/);
   });
 
   test('Tests that a text without an arrow keeps its children when it has none', () => {

@@ -42,6 +42,7 @@ const colors: ThemeColors = {
   bgAccentDisabled: '#5a8c5a',
 
   fgSyncing: '#ebff5a',
+  fgScanPending: '#5DBB4C',
   borderSyncing: '#ebff5a',
 
   fgWarning: '#F99D00',

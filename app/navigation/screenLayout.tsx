@@ -23,15 +23,16 @@ export type ScreenLayoutProps = {
   options: { presentation?: string };
 };
 
-/**
- * iOS presents a transparent modal over the whole window, outside App's
- * SafeArea; Android keeps it inside.
- */
+/** iOS presents a transparent modal over the whole window, outside LoadedApp's root. */
 export const isIosModal = (options: { presentation?: string }) =>
   Platform.OS === 'ios' && options.presentation === 'transparentModal';
 
-/** The padding App's SafeArea gives every other screen. */
-export const ModalSafeArea = ({ children }: { children: React.ReactNode }) => {
+/**
+ * Pads a screen inside the system's safe area. The pad goes on each screen
+ * and the sheets' providers span the whole window, as gorhom places a sheet
+ * against the window: inside the pad it sat that much too low.
+ */
+export const ScreenSafeArea = ({ children }: { children: React.ReactNode }) => {
   const insets = useSafeAreaInsets();
   return (
     <View

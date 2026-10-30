@@ -274,7 +274,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
     <View
       accessible={true}
       accessibilityLabel={translate('mixnetdoctor.title-acc') as string}
-      style={{ flex: 1, backgroundColor: colors.bgCanvas }}
+      style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}
     >
       <Header
         title={translate('mixnetdoctor.title') as string}

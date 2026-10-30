@@ -7,9 +7,8 @@ export const MAP_ROWS = 6;
 export const MAP_COLS = 30;
 export const MAP_CELLS = MAP_ROWS * MAP_COLS;
 
-export type CellState = 'scanned' | 'scanning' | 'refetching' | 'high' | 'low';
-
-export type Phase = 'done' | 'verifying' | 'tip' | 'notes' | 'historic';
+export type CellState =
+  'scanned' | 'pending' | 'scanning' | 'refetching' | 'high' | 'low';
 
 /**
  * The chain height the wallet syncs to. zingolib reports its span from the
@@ -31,10 +30,10 @@ export type Heights = {
 };
 
 const SCANNED: Priority[] = [Priority.Scanned];
-const REFETCHING: Priority[] = [
-  Priority.ScannedWithoutMapping,
-  Priority.RefetchingNullifiers,
-];
+/** Scanned, its nullifiers not mapped: its spends are refetched later. */
+const PENDING: Priority[] = [Priority.ScannedWithoutMapping];
+/** Refetching those nullifiers now. */
+const REFETCHING: Priority[] = [Priority.RefetchingNullifiers];
 const HIGH: Priority[] = [
   Priority.Verify,
   Priority.ChainTip,
@@ -46,13 +45,15 @@ const HIGH: Priority[] = [
 export const cellState = (priority: Priority): CellState =>
   SCANNED.includes(priority)
     ? 'scanned'
-    : REFETCHING.includes(priority)
-      ? 'refetching'
-      : priority === Priority.Scanning
-        ? 'scanning'
-        : HIGH.includes(priority)
-          ? 'high'
-          : 'low';
+    : PENDING.includes(priority)
+      ? 'pending'
+      : REFETCHING.includes(priority)
+        ? 'refetching'
+        : priority === Priority.Scanning
+          ? 'scanning'
+          : HIGH.includes(priority)
+            ? 'high'
+            : 'low';
 
 const ranges = (status: RPCSyncStatusType): RPCSyncScanRangeStatusType[] =>
   status.scan_ranges ?? [];
@@ -65,7 +66,9 @@ export const heights = (
   synced: boolean,
 ): Heights => {
   const scanned = ranges(status)
-    .filter(r => ['scanned', 'refetching'].includes(cellState(r.priority)))
+    .filter(r =>
+      ['scanned', 'pending', 'refetching'].includes(cellState(r.priority)),
+    )
     .reduce((sum, r) => sum + (r.end_block - r.start_block), 0);
   const span = Math.max(0, tip - birthday);
   const done = synced ? span : Math.min(span, scanned);
@@ -76,22 +79,6 @@ export const heights = (
     behind: Math.max(0, tip - wallet),
     scanned: done,
   };
-};
-
-/** The scan phase named by the most urgent range still waiting. */
-export const phase = (status: RPCSyncStatusType, synced: boolean): Phase => {
-  if (synced) {
-    return 'done';
-  }
-  const waiting = ranges(status).map(r => r.priority);
-  return waiting.includes(Priority.Verify)
-    ? 'verifying'
-    : waiting.includes(Priority.ChainTip)
-      ? 'tip'
-      : waiting.includes(Priority.FoundNote) ||
-          waiting.includes(Priority.OpenAdjacent)
-        ? 'notes'
-        : 'historic';
 };
 
 /** One state per map cell, birthday on the left and tip on the right, filled column by column. */

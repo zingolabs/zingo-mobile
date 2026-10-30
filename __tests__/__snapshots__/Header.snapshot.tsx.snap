@@ -12,7 +12,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
             "backgroundColor": "#011401",
             "display": "flex",
             "minHeight": 50,
-            "paddingBottom": 10,
+            "paddingBottom": 0,
             "paddingTop": 0,
           },
         ]
@@ -414,7 +414,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
         "justifyContent": "space-between",
         "paddingBottom": 6,
         "paddingHorizontal": 16,
-        "paddingTop": 8,
+        "paddingTop": 4,
       }
     }
     testID="valuetransfer text"
@@ -477,7 +477,7 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
             "backgroundColor": "#011401",
             "display": "flex",
             "minHeight": 50,
-            "paddingBottom": 10,
+            "paddingBottom": 0,
             "paddingTop": 0,
           },
         ]
@@ -557,7 +557,7 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
         "justifyContent": "space-between",
         "paddingBottom": 6,
         "paddingHorizontal": 16,
-        "paddingTop": 8,
+        "paddingTop": 4,
       }
     }
   >

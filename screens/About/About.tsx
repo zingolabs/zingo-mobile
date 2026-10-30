@@ -6,7 +6,6 @@ import { useTheme } from '@app/theme';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 import FadeText from '@ui/primitives/FadeText';
-import TitleBar from '@ui/widgets/TitleBar';
 import AppSheet from '@ui/primitives/AppSheet';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
@@ -15,7 +14,6 @@ import DetailLine from '@ui/widgets/DetailLine';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
-import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 
 type AboutProps = NativeStackScreenProps<AppDrawerParamList, 'About'>;
 
@@ -42,29 +40,20 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
 
   const aboutSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
-  const aboutHeader = (
-    <TitleBar
-      title={getZingoName() + ' ' + getZingoVersion()}
-      left={{
-        icon: ChevronLeft,
-        onPress: closeScreen,
-        accessibilityLabel: translate('about.back-acc') as string,
-        accent: true,
-      }}
-    />
-  );
-
   return (
     <View
       style={{
         flex: 1,
         backgroundColor: colors.bgCanvas,
+        paddingTop: 4,
       }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
       <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <Header
-          title={''}
+          title={getZingoName() + ' ' + getZingoVersion()}
+          closeScreen={closeScreen}
+          backAccessibilityLabel={translate('about.back-acc') as string}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
@@ -72,11 +61,7 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
           noUfvkIcon={true}
         />
       </View>
-      <AppSheet
-        ref={aboutSheetRef}
-        snapPoints={aboutSnapPoints}
-        header={aboutHeader}
-      >
+      <AppSheet ref={aboutSheetRef} snapPoints={aboutSnapPoints}>
         <BottomSheetScrollView
           testID="about.scroll-view"
           bounces={false}

@@ -664,12 +664,14 @@ const Server: React.FunctionComponent<ServerProps> = ({
         onPress={leave}
         disabled={busy || working}
       />
-      <ScreenHeader
-        testID="server.back"
-        title={t('title')}
-        onBack={leave}
-        disabled={busy || working}
-      />
+      {placement !== 'belowHeader' && (
+        <ScreenHeader
+          testID="server.back"
+          title={t('title')}
+          onBack={leave}
+          disabled={busy || working}
+        />
+      )}
       {asking && (
         <SaveSheet
           testID="server.unsaved"
