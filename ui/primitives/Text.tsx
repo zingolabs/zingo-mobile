@@ -6,14 +6,56 @@ import {
   TextProps as RNTextProps,
   TextStyle,
   StyleProp,
+  useWindowDimensions,
 } from 'react-native';
 import { textVariants, useTheme } from '@app/theme';
 import type { TextVariant } from '@app/theme';
+import { ArrowRightIcon } from './Icons/ArrowRightIcon';
 
 export type TextTone =
   'default' | 'muted' | 'accent' | 'danger' | 'warning' | 'transparent';
 
 const monoFamily = Platform.select({ ios: 'Menlo', default: 'monospace' });
+
+const ARROW = '→';
+/** The drawn arrow against the text's size, and how far it drops to sit on the x-height. */
+const ARROW_EM = 0.9;
+const ARROW_DROP_EM = 0.1;
+
+/**
+ * Every "→" in the text is drawn as an icon: some phones' fonts draw the
+ * character wrong (a Tecno showed "ʼn"), and an icon looks the same on all.
+ */
+function drawArrows(
+  children: React.ReactNode,
+  size: number,
+  color: string,
+): React.ReactNode {
+  const arrow = (key: string) => (
+    <ArrowRightIcon
+      key={key}
+      // The arrow takes the text's size, not an icon token: it stands for a character.
+      // eslint-disable-next-line no-restricted-syntax
+      size={size * ARROW_EM}
+      color={color}
+      style={{ transform: [{ translateY: size * ARROW_DROP_EM }] }}
+    />
+  );
+  const hasArrow = (node: React.ReactNode): boolean =>
+    typeof node === 'string'
+      ? node.includes(ARROW)
+      : Array.isArray(node) && node.some(hasArrow);
+  if (!hasArrow(children)) {
+    return children;
+  }
+  return React.Children.map(children, (child, i) =>
+    typeof child === 'string' && child.includes(ARROW)
+      ? child
+          .split(ARROW)
+          .flatMap((part, j) => (j === 0 ? [part] : [arrow(`${i}-${j}`), part]))
+      : child,
+  );
+}
 
 /**
  * A simulated OS text size, for the web Storybook only: the web has no
@@ -42,6 +84,7 @@ const Text: React.FunctionComponent<TextProps> = ({
 }) => {
   const { colors } = useTheme();
   const scale = useContext(TextScaleContext);
+  const { fontScale } = useWindowDimensions();
   const v = textVariants[variant];
   const toneColor = {
     default: colors.fgDefault,
@@ -72,7 +115,15 @@ const Text: React.FunctionComponent<TextProps> = ({
     }
   }
 
-  return <RNText maxFontSizeMultiplier={v.cap} {...rest} style={merged} />;
+  /** The OS scales the text but not a drawn arrow: the arrow follows it. */
+  const arrowSize =
+    (merged.fontSize ?? v.fontSize) *
+    (scale === 1 ? Math.min(fontScale, v.cap) : 1);
+  return (
+    <RNText maxFontSizeMultiplier={v.cap} {...rest} style={merged}>
+      {drawArrows(rest.children, arrowSize, String(merged.color))}
+    </RNText>
+  );
 };
 
 export default Text;
