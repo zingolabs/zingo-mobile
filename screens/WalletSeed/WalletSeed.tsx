@@ -471,7 +471,19 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               />
             </View>
           )}
-          <View style={{ marginTop: space12 }}>
+        </ScrollView>
+
+        {/**
+         * Copy and Show stay in the footer: at the end of the scroll, a tall
+         * seed on a short screen pushed them out of sight.
+         */}
+        <View
+          style={{
+            paddingTop: space8,
+            paddingBottom: bottomPad,
+          }}
+        >
+          <View style={{ marginBottom: space12 }}>
             <CopyShowButtons
               testID="walletseed"
               hidden={hidden}
@@ -479,14 +491,6 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               onCopy={copyWords}
             />
           </View>
-        </ScrollView>
-
-        <View
-          style={{
-            paddingTop: space8,
-            paddingBottom: bottomPad,
-          }}
-        >
           {action ? (
             <View style={{ marginHorizontal: SIDE }}>
               <Button
