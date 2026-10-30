@@ -106,12 +106,14 @@ const ServerList: React.FunctionComponent<ServerListProps> = ({
         onPress={onBack}
         disabled={busy}
       />
-      <ScreenHeader
-        testID="serverlist.back"
-        title={translate('server.other') as string}
-        onBack={onBack}
-        disabled={busy}
-      />
+      {placement !== 'belowHeader' && (
+        <ScreenHeader
+          testID="serverlist.back"
+          title={translate('server.other') as string}
+          onBack={onBack}
+          disabled={busy}
+        />
+      )}
     </View>
   );
 };

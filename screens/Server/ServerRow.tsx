@@ -180,8 +180,9 @@ export type Placement = 'screen' | 'belowHeader';
 
 /**
  * How far to raise a server screen's content. The prototype's fractions of
- * the screen height leave room for the top bar; under the shared header that
- * room is already taken, so the first block moves up to sit under the title.
+ * the screen height leave room for the top bar; under the shared header,
+ * which draws the title and back itself, the first block moves up to sit
+ * just under that title.
  */
 export const liftFor = (
   placement: Placement,
@@ -189,7 +190,7 @@ export const liftFor = (
   height: number,
 ): number =>
   placement === 'belowHeader'
-    ? Math.max(0, firstTop * height - (TITLE_TOP + TITLE_H + BELOW_TITLE))
+    ? Math.max(0, firstTop * height - BELOW_TITLE)
     : 0;
 
 export const useLift = (placement: Placement, firstTop: number) => {

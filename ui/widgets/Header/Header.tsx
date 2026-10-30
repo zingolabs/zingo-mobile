@@ -61,6 +61,8 @@ type HeaderProps = {
   // side menu
   noDrawMenu?: boolean;
   closeScreen?: () => void;
+  /** The back arrow does nothing for now (a server being set). */
+  backDisabled?: boolean;
   /** The back arrow's testID and spoken label, with closeScreen. */
   backTestID?: string;
   backAccessibilityLabel?: string;
@@ -111,6 +113,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   setPrivacyOption,
   receivedLegend,
   closeScreen,
+  backDisabled,
   backTestID,
   backAccessibilityLabel,
   titleElement,
@@ -202,6 +205,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     );
   };
 
+  const hasTitle = !!title || !!titleElement;
+
   return (
     <>
       <View>
@@ -214,7 +219,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               alignItems: 'center',
               backgroundColor: colors.bgCanvas,
               paddingTop: 0,
-              paddingBottom: BAR_BOTTOM,
+              /** A screen's title sits right under the row: 40 from the badge's centre to the title's. */
+              paddingBottom: hasTitle ? 0 : BAR_BOTTOM,
               minHeight: 50,
             },
           ]}
@@ -388,8 +394,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         </Animated.View>
       </View>
 
-      {(!!title || !!titleElement) && (
+      {hasTitle && (
         <TitleBar
+          tight
           testID={testID}
           title={titleElement ?? title}
           right={right}
@@ -399,6 +406,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   icon: ChevronLeft,
                   accent: true,
                   onPress: closeScreen,
+                  disabled: backDisabled,
                   testID: backTestID,
                   accessibilityLabel: backAccessibilityLabel ?? title,
                 }
