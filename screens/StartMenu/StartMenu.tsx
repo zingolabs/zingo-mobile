@@ -112,6 +112,8 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   const { colors } = useTheme();
 
   const [containerH, setContainerH] = useState<number>(0);
+  const [cardH, setCardH] = useState<number>(0);
+  const [actionsH, setActionsH] = useState<number>(0);
   const [backOnline, setBackOnline] = useState<boolean>(false);
   const [started, setStarted] = useState<string | null>(null);
   const wasOffline = useRef<boolean>(!netInfo.isConnected);
@@ -137,6 +139,20 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
       setBackOnline(false);
     }
   }, [netInfo.isConnected]);
+
+  /**
+   * On a short screen, or with large text, the card at its design height
+   * runs into the actions at the bottom: it rises to sit above them, and the
+   * title rises with it.
+   */
+  const cardTop = containerH * CARD_TOP;
+  const lift =
+    recoveryWallet && cardH > 0 && actionsH > 0
+      ? Math.max(
+          0,
+          cardTop + cardH + space16 - (containerH - BOTTOM_MARGIN - actionsH),
+        )
+      : 0;
 
   const offline = server.kind === 'offline';
   const noInternet = !netInfo.isConnected;
@@ -278,7 +294,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           position: 'absolute',
           left: 0,
           right: 0,
-          top: containerH * TITLE_TOP,
+          top: Math.max(0, containerH * TITLE_TOP - lift),
           alignItems: 'center',
         }}
       >
@@ -331,11 +347,12 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
       {recoveryWallet && (
         <Animated.View
           entering={tagEnter()}
+          onLayout={e => setCardH(e.nativeEvent.layout.height)}
           style={{
             position: 'absolute',
             left: space24,
             right: space24,
-            top: containerH * CARD_TOP,
+            top: cardTop - lift,
           }}
         >
           <Card>
@@ -402,6 +419,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
 
       <Animated.View
         entering={actionsEnter()}
+        onLayout={e => setActionsH(e.nativeEvent.layout.height)}
         style={{
           position: 'absolute',
           left: 0,
