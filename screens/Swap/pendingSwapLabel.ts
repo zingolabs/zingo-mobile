@@ -3,8 +3,8 @@ import type { SwapRecordType } from '@app/swap';
 
 /**
  * What a swap in flight says under its pair, on the card on top of Swap and
- * in Your swaps. A payment not seen half an hour after its address was made
- * reads as a warning. No time shows.
+ * in Your swaps. A payment not seen by its warning time (longer on a slow
+ * chain) reads as a warning. No time shows.
  */
 export function pendingSwapLabel(
   record: SwapRecordType,
