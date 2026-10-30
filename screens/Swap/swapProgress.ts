@@ -1,7 +1,15 @@
 import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
 import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
 
-type Progress = { direction: SwapDirectionEnum; status: SwapStatusEnum };
+type Progress = {
+  direction: SwapDirectionEnum;
+  status: SwapStatusEnum;
+  /**
+   * The provider's deposit is already seen (its hash is known) while the
+   * status still awaits it: the payment counts as detected.
+   */
+  depositSeen?: boolean;
+};
 
 /**
  * The steps a swap walks, as the tracking screen draws them. A sale has
@@ -23,7 +31,11 @@ export function swapStepKeys(direction: SwapDirectionEnum): string[] {
  * Which step a swap sits on. A step is `done` below the current one, `now`
  * at it, and `next` above it; a completed swap sits past the last.
  */
-export function swapStepIndex({ direction, status }: Progress): number {
+export function swapStepIndex({
+  direction,
+  status,
+  depositSeen = false,
+}: Progress): number {
   const count = swapStepKeys(direction).length;
   if (status === SwapStatusEnum.Completed) return count;
   if (direction === SwapDirectionEnum.Outbound) {
@@ -31,7 +43,7 @@ export function swapStepIndex({ direction, status }: Progress): number {
   }
   switch (status) {
     case SwapStatusEnum.AwaitingExternalDeposit:
-      return 0;
+      return depositSeen ? 1 : 0;
     case SwapStatusEnum.Pending:
       return 1;
     default:

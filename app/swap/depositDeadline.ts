@@ -87,7 +87,8 @@ export function depositPhase(
   }
   if (
     record.direction === SwapDirectionEnum.Inbound &&
-    record.status === SwapStatusEnum.Pending
+    (record.status === SwapStatusEnum.Pending ||
+      record.status === SwapStatusEnum.AwaitingExternalDeposit)
   ) {
     return 'detected';
   }
