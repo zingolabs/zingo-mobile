@@ -152,8 +152,8 @@ android {
         applicationId = "org.ZingoLabs.Zingo" // Real
         minSdk = rootProject.extra["minSdkVersion"] as Int
         targetSdk = rootProject.extra["targetSdkVersion"] as Int
-        versionCode = 323 // Real (prod baseline; beta flavor overrides below)
-        versionName = "2.1.1" // Real
+        versionCode = 324 // Real (prod baseline; beta flavor overrides below)
+        versionName = "3.0.0" // Real
         testBuildType = System.getProperty("testBuildType", "debug")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resValue("string", "zm_descriptor", zmDescriptor)
