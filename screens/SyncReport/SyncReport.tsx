@@ -66,6 +66,7 @@ import {
   scaleMax,
 } from '@screens/SyncReport/syncModel';
 import { themeTokens } from '@app/theme';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 const SIDE = space20;
 const SOFT_INK = themeTokens.fgMuted;
@@ -161,6 +162,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     addLastSnackbar,
   } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
+  const { edges, fades } = useScrollEdges();
   const { percentageOutputsScanned, syncInProgress } = useSyncStatus({
     syncingStatus,
     noSyncingStatus: true,
@@ -472,6 +474,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
       />
 
       <ScrollView
+        {...edges}
         testID="syncreport.scroll-view"
         onTouchStart={() => tip && setTip(false)}
         contentContainerStyle={{
@@ -771,6 +774,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           </Pressable>
         )}
       </ScrollView>
+      {fades}
     </View>
   );
 };

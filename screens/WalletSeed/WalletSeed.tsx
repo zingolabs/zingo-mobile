@@ -57,6 +57,7 @@ import {
 import { SIDE, StepActions } from '@screens/SeedBackup/components/StepParts';
 import ScreenshotSheet from '@screens/SeedBackup/components/ScreenshotSheet';
 import KeyCard from '@screens/ViewingKey/components/KeyCard';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 const PUSHED_DIM = 0.55;
 const PUSH_IN_MS = duration.screen;
@@ -137,6 +138,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
     [navigation],
   );
   const { colors } = useTheme();
+  const { edges, fades } = useScrollEdges();
   const bottomPad = useBottomActionPad();
   const focused = useIsFocused();
   const secured = useSecureScreen();
@@ -308,6 +310,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
         />
         {/** The content scrolls above the footer, never under it. */}
         <ScrollView
+          {...edges}
           style={{ flex: 1 }}
           contentContainerStyle={{ paddingBottom: space16 }}
           keyboardShouldPersistTaps="handled"
@@ -480,6 +483,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
             />
           </View>
         </ScrollView>
+        {fades}
 
         <View
           style={{

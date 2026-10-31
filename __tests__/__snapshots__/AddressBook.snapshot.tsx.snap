@@ -249,6 +249,10 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
       }
     }
     keyboardShouldPersistTaps="handled"
+    onContentSizeChange={[Function]}
+    onLayout={[Function]}
+    onScroll={[Function]}
+    scrollEventThrottle={16}
     style={
       {
         "flex": 1,

@@ -45,6 +45,7 @@ import { TreeIcon } from '@ui/primitives/Icons/TreeIcon';
 import { SaplingIcon } from '@ui/primitives/Icons/SaplingIcon';
 import { EyeIcon } from '@ui/primitives/Icons/EyeIcon';
 import ShieldSheet from '@screens/History/components/ShieldSheet';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 const SIDE = 21.5;
 const TILE = 36;
@@ -92,6 +93,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
     mixnetView,
   } = context;
   const { colors } = useTheme();
+  const { edges, fades } = useScrollEdges();
   const t = (key: string) => translate(key) as string;
   /** One reveal for the screen: a tap on any amount shows them all. */
   const amounts = useAmountReveal();
@@ -252,6 +254,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
         noUfvkIcon={true}
       />
       <ScrollView
+        {...edges}
         testID="pools.scroll-view"
         contentContainerStyle={{
           paddingHorizontal: SIDE,
@@ -420,6 +423,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
           </>
         )}
       </ScrollView>
+      {fades}
 
       <ShieldSheet
         ref={shieldSheetRef}

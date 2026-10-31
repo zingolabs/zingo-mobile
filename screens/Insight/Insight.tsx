@@ -51,6 +51,7 @@ import {
   weekEnd,
 } from '@screens/Insight/insightModel';
 import { themeTokens } from '@app/theme';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 const SIDE = space20;
 const SOFT_INK = themeTokens.fgMuted;
@@ -126,6 +127,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
     launchAddTagModal,
   } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
+  const { edges, fades } = useScrollEdges();
   const insight = buildInsight(valueTransfers ?? [], addressBook, new Date());
   const last = insight.weeks - 1;
 
@@ -299,6 +301,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
         noUfvkIcon={true}
       />
       <ScrollView
+        {...edges}
         testID="insight.scroll-view"
         contentContainerStyle={{
           paddingHorizontal: SIDE,
@@ -618,6 +621,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
           </View>
         </View>
       </ScrollView>
+      {fades}
     </View>
   );
 };

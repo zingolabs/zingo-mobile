@@ -41,6 +41,7 @@ import ContactSheet, {
 import TitleBar from '@ui/widgets/TitleBar';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { themeTokens } from '@app/theme';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 const SIDE = 22;
 const SOFT_INK = themeTokens.fgMuted;
@@ -152,6 +153,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   } = useContext(ContextAppLoaded);
   const optionsPanel = useOptionsPanel();
   const { colors } = useTheme();
+  const { edges, fades } = useScrollEdges();
   const bottomPad = useBottomActionPad();
   const walletChain = walletChainName || server.chainName;
 
@@ -363,6 +365,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       </View>
 
       <ScrollView
+        {...edges}
         ref={scrollRef}
         testID="addressbook.scroll-view"
         keyboardShouldPersistTaps="handled"
@@ -528,6 +531,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           </Text>
         )}
       </ScrollView>
+      {fades}
 
       {!pick && (
         <View

@@ -203,6 +203,10 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
         "paddingHorizontal": 21.5,
       }
     }
+    onContentSizeChange={[Function]}
+    onLayout={[Function]}
+    onScroll={[Function]}
+    scrollEventThrottle={16}
     testID="pools.scroll-view"
   >
     <View>

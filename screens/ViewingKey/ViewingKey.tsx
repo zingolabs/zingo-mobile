@@ -51,6 +51,7 @@ import { SIDE } from '@screens/SeedBackup/components/StepParts';
 import KeyCard from './components/KeyCard';
 import Button from '@ui/primitives/Button';
 import { themeTokens } from '@app/theme';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 const QR = 196;
 const TILE_BG = themeTokens.bgViewOnlySubtle;
@@ -115,6 +116,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
     cancelPendingServer: onCancel,
   } = context;
   const { colors } = useTheme();
+  const { edges, fades } = useScrollEdges();
   const bottomPad = useBottomActionPad();
   const { entry, switchTo } = route.params;
   const net = switchTo
@@ -228,6 +230,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
       />
       {/** The content scrolls above the footer, never under it. */}
       <ScrollView
+        {...edges}
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: space16 }}
       >
@@ -293,6 +296,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
           ))}
         </View>
       </ScrollView>
+      {fades}
 
       <View
         style={{
