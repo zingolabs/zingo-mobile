@@ -1432,8 +1432,8 @@
     "vk-copied": "Clave de visualización copiada",
     "verify": "Verificar de nuevo",
     "title-server": "Cambiar servidor",
-    "sub-change": "Antes de abrir otro monedero, guarda con cuidado la frase semilla, el cumpleaños y la clave de visualización de este. Los necesitarás para volver a él.",
-    "sub-server": "Antes de cambiar de servidor, guarda con cuidado la frase semilla, el cumpleaños y la clave de visualización de este monedero. Los necesitarás para volver a él.",
+    "sub-change": "Antes de abrir otro monedero, guarda la frase semilla, el cumpleaños y la clave de visualización de este.",
+    "sub-server": "Antes de cambiar de servidor, guarda la frase semilla, el cumpleaños y la clave de visualización de este monedero.",
     "go-change": "Abrir otro",
     "go-server": "Cambiar",
     "confirm-title": "¿Estás seguro?"

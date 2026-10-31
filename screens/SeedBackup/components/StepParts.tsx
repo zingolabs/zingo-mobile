@@ -3,7 +3,7 @@ import React from 'react';
 import { View, ViewStyle } from 'react-native';
 import Animated, { AnimatedStyle } from 'react-native-reanimated';
 
-import { space12, space20, space24, space32 } from '@app/theme';
+import { space12, space16, space20, space32 } from '@app/theme';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
@@ -15,7 +15,7 @@ export const StepTitle: React.FunctionComponent<{
   sub?: string;
 }> = ({ title, sub }) => {
   return (
-    <View style={{ paddingHorizontal: SIDE, marginBottom: space24 }}>
+    <View style={{ paddingHorizontal: SIDE, marginBottom: space16 }}>
       <Text
         accessibilityRole="header"
         variant="subtitle"

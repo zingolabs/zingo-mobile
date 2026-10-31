@@ -1432,8 +1432,8 @@
     "vk-copied": "Viewing key copied",
     "verify": "Verify again",
     "title-server": "Change server",
-    "sub-change": "Before accessing another wallet, carefully save this wallet's seed phrase, birthday and viewing key. You'll need them to get back to it.",
-    "sub-server": "Before changing the server, carefully save this wallet's seed phrase, birthday and viewing key. You'll need them to get back to it.",
+    "sub-change": "Before opening another wallet, save this wallet's seed phrase, birthday and viewing key.",
+    "sub-server": "Before changing the server, save this wallet's seed phrase, birthday and viewing key.",
     "go-change": "Open new",
     "go-server": "Change",
     "confirm-title": "Are you certain?"
