@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.WindowManager
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
@@ -49,6 +50,22 @@ class MainActivity : ReactActivity() {
         // Applied to every flavor: beta has to behave exactly like the build
         // that ships, or beta testing proves nothing about prod.
         window.decorView.filterTouchesWhenObscured = true
+        // The window draws behind the status bar and the screen's cutouts
+        // (a notch, a camera hole, curved edges). Left at its default, Android
+        // 14 and older keep the window out of any cutout not wholly inside a
+        // system bar, and some phones then show a black band over the app's
+        // top and down its sides. Android 15+ already treats the default as
+        // ALWAYS for an edge-to-edge window.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            window.attributes = window.attributes.apply {
+                layoutInDisplayCutoutMode =
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+                    } else {
+                        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                    }
+            }
+        }
     }
 
     override fun createReactActivityDelegate(): ReactActivityDelegate {
