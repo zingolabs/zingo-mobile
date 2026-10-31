@@ -39,6 +39,7 @@ import { useOwnAddresses } from './ownAddresses';
 import { onTabScroll } from '@app/navigation/tabBarScroll';
 import { PANEL_TOP } from '@ui/widgets/Header/Header';
 import { useReceiveSelection } from './useReceiveSelection';
+import { useCompact } from '@app/hooks/useCompact';
 
 type ReceiveProps = HomeTabScreenProps<'Receive'>;
 
@@ -104,6 +105,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
     bottomSheetRef.current?.present();
   }, []);
 
+  const { gap } = useCompact();
   const hide = useCallback(() => {
     setSheetType(null);
     Keyboard.dismiss();
@@ -224,7 +226,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
                 <Text
                   variant="body"
                   tone="muted"
-                  style={{ textAlign: 'center', marginTop: space32 }}
+                  style={{ textAlign: 'center', marginTop: gap(space32) }}
                 >
                   {t('receive.noaddress')}
                 </Text>

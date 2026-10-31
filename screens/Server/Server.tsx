@@ -50,6 +50,7 @@ import CustomServerBox from './CustomServerBox';
 import SaveSheet from '@ui/widgets/SaveSheet';
 import { LogLine } from './ServerLog';
 import { hostOf, useCustomServer } from './useCustomServer';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 export type ServerProps = {
   translate: (key: string) => TranslateType;
@@ -225,6 +226,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
 }) => {
   const { lift, onLayout } = useLift(placement, CARD_TOP);
   const { colors } = useTheme();
+  const { edges, fades } = useScrollEdges();
   const t = (key: string, values: Record<string, string> = {}) =>
     fill(translate(`server.${key}`) as string, values);
   const offline = server.kind === 'offline';
@@ -606,6 +608,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
         }}
       >
         <KeyboardAwareScrollView
+          {...edges}
           bottomOffset={16}
           style={{ flex: 1 }}
           contentContainerStyle={{ paddingBottom: 16 }}
@@ -656,6 +659,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
             />
           </Animated.View>
         </KeyboardAwareScrollView>
+        {fades}
       </View>
 
       <DoneButton

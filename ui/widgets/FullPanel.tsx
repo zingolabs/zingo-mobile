@@ -28,6 +28,7 @@ import TooltipHost from '@ui/widgets/TooltipHost';
 import Header, { PANEL_TOP } from '@ui/widgets/Header/Header';
 import SheetRim from '@ui/primitives/SheetRim';
 import { SurfaceContext } from '@ui/primitives/Surface';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 
@@ -118,6 +119,11 @@ export default function FullPanel({
   );
   const [headerH, setHeaderH] = useState<number>(0);
   const [contentH, setContentH] = useState<number>(0);
+  const [footerH, setFooterH] = useState<number>(0);
+  const { edges, fades } = useScrollEdges({
+    bottomInset: footer ? footerH : 0,
+    surface: 'surface',
+  });
   const fitted = fit && headerH > 0 && contentH > 0;
   const fitHeight = Math.max(headerH, radiusSheet) + contentH;
   /** Never so tall that only a sliver of the title behind shows. */
@@ -306,39 +312,49 @@ export default function FullPanel({
                   {children}
                 </Animated.View>
               ) : (
-                <KeyboardAwareScrollView
-                  testID={testID}
-                  bottomOffset={16}
-                  keyboardShouldPersistTaps="handled"
-                  bounces={false}
-                  alwaysBounceVertical={false}
-                  style={{ flex: 1 }}
-                  onContentSizeChange={
-                    fit ? (_: number, h: number) => setContentH(h) : undefined
-                  }
-                  contentContainerStyle={{
-                    flexGrow: center ? 1 : undefined,
-                    justifyContent: center ? 'center' : 'flex-start',
-                    paddingHorizontal: space20,
-                    paddingTop: 8,
-                    /** Clears the footer (its top pad and button) and the bottom pad. */
-                    paddingBottom: bottomPad + (footer ? FOOTER_CLEAR : 28),
-                  }}
-                >
-                  <Animated.View
-                    style={[
-                      contentStyle,
-                      center ? { flexGrow: 1, justifyContent: 'center' } : null,
-                    ]}
+                <>
+                  <KeyboardAwareScrollView
+                    {...edges}
+                    testID={testID}
+                    bottomOffset={16}
+                    keyboardShouldPersistTaps="handled"
+                    bounces={false}
+                    alwaysBounceVertical={false}
+                    style={{ flex: 1 }}
+                    onContentSizeChange={(w: number, h: number) => {
+                      edges.onContentSizeChange(w, h);
+                      if (fit) {
+                        setContentH(h);
+                      }
+                    }}
+                    contentContainerStyle={{
+                      flexGrow: center ? 1 : undefined,
+                      justifyContent: center ? 'center' : 'flex-start',
+                      paddingHorizontal: space20,
+                      paddingTop: 8,
+                      /** Clears the footer (its top pad and button) and the bottom pad. */
+                      paddingBottom: bottomPad + (footer ? FOOTER_CLEAR : 28),
+                    }}
                   >
-                    {children}
-                  </Animated.View>
-                </KeyboardAwareScrollView>
+                    <Animated.View
+                      style={[
+                        contentStyle,
+                        center
+                          ? { flexGrow: 1, justifyContent: 'center' }
+                          : null,
+                      ]}
+                    >
+                      {children}
+                    </Animated.View>
+                  </KeyboardAwareScrollView>
+                  {fades}
+                </>
               )}
             </TooltipHost>
           </SurfaceContext.Provider>
           {!!footer && (
             <View
+              onLayout={e => setFooterH(e.nativeEvent.layout.height)}
               style={{
                 position: 'absolute',
                 left: 0,

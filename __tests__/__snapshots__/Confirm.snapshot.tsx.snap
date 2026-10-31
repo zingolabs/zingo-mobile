@@ -845,6 +845,7 @@ memo10
       </View>
     </View>
     <View
+      onLayout={[Function]}
       style={
         {
           "backgroundColor": "#031124",
@@ -1850,6 +1851,7 @@ memo10
       </View>
     </View>
     <View
+      onLayout={[Function]}
       style={
         {
           "backgroundColor": "#031124",

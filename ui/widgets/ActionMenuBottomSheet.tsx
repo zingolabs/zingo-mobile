@@ -31,6 +31,7 @@ const ActionMenuBottomSheet = forwardRef<
 
   return (
     <AppSheetModal
+      ownScroll
       ref={ref}
       header={
         <TitleBar

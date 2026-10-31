@@ -4,143 +4,152 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
 <View
   style={
     {
-      "alignItems": "center",
       "backgroundColor": "#011401",
       "flex": 1,
-      "justifyContent": "center",
     }
   }
 >
-  <View
-    style={
+  <RCTScrollView
+    contentContainerStyle={
       {
         "alignItems": "center",
-        "flex": 1,
         "flexDirection": "column",
+        "flexGrow": 1,
         "justifyContent": "center",
         "paddingHorizontal": 20,
       }
     }
+    onContentSizeChange={[Function]}
+    onLayout={[Function]}
+    onScroll={[Function]}
+    scrollEventThrottle={16}
+    style={
+      {
+        "flex": 1,
+      }
+    }
   >
-    <View
-      style={
-        {
-          "alignItems": "center",
-          "alignSelf": "stretch",
-          "flexDirection": "column",
-          "height": "40%",
-          "justifyContent": "flex-end",
-          "marginTop": 20,
-        }
-      }
-    >
-      <Text
-        maxFontSizeMultiplier={1.3}
-        style={
-          {
-            "color": "#888888",
-            "fontSize": 36,
-            "fontWeight": "700",
-            "lineHeight": 40,
-          }
-        }
-      >
-        Zingo
-      </Text>
-      <Text
-        maxFontSizeMultiplier={2}
-        style={
-          {
-            "color": "#888888",
-            "fontSize": 12,
-            "fontWeight": "400",
-            "lineHeight": 16,
-          }
-        }
-      >
-        2.0.19 (307)
-      </Text>
-    </View>
-    <View
-      style={
-        {
-          "alignItems": "center",
-          "alignSelf": "stretch",
-          "flexDirection": "column",
-          "height": "60%",
-          "justifyContent": "flex-start",
-          "marginTop": 20,
-        }
-      }
-    >
+    <View>
       <View
-        accessibilityElementsHidden={true}
-        importantForAccessibility="no-hide-descendants"
         style={
           {
             "alignItems": "center",
             "alignSelf": "stretch",
+            "flexDirection": "column",
+            "flexGrow": 4,
+            "justifyContent": "flex-end",
+            "marginTop": 20,
           }
         }
       >
-        <ActivityIndicator
-          color="transparent"
-          size="large"
-        />
         <Text
-          maxFontSizeMultiplier={1.5}
-          selectable={false}
+          maxFontSizeMultiplier={1.3}
           style={
             {
-              "color": "#c3c3c3",
-              "fontSize": 18,
+              "color": "#888888",
+              "fontSize": 36,
               "fontWeight": "700",
-              "lineHeight": 24,
-              "marginTop": 8,
-              "opacity": 0,
-              "textAlign": "center",
+              "lineHeight": 40,
             }
           }
         >
-          updating.firstlaunchingmessage-title
+          Zingo
         </Text>
         <Text
           maxFontSizeMultiplier={2}
-          selectable={false}
           style={
             {
-              "color": "#c3c3c3",
-              "fontSize": 15,
+              "color": "#888888",
+              "fontSize": 12,
               "fontWeight": "400",
-              "lineHeight": 21,
-              "marginTop": 8,
-              "opacity": 0,
-              "textAlign": "center",
+              "lineHeight": 16,
             }
           }
         >
-          updating.firstlaunchingmessage-body
-        </Text>
-        <Text
-          maxFontSizeMultiplier={2}
-          selectable={false}
-          style={
-            {
-              "color": "#c3c3c3",
-              "fontSize": 15,
-              "fontWeight": "400",
-              "lineHeight": 21,
-              "marginBottom": 8,
-              "marginTop": 8,
-              "opacity": 0,
-              "textAlign": "center",
-            }
-          }
-        >
-          updating.firstlaunchingmessage-footer
+          2.0.19 (307)
         </Text>
       </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "alignSelf": "stretch",
+            "flexDirection": "column",
+            "flexGrow": 6,
+            "justifyContent": "flex-start",
+            "marginTop": 20,
+          }
+        }
+      >
+        <View
+          accessibilityElementsHidden={true}
+          importantForAccessibility="no-hide-descendants"
+          style={
+            {
+              "alignItems": "center",
+              "alignSelf": "stretch",
+            }
+          }
+        >
+          <ActivityIndicator
+            color="transparent"
+            size="large"
+          />
+          <Text
+            maxFontSizeMultiplier={1.5}
+            selectable={false}
+            style={
+              {
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "700",
+                "lineHeight": 24,
+                "marginTop": 8,
+                "opacity": 0,
+                "textAlign": "center",
+              }
+            }
+          >
+            updating.firstlaunchingmessage-title
+          </Text>
+          <Text
+            maxFontSizeMultiplier={2}
+            selectable={false}
+            style={
+              {
+                "color": "#c3c3c3",
+                "fontSize": 15,
+                "fontWeight": "400",
+                "lineHeight": 21,
+                "marginTop": 8,
+                "opacity": 0,
+                "textAlign": "center",
+              }
+            }
+          >
+            updating.firstlaunchingmessage-body
+          </Text>
+          <Text
+            maxFontSizeMultiplier={2}
+            selectable={false}
+            style={
+              {
+                "color": "#c3c3c3",
+                "fontSize": 15,
+                "fontWeight": "400",
+                "lineHeight": 21,
+                "marginBottom": 8,
+                "marginTop": 8,
+                "opacity": 0,
+                "textAlign": "center",
+              }
+            }
+          >
+            updating.firstlaunchingmessage-footer
+          </Text>
+        </View>
+      </View>
     </View>
-  </View>
+  </RCTScrollView>
 </View>
 `;

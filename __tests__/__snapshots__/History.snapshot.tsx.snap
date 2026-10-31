@@ -1609,6 +1609,19 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
             </View>
           </View>
         </View>
+      </View>
+      <View
+        style={
+          [
+            {
+              "paddingHorizontal": 20,
+            },
+            {
+              "paddingHorizontal": 20,
+            },
+          ]
+        }
+      >
         <View
           style={
             {
@@ -3362,6 +3375,19 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
             </View>
           </View>
         </View>
+      </View>
+      <View
+        style={
+          [
+            {
+              "paddingHorizontal": 20,
+            },
+            {
+              "paddingHorizontal": 20,
+            },
+          ]
+        }
+      >
         <View
           style={
             {

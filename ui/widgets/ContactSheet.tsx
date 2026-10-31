@@ -30,6 +30,7 @@ import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { singleLineInput } from '@ui/primitives/singleLineInput';
+import { SheetFooter } from '@ui/primitives/AppSheetModal';
 
 const ZEC = 'ZEC';
 const NAME_MAX = 32;
@@ -517,16 +518,18 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
         </View>
       </View>
 
-      <Button
-        testID="addressbook.save"
-        variant="primary"
-        title={translate('save') as string}
-        disabled={saving || !ready}
-        onPress={save}
-        style={{
-          marginTop: 20,
-        }}
-      />
+      <SheetFooter style={{ paddingHorizontal: 20 }}>
+        <Button
+          testID="addressbook.save"
+          variant="primary"
+          title={translate('save') as string}
+          disabled={saving || !ready}
+          onPress={save}
+          style={{
+            marginTop: 20,
+          }}
+        />
+      </SheetFooter>
     </View>
   );
 };

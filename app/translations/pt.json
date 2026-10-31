@@ -1467,8 +1467,8 @@
     "vk-copied": "Chave de visualização copiada",
     "verify": "Verificar de novo",
     "title-server": "Mudar servidor",
-    "sub-change": "Antes de abrir outra carteira, guarde com cuidado a frase semente, o aniversário e a chave de visualização desta. Você vai precisar deles para voltar a ela.",
-    "sub-server": "Antes de mudar de servidor, guarde com cuidado a frase semente, o aniversário e a chave de visualização desta carteira. Você vai precisar deles para voltar a ela.",
+    "sub-change": "Antes de abrir outra carteira, guarde a frase semente, o aniversário e a chave de visualização desta.",
+    "sub-server": "Antes de mudar de servidor, guarde a frase semente, o aniversário e a chave de visualização desta carteira.",
     "go-change": "Abrir nova",
     "go-server": "Mudar",
     "confirm-title": "Tem certeza?"

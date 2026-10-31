@@ -39,6 +39,7 @@ import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { DatabaseIcon } from '@ui/primitives/Icons/DatabaseIcon';
 import { ChevronDown } from '@ui/primitives/Icons/Chevron';
 import { WalletIcon } from '@ui/primitives/Icons/WalletIcon';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 type WalletErrorProps = {
   kind: WalletErrorKind;
@@ -154,6 +155,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
 }) => {
   const { translate, netInfo, server } = useContext(ContextAppLoading);
   const { colors } = useTheme();
+  const { edges, fades } = useScrollEdges();
   const bottomPad = useBottomActionPad();
   const [open, setOpen] = useState(false);
   const shakeX = useSharedValue(0);
@@ -440,6 +442,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
       </Animated.View>
 
       <ScrollView
+        {...edges}
         style={{
           position: 'absolute',
           left: space20,
@@ -529,6 +532,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
           </DetailsBox>
         </View>
       </ScrollView>
+      {fades}
 
       {chain
         ? link(

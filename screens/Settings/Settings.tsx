@@ -74,6 +74,8 @@ import { ChevronRight } from '@ui/primitives/Icons/Chevron';
 import { RadioOffIcon } from '@ui/primitives/Icons/RadioOffIcon';
 import { RadioOnIcon } from '@ui/primitives/Icons/RadioOnIcon';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
+import { useCompact } from '@app/hooks/useCompact';
 
 type Options = {
   value: string;
@@ -139,6 +141,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   }
 
   const { colors } = useTheme();
+  const { edges, fades } = useScrollEdges();
+  const { gap } = useCompact();
   const bottomPad = useBottomActionPad();
 
   // The requirement is read once, at mount: this screen's own save
@@ -524,7 +528,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
 
   /** A section: its label over one card that holds its rows. */
   const section = (key: string, rows: React.ReactNode) => (
-    <View style={{ marginHorizontal: space20, marginTop: space24 }}>
+    <View style={{ marginHorizontal: space20, marginTop: gap(space24) }}>
       <Text
         variant="caption"
         tone="muted"
@@ -590,6 +594,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
           noPrivacy={true}
         />
         <ScrollView
+          {...edges}
           keyboardShouldPersistTaps="handled"
           testID="settings.scroll-view"
           bounces={false}
@@ -942,6 +947,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
             </>
           )}
         </ScrollView>
+        {fades}
         <View
           style={{
             paddingHorizontal: space20,

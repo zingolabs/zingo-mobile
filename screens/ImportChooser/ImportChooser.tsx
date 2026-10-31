@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { Platform, View } from 'react-native';
+import { Platform, ScrollView, View } from 'react-native';
 import Animated, {
   interpolateColor,
   useAnimatedStyle,
@@ -29,6 +29,8 @@ import { ChevronLeft, ChevronRight } from '@ui/primitives/Icons/Chevron';
 import { HistoryIcon } from '@ui/primitives/Icons/HistoryIcon';
 import { Icon } from '@ui/primitives/Icons/Icon';
 import { KeyboardIcon } from '@ui/primitives/Icons/KeyboardIcon';
+import { useCompact } from '@app/hooks/useCompact';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 type ImportChooserProps = {
   busy: boolean;
@@ -138,6 +140,8 @@ const ImportChooser: React.FunctionComponent<ImportChooserProps> = ({
 }) => {
   const { translate } = useContext(ContextAppLoading);
   const { colors } = useTheme();
+  const { gap } = useCompact();
+  const { edges, fades } = useScrollEdges();
 
   return (
     <View style={{ flex: 1 }}>
@@ -152,51 +156,54 @@ const ImportChooser: React.FunctionComponent<ImportChooserProps> = ({
           disabled: busy,
         }}
       />
-      <Text
-        variant="caption"
-        tone="muted"
-        style={{
-          marginTop: space24,
-          marginHorizontal: space20,
-          textAlign: 'center',
-        }}
-      >
-        {translate('import.chooser-sub') as string}
-      </Text>
-      <View style={{ marginTop: space16, marginHorizontal: space20 }}>
-        <Option
-          testID="import.chooser.previous"
-          icon={HistoryIcon}
-          iconBg={colors.bgAccentSubtle}
-          iconColor={colors.fgAccent}
-          title={translate('import.chooser-previous') as string}
-          sub={(translate('import.chooser-previous-sub') as string).replace(
-            '{store}',
-            SECURE_STORE,
-          )}
-          subColor={colors.fgMuted}
-          disabled={busy}
-          onPress={onPrevious}
-        />
+      <ScrollView {...edges} style={{ flex: 1 }}>
         <Text
           variant="caption"
           tone="muted"
-          style={{ textAlign: 'center', marginVertical: space8 }}
+          style={{
+            marginTop: gap(space24),
+            marginHorizontal: space20,
+            textAlign: 'center',
+          }}
         >
-          {translate('import.chooser-or') as string}
+          {translate('import.chooser-sub') as string}
         </Text>
-        <Option
-          testID="import.chooser.seed"
-          icon={KeyboardIcon}
-          iconBg={colors.bgAccentSubtle}
-          iconColor={colors.fgAccent}
-          title={translate('import.chooser-seed') as string}
-          sub={translate('import.chooser-seed-sub') as string}
-          subColor={colors.fgWarning}
-          disabled={busy}
-          onPress={onSeed}
-        />
-      </View>
+        <View style={{ marginTop: space16, marginHorizontal: space20 }}>
+          <Option
+            testID="import.chooser.previous"
+            icon={HistoryIcon}
+            iconBg={colors.bgAccentSubtle}
+            iconColor={colors.fgAccent}
+            title={translate('import.chooser-previous') as string}
+            sub={(translate('import.chooser-previous-sub') as string).replace(
+              '{store}',
+              SECURE_STORE,
+            )}
+            subColor={colors.fgMuted}
+            disabled={busy}
+            onPress={onPrevious}
+          />
+          <Text
+            variant="caption"
+            tone="muted"
+            style={{ textAlign: 'center', marginVertical: space8 }}
+          >
+            {translate('import.chooser-or') as string}
+          </Text>
+          <Option
+            testID="import.chooser.seed"
+            icon={KeyboardIcon}
+            iconBg={colors.bgAccentSubtle}
+            iconColor={colors.fgAccent}
+            title={translate('import.chooser-seed') as string}
+            sub={translate('import.chooser-seed-sub') as string}
+            subColor={colors.fgWarning}
+            disabled={busy}
+            onPress={onSeed}
+          />
+        </View>
+      </ScrollView>
+      {fades}
     </View>
   );
 };

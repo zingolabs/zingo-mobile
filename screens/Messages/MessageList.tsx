@@ -39,6 +39,8 @@ import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ChevronDown } from '@ui/primitives/Icons/Chevron';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
+import { useCompact } from '@app/hooks/useCompact';
 
 type MessageListProps = NativeStackScreenProps<AppDrawerParamList, 'Messages'>;
 
@@ -66,6 +68,8 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   const scrollViewRef = useRef<ScrollView>(null);
+  const { edges, fades } = useScrollEdges({ surface: 'surface' });
+  const { gap } = useCompact();
 
   useEffect(() => {
     if (messages !== null && loading) {
@@ -192,9 +196,16 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
     >
       <ScrollView
         ref={scrollViewRef}
-        onScroll={handleScroll}
-        onContentSizeChange={onContentSizeChange}
-        onLayout={() => {
+        onScroll={e => {
+          edges.onScroll(e);
+          handleScroll(e);
+        }}
+        onContentSizeChange={(w, h) => {
+          edges.onContentSizeChange(w, h);
+          onContentSizeChange();
+        }}
+        onLayout={e => {
+          edges.onLayout(e);
           if (!loadingRef.current && isAtBottomRef.current) {
             scrollViewRef.current?.scrollToEnd({ animated: false });
           }
@@ -229,7 +240,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
           <View
             style={{
               alignItems: 'center',
-              marginTop: space32,
+              marginTop: gap(space32),
               paddingHorizontal: space20,
             }}
           >
@@ -288,6 +299,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
           </>
         )}
       </ScrollView>
+      {fades}
       {!isAtBottom && !loading && (
         <Pressable
           kind="button"

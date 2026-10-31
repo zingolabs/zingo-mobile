@@ -220,7 +220,11 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         }
       }
       keyboardShouldPersistTaps="handled"
+      onContentSizeChange={[Function]}
+      onLayout={[Function]}
+      onScroll={[Function]}
       onScrollBeginDrag={[Function]}
+      scrollEventThrottle={16}
       style={
         {
           "flex": 1,

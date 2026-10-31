@@ -4,8 +4,8 @@ import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Image, Keyboard, View } from 'react-native';
 import { useTheme, space8, space16 } from '@app/theme';
 import Pressable from '@ui/primitives/Pressable';
-import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import AppSheetModal from '@ui/primitives/AppSheetModal';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import AppSheetModal, { SheetScrollView } from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
 import TitleBar from '@ui/widgets/TitleBar';
 
@@ -201,7 +201,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
           </View>
         }
       >
-        <BottomSheetScrollView
+        <SheetScrollView
           keyboardShouldPersistTaps="handled"
           style={{ flex: 1 }}
         >
@@ -246,7 +246,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
               </Pressable>
             );
           })}
-        </BottomSheetScrollView>
+        </SheetScrollView>
       </AppSheetModal>
     </View>
   );

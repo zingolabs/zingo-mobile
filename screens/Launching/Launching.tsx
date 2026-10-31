@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, ScrollView } from 'react-native';
 
 import { space8, space20, useTheme } from '@app/theme';
 import Text from '@ui/primitives/Text';
@@ -13,6 +13,8 @@ import {
 import Button from '@ui/primitives/Button';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
 import Utils from '@app/utils';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 type LaunchingProps = {
   translate: (key: string) => TranslateType;
@@ -31,19 +33,26 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
       ? Utils.renderGateFailure(props.biometricGate.failure, props.translate)
       : undefined;
   const { colors } = useTheme();
+  const bottomPad = useBottomActionPad();
+  const { edges, fades } = useScrollEdges();
 
+  /**
+   * The name sits over the first 40 of the screen and the message under it,
+   * while they fit; past that the content scrolls, and Try again stays below
+   * it at the one bottom distance.
+   */
   return (
     <View
       style={{
         flex: 1,
         backgroundColor: colors.bgCanvas,
-        alignItems: 'center',
-        justifyContent: 'center',
       }}
     >
-      <View
-        style={{
-          flex: 1,
+      <ScrollView
+        {...edges}
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          flexGrow: 1,
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
@@ -56,7 +65,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
             alignItems: 'center',
             justifyContent: 'flex-end',
             alignSelf: 'stretch',
-            height: '40%',
+            flexGrow: 4,
             marginTop: space20,
           }}
         >
@@ -73,7 +82,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
             alignItems: 'center',
             justifyContent: 'flex-start',
             alignSelf: 'stretch',
-            height: '60%',
+            flexGrow: 6,
             marginTop: space20,
           }}
         >
@@ -120,12 +129,6 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
               >
                 {props.translate('biometricsfailed-footer') as string}
               </Text>
-              <Button
-                variant="primary"
-                title={props.translate('biometricsfailed-button') as string}
-                onPress={() => props.tryAgain && props.tryAgain()}
-                style={{ marginVertical: space8 }}
-              />
             </>
           ) : (
             /** Keeps the room so the logo does not jump; hidden from screen
@@ -194,7 +197,23 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
             </View>
           )}
         </View>
-      </View>
+      </ScrollView>
+      {fades}
+      {biometricsFailed && (
+        <View
+          style={{
+            paddingHorizontal: space20,
+            paddingTop: space8,
+            paddingBottom: bottomPad,
+          }}
+        >
+          <Button
+            variant="primary"
+            title={props.translate('biometricsfailed-button') as string}
+            onPress={() => props.tryAgain && props.tryAgain()}
+          />
+        </View>
+      )}
     </View>
   );
 };

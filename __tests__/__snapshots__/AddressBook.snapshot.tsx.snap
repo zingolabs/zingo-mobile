@@ -249,6 +249,10 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
       }
     }
     keyboardShouldPersistTaps="handled"
+    onContentSizeChange={[Function]}
+    onLayout={[Function]}
+    onScroll={[Function]}
+    scrollEventThrottle={16}
     style={
       {
         "flex": 1,
@@ -5807,6 +5811,19 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
             testID="addressbook.note.none"
           />
         </View>
+      </View>
+      <View
+        style={
+          [
+            {
+              "paddingHorizontal": 20,
+            },
+            {
+              "paddingHorizontal": 20,
+            },
+          ]
+        }
+      >
         <View
           accessibilityRole="button"
           accessibilityState={

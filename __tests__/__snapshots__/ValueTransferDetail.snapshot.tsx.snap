@@ -922,6 +922,7 @@ hello
       </View>
     </View>
     <View
+      onLayout={[Function]}
       style={
         {
           "backgroundColor": "#031124",
@@ -2111,6 +2112,7 @@ hello
       </View>
     </View>
     <View
+      onLayout={[Function]}
       style={
         {
           "backgroundColor": "#031124",

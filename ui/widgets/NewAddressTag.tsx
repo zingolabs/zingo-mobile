@@ -12,6 +12,7 @@ import Card from '@ui/widgets/Card';
 import ChainSelect from '@ui/widgets/ChainSelect';
 import Text from '@ui/primitives/Text';
 import TextField from '@ui/primitives/TextField';
+import { SheetFooter } from '@ui/primitives/AppSheetModal';
 
 const NAME_MAX = 32;
 
@@ -100,15 +101,17 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
         </Card>
       </View>
 
-      <View style={{ marginTop: space20 }}>
-        <Button
-          testID="addresstag.save"
-          variant="primary"
-          title={translate('save') as string}
-          disabled={saving || !ready}
-          onPress={save}
-        />
-      </View>
+      <SheetFooter style={{ paddingHorizontal: space20 }}>
+        <View style={{ marginTop: space20 }}>
+          <Button
+            testID="addresstag.save"
+            variant="primary"
+            title={translate('save') as string}
+            disabled={saving || !ready}
+            onPress={save}
+          />
+        </View>
+      </SheetFooter>
     </View>
   );
 };

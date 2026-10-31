@@ -11,7 +11,7 @@ import {
   space20,
 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import AppSheetModal from '@ui/primitives/AppSheetModal';
+import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import { WalletIcon } from '@ui/primitives/Icons/WalletIcon';
@@ -77,19 +77,21 @@ const InsufficientFundsSheet = forwardRef<
               : (translate('swap.reduce-note-all') as string)
             : (translate('swap.insufficient-hint') as string)}
         </Text>
-        {maxSpendableForSwap > 0 && (
-          <View style={{ marginTop: space16 }}>
-            <Button
-              testID="swap.reduce"
-              variant="primary"
-              title={`${translate('swap.reduce-to') as string} ${reduced} ${info.currencyName}`}
-              onPress={() => {
-                onReduce(reduced);
-                dismiss();
-              }}
-            />
-          </View>
-        )}
+        <SheetFooter style={{ paddingHorizontal: space20 }}>
+          {maxSpendableForSwap > 0 && (
+            <View style={{ marginTop: space16 }}>
+              <Button
+                testID="swap.reduce"
+                variant="primary"
+                title={`${translate('swap.reduce-to') as string} ${reduced} ${info.currencyName}`}
+                onPress={() => {
+                  onReduce(reduced);
+                  dismiss();
+                }}
+              />
+            </View>
+          )}
+        </SheetFooter>
       </View>
     </AppSheetModal>
   );

@@ -1467,8 +1467,8 @@
     "vk-copied": "Görüntüleme anahtarı kopyalandı",
     "verify": "Yeniden doğrula",
     "title-server": "Sunucuyu değiştir",
-    "sub-change": "Başka bir cüzdana geçmeden önce bu cüzdanın kurtarma ifadesini, doğum gününü ve görüntüleme anahtarını dikkatlice kaydedin. Ona geri dönmek için bunlara ihtiyacınız olacak.",
-    "sub-server": "Sunucuyu değiştirmeden önce bu cüzdanın kurtarma ifadesini, doğum gününü ve görüntüleme anahtarını dikkatlice kaydedin. Ona geri dönmek için bunlara ihtiyacınız olacak.",
+    "sub-change": "Başka bir cüzdana geçmeden önce bu cüzdanın kurtarma ifadesini, doğum gününü ve görüntüleme anahtarını kaydedin.",
+    "sub-server": "Sunucuyu değiştirmeden önce bu cüzdanın kurtarma ifadesini, doğum gününü ve görüntüleme anahtarını kaydedin.",
     "go-change": "Yenisini aç",
     "go-server": "Değiştir",
     "confirm-title": "Emin misiniz?"

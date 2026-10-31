@@ -21,6 +21,7 @@ import { RPCTransparentAddressType } from '@app/walletBackend/types/RPCTranspare
 import Utils from '@app/utils';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import TextField from '@ui/primitives/TextField';
+import { SheetFooter } from '@ui/primitives/AppSheetModal';
 
 type NewKind = 'orchard' | 'orchardSapling' | 'sapling' | 'transparent';
 
@@ -166,17 +167,19 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
           clearLabel={t('clear')}
         />
       </View>
-      <View style={{ marginTop: space20 }}>
-        <ButtonStack>
-          <Button
-            testID="receive.new-create"
-            variant="primary"
-            title={t('receive.create')}
-            busy={creating}
-            onPress={createAddress}
-          />
-        </ButtonStack>
-      </View>
+      <SheetFooter style={{ paddingHorizontal: space20 }}>
+        <View style={{ marginTop: space20 }}>
+          <ButtonStack>
+            <Button
+              testID="receive.new-create"
+              variant="primary"
+              title={t('receive.create')}
+              busy={creating}
+              onPress={createAddress}
+            />
+          </ButtonStack>
+        </View>
+      </SheetFooter>
     </View>
   );
 };

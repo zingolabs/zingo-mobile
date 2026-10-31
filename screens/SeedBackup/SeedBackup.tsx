@@ -56,6 +56,7 @@ import DoneStep from './components/DoneStep';
 import ScreenshotSheet from './components/ScreenshotSheet';
 import { SIDE, StepActions } from './components/StepParts';
 import Button from '@ui/primitives/Button';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 type SeedBackupProps = NativeStackScreenProps<AppDrawerParamList, 'SeedBackup'>;
 
@@ -114,22 +115,29 @@ const StepPage: React.FunctionComponent<{
   footer: React.ReactNode;
   bottom: number;
   center?: boolean;
-}> = ({ children, footer, bottom, center = false }) => (
-  <>
-    <ScrollView
-      style={{ flex: 1 }}
-      contentContainerStyle={
-        center
-          ? { flexGrow: 1, justifyContent: 'center', paddingBottom: space16 }
-          : { paddingBottom: space16 }
-      }
-      keyboardShouldPersistTaps="handled"
-    >
-      {children}
-    </ScrollView>
-    <View style={{ paddingTop: space8, paddingBottom: bottom }}>{footer}</View>
-  </>
-);
+}> = ({ children, footer, bottom, center = false }) => {
+  const { edges, fades } = useScrollEdges();
+  return (
+    <>
+      <ScrollView
+        {...edges}
+        style={{ flex: 1 }}
+        contentContainerStyle={
+          center
+            ? { flexGrow: 1, justifyContent: 'center', paddingBottom: space16 }
+            : { paddingBottom: space16 }
+        }
+        keyboardShouldPersistTaps="handled"
+      >
+        {children}
+      </ScrollView>
+      {fades}
+      <View style={{ paddingTop: space8, paddingBottom: bottom }}>
+        {footer}
+      </View>
+    </>
+  );
+};
 
 // The confirm step and its actions, remounted for every new attempt.
 const ConfirmPage: React.FunctionComponent<{

@@ -7,7 +7,7 @@ import React, {
   useState,
 } from 'react';
 import { View } from 'react-native';
-import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import {
   space12,
   space16,
@@ -19,7 +19,7 @@ import {
 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import type { TokenEntryType } from '@app/swap';
-import AppSheetModal from '@ui/primitives/AppSheetModal';
+import AppSheetModal, { SheetScrollView } from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
 import SearchField from '@ui/widgets/SearchField';
 import Banner from '@ui/widgets/Banner';
@@ -279,7 +279,7 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
         }}
       >
         {networksOf ? (
-          <BottomSheetScrollView
+          <SheetScrollView
             contentContainerStyle={{
               paddingHorizontal: space20,
               paddingTop: space8,
@@ -306,9 +306,9 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
                 />
               ))}
             </RadioList>
-          </BottomSheetScrollView>
+          </SheetScrollView>
         ) : (
-          <BottomSheetScrollView
+          <SheetScrollView
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{
               paddingHorizontal: space20,
@@ -357,7 +357,7 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
                 </Text>
               </View>
             )}
-          </BottomSheetScrollView>
+          </SheetScrollView>
         )}
       </AppSheetModal>
     );

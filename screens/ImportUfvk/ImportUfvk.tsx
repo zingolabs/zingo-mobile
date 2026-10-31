@@ -39,6 +39,7 @@ import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
+import { useCompact } from '@app/hooks/useCompact';
 
 // Positions from the 402 x 874 design.
 const FIELD_WIDTH = 270;
@@ -64,6 +65,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   const context = useContext(ContextAppLoading);
   const { translate, netInfo, server, addLastSnackbar } = context;
   const { colors } = useTheme();
+  const { gap } = useCompact();
   const bottomPad = useBottomActionPad();
 
   const [seedufvkText, setSeedufvkText] = useState<string>('');
@@ -264,7 +266,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
         onScrollBeginDrag={() => setTipOpen(false)}
         style={{ flex: 1 }}
         contentContainerStyle={{
-          paddingTop: space32,
+          paddingTop: gap(space32),
           paddingHorizontal: space20,
           paddingBottom: 200,
         }}
@@ -324,7 +326,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           onBirthday={fillBirthday}
         />
 
-        <View style={{ marginTop: space32, alignItems: 'center' }}>
+        <View style={{ marginTop: gap(space32), alignItems: 'center' }}>
           <InfoTooltip
             testID="import.birthdayinfo"
             label={translate('import.birthday') as string}

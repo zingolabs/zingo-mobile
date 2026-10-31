@@ -159,6 +159,7 @@ const SwapHistorySheet = forwardRef<BottomSheetModal, SwapHistorySheetProps>(
     };
     return (
       <AppSheetModal
+        ownScroll
         ref={ref}
         header={
           <SheetTitle

@@ -363,7 +363,11 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         "paddingHorizontal": 20,
       }
     }
+    onContentSizeChange={[Function]}
+    onLayout={[Function]}
+    onScroll={[Function]}
     onTouchStart={[Function]}
+    scrollEventThrottle={16}
     testID="syncreport.scroll-view"
   >
     <View>
