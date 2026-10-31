@@ -19,13 +19,22 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 const RING = 2 * Math.PI * 44;
 const TICK = 60;
+const CROSS = 80;
 
 /**
  * Done, drawn: the ring draws itself, the check follows it, and a sprout
- * pops on its shoulder.
+ * pops on its shoulder. Failed, the same ring draws a red cross, and no
+ * sprout.
  */
-export default function SentMark() {
+export default function SentMark({
+  kind = 'sent',
+}: {
+  kind?: 'sent' | 'failed';
+}) {
   const { colors } = useTheme();
+  const failed = kind === 'failed';
+  const tone = failed ? colors.fgDanger : colors.fgAccent;
+  const mark = failed ? CROSS : TICK;
   const ring = useSharedValue(0);
   const tick = useSharedValue(0);
   const sprout = useSharedValue(0);
@@ -59,7 +68,7 @@ export default function SentMark() {
     strokeDashoffset: RING * (1 - ring.value),
   }));
   const tickProps = useAnimatedProps(() => ({
-    strokeDashoffset: TICK * (1 - tick.value),
+    strokeDashoffset: mark * (1 - tick.value),
   }));
   const sproutStyle = useAnimatedStyle(() => ({
     transform: [
@@ -69,14 +78,17 @@ export default function SentMark() {
   }));
 
   return (
-    <View testID="computing.sent" style={{ width: 96, height: 96 }}>
+    <View
+      testID={failed ? 'computing.failed' : 'computing.sent'}
+      style={{ width: 96, height: 96 }}
+    >
       <Svg width={96} height={96} viewBox="0 0 96 96">
         <AnimatedCircle
           cx={48}
           cy={48}
           r={44}
-          fill={colors.bgAccentSubtle}
-          stroke={colors.fgAccent}
+          fill={failed ? colors.bgDangerSubtle : colors.bgAccentSubtle}
+          stroke={tone}
           strokeWidth={3}
           strokeDasharray={[RING, RING]}
           rotation={-90}
@@ -84,29 +96,31 @@ export default function SentMark() {
           animatedProps={ringProps}
         />
         <AnimatedPath
-          d="M30 49 l12 12 24-26"
+          d={failed ? 'M35 35 L61 61 M61 35 L35 61' : 'M30 49 l12 12 24-26'}
           fill="none"
-          stroke={colors.fgAccent}
+          stroke={tone}
           strokeWidth={4}
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeDasharray={[TICK, TICK]}
+          strokeDasharray={[mark, mark]}
           animatedProps={tickProps}
         />
       </Svg>
-      <Animated.View
-        style={[
-          {
-            position: 'absolute',
-            right: -16,
-            top: -18,
-            transformOrigin: '20% 100%',
-          },
-          sproutStyle,
-        ]}
-      >
-        <SproutIcon size={iconSize} color={colors.fgAccent} />
-      </Animated.View>
+      {!failed && (
+        <Animated.View
+          style={[
+            {
+              position: 'absolute',
+              right: -16,
+              top: -18,
+              transformOrigin: '20% 100%',
+            },
+            sproutStyle,
+          ]}
+        >
+          <SproutIcon size={iconSize} color={colors.fgAccent} />
+        </Animated.View>
+      )}
     </View>
   );
 }

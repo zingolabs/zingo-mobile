@@ -17,7 +17,13 @@ import {
 } from '@app/walletBackend';
 import type { FfiResult } from '@app/walletBackend';
 import { RPCShieldProposeType } from '@app/walletBackend/types/RPCShieldProposeType';
-import { shieldEnd } from '@app/walletBackend/transforms/sendSettlement';
+import {
+  ComputingSubject,
+  nowSeconds,
+  shieldEnd,
+} from '@app/walletBackend/transforms/sendSettlement';
+import { isOnTop } from '@app/navigation/navigate';
+import { formatAmount } from '@app/utils/formatAmount';
 import { withSyncStopped } from '@app/walletBackend/utils/syncBracket';
 import { SendPermit } from '@app/walletBackend/transforms/sendPermit';
 
@@ -162,7 +168,14 @@ export function useShieldFunds({
       return;
     }
 
-    navigation.navigate(Route.Computing);
+    const subject: ComputingSubject = {
+      amount: formatAmount(shieldingAmount),
+      who: translate('send.shield-who') as string,
+      kind: 'shield',
+      pair: false,
+    };
+    const since = nowSeconds();
+    navigation.navigate(Route.Computing, { subject });
     const shield = await withSyncStopped(async () => {
       await shieldPropose();
       return shieldConfirm();
@@ -172,13 +185,19 @@ export function useShieldFunds({
     setScrollToBottom?.(true);
     setShieldingFee(0);
     setShieldingAmount?.(0);
-    navigation.navigate(Route.Computing, shieldEnd(shield));
+    const end = shieldEnd(shield, since);
+    if (isOnTop(Route.Computing)) {
+      navigation.navigate(Route.Computing, { ...end, subject });
+    } else if (end.phase === 'failed') {
+      addLastSnackbar(translate('send.shield-failed-away') as string);
+    }
   }, [
     setBackgroundError,
     addLastSnackbar,
     sendPermitNow,
     translate,
     navigation,
+    shieldingAmount,
     setScrollToTop,
     setScrollToBottom,
     setShieldingAmount,

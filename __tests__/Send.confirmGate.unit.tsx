@@ -38,6 +38,12 @@ jest.mock('@app/services/selectingServer', () => ({
   default: jest.fn(),
 }));
 
+// The sending screen is still on top when the send settles.
+jest.mock('@app/navigation/navigate', () => ({
+  ...jest.requireActual('@app/navigation/navigate'),
+  isOnTop: () => true,
+}));
+
 /**
  * The Confirm screen holds the confirm handler of the render that opened it.
  * These tests change the app state after that render and then confirm.

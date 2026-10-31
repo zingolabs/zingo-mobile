@@ -60,6 +60,8 @@ import ShieldSheet from './components/ShieldSheet';
 import { useShieldFunds } from '@app/hooks/useShieldFunds';
 import { useIronwoodNoticeHide } from '@app/hooks/useIronwoodNoticeHide';
 import ViewOnlyNotice from './components/ViewOnlyNotice';
+import { followsHere } from '@screens/Computing/sendProgress';
+import { transferSubject } from '@screens/Send/sendSubject';
 import NoticeStack, { Notice, NOTICE_RADIUS } from '@ui/widgets/NoticeStack';
 import { PriceCard } from '@ui/widgets/Header/components/PriceRow';
 import { fiatQuote } from '@app/price/fiatQuote';
@@ -130,6 +132,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     mixnetView,
     sendPermitNow,
     setScrollToBottom,
+    addressBook,
   } = context;
   const shieldSheetRef = useRef<BottomSheetModal>(null);
   const { showShieldButton, shieldingFee, shieldNow } = useShieldFunds({
@@ -726,6 +729,15 @@ const History: React.FunctionComponent<HistoryProps> = () => {
 
   const setValueTransferDetailModalShow = useCallback(
     (_index: number, vt: ValueTransferType) => {
+      // A send or a shield still confirming reopens where it is on its way.
+      if (followsHere(vt)) {
+        navigation.navigate(Route.Computing, {
+          phase: 'created',
+          txids: [vt.txid],
+          subject: transferSubject(vt, addressBook, translate),
+        });
+        return;
+      }
       const targetIndex = valueTransfersSliced.indexOf(vt);
       const totalLength =
         valueTransfersFiltered !== null
@@ -738,7 +750,13 @@ const History: React.FunctionComponent<HistoryProps> = () => {
         totalLength,
       });
     },
-    [navigation, valueTransfersSliced, valueTransfersFiltered],
+    [
+      navigation,
+      valueTransfersSliced,
+      valueTransfersFiltered,
+      addressBook,
+      translate,
+    ],
   );
 
   /** Transactions that turned up while History is open, lit for a moment. */

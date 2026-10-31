@@ -56,8 +56,10 @@ import {
 } from '@app/walletBackend';
 import {
   computingEnd,
+  nowSeconds,
   settleSend,
 } from '@app/walletBackend/transforms/sendSettlement';
+import { isOnTop } from '@app/navigation/navigate';
 import Utils from '@app/utils';
 import {
   formatAmount,
@@ -816,6 +818,8 @@ const Send: React.FunctionComponent<SendProps> = () => {
           kind: 'verbatim',
           text: translate(permit.errorKey) as string,
         },
+        stage: 'create',
+        since: nowSeconds(),
         subject,
       });
       return;
@@ -841,10 +845,18 @@ const Send: React.FunctionComponent<SendProps> = () => {
       setScrollToTop(true);
       setScrollToBottom(true);
     }
-    navigation.navigate(Route.Computing, {
-      ...computingEnd(settlement),
-      subject,
-    });
+    if (isOnTop(Route.Computing)) {
+      navigation.navigate(Route.Computing, {
+        ...computingEnd(settlement),
+        subject,
+      });
+    } else if (settlement.kind === 'failed') {
+      addLastSnackbar(
+        (translate('send.failed-away') as string)
+          .replace('{amount}', subject.amount)
+          .replace('{who}', subject.who),
+      );
+    }
   };
 
   const scanButton = useRef<View>(null);
