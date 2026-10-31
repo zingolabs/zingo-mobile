@@ -1,10 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { space20 } from '@app/theme';
-import { View } from 'react-native';
+import { ScrollView } from 'react-native';
 
 import { ContextAppLoading } from '@app/context';
 import ProgressState from '@ui/widgets/ProgressState';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 export type WalletProgressKind = 'import' | 'create';
 
@@ -18,15 +19,21 @@ const WalletProgress: React.FunctionComponent<WalletProgressProps> = ({
   kind,
 }) => {
   const { translate } = useContext(ContextAppLoading);
+  const [height, setHeight] = useState<number>(0);
+  const { edges, fades } = useScrollEdges();
 
   return (
-    <View style={{ flex: 1 }}>
-      <View
-        style={{
-          position: 'absolute',
-          left: space20,
-          right: space20,
-          top: `${CENTER_TOP * 100}%`,
+    <>
+      <ScrollView
+        {...edges}
+        onLayout={e => {
+          edges.onLayout(e);
+          setHeight(e.nativeEvent.layout.height);
+        }}
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          paddingTop: height * CENTER_TOP,
+          paddingHorizontal: space20,
           alignItems: 'center',
         }}
       >
@@ -40,8 +47,9 @@ const WalletProgress: React.FunctionComponent<WalletProgressProps> = ({
             ) as string
           }
         />
-      </View>
-    </View>
+      </ScrollView>
+      {fades}
+    </>
   );
 };
 

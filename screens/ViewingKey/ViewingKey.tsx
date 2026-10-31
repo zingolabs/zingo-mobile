@@ -52,6 +52,7 @@ import KeyCard from './components/KeyCard';
 import Button from '@ui/primitives/Button';
 import { themeTokens } from '@app/theme';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
+import { useCompact } from '@app/hooks/useCompact';
 
 const QR = 196;
 const TILE_BG = themeTokens.bgViewOnlySubtle;
@@ -117,6 +118,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
   } = context;
   const { colors } = useTheme();
   const { edges, fades } = useScrollEdges();
+  const { gap } = useCompact();
   const bottomPad = useBottomActionPad();
   const { entry, switchTo } = route.params;
   const net = switchTo
@@ -247,7 +249,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
             : (translate('viewingkey.sub') as string)}
         </Text>
 
-        <View style={{ marginTop: space24 }}>
+        <View style={{ marginTop: gap(space24) }}>
           <KeyCard
             testID="viewingkey"
             value={key}

@@ -19,6 +19,7 @@ import { duration, ease } from '@app/theme/motion';
 import Text from '@ui/primitives/Text';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { useCompact } from '@app/hooks/useCompact';
 
 // One dot grows from 0.55 to 1 and from 35% to full opacity and back over
 // the first 80% of a 1.1 s loop; the next dot starts 160 ms later.
@@ -142,13 +143,14 @@ const ProgressState: React.FC<ProgressStateProps> = ({
   body,
 }) => {
   const { colors } = useTheme();
+  const { gap } = useCompact();
 
   return (
     <>
       <View
         style={{
           height: RING,
-          marginBottom: space24,
+          marginBottom: gap(space24),
           alignItems: 'center',
           justifyContent: 'center',
         }}

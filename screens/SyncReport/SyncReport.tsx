@@ -67,6 +67,7 @@ import {
 } from '@screens/SyncReport/syncModel';
 import { themeTokens } from '@app/theme';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
+import { useCompact } from '@app/hooks/useCompact';
 
 const SIDE = space20;
 const SOFT_INK = themeTokens.fgMuted;
@@ -163,6 +164,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const { edges, fades } = useScrollEdges();
+  const { gap } = useCompact();
   const { percentageOutputsScanned, syncInProgress } = useSyncStatus({
     syncingStatus,
     noSyncingStatus: true,
@@ -479,7 +481,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
         onTouchStart={() => tip && setTip(false)}
         contentContainerStyle={{
           paddingHorizontal: SIDE,
-          paddingBottom: space32,
+          paddingBottom: gap(space32),
         }}
       >
         <View

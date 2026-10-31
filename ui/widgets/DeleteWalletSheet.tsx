@@ -28,6 +28,7 @@ import Text from '@ui/primitives/Text';
 import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
 import Button, { BUTTON_HEIGHT } from '@ui/primitives/Button';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
+import { useCompact } from '@app/hooks/useCompact';
 
 type DeleteWalletSheetProps = {
   context: DeleteWalletContext;
@@ -44,6 +45,7 @@ const RELEASE_FLOOR = 0.02;
 const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
   ({ context, translate, onConfirmed, onReleasedEarly }, ref) => {
     const { colors } = useTheme();
+    const { gap } = useCompact();
     const progress = useSharedValue(0);
     const pulse = useSharedValue(1);
     const done = useRef(false);
@@ -171,7 +173,7 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
               onPressOut={release}
               accessibilityRole="button"
               style={{
-                marginTop: space24,
+                marginTop: gap(space24),
                 height: BUTTON_HEIGHT,
                 borderRadius: radiusPill,
                 borderWidth: 1.5,

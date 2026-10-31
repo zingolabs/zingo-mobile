@@ -52,6 +52,7 @@ import {
 } from '@screens/Insight/insightModel';
 import { themeTokens } from '@app/theme';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
+import { useCompact } from '@app/hooks/useCompact';
 
 const SIDE = space20;
 const SOFT_INK = themeTokens.fgMuted;
@@ -128,6 +129,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
   } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const { edges, fades } = useScrollEdges();
+  const { gap } = useCompact();
   const insight = buildInsight(valueTransfers ?? [], addressBook, new Date());
   const last = insight.weeks - 1;
 
@@ -305,7 +307,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
         testID="insight.scroll-view"
         contentContainerStyle={{
           paddingHorizontal: SIDE,
-          paddingBottom: space32,
+          paddingBottom: gap(space32),
         }}
       >
         <View

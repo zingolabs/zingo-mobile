@@ -27,6 +27,7 @@ import { duration, ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import Button from '@ui/primitives/Button';
+import { useCompact } from '@app/hooks/useCompact';
 
 const OFFSCREEN = 600;
 
@@ -72,6 +73,7 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
 }) => {
   const { translate } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
+  const { gap } = useCompact();
   const insets = useSafeAreaInsets();
   const dim = useSharedValue(0);
   const drop = useSharedValue(OFFSCREEN);
@@ -161,7 +163,7 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
             right: 0,
             bottom: 0,
             alignItems: 'center',
-            paddingTop: space32,
+            paddingTop: gap(space32),
             paddingHorizontal: space20,
             paddingBottom: insets.bottom + space24,
             backgroundColor: colors.bgSurface,
@@ -210,7 +212,7 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
           <Text
             variant="caption"
             tone="muted"
-            style={{ textAlign: 'center', marginBottom: space24 }}
+            style={{ textAlign: 'center', marginBottom: gap(space24) }}
           >
             {translate('seedbackup.shot-body') as string}
           </Text>

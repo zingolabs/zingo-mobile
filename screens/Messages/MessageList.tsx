@@ -40,6 +40,7 @@ import Utils from '@app/utils';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ChevronDown } from '@ui/primitives/Icons/Chevron';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
+import { useCompact } from '@app/hooks/useCompact';
 
 type MessageListProps = NativeStackScreenProps<AppDrawerParamList, 'Messages'>;
 
@@ -68,6 +69,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
 
   const scrollViewRef = useRef<ScrollView>(null);
   const { edges, fades } = useScrollEdges({ surface: 'surface' });
+  const { gap } = useCompact();
 
   useEffect(() => {
     if (messages !== null && loading) {
@@ -238,7 +240,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
           <View
             style={{
               alignItems: 'center',
-              marginTop: space32,
+              marginTop: gap(space32),
               paddingHorizontal: space20,
             }}
           >
