@@ -38,7 +38,7 @@ import { SIDE } from './StepParts';
 export const VEIL_MS = 220;
 // The words blur by this much while hidden; the numbers stay sharp.
 const BLUR_PT = 6;
-const WORD_H = 32;
+const WORD_H = 28;
 // Room left of the word for the blur to fade out round, not cut straight.
 const BLUR_PAD = BLUR_PT * 2;
 // react-native-svg reads stdDeviation differently per platform. Android
