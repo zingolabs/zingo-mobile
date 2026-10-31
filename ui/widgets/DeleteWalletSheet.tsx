@@ -25,7 +25,7 @@ import { duration, ease } from '@app/theme/motion';
 import { TranslateType } from '@app/AppState';
 import { DeleteWalletContext } from '@app/AppState/types/DeleteWalletContext';
 import Text from '@ui/primitives/Text';
-import AppSheetModal from '@ui/primitives/AppSheetModal';
+import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
 import Button, { BUTTON_HEIGHT } from '@ui/primitives/Button';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 
@@ -207,15 +207,17 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
               </Text>
             </Pressable>
           </Animated.View>
-          <View style={{ marginTop: space12 }}>
-            <Button
-              testID="deletesheet.cancel"
-              variant="quiet"
-              inline
-              title={translate('cancel') as string}
-              onPress={dismiss}
-            />
-          </View>
+          <SheetFooter style={{ paddingHorizontal: 24 }}>
+            <View style={{ marginTop: space12 }}>
+              <Button
+                testID="deletesheet.cancel"
+                variant="quiet"
+                inline
+                title={translate('cancel') as string}
+                onPress={dismiss}
+              />
+            </View>
+          </SheetFooter>
         </View>
       </AppSheetModal>
     );

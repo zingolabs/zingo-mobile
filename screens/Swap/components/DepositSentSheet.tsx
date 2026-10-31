@@ -7,7 +7,7 @@ import { ContextAppLoaded } from '@app/context';
 import type { SwapRecordType } from '@app/swap';
 import Utils from '@app/utils';
 import { formatExactAmount } from '@app/utils/formatAmount';
-import AppSheetModal from '@ui/primitives/AppSheetModal';
+import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import TokenLogo from './TokenLogo';
@@ -97,28 +97,30 @@ const DepositSentSheet = forwardRef<
             ),
           )}
         </Text>
-        <View
-          style={{ alignSelf: 'stretch', marginTop: space20, rowGap: space8 }}
-        >
-          <Button
-            testID="swap.sent-confirm.yes"
-            variant="primary"
-            title={t('swap.sent-confirm-yes')}
-            busy={busy}
-            onPress={async () => {
-              setBusy(true);
-              await onConfirm();
-              dismiss();
-              onConfirmed();
-            }}
-          />
-          <Button
-            testID="swap.sent-confirm.no"
-            variant="quiet"
-            title={t('swap.sent-confirm-no')}
-            onPress={dismiss}
-          />
-        </View>
+        <SheetFooter style={{ paddingHorizontal: space20 }}>
+          <View
+            style={{ alignSelf: 'stretch', marginTop: space20, rowGap: space8 }}
+          >
+            <Button
+              testID="swap.sent-confirm.yes"
+              variant="primary"
+              title={t('swap.sent-confirm-yes')}
+              busy={busy}
+              onPress={async () => {
+                setBusy(true);
+                await onConfirm();
+                dismiss();
+                onConfirmed();
+              }}
+            />
+            <Button
+              testID="swap.sent-confirm.no"
+              variant="quiet"
+              title={t('swap.sent-confirm-no')}
+              onPress={dismiss}
+            />
+          </View>
+        </SheetFooter>
       </View>
     </AppSheetModal>
   );

@@ -1694,6 +1694,19 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
             </View>
           </View>
         </View>
+      </View>
+      <View
+        style={
+          [
+            {
+              "paddingHorizontal": 20,
+            },
+            {
+              "paddingHorizontal": 20,
+            },
+          ]
+        }
+      >
         <View
           style={
             {

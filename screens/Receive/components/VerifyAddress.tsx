@@ -22,6 +22,7 @@ import Text from '@ui/primitives/Text';
 import { RPCCheckAddressType } from '@app/walletBackend/types/RPCCheckAddressType';
 import { VerifyCheckIcon } from '@ui/primitives/Icons/VerifyCheckIcon';
 import { VerifyXIcon } from '@ui/primitives/Icons/VerifyXIcon';
+import { SheetFooter } from '@ui/primitives/AppSheetModal';
 
 const VerifyAddress: React.FunctionComponent = () => {
   const context = useContext(ContextAppLoaded);
@@ -171,29 +172,31 @@ const VerifyAddress: React.FunctionComponent = () => {
           )}
         </View>
       )}
-      <View style={{ display: 'flex', flexDirection: 'column', margin: 0 }}>
-        <View
-          style={{
-            flexGrow: 1,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginTop: space16,
-            marginBottom: space4,
-          }}
-        >
-          <ButtonStack>
-            <Button
-              variant="primary"
-              title={translate('verify') as string}
-              onPress={() => {
-                verifyAddress();
-              }}
-              disabled={!address || !!errorAddress}
-            />
-          </ButtonStack>
+      <SheetFooter style={{ paddingHorizontal: space20 }}>
+        <View style={{ display: 'flex', flexDirection: 'column', margin: 0 }}>
+          <View
+            style={{
+              flexGrow: 1,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: space16,
+              marginBottom: space4,
+            }}
+          >
+            <ButtonStack>
+              <Button
+                variant="primary"
+                title={translate('verify') as string}
+                onPress={() => {
+                  verifyAddress();
+                }}
+                disabled={!address || !!errorAddress}
+              />
+            </ButtonStack>
+          </View>
         </View>
-      </View>
+      </SheetFooter>
     </View>
   );
 };

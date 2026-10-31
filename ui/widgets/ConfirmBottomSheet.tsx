@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 import { space4, space8 } from '@app/theme';
-import AppSheetModal from '@ui/primitives/AppSheetModal';
+import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import {
@@ -82,32 +82,34 @@ const ConfirmBottomSheet: React.FC = () => {
         </Text>
       )}
       {options?.content}
-      <View style={{ marginTop: 20, gap: 10 }}>
-        {actions.map((b, i) => (
+      <SheetFooter style={{ paddingHorizontal: 0 }}>
+        <View style={{ marginTop: 20, gap: 10 }}>
+          {actions.map((b, i) => (
+            <Button
+              key={`${i}-${b.text}`}
+              testID={`confirm.action.${i}`}
+              variant={
+                b.style === 'destructive'
+                  ? 'danger'
+                  : b.style === 'ghost'
+                    ? 'text'
+                    : 'primary'
+              }
+              title={b.text}
+              onPress={() => handleButton(b)}
+            />
+          ))}
+        </View>
+        {!!cancel && (
           <Button
-            key={`${i}-${b.text}`}
-            testID={`confirm.action.${i}`}
-            variant={
-              b.style === 'destructive'
-                ? 'danger'
-                : b.style === 'ghost'
-                  ? 'text'
-                  : 'primary'
-            }
-            title={b.text}
-            onPress={() => handleButton(b)}
+            testID="confirm.cancel"
+            variant="quiet"
+            title={cancel.text}
+            onPress={() => handleButton(cancel)}
+            style={{ marginTop: 8 }}
           />
-        ))}
-      </View>
-      {!!cancel && (
-        <Button
-          testID="confirm.cancel"
-          variant="quiet"
-          title={cancel.text}
-          onPress={() => handleButton(cancel)}
-          style={{ marginTop: 8 }}
-        />
-      )}
+        )}
+      </SheetFooter>
     </AppSheetModal>
   );
 };

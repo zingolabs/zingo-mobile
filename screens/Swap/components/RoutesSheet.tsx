@@ -74,6 +74,7 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
 
     return (
       <AppSheetModal
+        ownScroll
         ref={ref}
         header={
           <SheetTitle

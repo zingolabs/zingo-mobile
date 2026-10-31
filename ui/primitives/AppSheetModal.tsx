@@ -4,6 +4,8 @@ import React, {
   useContext,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
+  useReducer,
   useRef,
   useState,
 } from 'react';
@@ -25,7 +27,7 @@ import {
   BottomSheetView,
   useBottomSheetInternal,
 } from '@gorhom/bottom-sheet';
-import { radiusSheet, useTheme, radiusPill } from '@app/theme';
+import { radiusSheet, useTheme, radiusPill, space20 } from '@app/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { SurfaceContext } from './Surface';
@@ -35,10 +37,63 @@ import { duration, ease } from '@app/theme/motion';
 /** Every sheet opens and closes in 420 ms on (.2,0,0,1). */
 const SHEET_MOTION = { duration: duration.sheet, easing: ease.emphasized };
 import SheetRim from './SheetRim';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { SheetPresence } from './SheetPresence';
 
 /** The measured height of a dynamic sheet's whole body, for its `SheetScrollView`. */
 const SheetBodyHeight = createContext<number>(0);
+
+/** What a sheet's `SheetFooter` holds, and the outlet that draws it. */
+type FooterStore = { node: React.ReactNode; redraw?: () => void };
+const SheetFooterStore = createContext<React.RefObject<FooterStore> | null>(
+  null,
+);
+
+/**
+ * A sheet's actions, pinned at the one bottom distance: the body scrolls
+ * above them when it does not fit. Wrap them where they are; they are drawn
+ * under the body, outside its scroll. Outside a sheet they draw in place, as they are.
+ */
+export function SheetFooter({
+  children,
+  style,
+}: {
+  children: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+}) {
+  const store = useContext(SheetFooterStore);
+  const node = <View style={[styles.footer, style]}>{children}</View>;
+  useLayoutEffect(() => {
+    if (store?.current) {
+      store.current.node = node;
+      store.current.redraw?.();
+    }
+  });
+  useLayoutEffect(
+    () => () => {
+      if (store?.current) {
+        store.current.node = null;
+        store.current.redraw?.();
+      }
+    },
+    [store],
+  );
+  return store ? null : <>{children}</>;
+}
+
+/** Draws the footer a `SheetFooter` in the body hands over. */
+function FooterOutlet({ store }: { store: React.RefObject<FooterStore> }) {
+  const [, redraw] = useReducer((n: number) => n + 1, 0);
+  useLayoutEffect(() => {
+    const held = store.current;
+    held.redraw = redraw;
+    redraw();
+    return () => {
+      held.redraw = undefined;
+    };
+  }, [store]);
+  return <>{store.current.node}</>;
+}
 
 type AppSheetModalProps = {
   header?: React.ReactNode;
@@ -55,6 +110,11 @@ type AppSheetModalProps = {
   dismissable?: boolean;
   accessible?: boolean;
   renderFooter?: (props: BottomSheetFooterProps) => React.ReactElement;
+  /**
+   * The body holds its own `SheetScrollView` (a list under a fixed title):
+   * the sheet does not wrap it in another.
+   */
+  ownScroll?: boolean;
   // Shows the grab pill at the top, drawn by the library.
   handle?: boolean;
 };
@@ -96,6 +156,7 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
       // tree. The call sites passing false explicitly predate this.
       accessible = false,
       renderFooter,
+      ownScroll = false,
       handle,
     },
     ref,
@@ -131,6 +192,9 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
       [],
     );
     const fixed = snapPoints !== undefined;
+    const footerStore = useRef<FooterStore>({ node: null });
+    const insets = useSafeAreaInsets();
+    const { height: windowHeight } = useWindowDimensions();
     const [bodyHeight, setBodyHeight] = useState<number>(0);
     const bottomPad = useBottomActionPad();
     const presence = useContext(SheetPresence);
@@ -158,10 +222,19 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
           ]}
         >
           <SurfaceContext.Provider value="surface">
-            <TooltipHost>
-              {header}
-              {children}
-            </TooltipHost>
+            <SheetFooterStore.Provider value={footerStore}>
+              <TooltipHost>
+                {header}
+                {fixed || ownScroll ? (
+                  children
+                ) : (
+                  <SheetScrollView keyboardShouldPersistTaps="handled">
+                    {children}
+                  </SheetScrollView>
+                )}
+                <FooterOutlet store={footerStore} />
+              </TooltipHost>
+            </SheetFooterStore.Provider>
           </SurfaceContext.Provider>
         </View>
         {!handle && <SheetRim />}
@@ -184,6 +257,7 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
         ref={sheet}
         accessible={accessible}
         enableDynamicSizing={!fixed}
+        maxDynamicContentSize={windowHeight - insets.top}
         snapPoints={snapPoints}
         animationConfigs={SHEET_MOTION}
         enablePanDownToClose={enablePanDownToClose}
@@ -240,6 +314,7 @@ const roundedClip = {
 
 const styles = StyleSheet.create({
   fill: { flex: 1 },
+  footer: { paddingHorizontal: space20 },
   mask: roundedClip,
   maskFill: { flex: 1, ...roundedClip },
   handle: { paddingTop: 10, paddingBottom: 6 },
@@ -276,6 +351,7 @@ export function SheetScrollView({
   const frame = useRef<number>(0);
   const content = useRef<number>(0);
   const [chrome, setChrome] = useState<number>(0);
+  const { edges, fades } = useScrollEdges({ surface: 'surface' });
 
   /** Runs after gorhom's own report, so the sheet takes this height. */
   const report = useCallback(() => {
@@ -295,21 +371,27 @@ export function SheetScrollView({
   useEffect(report, [report]);
 
   return (
-    <BottomSheetScrollView
-      testID={testID}
-      style={[style, { maxHeight: windowHeight - insets.top - chrome }]}
-      contentContainerStyle={contentContainerStyle}
-      keyboardShouldPersistTaps={keyboardShouldPersistTaps}
-      onLayout={e => {
-        frame.current = e.nativeEvent.layout.height;
-        report();
-      }}
-      onContentSizeChange={(_w: number, h: number) => {
-        content.current = h;
-        report();
-      }}
-    >
-      {children}
-    </BottomSheetScrollView>
+    <>
+      <BottomSheetScrollView
+        testID={testID}
+        onScroll={edges.onScroll}
+        style={[style, { maxHeight: windowHeight - insets.top - chrome }]}
+        contentContainerStyle={contentContainerStyle}
+        keyboardShouldPersistTaps={keyboardShouldPersistTaps}
+        onLayout={e => {
+          edges.onLayout(e);
+          frame.current = e.nativeEvent.layout.height;
+          report();
+        }}
+        onContentSizeChange={(w: number, h: number) => {
+          edges.onContentSizeChange(w, h);
+          content.current = h;
+          report();
+        }}
+      >
+        {children}
+      </BottomSheetScrollView>
+      {fades}
+    </>
   );
 }

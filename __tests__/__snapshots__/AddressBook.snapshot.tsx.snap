@@ -5811,6 +5811,19 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
             testID="addressbook.note.none"
           />
         </View>
+      </View>
+      <View
+        style={
+          [
+            {
+              "paddingHorizontal": 20,
+            },
+            {
+              "paddingHorizontal": 20,
+            },
+          ]
+        }
+      >
         <View
           accessibilityRole="button"
           accessibilityState={

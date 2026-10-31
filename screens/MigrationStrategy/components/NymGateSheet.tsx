@@ -6,7 +6,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
-import AppSheetModal from '@ui/primitives/AppSheetModal';
+import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
 import MixnetIcon from '@ui/primitives/Icons/MixnetIcon';
 import { ContextAppLoaded } from '@app/context';
 import { useTheme } from '@app/theme';
@@ -93,27 +93,31 @@ const NymGateSheet = forwardRef<BottomSheetModal, NymGateSheetProps>(
               {translate(gate.failureKey) as string}
             </Text>
           ) : null}
-          <ButtonStack>
-            <Button
-              testID="migrationstrategy.nym-continue"
-              variant="text"
-              title={translate('migrationstrategy.nym-gate-continue') as string}
-              onPress={onContinue}
-            />
-            <Button
-              testID="migrationstrategy.nym-enable"
-              variant="primary"
-              title={
-                gate.kind === 'connecting'
-                  ? (translate(
-                      'migrationstrategy.nym-gate-connecting',
-                    ) as string)
-                  : (translate('migrationstrategy.nym-gate-enable') as string)
-              }
-              disabled={gate.kind === 'connecting'}
-              onPress={onEnable}
-            />
-          </ButtonStack>
+          <SheetFooter style={{ paddingHorizontal: 28 }}>
+            <ButtonStack>
+              <Button
+                testID="migrationstrategy.nym-continue"
+                variant="text"
+                title={
+                  translate('migrationstrategy.nym-gate-continue') as string
+                }
+                onPress={onContinue}
+              />
+              <Button
+                testID="migrationstrategy.nym-enable"
+                variant="primary"
+                title={
+                  gate.kind === 'connecting'
+                    ? (translate(
+                        'migrationstrategy.nym-gate-connecting',
+                      ) as string)
+                    : (translate('migrationstrategy.nym-gate-enable') as string)
+                }
+                disabled={gate.kind === 'connecting'}
+                onPress={onEnable}
+              />
+            </ButtonStack>
+          </SheetFooter>
         </View>
       </AppSheetModal>
     );

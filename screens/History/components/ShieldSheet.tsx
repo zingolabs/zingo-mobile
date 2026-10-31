@@ -12,7 +12,7 @@ import {
   sendGateOpen,
   shownStatusKey,
 } from '@app/walletBackend/transforms/mixnetView';
-import AppSheetModal from '@ui/primitives/AppSheetModal';
+import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
@@ -115,26 +115,28 @@ const ShieldSheet = forwardRef<BottomSheetModal, ShieldSheetProps>(
               </Text>
             </View>
           )}
-          <View style={{ marginTop: 20, rowGap: 8 }}>
-            <Button
-              testID="shield.confirm"
-              variant="primary"
-              title={t('shield.button')}
-              busy={busy}
-              disabled={busy || !open}
-              onPress={async () => {
-                setBusy(true);
-                dismiss();
-                await onShield();
-              }}
-            />
-            <Button
-              testID="shield.cancel"
-              variant="quiet"
-              title={t('cancel')}
-              onPress={dismiss}
-            />
-          </View>
+          <SheetFooter style={{ paddingHorizontal: 20 }}>
+            <View style={{ marginTop: 20, rowGap: 8 }}>
+              <Button
+                testID="shield.confirm"
+                variant="primary"
+                title={t('shield.button')}
+                busy={busy}
+                disabled={busy || !open}
+                onPress={async () => {
+                  setBusy(true);
+                  dismiss();
+                  await onShield();
+                }}
+              />
+              <Button
+                testID="shield.cancel"
+                variant="quiet"
+                title={t('cancel')}
+                onPress={dismiss}
+              />
+            </View>
+          </SheetFooter>
         </View>
       </AppSheetModal>
     );

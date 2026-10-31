@@ -8,7 +8,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { TranslateType, WalletType } from '@app/AppState';
 import { formatInteger } from '@app/utils/formatAmount';
 import Text from '@ui/primitives/Text';
-import AppSheetModal from '@ui/primitives/AppSheetModal';
+import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
 import Button from '@ui/primitives/Button';
 
 // Rises as every sheet does; Done drops it quickly, 260 ms ease-in.
@@ -105,12 +105,14 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
               {formatInteger(wallet?.birthday ?? 0)}
             </Text>
           </View>
-          <Button
-            variant="primary"
-            title={translate('seedsheet.done') as string}
-            onPress={dismiss}
-            style={{ marginTop: 20 }}
-          />
+          <SheetFooter style={{ paddingHorizontal: 24 }}>
+            <Button
+              variant="primary"
+              title={translate('seedsheet.done') as string}
+              onPress={dismiss}
+              style={{ marginTop: 20 }}
+            />
+          </SheetFooter>
         </View>
       </AppSheetModal>
     );

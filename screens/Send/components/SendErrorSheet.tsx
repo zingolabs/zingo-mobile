@@ -13,7 +13,7 @@ import {
   space20,
 } from '@app/theme';
 import type { BottomSheetModal } from '@gorhom/bottom-sheet';
-import AppSheetModal from '@ui/primitives/AppSheetModal';
+import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
 import Card from '@ui/widgets/Card';
 
 import { TranslateType } from '@app/AppState';
@@ -117,14 +117,16 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
       >
         {section(spendableLabel, spendableError)}
         {section(feeLabel, feeError)}
-        <View style={{ marginTop: space4 }}>
-          <Button
-            variant="primary"
-            title={t('support', 'Support')}
-            onPress={onSupportPress}
-            testID="send.error.support"
-          />
-        </View>
+        <SheetFooter style={{ paddingHorizontal: 0 }}>
+          <View style={{ marginTop: space4 }}>
+            <Button
+              variant="primary"
+              title={t('support', 'Support')}
+              onPress={onSupportPress}
+              testID="send.error.support"
+            />
+          </View>
+        </SheetFooter>
       </AppSheetModal>
     );
   },

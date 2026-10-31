@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useTheme, iconSizeSm, space8, space16 } from '@app/theme';
 import Pressable from '@ui/primitives/Pressable';
 import AppSheetModal, { SheetScrollView } from '@ui/primitives/AppSheetModal';
@@ -116,6 +116,7 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
 
     return (
       <AppSheetModal
+        ownScroll
         ref={ref}
         // Searchable: a fixed tall sheet, its search field drawn with the
         // title so the input survives keystroke re-renders. Otherwise the
@@ -143,13 +144,13 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
         }
       >
         {searchable ? (
-          <BottomSheetScrollView
+          <SheetScrollView
             testID={testID}
             keyboardShouldPersistTaps="handled"
             style={{ flex: 1 }}
           >
             {rows}
-          </BottomSheetScrollView>
+          </SheetScrollView>
         ) : (
           <SheetScrollView testID={testID}>{rows}</SheetScrollView>
         )}
