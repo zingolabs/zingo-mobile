@@ -1,0 +1,574 @@
+/* eslint-disable react-native/no-inline-styles */
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { formatZecAmount } from '@app/utils/formatZecAmount';
+import { formatUsd } from '@app/utils/formatAmount';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { Linking, View } from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
+import Clipboard from '@react-native-clipboard/clipboard';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { space12, space8, useTheme, iconSizeMd, iconSizeSm } from '@app/theme';
+import { AppDrawerParamList } from '@app/types';
+import {
+  Route,
+  SnackbarDurationEnum,
+  ValueTransferKindEnum,
+} from '@app/AppState';
+import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
+import { ContextAppLoaded, useSwapRecords, useSwapService } from '@app/context';
+import {
+  SwapDirectionEnum,
+  buildSwapKitTrackerUrl,
+  canonicalChainAddress,
+  canRemoveSwap,
+  formatAmountForDisplay,
+  isRealLegHash,
+  isRefunding,
+  isTerminalStatus,
+  prefillFromRecord,
+  providerLongLabel,
+} from '@app/swap';
+import Utils from '@app/utils';
+import Text from '@ui/primitives/Text';
+import Button from '@ui/primitives/Button';
+import ButtonStack from '@ui/primitives/ButtonStack';
+import TextField from '@ui/primitives/TextField';
+import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
+import { TxSwapIcon } from '@ui/primitives/Icons/TxSwapIcon';
+import { TxPendingIcon } from '@ui/primitives/Icons/TxPendingIcon';
+import { swapInFlight } from '@screens/History/historyRowText';
+import { ChevronRight } from '@ui/primitives/Icons/Chevron';
+import Banner from '@ui/widgets/Banner';
+import FoldSection from './components/FoldSection';
+import TrackSwap from './components/TrackSwap';
+import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
+import DepositSlip from '@screens/Swap/components/DepositSlip';
+import DetailHero from '@screens/Swap/components/DetailHero';
+import DetailRows from '@screens/Swap/components/DetailRows';
+import type { DetailRow } from '@screens/Swap/components/DetailRows';
+import ShieldNote from '@screens/Swap/components/ShieldNote';
+import SaveContactSheet from '@screens/Swap/components/SaveContactSheet';
+import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
+import SaveContactButton from '@ui/widgets/SaveContactButton';
+import { useSwapRecord } from '@screens/Swap/useSwapRecord';
+import { swapOutcome } from '@screens/Swap/swapProgress';
+import { useRemoveSwap } from '@screens/Swap/useRemoveSwap';
+import { legName, legSlot, legsOf } from '@screens/Swap/swapLegs';
+
+type SwapDetailProps = NativeStackScreenProps<
+  AppDrawerParamList,
+  typeof Route.SwapDetail
+>;
+
+/**
+ * A swap's record. The top says what happened and what it got; the rows
+ * say when, through whom, for how much and where; its Zcash transactions
+ * fold under "Transactions", each opening its own detail. A deposit still
+ * unpaid shows its slip first, the one thing left to do.
+ */
+const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
+  navigation,
+  route,
+}) => {
+  const { recordId } = route.params;
+  const {
+    translate,
+    language,
+    walletChainName,
+    blockExplorer,
+    valueTransfers,
+    info,
+    addressBook,
+    setAddressBook,
+    addLastSnackbar,
+  } = useContext(ContextAppLoaded);
+  const saveSheetRef = useRef<BottomSheetModal>(null);
+  const { colors } = useTheme();
+  const swapService = useSwapService();
+  const records = useSwapRecords();
+  const record = useSwapRecord(recordId);
+  const [legsOpen, setLegsOpen] = useState<boolean>(false);
+  const [hash, setHash] = useState<string>('');
+  const [attaching, setAttaching] = useState<boolean>(false);
+  const [attachError, setAttachError] = useState<string>('');
+  const t = (key: string) => (translate(key) as string).trim();
+
+  // A finished swap is no longer polled, so one that finished before the
+  // tracker kept some detail is asked about once, here.
+  useEffect(() => {
+    if (!swapService) {
+      return;
+    }
+    swapService
+      .backfillFinishedRecord(recordId)
+      .catch(err =>
+        console.log(`SwapDetail: backfill failed for ${recordId}: ${err}`),
+      );
+  }, [swapService, recordId]);
+
+  const close = useCallback(() => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
+  }, [navigation]);
+
+  const attach = useCallback(async () => {
+    const trimmed = hash.trim();
+    if (!trimmed || !swapService || !record) {
+      return;
+    }
+    setAttaching(true);
+    setAttachError('');
+    try {
+      if (record.direction === SwapDirectionEnum.Outbound) {
+        await swapService.markBroadcasted({ recordId, txId: trimmed });
+      } else {
+        await swapService.setObservedDepositTxHash({ recordId, hash: trimmed });
+      }
+      setHash('');
+    } catch (e) {
+      setAttachError(`${e}`);
+    } finally {
+      setAttaching(false);
+    }
+  }, [hash, swapService, record, recordId]);
+
+  const removeSwap = useRemoveSwap(close);
+
+  if (!record) {
+    return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
+  }
+
+  const sell = record.direction === SwapDirectionEnum.Outbound;
+  const outcome = swapOutcome(record.status);
+  const done = outcome === 'completed';
+  const expired = outcome === 'expired';
+  const refunding = isRefunding(record);
+  const sellSym = record.sellAsset.ticker ?? record.sellAsset.symbol;
+  const getSym = record.receiveAsset.ticker ?? record.receiveAsset.symbol;
+  const other = sell ? record.receiveAsset : record.sellAsset;
+  const got = record.actualReceiveAmount ?? record.expectedReceiveAmount;
+  const back = record.refundInfo?.refundedAmountText;
+  const usd = (amount: string, unit: number) => {
+    const v = parseFloat(amount) * unit;
+    return unit > 0 && Number.isFinite(v) ? `≈ ${formatUsd(v)}` : '';
+  };
+
+  const title = t(done ? 'history.swapped-pair' : 'history.swap-pair')
+    .replace('{from}', sellSym)
+    .replace('{to}', getSym);
+  const hero =
+    outcome === 'refunded'
+      ? {
+          amount:
+            back !== undefined
+              ? `−${formatAmountForDisplay((parseFloat(record.sellAmountHumanDecimal) - parseFloat(back)).toFixed(8))}`
+              : formatAmountForDisplay(record.sellAmountHumanDecimal),
+          unit: sellSym,
+          tone: 'default' as const,
+          line:
+            back !== undefined
+              ? `${formatAmountForDisplay(back)} ${t('swap.detail-of')} ${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym} ${t('swap.detail-came-back')}`
+              : '',
+        }
+      : expired
+        ? {
+            amount: `+${formatAmountForDisplay(got)}`,
+            unit: getSym,
+            tone: 'muted' as const,
+            line: t('history.swap-not-sent').replace(
+              '{amount}',
+              `${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}`,
+            ),
+          }
+        : {
+            amount: `${done ? '+' : '≈ +'}${formatAmountForDisplay(got)}`,
+            unit: getSym,
+            tone: done
+              ? ('positive' as const)
+              : outcome === 'failed'
+                ? ('muted' as const)
+                : ('default' as const),
+            line: `−${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}${usd(got, record.fiatValueBasis.receiveUsdUnitPrice) ? ` · ${usd(got, record.fiatValueBasis.receiveUsdUnitPrice)}` : ''}`,
+          };
+  const pill =
+    outcome === 'completed'
+      ? { text: t('swap.history-done'), tone: 'accent' as const }
+      : outcome === 'refunded'
+        ? { text: t('swap.history-refunded'), tone: 'warning' as const }
+        : outcome === 'failed'
+          ? { text: t('swap.history-failed'), tone: 'danger' as const }
+          : expired
+            ? { text: t('history.state-expired'), tone: 'neutral' as const }
+            : {
+                text: t('swap.history-in-progress'),
+                tone: 'neutral' as const,
+              };
+
+  const feesUsd =
+    record.totalFeesInReceiveAsset &&
+    record.fiatValueBasis.receiveUsdUnitPrice > 0
+      ? usd(
+          record.totalFeesInReceiveAsset,
+          record.fiatValueBasis.receiveUsdUnitPrice,
+        ).replace('≈ ', '')
+      : record.totalFeesInReceiveAsset
+        ? `${formatAmountForDisplay(record.totalFeesInReceiveAsset)} ${getSym}`
+        : '';
+  const reason = record.refundInfo?.refundReason ?? record.failureReason;
+  /** The swap's address outside the wallet: where a sale went, or a buy's refund. */
+  const outside = sell
+    ? { chain: record.receiveAsset.chain, address: record.destinationAddress }
+    : { chain: record.sellAsset.chain, address: record.sourceAddress };
+  const outsideAddress = outside.address
+    ? canonicalChainAddress(outside.chain, outside.address)
+    : '';
+  /** That address's contact, when it is saved. */
+  const contact = outsideAddress
+    ? addressBook.find(
+        c =>
+          c.swapChain.toUpperCase() === outside.chain.toUpperCase() &&
+          c.address === outsideAddress,
+      )
+    : undefined;
+  const rows: DetailRow[] = [
+    {
+      label: t('swap.detail-date'),
+      value: Utils.formatDate(
+        record.createdAtMs,
+        'MMM d, yyyy · h:mm aaa',
+        language,
+      ),
+    },
+    { label: t('swap.provider'), value: providerLongLabel(record.provider) },
+    ...(expired
+      ? [
+          {
+            label: t('swap.result-reason'),
+            value: t('swap.expired-why'),
+            wrap: true,
+          },
+          {
+            label: t('swap.deposit-address'),
+            value: Utils.trimToSmall(record.depositAddress, 6),
+            mono: true,
+            strike: true,
+          },
+        ]
+      : []),
+    ...(feesUsd && !expired
+      ? [{ label: t('swap.review-fees'), value: feesUsd }]
+      : []),
+    ...(done && sell
+      ? [
+          {
+            label: t('swap.detail-sent-to'),
+            value: contact
+              ? `${contact.label}  ${Utils.trimToSmall(record.destinationAddress, 6)}`
+              : Utils.trimToSmall(record.destinationAddress, 6),
+            copy: record.destinationAddress,
+            leading: contact ? (
+              <Avatar
+                kind="contact"
+                name={contact.label}
+                category={avatarCategoryOf(contact.color)}
+                size="md"
+              />
+            ) : undefined,
+          },
+        ]
+      : []),
+    ...(!done && !expired && reason
+      ? [{ label: t('swap.result-reason'), value: reason, wrap: true }]
+      : []),
+  ];
+  const sold = `${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}`;
+  /** A payment that came after the quote expired, on its way back. */
+  const view = refunding
+    ? {
+        hero: {
+          amount: formatAmountForDisplay(record.sellAmountHumanDecimal),
+          unit: sellSym,
+          tone: 'default' as const,
+          line: t('swap.going-back-line').replace('{amount}', sold),
+        },
+        pill: { text: t('history.state-refunding'), tone: 'warning' as const },
+        rows: [
+          rows[0],
+          rows[1],
+          {
+            label: t('swap.result-reason'),
+            value: t('swap.late-why'),
+            wrap: true,
+          },
+          {
+            label: t('swap.goes-back-to'),
+            value: Utils.trimToSmall(record.sourceAddress, 6),
+            copy: record.sourceAddress,
+          },
+        ] as DetailRow[],
+      }
+    : { hero, pill, rows };
+
+  const hasDepositEvidence =
+    isRealLegHash(record.broadcast?.txId) ||
+    isRealLegHash(record.observedDepositTxHash);
+  const awaitingDeposit =
+    !isTerminalStatus(record.status) && !hasDepositEvidence;
+  const legs = legsOf(records, valueTransfers ?? [], recordId);
+  const receivedTransparent = legs.some(
+    l => l.kind === ValueTransferKindEnum.Received,
+  );
+
+  /** Didn't finish well: the Track section lists every link, SwapKit's first. */
+  const troubled =
+    outcome === 'failed' || outcome === 'refunded' || expired || refunding;
+  const swapKitUrl = troubled ? null : buildSwapKitTrackerUrl(record);
+
+  return (
+    <SwapFlowScreen
+      testID="swap.detail"
+      title={t('swap.detail-title')}
+      onBack={close}
+      footer={
+        <ButtonStack>
+          {/* The last child shows on top: explorer, new quote, Delete. */}
+          {canRemoveSwap(record) && (
+            <Button
+              testID="swap.detail.remove"
+              variant="dangerText"
+              title={t('swap.delete')}
+              onPress={() => removeSwap(record)}
+            />
+          )}
+          {(expired || outcome === 'failed') && (
+            <Button
+              testID="swap.detail.new-quote"
+              variant="primary"
+              title={t('swap.get-new-quote')}
+              onPress={() =>
+                navigation.navigate(
+                  Route.Home,
+                  {
+                    screen: Route.Swap,
+                    params: { prefill: prefillFromRecord(record, Date.now()) },
+                  },
+                  { pop: true },
+                )
+              }
+            />
+          )}
+          {!!swapKitUrl && (
+            <Button
+              testID="swap.detail.explorer"
+              variant="text"
+              title={t('swap.detail-view-on').replace(
+                '{name}',
+                'SwapKit Explorer',
+              )}
+              onPress={() => Linking.openURL(swapKitUrl)}
+            />
+          )}
+        </ButtonStack>
+      }
+    >
+      <DetailHero
+        icon={
+          swapInFlight(record) ? (
+            <TxPendingIcon size={iconSizeMd} color={colors.fgDefault} />
+          ) : (
+            <TxSwapIcon size={iconSizeMd} color={colors.fgDefault} />
+          )
+        }
+        badge={other}
+        title={title}
+        amount={view.hero.amount}
+        unit={view.hero.unit}
+        tone={view.hero.tone}
+        line={view.hero.line}
+        pill={view.pill.text}
+        pillTone={view.pill.tone}
+        strike={expired || outcome === 'failed'}
+      />
+
+      {awaitingDeposit && (
+        <View style={{ marginVertical: space12, rowGap: space12 }}>
+          <Text variant="bodyStrong">
+            {t(sell ? 'swap.deposit-unsent-title' : 'swap.deposit-title')}
+          </Text>
+          <DepositSlip record={record} paid={sell} />
+          <Text variant="bodySmall" tone="muted">
+            {t(sell ? 'swap.deposit-left-anyway' : 'swap.deposit-already-paid')}
+          </Text>
+          <TextField
+            testID="swap.detail.hash"
+            label={t('swap.deposit-hash')}
+            value={hash}
+            onChangeText={setHash}
+            placeholder={t('swap.deposit-hash-placeholder')}
+            mono
+            error={attachError || undefined}
+            trailingIcon={ClipboardPasteIcon}
+            trailingLabel={t('paste')}
+            onTrailingPress={async () =>
+              setHash((await Clipboard.getString()).trim())
+            }
+          />
+          <Button
+            inline
+            variant="text"
+            title={t('swap.deposit-follow')}
+            disabled={attaching || hash.trim().length === 0}
+            busy={attaching}
+            onPress={attach}
+          />
+        </View>
+      )}
+
+      <DetailRows rows={view.rows} />
+
+      {refunding && (
+        <Text variant="bodySmall" tone="muted" style={{ marginTop: space12 }}>
+          {t('swap.late-note').replace(
+            '{provider}',
+            providerLongLabel(record.provider),
+          )}
+        </Text>
+      )}
+
+      {expired && (
+        <View style={{ marginTop: space12, rowGap: space12 }}>
+          <Banner
+            testID="swap.detail.dont-send"
+            tone="warning"
+            title={t('swap.expired-dont-send')}
+          />
+        </View>
+      )}
+
+      {!!outside.address && !contact && (
+        <SaveContactButton
+          testID="swap.detail.save-contact"
+          label={t('swap.save-contact')}
+          onPress={() => saveSheetRef.current?.present()}
+        />
+      )}
+
+      {legs.length > 0 && (
+        <View style={{ marginTop: space12 }}>
+          <FoldSection
+            testID="swap.detail.legs"
+            title={t('swap.detail-transactions')}
+            count={legs.length}
+            open={legsOpen}
+            onToggle={() => setLegsOpen(open => !open)}
+          >
+            {legs.map((leg, index) => {
+              const received = leg.kind === ValueTransferKindEnum.Received;
+              return (
+                <Pressable
+                  kind="row"
+                  key={`${leg.txid}:${leg.kind}:${legSlot(legs, leg)}`}
+                  testID={`swap.detail.leg.${index}`}
+                  accessibilityRole="button"
+                  onPress={() =>
+                    navigation.navigate(Route.SwapTransaction, {
+                      recordId,
+                      txid: leg.txid,
+                      kind: leg.kind,
+                      slot: legSlot(legs, leg),
+                    })
+                  }
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    columnGap: space12,
+                    minHeight: 44,
+                    paddingVertical: 12,
+                    paddingHorizontal: 16,
+                    borderTopWidth: index === 0 ? 0 : 1,
+                    borderTopColor: colors.borderSubtle,
+                  }}
+                >
+                  <View style={{ flexShrink: 1 }}>
+                    <Text variant="bodySmall" style={{ fontWeight: '700' }}>
+                      {legName(leg, record, t)}
+                    </Text>
+                    <Text variant="caption" tone="muted">
+                      {Utils.formatDate(
+                        leg.time * 1000,
+                        'MMM d, h:mm aaa',
+                        language,
+                      )}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      columnGap: space8,
+                    }}
+                  >
+                    <Text
+                      variant="bodyStrong"
+                      style={{
+                        color: received ? colors.fgAccent : colors.fgDefault,
+                      }}
+                    >
+                      {`${received ? '+' : '−'}${formatZecAmount(leg.amount)} ${info.currencyName}`}
+                    </Text>
+                    <ChevronRight size={iconSizeSm} color={colors.fgMuted} />
+                  </View>
+                </Pressable>
+              );
+            })}
+          </FoldSection>
+        </View>
+      )}
+
+      {troubled && (
+        <TrackSwap
+          record={record}
+          zecChainName={walletChainName}
+          zecBlockExplorer={blockExplorer}
+        />
+      )}
+
+      {receivedTransparent && (
+        <View style={{ marginTop: space12 }}>
+          <ShieldNote text={t('swap.shield-note')} />
+        </View>
+      )}
+      {!!outside.address && (
+        <SaveContactSheet
+          ref={saveSheetRef}
+          address={outsideAddress}
+          chain={outside.chain}
+          book={addressBook}
+          onSave={async name => {
+            setAddressBook(
+              await AddressBookFileImpl.saveChainContact(
+                name,
+                outside.address,
+                outside.chain,
+              ),
+            );
+            addLastSnackbar(
+              t('addressbook.added').replace('{name}', name),
+              SnackbarDurationEnum.short,
+            );
+          }}
+        />
+      )}
+    </SwapFlowScreen>
+  );
+};
+
+export default SwapDetail;

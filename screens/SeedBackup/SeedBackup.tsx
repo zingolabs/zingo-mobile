@@ -8,12 +8,13 @@ import React, {
 } from 'react';
 import {
   BackHandler,
-  Pressable,
+  ScrollView,
   StyleSheet,
   useWindowDimensions,
   View,
 } from 'react-native';
 import Animated, {
+  interpolate,
   FadeIn,
   FadeOut,
   interpolateColor,
@@ -22,20 +23,19 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withDelay,
-  withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { useTheme } from '@app/theme';
+import { useTheme, iconSizeMd, radiusPill, space8, space16 } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum, ScreenEnum, SnackbarDurationEnum } from '@app/AppState';
+import { SnackbarDurationEnum } from '@app/AppState';
 import Header from '@ui/widgets/Header';
 import { AppDrawerParamList, CardRect } from '@app/types';
 import { useSecureScreen } from '@app/hooks/useSecureScreen';
-import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { useScreenCapture } from '@app/hooks/useScreenCapture';
 import {
   enactGateAnswer,
@@ -55,11 +55,10 @@ import ConfirmStep, { useWordCheck } from './components/ConfirmStep';
 import DoneStep from './components/DoneStep';
 import ScreenshotSheet from './components/ScreenshotSheet';
 import { SIDE, StepActions } from './components/StepParts';
+import Button from '@ui/primitives/Button';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
-type SeedBackupProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.SeedBackup
->;
+type SeedBackupProps = NativeStackScreenProps<AppDrawerParamList, 'SeedBackup'>;
 
 type Step = 'info' | 'words' | 'confirm' | 'done';
 type Move = { step: Step; dir: 1 | -1 };
@@ -107,6 +106,39 @@ const exitFor = (move: Move) =>
         .reduceMotion(ReduceMotion.System)
     : axisExit(-AXIS_PT * move.dir);
 
+/**
+ * A step's content scrolls in the room above its actions, which sit below
+ * it in the flow, so 24 words or a large font never end up under them.
+ */
+const StepPage: React.FunctionComponent<{
+  children: React.ReactNode;
+  footer: React.ReactNode;
+  bottom: number;
+  center?: boolean;
+}> = ({ children, footer, bottom, center = false }) => {
+  const { edges, fades } = useScrollEdges();
+  return (
+    <>
+      <ScrollView
+        {...edges}
+        style={{ flex: 1 }}
+        contentContainerStyle={
+          center
+            ? { flexGrow: 1, justifyContent: 'center', paddingBottom: space16 }
+            : { paddingBottom: space16 }
+        }
+        keyboardShouldPersistTaps="handled"
+      >
+        {children}
+      </ScrollView>
+      {fades}
+      <View style={{ paddingTop: space8, paddingBottom: bottom }}>
+        {footer}
+      </View>
+    </>
+  );
+};
+
 // The confirm step and its actions, remounted for every new attempt.
 const ConfirmPage: React.FunctionComponent<{
   words: string[];
@@ -117,19 +149,21 @@ const ConfirmPage: React.FunctionComponent<{
   const { translate } = useContext(ContextAppLoaded);
   const check = useWordCheck(words, onPassed);
   return (
-    <>
-      <ConfirmStep check={check} />
-      <View style={{ position: 'absolute', left: 0, right: 0, bottom }}>
+    <StepPage
+      bottom={bottom}
+      footer={
         <StepActions
           testID="seedbackup.confirm"
           link={translate('seedbackup.view-phrase') as string}
           onLink={onViewPhrase}
           primary={translate('seedbackup.confirm') as string}
-          off={!check.value}
-          onPrimary={() => (check.value ? check.submit() : check.nudge())}
+          disabled={!check.value}
+          onPrimary={check.submit}
         />
-      </View>
-    </>
+      }
+    >
+      <ConfirmStep check={check} />
+    </StepPage>
   );
 };
 
@@ -148,7 +182,6 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
     birthday: walletBirthday,
   } = context;
   const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
   const root = useRef<View>(null);
   const [screen, setScreen] = useState<CardRect>({
     x: 0,
@@ -156,7 +189,8 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
     width: 0,
     height: 0,
   });
-  const keyboard = useKeyboardHeight();
+  /** Every step's actions end at the one bottom distance, above the keyboard too. */
+  const bottom = useBottomActionPad();
   const secured = useSecureScreen();
   const [shot, setShot] = useState<'none' | 'on' | 'leaving'>('none');
   const shotGone = useCallback(() => setShot('none'), []);
@@ -176,14 +210,12 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
   const [loading, setLoading] = useState(false);
   const [hidden, setHidden] = useState(true);
   const [checked, setChecked] = useState(false);
-  const [nudge, setNudge] = useState(0);
   const [attempt, setAttempt] = useState(0);
   const closing = useRef(false);
 
   const grow = useSharedValue(0);
   const content = useSharedValue(1);
   const whole = useSharedValue(1);
-  const savedShake = useSharedValue(0);
   const slide = useSharedValue(pushed ? window.width : 0);
 
   const measured = screen.width > 0;
@@ -330,19 +362,6 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
   }, []);
 
   const saved = () => {
-    if (!checked) {
-      savedShake.value = withSequence(
-        withTiming(-4, motion(60, ease.standard)),
-        withTiming(4, motion(120, ease.standard)),
-        withTiming(0, motion(60, ease.standard)),
-      );
-      setNudge(n => n + 1);
-      addLastSnackbar(
-        translate('seedbackup.check-first') as string,
-        SnackbarDurationEnum.short,
-      );
-      return;
-    }
     setAttempt(a => a + 1);
     go('confirm', 1);
   };
@@ -384,7 +403,7 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
       width: from.width + (screen.width - from.width) * g,
       height: from.height + (screen.height - from.height) * g,
       opacity: whole.value,
-      borderRadius: RADIUS * (1 - g),
+      borderRadius: interpolate(g, [0, 1], [RADIUS, 0]),
       backgroundColor: interpolateColor(
         g,
         [0, 0.12, 1],
@@ -398,33 +417,42 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
   const sliding = useAnimatedStyle(() => ({
     transform: [{ translateX: slide.value }],
   }));
-  const savedNudge = useAnimatedStyle(() => ({
-    transform: [{ translateX: savedShake.value }],
-  }));
-
-  const bottom = Math.max(insets.bottom + 16, keyboard + 12);
 
   const page = () => {
     switch (step) {
       case 'info':
         return (
-          <>
-            <InfoStep keychainNote={keychainNote} />
-            <View style={{ position: 'absolute', left: 0, right: 0, bottom }}>
+          <StepPage
+            bottom={bottom}
+            footer={
               <StepActions
                 testID="seedbackup.info"
                 link={translate('seedbackup.not-now') as string}
                 onLink={close}
                 primary={translate('seedbackup.continue') as string}
-                off={loading}
+                disabled={loading}
                 onPrimary={toWords}
               />
-            </View>
-          </>
+            }
+          >
+            <InfoStep keychainNote={keychainNote} />
+          </StepPage>
         );
       case 'words':
         return (
-          <>
+          <StepPage
+            bottom={bottom}
+            footer={
+              <StepActions
+                testID="seedbackup.words"
+                link={translate('seedbackup.back') as string}
+                onLink={() => go('info', -1)}
+                primary={translate('seedbackup.saved') as string}
+                disabled={!checked}
+                onPrimary={saved}
+              />
+            }
+          >
             {secured && (
               <WordsStep
                 words={words}
@@ -435,21 +463,9 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
                 onCopy={copy}
                 checked={checked}
                 onCheck={() => setChecked(c => !c)}
-                nudge={nudge}
               />
             )}
-            <View style={{ position: 'absolute', left: 0, right: 0, bottom }}>
-              <StepActions
-                testID="seedbackup.words"
-                link={translate('seedbackup.back') as string}
-                onLink={() => go('info', -1)}
-                primary={translate('seedbackup.saved') as string}
-                off={!checked}
-                primaryStyle={savedNudge}
-                onPrimary={saved}
-              />
-            </View>
-          </>
+          </StepPage>
         );
       case 'confirm':
         return words.length > 0 ? (
@@ -465,43 +481,22 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
         ) : null;
       case 'done':
         return (
-          <>
-            <View style={{ flex: 1, justifyContent: 'center' }}>
-              <DoneStep />
-            </View>
-            <View
-              style={{
-                position: 'absolute',
-                left: 52,
-                right: 52,
-                bottom: insets.bottom + 28,
-              }}
-            >
-              <Pressable
-                testID="seedbackup.done"
-                accessibilityRole="button"
-                onPress={finish}
-                style={({ pressed }) => ({
-                  height: 44,
-                  borderRadius: 22,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: colors.bgAccent,
-                  transform: [{ scale: pressed ? 0.97 : 1 }],
-                })}
-              >
-                <Animated.Text
-                  style={{
-                    color: colors.bgCanvas,
-                    fontSize: 15,
-                    fontWeight: '700',
-                  }}
-                >
-                  {translate('seedbackup.done') as string}
-                </Animated.Text>
-              </Pressable>
-            </View>
-          </>
+          <StepPage
+            center
+            bottom={bottom}
+            footer={
+              <View style={{ marginHorizontal: SIDE }}>
+                <Button
+                  testID="seedbackup.done"
+                  variant="primary"
+                  title={translate('seedbackup.done') as string}
+                  onPress={finish}
+                />
+              </View>
+            }
+          >
+            <DoneStep />
+          </StepPage>
         );
     }
   };
@@ -523,7 +518,6 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
           <View style={{ paddingTop: 4 }}>
             <Header
               title={''}
-              screenName={ScreenEnum.Seed}
               noBalance={true}
               noSyncingStatus={true}
               noDrawMenu={true}
@@ -559,22 +553,20 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
                 }}
               >
                 <Pressable
+                  kind="icon"
                   testID="seedbackup.close"
                   accessibilityRole="button"
                   accessibilityLabel={translate('seedbackup.close') as string}
                   onPress={close}
-                  style={({ pressed }) => ({
+                  style={{
                     width: 44,
                     height: 44,
-                    borderRadius: 12,
+                    borderRadius: radiusPill,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: pressed
-                      ? 'rgba(255,255,255,0.06)'
-                      : undefined,
-                  })}
+                  }}
                 >
-                  <XIcon size={18} color={colors.fgMuted} strokeWidth={1.8} />
+                  <XIcon size={iconSizeMd} color={colors.fgMuted} />
                 </Pressable>
               </Animated.View>
             )}

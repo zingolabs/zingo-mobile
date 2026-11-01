@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect } from 'react';
-import { Text, View, TextStyle, TouchableOpacity } from 'react-native';
-import { useTheme } from '@app/theme';
+import { Text, View, TextStyle } from 'react-native';
+import { useTheme, fontScaleBody } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { getNumberFormatSettings } from 'react-native-localize';
 import Animated, {
   ReduceMotion,
@@ -9,9 +10,13 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import Utils from '@app/utils';
+import { formatUsd } from '@app/utils/formatAmount';
 import { usePriceHealth } from './priceFetcherStore';
 import { useTimedReveal } from '@app/hooks/useTimedReveal';
+import { MASK } from '@ui/widgets/PrivateAmount';
+
+/** The fiat beside a ZEC amount, at ZecAmount's default size. */
+const AMOUNT_SIZE = 20;
 
 type CurrencyAmountProps = {
   price?: number;
@@ -30,8 +35,6 @@ type CurrencyAmountProps = {
 
 export type PriceTint = 'none' | 'up' | 'down';
 
-const TINT_UP = '#3CC52A';
-const TINT_DOWN = '#F2878A';
 const TINT_MS = 500;
 
 // The amount eases to green or red for the direction of a price move.
@@ -42,18 +45,22 @@ const TintedText: React.FunctionComponent<{
   selectable?: boolean;
   children: string;
 }> = ({ tint, base, style, selectable, children }) => {
+  const { colors } = useTheme();
+  const up = colors.fgPriceUp;
+  const down = colors.fgPriceDown;
   const tinted = useAnimatedStyle(() => ({
-    color: withTiming(
-      tint === 'up' ? TINT_UP : tint === 'down' ? TINT_DOWN : base,
-      { duration: TINT_MS, reduceMotion: ReduceMotion.Never },
-    ),
+    color: withTiming(tint === 'up' ? up : tint === 'down' ? down : base, {
+      duration: TINT_MS,
+      reduceMotion: ReduceMotion.Never,
+    }),
   }));
   return (
     <Animated.Text
+      maxFontSizeMultiplier={fontScaleBody}
       style={[
         {
           color: base,
-          fontSize: 20,
+          fontSize: AMOUNT_SIZE,
           fontWeight: '700',
           fontVariant: ['tabular-nums'],
           ...style,
@@ -90,7 +97,6 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
     color ?? (health === 'live' ? colors.fgDefault : colors.fgMuted);
 
   useEffect(() => {
-    const zeroString = '0' + decimalSeparator + '00';
     var currencyStr;
 
     if (
@@ -98,12 +104,11 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
       typeof amtZec === 'undefined' ||
       price <= 0
     ) {
-      currencyStr = '-' + decimalSeparator + '--';
+      currencyStr = '$-' + decimalSeparator + '--';
     } else {
-      const currencyAmo = price * amtZec;
-      currencyStr = Utils.parseNumberFloatToStringLocale(currencyAmo, 2);
-      if (currencyStr === zeroString && amtZec > 0) {
-        currencyStr = '< 0' + decimalSeparator + '01';
+      currencyStr = formatUsd(price * amtZec);
+      if (currencyStr === formatUsd(0) && amtZec > 0) {
+        currencyStr = '< ' + formatUsd(0.01);
       }
     }
     setCurrencyString(currencyStr);
@@ -111,18 +116,19 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
 
   return (
     <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-      <TouchableOpacity disabled={!privacyHigh} onPress={reveal}>
+      <Pressable kind="link" disabled={!privacyHigh} onPress={reveal}>
         <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
           {privacyHigh ? (
             <Text
+              maxFontSizeMultiplier={fontScaleBody}
               style={{
                 color: baseColor,
-                fontSize: 20,
+                fontSize: AMOUNT_SIZE,
                 fontWeight: '700',
                 ...style,
               }}
             >
-              {'$ -' + decimalSeparator + '--'}
+              {`$${MASK}`}
             </Text>
           ) : tint ? (
             <TintedText
@@ -131,23 +137,24 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
               style={style}
               selectable={selectable}
             >
-              {'$ ' + currencyString}
+              {currencyString}
             </TintedText>
           ) : (
             <Text
+              maxFontSizeMultiplier={fontScaleBody}
               style={{
                 color: baseColor,
-                fontSize: 20,
+                fontSize: AMOUNT_SIZE,
                 fontWeight: '700',
                 ...style,
               }}
               selectable={selectable}
             >
-              {'$ ' + currencyString}
+              {currencyString}
             </Text>
           )}
         </View>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };

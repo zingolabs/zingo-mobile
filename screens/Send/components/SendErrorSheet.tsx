@@ -1,26 +1,29 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback } from 'react';
-import { Keyboard, Pressable, StyleSheet, View } from 'react-native';
-import { radiusSheet, useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCircleInfo, faXmark } from '@fortawesome/free-solid-svg-icons';
+import TitleBar from '@ui/widgets/TitleBar';
+import Text from '@ui/primitives/Text';
+import { View } from 'react-native';
 import {
-  BottomSheetBackdrop,
-  BottomSheetBackdropProps,
-  BottomSheetModal,
-  BottomSheetScrollView,
-} from '@gorhom/bottom-sheet';
+  useTheme,
+  iconSizeSm,
+  space4,
+  space8,
+  space12,
+  space16,
+  space20,
+} from '@app/theme';
+import type { BottomSheetModal } from '@gorhom/bottom-sheet';
+import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
+import Card from '@ui/widgets/Card';
 
 import { TranslateType } from '@app/AppState';
-import BoldText from '@ui/primitives/BoldText';
-import FadeText from '@ui/primitives/FadeText';
-import RegText from '@ui/primitives/RegText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
-import SheetRim from '@ui/primitives/SheetRim';
+import Button from '@ui/primitives/Button';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 
 /**
  * Informational sheet that surfaces the raw error(s) returned by the fee
- * (`sendPropose`) and/or spendable-balance RPC. Both are shown when present —
+ * (`sendPreview`) and/or spendable-balance RPC. Both are shown when present —
  * they are frequently the same underlying failure, but showing each under its
  * own label makes that explicit rather than hiding one. Title bar with a
  * close X, the error text, and a one-tap "Support" affordance (opens a
@@ -30,7 +33,7 @@ import SheetRim from '@ui/primitives/SheetRim';
 type SendErrorSheetProps = {
   /** Sheet title. */
   title: string;
-  /** Raw fee (`sendPropose`) RPC error, or '' when none. */
+  /** Raw fee (`sendPreview`) RPC error, or '' when none. */
   feeError: string;
   /** Raw spendable-balance RPC error, or '' when none. */
   spendableError: string;
@@ -72,156 +75,61 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
       dismiss();
     }, [onSupport, dismiss]);
 
-    const renderBackdrop = useCallback(
-      (props: BottomSheetBackdropProps) => (
-        <BottomSheetBackdrop
-          {...props}
-          disappearsOnIndex={-1}
-          appearsOnIndex={0}
-          pressBehavior="close"
-        />
-      ),
-      [],
-    );
-
-    const renderHandle = useCallback(
-      () => (
-        <View
-          style={{
-            paddingTop: 8,
-            paddingBottom: 6,
-            paddingHorizontal: 16,
-            backgroundColor: colors.bgSurface,
-            borderTopLeftRadius: radiusSheet,
-            borderTopRightRadius: radiusSheet,
-          }}
-        >
-          <SheetRim />
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <View style={{ width: 48 }} />
-            <BoldText
-              numberOfLines={1}
-              style={{ flex: 1, textAlign: 'center', color: colors.fgDefault }}
-            >
-              {title}
-            </BoldText>
-            <Pressable
-              onPress={dismiss}
-              accessibilityRole="button"
-              hitSlop={8}
-              style={{ padding: 14 }}
-            >
-              <FontAwesomeIcon
-                icon={faXmark}
-                size={20}
-                color={colors.fgDefault}
-              />
-            </Pressable>
-          </View>
-        </View>
-      ),
-      [colors, dismiss, title],
-    );
-
     const section = (label: string, message: string) =>
       message ? (
-        <View style={{ rowGap: 6 }}>
-          <FadeText style={{ fontSize: 12 }}>{label}</FadeText>
-          <View
-            style={[
-              styles.infoRow,
-              {
-                backgroundColor: colors.bgCanvas,
-                borderColor: colors.borderMuted,
-              },
-            ]}
-          >
-            <FontAwesomeIcon
-              icon={faCircleInfo}
-              size={16}
-              color={colors.fgDanger}
-            />
-            <RegText
-              style={{
-                color: colors.fgDefault,
-                flex: 1,
-                marginLeft: 10,
-                fontSize: 13,
-              }}
-            >
-              {message}
-            </RegText>
-          </View>
+        <View style={{ rowGap: space4 }}>
+          <Text variant="caption" tone="muted">
+            {label}
+          </Text>
+          <Card>
+            <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+              <InfoIcon size={iconSizeSm} color={colors.fgDanger} />
+              <Text
+                variant="bodySmall"
+                style={{ flex: 1, marginLeft: space12 }}
+              >
+                {message}
+              </Text>
+            </View>
+          </Card>
         </View>
       ) : null;
 
     return (
-      <BottomSheetModal
+      <AppSheetModal
         ref={ref}
         accessible={false}
-        enableDynamicSizing={true}
-        enablePanDownToClose
-        stackBehavior="push"
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        onAnimate={(from, to) => {
-          // Opening (from === -1) dismisses a keyboard left open by the
-          // underlying screen so the sheet never renders behind it. Guard
-          // avoids fighting a keyboard the sheet itself focuses later.
-          if (from === -1 && to >= 0) {
-            Keyboard.dismiss();
-          }
+        header={
+          <TitleBar
+            title={title}
+            right={{
+              icon: XIcon,
+              accessibilityLabel: title,
+              onPress: dismiss,
+            }}
+          />
+        }
+        contentStyle={{
+          paddingHorizontal: space20,
+          paddingTop: space8,
+          rowGap: space16,
         }}
-        handleComponent={renderHandle}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: radiusSheet,
-          borderTopRightRadius: radiusSheet,
-        }}
-        backdropComponent={renderBackdrop}
       >
-        <BottomSheetScrollView
-          style={{ backgroundColor: colors.bgSurface }}
-          contentContainerStyle={{
-            paddingHorizontal: 20,
-            paddingBottom: 24,
-            paddingTop: 8,
-            rowGap: 16,
-          }}
-        >
-          {section(spendableLabel, spendableError)}
-          {section(feeLabel, feeError)}
-
-          <View style={{ alignItems: 'center', marginTop: 4 }}>
+        {section(spendableLabel, spendableError)}
+        {section(feeLabel, feeError)}
+        <SheetFooter style={{ paddingHorizontal: 0 }}>
+          <View style={{ marginTop: space4 }}>
             <Button
-              type={ButtonTypeEnum.Primary}
+              variant="primary"
               title={t('support', 'Support')}
               onPress={onSupportPress}
               testID="send.error.support"
             />
           </View>
-        </BottomSheetScrollView>
-      </BottomSheetModal>
+        </SheetFooter>
+      </AppSheetModal>
     );
   },
 );
-
-const styles = StyleSheet.create({
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-});
 
 export default React.memo(SendErrorSheet);

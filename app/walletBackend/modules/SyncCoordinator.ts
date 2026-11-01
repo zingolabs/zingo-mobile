@@ -3,7 +3,9 @@
  *
  * A single 5 s setInterval (updateTimerID) calls runTaskPromises() which:
  *   1. Adjusts performance level if it drifted from config.
- *   2. Calls fetchSyncPoll() to check whether a sync task is running.
+ *   2. Calls fetchSyncPoll() to check whether a sync task is running, and
+ *      launches one when none is. The engine runs continuously: it stays at
+ *      the chain tip and ends only when stopped or on a failure.
  *   3. If save_required, also fetches all wallet state and persists to disk.
  *
  * Lock flags on this class (refreshSyncLock, fetchSyncStatusLock,
@@ -24,6 +26,10 @@ import {
 } from '@app/walletBackend/config/WalletBackendConfig';
 import { DataService } from './DataService';
 import { changeServer, doSave } from '@app/walletBackend/utils/walletUtils';
+import {
+  spendInFlight,
+  stopSyncAndWait,
+} from '@app/walletBackend/utils/syncBracket';
 
 // zingolib's refusal to sync a client that has no indexer configured.
 const INDEXERLESS = /no indexer configured/i;
@@ -162,16 +168,15 @@ export class SyncCoordinator {
     await Promise.allSettled(taskPromises);
   }
 
-  async pauseSyncProcess(): Promise<void> {
-    try {
-      const returnPause: string = await RPCModule.pauseSyncProcess();
-      // pauseSyncProcess rejects on failure (typed FFI errors); the catch
-      // owns the error path, so the result is never inspected for a sentinel.
-      console.log('pause sync process. PAUSED', returnPause);
-    } catch (error) {
-      console.log(`Critical Error pause sync ${error}`);
-      this.config.onError(`Error sync pause: ${error}`);
-    }
+  /**
+   * Stops the engine and waits up to `waitMs` for it to end. Nothing
+   * relaunches it until the tick runs again.
+   */
+  async stopSyncProcess(waitMs: number): Promise<void> {
+    await stopSyncAndWait(waitMs, error => {
+      console.log(`Critical Error stop sync ${error}`);
+      this.config.onError(`Error sync stop: ${error}`);
+    });
   }
 
   async clearTimers(): Promise<void> {
@@ -211,6 +216,9 @@ export class SyncCoordinator {
       return;
     }
     if (this.refreshSyncLock && !fullRescan) {
+      return;
+    }
+    if (spendInFlight() && !fullRescan) {
       return;
     }
     this.refreshSyncLock = true;
@@ -389,14 +397,11 @@ export class SyncCoordinator {
         return;
       }
 
+      // A running engine answers this for its whole continuous session.
       if (returnPoll.toLowerCase().startsWith('sync task is not complete')) {
         console.log('SYNC POLL -> FETCH STATUS', returnPoll);
         setTimeout(async () => {
           await this.fetchSyncStatus();
-        }, 0);
-        console.log('SYNC POLL -> RUN SYNC', returnPoll);
-        setTimeout(async () => {
-          await this.refreshSync();
         }, 0);
         return;
       }

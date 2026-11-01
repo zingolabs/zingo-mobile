@@ -33,12 +33,13 @@ import { LanguageEnum } from './enums/LanguageEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
+import type { SnackbarActionType } from './types/SnackbarActionType';
 import { TransactionTypeEnum } from './enums/TransactionTypeEnum';
 import { PoolEnum } from './enums/PoolEnum';
 import { RestoreFromTypeEnum } from './enums/RestoreFromTypeEnum';
 import { PoolToShieldEnum } from './enums/PoolToShieldEnum';
 import { SettingsNameEnum } from './enums/SettingsNameEnum';
-import { RouteEnum } from './enums/RouteEnum';
+import { Route } from './enums/Route';
 import { AppStateStatusEnum } from './enums/AppStateStatusEnum';
 import { CurrencyNameEnum } from './enums/CurrencyNameEnum';
 import { AddressKindEnum } from './enums/AddressKindEnum';
@@ -49,7 +50,6 @@ import { FilterEnum } from './enums/FilterEnum';
 import { TransactionActionEnum } from './enums/TransactionActionEnum';
 import { AddressUnifiedTypeEnum } from './enums/AddressUnifiedTypeEnum';
 import { ZcashUriFieldEnum } from './enums/ZcashUriFieldEnum';
-import { ScreenEnum } from './enums/ScreenEnum';
 import { LaunchingModeEnum } from './enums/LaunchingModeEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 
@@ -66,6 +66,7 @@ import type AppStateLoaded from './AppStateLoaded';
 import type AppStateLoading from './AppStateLoading';
 import type { BiometricGateOutcome } from './AppStateLoading';
 import type AppContextLoading from './AppContextLoading';
+import type { OnboardingContext } from './AppContextLoading';
 import type AppContextLoaded from './AppContextLoaded';
 
 export {
@@ -93,7 +94,7 @@ export {
   RestoreFromTypeEnum,
   PoolToShieldEnum,
   SettingsNameEnum,
-  RouteEnum,
+  Route,
   AppStateStatusEnum,
   CurrencyNameEnum,
   AddressKindEnum,
@@ -104,7 +105,6 @@ export {
   TransactionActionEnum,
   AddressUnifiedTypeEnum,
   ZcashUriFieldEnum,
-  ScreenEnum,
   LaunchingModeEnum,
   BlockExplorerEnum,
   GlobalConst,
@@ -120,6 +120,7 @@ export type {
   AppStateLoading,
   BiometricGateOutcome,
   AppContextLoading,
+  OnboardingContext,
   AppContextLoaded,
   WalletType,
   SendJsonToTypeType,
@@ -128,6 +129,7 @@ export type {
   BackgroundType,
   BackgroundErrorType,
   TranslateType,
+  SnackbarActionType,
   NetInfoType,
   ServerType,
   ServerUrisType,

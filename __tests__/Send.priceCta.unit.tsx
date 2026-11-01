@@ -26,15 +26,14 @@ jest.mock('@ui/widgets/priceFetcherStore', () => ({
 
 import 'react-native';
 import React from 'react';
-import { fireEvent, render } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import Send from '@screens/Send';
 import Confirm from '@screens/Confirm';
-import ZecAmount from '@ui/widgets/ZecAmount';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import {
   usePriceFetcherStore,
   usePriceHealth,
@@ -46,30 +45,35 @@ import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppDrawerParamList } from '@app/types';
+import { HomeTabScreenProps } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
+
+/** Send mounts its sheet once its container is measured; jest never lays out. */
+const layoutSend = () => {
+  const container = screen.queryByTestId('send.container');
+  if (container) {
+    fireEvent(container, 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 400, height: 800 } },
+    });
+  }
+};
 
 const storeHook = usePriceFetcherStore as jest.MockedFunction<
   typeof usePriceFetcherStore
 >;
 const healthHook = usePriceHealth as jest.MockedFunction<typeof usePriceHealth>;
 
-function makeDrawerProps(): NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Send
-> {
+function makeDrawerProps(): HomeTabScreenProps<'Send'> {
   return {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.Send,
+      name: Route.Send,
       params: undefined,
     },
   };
 }
 
-const onFunction = jest.fn();
 const sendUi = (zecPrice: { zecPrice: number; date: number }) => {
   const state = { ...defaultAppContextLoaded };
   state.valueTransfers = mockValueTransfers;
@@ -82,16 +86,7 @@ const sendUi = (zecPrice: { zecPrice: number; date: number }) => {
   state.zecPrice = zecPrice;
   return (
     <ContextAppLoadedProvider value={state}>
-      <Send
-        {...makeDrawerProps()}
-        sendTransaction={onFunction}
-        clearToAddr={onFunction}
-        toggleMenuDrawer={onFunction}
-        setShieldingAmount={onFunction}
-        setScrollToTop={onFunction}
-        setScrollToBottom={onFunction}
-        setServerOption={onFunction}
-      />
+      <Send {...makeDrawerProps()} />
     </ContextAppLoadedProvider>
   );
 };
@@ -113,37 +108,27 @@ beforeEach(() => {
   );
 });
 
-test('F8: the in-form USD amounts dim when the price is stale', () => {
+test('F8: the in-form USD amount dims when the price is stale', () => {
   const view = render(
     sendUi({ zecPrice: 33.33, date: Date.now() - 11 * 60_000 }),
   );
+  layoutSend();
 
   const { StyleSheet } = require('react-native');
-  const formAmounts = view
-    .getAllByText(/^\$ /)
-    .map(t => StyleSheet.flatten(t.props.style))
-    .filter(
-      (s: { fontSize?: number }) => s.fontSize === 16 || s.fontSize === 14,
-    );
-  expect(formAmounts.length).toBeGreaterThan(0);
-  formAmounts.forEach(s => expect(s.color).toBe('#888888'));
+  const line = view.getByTestId('send.zec-derived');
+  expect(line).toHaveTextContent(/≈ \$/);
+  expect(StyleSheet.flatten(line.props.style).color).toBe('#888888');
 });
 
 test('P8: an absent price hides the in-form USD amounts and the ring', () => {
   const view = render(sendUi({ zecPrice: 0, date: 0 }));
+  layoutSend();
 
-  const { StyleSheet } = require('react-native');
-  const formAmounts = view
-    .queryAllByText(/^\$ /)
-    .map(t => StyleSheet.flatten(t.props.style))
-    .filter(
-      (s: { fontSize?: number }) => s.fontSize === 16 || s.fontSize === 14,
-    );
-  expect(formAmounts).toHaveLength(0);
+  expect(view.getByTestId('send.zec-derived')).not.toHaveTextContent(/\$/);
   expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
 });
 
-test('N7: the send-confirmation conversions dim on a stale price too', () => {
+test('N7: the send-confirmation conversion dims on a stale price too', () => {
   const state = { ...defaultAppContextLoaded };
   state.translate = mockTranslate;
   state.info = mockInfo;
@@ -156,13 +141,11 @@ test('N7: the send-confirmation conversions dim on a stale price too', () => {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.Confirm,
+      name: Route.Confirm,
       params: {
         calculatedFee: 0.00001,
         proposalPools: { source: ['ironwood'], destination: ['ironwood'] },
-        confirmSend: jest.fn(async () => {}),
         sendAllAmount: false,
-        calculateFeeWithPropose: jest.fn(async () => {}),
         sendPageState: mockSendPageState,
       },
     },
@@ -172,26 +155,25 @@ test('N7: the send-confirmation conversions dim on a stale price too', () => {
       <Confirm {...confirmProps} />
     </ContextAppLoadedProvider>,
   );
+  layoutSend();
 
   const { StyleSheet } = require('react-native');
-  const conversions = view
-    .getAllByText(/^\$ /)
-    .map(t => StyleSheet.flatten(t.props.style));
-  expect(conversions.length).toBeGreaterThan(0);
-  conversions.forEach(s => expect(s.color).toBe('#888888'));
+  const fiat = view.getByTestId('send.confirm.fiat');
+  expect(fiat).toHaveTextContent(/^\$\d/);
+  expect(StyleSheet.flatten(fiat.props.style).color).toBe('#888888');
 });
 
 test('H3: the USD-entry derived ZEC amount dims on a stale price', () => {
   const view = render(
     sendUi({ zecPrice: 33.33, date: Date.now() - 11 * 60_000 }),
   );
+  layoutSend();
 
   fireEvent.press(view.getByTestId('send.swap-entry'));
-  const derived = view
-    .UNSAFE_getAllByType(ZecAmount)
-    .find(z => z.props.testID === 'send.zec-derived');
-  expect(derived).toBeTruthy();
-  expect(derived?.props.color).toBe('#888888');
+  const { StyleSheet } = require('react-native');
+  const derived = view.getByTestId('send.zec-derived');
+  expect(derived).toHaveTextContent(/≈ .* ZEC/);
+  expect(StyleSheet.flatten(derived.props.style).color).toBe('#888888');
 });
 
 test('the amount being typed shows in both currencies with privacy on', () => {
@@ -201,12 +183,8 @@ test('the amount being typed shows in both currencies with privacy on', () => {
       {ui.props.children}
     </ContextAppLoadedProvider>,
   );
+  layoutSend();
 
-  const { StyleSheet } = require('react-native');
-  // A masked amount reads "$ -.--"; a shown one starts with a digit.
-  const derived = view
-    .queryAllByText(/^\$ \d/)
-    .map(t => StyleSheet.flatten(t.props.style))
-    .filter((s: { fontSize?: number }) => s.fontSize === 16);
-  expect(derived.length).toBeGreaterThan(0);
+  // A masked amount would read "•••••"; the typed one shows its digits.
+  expect(view.getByTestId('send.zec-derived')).toHaveTextContent(/≈ \$\d/);
 });

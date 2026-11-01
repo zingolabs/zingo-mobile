@@ -41,6 +41,8 @@ type QuoteRefreshRingProps = {
   /** Elapsed fraction a refill begins at, for a ring mounted mid-cycle. */
   startProgress?: number;
   fetching?: boolean;
+  /** Holds the arc where it is; it carries on from there when released. */
+  paused?: boolean;
   style?: StyleProp<ViewStyle>;
   testID?: string;
 };
@@ -54,6 +56,7 @@ export default function QuoteRefreshRing({
   resetKey,
   startProgress,
   fetching,
+  paused,
   style,
   testID,
 }: QuoteRefreshRingProps) {
@@ -62,18 +65,25 @@ export default function QuoteRefreshRing({
   const startProgressRef = useRef(0);
   startProgressRef.current = Math.min(Math.max(startProgress ?? 0, 0), 1);
   const [progress, setProgress] = useState(startProgressRef.current);
+  const progressRef = useRef(startProgressRef.current);
+  const keyRef = useRef(resetKey);
   const strokeWidth = 2;
   const center = size / 2;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
 
   useEffect(() => {
-    const from = startProgressRef.current;
+    if (keyRef.current !== resetKey) {
+      keyRef.current = resetKey;
+      progressRef.current = startProgressRef.current;
+    }
+    const from = progressRef.current;
     const startedAt = Date.now();
     setProgress(from);
-    if (from >= 1 || durationMs <= 0) return;
+    if (paused || from >= 1 || durationMs <= 0) return;
     const tick = setInterval(() => {
       const now = Math.min(from + (Date.now() - startedAt) / durationMs, 1);
+      progressRef.current = now;
       // The functional update returns the previous value for sub-step
       // movement, so React bails out of those re-renders.
       setProgress(prev =>
@@ -82,7 +92,7 @@ export default function QuoteRefreshRing({
       if (now >= 1) clearInterval(tick);
     }, RING_TICK_MS);
     return () => clearInterval(tick);
-  }, [resetKey, durationMs]);
+  }, [resetKey, durationMs, paused]);
 
   const turn = useSharedValue(0);
   useEffect(() => {

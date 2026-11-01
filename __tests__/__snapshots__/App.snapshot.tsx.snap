@@ -6,14 +6,11 @@ exports[`Component App - test App - snapshot 1`] = `
     {
       "backgroundColor": "#011401",
       "flex": 1,
-      "paddingLeft": 0,
-      "paddingRight": 0,
-      "paddingTop": 0,
     }
   }
 >
   <MockedNavigator
-    initialRouteName="LoadingApp"
+    screenLayout={[Function]}
     screenOptions={
       {
         "animation": "none",
@@ -22,14 +19,11 @@ exports[`Component App - test App - snapshot 1`] = `
     }
   >
     <MockedScreen
-      name="LoadingApp"
-    />
-    <MockedScreen
-      name="LoadedApp"
+      name="Loading"
     />
     <MockedScreen
       component={[Function]}
-      name="ScannerAddress"
+      name="Scanner"
       options={
         {
           "animation": "none",

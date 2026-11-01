@@ -11,7 +11,6 @@ import {
 } from '@app/context';
 
 import MessageLine from '@screens/Messages/components/MessageLine';
-import { ScreenEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
@@ -41,7 +40,6 @@ describe('MessageLine - snapshots', () => {
             month="January 2024"
             vt={vt}
             setValueTransferDetailModalShow={onFn}
-            screenName={ScreenEnum.MessagesList}
           />
         </ContextAppLoadedProvider>,
       ).toJSON(),
@@ -59,7 +57,6 @@ describe('MessageLine - snapshots', () => {
             vt={vt}
             setValueTransferDetailModalShow={onFn}
             messageAddress="u1abc123def456"
-            screenName={ScreenEnum.MessagesList}
           />
         </ContextAppLoadedProvider>,
       ).toJSON(),

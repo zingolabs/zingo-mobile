@@ -2,7 +2,6 @@ export const GlobalConst = {
   zcash: 'zcash:',
   port80: '80',
   port443: '443',
-  port9067: '9067',
   http: 'http:',
   https: 'https:',
   serverPlaceHolder: 'https://------.---:---',

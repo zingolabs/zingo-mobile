@@ -218,19 +218,33 @@ private func syncStatusOrReason() -> String {
     }
 }
 
-/// Launches a sync of `what` and polls it each second to completion, failing with the elapsed time and the sync status at the deadline or on a sync error.
+/// Whether the running session has reached the chain tip it found.
+private func syncHasCaughtUp() throws -> Bool {
+    return try syncCaughtUp().range(of: "\"caught_up\":\\s*true", options: .regularExpression) != nil
+}
+
+/// Stops the session and polls each second until it has ended. Sync is continuous, so a session never ends on its own.
+private func stopSyncAndWait() throws {
+    _ = try stopSync()
+    while try pollSync().lowercased().hasPrefix("sync task is not complete") {
+        Thread.sleep(forTimeInterval: 1.0)
+    }
+}
+
+/// Launches a sync of `what`, polls it each second until it reaches the tip and stops it, failing with the elapsed time and the sync status at the deadline or on a sync error.
 private func syncToCompletion(_ what: String, deadlineSeconds: TimeInterval, start: Date) throws {
     let syncStart = Date()
     do {
         let syncJson = try runSync()
         print("\nSync:\n\(syncJson)")
-        while try !pollSync().contains("sync_complete") {
+        while try pollSync().lowercased().hasPrefix("sync task is not complete"), try !syncHasCaughtUp() {
             let elapsed = Date().timeIntervalSince(start)
             if elapsed > deadlineSeconds {
                 throw ChainFailure(description: "the test passed its \(Int(deadlineSeconds)) s deadline after \(elapsed) s while syncing \(what): \(syncStatusOrReason())")
             }
             Thread.sleep(forTimeInterval: 1.0)
         }
+        try stopSyncAndWait()
     } catch let error as ZingolibError {
         throw ChainFailure(description: "the sync of \(what) failed after \(Date().timeIntervalSince(start)) s: \(error): \(syncStatusOrReason())")
     }
@@ -256,7 +270,7 @@ private func syncUntilSpendable(_ minimum: Int64, deadlineSeconds: TimeInterval,
 private func syncFixtureWallet(start: Date) throws -> UInt64 {
     let (serveruri, tip) = try firstAnsweringServer("testnet", TestnetFixture.SERVERS)
 
-    let initJson = try initFromSeed(seed: TestnetFixture.SEED, birthday: UInt32(TestnetFixture.BIRTHDAY), connection: IndexerConnection(serverUri: serveruri, chainHint: TestnetFixture.CHAIN_HINT, sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
+    let initJson = try initFromSeed(seed: TestnetFixture.SEED, birthday: UInt32(TestnetFixture.BIRTHDAY), connection: IndexerConnection(indexer: .named(uri: serveruri), chainHint: TestnetFixture.CHAIN_HINT, sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
     print("\nInit from seed:\n\(initJson)")
     let initRes: InitFromSeed = try decodeJSON(initJson)
     XCTAssertEqual(initRes.seed_phrase, TestnetFixture.SEED)
@@ -288,7 +302,7 @@ final class ExecuteAddressesFromSeed: XCTestCase {
         let seed = Seeds.HOSPITAL
 
         do {
-            let initJson = try initFromSeed(seed: seed, birthday:UInt32(1), connection: IndexerConnection(serverUri: "", chainHint: "regtest", sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
+            let initJson = try initFromSeed(seed: seed, birthday:UInt32(1), connection: IndexerConnection(indexer: .offline, chainHint: "regtest", sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
             print("\nInit from seed:\n\(initJson)")
             let initRes: InitFromSeed = try decodeJSON(initJson)
             XCTAssertEqual(initRes.seed_phrase, seed)
@@ -330,7 +344,7 @@ final class ExecuteAddressFromUfvk: XCTestCase {
         let ufvk = UfvkConst.HOSPITAL
 
         do {
-          let initJson = try initFromUfvk(ufvk: ufvk, birthday: UInt32(1), connection: IndexerConnection(serverUri: "", chainHint: "regtest", sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
+          let initJson = try initFromUfvk(ufvk: ufvk, birthday: UInt32(1), connection: IndexerConnection(indexer: .offline, chainHint: "regtest", sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
           print("\nInit From UFVK:\n\(initJson)")
           let initRes: InitFromUfvk = try decodeJSON(initJson)
           XCTAssertEqual(initRes.ufvk, ufvk)
@@ -383,7 +397,7 @@ final class ExecuteVersionFromSeed: XCTestCase {
         let seed = Seeds.HOSPITAL
 
         do {
-          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), connection: IndexerConnection(serverUri: "", chainHint: "regtest", sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
+          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), connection: IndexerConnection(indexer: .offline, chainHint: "regtest", sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
           print("\nInit from seed:\n\(initJson)")
           let initRes: InitFromSeed = try decodeJSON(initJson)
           XCTAssertEqual(initRes.seed_phrase, seed)
@@ -396,9 +410,9 @@ final class ExecuteVersionFromSeed: XCTestCase {
         do {
             let version = try getVersion()
             print("\nVersion:\n\(version)")
-            let part = "[0-9A-Za-z.+-]+(_[0-9a-f]{5})?(_dirty)?"
+            let zingolibPart = "[0-9A-Za-z.+-]+_[0-9a-f]{16}(_dirty)?"
             // The zm_ part is the app build's, joined by RPCModule.
-            XCTAssertNotNil(version.range(of: "^zl_\(part)$", options: .regularExpression), version)
+            XCTAssertNotNil(version.range(of: "^zl_\(zingolibPart)$", options: .regularExpression), version)
         } catch {
           XCTFail("\nVersion error:\n\(error.localizedDescription)")
           return
@@ -416,7 +430,7 @@ final class ExecuteSyncFromSeed: XCTestCase {
         let (serveruri, tip) = try firstAnsweringServer("mainnet", MainnetServers.SERVERS)
 
         let birthday = tip - window
-        let initJson = try initFromSeed(seed: seed, birthday: UInt32(birthday), connection: IndexerConnection(serverUri: serveruri, chainHint: "main", sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
+        let initJson = try initFromSeed(seed: seed, birthday: UInt32(birthday), connection: IndexerConnection(indexer: .named(uri: serveruri), chainHint: "main", sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
         print("\nInit from seed:\n\(initJson)")
         let initRes: InitFromSeed = try decodeJSON(initJson)
         XCTAssertEqual(initRes.seed_phrase, seed)
@@ -522,7 +536,7 @@ final class PriceRefusedWithoutMixnet: XCTestCase {
         let seed = Seeds.HOSPITAL
 
         do {
-          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), connection: IndexerConnection(serverUri: "", chainHint: "regtest", sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
+          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), connection: IndexerConnection(indexer: .offline, chainHint: "regtest", sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
           print("\nInit from seed:\n\(initJson)")
           let initRes: InitFromSeed = try decodeJSON(initJson)
           XCTAssertEqual(initRes.seed_phrase, seed)
@@ -587,6 +601,7 @@ class FfiOutcomeTests: XCTestCase {
         (ZingolibError.Read(message: "boom"), "Read"),
         (ZingolibError.Send(message: "boom"), "Send"),
         (ZingolibError.Shield(message: "boom"), "Shield"),
+        (ZingolibError.SendAfterDeshield(message: "boom"), "SendAfterDeshield"),
         (ZingolibError.InvalidInput(message: "boom"), "InvalidInput"),
         (ZingolibError.Wallet(message: "boom"), "Wallet"),
         (ZingolibError.Indexer(message: "boom"), "Indexer"),
@@ -810,7 +825,7 @@ class WalletFileDiagnosisTests: XCTestCase {
 
     func testALegacyTextFileMigratesToRawBytesOnRead() throws {
         _ = try initFromSeed(
-            seed: Seeds.HOSPITAL, birthday: UInt32(2_000_000), connection: IndexerConnection(serverUri: "", chainHint: "main", sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
+            seed: Seeds.HOSPITAL, birthday: UInt32(2_000_000), connection: IndexerConnection(indexer: .offline, chainHint: "main", sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
         let wallet = try XCTUnwrap(try saveWalletBytes())
 
         let rpc = RPCModule()

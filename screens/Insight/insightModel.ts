@@ -1,11 +1,18 @@
 import { AddressBookFileClass, ValueTransferKindEnum } from '@app/AppState';
 import ValueTransferType from '@app/AppState/types/ValueTransferType';
+import { themeTokens } from '@app/theme';
 
 export const TOP = 5;
 export const MIN_WEEKS = 4;
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-const PALETTE = ['#3CC52A', '#8FB4E6', '#E6C46A', '#F07A86', '#B79CF2'];
-export const OTHERS_COLOR = '#7E92B0';
+const PALETTE = [
+  themeTokens.fgCategory1,
+  themeTokens.fgCategory2,
+  themeTokens.fgCategory3,
+  themeTokens.fgCategory4,
+  themeTokens.fgCategory5,
+];
+export const OTHERS_COLOR = themeTokens.fgMuted;
 
 export type Cell = { amount: number; sends: number; bytes: number };
 

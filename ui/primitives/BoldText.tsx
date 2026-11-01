@@ -1,6 +1,6 @@
 import React from 'react';
-import { Text, TextStyle } from 'react-native';
-import { useTheme } from '@app/theme';
+import { TextStyle } from 'react-native';
+import Text from './Text';
 
 type BoldTextProps = {
   style?: TextStyle;
@@ -12,32 +12,9 @@ type BoldTextProps = {
   numberOfLines?: number;
 };
 
-const BoldText: React.FunctionComponent<BoldTextProps> = ({
-  style,
-  children,
-  testID,
-  selectable,
-  numberOfLines,
-}) => {
-  const { colors } = useTheme();
-  const totalStyle: TextStyle = {
-    color: colors.fgDefault,
-    fontSize: 16,
-    fontWeight: 'bold',
-    opacity: 0.87,
-    ...style,
-  };
-
-  return (
-    <Text
-      testID={testID}
-      style={totalStyle}
-      selectable={selectable}
-      numberOfLines={numberOfLines}
-    >
-      {children}
-    </Text>
-  );
-};
+/** `Text` in its `bodyStrong` style. */
+const BoldText: React.FunctionComponent<BoldTextProps> = props => (
+  <Text variant="bodyStrong" {...props} />
+);
 
 export default BoldText;

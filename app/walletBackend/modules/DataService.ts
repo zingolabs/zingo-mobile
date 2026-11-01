@@ -22,6 +22,10 @@ import {
   TransparentAddressClass,
   foldBlockSpacing,
 } from '@app/AppState';
+import {
+  noteHeights,
+  resetFreshness,
+} from '@app/walletBackend/utils/syncFreshness';
 import RPCModule from '@app/RPCModule';
 import { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddressType';
 import { RPCBalancesType } from '@app/walletBackend/types/RPCBalancesType';
@@ -69,6 +73,12 @@ export class DataService {
   fetchWalletBirthdaySeedUfvkLock: boolean = false;
   fetchInfoAndServerHeightLock: boolean = false;
   fetchTandZandOValueTransfersLock: boolean = false;
+  /**
+   * A fetch asked for while one ran. That one may have read the list before
+   * the change it is asked for (a send that just went out), so another
+   * follows it instead of the ask being dropped.
+   */
+  fetchTandZandOValueTransfersAgain: boolean = false;
   fetchTandZandOMessagesLock: boolean = false;
   fetchTotalBalanceLock: boolean = false;
   fetchAddressesLock: boolean = false;
@@ -80,6 +90,8 @@ export class DataService {
 
   constructor(config: WalletBackendConfig) {
     this.config = config;
+    // The freshness store is module state: a new wallet starts from nothing.
+    resetFreshness();
   }
 
   async fetchTotalBalance() {
@@ -246,6 +258,11 @@ export class DataService {
       }
       const heightJSON: RPCWalletHeight = await JSON.parse(heightStr);
       this.lastWalletBlockHeight = heightJSON.height;
+      noteHeights(
+        this.lastWalletBlockHeight,
+        this.lastServerBlockHeight,
+        Date.now(),
+      );
     } catch (error) {
       console.log(`Critical Error wallet height ${error}`);
       this.config.onError(`Error wallet height: ${error}`);
@@ -317,6 +334,11 @@ export class DataService {
 
       this.config.onInfoChanged(info);
       this.lastServerBlockHeight = info.latestBlock;
+      noteHeights(
+        this.lastWalletBlockHeight,
+        this.lastServerBlockHeight,
+        Date.now(),
+      );
     } catch (error) {
       console.log(`Critical Error info & server block height ${error}`);
       this.config.onError(`Error info: ${error}`);
@@ -393,6 +415,9 @@ export class DataService {
       if (wallet) {
         this.walletBirthday = wallet.birthday;
         this.config.onBirthdayChanged(wallet.birthday || 0);
+        if (wallet.birthdayAdjustedFrom) {
+          this.config.onBirthdayAdjusted(wallet.birthday);
+        }
       }
     } catch (error) {
       console.log(`Critical Error wallet birthday ${error}`);
@@ -433,8 +458,9 @@ export class DataService {
     }
   }
 
-  async fetchTandZandOValueTransfers() {
+  async fetchTandZandOValueTransfers(): Promise<void> {
     if (this.fetchTandZandOValueTransfersLock) {
+      this.fetchTandZandOValueTransfersAgain = true;
       return;
     }
     this.fetchTandZandOValueTransfersLock = true;
@@ -480,6 +506,10 @@ export class DataService {
       await this.onSyncError();
     } finally {
       this.fetchTandZandOValueTransfersLock = false;
+    }
+    if (this.fetchTandZandOValueTransfersAgain) {
+      this.fetchTandZandOValueTransfersAgain = false;
+      await this.fetchTandZandOValueTransfers();
     }
   }
 

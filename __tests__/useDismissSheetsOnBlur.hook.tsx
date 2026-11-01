@@ -11,9 +11,9 @@ jest.mock('@gorhom/bottom-sheet', () => ({
 import { renderHook } from '@testing-library/react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 
-const blurTo = (route: RouteEnum) => {
+const blurTo = (route: Route) => {
   jest.mocked(useNavigation).mockReturnValue({
     getParent: () => undefined,
     getState: () => ({ index: 0, routes: [{ name: route }] }),
@@ -36,13 +36,13 @@ beforeEach(() => {
 });
 
 test('Tests that the open sheets survive the blur when the scanner opens over them. The scanner hands the scanned value back to the sheet that asked for it.', () => {
-  blurTo(RouteEnum.ScannerAddress);
+  blurTo(Route.Scanner);
 
   expect(mockDismissAll).not.toHaveBeenCalled();
 });
 
 test('Tests that the open sheets close when the blur comes from any other route.', () => {
-  blurTo(RouteEnum.Send);
+  blurTo(Route.Send);
 
   expect(mockDismissAll).toHaveBeenCalled();
 });

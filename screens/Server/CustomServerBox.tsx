@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
-import { Pressable, TextInput, View } from 'react-native';
+import { TextInput, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -8,22 +8,21 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
-import { useTheme } from '@app/theme';
+import {
+  fontScaleBody,
+  space8,
+  space12,
+  textVariants,
+  useTheme,
+} from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ChainNameEnum } from '@app/AppState';
-import RegText from '@ui/primitives/RegText';
-import BoldText from '@ui/primitives/BoldText';
-import { LoadingDots } from '@ui/widgets/ProgressState';
+import Text from '@ui/primitives/Text';
+import TextField from '@ui/primitives/TextField';
 import ServerLog, { LogLine } from './ServerLog';
-import { DEFAULT_PORT, schemeFor } from './useCustomServer';
-
-const PLACEHOLDER = '#3F5677';
-const SAVE_OFF_BG = '#0F3A12';
-const SAVE_OFF_TEXT = '#5E8A5E';
-const OK_TEXT = '#6FD35C';
+import { schemeFor } from './useCustomServer';
+import Button from '@ui/primitives/Button';
 
 type CustomServerBoxProps = {
   chain: ChainNameEnum;
@@ -56,6 +55,9 @@ type CustomServerBoxProps = {
   onSwitch: (chain: ChainNameEnum) => void;
 };
 
+/** Five digits at the value's size. */
+const PORT_WIDTH = 64;
+
 const CustomServerBox: React.FC<CustomServerBoxProps> = ({
   chain,
   host,
@@ -77,7 +79,7 @@ const CustomServerBox: React.FC<CustomServerBoxProps> = ({
   onSwitch,
 }) => {
   const { colors } = useTheme();
-  const [focused, setFocused] = useState(false);
+  const [portFocused, setPortFocused] = useState(false);
   const hostInput = useRef<TextInput>(null);
   const portInput = useRef<TextInput>(null);
   const fieldX = useSharedValue(0);
@@ -127,14 +129,6 @@ const CustomServerBox: React.FC<CustomServerBoxProps> = ({
 
   const empty = !host.trim();
   const busy = working !== null;
-  const border =
-    result === true
-      ? colors.fgAccent
-      : result === false
-        ? colors.fgDangerEmphasis
-        : focused
-          ? colors.borderFocus
-          : colors.bottomSheetBorder;
   const blur = () => {
     hostInput.current?.blur();
     portInput.current?.blur();
@@ -145,187 +139,114 @@ const CustomServerBox: React.FC<CustomServerBoxProps> = ({
 
   return (
     <View>
-      <Animated.View
-        style={[
-          {
-            flexDirection: 'row',
-            height: 41,
-            borderRadius: 10,
-            borderWidth: 1,
-            borderColor: border,
-            backgroundColor: colors.bgSurface,
-            overflow: 'hidden',
-          },
-          fieldStyle,
-        ]}
-      >
-        <View style={{ justifyContent: 'center', paddingLeft: 12 }}>
-          <RegText style={{ fontSize: 13, color: colors.fgMuted }}>
-            {schemeFor(chain)}
-          </RegText>
-        </View>
-        <TextInput
-          ref={hostInput}
+      <Animated.View style={fieldStyle}>
+        <TextField
+          label=""
+          inputRef={hostInput}
           testID="server.custom.host"
           accessibilityLabel={labels.host}
+          prefix={schemeFor(chain)}
           value={host}
           onChangeText={text => {
             if (onHost(text)) {
               portInput.current?.focus();
             }
           }}
-          selectTextOnFocus
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          onSubmitEditing={() => {
-            blur();
-            onTest();
-          }}
-          editable={!disabled && !busy}
+          valid={result === true}
+          invalid={result === false}
+          active={portFocused}
+          disabled={disabled}
+          readOnly={busy}
           placeholder={
             chain === ChainNameEnum.regtestChainName
               ? labels.hostRegtest
               : labels.host
           }
-          placeholderTextColor={PLACEHOLDER}
           keyboardType="url"
           autoCapitalize="none"
           autoCorrect={false}
-          spellCheck={false}
           textContentType="URL"
           returnKeyType="go"
-          style={{
-            flex: 1,
-            minWidth: 0,
-            paddingLeft: 1,
-            paddingRight: 12,
-            fontSize: 13,
-            color: colors.fgDefault,
-          }}
-        />
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            borderLeftWidth: 1,
-            borderLeftColor: colors.bottomSheetBorder,
-          }}
-        >
-          <RegText style={{ fontSize: 13, color: '#5A6F8F', paddingLeft: 9 }}>
-            :
-          </RegText>
-          <TextInput
-            ref={portInput}
-            testID="server.custom.port"
-            accessibilityLabel={labels.port}
-            value={port}
-            onChangeText={onPort}
-            selectTextOnFocus
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-            onSubmitEditing={() => {
-              blur();
-              onTest();
-            }}
-            editable={!disabled && !busy}
-            placeholder={DEFAULT_PORT}
-            placeholderTextColor={PLACEHOLDER}
-            keyboardType="number-pad"
-            maxLength={5}
-            returnKeyType="go"
-            style={{
-              width: 52,
-              paddingLeft: 3,
-              paddingRight: 10,
-              fontSize: 13,
-              color: colors.fgDefault,
-              fontVariant: ['tabular-nums'],
-            }}
-          />
-        </View>
-      </Animated.View>
-
-      <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-        <Pressable
-          testID="server.custom.test"
-          onPress={() => {
+          selectTextOnFocus
+          onSubmitEditing={() => {
             blur();
             onTest();
           }}
-          disabled={testOff}
-          accessibilityRole="button"
-          accessibilityState={{ disabled: testOff, busy: working === 'test' }}
-          style={{
-            flex: 1,
-            height: 38,
-            borderRadius: 10,
-            borderWidth: 1,
-            borderColor: colors.bottomSheetBorder,
-            backgroundColor: colors.bgCanvas,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {working === 'test' ? (
-            <LoadingDots size={6} gap={5} color={colors.fgDefault} />
-          ) : (
-            <BoldText
+          suffix={
+            <View
               style={{
-                fontSize: 12.5,
-                color: testOff ? PLACEHOLDER : colors.fgDefault,
+                flexDirection: 'row',
+                alignItems: 'center',
+                alignSelf: 'stretch',
+                paddingLeft: space8,
+                borderLeftWidth: 1,
+                borderLeftColor: colors.bottomSheetBorder,
               }}
             >
-              {labels.test}
-            </BoldText>
-          )}
-        </Pressable>
+              <Text variant="body" tone="muted">
+                :
+              </Text>
+              <TextInput
+                ref={portInput}
+                testID="server.custom.port"
+                accessibilityLabel={labels.port}
+                value={port}
+                onChangeText={onPort}
+                selectTextOnFocus
+                onFocus={() => setPortFocused(true)}
+                onBlur={() => setPortFocused(false)}
+                onSubmitEditing={() => {
+                  blur();
+                  onTest();
+                }}
+                editable={!disabled && !busy}
+                keyboardType="number-pad"
+                maxLength={5}
+                returnKeyType="go"
+                maxFontSizeMultiplier={fontScaleBody}
+                style={{
+                  width: PORT_WIDTH,
+                  paddingLeft: space8 / 2,
+                  paddingRight: space12,
+                  fontSize: textVariants.bodyStrong.fontSize,
+                  fontWeight: textVariants.bodyStrong.fontWeight,
+                  color: colors.fgDefault,
+                  fontVariant: ['tabular-nums'],
+                }}
+              />
+            </View>
+          }
+        />
+      </Animated.View>
+
+      {/** Test and Save sit side by side: they act on the server field, they
+          are not the form's actions, so they do not stack. */}
+      <View style={{ marginTop: space8, flexDirection: 'row', gap: space8 }}>
+        <View style={{ flex: 1 }}>
+          <Button
+            testID="server.custom.test"
+            variant="text"
+            title={labels.test}
+            busy={working === 'test'}
+            disabled={testOff}
+            onPress={() => {
+              blur();
+              onTest();
+            }}
+          />
+        </View>
         <Animated.View style={[{ flex: 1 }, saveStyle]}>
-          <Pressable
+          <Button
             testID="server.custom.save"
+            variant={saved && !busy ? 'text' : 'primary'}
+            title={saved && !busy ? labels.saved : labels.save}
+            busy={working === 'save'}
+            disabled={saveOff}
             onPress={() => {
               blur();
               onSave();
             }}
-            disabled={saveOff}
-            accessibilityRole="button"
-            accessibilityState={{ disabled: saveOff, busy: working === 'save' }}
-            style={{
-              height: 38,
-              borderRadius: 10,
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexDirection: 'row',
-              gap: 6,
-              backgroundColor:
-                saved && !busy
-                  ? 'rgba(20,157,5,0.12)'
-                  : saveOff
-                    ? SAVE_OFF_BG
-                    : colors.bgAccent,
-              borderWidth: saved && !busy ? 1 : 0,
-              borderColor: 'rgba(20,157,5,0.45)',
-            }}
-          >
-            {working === 'save' ? (
-              <LoadingDots size={6} gap={5} color={colors.bgCanvas} />
-            ) : saved ? (
-              <>
-                <FontAwesomeIcon icon={faCheck} size={11} color={OK_TEXT} />
-                <BoldText style={{ fontSize: 12.5, color: OK_TEXT }}>
-                  {labels.saved}
-                </BoldText>
-              </>
-            ) : (
-              <BoldText
-                style={{
-                  fontSize: 12.5,
-                  color: saveOff ? SAVE_OFF_TEXT : colors.bgCanvas,
-                }}
-              >
-                {labels.save}
-              </BoldText>
-            )}
-          </Pressable>
+          />
         </Animated.View>
       </View>
 

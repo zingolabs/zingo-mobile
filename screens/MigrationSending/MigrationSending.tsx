@@ -1,4 +1,6 @@
+/* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
+import { leaveFlow } from '@app/navigation/navigate';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { BackHandler, ScrollView, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -7,20 +9,20 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import ProgressBar from '@ui/primitives/ProgressBar';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum } from '@app/AppState';
-import Utils from '@app/utils';
+import { formatAmount } from '@app/utils/formatAmount';
 import useTrickleProgress from '@app/hooks/useTrickleProgress';
 import { drainOrchard, drainStatus } from '@app/walletBackend';
 import { RPCDrainType } from '@app/walletBackend/types/RPCDrainType';
 import { RPCDrainStatusType } from '@app/walletBackend/types/RPCDrainStatusType';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 
 type MigrationSendingProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.MigrationSending
+  'MigrationSending'
 >;
 
 const ZATS_PER_ZEC = 10 ** 8;
@@ -28,11 +30,6 @@ const ZATS_PER_ZEC = 10 ** 8;
 // Share of the progress bar each drain phase owns: building (proving, the slow
 // part) fills the first 90%, broadcasting the last 10%.
 const BUILD_WEIGHT = 0.9;
-
-// Compact ZEC amount for the per-transaction note list: trims trailing zeros so
-// a 10 ZEC note reads "10" and a dust note "0.01", matching the preview values.
-const fmt = (zats: number): string =>
-  `${parseFloat((zats / ZATS_PER_ZEC).toFixed(4))}`;
 
 // Where a transaction is in its lifecycle, derived from the drain's live
 // { built, sent, phase } snapshot. Build proves+signs each tx (queued ->
@@ -79,22 +76,23 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar, info } = context;
   const { colors } = useTheme();
+  /** The footer's lowest action ends at the one bottom distance. */
+  const bottomPad = useBottomActionPad();
 
   const transactions = route.params?.transactions ?? [];
   const txCount = transactions.length;
   // Total value landing in the Ironwood pool across every transaction (the sum
   // of the single output each drain transaction creates).
   const totalTransferred = transactions.reduce((sum, tx) => sum + tx.output, 0);
-  const totalTransferredStr = `${Utils.parseNumberFloatToStringLocale(
+  const totalTransferredStr = `${formatAmount(
     totalTransferred / ZATS_PER_ZEC,
-    4,
   )} ${info.currencyName}`;
 
   const [progress, setProgress] = useState<RPCDrainStatusType | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const goHome = useCallback(() => {
-    navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
+    leaveFlow(navigation);
   }, [navigation]);
 
   // Broadcasting can't be interrupted, so block hardware-back for the whole
@@ -212,7 +210,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
     },
     calculating: {
       key: 'migrationsending.status-calculating',
-      color: colors.fgAccent,
+      color: colors.fgWarning,
     },
     calculated: {
       key: 'migrationsending.status-calculated',
@@ -224,7 +222,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
     },
     sent: {
       key: 'migrationsending.status-sent',
-      color: colors.fgAccent,
+      color: colors.fgWarning,
     },
   };
 
@@ -269,13 +267,13 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
         </ScrollView>
         <View
           style={{
-            paddingBottom: 24,
+            paddingBottom: bottomPad,
             paddingHorizontal: 24,
             alignItems: 'center',
           }}
         >
           <Button
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={translate('migrationsending.close') as string}
             onPress={goHome}
           />
@@ -328,7 +326,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
         {transactions.map((tx, i) => {
           const meta = statusMeta[deriveStatus(i, progress)];
           // The value this transaction moves into Ironwood (its single output).
-          const value = fmt(tx.output);
+          const value = formatAmount(tx.output / ZATS_PER_ZEC);
           return (
             <View
               key={i}
@@ -367,7 +365,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
                 )}
               </Text>
               <Text
-                style={{ color: colors.fgAccent, fontSize: 14, flexShrink: 1 }}
+                style={{ color: colors.fgDefault, fontSize: 14, flexShrink: 1 }}
                 numberOfLines={1}
               >
                 {value}
@@ -389,7 +387,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
 
       {/* Pinned above the hint. Proving reports no discrete steps, so the
           trickle keeps a continuous bar moving rather than counting pieces. */}
-      <View style={{ paddingHorizontal: 24, paddingBottom: 28 }}>
+      <View style={{ paddingHorizontal: 24, paddingBottom: bottomPad }}>
         <ProgressBar progress={trickle.progress} />
         <Text
           style={{

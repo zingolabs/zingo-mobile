@@ -7,71 +7,56 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
+import Pressable from '@ui/primitives/Pressable';
 import {
   View,
   RefreshControl,
   ScrollView,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  TouchableOpacity,
   ActivityIndicator,
-  Pressable,
-  StyleSheet,
 } from 'react-native';
-import Animated from 'react-native-reanimated';
-import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 
+import { useNavigation } from '@react-navigation/native';
 import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
-import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronLeft, faAngleDown } from '@fortawesome/free-solid-svg-icons';
-import BottomSheet from '@gorhom/bottom-sheet';
+  iconSizeMd,
+  radiusPill,
+  slopFor,
+  space8,
+  space20,
+  space32,
+  useTheme,
+} from '@app/theme';
 
-import { RouteEnum, ScreenEnum, ValueTransferType } from '@app/AppState';
-import { AppDrawerParamList } from '@app/types';
-import FadeText from '@ui/primitives/FadeText';
-import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
-import AppSheet from '@ui/primitives/AppSheet';
+import { Route, ValueTransferType } from '@app/AppState';
+import { AppDrawerParamList, WalletNavigation } from '@app/types';
+import Text from '@ui/primitives/Text';
+import FullPanel from '@ui/widgets/FullPanel';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
+import Button from '@ui/primitives/Button';
 import MessageLine from './components/MessageLine';
 import { ContextAppLoaded } from '@app/context';
-import Header from '@ui/widgets/Header';
-import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import Utils from '@app/utils';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { ChevronDown } from '@ui/primitives/Icons/Chevron';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
+import { useCompact } from '@app/hooks/useCompact';
 
-type MessageListProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Messages
-> & {
-  toggleMenuDrawer: () => void;
-  setScrollToBottom: (value: boolean) => void;
-  scrollToBottom: boolean;
-  closeScreen?: () => void;
-};
+type MessageListProps = NativeStackScreenProps<AppDrawerParamList, 'Messages'>;
 
-const MessageList: React.FunctionComponent<MessageListProps> = ({
-  toggleMenuDrawer,
-  setScrollToBottom,
-  scrollToBottom,
-  closeScreen,
-}) => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+const MessageList: React.FunctionComponent<MessageListProps> = () => {
+  const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
+  const bottomPad = useBottomActionPad();
   const {
+    setScrollToBottom,
+    scrollToBottom,
     translate,
     messages,
     language,
     doRefresh,
-    setPrivacyOption,
-    addLastSnackbar,
   } = context;
   const { colors } = useTheme();
-  const screenName = ScreenEnum.MessagesList;
 
   // With FlatList + `inverted`, the visual bottom (newest messages)
   // corresponds to contentOffset.y ≈ 0. We surface a jump-to-bottom
@@ -81,60 +66,10 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
   const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
-  const [containerH, setContainerH] = useState<number>(0);
-  const [headerH, setHeaderH] = useState<number>(0);
 
   const scrollViewRef = useRef<ScrollView>(null);
-  const messagesSheetRef = useRef<BottomSheet>(null);
-  const sheetSlideStyle = useOptionsPanelSheetSlide();
-
-  const messagesSnapPoints = useFullSheetSnapPoints(containerH, headerH);
-
-  const messagesHeader = (
-    <View
-      style={{
-        paddingTop: 12,
-        paddingBottom: 8,
-        paddingHorizontal: 16,
-      }}
-    >
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        {closeScreen ? (
-          <TouchableOpacity
-            onPress={closeScreen}
-            hitSlop={8}
-            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-          >
-            <FontAwesomeIcon
-              icon={faChevronLeft}
-              size={20}
-              color={colors.fgAccent}
-            />
-          </TouchableOpacity>
-        ) : (
-          <View style={{ width: 28 }} />
-        )}
-        <BoldText
-          numberOfLines={1}
-          style={{
-            flex: 1,
-            fontSize: 16,
-            lineHeight: 28,
-            textAlign: 'center',
-          }}
-        >
-          {translate('messages.title') as string}
-        </BoldText>
-        <View style={{ width: 28 }} />
-      </View>
-    </View>
-  );
+  const { edges, fades } = useScrollEdges({ surface: 'surface' });
+  const { gap } = useCompact();
 
   useEffect(() => {
     if (messages !== null && loading) {
@@ -179,13 +114,19 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     });
   }, [messagesData, language]);
 
-  // Auto-scroll to end on first content layout so the newest message is
-  // visible. Re-scroll on later content size changes only if the user
-  // is already pinned at the bottom (don't yank them away while they
-  // read older messages).
+  // Auto-scroll to end on the first layout of the messages themselves (not
+  // the loading spinner before them) so the newest message is visible.
+  // Re-scroll on later content or viewport size changes only if the user
+  // is already pinned at the bottom (don't yank them away while they read
+  // older messages); the panel still rising changes the viewport.
   const didInitialScrollRef = useRef<boolean>(false);
   const isAtBottomRef = useRef<boolean>(true);
+  const loadingRef = useRef<boolean>(true);
+  loadingRef.current = loading;
   const onContentSizeChange = useCallback(() => {
+    if (loadingRef.current) {
+      return;
+    }
     if (!didInitialScrollRef.current) {
       scrollViewRef.current?.scrollToEnd({ animated: false });
       didInitialScrollRef.current = true;
@@ -236,7 +177,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   const setValueTransferDetailModalShow = useCallback(
     async (index: number, vt: ValueTransferType) => {
       const current = messagesRef.current;
-      navigation.navigate(RouteEnum.ValueTransferDetail, {
+      navigation.navigate(Route.ValueTransferDetail, {
         index,
         vt,
         valueTransfersSliced: current ?? [],
@@ -247,154 +188,143 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   );
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: colors.bgCanvas,
-      }}
-      onLayout={e => setContainerH(e.nativeEvent.layout.height)}
+    <FullPanel
+      title={translate('messages.title') as string}
+      onBack={() => navigation.goBack()}
+      ownScroll
+      testID="messages"
     >
-      <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
-        <Header
-          title={''}
-          screenName={screenName}
-          toggleMenuDrawer={toggleMenuDrawer}
-          noBalance={true}
-          setPrivacyOption={setPrivacyOption}
-          addLastSnackbar={addLastSnackbar /* context */}
-        />
-      </View>
-      <Animated.View
-        pointerEvents="box-none"
-        style={[StyleSheet.absoluteFill, sheetSlideStyle]}
+      <ScrollView
+        ref={scrollViewRef}
+        onScroll={e => {
+          edges.onScroll(e);
+          handleScroll(e);
+        }}
+        onContentSizeChange={(w, h) => {
+          edges.onContentSizeChange(w, h);
+          onContentSizeChange();
+        }}
+        onLayout={e => {
+          edges.onLayout(e);
+          if (!loadingRef.current && isAtBottomRef.current) {
+            scrollViewRef.current?.scrollToEnd({ animated: false });
+          }
+        }}
+        scrollEventThrottle={100}
+        bounces={false}
+        alwaysBounceVertical={false}
+        style={{
+          flex: 1,
+        }}
+        contentContainerStyle={{
+          flexDirection: 'column',
+          alignItems: 'stretch',
+          justifyContent: 'flex-start',
+        }}
+        refreshControl={
+          <RefreshControl
+            refreshing={false}
+            onRefresh={() => doRefresh('messages')}
+            tintColor={colors.fgDefault}
+            title={translate('history.refreshing') as string}
+          />
+        }
       >
-        <AppSheet
-          ref={messagesSheetRef}
-          snapPoints={messagesSnapPoints}
-          header={messagesHeader}
-        >
-          <ScrollView
-            ref={scrollViewRef}
-            onScroll={handleScroll}
-            onContentSizeChange={onContentSizeChange}
-            scrollEventThrottle={100}
-            bounces={false}
-            alwaysBounceVertical={false}
+        {loading ? (
+          <ActivityIndicator
+            size="large"
+            color={colors.fgMuted}
+            style={{ marginVertical: 20 }}
+          />
+        ) : messagesData.length === 0 ? (
+          <View
             style={{
-              flex: 1,
+              alignItems: 'center',
+              marginTop: gap(space32),
+              paddingHorizontal: space20,
             }}
-            contentContainerStyle={{
-              flexDirection: 'column',
-              alignItems: 'stretch',
-              justifyContent: 'flex-start',
-            }}
-            refreshControl={
-              <RefreshControl
-                refreshing={false}
-                onRefresh={() => doRefresh(screenName)}
-                tintColor={colors.fgDefault}
-                title={translate('history.refreshing') as string}
-              />
-            }
           >
-            {loading ? (
-              <ActivityIndicator
-                size="large"
-                color={colors.fgAccent}
-                style={{ marginVertical: 20 }}
-              />
-            ) : messagesData.length === 0 ? (
+            <Text variant="body" tone="muted">
+              {translate('messages.empty') as string}
+            </Text>
+          </View>
+        ) : (
+          <>
+            {loadMoreButton ? (
               <View
                 style={{
-                  height: 150,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'flex-start',
-                  marginTop: 30,
+                  paddingHorizontal: space20,
+                  marginTop: space20,
+                  marginBottom: space8,
                 }}
               >
-                <FadeText style={{ color: colors.fgAccent }}>
-                  {translate('messages.empty') as string}
-                </FadeText>
+                <Button
+                  variant="text"
+                  title={translate('history.loadmore') as string}
+                  onPress={loadMoreClicked}
+                />
               </View>
             ) : (
-              <>
-                {loadMoreButton ? (
-                  <View
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'flex-start',
-                      marginTop: 20,
-                      marginBottom: 10,
-                    }}
-                  >
-                    <Button
-                      type={ButtonTypeEnum.Secondary}
-                      title={translate('history.loadmore') as string}
-                      onPress={loadMoreClicked}
-                    />
-                  </View>
-                ) : (
-                  <View
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'flex-start',
-                      marginTop: 20,
-                      marginBottom: 10,
-                    }}
-                  >
-                    <FadeText style={{ color: colors.fgAccent }}>
-                      {translate('history.end') as string}
-                    </FadeText>
-                  </View>
-                )}
-                {messagesData.map((vt, index) => (
-                  <MessageLine
-                    key={`${index}-${vt.txid}-${vt.kind}`}
-                    index={index}
-                    vt={vt}
-                    month={monthLabels[index] ?? ''}
-                    setValueTransferDetailModalShow={
-                      setValueTransferDetailModalShow
-                    }
-                    screenName={screenName}
-                  />
-                ))}
-                {/* Breathing room below the newest message so it doesn't
-                    sit flush against the bottom edge of the sheet. */}
-                <View style={{ height: 20 }} />
-              </>
+              <View
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  marginTop: space20,
+                  marginBottom: space8,
+                }}
+              >
+                <Text variant="body" tone="muted">
+                  {translate('history.end') as string}
+                </Text>
+              </View>
             )}
-          </ScrollView>
-        </AppSheet>
-        {!isAtBottom && !loading && (
-          <Pressable
-            onPress={handleScrollToBottom}
-            style={({ pressed }) => ({
-              position: 'absolute',
-              bottom: 30,
-              right: 10,
-              paddingHorizontal: 5,
-              paddingVertical: 10,
-              backgroundColor: colors.bgChrome,
-              borderRadius: 50,
-              transform: [{ scale: pressed ? 0.9 : 1 }],
-              borderWidth: 1,
-              borderColor: colors.borderMuted,
-            })}
-          >
-            <FontAwesomeIcon
-              style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-              size={16}
-              icon={faAngleDown}
-              color={colors.fgMuted}
-            />
-          </Pressable>
+            {messagesData.map((vt, index) => (
+              <MessageLine
+                key={`${index}-${vt.txid}-${vt.kind}`}
+                index={index}
+                vt={vt}
+                month={monthLabels[index] ?? ''}
+                setValueTransferDetailModalShow={
+                  setValueTransferDetailModalShow
+                }
+              />
+            ))}
+            {/* Breathing room below the newest message so it doesn't
+                    sit flush against the bottom edge of the sheet. */}
+            <View style={{ height: space20 }} />
+          </>
         )}
-      </Animated.View>
-    </View>
+      </ScrollView>
+      {fades}
+      {!isAtBottom && !loading && (
+        <Pressable
+          kind="button"
+          hitSlop={slopFor(36)}
+          onPress={handleScrollToBottom}
+          accessibilityRole="button"
+          accessibilityLabel={translate('messages.bottom-acc') as string}
+          style={{
+            position: 'absolute',
+            bottom: bottomPad,
+            right: space20,
+            width: 36,
+            height: 36,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: colors.bgSurface,
+            borderRadius: radiusPill,
+            borderWidth: 1,
+            borderColor: colors.borderMuted,
+          }}
+        >
+          <ChevronDown size={iconSizeMd} color={colors.fgMuted} />
+        </Pressable>
+      )}
+    </FullPanel>
   );
 };
 

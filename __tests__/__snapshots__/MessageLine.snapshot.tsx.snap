@@ -6,7 +6,7 @@ exports[`MessageLine - snapshots MessageLine received with messageAddress, no mo
     {
       "display": "flex",
       "flexDirection": "column",
-      "marginHorizontal": 10,
+      "marginHorizontal": 20,
     }
   }
   testID="m-2"
@@ -32,7 +32,9 @@ exports[`MessageLine - snapshots MessageLine received with messageAddress, no mo
     accessible={true}
     collapsable={false}
     focusable={true}
+    onBlur={[Function]}
     onClick={[Function]}
+    onFocus={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -40,29 +42,33 @@ exports[`MessageLine - snapshots MessageLine received with messageAddress, no mo
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "opacity": 1,
-        "zIndex": 999,
-      }
+      [
+        {
+          "zIndex": 999,
+        },
+        {},
+      ]
     }
   >
     <View
       style={
-        {
-          "alignItems": "flex-start",
-          "backgroundColor": "#5a8c5a",
-          "borderBottomEndRadius": 20,
-          "borderBottomStartRadius": 0,
-          "borderRadius": 20,
-          "display": "flex",
-          "flexDirection": "column",
-          "justifyContent": "flex-start",
-          "marginBottom": 5,
-          "marginLeft": 0,
-          "marginRight": 50,
-          "opacity": 1,
-          "padding": 10,
-        }
+        [
+          {
+            "alignItems": "flex-start",
+            "backgroundColor": "#18bd181F",
+            "borderBottomEndRadius": 12,
+            "borderBottomStartRadius": 0,
+            "borderRadius": 12,
+            "display": "flex",
+            "flexDirection": "column",
+            "justifyContent": "flex-start",
+            "marginBottom": 8,
+            "marginLeft": 0,
+            "marginRight": 48,
+            "padding": 12,
+          },
+          {},
+        ]
       }
     >
       <View
@@ -93,7 +99,9 @@ exports[`MessageLine - snapshots MessageLine received with messageAddress, no mo
           accessible={true}
           collapsable={false}
           focusable={true}
+          onBlur={[Function]}
           onClick={[Function]}
+          onFocus={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -101,20 +109,23 @@ exports[`MessageLine - snapshots MessageLine received with messageAddress, no mo
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "opacity": 1,
-              "zIndex": 999,
-            }
+            [
+              {
+                "zIndex": 999,
+              },
+              {},
+            ]
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             selectable={true}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
                 "fontWeight": "400",
-                "opacity": 1,
+                "lineHeight": 21,
               }
             }
           >
@@ -139,8 +150,7 @@ hello
             {
               "flexDirection": "row",
               "marginHorizontal": 5,
-              "opacity": 1,
-              "paddingRight": 5,
+              "paddingRight": 4,
             }
           }
         >
@@ -164,8 +174,10 @@ hello
             }
             accessible={true}
             collapsable={false}
-            focusable={false}
+            focusable={true}
+            onBlur={[Function]}
             onClick={[Function]}
+            onFocus={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -173,22 +185,47 @@ hello
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "opacity": 1,
-              }
+              [
+                undefined,
+                {},
+              ]
             }
           >
             <View
               style={
                 {
-                  "alignItems": "flex-end",
+                  "alignItems": "baseline",
                   "flexDirection": "row",
                   "margin": 0,
                   "padding": 0,
                 }
               }
             >
+              <View
+                style={
+                  {
+                    "height": 20.225993866741007,
+                    "marginRight": 2.2944856425982714,
+                    "width": 13.939514914970726,
+                  }
+                }
+              />
               <Text
+                maxFontSizeMultiplier={2}
+                style={
+                  {
+                    "color": "#18bd18",
+                    "fontSize": 12,
+                    "fontWeight": "700",
+                    "margin": 0,
+                    "padding": 0,
+                  }
+                }
+              >
+                EC
+              </Text>
+              <Text
+                maxFontSizeMultiplier={2}
                 style={
                   {
                     "color": "#18bd18",
@@ -200,31 +237,20 @@ hello
                 }
                 testID="undefined.big-part"
               >
-                 0.7765
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": "#18bd18",
-                    "fontSize": 8.399999999999999,
-                    "margin": 0,
-                    "marginBottom": 0.8,
-                    "padding": 0,
-                  }
-                }
-                testID="undefined.small-part"
-              >
-                4321
+                 0.77654321
               </Text>
             </View>
           </View>
         </View>
         <View>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
-                "color": "#c3c3c3",
-                "opacity": 0.65,
+                "color": "#888888",
+                "fontSize": 12,
+                "fontWeight": "400",
+                "lineHeight": 16,
               }
             }
           >
@@ -248,62 +274,7 @@ hello
                 "justifyContent": "center",
               }
             }
-          >
-            <
-              color="#18bd18"
-              icon={
-                {
-                  "icon": [
-                    512,
-                    512,
-                    [
-                      61533,
-                      "check-circle",
-                    ],
-                    "f058",
-                    "M256 512a256 256 0 1 1 0-512 256 256 0 1 1 0 512zM374 145.7c-10.7-7.8-25.7-5.4-33.5 5.3L221.1 315.2 169 263.1c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l72 72c5 5 11.8 7.5 18.8 7s13.4-4.1 17.5-9.8L379.3 179.2c7.8-10.7 5.4-25.7-5.3-33.5z",
-                  ],
-                  "iconName": "circle-check",
-                  "prefix": "fas",
-                }
-              }
-              size={12}
-              style={
-                {
-                  "marginLeft": 5,
-                  "marginRight": 1,
-                  "marginTop": 2,
-                }
-              }
-            />
-            <
-              color="#18bd18"
-              icon={
-                {
-                  "icon": [
-                    512,
-                    512,
-                    [
-                      61533,
-                      "check-circle",
-                    ],
-                    "f058",
-                    "M256 512a256 256 0 1 1 0-512 256 256 0 1 1 0 512zM374 145.7c-10.7-7.8-25.7-5.4-33.5 5.3L221.1 315.2 169 263.1c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l72 72c5 5 11.8 7.5 18.8 7s13.4-4.1 17.5-9.8L379.3 179.2c7.8-10.7 5.4-25.7-5.3-33.5z",
-                  ],
-                  "iconName": "circle-check",
-                  "prefix": "fas",
-                }
-              }
-              size={12}
-              style={
-                {
-                  "marginLeft": 1,
-                  "marginRight": 0,
-                  "marginTop": 2,
-                }
-              }
-            />
-          </View>
+          />
         </View>
       </View>
     </View>
@@ -317,7 +288,7 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
     {
       "display": "flex",
       "flexDirection": "column",
-      "marginHorizontal": 10,
+      "marginHorizontal": 20,
     }
   }
   testID="m-1"
@@ -325,21 +296,20 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
   <View
     style={
       {
-        "backgroundColor": "#031124",
-        "borderBottomWidth": 1,
-        "borderColor": "#011401",
-        "borderTopWidth": 1,
-        "paddingBottom": 5,
-        "paddingLeft": 15,
-        "paddingTop": 5,
+        "paddingBottom": 8,
+        "paddingTop": 16,
       }
     }
   >
     <Text
+      maxFontSizeMultiplier={2}
       style={
         {
-          "color": "#c3c3c3",
-          "opacity": 0.65,
+          "color": "#888888",
+          "fontSize": 12,
+          "fontWeight": "600",
+          "lineHeight": 16,
+          "textTransform": "uppercase",
         }
       }
     >
@@ -367,7 +337,9 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
     accessible={true}
     collapsable={false}
     focusable={true}
+    onBlur={[Function]}
     onClick={[Function]}
+    onFocus={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -375,37 +347,39 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "opacity": 1,
-        "zIndex": 999,
-      }
+      [
+        {
+          "zIndex": 999,
+        },
+        {},
+      ]
     }
   >
     <View
       style={
-        {
-          "alignItems": "flex-start",
-          "backgroundColor": "#233623",
-          "borderBottomEndRadius": 0,
-          "borderBottomStartRadius": 20,
-          "borderRadius": 20,
-          "display": "flex",
-          "flexDirection": "column",
-          "justifyContent": "flex-start",
-          "marginBottom": 5,
-          "marginLeft": 50,
-          "marginRight": 0,
-          "opacity": 1,
-          "padding": 10,
-        }
+        [
+          {
+            "alignItems": "flex-start",
+            "backgroundColor": "#18bd181F",
+            "borderBottomEndRadius": 0,
+            "borderBottomStartRadius": 12,
+            "borderRadius": 12,
+            "display": "flex",
+            "flexDirection": "column",
+            "justifyContent": "flex-start",
+            "marginBottom": 8,
+            "marginLeft": 48,
+            "marginRight": 0,
+            "padding": 12,
+          },
+          {},
+        ]
       }
     >
       <View
         style={
           {
-            "marginBottom": 10,
-            "marginLeft": 30,
-            "marginTop": -10,
+            "marginBottom": 8,
           }
         }
       >
@@ -449,7 +423,9 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
               accessible={true}
               collapsable={false}
               focusable={true}
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -457,9 +433,10 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "opacity": 1,
-                }
+                [
+                  undefined,
+                  {},
+                ]
               }
             >
               <View
@@ -472,12 +449,13 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
                 }
               >
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
                       "fontSize": 15,
                       "fontWeight": "400",
-                      "opacity": 1,
+                      "lineHeight": 21,
                     }
                   }
                 >
@@ -516,7 +494,9 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
           accessible={true}
           collapsable={false}
           focusable={true}
+          onBlur={[Function]}
           onClick={[Function]}
+          onFocus={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -524,20 +504,23 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "opacity": 1,
-              "zIndex": 999,
-            }
+            [
+              {
+                "zIndex": 999,
+              },
+              {},
+            ]
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             selectable={true}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
                 "fontWeight": "400",
-                "opacity": 1,
+                "lineHeight": 21,
               }
             }
           >
@@ -562,8 +545,7 @@ hello
             {
               "flexDirection": "row",
               "marginHorizontal": 5,
-              "opacity": 1,
-              "paddingRight": 5,
+              "paddingRight": 4,
             }
           }
         >
@@ -587,8 +569,10 @@ hello
             }
             accessible={true}
             collapsable={false}
-            focusable={false}
+            focusable={true}
+            onBlur={[Function]}
             onClick={[Function]}
+            onFocus={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -596,22 +580,47 @@ hello
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "opacity": 1,
-              }
+              [
+                undefined,
+                {},
+              ]
             }
           >
             <View
               style={
                 {
-                  "alignItems": "flex-end",
+                  "alignItems": "baseline",
                   "flexDirection": "row",
                   "margin": 0,
                   "padding": 0,
                 }
               }
             >
+              <View
+                style={
+                  {
+                    "height": 20.225993866741007,
+                    "marginRight": 2.2944856425982714,
+                    "width": 13.939514914970726,
+                  }
+                }
+              />
               <Text
+                maxFontSizeMultiplier={2}
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "fontSize": 12,
+                    "fontWeight": "700",
+                    "margin": 0,
+                    "padding": 0,
+                  }
+                }
+              >
+                EC
+              </Text>
+              <Text
+                maxFontSizeMultiplier={2}
                 style={
                   {
                     "color": "#c3c3c3",
@@ -623,31 +632,20 @@ hello
                 }
                 testID="undefined.big-part"
               >
-                 0.1234
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 8.399999999999999,
-                    "margin": 0,
-                    "marginBottom": 0.8,
-                    "padding": 0,
-                  }
-                }
-                testID="undefined.small-part"
-              >
-                5678
+                 0.12345678
               </Text>
             </View>
           </View>
         </View>
         <View>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
-                "color": "#c3c3c3",
-                "opacity": 0.65,
+                "color": "#888888",
+                "fontSize": 12,
+                "fontWeight": "400",
+                "lineHeight": 16,
               }
             }
           >
@@ -671,62 +669,7 @@ hello
                 "justifyContent": "center",
               }
             }
-          >
-            <
-              color="#18bd18"
-              icon={
-                {
-                  "icon": [
-                    512,
-                    512,
-                    [
-                      61533,
-                      "check-circle",
-                    ],
-                    "f058",
-                    "M256 512a256 256 0 1 1 0-512 256 256 0 1 1 0 512zM374 145.7c-10.7-7.8-25.7-5.4-33.5 5.3L221.1 315.2 169 263.1c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l72 72c5 5 11.8 7.5 18.8 7s13.4-4.1 17.5-9.8L379.3 179.2c7.8-10.7 5.4-25.7-5.3-33.5z",
-                  ],
-                  "iconName": "circle-check",
-                  "prefix": "fas",
-                }
-              }
-              size={12}
-              style={
-                {
-                  "marginLeft": 5,
-                  "marginRight": 1,
-                  "marginTop": 2,
-                }
-              }
-            />
-            <
-              color="#18bd18"
-              icon={
-                {
-                  "icon": [
-                    512,
-                    512,
-                    [
-                      61533,
-                      "check-circle",
-                    ],
-                    "f058",
-                    "M256 512a256 256 0 1 1 0-512 256 256 0 1 1 0 512zM374 145.7c-10.7-7.8-25.7-5.4-33.5 5.3L221.1 315.2 169 263.1c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l72 72c5 5 11.8 7.5 18.8 7s13.4-4.1 17.5-9.8L379.3 179.2c7.8-10.7 5.4-25.7-5.3-33.5z",
-                  ],
-                  "iconName": "circle-check",
-                  "prefix": "fas",
-                }
-              }
-              size={12}
-              style={
-                {
-                  "marginLeft": 1,
-                  "marginRight": 0,
-                  "marginTop": 2,
-                }
-              }
-            />
-          </View>
+          />
         </View>
       </View>
     </View>

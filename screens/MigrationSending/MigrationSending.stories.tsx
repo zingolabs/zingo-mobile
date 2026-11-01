@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import MigrationSending from './MigrationSending';
 import {
   screenProps,
@@ -15,7 +15,7 @@ const meta: Meta<typeof MigrationSending> = {
   title: 'Migration/Sending',
   component: MigrationSending,
   decorators: [withAppContext({ info: mockInfo }), withNavigation],
-  args: screenProps(RouteEnum.MigrationSending, {
+  args: screenProps(Route.MigrationSending, {
     transactions: drainPlan.transactions ?? [],
   }),
 };

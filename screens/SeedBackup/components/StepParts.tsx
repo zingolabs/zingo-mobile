@@ -1,35 +1,34 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { Pressable, Text, View, ViewStyle } from 'react-native';
+import { View, ViewStyle } from 'react-native';
 import Animated, { AnimatedStyle } from 'react-native-reanimated';
 
-import { useTheme } from '@app/theme';
+import { space12, space16, space20, space32 } from '@app/theme';
+import Text from '@ui/primitives/Text';
+import Button from '@ui/primitives/Button';
+import ButtonStack from '@ui/primitives/ButtonStack';
 
-export const SIDE = 22;
+export const SIDE = space20;
 
 export const StepTitle: React.FunctionComponent<{
   title: string;
   sub?: string;
 }> = ({ title, sub }) => {
-  const { colors } = useTheme();
   return (
-    <View style={{ paddingHorizontal: SIDE, marginBottom: 22 }}>
+    <View style={{ paddingHorizontal: SIDE, marginBottom: space16 }}>
       <Text
         accessibilityRole="header"
+        variant="subtitle"
         style={{
-          color: colors.fgDefault,
-          fontSize: 18,
-          lineHeight: 24,
-          fontWeight: '700',
           textAlign: 'center',
-          marginHorizontal: 30,
-          marginBottom: 14,
+          marginHorizontal: space32,
+          marginBottom: space12,
         }}
       >
         {title}
       </Text>
       {!!sub && (
-        <Text style={{ color: colors.fgMuted, fontSize: 14, lineHeight: 20 }}>
+        <Text variant="body" tone="muted">
           {sub}
         </Text>
       )}
@@ -42,76 +41,41 @@ type StepActionsProps = {
   onLink: () => void;
   primary: string;
   onPrimary: () => void;
-  // Dimmed look while the step is incomplete; the press still lands.
-  off?: boolean;
+  /** Until the step is complete. */
+  disabled?: boolean;
   primaryStyle?: AnimatedStyle<ViewStyle>;
   testID: string;
 };
 
-// The bottom pair of every step: a text link on the left, the main pill on the right.
+// The bottom pair of every step: the main action on top, the text link below it.
 export const StepActions: React.FunctionComponent<StepActionsProps> = ({
   link,
   onLink,
   primary,
   onPrimary,
-  off,
+  disabled,
   primaryStyle,
   testID,
 }) => {
-  const { colors } = useTheme();
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: SIDE,
-        gap: 14,
-      }}
-    >
-      <Pressable
-        testID={`${testID}.link`}
-        accessibilityRole="button"
-        onPress={onLink}
-        style={({ pressed }) => ({
-          flex: 1,
-          height: 44,
-          alignItems: 'center',
-          justifyContent: 'center',
-          opacity: pressed ? 0.6 : 1,
-        })}
-      >
-        <Text
-          style={{ color: colors.fgAccent, fontSize: 15, fontWeight: '700' }}
-        >
-          {link}
-        </Text>
-      </Pressable>
-      <Animated.View style={[{ flex: 1 }, primaryStyle]}>
-        <Pressable
-          testID={`${testID}.primary`}
-          accessibilityRole="button"
-          accessibilityState={{ disabled: off }}
-          onPress={onPrimary}
-          style={({ pressed }) => ({
-            height: 44,
-            borderRadius: 22,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: off ? colors.bgAccentDisabled : colors.bgAccent,
-            transform: [{ scale: pressed ? 0.97 : 1 }],
-          })}
-        >
-          <Text
-            style={{
-              color: colors.bgCanvas,
-              fontSize: 15,
-              fontWeight: '700',
-            }}
-          >
-            {primary}
-          </Text>
-        </Pressable>
-      </Animated.View>
+    <View style={{ paddingHorizontal: SIDE }}>
+      <ButtonStack>
+        <Button
+          testID={`${testID}.link`}
+          variant="text"
+          title={link}
+          onPress={onLink}
+        />
+        <Animated.View style={primaryStyle}>
+          <Button
+            testID={`${testID}.primary`}
+            variant="primary"
+            title={primary}
+            onPress={onPrimary}
+            disabled={disabled}
+          />
+        </Animated.View>
+      </ButtonStack>
     </View>
   );
 };

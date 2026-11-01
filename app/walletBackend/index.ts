@@ -8,30 +8,19 @@
 import WalletBackend from './WalletBackend';
 
 export type { FfiError, FfiErrorCode, FfiResult } from './ffi';
-export type {
-  CadencePlanRoute,
-  ReschedulePartsRoute,
-  StartMigrationRoute,
-} from './utils/migrationRouting';
-export {
-  routeCadencePlan,
-  routeRescheduleParts,
-  routeStartMigration,
-} from './utils/migrationRouting';
+export type { SwapDepositArgs } from './modules/TransactionService';
 export { scanInProgress } from './utils/syncProgress';
 export {
   cancelIronwoodMigration,
+  cancelOldPrivateMigration,
   changeServer,
   checkMyAddress,
-  continueNoteSplitting,
   createNewTransparentAddress,
   createNewUnifiedAddress,
   createNewWallet,
   doSave,
   drainOrchard,
   drainStatus,
-  executeDueParts,
-  executeDuePartsStatus,
   fetchWallet,
   getBalanceInfo,
   getLatestBlockServerInfo,
@@ -49,27 +38,24 @@ export {
   migrationStatus,
   parseAddress,
   checkUfvk,
-  planIronwoodMigration,
   planOrchardDrain,
-  quickSplit,
   reconcileMigration,
   removeTransaction,
-  rescheduleParts,
+  reserveRefundAddress,
+  deriveRefundAddress,
   deleteExistingWallet,
   resolvedTrue,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,
-  sendAllPropose,
-  sendPropose,
+  sendAllPreview,
+  sendPreview,
   setConfigWalletToProd,
   shieldConfirm,
+  shieldPreview,
   shieldPropose,
-  splitStatus,
-  startIronwoodMigration,
   walletBackupExists,
   walletExists,
   readWalletChain,
-  windowTimeline,
 } from './utils/walletUtils';
 export type {
   ProbeTarget,

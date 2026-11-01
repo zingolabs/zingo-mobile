@@ -11,7 +11,6 @@ import {
 } from '@app/context';
 
 import AddressItem from '@ui/widgets/AddressItem';
-import { ScreenEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
@@ -26,10 +25,7 @@ describe('AddressItem - snapshots', () => {
     expect(
       render(
         <ContextAppLoadedProvider value={state}>
-          <AddressItem
-            address="u1abc123def456abc123def456abc123def456abc123"
-            screenName={ScreenEnum.History}
-          />
+          <AddressItem address="u1abc123def456abc123def456abc123def456abc123" />
         </ContextAppLoadedProvider>,
       ).toJSON(),
     ).toMatchSnapshot();
@@ -41,7 +37,6 @@ describe('AddressItem - snapshots', () => {
         <ContextAppLoadedProvider value={state}>
           <AddressItem
             address={mockAddressBook[0].address}
-            screenName={ScreenEnum.History}
             withIcon
             withSendIcon
           />
@@ -56,7 +51,6 @@ describe('AddressItem - snapshots', () => {
         <ContextAppLoadedProvider value={state}>
           <AddressItem
             address="u1abc123def456abc123def456abc123def456abc123"
-            screenName={ScreenEnum.History}
             oneLine
           />
         </ContextAppLoadedProvider>,
@@ -69,10 +63,7 @@ describe('AddressItem - snapshots', () => {
     expect(
       render(
         <ContextAppLoadedProvider value={privState}>
-          <AddressItem
-            address="u1abc123def456abc123def456abc123def456abc123"
-            screenName={ScreenEnum.History}
-          />
+          <AddressItem address="u1abc123def456abc123def456abc123def456abc123" />
         </ContextAppLoadedProvider>,
       ).toJSON(),
     ).toMatchSnapshot();

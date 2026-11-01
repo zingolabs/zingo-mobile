@@ -1,38 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback } from 'react';
-import { Pressable, View } from 'react-native';
-import { radiusSheet, useTheme } from '@app/theme';
+import { View } from 'react-native';
+import { useTheme, radiusSm, space12 } from '@app/theme';
 import { ease } from '@app/theme/motion';
-import {
-  BottomSheetBackdrop,
-  BottomSheetBackdropProps,
-  BottomSheetModal,
-  BottomSheetView,
-} from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 import { TranslateType, WalletType } from '@app/AppState';
-import BoldText from '@ui/primitives/BoldText';
-import RegText from '@ui/primitives/RegText';
-import SheetRim from '@ui/primitives/SheetRim';
+import { formatInteger } from '@app/utils/formatAmount';
+import Text from '@ui/primitives/Text';
+import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
+import Button from '@ui/primitives/Button';
 
-const SeedHandle: React.FC = () => {
-  const { colors } = useTheme();
-  return (
-    <View
-      style={{
-        paddingTop: 8,
-        backgroundColor: colors.bgSurface,
-        borderTopLeftRadius: radiusSheet,
-        borderTopRightRadius: radiusSheet,
-      }}
-    >
-      <SheetRim />
-    </View>
-  );
-};
-
-// Rises in 420 ms emphasized; drops quickly, 260 ms ease-in.
-const OPEN = { duration: 420, easing: ease.emphasized };
+// Rises as every sheet does; Done drops it quickly, 260 ms ease-in.
 const CLOSE = { duration: 260, easing: ease.in };
 
 type SeedSheetProps = {
@@ -51,52 +30,16 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
       (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss(CLOSE);
     }, [ref]);
 
-    const renderBackdrop = useCallback(
-      (props: BottomSheetBackdropProps) => (
-        <BottomSheetBackdrop
-          {...props}
-          disappearsOnIndex={-1}
-          appearsOnIndex={0}
-          opacity={0.62}
-          pressBehavior="none"
-          onPress={dismiss}
-        />
-      ),
-      [dismiss],
-    );
-
     return (
-      <BottomSheetModal
-        ref={ref}
-        accessible={false}
-        enableDynamicSizing
-        enablePanDownToClose
-        animationConfigs={OPEN}
-        backdropComponent={renderBackdrop}
-        handleComponent={SeedHandle}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: radiusSheet,
-          borderTopRightRadius: radiusSheet,
-        }}
-      >
-        <BottomSheetView
-          style={{
-            backgroundColor: colors.bgSurface,
-            paddingHorizontal: 24,
-            paddingTop: 20,
-            paddingBottom: 32,
-          }}
-        >
-          <BoldText
-            style={{ fontSize: 14.5, lineHeight: 20, textAlign: 'center' }}
-          >
+      <AppSheetModal ref={ref}>
+        <View style={{ paddingHorizontal: 24, paddingTop: 28 }}>
+          <Text variant="bodyStrong" style={{ textAlign: 'center' }}>
             {
               translate(
                 wallet?.seed ? 'seedsheet.title' : 'seedsheet.title-key',
               ) as string
             }
-          </BoldText>
+          </Text>
           {wallet?.seed ? (
             <View style={{ flexDirection: 'row', marginTop: 24, gap: 13 }}>
               {columns.map((col, c) => (
@@ -110,18 +53,18 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
                         gap: 6,
                         height: 30,
                         paddingHorizontal: 10,
-                        borderRadius: 8,
+                        borderRadius: radiusSm,
                         backgroundColor: colors.bgCanvas,
                         borderWidth: 1,
                         borderColor: colors.bottomSheetBorder,
                       }}
                     >
-                      <RegText style={{ fontSize: 10, color: colors.fgMuted }}>
+                      <Text variant="caption" tone="muted">
                         {String(r * 3 + c + 1)}
-                      </RegText>
-                      <RegText style={{ fontSize: 12.5 }} selectable={false}>
+                      </Text>
+                      <Text variant="bodySmall" selectable={false}>
                         {word}
-                      </RegText>
+                      </Text>
                     </View>
                   ))}
                 </View>
@@ -131,21 +74,21 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
             <View
               style={{
                 marginTop: 24,
-                padding: 12,
-                borderRadius: 8,
+                padding: space12,
+                borderRadius: radiusSm,
                 backgroundColor: colors.bgCanvas,
                 borderWidth: 1,
                 borderColor: colors.bottomSheetBorder,
               }}
             >
-              <RegText style={{ fontSize: 12.5 }}>{wallet?.ufvk ?? ''}</RegText>
+              <Text variant="address">{wallet?.ufvk ?? ''}</Text>
             </View>
           )}
           <View
             style={{
               marginTop: 20,
               height: 38,
-              borderRadius: 10,
+              borderRadius: radiusSm,
               borderWidth: 1,
               borderColor: colors.bottomSheetBorder,
               backgroundColor: colors.bgCanvas,
@@ -155,38 +98,23 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
               paddingHorizontal: 15,
             }}
           >
-            <RegText style={{ fontSize: 11, color: colors.fgMuted }}>
+            <Text variant="caption" tone="muted">
               {translate('seedsheet.birthday') as string}
-            </RegText>
-            <BoldText style={{ fontSize: 12.5 }}>
-              {(wallet?.birthday ?? 0).toLocaleString()}
-            </BoldText>
+            </Text>
+            <Text variant="bodySmall" style={{ fontWeight: '600' }}>
+              {formatInteger(wallet?.birthday ?? 0)}
+            </Text>
           </View>
-          <Pressable
-            onPress={dismiss}
-            accessibilityRole="button"
-            style={({ pressed }) => ({
-              marginTop: 20,
-              height: 44,
-              borderRadius: 22,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: colors.bgAccent,
-              transform: [{ scale: pressed ? 0.97 : 1 }],
-            })}
-          >
-            <RegText
-              style={{
-                color: colors.bgCanvas,
-                fontSize: 16,
-                fontWeight: '700',
-              }}
-            >
-              {translate('seedsheet.done') as string}
-            </RegText>
-          </Pressable>
-        </BottomSheetView>
-      </BottomSheetModal>
+          <SheetFooter style={{ paddingHorizontal: 24 }}>
+            <Button
+              variant="primary"
+              title={translate('seedsheet.done') as string}
+              onPress={dismiss}
+              style={{ marginTop: 20 }}
+            />
+          </SheetFooter>
+        </View>
+      </AppSheetModal>
     );
   },
 );

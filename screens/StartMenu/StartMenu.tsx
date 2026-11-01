@@ -1,40 +1,55 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { View, Pressable } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import Animated, {
   FadeIn,
   FadeInUp,
   FadeOut,
   ReduceMotion,
 } from 'react-native-reanimated';
-import { useTheme } from '@app/theme';
-
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
-  faCheck,
-  faTriangleExclamation,
-  faWifi,
-} from '@fortawesome/free-solid-svg-icons';
+  chipMinHeight,
+  iconSizeSm,
+  radiusPill,
+  space4,
+  space8,
+  space12,
+  space16,
+  space20,
+  space24,
+  useTheme,
+} from '@app/theme';
 
 import { ContextAppLoading } from '@app/context';
 import { WalletType } from '@app/AppState';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
-import RegText from '@ui/primitives/RegText';
-import BoldText from '@ui/primitives/BoldText';
-import BusyButton from '@ui/widgets/BusyButton';
+import { formatInteger } from '@app/utils/formatAmount';
+import Text from '@ui/primitives/Text';
+import Button from '@ui/primitives/Button';
+import Card from '@ui/widgets/Card';
+import Tag from '@ui/widgets/Tag';
 import ServerIcon from '@ui/widgets/ServerIcon';
-import { ease } from '@app/theme/motion';
+import { duration, ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
+import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
+import { WifiIcon } from '@ui/primitives/Icons/WifiIcon';
+import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
+import { useCompact } from '@app/hooks/useCompact';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
-// Vertical positions from the 402 x 874 design, as fractions of the height.
+// The title's place in the 402 x 874 design, as a fraction of the height.
 const TITLE_TOP = 294 / 874;
-const CARD_TOP = 422 / 874;
-const BOTTOM_MARGIN = 60;
-const PILL_WIDTH = 270;
-const BACK_ONLINE_MS = 1600;
+// Room kept above the title for the server icon.
+const ICON_ROOM = 48;
+const BACK_ONLINE_MS = duration.fresh;
+// Exception E, the brand: the wordmark, used once, not text.
+const BRAND_SIZE = 49;
+const BRAND_LINE = 59;
 
 // The launch sequence, about 1.1 s: "Welcome to" rises, "Zingo" settles,
 // the tagline fades, the actions arrive last.
-const LAUNCH_MS = 1100;
+const LAUNCH_MS = duration.hero;
 const titleEnter = () =>
   FadeInUp.duration(500)
     .delay(250)
@@ -60,12 +75,14 @@ const actionsEnter = () =>
     .reduceMotion(ReduceMotion.System);
 // Going offline after the launch: the pill and the line fade in at once.
 const offlineEnter = () =>
-  FadeIn.duration(240).reduceMotion(ReduceMotion.System);
+  FadeIn.duration(duration.tabFade).reduceMotion(ReduceMotion.System);
 const offlineExit = () =>
-  FadeOut.duration(240).reduceMotion(ReduceMotion.System);
-const pillExit = () => FadeOut.duration(300).reduceMotion(ReduceMotion.System);
+  FadeOut.duration(duration.tabFade).reduceMotion(ReduceMotion.System);
+const pillExit = () =>
+  FadeOut.duration(duration.axis).reduceMotion(ReduceMotion.System);
 // Back online, only the pill's icon and text change.
-const pillSwap = () => FadeIn.duration(200).reduceMotion(ReduceMotion.System);
+const pillSwap = () =>
+  FadeIn.duration(duration.base).reduceMotion(ReduceMotion.System);
 
 type StartMenuProps = {
   actionButtonsDisabled: boolean;
@@ -98,6 +115,9 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   const { colors } = useTheme();
 
   const [containerH, setContainerH] = useState<number>(0);
+  const bottomPad = useBottomActionPad();
+  const { gap } = useCompact();
+  const { edges, fades } = useScrollEdges();
   const [backOnline, setBackOnline] = useState<boolean>(false);
   const [started, setStarted] = useState<string | null>(null);
   const wasOffline = useRef<boolean>(!netInfo.isConnected);
@@ -139,31 +159,17 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
     title: string,
     onPress: () => void,
     testID: string,
-    size = 16,
+    small = false,
   ) => (
-    <Pressable
+    <Button
       testID={testID}
+      variant="text"
+      inline
+      size={small ? 'small' : undefined}
       disabled={actionButtonsDisabled}
+      title={title}
       onPress={onPress}
-      hitSlop={8}
-      style={({ pressed }) => ({
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        opacity: pressed ? 0.6 : 1,
-      })}
-    >
-      <RegText
-        style={{
-          color: actionButtonsDisabled
-            ? colors.fgAccentDisabled
-            : colors.fgAccent,
-          fontSize: size,
-          fontWeight: size < 16 ? '700' : '500',
-        }}
-      >
-        {title}
-      </RegText>
-    </Pressable>
+    />
   );
 
   // Only the button that started the work collapses into its spinner; the
@@ -179,15 +185,13 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
     actionButtonsDisabled && started === testID;
 
   const pill = (title: string, onPress: () => void, testID: string) => (
-    <View style={{ width: PILL_WIDTH }}>
-      <BusyButton
+    <View style={{ alignSelf: 'stretch' }}>
+      <Button
+        variant="primary"
         testID={testID}
         title={title}
-        labelSize={16}
-        enabled={true}
         busy={busyFor(testID)}
         onPress={press(testID, onPress)}
-        onDisabledPress={() => {}}
       />
     </View>
   );
@@ -197,60 +201,42 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
       style={{
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-        height: 30,
-        paddingHorizontal: 14,
-        borderRadius: 15,
+        gap: space8,
+        minHeight: chipMinHeight,
+        paddingHorizontal: space12,
+        borderRadius: radiusPill,
         borderWidth: 1,
         borderColor: ok ? colors.borderAccent : colors.bottomSheetBorder,
-        backgroundColor: ok ? colors.bgSecondaryDisabled : colors.bgSurface,
+        backgroundColor: ok ? colors.bgAccentSubtle : colors.bgSurface,
       }}
     >
       {icon}
-      <RegText style={{ fontSize: 11.5, fontWeight: '500' }}>{label}</RegText>
+      <Text variant="caption" style={{ fontWeight: '600' }}>
+        {label}
+      </Text>
     </View>
   );
 
   return (
     <View
-      style={{ flex: 1, backgroundColor: 'transparent' }}
+      style={{ flex: 1 }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
       <Animated.View
         entering={tagEnter()}
         style={{
           position: 'absolute',
-          top: 1,
-          right: 20,
+          zIndex: 1,
+          top: 0,
+          right: space20,
           flexDirection: 'row',
           alignItems: 'center',
-          gap: 8,
+          gap: space8,
         }}
       >
-        {!!netLabel && (
-          <View
-            style={{
-              height: 23,
-              paddingHorizontal: 11,
-              borderRadius: 12,
-              borderWidth: 1,
-              borderColor: colors.borderWarning,
-              backgroundColor: colors.bgWarning,
-              justifyContent: 'center',
-            }}
-          >
-            <RegText
-              style={{
-                fontSize: 11.5,
-                fontWeight: '600',
-                color: colors.fgWarningEmphasis,
-              }}
-            >
-              {netLabel}
-            </RegText>
-          </View>
-        )}
+        {!!netLabel && <Tag tone="warning">{netLabel}</Tag>}
         <Pressable
+          kind="icon"
           testID="loadingapp.server"
           onPress={customServer}
           disabled={actionButtonsDisabled}
@@ -268,7 +254,8 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           pointerEvents="none"
           style={{
             position: 'absolute',
-            top: 6,
+            zIndex: 1,
+            top: space4,
             left: 0,
             right: 0,
             alignItems: 'center',
@@ -282,173 +269,162 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
               ? chip(
                   translate('loadingapp.back-online') as string,
                   true,
-                  <FontAwesomeIcon
-                    icon={faCheck}
-                    size={12}
-                    color={colors.fgAccent}
-                  />,
+                  <CheckIcon size={iconSizeSm} color={colors.fgAccent} />,
                 )
               : chip(
                   translate('loadingapp.no-internet') as string,
                   false,
-                  <FontAwesomeIcon
-                    icon={faWifi}
-                    size={12}
-                    color={colors.fgDangerEmphasis}
-                  />,
+                  <WifiIcon size={iconSizeSm} color={colors.fgDanger} />,
                 )}
           </Animated.View>
         </Animated.View>
       )}
 
-      <View
-        pointerEvents="none"
-        style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          top: containerH * TITLE_TOP,
-          alignItems: 'center',
-        }}
+      {/**
+       * The title and the saved-wallet card scroll; the actions sit below
+       * them at the one bottom distance. The title keeps its place in the
+       * design while everything fits.
+       */}
+      <ScrollView
+        {...edges}
+        style={{ flex: 1 }}
+        contentContainerStyle={{ flexGrow: 1 }}
       >
-        <Animated.Text
-          entering={titleEnter()}
-          style={{ color: colors.fgDefault, fontSize: 35 }}
-        >
-          {translate('loadingapp.welcome') as string}
-        </Animated.Text>
-        <Animated.Text
-          entering={brandEnter()}
+        <View
           style={{
-            color: colors.fgDefault,
-            fontSize: 49,
-            letterSpacing: -0.2,
-            marginTop: 10,
+            flexGrow: 1,
+            minHeight: ICON_ROOM,
+            maxHeight: Math.max(ICON_ROOM, containerH * TITLE_TOP),
           }}
-        >
-          {getZingoName()}
-        </Animated.Text>
-        <Animated.Text
-          entering={tagEnter()}
-          style={{
-            color: colors.fgMuted,
-            fontSize: 13.5,
-            marginTop: 20,
-            textAlign: 'center',
-            paddingHorizontal: 32,
-          }}
-        >
-          {translate('loadingapp.tagline') as string}
-        </Animated.Text>
-        {noInternet && !recoveryWallet && (
-          <Animated.Text
-            entering={lateEnter()}
-            exiting={offlineExit()}
-            style={{
-              color: colors.fgMuted,
-              fontSize: 10,
-              lineHeight: 15,
-              marginTop: 10,
-              textAlign: 'center',
-              paddingHorizontal: 46,
-            }}
+        />
+        <View pointerEvents="none" style={{ alignItems: 'center' }}>
+          <Animated.View entering={titleEnter()}>
+            <Text variant="balance" style={{ fontWeight: '400' }}>
+              {translate('loadingapp.welcome') as string}
+            </Text>
+          </Animated.View>
+          <Animated.View entering={brandEnter()} style={{ marginTop: space8 }}>
+            <Text
+              variant="balance"
+              style={{
+                fontWeight: '400',
+                fontSize: BRAND_SIZE,
+                lineHeight: BRAND_LINE,
+              }}
+            >
+              {getZingoName()}
+            </Text>
+          </Animated.View>
+          <Animated.View
+            entering={tagEnter()}
+            style={{ marginTop: space20, paddingHorizontal: space20 }}
           >
-            {translate('loadingapp.offline-line') as string}
-          </Animated.Text>
-        )}
-      </View>
+            <Text
+              variant="bodySmall"
+              tone="muted"
+              style={{ textAlign: 'center' }}
+            >
+              {translate('loadingapp.tagline') as string}
+            </Text>
+          </Animated.View>
+          {noInternet && !recoveryWallet && (
+            <Animated.View
+              entering={lateEnter()}
+              exiting={offlineExit()}
+              style={{ marginTop: space8, paddingHorizontal: space24 }}
+            >
+              <Text
+                variant="caption"
+                tone="muted"
+                style={{ textAlign: 'center' }}
+              >
+                {translate('loadingapp.offline-line') as string}
+              </Text>
+            </Animated.View>
+          )}
+        </View>
 
-      {recoveryWallet && (
-        <Animated.View
-          entering={tagEnter()}
-          style={{
-            position: 'absolute',
-            left: 46,
-            right: 46,
-            top: containerH * CARD_TOP,
-            borderRadius: 10,
-            borderWidth: 1,
-            borderColor: colors.bottomSheetBorder,
-            backgroundColor: colors.bgSurface,
-            paddingHorizontal: 15,
-            paddingTop: 13,
-            paddingBottom: 8,
-          }}
-        >
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
-            <FontAwesomeIcon
-              icon={faTriangleExclamation}
-              size={11}
-              color={colors.fgDefault}
-            />
-            <BoldText style={{ fontSize: 11, lineHeight: 16 }}>
-              {
-                translate(
-                  freshInstall
-                    ? 'loadingapp.previous-install-title'
-                    : 'loadingapp.saved-wallet-title',
-                ) as string
-              }
-            </BoldText>
-          </View>
-          <RegText
-            style={{
-              marginTop: 6,
-              fontSize: 10.5,
-              lineHeight: 14,
-              color: colors.fgMuted,
-            }}
+        {recoveryWallet && (
+          <Animated.View
+            entering={tagEnter()}
+            style={{ marginTop: gap(space24), marginHorizontal: space24 }}
           >
-            {translate('loadingapp.previous-install-body') as string}
-          </RegText>
-          <RegText style={{ marginTop: 9, fontSize: 10.5, lineHeight: 16 }}>
-            {`${
-              translate(
-                recoveryWallet.seed
-                  ? 'loadingapp.card-words'
-                  : 'loadingapp.card-key',
-              ) as string
-            }  ·  ${(translate('loadingapp.card-birthday') as string).replace(
-              '{height}',
-              recoveryWallet.birthday.toLocaleString(),
-            )}`}
-          </RegText>
-          <View style={{ marginTop: 12 }}>
-            <BusyButton
-              testID="loadingapp.importthis"
-              title={translate('loadingapp.import-this') as string}
-              labelSize={11}
-              height={30}
-              enabled={true}
-              busy={busyFor('loadingapp.importthis')}
-              onPress={press('loadingapp.importthis', importRecoveryWallet)}
-              onDisabledPress={() => {}}
-            />
-          </View>
-          <View style={{ alignItems: 'center', marginTop: 6 }}>
-            {link(
-              translate('loadingapp.view-seed') as string,
-              viewRecoveryWallet,
-              'loadingapp.viewseed',
-              10.5,
-            )}
-          </View>
-        </Animated.View>
-      )}
+            <Card>
+              <View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: space8,
+                  }}
+                >
+                  <TriangleAlert size={iconSizeSm} color={colors.fgDefault} />
+                  <Text variant="bodyStrong">
+                    {
+                      translate(
+                        freshInstall
+                          ? 'loadingapp.previous-install-title'
+                          : 'loadingapp.saved-wallet-title',
+                      ) as string
+                    }
+                  </Text>
+                </View>
+                <Text
+                  variant="caption"
+                  tone="muted"
+                  style={{ marginTop: space4 }}
+                >
+                  {translate('loadingapp.previous-install-body') as string}
+                </Text>
+              </View>
+              <Text variant="caption">
+                {`${
+                  translate(
+                    recoveryWallet.seed
+                      ? 'loadingapp.card-words'
+                      : 'loadingapp.card-key',
+                  ) as string
+                } · ${(translate('loadingapp.card-birthday') as string).replace(
+                  '{height}',
+                  formatInteger(recoveryWallet.birthday),
+                )}`}
+              </Text>
+              <View>
+                <Button
+                  variant="primary"
+                  size="small"
+                  testID="loadingapp.importthis"
+                  title={translate('loadingapp.import-this') as string}
+                  busy={busyFor('loadingapp.importthis')}
+                  onPress={press('loadingapp.importthis', importRecoveryWallet)}
+                />
+              </View>
+              <View style={{ alignItems: 'center' }}>
+                {link(
+                  translate('loadingapp.view-seed') as string,
+                  viewRecoveryWallet,
+                  'loadingapp.viewseed',
+                  true,
+                )}
+              </View>
+            </Card>
+          </Animated.View>
+        )}
+        <View style={{ flexGrow: 1, minHeight: space16 }} />
+      </ScrollView>
+      {fades}
 
       <Animated.View
         entering={actionsEnter()}
         style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          bottom: BOTTOM_MARGIN,
           alignItems: 'center',
-          paddingHorizontal: 32,
+          paddingHorizontal: space20,
+          paddingTop: space8,
+          paddingBottom: bottomPad,
         }}
       >
         {nonMain && server.kind === 'remote' && (
-          <View style={{ marginBottom: 18 }}>
+          <View style={{ marginBottom: space16 }}>
             {chip(
               (translate('loadingapp.connected-to') as string).replace(
                 '{host}',
@@ -465,7 +441,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             'loadingapp.restorewalletseedufvk',
           )}
         {canAct && walletExists && (
-          <View style={{ marginTop: 6 }}>
+          <View style={{ marginTop: space4 }}>
             {link(
               translate('loadingapp.createnewwallet') as string,
               createNewWallet,
@@ -473,7 +449,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             )}
           </View>
         )}
-        <View style={{ marginTop: 27 }}>
+        <View style={{ marginTop: space24, alignSelf: 'stretch' }}>
           {walletExists
             ? pill(
                 translate('loadingapp.opencurrentwallet') as string,
@@ -487,16 +463,13 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                 'loadingapp.createnewwallet',
               )}
         </View>
-        <RegText
-          style={{
-            color: colors.fgMuted,
-            fontSize: 11,
-            marginTop: 18,
-            textAlign: 'center',
-          }}
+        <Text
+          variant="caption"
+          tone="muted"
+          style={{ marginTop: space16, textAlign: 'center' }}
         >
           {getZingoVersion()}
-        </RegText>
+        </Text>
       </Animated.View>
     </View>
   );

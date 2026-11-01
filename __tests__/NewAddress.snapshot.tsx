@@ -11,7 +11,6 @@ import {
 } from '@app/context';
 
 import NewAddress from '@screens/Receive/components/NewAddress';
-import { AddressKindEnum, ScreenEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 
@@ -22,31 +21,11 @@ describe('NewAddress - snapshots', () => {
 
   const onFn = jest.fn();
 
-  test('NewAddress unified kind', () => {
+  test('NewAddress kinds and tag', () => {
     expect(
       render(
         <ContextAppLoadedProvider value={state}>
-          <NewAddress
-            addressKind={AddressKindEnum.u}
-            closeSheet={onFn}
-            setAddressBook={onFn}
-            screenName={ScreenEnum.Receive}
-          />
-        </ContextAppLoadedProvider>,
-      ).toJSON(),
-    ).toMatchSnapshot();
-  });
-
-  test('NewAddress transparent kind', () => {
-    expect(
-      render(
-        <ContextAppLoadedProvider value={state}>
-          <NewAddress
-            addressKind={AddressKindEnum.t}
-            closeSheet={onFn}
-            setAddressBook={onFn}
-            screenName={ScreenEnum.Receive}
-          />
+          <NewAddress closeSheet={onFn} setAddressBook={onFn} />
         </ContextAppLoadedProvider>,
       ).toJSON(),
     ).toMatchSnapshot();

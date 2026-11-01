@@ -2,9 +2,8 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   BackHandler,
-  Pressable,
+  ScrollView,
   StyleSheet,
-  Text,
   useWindowDimensions,
   View,
 } from 'react-native';
@@ -16,12 +15,22 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 
-import { useTheme } from '@app/theme';
+import {
+  useTheme,
+  iconSizeMd,
+  radiusSm,
+  space8,
+  space12,
+  space16,
+  space24,
+} from '@app/theme';
+import Text from '@ui/primitives/Text';
+import { duration } from '@app/theme/motion';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum, ScreenEnum, SnackbarDurationEnum } from '@app/AppState';
+import { SnackbarDurationEnum } from '@app/AppState';
 import Header from '@ui/widgets/Header';
 import { AppDrawerParamList } from '@app/types';
 import {
@@ -32,7 +41,6 @@ import { getRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
 import { showConfirm } from '@app/services/showConfirm';
 import { fetchWallet } from '@app/walletBackend';
 import { copySensitive } from '@app/utils/sensitiveClipboard';
-import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { EyeIcon } from '@ui/primitives/Icons/EyeIcon';
 import { BanIcon } from '@ui/primitives/Icons/BanIcon';
 import { UsersIcon } from '@ui/primitives/Icons/UsersIcon';
@@ -41,21 +49,15 @@ import CardExpand from '@ui/widgets/CardExpand';
 import { CopyShowButtons } from '@screens/SeedBackup/components/SeedParts';
 import { SIDE } from '@screens/SeedBackup/components/StepParts';
 import KeyCard from './components/KeyCard';
-
-type ViewingKeyProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.ViewingKey
-> & {
-  // Moves the wallet to the chosen server on another network.
-  onConfirm: () => Promise<void>;
-  // Runs when the user backs out of that move.
-  onCancel: () => Promise<void>;
-};
+import Button from '@ui/primitives/Button';
+import { themeTokens } from '@app/theme';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
+import { useCompact } from '@app/hooks/useCompact';
 
 const QR = 196;
-const TILE_BG = '#0A1B33';
-const PUSH_IN_MS = 380;
-const PUSH_OUT_MS = 320;
+const TILE_BG = themeTokens.bgViewOnlySubtle;
+const PUSH_IN_MS = duration.screen;
+const PUSH_OUT_MS = duration.emphasized;
 
 // Moves the screen in from the right and back out, for the menu entry.
 const Slide: React.FunctionComponent<{
@@ -100,16 +102,24 @@ const Slide: React.FunctionComponent<{
 // The wallet's viewing key: a QR and its ends, hidden until Show. With
 // `switchTo`, the last look at it before the wallet moves to a server on
 // that network.
+type ViewingKeyProps = NativeStackScreenProps<AppDrawerParamList, 'ViewingKey'>;
+
 const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
   navigation,
   route,
-  onConfirm,
-  onCancel,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, biometrics, addLastSnackbar } = context;
+  const {
+    translate,
+    biometrics,
+    addLastSnackbar,
+    applyPendingServer: onConfirm,
+    cancelPendingServer: onCancel,
+  } = context;
   const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
+  const { edges, fades } = useScrollEdges();
+  const { gap } = useCompact();
+  const bottomPad = useBottomActionPad();
   const { entry, switchTo } = route.params;
   const net = switchTo
     ? (translate(`settings.value-chainname-${switchTo}`) as string)
@@ -203,69 +213,33 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
   const page = (
     <View testID="viewingkey" style={{ flex: 1, paddingTop: 4 }}>
       <Header
-        title={''}
-        screenName={ScreenEnum.ViewingKey}
+        title={
+          switchTo
+            ? (translate('viewingkey.switch-title') as string).replace(
+                '{net}',
+                net,
+              )
+            : (translate('viewingkey.title') as string)
+        }
+        closeScreen={close}
+        backTestID="viewingkey.back"
+        backAccessibilityLabel={translate('walletseed.back-acc') as string}
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
         noPrivacy={true}
         noUfvkIcon={true}
       />
-      <View style={{ flex: 1 }}>
-        <View
-          style={{
-            minHeight: 44,
-            marginTop: 6,
-            marginBottom: 10,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Pressable
-            testID="viewingkey.back"
-            accessibilityRole="button"
-            accessibilityLabel={translate('walletseed.back-acc') as string}
-            onPress={close}
-            style={({ pressed }) => ({
-              position: 'absolute',
-              left: 10,
-              top: 0,
-              width: 44,
-              height: 44,
-              borderRadius: 12,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
-            })}
-          >
-            <ChevronLeft size={22} color={colors.fgAccent} strokeWidth={2.2} />
-          </Pressable>
-          <Text
-            accessibilityRole="header"
-            style={{
-              color: colors.fgDefault,
-              fontSize: 18,
-              fontWeight: '700',
-              textAlign: 'center',
-              marginHorizontal: 60,
-            }}
-          >
-            {switchTo
-              ? (translate('viewingkey.switch-title') as string).replace(
-                  '{net}',
-                  net,
-                )
-              : (translate('viewingkey.title') as string)}
-          </Text>
-        </View>
+      {/** The content scrolls above the footer, never under it. */}
+      <ScrollView
+        {...edges}
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: space16 }}
+      >
         <Text
-          style={{
-            color: colors.fgMuted,
-            fontSize: 14,
-            lineHeight: 20,
-            textAlign: 'center',
-            marginHorizontal: SIDE,
-          }}
+          variant="body"
+          tone="muted"
+          style={{ textAlign: 'center', marginHorizontal: SIDE }}
         >
           {switchTo
             ? (translate('viewingkey.switch-sub') as string).replace(
@@ -275,7 +249,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
             : (translate('viewingkey.sub') as string)}
         </Text>
 
-        <View style={{ marginTop: 22 }}>
+        <View style={{ marginTop: gap(space24) }}>
           <KeyCard
             testID="viewingkey"
             value={key}
@@ -284,7 +258,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
           />
         </View>
 
-        <View style={{ marginTop: 14 }}>
+        <View style={{ marginTop: space12 }}>
           <CopyShowButtons
             testID="viewingkey"
             hidden={hidden}
@@ -293,66 +267,57 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
           />
         </View>
 
-        <View style={{ marginTop: 18, marginHorizontal: SIDE, gap: 12 }}>
+        <View
+          style={{ marginTop: space16, marginHorizontal: SIDE, gap: space12 }}
+        >
           {rows.map(({ id, Icon }) => (
             <View
               key={id}
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: space12,
+              }}
             >
               <View
                 style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 9,
+                  width: 36,
+                  height: 36,
+                  borderRadius: radiusSm,
                   backgroundColor: TILE_BG,
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <Icon size={16} color={colors.fgViewOnly} strokeWidth={1.9} />
+                <Icon size={iconSizeMd} color={colors.fgViewOnly} />
               </View>
-              <Text
-                style={{
-                  flex: 1,
-                  color: colors.fgDefault,
-                  fontSize: 13,
-                  lineHeight: 18,
-                }}
-              >
+              <Text variant="bodySmall" style={{ flex: 1 }}>
                 {translate(`viewingkey.${id}`) as string}
               </Text>
             </View>
           ))}
         </View>
+      </ScrollView>
+      {fades}
 
-        <Pressable
+      <View
+        style={{
+          marginHorizontal: SIDE,
+          paddingTop: space8,
+          paddingBottom: bottomPad,
+        }}
+      >
+        <Button
           testID="viewingkey.done"
-          accessibilityRole="button"
+          variant="primary"
           disabled={!!switchTo && !key}
           onPress={switchTo ? confirmSwitch : close}
-          style={({ pressed }) => ({
-            position: 'absolute',
-            left: 52,
-            right: 52,
-            bottom: insets.bottom + 24,
-            height: 44,
-            borderRadius: 22,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: colors.bgAccent,
-            transform: [{ scale: pressed ? 0.97 : 1 }],
-          })}
-        >
-          <Text
-            style={{ color: colors.bgCanvas, fontSize: 15, fontWeight: '700' }}
-          >
-            {
-              translate(
-                switchTo ? 'viewingkey.switch' : 'seedbackup.done',
-              ) as string
-            }
-          </Text>
-        </Pressable>
+          title={
+            translate(
+              switchTo ? 'viewingkey.switch' : 'seedbackup.done',
+            ) as string
+          }
+        />
       </View>
     </View>
   );

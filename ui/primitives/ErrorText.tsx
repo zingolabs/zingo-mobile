@@ -1,6 +1,6 @@
 import React from 'react';
-import { Text, TextStyle } from 'react-native';
-import { useTheme } from '@app/theme';
+import { TextStyle } from 'react-native';
+import Text from './Text';
 
 type ErrorTextProps = {
   style?: TextStyle;
@@ -9,23 +9,9 @@ type ErrorTextProps = {
   selectable?: boolean;
 };
 
-const ErrorText: React.FunctionComponent<ErrorTextProps> = ({
-  style,
-  children,
-  testID,
-  selectable,
-}) => {
-  const { colors } = useTheme();
-
-  return (
-    <Text
-      testID={testID}
-      style={{ color: colors.fgAccent, ...style }}
-      selectable={selectable}
-    >
-      {children}
-    </Text>
-  );
-};
+/** `Text` in the `danger` tone, for the message under what failed. */
+const ErrorText: React.FunctionComponent<ErrorTextProps> = props => (
+  <Text variant="bodySmall" tone="danger" {...props} />
+);
 
 export default ErrorText;

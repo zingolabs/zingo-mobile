@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   ReduceMotion,
   runOnJS,
@@ -12,16 +12,23 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { radiusSheet, useTheme } from '@app/theme';
+import {
+  iconSize,
+  radiusSheet,
+  radiusSm,
+  space8,
+  space20,
+  space24,
+  space32,
+  useTheme,
+} from '@app/theme';
+import Text from '@ui/primitives/Text';
 import { duration, ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
+import Button from '@ui/primitives/Button';
+import { useCompact } from '@app/hooks/useCompact';
 
-const DIM = 'rgba(0,5,12,0.93)';
-const TILE_BG = '#242627';
-const TILE_BORDER = '#76592F';
-const ALERT_INK = '#F0A63C';
-const BODY_INK = '#8DA0B8';
 const OFFSCREEN = 600;
 
 // Fades in and rises 8 pt once, delay ms after it mounts.
@@ -66,6 +73,7 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
 }) => {
   const { translate } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
+  const { gap } = useCompact();
   const insets = useSafeAreaInsets();
   const dim = useSharedValue(0);
   const drop = useSharedValue(OFFSCREEN);
@@ -141,7 +149,11 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
       testID="seedbackup.shot"
     >
       <Animated.View
-        style={[StyleSheet.absoluteFill, { backgroundColor: DIM }, dimStyle]}
+        style={[
+          StyleSheet.absoluteFill,
+          { backgroundColor: colors.bgScrim },
+          dimStyle,
+        ]}
       />
       <Animated.View
         style={[
@@ -151,9 +163,9 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
             right: 0,
             bottom: 0,
             alignItems: 'center',
-            paddingTop: 32,
-            paddingHorizontal: 40,
-            paddingBottom: insets.bottom + 28,
+            paddingTop: gap(space32),
+            paddingHorizontal: space20,
+            paddingBottom: insets.bottom + space24,
             backgroundColor: colors.bgSurface,
             borderTopWidth: 1,
             borderColor: colors.bottomSheetBorder,
@@ -166,32 +178,31 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
         <Animated.View
           style={[
             {
-              width: 52,
-              height: 52,
-              borderRadius: 14,
-              backgroundColor: TILE_BG,
+              width: 48,
+              height: 48,
+              borderRadius: radiusSm,
+              backgroundColor: colors.bgWarning,
               borderWidth: 1,
-              borderColor: TILE_BORDER,
+              borderColor: colors.borderWarning,
               alignItems: 'center',
               justifyContent: 'center',
-              marginBottom: 18,
+              marginBottom: space20,
             },
             tileStyle,
           ]}
         >
           <Animated.View style={wiggleStyle}>
-            <TriangleAlert size={24} color={ALERT_INK} />
+            <TriangleAlert size={iconSize} color={colors.fgWarning} />
           </Animated.View>
         </Animated.View>
         <Rise delay={260}>
           <Text
             accessibilityRole="alert"
+            variant="bodyStrong"
             style={{
-              color: colors.fgDefault,
-              fontSize: 16,
               fontWeight: '700',
               textAlign: 'center',
-              marginBottom: 12,
+              marginBottom: space8,
             }}
           >
             {translate('seedbackup.shot-title') as string}
@@ -199,42 +210,20 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
         </Rise>
         <Rise delay={300}>
           <Text
-            style={{
-              color: BODY_INK,
-              fontSize: 14,
-              lineHeight: 20,
-              textAlign: 'center',
-              marginBottom: 24,
-            }}
+            variant="caption"
+            tone="muted"
+            style={{ textAlign: 'center', marginBottom: gap(space24) }}
           >
             {translate('seedbackup.shot-body') as string}
           </Text>
         </Rise>
         <Rise delay={340} stretch>
-          <Pressable
+          <Button
             testID="seedbackup.shot.ok"
-            accessibilityRole="button"
+            variant="primary"
+            title={translate('seedbackup.shot-ok') as string}
             onPress={onGotIt}
-            style={({ pressed }) => ({
-              height: 44,
-              marginHorizontal: 12,
-              borderRadius: 22,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: colors.bgAccent,
-              transform: [{ scale: pressed ? 0.97 : 1 }],
-            })}
-          >
-            <Text
-              style={{
-                color: colors.bgCanvas,
-                fontSize: 15,
-                fontWeight: '700',
-              }}
-            >
-              {translate('seedbackup.shot-ok') as string}
-            </Text>
-          </Pressable>
+          />
         </Rise>
       </Animated.View>
     </View>

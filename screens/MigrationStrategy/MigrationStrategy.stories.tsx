@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import MigrationStrategy from './MigrationStrategy';
 import {
   screenProps,
@@ -22,7 +22,7 @@ const meta: Meta<typeof MigrationStrategy> = {
     withNavigation,
     withBottomSheet,
   ],
-  args: { ...screenProps(RouteEnum.MigrationStrategy), nymSheetOpen: false },
+  args: { ...screenProps(Route.MigrationStrategy), nymSheetOpen: false },
   argTypes: { nymSheetOpen: { control: 'boolean' } },
 };
 

@@ -1,33 +1,30 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
 import { View, Keyboard } from 'react-native';
-import { NavigationProp, ParamListBase } from '@react-navigation/native';
-import { useTheme } from '@app/theme';
+import {
+  space8,
+  space20,
+  useTheme,
+  space4,
+  space16,
+  iconSizeSm,
+} from '@app/theme';
 
-import { GlobalConst, ScreenEnum, SnackbarDurationEnum } from '@app/AppState';
+import { GlobalConst, SnackbarDurationEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import { checkMyAddress } from '@app/walletBackend';
 import { parseZcashURI } from '@app/uris';
 import Utils from '@app/utils';
 import TextInputAddress from '@ui/widgets/TextInputAddress';
-import FadeText from '@ui/primitives/FadeText';
+import Text from '@ui/primitives/Text';
 import { RPCCheckAddressType } from '@app/walletBackend/types/RPCCheckAddressType';
 import { VerifyCheckIcon } from '@ui/primitives/Icons/VerifyCheckIcon';
 import { VerifyXIcon } from '@ui/primitives/Icons/VerifyXIcon';
+import { SheetFooter } from '@ui/primitives/AppSheetModal';
 
-type VerifyAddressProps = {
-  closeSheet: () => void;
-  screenName: ScreenEnum;
-  // VerifyAddress lives inside a portaled BottomSheetModal; pass navigation
-  // from the host (Receive) so the QR button can navigate to ScannerAddress.
-  navigation: NavigationProp<ParamListBase>;
-};
-const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
-  closeSheet,
-  screenName,
-  navigation,
-}) => {
+const VerifyAddress: React.FunctionComponent = () => {
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar, server } = context;
   const { colors } = useTheme();
@@ -94,32 +91,27 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
   };
 
   return (
-    <View
-      style={{
-        backgroundColor: colors.bgSurface,
-      }}
-    >
+    <View style={{ paddingHorizontal: space20 }}>
+      <Text
+        variant="caption"
+        tone="muted"
+        style={{ textAlign: 'center', marginBottom: space8 }}
+      >
+        {translate('receive.verify-sub') as string}
+      </Text>
       <TextInputAddress
         address={address}
         setAddress={updateAddress}
         setError={setErrorAddress}
         disabled={false}
         showLabel={false}
-        screenName={screenName}
-        navigation={navigation}
+        scanRequest="receive.address"
+        pasteLabel={translate('paste') as string}
       />
       {!!errorAddress && (
-        <View
-          style={{
-            flexGrow: 1,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginVertical: 5,
-          }}
-        >
-          <FadeText style={{ color: colors.fgAccent }}>{errorAddress}</FadeText>
-        </View>
+        <Text variant="bodySmall" tone="danger" style={{ marginTop: space8 }}>
+          {errorAddress}
+        </Text>
       )}
       {verifyOK !== null && (
         <View
@@ -128,7 +120,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
-            marginVertical: 5,
+            marginVertical: space4,
           }}
         >
           {verifyOK ? (
@@ -137,16 +129,22 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'flex-start',
-                width: '90%',
+                width: '100%',
               }}
             >
               <VerifyCheckIcon
+                size={iconSizeSm}
                 color={colors.fgAccent}
-                style={{ marginRight: 10 }}
+                style={{ marginRight: space8 }}
               />
-              <FadeText style={{ color: colors.fgDefault }}>
+              <Text
+                testID="receive.verify-mine"
+                variant="bodySmall"
+                tone="accent"
+                style={{ flexShrink: 1 }}
+              >
                 {translate('receive.verification-success') as string}
-              </FadeText>
+              </Text>
             </View>
           ) : (
             <View
@@ -154,56 +152,51 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'flex-start',
-                width: '90%',
+                width: '100%',
               }}
             >
               <VerifyXIcon
-                color={colors.fgDangerEmphasis}
-                style={{ marginRight: 10 }}
+                size={iconSizeSm}
+                color={colors.fgDanger}
+                style={{ marginRight: space8 }}
               />
-              <FadeText style={{ color: colors.fgDefault }}>
+              <Text
+                testID="receive.verify-not-mine"
+                variant="bodySmall"
+                tone="danger"
+                style={{ flexShrink: 1 }}
+              >
                 {translate('receive.verification-failure') as string}
-              </FadeText>
+              </Text>
             </View>
           )}
         </View>
       )}
-      <View style={{ display: 'flex', flexDirection: 'column', margin: 0 }}>
-        <View
-          style={{
-            flexGrow: 1,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 10,
-            marginVertical: 5,
-            marginTop: 15,
-          }}
-        >
-          <Button
-            type={ButtonTypeEnum.Link}
-            title={translate('cancel') as string}
-            onPress={() => {
-              setAddress('');
-              setVerifyOK(null);
-              Keyboard.dismiss();
-              setTimeout(() => {
-                closeSheet();
-              }, 100);
+      <SheetFooter style={{ paddingHorizontal: space20 }}>
+        <View style={{ display: 'flex', flexDirection: 'column', margin: 0 }}>
+          <View
+            style={{
+              flexGrow: 1,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: space16,
+              marginBottom: space4,
             }}
-            twoButtons={true}
-          />
-          <Button
-            type={ButtonTypeEnum.Primary}
-            title={translate('verify') as string}
-            onPress={() => {
-              verifyAddress();
-            }}
-            twoButtons={true}
-            disabled={!address || !!errorAddress}
-          />
+          >
+            <ButtonStack>
+              <Button
+                variant="primary"
+                title={translate('verify') as string}
+                onPress={() => {
+                  verifyAddress();
+                }}
+                disabled={!address || !!errorAddress}
+              />
+            </ButtonStack>
+          </View>
         </View>
-      </View>
+      </SheetFooter>
     </View>
   );
 };

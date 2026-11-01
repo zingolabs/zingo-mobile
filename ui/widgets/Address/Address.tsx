@@ -1,7 +1,7 @@
-/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { TextStyle } from 'react-native';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import { textVariants } from '@app/theme';
+import { Platform, TextStyle } from 'react-native';
+import Button from '@ui/primitives/Button';
 
 type AddressProps = {
   address: string;
@@ -28,14 +28,16 @@ const Address: React.FunctionComponent<AddressProps> = ({
 
   return (
     <Button
-      type={ButtonTypeEnum.Ghost}
+      inline
+      variant="text"
       onPress={onPress ? onPress : () => console.log('onPress')}
       title={shortAddress}
       testID={testID}
       textStyle={{
+        fontSize: textVariants.address.fontSize,
+        lineHeight: textVariants.address.lineHeight,
+        fontFamily: Platform.select({ ios: 'Menlo', default: 'monospace' }),
         ...style,
-        fontSize: 16,
-        fontFamily: 'monospace',
       }}
     />
   );

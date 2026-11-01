@@ -1,4 +1,6 @@
+/* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
+import { leaveFlow } from '@app/navigation/navigate';
 import React, {
   useCallback,
   useContext,
@@ -29,28 +31,30 @@ import Animated, {
 import Svg, { Circle } from 'react-native-svg';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faArrowRightLong } from '@fortawesome/free-solid-svg-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum, SettingsNameEnum } from '@app/AppState';
+import { Route, SettingsNameEnum } from '@app/AppState';
+import { ArrowRightIcon } from '@ui/primitives/Icons/ArrowRightIcon';
+import { themeTokens } from '@app/theme';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 
 // Pool artwork palette — Orchard teal and Ironwood gold are one-off brand
 // accents for this onboarding, not part of the app theme.
-const ORCHARD_ACCENT = '#4E8E96';
-const ORCHARD_BORDER = '#2E5E66';
-const ORCHARD_BG = '#0B1D26';
-const IRONWOOD_ACCENT = '#E4C28F';
-const IRONWOOD_BORDER = '#5A4630';
-const IRONWOOD_BG = '#241A12';
-const RING_DARK = '#3A2A1A';
+const ORCHARD_ACCENT = themeTokens.fgOrchard;
+const ORCHARD_BORDER = themeTokens.borderOrchard;
+const ORCHARD_BG = themeTokens.bgOrchard;
+const IRONWOOD_ACCENT = themeTokens.fgIronwood;
+const IRONWOOD_BORDER = themeTokens.borderIronwood;
+const IRONWOOD_BG = themeTokens.bgIronwood;
+const RING_DARK = themeTokens.borderIronwood;
 // Hairline that separates the option sections.
-const SECTION_DIVIDER = 'rgba(255, 255, 255, 0.08)';
+const SECTION_DIVIDER = themeTokens.borderSubtle;
 
 const STEP_COUNT = 2;
 
@@ -221,7 +225,7 @@ const BodyText: React.FunctionComponent<BodyTextProps> = ({
   <Text
     style={{
       color: dimColor,
-      fontSize: 17,
+      fontSize: 18,
       lineHeight: 26,
       marginBottom,
     }}
@@ -261,7 +265,7 @@ const MiniCard: React.FunctionComponent<{
   size: number;
   color: string;
   fill?: string;
-}> = ({ size, color, fill = 'transparent' }) => (
+}> = ({ size, color, fill = 'none' }) => (
   <View
     style={{
       width: size,
@@ -316,8 +320,7 @@ const Phase1Graphic: React.FunctionComponent<{
         ))}
       </View>
     )}
-    <FontAwesomeIcon
-      icon={faArrowRightLong}
+    <ArrowRightIcon
       size={24}
       color={arrowColor}
       style={{ marginHorizontal: 20 }}
@@ -339,11 +342,11 @@ const Phase1Graphic: React.FunctionComponent<{
 // The bold heading for each migration option.
 const OptionTitle: React.FunctionComponent<{ children: string }> = ({
   children,
-}) => <BoldText style={{ fontSize: 17, marginBottom: 8 }}>{children}</BoldText>;
+}) => <BoldText style={{ fontSize: 18, marginBottom: 8 }}>{children}</BoldText>;
 
 type MeetIronwoodProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.MeetIronwood
+  'MeetIronwood'
 >;
 
 const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
@@ -352,6 +355,8 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
   const { colors } = useTheme();
+  /** The footer's lowest action ends at the one bottom distance. */
+  const bottomPad = useBottomActionPad();
   const { width } = useWindowDimensions();
 
   // One shared value drives everything: the strip position, the per-page
@@ -418,7 +423,7 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
     // modal somebody just dismissed is a nag, and the History banner is still
     // there as the way back in.
     markSeen();
-    navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
+    leaveFlow(navigation);
   }, [markSeen, navigation]);
 
   const onPrimary = useCallback(() => {
@@ -428,7 +433,7 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
       // Last onboarding step continues into the migration flow rather than
       // closing. The migration screens end the flow (reset to Home) once the
       // user accepts or backs all the way out.
-      navigation.navigate(RouteEnum.MigrationStrategy);
+      navigation.navigate(Route.MigrationStrategy);
     }
   }, [index, goTo, navigation]);
 
@@ -509,9 +514,8 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
           </PoolLabel>
           <PoolCard variant="orchard" />
         </View>
-        <FontAwesomeIcon
-          icon={faArrowRightLong}
-          size={26}
+        <ArrowRightIcon
+          size={24}
           color={colors.fgDefault}
           style={{ marginHorizontal: 22, marginTop: 25 }}
         />
@@ -582,27 +586,6 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
       >
         {translate('meetironwood.option2-body') as string}
       </BodyText>
-
-      <View
-        style={{
-          height: 1,
-          backgroundColor: SECTION_DIVIDER,
-          marginVertical: 22,
-        }}
-      />
-
-      {/* Option 3 — split & migrate: the balance splits into standardized
-          notes that later cross in timed batches. */}
-      <OptionTitle>
-        {translate('meetironwood.option3-label') as string}
-      </OptionTitle>
-      <BodyText
-        dimColor={colors.fgMuted}
-        boldColor={colors.fgDefault}
-        marginBottom={0}
-      >
-        {translate('meetironwood.option3-body') as string}
-      </BodyText>
     </View>,
   ];
 
@@ -663,7 +646,7 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
           .withInitialValues({ opacity: 0, transform: [{ translateY: 14 }] })
           .reduceMotion(ReduceMotion.System)}
         style={{
-          paddingBottom: 24,
+          paddingBottom: bottomPad,
           paddingHorizontal: 24,
         }}
       >
@@ -671,7 +654,7 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
           <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
             <Button
               testID="meetironwood.primary"
-              type={ButtonTypeEnum.Primary}
+              variant="primary"
               title={translate('meetironwood.next') as string}
               onPress={onPrimary}
             />
@@ -684,20 +667,20 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
               alignItems: 'center',
             }}
           >
-            <Button
-              testID="meetironwood.back"
-              type={ButtonTypeEnum.Ghost}
-              title={translate('meetironwood.back') as string}
-              onPress={() => goTo(index - 1)}
-              twoButtons={true}
-            />
-            <Button
-              testID="meetironwood.primary"
-              type={ButtonTypeEnum.Primary}
-              title={translate('meetironwood.next') as string}
-              onPress={onPrimary}
-              twoButtons={true}
-            />
+            <ButtonStack>
+              <Button
+                testID="meetironwood.back"
+                variant="text"
+                title={translate('meetironwood.back') as string}
+                onPress={() => goTo(index - 1)}
+              />
+              <Button
+                testID="meetironwood.primary"
+                variant="primary"
+                title={translate('meetironwood.next') as string}
+                onPress={onPrimary}
+              />
+            </ButtonStack>
           </View>
         )}
       </Animated.View>

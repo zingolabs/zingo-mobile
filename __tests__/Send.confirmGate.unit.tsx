@@ -38,6 +38,12 @@ jest.mock('@app/services/selectingServer', () => ({
   default: jest.fn(),
 }));
 
+// The sending screen is still on top when the send settles.
+jest.mock('@app/navigation/navigate', () => ({
+  ...jest.requireActual('@app/navigation/navigate'),
+  isOnTop: () => true,
+}));
+
 /**
  * The Confirm screen holds the confirm handler of the render that opened it.
  * These tests change the app state after that render and then confirm.
@@ -46,9 +52,15 @@ jest.mock('@app/services/selectingServer', () => ({
 import 'react-native';
 import React from 'react';
 
-import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import {
+  act,
+  fireEvent,
+  render,
+  waitFor,
+  screen,
+} from '@testing-library/react-native';
+import { deliver } from '@app/navigation/results';
 import { useNavigation } from '@react-navigation/native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Send from '@screens/Send';
 import {
   ContextAppLoadedProvider,
@@ -56,7 +68,7 @@ import {
 } from '@app/context';
 import {
   ChainNameEnum,
-  RouteEnum,
+  Route,
   SendPageStateClass,
   ToAddrClass,
   offlineServer,
@@ -64,7 +76,7 @@ import {
 } from '@app/AppState';
 import type { TranslateType } from '@app/AppState';
 import { errorKeyed } from '@app/AppState/types/Result';
-import { AppDrawerParamList } from '@app/types';
+import { HomeTabScreenProps } from '@app/types';
 import { fetchServerList } from '@app/uris';
 import Utils from '@app/utils';
 import RPCModule from '@app/RPCModule';
@@ -81,9 +93,19 @@ import { mockOnline } from '../__mocks__/dataMocks/mockOnline';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 
+/** Send mounts its sheet once its container is measured; jest never lays out. */
+const layoutSend = () => {
+  const container = screen.queryByTestId('send.container');
+  if (container) {
+    fireEvent(container, 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 400, height: 800 } },
+    });
+  }
+};
+
 const FEE_ZATOSHIS = 10_000;
 const SPENDABLE_ZATOSHIS = 100_000_000;
-const proposeMock = RPCModule.sendProcess as jest.Mock;
+const previewMock = RPCModule.previewSendProcess as jest.Mock;
 const spendableMock = RPCModule.getSpendableBalanceWithAddressInfo as jest.Mock;
 const navigate = mockNavigation.navigate as jest.Mock;
 
@@ -91,15 +113,12 @@ const sendPageState = new SendPageStateClass(new ToAddrClass(0));
 sendPageState.toaddr.to = 'UA-12345678901234567890';
 sendPageState.toaddr.amount = '0.1';
 
-function makeDrawerProps(): NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Send
-> {
+function makeDrawerProps(): HomeTabScreenProps<'Send'> {
   return {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.Send,
+      name: Route.Send,
       params: undefined,
     },
   };
@@ -131,37 +150,34 @@ const sendUi = (
   state.netInfo = inputs.netInfo;
   state.mixnetView = inputs.mixnetView;
   state.sendPermitNow = () => sendPermit(appState);
+  state.sendTransaction = sendTransaction;
+  state.setServerOption = setServerOption;
   return (
     <ContextAppLoadedProvider value={state}>
-      <Send
-        {...makeDrawerProps()}
-        sendTransaction={sendTransaction}
-        clearToAddr={jest.fn()}
-        toggleMenuDrawer={jest.fn()}
-        setShieldingAmount={jest.fn()}
-        setScrollToTop={jest.fn()}
-        setScrollToBottom={jest.fn()}
-        setServerOption={setServerOption}
-      />
+      <Send {...makeDrawerProps()} />
     </ContextAppLoadedProvider>
   );
 };
 
-// Presses Send on a valid form and returns the handler that the Confirm
-// screen received.
+// Presses Send on a valid form and returns what the Confirm screen's button
+// does: deliver the confirmation to the form beneath it. The button enables
+// only once the address check, the fee proposal and the spendable balance
+// settle, which on a cold CI runner can take longer than waitFor's default
+// second.
 const openConfirmScreen = async (view: ReturnType<typeof render>) => {
-  const sendButton = await waitFor(() => view.getByTestId('send.button'));
-  fireEvent.press(sendButton);
-  const confirmCall = await waitFor(() => {
-    const call = navigate.mock.calls.find(
-      ([route]) => route === RouteEnum.Confirm,
-    );
-    expect(call).toBeDefined();
-    return call;
+  const sendButton = await waitFor(() => view.getByTestId('send.button'), {
+    timeout: 5000,
   });
-  return confirmCall[1].confirmSend as (
-    state: SendPageStateClass,
-  ) => Promise<void>;
+  fireEvent.press(sendButton);
+  await waitFor(() => {
+    const call = navigate.mock.calls.find(([route]) => route === Route.Confirm);
+    expect(call).toBeDefined();
+  });
+  return async () => {
+    await act(async () => {
+      deliver('send.confirm', '');
+    });
+  };
 };
 
 beforeEach(() => {
@@ -170,7 +186,7 @@ beforeEach(() => {
   jest
     .spyOn(Utils, 'isValidAddress')
     .mockResolvedValue({ isValid: true, shieldedOnlyUA: '' });
-  proposeMock.mockResolvedValue(JSON.stringify({ fee: FEE_ZATOSHIS }));
+  previewMock.mockResolvedValue(JSON.stringify({ fee: FEE_ZATOSHIS }));
   spendableMock.mockResolvedValue(
     JSON.stringify({ spendable_balance: SPENDABLE_ZATOSHIS }),
   );
@@ -187,6 +203,7 @@ describe('Send confirm send permit', () => {
     const sendTransaction = jest.fn().mockResolvedValue(sent);
     const addLastSnackbar = jest.fn();
     const view = render(sendUi(online, sendTransaction, addLastSnackbar));
+    layoutSend();
     const confirmSend = await openConfirmScreen(view);
 
     view.rerender(
@@ -196,16 +213,25 @@ describe('Send confirm send permit', () => {
         addLastSnackbar,
       ),
     );
-    await confirmSend(sendPageState);
+    await confirmSend();
 
     expect(sendTransaction).not.toHaveBeenCalled();
-    expect(addLastSnackbar).toHaveBeenCalledWith('send.nym-blocked');
+    // Confirm has already replaced itself with the sending screen, which
+    // shows the refusal.
+    expect(navigate).toHaveBeenLastCalledWith(
+      Route.Computing,
+      expect.objectContaining({
+        phase: 'failed',
+        failure: { kind: 'verbatim', text: 'send.nym-blocked' },
+      }),
+    );
   });
 
   test('Tests that confirming does not send when the device disconnects while the Confirm screen is open. The screen opened on a connected device.', async () => {
     const sendTransaction = jest.fn().mockResolvedValue(sent);
     const addLastSnackbar = jest.fn();
     const view = render(sendUi(online, sendTransaction, addLastSnackbar));
+    layoutSend();
     const confirmSend = await openConfirmScreen(view);
 
     view.rerender(
@@ -215,16 +241,25 @@ describe('Send confirm send permit', () => {
         addLastSnackbar,
       ),
     );
-    await confirmSend(sendPageState);
+    await confirmSend();
 
     expect(sendTransaction).not.toHaveBeenCalled();
-    expect(addLastSnackbar).toHaveBeenCalledWith('loadedapp.connection-error');
+    // Confirm has already replaced itself with the sending screen, which
+    // shows the refusal.
+    expect(navigate).toHaveBeenLastCalledWith(
+      Route.Computing,
+      expect.objectContaining({
+        phase: 'failed',
+        failure: { kind: 'verbatim', text: 'loadedapp.connection-error' },
+      }),
+    );
   });
 
   test('Tests that confirming does not send when the server goes offline while the Confirm screen is open. The screen opened on a remote server.', async () => {
     const sendTransaction = jest.fn().mockResolvedValue(sent);
     const addLastSnackbar = jest.fn();
     const view = render(sendUi(online, sendTransaction, addLastSnackbar));
+    layoutSend();
     const confirmSend = await openConfirmScreen(view);
 
     view.rerender(
@@ -234,10 +269,18 @@ describe('Send confirm send permit', () => {
         addLastSnackbar,
       ),
     );
-    await confirmSend(sendPageState);
+    await confirmSend();
 
     expect(sendTransaction).not.toHaveBeenCalled();
-    expect(addLastSnackbar).toHaveBeenCalledWith('loadedapp.connection-error');
+    // Confirm has already replaced itself with the sending screen, which
+    // shows the refusal.
+    expect(navigate).toHaveBeenLastCalledWith(
+      Route.Computing,
+      expect.objectContaining({
+        phase: 'failed',
+        failure: { kind: 'verbatim', text: 'loadedapp.connection-error' },
+      }),
+    );
   });
 
   test('Tests that the Computing screen receives the refusal when the retry on another server is refused. The first attempt fails with a server error, and the live list holds one other server.', async () => {
@@ -258,9 +301,10 @@ describe('Send confirm send permit', () => {
     const view = render(
       sendUi(online, sendTransaction, jest.fn(), setServerOption),
     );
+    layoutSend();
     const confirmSend = await openConfirmScreen(view);
 
-    await confirmSend(sendPageState);
+    await confirmSend();
 
     expect(setServerOption).toHaveBeenCalledWith(
       remoteServer(other.uri, other.chainName),
@@ -272,33 +316,57 @@ describe('Send confirm send permit', () => {
     expect(setServerOption.mock.invocationCallOrder[0]).toBeLessThan(
       sendTransaction.mock.invocationCallOrder[1],
     );
-    expect(navigate).toHaveBeenLastCalledWith(RouteEnum.Computing, {
-      phase: 'failed',
-      failure: errorKeyed('send.nym-blocked'),
-    });
+    expect(navigate).toHaveBeenLastCalledWith(
+      Route.Computing,
+      expect.objectContaining({
+        phase: 'failed',
+        failure: errorKeyed('send.nym-blocked'),
+      }),
+    );
   });
 
   test('Tests that confirming sends when the permit is granted.', async () => {
     const sendTransaction = jest.fn().mockResolvedValue(sent);
     const view = render(sendUi(online, sendTransaction, jest.fn()));
+    layoutSend();
     const confirmSend = await openConfirmScreen(view);
 
-    await confirmSend(sendPageState);
+    await confirmSend();
 
     expect(sendTransaction).toHaveBeenCalledTimes(1);
-    expect(navigate).toHaveBeenLastCalledWith(RouteEnum.Computing, {
-      phase: 'created',
-    });
+    expect(navigate).toHaveBeenLastCalledWith(
+      Route.Computing,
+      expect.objectContaining({ phase: 'created' }),
+    );
+  });
+
+  test('Tests that confirming sends the state the Confirm screen shows when the form changes after it opened.', async () => {
+    const sendTransaction = jest.fn().mockResolvedValue(sent);
+    const view = render(sendUi(online, sendTransaction, jest.fn()));
+    layoutSend();
+    const confirmSend = await openConfirmScreen(view);
+    const confirmCall = navigate.mock.calls.find(
+      ([route]) => route === Route.Confirm,
+    );
+
+    fireEvent.changeText(view.getByTestId('send.amount'), '0.0001');
+    await confirmSend();
+
+    expect(sendTransaction).toHaveBeenCalledTimes(1);
+    expect(sendTransaction.mock.calls[0][0]).toBe(
+      confirmCall?.[1].sendPageState,
+    );
   });
 
   test('Tests that confirming sends when the platform has no mixnet transport. The Send screen shows no blocked reason.', async () => {
     const sendTransaction = jest.fn().mockResolvedValue(sent);
     const absent = { ...online, mixnetView: ABSENT_MIXNET_VIEW };
     const view = render(sendUi(absent, sendTransaction, jest.fn()));
+    layoutSend();
     const confirmSend = await openConfirmScreen(view);
 
     expect(view.queryByTestId('send.mixnet-blocked')).toBeNull();
-    await confirmSend(sendPageState);
+    await confirmSend();
 
     expect(sendTransaction).toHaveBeenCalledTimes(1);
   });

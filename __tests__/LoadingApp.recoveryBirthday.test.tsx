@@ -9,7 +9,7 @@ import {
   ChainNameEnum,
   LanguageEnum,
   LaunchingModeEnum,
-  RouteEnum,
+  Route,
   SelectServerEnum,
 } from '@app/AppState';
 import { remoteServer } from '@app/AppState/types/ServerType';
@@ -18,7 +18,6 @@ import {
   ConfirmOptions,
   registerConfirmListener,
 } from '@app/services/showConfirm';
-import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
@@ -39,8 +38,10 @@ const appWithSaved = (
   saved: { seed?: string; ufvk?: string } = { seed: 'abandon ability able' },
 ) => {
   const app = new LoadingAppClass({
-    navigationApp: mockNavigation,
-    route: { key: 'Key-1', name: RouteEnum.LoadingApp, params: undefined },
+    session: { kind: 'boot', startingApp: true, newWallet: false },
+    openWallet: jest.fn(),
+    openOnboarding: jest.fn(),
+    openBoot: jest.fn(),
     translate: (key: string) => key,
     language: LanguageEnum.en,
     server: remoteServer(
@@ -72,7 +73,7 @@ test('Tests that a saved phrase born past the network tip warns instead of resto
   registerConfirmListener(options => confirms.push(options));
   const { app, doRestore } = appWithSaved(3700000);
 
-  await app.importRecoveryWallet();
+  await app.importRecoveryWallet(Route.Welcome);
 
   expect(doRestore).not.toHaveBeenCalled();
   expect(confirms[0].title).toBe('loadingapp.saved-wallet-net-title');
@@ -81,7 +82,7 @@ test('Tests that a saved phrase born past the network tip warns instead of resto
 test('Tests that a saved phrase born before the network tip restores', async () => {
   const { app, doRestore } = appWithSaved(2900000);
 
-  await app.importRecoveryWallet();
+  await app.importRecoveryWallet(Route.Welcome);
 
   expect(doRestore).toHaveBeenCalledWith(
     'abandon ability able',
@@ -96,7 +97,7 @@ test('Tests that a saved viewing key of another network offers a server of its n
   const { app, doRestore } = appWithSaved(2900000, { ufvk: 'uviewtest1qqqq' });
   const openServer = jest.spyOn(app, 'openServer').mockImplementation(() => {});
 
-  await app.importRecoveryWallet();
+  await app.importRecoveryWallet(Route.Welcome);
 
   expect(doRestore).not.toHaveBeenCalled();
   expect(confirms[0].message).toBe('loadingapp.saved-key-net-body');
@@ -107,7 +108,7 @@ test('Tests that a saved viewing key of another network offers a server of its n
 test('Tests that a saved viewing key of the server network restores', async () => {
   const { app, doRestore } = appWithSaved(2900000, { ufvk: 'uview1qqqq' });
 
-  await app.importRecoveryWallet();
+  await app.importRecoveryWallet(Route.Welcome);
 
   expect(doRestore).toHaveBeenCalledWith(
     'uview1qqqq',
@@ -120,19 +121,22 @@ test.each([
   ['a birthday of 0, as an empty field or an old saved entry gives', 0],
   ['a height below Sapling activation', 1000],
 ])(
-  'Tests that the restore starts at Sapling activation when it gets %s',
+  'Tests that the restore passes the height it was given to zingolib when it gets %s',
   async (_case, birthday) => {
     jest.useFakeTimers();
-    const { app } = appWithSaved(birthday);
-    jest.mocked(app.doRestore).mockRestore();
-    jest.spyOn(app, 'setState').mockImplementation(() => {});
-    const restore = jest.mocked(RPCModule.restoreWalletFromSeed);
-    restore.mockRejectedValue(new Error('stop here'));
+    try {
+      const { app } = appWithSaved(birthday);
+      jest.mocked(app.doRestore).mockRestore();
+      jest.spyOn(app, 'setState').mockImplementation(() => {});
+      const restore = jest.mocked(RPCModule.restoreWalletFromSeed);
+      restore.mockRejectedValue(new Error('stop here'));
 
-    await app.doRestore('abandon ability able', birthday);
+      await app.doRestore('abandon ability able', birthday);
 
-    expect(restore.mock.calls[0][1]).toBe('419200');
-    jest.clearAllTimers();
-    jest.useRealTimers();
+      expect(restore.mock.calls[0][1]).toBe(String(birthday));
+    } finally {
+      jest.clearAllTimers();
+      jest.useRealTimers();
+    }
   },
 );

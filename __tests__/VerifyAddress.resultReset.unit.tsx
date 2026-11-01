@@ -5,10 +5,9 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { ChainNameEnum, ScreenEnum, remoteServer } from '@app/AppState';
+import { ChainNameEnum, remoteServer } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
 import VerifyAddress from '@screens/Receive/components/VerifyAddress';
-import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
@@ -20,7 +19,7 @@ const other =
   'zs14mccpahrfc65hzy0sxntz04rxmwm0fnmkzdqu68f608m8ysssv028g5khgy6jgsxplfckyxhys5';
 
 beforeEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
   jest.mocked(RPCModule.parseAddressInfo).mockResolvedValue(
     JSON.stringify({
       status: 'success',
@@ -50,11 +49,7 @@ async function verified() {
   };
   const view = render(
     <ContextAppLoadedProvider value={context}>
-      <VerifyAddress
-        closeSheet={jest.fn()}
-        screenName={ScreenEnum.Receive}
-        navigation={mockNavigation}
-      />
+      <VerifyAddress />
     </ContextAppLoadedProvider>,
   );
   await act(async () => {
@@ -81,10 +76,17 @@ test('Tests that the verification result is cleared when the address changes.', 
   expect(view.queryByText('receive.verification-success')).toBeNull();
 });
 
-test('Tests that the verification result is cleared when the sheet is cancelled.', async () => {
+test('Tests that the sheet opens empty again when it was closed after a verification.', async () => {
   const view = await verified();
-  await act(async () => {
-    fireEvent.press(view.getByText('cancel'));
-  });
-  expect(view.queryByText('receive.verification-success')).toBeNull();
+  // Receive unmounts the sheet's content however the sheet closes.
+  view.unmount();
+  const again = render(
+    <ContextAppLoadedProvider
+      value={{ ...defaultAppContextLoaded, translate: (key: string) => key }}
+    >
+      <VerifyAddress />
+    </ContextAppLoadedProvider>,
+  );
+  expect(again.queryByText('receive.verification-success')).toBeNull();
+  expect(again.getByTestId('send.addressplaceholder').props.value).toBe('');
 });

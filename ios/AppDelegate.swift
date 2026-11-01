@@ -13,29 +13,11 @@ import React_RCTAppDelegate
 import ReactAppDependencyProvider
 import ZingoBindings
 
-struct ScanRanges: Decodable {
-    let priority: String
-    let start_block: String
-    let end_block: String
-}
-
-struct SyncStatus: Decodable {
-    let scan_ranges: [ScanRanges]?
-    let sync_start_height: Int64?
-    let session_blocks_scanned: Int64?
-    let total_blocks_scanned: Int64?
-    let percentage_session_blocks_scanned: Double?
-    let percentage_total_blocks_scanned: Double?
-    let session_sapling_outputs_scanned: Int64?
-    let total_sapling_outputs_scanned: Int64?
-    let session_orchard_outputs_scanned: Int64?
-    let total_orchard_outputs_scanned: Int64?
-    let session_ironwood_outputs_scanned: Int64?
-    let total_ironwood_outputs_scanned: Int64?
-    let percentage_session_outputs_scanned: Double?
-    let percentage_total_outputs_scanned: Double?
-    let total_outputs_scanned: Int64?
-    let total_outputs: Int64?
+/// What `syncCaughtUp` answers: read from the engine's published status, so
+/// a stale wallet never reads as caught up before the engine publishes.
+struct SyncCaughtUp: Decodable {
+    let caught_up: Bool
+    let percent: Double?
 }
 
 /// What `loadWalletFile` found when preparing a background sync.
@@ -224,12 +206,32 @@ extension AppDelegate {
         NSLog("BGTask SCHEDULER registered \(bcgSchedulerTaskResult)")
     }
     
+    // The engine would keep scanning after the task completes; end it so the
+    // save holds the whole session and nothing runs on behind the app.
+    private func stopSyncAndWait() {
+        do {
+            _ = try stopSync()
+            let deadline = Date().addingTimeInterval(30)
+            while Date() < deadline {
+                let poll = try pollSync()
+                if !poll.lowercased().hasPrefix("sync task is not complete") {
+                    return
+                }
+                _ = DispatchSemaphore(value: 0).wait(timeout: .now() + 0.2)
+            }
+            NSLog("BGTask stopSyncAndWait - timed out")
+        } catch {
+            NSLog("BGTask stopSyncAndWait - error: \(error.localizedDescription)")
+        }
+    }
+
     private func startBackgroundTask(_ task: BGProcessingTask) {
         task.expirationHandler = {
             NSLog("BGTask startBackgroundTask - expirationHandler called")
             // stop the sync process, can't wait to check if the process is over.
             // have no time here
             self.syncWorkItem?.cancel()
+            _ = try? stopSync()
             
             let rpcmodule = RPCModule()
 
@@ -476,7 +478,7 @@ extension AppDelegate {
               return
             }
 
-            var syncStatus: SyncStatus?
+            var syncStatus: SyncCaughtUp?
             while true {
                 if syncWorkItem?.isCancelled == true {
                     NSLog("BGTask syncingProcessBackgroundTask - sync cancelled by expiration handler")
@@ -484,10 +486,15 @@ extension AppDelegate {
                 }
                 var syncStatusJson: String = ""
                 do {
-                  // statusSync throws on failure (typed FFI errors); the
-                  // catch below owns the error path, so the status JSON is
-                  // never inspected for an error sentinel.
-                  syncStatusJson = try statusSync()
+                  // The session is continuous: it never ends on its own, so
+                  // one that has ended stopped on a failure, which pollSync
+                  // throws.
+                  let poll = try pollSync()
+                  if !poll.lowercased().hasPrefix("sync task is not complete") {
+                    NSLog("BGTask syncingProcessBackgroundTask - sync ENDED \(poll)")
+                    break
+                  }
+                  syncStatusJson = try syncCaughtUp()
                 } catch {
                   NSLog("BGTask syncingProcessBackgroundTask - sync STATUS error: \(error.localizedDescription)")
 
@@ -518,15 +525,12 @@ extension AppDelegate {
                     bgTask = nil
                     return
                   }
-                  syncStatus = try JSONDecoder().decode(SyncStatus.self, from: data)
+                  syncStatus = try JSONDecoder().decode(SyncCaughtUp.self, from: data)
 
-                  let percent =
-                    syncStatus?.percentage_total_outputs_scanned
-                    ?? syncStatus?.percentage_total_blocks_scanned
-                    ?? 0
+                  let percent = syncStatus?.percent ?? 0
 
-                  if percent >= 100.0 {
-                      NSLog("BGTask syncingProcessBackgroundTask - sync COMPLETED %: \(percent)")
+                  if syncStatus?.caught_up == true {
+                      NSLog("BGTask syncingProcessBackgroundTask - sync CAUGHT UP %: \(percent)")
                       break
                   } else {
                       NSLog("BGTask syncingProcessBackgroundTask - sync STATUS %: \(percent)")
@@ -577,6 +581,7 @@ extension AppDelegate {
             return
         }
 
+        stopSyncAndWait()
         NSLog("BGTask syncingProcessBackgroundTask - syncing task STOPPED")
 
         // save the wallet

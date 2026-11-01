@@ -10,23 +10,25 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import {
-  BottomSheetBackdrop,
-  BottomSheetBackdropProps,
-  BottomSheetModal,
-  BottomSheetView,
-} from '@gorhom/bottom-sheet';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
-import { radiusSheet, useTheme } from '@app/theme';
+import {
+  useTheme,
+  iconSizeMd,
+  radiusPill,
+  space4,
+  space12,
+  space16,
+  space24,
+} from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
 import { TranslateType } from '@app/AppState';
 import { DeleteWalletContext } from '@app/AppState/types/DeleteWalletContext';
-import BoldText from '@ui/primitives/BoldText';
-import RegText from '@ui/primitives/RegText';
-import SheetRim from '@ui/primitives/SheetRim';
-import { BUTTON_HEIGHT } from '@ui/primitives/Button';
+import Text from '@ui/primitives/Text';
+import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
+import Button, { BUTTON_HEIGHT } from '@ui/primitives/Button';
+import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
+import { useCompact } from '@app/hooks/useCompact';
 
 type DeleteWalletSheetProps = {
   context: DeleteWalletContext;
@@ -39,30 +41,11 @@ const DRAIN_MS = 250;
 const PULSE_MS = 220;
 const SETTLE_MS = 260;
 const RELEASE_FLOOR = 0.02;
-const ICON_BG = '#2A1218';
-const ICON_BORDER = '#6B2A33';
-const ICON_FG = '#F07A86';
-const HOLD_LABEL = '#FFE9EA';
-
-const SheetHandle: React.FC = () => {
-  const { colors } = useTheme();
-  return (
-    <View
-      style={{
-        paddingTop: 8,
-        backgroundColor: colors.bgSurface,
-        borderTopLeftRadius: radiusSheet,
-        borderTopRightRadius: radiusSheet,
-      }}
-    >
-      <SheetRim />
-    </View>
-  );
-};
 
 const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
   ({ context, translate, onConfirmed, onReleasedEarly }, ref) => {
     const { colors } = useTheme();
+    const { gap } = useCompact();
     const progress = useSharedValue(0);
     const pulse = useSharedValue(1);
     const done = useRef(false);
@@ -133,19 +116,6 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
       transform: [{ scale: pulse.value }],
     }));
 
-    const renderBackdrop = useCallback(
-      (props: BottomSheetBackdropProps) => (
-        <BottomSheetBackdrop
-          {...props}
-          disappearsOnIndex={-1}
-          appearsOnIndex={0}
-          opacity={0.62}
-          pressBehavior="close"
-        />
-      ),
-      [],
-    );
-
     const sub = translate(
       context === 'import'
         ? 'deletesheet.import-sub'
@@ -155,26 +125,11 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
     ) as string;
 
     return (
-      <BottomSheetModal
-        ref={ref}
-        accessible={false}
-        enableDynamicSizing
-        enablePanDownToClose
-        backdropComponent={renderBackdrop}
-        handleComponent={SheetHandle}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: radiusSheet,
-          borderTopRightRadius: radiusSheet,
-        }}
-        onDismiss={reset}
-      >
-        <BottomSheetView
+      <AppSheetModal ref={ref} onDismiss={reset}>
+        <View
           style={{
-            backgroundColor: colors.bgSurface,
             paddingHorizontal: 24,
-            paddingTop: 18,
-            paddingBottom: 40,
+            paddingTop: 26,
             alignItems: 'center',
           }}
         >
@@ -182,27 +137,19 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
             style={{
               width: 52,
               height: 52,
-              borderRadius: 26,
-              backgroundColor: ICON_BG,
+              borderRadius: radiusPill,
+              backgroundColor: colors.bgDangerSubtle,
               borderWidth: 1,
-              borderColor: ICON_BORDER,
+              borderColor: colors.borderDanger,
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <FontAwesomeIcon
-              icon={faTriangleExclamation}
-              size={20}
-              color={ICON_FG}
-            />
+            <TriangleAlert size={iconSizeMd} color={colors.fgDanger} />
           </View>
-          <BoldText
-            style={{
-              marginTop: 16,
-              fontSize: 15,
-              lineHeight: 20,
-              textAlign: 'center',
-            }}
+          <Text
+            variant="bodyStrong"
+            style={{ marginTop: space16, textAlign: 'center' }}
           >
             {
               translate(
@@ -211,18 +158,14 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
                   : 'deletesheet.title',
               ) as string
             }
-          </BoldText>
-          <RegText
-            style={{
-              marginTop: 5,
-              fontSize: 10.5,
-              lineHeight: 16,
-              textAlign: 'center',
-              color: colors.fgMuted,
-            }}
+          </Text>
+          <Text
+            variant="caption"
+            tone="muted"
+            style={{ marginTop: space4, textAlign: 'center' }}
           >
             {sub}
-          </RegText>
+          </Text>
           <Animated.View style={[{ alignSelf: 'stretch' }, holdStyle]}>
             <Pressable
               testID="deletesheet.hold"
@@ -230,11 +173,11 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
               onPressOut={release}
               accessibilityRole="button"
               style={{
-                marginTop: 24,
+                marginTop: gap(space24),
                 height: BUTTON_HEIGHT,
-                borderRadius: 999,
+                borderRadius: radiusPill,
                 borderWidth: 1.5,
-                borderColor: colors.fgDangerEmphasis,
+                borderColor: colors.borderDanger,
                 overflow: 'hidden',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -249,13 +192,13 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
                     right: 0,
                     top: 0,
                     bottom: 0,
-                    backgroundColor: colors.fgDangerEmphasis,
+                    backgroundColor: colors.bgDanger,
                     transformOrigin: 'left',
                   },
                   fillStyle,
                 ]}
               />
-              <RegText style={{ fontSize: 15, color: HOLD_LABEL }}>
+              <Text variant="button">
                 {
                   translate(
                     context === 'replace'
@@ -263,34 +206,22 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
                       : 'deletesheet.hold',
                   ) as string
                 }
-              </RegText>
+              </Text>
             </Pressable>
           </Animated.View>
-          <Pressable
-            testID="deletesheet.cancel"
-            onPress={dismiss}
-            hitSlop={8}
-            accessibilityRole="button"
-            style={({ pressed }) => ({
-              marginTop: 14,
-              height: 26,
-              paddingHorizontal: 20,
-              justifyContent: 'center',
-              opacity: pressed ? 0.6 : 1,
-            })}
-          >
-            <RegText
-              style={{
-                fontSize: 12.5,
-                fontWeight: '700',
-                color: colors.fgMuted,
-              }}
-            >
-              {translate('cancel') as string}
-            </RegText>
-          </Pressable>
-        </BottomSheetView>
-      </BottomSheetModal>
+          <SheetFooter style={{ paddingHorizontal: 24 }}>
+            <View style={{ marginTop: space12 }}>
+              <Button
+                testID="deletesheet.cancel"
+                variant="quiet"
+                inline
+                title={translate('cancel') as string}
+                onPress={dismiss}
+              />
+            </View>
+          </SheetFooter>
+        </View>
+      </AppSheetModal>
     );
   },
 );

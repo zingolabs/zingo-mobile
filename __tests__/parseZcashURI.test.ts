@@ -145,4 +145,46 @@ describe('parseZcashURI — Issue H: failures carry no target', () => {
     const r = await parseZcashURI('zcash:?amount=1', mainnetServer);
     expect(r).toEqual({ kind: 'error', errorKey: 'uris.noaddress' });
   });
+
+  test.each(['1,5', '12.5ZEC', '1e2', '1 000', '0x10', '.5', '1.', '+1'])(
+    'Tests that the parser rejects the URI when the amount is %s.',
+    async amount => {
+      const r = await parseZcashURI(
+        `zcash:${VALID_ADDR}?amount=${encodeURIComponent(amount)}`,
+        mainnetServer,
+      );
+      expect(r).toEqual({
+        kind: 'error',
+        errorKey: 'uris.amount',
+        param: amount,
+      });
+    },
+  );
+
+  test('Tests that the parser rejects the URI when the amount has nine decimals.', async () => {
+    const r = await parseZcashURI(
+      `zcash:${VALID_ADDR}?amount=0.123456789`,
+      mainnetServer,
+    );
+    expect(r).toMatchObject({ kind: 'error', errorKey: 'uris.amount' });
+  });
+
+  test.each([
+    ['1', 1],
+    ['0.5', 0.5],
+    ['0.00000001', 0.00000001],
+    ['21000000', 21000000],
+  ])(
+    'Tests that the parser keeps the amount when it is the decimal %s.',
+    async (amount, zec) => {
+      const r = await parseZcashURI(
+        `zcash:${VALID_ADDR}?amount=${amount}`,
+        mainnetServer,
+      );
+      expect(r).toMatchObject({
+        kind: 'paymentTarget',
+        target: { amount: zec },
+      });
+    },
+  );
 });

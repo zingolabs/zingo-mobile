@@ -1,6 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { BannerPlainContext } from '@ui/widgets/Banner';
+import { Pressable as RNPressable, View } from 'react-native';
+import Text from '@ui/primitives/Text';
 import Animated, {
   Keyframe,
   ReduceMotion,
@@ -11,7 +13,8 @@ import Animated, {
   WithTimingConfig,
 } from 'react-native-reanimated';
 
-import { useTheme } from '@app/theme';
+import { useTheme, radiusMd, space20, iconSizeSm, slopFor } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { duration, ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { ChevronDown } from '@ui/primitives/Icons/Chevron';
@@ -35,17 +38,17 @@ const SCALE_STEP = 0.06;
 const OPACITY_STEP = 0.1;
 // Every card is clipped to this radius; a card that draws its own border
 // uses the same one, or the clip cuts the border at the corners.
-export const NOTICE_RADIUS = 14;
+export const NOTICE_RADIUS = radiusMd;
 const RADIUS = NOTICE_RADIUS;
 
 // As the wallet opens, the stack drops in 8 pt once its cards are measured.
 const DROP_PT = 8;
 const drop: WithTimingConfig = {
-  duration: 420,
+  duration: duration.sheet,
   easing: ease.out,
   reduceMotion: ReduceMotion.System,
 };
-const DROP_DELAY_MS = 200;
+const DROP_DELAY_MS = duration.base;
 
 const move: WithTimingConfig = {
   duration: duration.sheet,
@@ -67,7 +70,7 @@ const leave = () =>
       easing: ease.standard,
     },
   })
-    .duration(duration.axis)
+    .duration(duration.sheet)
     .reduceMotion(ReduceMotion.Never);
 
 type Slot = {
@@ -119,13 +122,30 @@ const Card: React.FunctionComponent<{
   children: React.ReactNode;
 }> = ({ slot, depth, animate, onMeasure, children }) => {
   const { colors } = useTheme();
+  /**
+   * A height cannot be animated from 'auto': a card that had none, such as
+   * the one behind a front card still being measured, takes its height at
+   * once, or it stays at its natural height and covers the label.
+   */
+  const sized = useRef(false);
+  const fromSize = sized.current;
+  useEffect(() => {
+    sized.current = slot.height > 0;
+  });
   const to = (v: number, cfg: WithTimingConfig) => {
     'worklet';
     return animate ? withTiming(v, cfg) : v;
   };
   const frame = useAnimatedStyle(() => ({
     top: to(slot.top, move),
-    height: slot.height > 0 ? to(slot.height, move) : 'auto',
+    height:
+      slot.height > 0
+        ? fromSize
+          ? to(slot.height, move)
+          : slot.height
+        : 'auto',
+  }));
+  const look = useAnimatedStyle(() => ({
     opacity: to(slot.opacity, fade),
     transform: [{ scale: to(slot.scale, move) }],
   }));
@@ -151,28 +171,38 @@ const Card: React.FunctionComponent<{
         frame,
       ]}
     >
-      <Animated.View style={content}>
-        <View onLayout={e => onMeasure(e.nativeEvent.layout.height)}>
-          {children}
-        </View>
-      </Animated.View>
       <Animated.View
-        pointerEvents="none"
+        pointerEvents="box-none"
         style={[
-          {
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-            borderRadius: RADIUS,
-            borderWidth: 1,
-            borderColor: colors.bottomSheetBorder,
-            backgroundColor: colors.bgSurface,
-          },
-          deck,
+          { flexGrow: 1, overflow: 'hidden', borderRadius: RADIUS },
+          look,
         ]}
-      />
+      >
+        <Animated.View style={content}>
+          <View onLayout={e => onMeasure(e.nativeEvent.layout.height)}>
+            <BannerPlainContext.Provider value={true}>
+              {children}
+            </BannerPlainContext.Provider>
+          </View>
+        </Animated.View>
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            {
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              borderRadius: RADIUS,
+              borderWidth: 1,
+              borderColor: colors.bottomSheetBorder,
+              backgroundColor: colors.bgSurface,
+            },
+            deck,
+          ]}
+        />
+      </Animated.View>
     </Animated.View>
   );
 };
@@ -246,7 +276,7 @@ const NoticeStack: React.FunctionComponent<NoticeStackProps> = ({
     <Animated.View
       style={[
         {
-          marginHorizontal: 20,
+          marginHorizontal: space20,
           marginTop: MARGIN_TOP,
           marginBottom: MARGIN_BOTTOM,
         },
@@ -268,7 +298,7 @@ const NoticeStack: React.FunctionComponent<NoticeStackProps> = ({
           </Card>
         ))}
         {more > 0 && !expanded && (
-          <Pressable
+          <RNPressable
             testID="noticestack.peek"
             accessible={false}
             onPress={() => setOpen(true)}
@@ -296,10 +326,11 @@ const NoticeStack: React.FunctionComponent<NoticeStackProps> = ({
             ]}
           >
             <Pressable
+              kind="link"
               testID="noticestack.toggle"
               accessibilityRole="button"
               accessibilityState={{ expanded }}
-              hitSlop={8}
+              hitSlop={slopFor(LABEL_H - 4)}
               onPress={() => setOpen(o => !o)}
               style={{
                 flexDirection: 'row',
@@ -309,11 +340,9 @@ const NoticeStack: React.FunctionComponent<NoticeStackProps> = ({
               }}
             >
               <Text
-                style={{
-                  color: colors.fgMuted,
-                  fontSize: 11,
-                  fontWeight: '700',
-                }}
+                variant="caption"
+                tone="muted"
+                style={{ fontWeight: '700' }}
               >
                 {expanded
                   ? (translate('notices.less') as string)
@@ -324,7 +353,7 @@ const NoticeStack: React.FunctionComponent<NoticeStackProps> = ({
                     ).replace('{n}', String(more))}
               </Text>
               <Animated.View style={chevron}>
-                <ChevronDown size={12} color={colors.fgMuted} />
+                <ChevronDown size={iconSizeSm} color={colors.fgMuted} />
               </Animated.View>
             </Pressable>
           </Animated.View>

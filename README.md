@@ -55,9 +55,17 @@ pointer, and propose a record.
 ## The Binding Layer
 
 The Rust wallet and the mixnet proxy, with their Kotlin and Swift bindings,
-live in [zingolabs/zingolib](https://github.com/zingolabs/zingolib). This
-repository pins them as a submodule at `zingolib/` (ADR zingo-mobile/0016).
-The Android and iOS builds read that checkout. Initialise it before any build.
+live in [zingolabs/zingolib](https://github.com/zingolabs/zingolib), which
+publishes them as Prebuilt Bundles. This repository pins one published
+zingolib commit in `binding-layer.json`, the Bundle Pin (ADR
+zingo-mobile/0020). The Android and iOS builds fetch the pinned bundles
+through the `fetch:binding-layer` script. A build host needs Node and
+network access to `ghcr.io` the first time. `yarn pin <commit>` moves the
+pin to another published commit.
+
+The zingolib submodule at `zingolib/` holds the same commit for the tests
+that read zingolib's source, and zingolib#2930 removes it. Initialise it
+before `yarn test` or the Android unit tests.
 
 ```sh
 git submodule update --init zingolib

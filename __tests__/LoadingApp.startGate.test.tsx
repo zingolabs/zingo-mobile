@@ -9,14 +9,13 @@ import {
   ChainNameEnum,
   LanguageEnum,
   LaunchingModeEnum,
-  RouteEnum,
+  Route,
   SelectServerEnum,
 } from '@app/AppState';
 import { remoteServer } from '@app/AppState/types/ServerType';
 import { askGate, resolveTriggerGate } from '@app/services/gateController';
 import RPCModule from '@app/RPCModule';
 import { hasRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
-import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
@@ -42,8 +41,11 @@ const hasRecovery = hasRecoveryWalletInfo as jest.Mock;
 // server keeps the boot off the network.
 const bootApp = () =>
   new LoadingAppClass({
-    navigationApp: mockNavigation,
-    route: { key: 'Key-1', name: RouteEnum.LoadingApp, params: undefined },
+    session: { kind: 'boot', startingApp: true, newWallet: false },
+    openWallet: jest.fn(),
+    openOnboarding: jest.fn(),
+    openBoot: jest.fn(),
+    openLock: jest.fn(),
     translate: (key: string) => key,
     language: LanguageEnum.en,
     server: remoteServer(
@@ -94,27 +96,32 @@ describe('LoadingApp start gate', () => {
       failure: { errorKey: 'biometrics-failure-declined' },
     });
 
-    await app.importRecoveryWallet();
+    await app.importRecoveryWallet(Route.Welcome);
 
     expect(askGate).toHaveBeenCalledTimes(1);
     expect(restore).not.toHaveBeenCalled();
 
-    await app.importRecoveryWallet();
+    await app.importRecoveryWallet(Route.Welcome);
 
     expect(restore).toHaveBeenCalledTimes(1);
   });
 
-  test('is still asked when a wallet exists, and a decline stops the boot', async () => {
+  test('is still asked when a wallet exists, and a decline locks the session instead of booting', async () => {
     walletExists.mockResolvedValue('true');
     hasRecovery.mockResolvedValue(false);
-    (resolveTriggerGate as jest.Mock).mockResolvedValueOnce({
+    const declined = {
       kind: 'declined',
       failure: { errorKey: 'biometrics-failure-declined' },
-    });
+    };
+    (resolveTriggerGate as jest.Mock).mockResolvedValueOnce(declined);
+    const app = bootApp();
 
-    await bootApp().componentDidMount();
+    await app.componentDidMount();
 
     expect(resolveTriggerGate).toHaveBeenCalledTimes(1);
     expect(RPCModule.loadExistingWallet).not.toHaveBeenCalled();
+    // The boot screen draws the gate as passed; only the locked session
+    // shows the reason and the retry.
+    expect(app.props.openLock).toHaveBeenCalledWith(declined);
   });
 });

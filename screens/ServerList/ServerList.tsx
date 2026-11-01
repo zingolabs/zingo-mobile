@@ -49,10 +49,7 @@ const ServerList: React.FunctionComponent<ServerListProps> = ({
   const { lift, onLayout } = useLift(placement, BODY_TOP);
 
   return (
-    <View
-      style={{ flex: 1, backgroundColor: 'transparent' }}
-      onLayout={onLayout}
-    >
+    <View style={{ flex: 1 }} onLayout={onLayout}>
       <ScrollView
         style={{
           position: 'absolute',
@@ -109,12 +106,14 @@ const ServerList: React.FunctionComponent<ServerListProps> = ({
         onPress={onBack}
         disabled={busy}
       />
-      <ScreenHeader
-        testID="serverlist.back"
-        title={translate('server.other') as string}
-        onBack={onBack}
-        disabled={busy}
-      />
+      {placement !== 'belowHeader' && (
+        <ScreenHeader
+          testID="serverlist.back"
+          title={translate('server.other') as string}
+          onBack={onBack}
+          disabled={busy}
+        />
+      )}
     </View>
   );
 };

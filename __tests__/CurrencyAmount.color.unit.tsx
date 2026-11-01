@@ -8,7 +8,7 @@ import { render } from '@testing-library/react-native';
 import CurrencyAmount from '@ui/widgets/CurrencyAmount';
 
 const colorOf = (view: ReturnType<typeof render>) =>
-  require('react-native').StyleSheet.flatten(view.getByText(/^\$ /).props.style)
+  require('react-native').StyleSheet.flatten(view.getByText(/^\$/).props.style)
     .color;
 
 test('Tests that a stale price dims the amount, and a warning color overrides it', () => {

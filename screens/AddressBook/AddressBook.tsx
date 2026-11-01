@@ -1,47 +1,51 @@
+/* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useRef, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-  useScrollToTop,
-} from '@react-navigation/native';
+import { ScrollView, Text, View } from 'react-native';
+import { useScrollToTop } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import { useTheme } from '@app/theme';
 import {
-  ScreenEnum,
   AddressBookFileClass,
   AddressKindEnum,
   GlobalConst,
-  RouteEnum,
+  Route,
   SendPageStateClass,
   SnackbarDurationEnum,
   ToAddrClass,
 } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
+import { useOptionsPanel } from '@app/context/optionsPanel';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
-import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
+import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import { showConfirm } from '@app/services/showConfirm';
+import { deliver } from '@app/navigation/results';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import Header from '@ui/widgets/Header';
 import SearchField from '@ui/widgets/SearchField';
-import { ChevronDown, ChevronLeft } from '@ui/primitives/Icons/Chevron';
+import { ChevronDown } from '@ui/primitives/Icons/Chevron';
 import ContactRow, { ROW_LINE } from './components/ContactRow';
 import AddressRowHead from './components/AddressRowHead';
 import SegmentedSwitch from '@ui/widgets/SegmentedSwitch';
 import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
-import ContactSheet, { ContactEdit } from '@ui/widgets/ContactSheet';
+import ContactSheet, {
+  ContactEdit,
+  contactSheetTitleKey,
+} from '@ui/widgets/ContactSheet';
+import TitleBar from '@ui/widgets/TitleBar';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { themeTokens } from '@app/theme';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 const SIDE = 22;
-const SOFT_INK = '#8DA0B8';
-const HINT_ICON = '#7D93B3';
+const SOFT_INK = themeTokens.fgMuted;
+const HINT_ICON = themeTokens.fgMuted;
 const FLASH_MS = 1400;
 
 type Victim =
@@ -59,10 +63,8 @@ export type MineEntry = {
 
 type AddressBookProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.AddressBook
-> & {
-  setAddressBook: (ab: AddressBookFileClass[]) => void;
-};
+  'AddressBook'
+>;
 
 /** Contacts the book lists: other people, on the wallet's own network. */
 export const listedContacts = (
@@ -137,10 +139,10 @@ export const mineEntries = (
 const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   navigation,
   route,
-  setAddressBook,
 }) => {
   const {
     translate,
+    setAddressBook,
     addresses,
     addressBook,
     walletChainName,
@@ -149,11 +151,10 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     addLastSnackbar,
     setSendPageState,
   } = useContext(ContextAppLoaded);
+  const optionsPanel = useOptionsPanel();
   const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
-  const keyboardHeight = useKeyboardHeight();
-  /** The Send tab lives in another navigator, out of this route's typed params. */
-  const rootNavigation = useNavigation<NavigationProp<ParamListBase>>();
+  const { edges, fades } = useScrollEdges();
+  const bottomPad = useBottomActionPad();
   const walletChain = walletChainName || server.chainName;
 
   const [query, setQuery] = useState('');
@@ -169,6 +170,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   const [victim, setVictim] = useState<Victim>({ kind: 'none' });
   const [tab, setTab] = useState<Tab>('contacts');
   const pick = route.params?.pick;
+  const pickChain = route.params?.chain ?? GlobalConst.zecSwapChain;
+  /** Your own addresses are Zcash ones, so only a Zcash pick offers them. */
+  const pickZcash = pickChain.toUpperCase() === GlobalConst.zecSwapChain;
 
   const scrollRef = useRef<ScrollView>(null);
   const contactSheet = useRef<BottomSheetModal>(null);
@@ -176,10 +180,11 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
 
   const canSend = !readOnly && server.kind !== 'offline';
   const contacts = listedContacts(addressBook, walletChain, query).filter(
-    contact => !pick || contact.swapChain === GlobalConst.zecSwapChain,
+    contact =>
+      !pick || contact.swapChain.toUpperCase() === pickChain.toUpperCase(),
   );
   const mine =
-    pick && tab === 'wallet'
+    pick && pickZcash && tab === 'wallet'
       ? mineEntries(
           addresses ?? [],
           addressBook,
@@ -192,7 +197,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       : [];
 
   const choose = (address: string) => {
-    pick?.(address);
+    if (pick) {
+      deliver(pick, address);
+    }
     navigation.goBack();
   };
 
@@ -211,13 +218,14 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     await AddressBookFileImpl.writeAddressBook(sorted);
   };
 
-  const save = async (name: string, address: string) => {
+  const save = async (name: string, address: string, chain: string) => {
     setAddressBook(
       await AddressBookFileImpl.saveContact(
         edit.kind === 'edit' ? edit.contact : undefined,
         name,
         address,
         walletChain,
+        chain,
       ),
     );
     contactSheet.current?.dismiss();
@@ -235,7 +243,10 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
     sendPageState.toaddr.to = contact.address;
     setSendPageState(sendPageState);
-    rootNavigation.navigate(RouteEnum.HomeStack, { screen: RouteEnum.Send });
+    // The book was opened from the options panel, which waits under it for
+    // the pop. Sending leaves for the Send tab, not back to the panel.
+    optionsPanel.close();
+    navigation.navigate(Route.Home, { screen: Route.Send }, { pop: true });
   };
 
   const copy = (contact: AddressBookFileClass) => {
@@ -288,9 +299,14 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           '{query}',
           query.trim(),
         )
-      : (translate(
-          pick ? 'addressbook.no-zcash' : 'addressbook.empty',
-        ) as string);
+      : !pick
+        ? (translate('addressbook.empty') as string)
+        : pickZcash
+          ? (translate('addressbook.no-zcash') as string)
+          : (translate('addressbook.no-chain') as string).replace(
+              '{chain}',
+              chainDisplayName(pickChain) || pickChain,
+            );
 
   return (
     <View
@@ -298,53 +314,20 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}
     >
       <Header
-        title={''}
-        screenName={ScreenEnum.AddressBook}
+        title={
+          translate(
+            pick ? 'addressbook.pick-title' : 'addressbook.title',
+          ) as string
+        }
+        closeScreen={() => navigation.goBack()}
+        backTestID="addressbook.back"
+        backAccessibilityLabel={translate('addressbook.back-acc') as string}
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
         noPrivacy={true}
         noUfvkIcon={true}
       />
-      <View
-        style={{
-          height: 44,
-          marginTop: 6,
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginBottom: 10,
-        }}
-      >
-        <Pressable
-          testID="addressbook.back"
-          accessibilityRole="button"
-          accessibilityLabel={translate('addressbook.back-acc') as string}
-          onPress={() => navigation.goBack()}
-          style={({ pressed }) => ({
-            position: 'absolute',
-            left: 10,
-            width: 44,
-            height: 44,
-            borderRadius: 12,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
-          })}
-        >
-          <ChevronLeft size={22} color={colors.fgAccent} strokeWidth={2.2} />
-        </Pressable>
-        <Text
-          accessibilityRole="header"
-          style={{ color: colors.fgDefault, fontSize: 18, fontWeight: '700' }}
-        >
-          {
-            translate(
-              pick ? 'addressbook.pick-title' : 'addressbook.title',
-            ) as string
-          }
-        </Text>
-      </View>
-
       <View style={{ marginHorizontal: SIDE }}>
         <SearchField
           testID="addressbook.search"
@@ -359,7 +342,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           }
           clearLabel={translate('clear') as string}
         />
-        {!!pick && (
+        {!!pick && pickZcash && (
           <SegmentedSwitch
             testID="addressbook.tabs"
             options={[
@@ -382,16 +365,17 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       </View>
 
       <ScrollView
+        {...edges}
         ref={scrollRef}
         testID="addressbook.scroll-view"
         keyboardShouldPersistTaps="handled"
         style={{ flex: 1, marginTop: 12 }}
         contentContainerStyle={{
           paddingHorizontal: SIDE,
-          paddingBottom: pick ? insets.bottom + 16 : 16,
+          paddingBottom: pick ? bottomPad : 16,
         }}
       >
-        {tab === 'wallet' ? (
+        {tab === 'wallet' && pickZcash ? (
           mine.length > 0 ? (
             <>
               <View
@@ -436,7 +420,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                   marginTop: 12,
                   marginHorizontal: 2,
                   color: SOFT_INK,
-                  fontSize: 11.5,
+                  fontSize: 12,
                   lineHeight: 17,
                 }}
               >
@@ -451,7 +435,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                 marginHorizontal: 10,
                 textAlign: 'center',
                 color: SOFT_INK,
-                fontSize: 12.5,
+                fontSize: 13,
                 lineHeight: 19,
               }}
             >
@@ -473,13 +457,13 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                   marginBottom: 10,
                 }}
               >
-                <ChevronDown size={18} color={HINT_ICON} strokeWidth={2.2} />
+                <ChevronDown size={20} color={HINT_ICON} />
                 <Text
                   style={{
                     flexShrink: 1,
                     marginTop: 1,
                     color: SOFT_INK,
-                    fontSize: 11.5,
+                    fontSize: 12,
                     lineHeight: 16,
                   }}
                 >
@@ -510,7 +494,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                     first={index === 0}
                     open={!pick && openAddress === contact.address}
                     sendable={!pick && canSend && zcash}
-                    editable={zcash}
+                    editable
                     flash={flashAddress === contact.address}
                     leaving={leavingAddress === contact.address}
                     onToggle={() =>
@@ -539,7 +523,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               marginHorizontal: 10,
               textAlign: 'center',
               color: SOFT_INK,
-              fontSize: 12.5,
+              fontSize: 13,
               lineHeight: 19,
             }}
           >
@@ -547,18 +531,20 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           </Text>
         )}
       </ScrollView>
+      {fades}
 
       {!pick && (
         <View
           style={{
+            paddingHorizontal: SIDE,
             paddingTop: 12,
-            paddingBottom: insets.bottom + 16,
+            paddingBottom: bottomPad,
             alignItems: 'center',
           }}
         >
           <Button
             testID="addressbook.new"
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={translate('addressbook.new-contact') as string}
             onPress={() => openContact({ kind: 'new', preset: '', label: '' })}
           />
@@ -567,11 +553,16 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
 
       <AppSheetModal
         ref={contactSheet}
-        handle
-        contentStyle={{
-          paddingBottom:
-            keyboardHeight > 0 ? keyboardHeight + 20 : insets.bottom + 24,
-        }}
+        header={
+          <TitleBar
+            title={translate(contactSheetTitleKey(edit)) as string}
+            right={{
+              icon: XIcon,
+              accessibilityLabel: translate('close') as string,
+              onPress: () => contactSheet.current?.dismiss(),
+            }}
+          />
+        }
       >
         <ContactSheet
           key={`contact-${editNonce}`}
@@ -579,8 +570,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           book={addressBook}
           walletChain={walletChain}
           onSave={save}
-          onCancel={() => contactSheet.current?.dismiss()}
-          navigation={navigation}
         />
       </AppSheetModal>
     </View>

@@ -1,63 +1,52 @@
+/* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import {
-  Animated as RNAnimated,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Animated as RNAnimated, StyleSheet, View } from 'react-native';
 import Animated, {
   ReduceMotion,
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
-  withDelay,
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
-import { useTheme } from '@app/theme';
-import { ease } from '@app/theme/motion';
+import { textVariants, useTheme } from '@app/theme';
+import { duration, ease } from '@app/theme/motion';
 import { AddressBookFileClass } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
+import Pressable from '@ui/primitives/Pressable';
+import Text from '@ui/primitives/Text';
 import AddressRowHead from './AddressRowHead';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
 import { PencilIcon } from '@ui/primitives/Icons/PencilIcon';
 import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
 import { TrashCan, TrashLid } from '@ui/primitives/Icons/TrashIcon';
+import { themeTokens } from '@app/theme';
 
-export const ROW_LINE = '#0A1F3D';
-const INK_CODE = '#B9C6D6';
-const ACT_BG = '#020B18';
-const ACT_PRESSED = '#0A1F3D';
-const RED = '#F2878A';
-const SWIPE_BG = '#0E5A18';
-const SWIPE_INK = '#D7F5D2';
-const FLASH = 'rgba(20,157,5,0.16)';
+export const ROW_LINE = themeTokens.borderSubtle;
+const INK_CODE = themeTokens.fgDefault;
+const ACT_BG = themeTokens.bgCanvas;
+const RED = themeTokens.fgDanger;
+const SWIPE_BG = themeTokens.bgAccent;
+const SWIPE_INK = themeTokens.fgOnAccent;
+const FLASH = themeTokens.bgAccentSubtle;
 
-const UNFOLD_MS = 260;
-const BUTTONS_MS = 200;
-const BUTTONS_AT = 60;
-const FOLD_MS = 120;
-const FLASH_HOLD_MS = 490;
-const FLASH_FADE_MS = 910;
-const COLLAPSE_MS = 260;
+/** An action is ready again once its motion is over and as long again has passed. */
+const ACTION_RESET_MS = duration.action * 2;
 const SEND_AT = 72;
-const LEAVE_MS = 280;
-const COPY_SQUEEZE_MS = 110;
-const COPY_SPRING_MS = 150;
-const COPY_HOLD_MS = 1400;
-const EDIT_MS = 420;
-const EDIT_AT = 470;
-const DELETE_MS = 360;
-const DELETE_AT = 380;
-const SEND_MS = 420;
-const SEND_RESET_AT = 900;
 const ACTIONS_H = 92;
 const CIRCLE = 52;
+const ACTION_W = 68;
+const LABEL_GAP = 7;
+/** The label under the circle presses it too. */
+const ACTION_SLOP = {
+  left: (ACTION_W - CIRCLE) / 2,
+  right: (ACTION_W - CIRCLE) / 2,
+  bottom: LABEL_GAP + textVariants.caption.lineHeight,
+};
 
 type Button = 'send' | 'copy' | 'edit' | 'delete';
 
@@ -95,40 +84,29 @@ const Action: React.FunctionComponent<ActionProps> = ({
   testID,
   children,
 }) => (
-  <Pressable
-    testID={testID}
-    accessibilityRole="button"
-    accessibilityLabel={label}
-    onPress={onPress}
-    style={{ alignItems: 'center', gap: 7, width: 68 }}
-  >
-    {({ pressed }) => (
-      <>
-        <View
-          style={{
-            width: CIRCLE,
-            height: CIRCLE,
-            borderRadius: CIRCLE / 2,
-            backgroundColor: pressed ? ACT_PRESSED : ACT_BG,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {children}
-        </View>
-        <Text
-          style={{
-            color: red ? RED : INK_CODE,
-            fontSize: 11,
-            lineHeight: 15,
-            fontWeight: '500',
-          }}
-        >
-          {label}
-        </Text>
-      </>
-    )}
-  </Pressable>
+  <View style={{ alignItems: 'center', gap: LABEL_GAP, width: ACTION_W }}>
+    <Pressable
+      kind="icon"
+      testID={testID}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      hitSlop={ACTION_SLOP}
+      onPress={onPress}
+      style={{
+        width: CIRCLE,
+        height: CIRCLE,
+        borderRadius: CIRCLE / 2,
+        backgroundColor: ACT_BG,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      {children}
+    </Pressable>
+    <Text variant="caption" color={red ? RED : INK_CODE}>
+      {label}
+    </Text>
+  </View>
 );
 
 // One contact: tap unfolds its actions under the row, a left swipe sends.
@@ -160,7 +138,6 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
   const shown = useSharedValue(open ? 1 : 0);
   const glow = useSharedValue(0);
   const gone = useSharedValue(0);
-  const leave = useSharedValue(0);
   const rowH = useSharedValue(0);
   const [rowW, setRowW] = useState(0);
   const swipeable = useRef<Swipeable | null>(null);
@@ -176,32 +153,29 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
 
   useEffect(() => {
     unfold.value = withTiming(open ? 1 : 0, {
-      duration: UNFOLD_MS,
+      duration: duration.medium,
       easing: ease.emphasized,
       reduceMotion: ReduceMotion.System,
     });
-    shown.value = open
-      ? withDelay(
-          BUTTONS_AT,
-          withTiming(1, {
-            duration: BUTTONS_MS,
-            easing: ease.standard,
-            reduceMotion: ReduceMotion.System,
-          }),
-        )
-      : withTiming(0, { duration: FOLD_MS, easing: ease.standard });
+    shown.value = withTiming(open ? 1 : 0, {
+      duration: duration.base,
+      easing: ease.standard,
+      reduceMotion: ReduceMotion.System,
+    });
   }, [open, unfold, shown]);
 
   useEffect(() => {
     if (!flash) {
       return;
     }
+    /** The same glow as a row that just arrived in History. */
     glow.value = withSequence(
       withTiming(1, { duration: 0 }),
-      withDelay(
-        FLASH_HOLD_MS,
-        withTiming(0, { duration: FLASH_FADE_MS, easing: ease.standard }),
-      ),
+      withTiming(0, {
+        duration: duration.fresh,
+        easing: ease.out,
+        reduceMotion: ReduceMotion.System,
+      }),
     );
   }, [flash, glow]);
 
@@ -212,7 +186,11 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
     const done = () => left.current();
     gone.value = withTiming(
       1,
-      { duration: COLLAPSE_MS, easing: ease.in },
+      {
+        duration: duration.medium,
+        easing: ease.in,
+        reduceMotion: ReduceMotion.System,
+      },
       finished => {
         if (finished) {
           runOnJS(done)();
@@ -223,7 +201,6 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
 
   const rowStyle = useAnimatedStyle(() => ({
     opacity: 1 - gone.value,
-    transform: [{ translateX: leave.value }],
     height: gone.value === 0 ? 'auto' : rowH.value * (1 - gone.value),
   }));
   const glowStyle = useAnimatedStyle(() => ({ opacity: glow.value }));
@@ -291,7 +268,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
           ],
         }}
       >
-        <PlaneIcon size={26} color={SWIPE_INK} strokeWidth={1.9} />
+        <PlaneIcon size={24} color={SWIPE_INK} />
       </RNAnimated.View>
     </View>
   );
@@ -308,9 +285,12 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
     });
     switch (button) {
       case 'send':
-        fly.value = withTiming(1, { ...motion(SEND_MS), easing: ease.in });
-        later(SEND_MS + 30, onSend);
-        later(SEND_RESET_AT, () => {
+        fly.value = withTiming(1, {
+          ...motion(duration.action),
+          easing: ease.out,
+        });
+        onSend();
+        later(ACTION_RESET_MS, () => {
           fly.value = 0;
           busy.current = false;
         });
@@ -318,31 +298,31 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
       case 'copy':
         onCopy();
         copyScale.value = withSequence(
-          withTiming(0.82, motion(COPY_SQUEEZE_MS)),
-          withTiming(1.12, { ...motion(COPY_SPRING_MS), easing: ease.spring }),
-          withTiming(1, { ...motion(COPY_SPRING_MS), easing: ease.spring }),
+          withTiming(0.82, motion(duration.fast)),
+          withTiming(1.12, { ...motion(duration.fast), easing: ease.spring }),
+          withTiming(1, { ...motion(duration.fast), easing: ease.spring }),
         );
-        later(COPY_SQUEEZE_MS, () => setCopied(true));
-        later(COPY_SQUEEZE_MS + COPY_HOLD_MS, () => {
+        later(duration.fast, () => setCopied(true));
+        later(duration.fast + duration.hold, () => {
           setCopied(false);
           busy.current = false;
         });
         return;
       case 'edit':
-        pen.value = withTiming(1, motion(EDIT_MS));
-        later(EDIT_AT, onEdit);
-        later(SEND_RESET_AT, () => {
+        pen.value = withTiming(1, motion(duration.action));
+        onEdit();
+        later(ACTION_RESET_MS, () => {
           pen.value = 0;
           busy.current = false;
         });
         return;
       case 'delete':
         lid.value = withTiming(1, {
-          ...motion(DELETE_MS),
+          ...motion(duration.action),
           easing: ease.spring,
         });
-        later(DELETE_AT, onDelete);
-        later(SEND_RESET_AT, () => {
+        onDelete();
+        later(ACTION_RESET_MS, () => {
           lid.value = 0;
           busy.current = false;
         });
@@ -377,22 +357,8 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
         renderRightActions={renderSend}
         onSwipeableOpenStartDrag={onSwipe}
         onSwipeableWillOpen={() => {
-          const sent = () => {
-            onSend();
-            later(SEND_RESET_AT, () => {
-              swipeable.current?.close();
-              leave.value = 0;
-            });
-          };
-          leave.value = withTiming(
-            -rowW,
-            { duration: LEAVE_MS, easing: ease.in },
-            finished => {
-              if (finished) {
-                runOnJS(sent)();
-              }
-            },
-          );
+          onSend();
+          later(ACTION_RESET_MS, () => swipeable.current?.close());
         }}
       >
         <View style={{ backgroundColor: colors.bgSurface }}>
@@ -434,11 +400,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
                   onPress={() => press('send')}
                 >
                   <Animated.View style={flyStyle}>
-                    <PlaneIcon
-                      size={22}
-                      color={colors.fgAccent}
-                      strokeWidth={1.9}
-                    />
+                    <PlaneIcon size={24} color={colors.fgAccent} />
                   </Animated.View>
                 </Action>
               )}
@@ -451,13 +413,9 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
               >
                 <Animated.View style={copyStyle}>
                   {copied ? (
-                    <CheckIcon
-                      size={20}
-                      color={colors.fgAccent}
-                      strokeWidth={2.6}
-                    />
+                    <CheckIcon size={20} color={colors.fgAccent} />
                   ) : (
-                    <CopyIcon size={20} color={INK_CODE} strokeWidth={1.9} />
+                    <CopyIcon size={20} color={INK_CODE} />
                   )}
                 </Animated.View>
               </Action>
@@ -468,7 +426,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
                   onPress={() => press('edit')}
                 >
                   <Animated.View style={penStyle}>
-                    <PencilIcon size={20} color={INK_CODE} strokeWidth={1.9} />
+                    <PencilIcon size={20} color={INK_CODE} />
                   </Animated.View>
                   <Animated.View
                     style={[
@@ -497,7 +455,6 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
                   <TrashCan
                     size={20}
                     color={RED}
-                    strokeWidth={1.9}
                     style={StyleSheet.absoluteFill}
                   />
                   <Animated.View
@@ -507,7 +464,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
                       lidStyle,
                     ]}
                   >
-                    <TrashLid size={20} color={RED} strokeWidth={1.9} />
+                    <TrashLid size={20} color={RED} />
                   </Animated.View>
                 </View>
               </Action>

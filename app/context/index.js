@@ -17,3 +17,9 @@ export {
   ContextAppLoading,
   ContextAppLoadingProvider,
 };
+export {
+  SwapServiceProvider,
+  useSwapService,
+  useSwapRecords,
+  useValueTransfersWithSwaps,
+} from './contextSwapService';

@@ -7,8 +7,6 @@ import {
   withNavigation,
 } from '../../../../.storybook/storyDecorators';
 import {
-  mixnetOff,
-  mixnetReady,
   mockInfo,
   mockTotalBalance,
   mockZecPrice,
@@ -23,22 +21,13 @@ const meta: Meta<typeof BalanceRow> = {
     noBalance: false,
     noPrivacy: false,
     setPrivacyOption: async () => {},
-    addLastSnackbar: () => {},
     privacy: false,
     translate: mockTranslate,
     totalBalance: mockTotalBalance,
     info: mockInfo,
     zecPrice: mockZecPrice,
     server: remoteServer(mockInfo.serverUri, ChainNameEnum.mainChainName),
-    showShieldButton: false,
-    shieldingFee: 0,
-    valueTransfersTotal: 12,
-    calculateAmountToShield: () => '0',
-    calculatePoolsToShield: () => '',
-    calculateDisableButtonToShield: () => true,
-    onPressShieldFunds: () => {},
     receivedLegend: false,
-    mixnetView: mixnetReady,
   },
 };
 
@@ -47,16 +36,3 @@ type Story = StoryObj<typeof BalanceRow>;
 
 export const Default: Story = {};
 export const Private: Story = { args: { privacy: true } };
-export const WithShield: Story = {
-  args: {
-    showShieldButton: true,
-    calculateDisableButtonToShield: () => false,
-    calculateAmountToShield: () => '0.5',
-  },
-};
-export const WithShieldBlocked: Story = {
-  args: {
-    ...WithShield.args,
-    mixnetView: mixnetOff,
-  },
-};

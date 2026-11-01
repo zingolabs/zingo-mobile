@@ -1,5 +1,12 @@
 // Corner radius values used in the app
 
-export const radiusSheet = 40;
-
-// TODO: move button radius here too!
+/** A checkbox: at 16, radiusSm would read as a radio. */
+export const radiusXs = 4;
+/** Tags, icon tiles, small fields. */
+export const radiusSm = 8;
+/** Cards, grouped rows, text fields and banners. */
+export const radiusMd = 12;
+/** Buttons, chips, toggles, avatars and the floating tab bar. */
+export const radiusPill = 999;
+/** Top corners of the panel and of every sheet, from the redesign style guide. */
+export const radiusSheet = 28;

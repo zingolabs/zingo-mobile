@@ -10,16 +10,17 @@ import Animated, {
 import Svg, { Defs, FeGaussianBlur, Filter, G, Path } from 'react-native-svg';
 import { create } from 'qrcode';
 
-import { useTheme } from '@app/theme';
-import { ease } from '@app/theme/motion';
+import { useTheme, iconSize, radiusMd, radiusSm } from '@app/theme';
+import { duration, ease } from '@app/theme/motion';
 import { SnowflakeIcon } from '@ui/primitives/Icons/SnowflakeIcon';
+import { themeTokens } from '@app/theme';
 
-const VEIL_MS = 220;
+const VEIL_MS = duration.tabColor;
 const BLUR_PT = 9;
 const QUIET = 2;
 const LOGO = 34;
-const INK = '#060B12';
-const PAPER = '#FFFFFF';
+const INK = themeTokens.fgQrInk;
+const PAPER = themeTokens.bgQrPaper;
 
 // Native filters run on the bitmap in device pixels; web runs in points.
 const BLUR_DEVIATION =
@@ -48,14 +49,9 @@ const Code = React.memo<{
   <Svg width={px} height={px} viewBox={`0 0 ${units} ${units}`}>
     {blur && (
       <Defs>
-        <Filter
-          id="qrblur"
-          filterUnits="userSpaceOnUse"
-          x="0"
-          y="0"
-          width={units}
-          height={units}
-        >
+        {/* The region in fractions of the drawing: in user units the device
+            reads it as pixels and blurs only the top-left corner. */}
+        <Filter id="qrblur" x="0%" y="0%" width="100%" height="100%">
           <FeGaussianBlur stdDeviation={(BLUR_DEVIATION * units) / px} />
         </Filter>
       </Defs>
@@ -101,7 +97,7 @@ const KeyQr: React.FunctionComponent<KeyQrProps> = ({
       style={{
         width: size,
         height: size,
-        borderRadius: 12,
+        borderRadius: radiusMd,
         overflow: 'hidden',
         backgroundColor: PAPER,
       }}
@@ -119,13 +115,13 @@ const KeyQr: React.FunctionComponent<KeyQrProps> = ({
           top: (size - LOGO) / 2,
           width: LOGO,
           height: LOGO,
-          borderRadius: 9,
+          borderRadius: radiusSm,
           backgroundColor: PAPER,
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <SnowflakeIcon size={22} color={colors.fgViewOnly} strokeWidth={2} />
+        <SnowflakeIcon size={iconSize} color={colors.fgViewOnly} />
       </View>
     </View>
   );

@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 
 // test suite
 describe('Component Button - test', () => {
@@ -15,7 +15,7 @@ describe('Component Button - test', () => {
   test('Button Primary - snapshot', () => {
     const button = render(
       <Button
-        type={ButtonTypeEnum.Primary}
+        variant="primary"
         title={'Primary button'}
         disabled={false}
         onPress={onPress}
@@ -25,11 +25,11 @@ describe('Component Button - test', () => {
     expect(button.toJSON()).toMatchSnapshot();
   });
 
-  test('Button Secondary - snapshot', () => {
+  test('Button Text - snapshot', () => {
     const button = render(
       <Button
-        type={ButtonTypeEnum.Secondary}
-        title={'Secondary button'}
+        variant="text"
+        title={'Text button'}
         disabled={false}
         onPress={onPress}
         style={{}}

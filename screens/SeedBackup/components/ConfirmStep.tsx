@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Platform, Text, TextInput, View } from 'react-native';
+import { Platform, TextInput, View } from 'react-native';
 import Animated, {
   Easing,
   Keyframe,
@@ -13,11 +13,23 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { useTheme } from '@app/theme';
+import {
+  iconSizeSm,
+  radiusMd,
+  radiusPill,
+  space4,
+  space8,
+  space12,
+  space16,
+  textVariants,
+  useTheme,
+} from '@app/theme';
+import Text from '@ui/primitives/Text';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { SIDE, StepTitle } from './StepParts';
+import { fieldBorder } from '@ui/primitives/fieldBorder';
 
 export const CONFIRM_COUNT = 3;
 const NEXT_MS = 420;
@@ -25,16 +37,10 @@ const SLIDE_OUT_MS = 160;
 const SLIDE_IN_MS = 260;
 const SLIDE_PT = 24;
 const DONE_MS = 620;
-const FIELD_BG = '#041834';
-const HINT_INK = '#5B70A0';
 const SLOT_W = 20;
-const SLOT_H = 31;
+const SLOT_H = 32;
 const SLOT_GAP = 6;
 const SLOT_FADE_MS = 140;
-const DASH_EMPTY = '#33486A';
-const DASH_FILL = '#5B70A0';
-const TRACK = '#13263F';
-const ERROR_INK = '#F2878A';
 
 /** Picks `n` distinct word positions (1-based, ascending) out of `count`. */
 export const pickPositions = (
@@ -60,7 +66,6 @@ export type WordCheck = {
   status: Status;
   type: (text: string) => void;
   submit: () => void;
-  nudge: () => void;
   shake: SharedValue<number>;
   slideX: SharedValue<number>;
   slideOpacity: SharedValue<number>;
@@ -151,16 +156,6 @@ export const useWordCheck = (
     }, NEXT_MS);
   };
 
-  const nudge = () => {
-    const step = (x: number) =>
-      withTiming(x, {
-        duration: 80,
-        easing: ease.standard,
-        reduceMotion: ReduceMotion.System,
-      });
-    shake.value = withSequence(step(-4), step(4), step(0));
-  };
-
   return {
     position,
     letters,
@@ -169,7 +164,6 @@ export const useWordCheck = (
     status,
     type,
     submit,
-    nudge,
     shake,
     slideX,
     slideOpacity,
@@ -188,6 +182,7 @@ const Segment: React.FunctionComponent<{ done: boolean; color: string }> = ({
   done,
   color,
 }) => {
+  const { colors } = useTheme();
   const fill = useAnimatedStyle(() => ({
     width: done
       ? withDelay(
@@ -205,8 +200,8 @@ const Segment: React.FunctionComponent<{ done: boolean; color: string }> = ({
       style={{
         flex: 1,
         height: 3,
-        borderRadius: 2,
-        backgroundColor: TRACK,
+        borderRadius: radiusPill,
+        backgroundColor: colors.bgMutedSubtle,
         overflow: 'hidden',
       }}
     >
@@ -229,10 +224,10 @@ const Slot: React.FunctionComponent<{ letter: string; tone: SlotTone }> = ({
     tone === 'ok' || tone === 'cur'
       ? colors.fgAccent
       : tone === 'err'
-        ? colors.fgDangerEmphasis
+        ? colors.fgDanger
         : tone === 'fill'
-          ? DASH_FILL
-          : DASH_EMPTY;
+          ? colors.fgMuted
+          : colors.borderMuted;
   const dash = useAnimatedStyle(() => ({
     backgroundColor: withTiming(target, {
       duration: SLOT_FADE_MS,
@@ -242,15 +237,7 @@ const Slot: React.FunctionComponent<{ letter: string; tone: SlotTone }> = ({
   }));
   return (
     <View style={{ width: SLOT_W, height: SLOT_H }}>
-      <Text
-        style={{
-          color: colors.fgDefault,
-          fontSize: 20,
-          lineHeight: 26,
-          fontWeight: '600',
-          textAlign: 'center',
-        }}
-      >
+      <Text variant="screenTitle" style={{ textAlign: 'center' }}>
         {letter}
       </Text>
       <Animated.View
@@ -262,7 +249,7 @@ const Slot: React.FunctionComponent<{ letter: string; tone: SlotTone }> = ({
             right: 1,
             bottom: 0,
             height: 2.5,
-            borderRadius: 2,
+            borderRadius: radiusPill,
           },
           dash,
         ]}
@@ -288,14 +275,15 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
   }));
 
   const done = check.index + (check.status === 'ok' ? 1 : 0);
-  const border =
+  const border = fieldBorder(
+    colors,
+    focused,
     check.status === 'ok'
-      ? colors.fgAccent
+      ? 'valid'
       : check.status === 'err'
-        ? colors.fgDangerEmphasis
-        : focused
-          ? colors.borderFocus
-          : colors.bottomSheetBorder;
+        ? 'invalid'
+        : 'unknown',
+  );
 
   return (
     <View>
@@ -318,10 +306,9 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
       <View
         style={{
           marginHorizontal: SIDE,
-          paddingTop: 18,
-          paddingBottom: 18,
-          paddingHorizontal: 16,
-          borderRadius: 16,
+          paddingVertical: space16,
+          paddingHorizontal: space16,
+          borderRadius: radiusMd,
           borderWidth: 1,
           borderColor: colors.bottomSheetBorder,
           backgroundColor: colors.bgSurface,
@@ -330,13 +317,9 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
       >
         <Animated.View style={slideStyle}>
           <Text
-            style={{
-              textAlign: 'center',
-              color: colors.fgMuted,
-              fontSize: 12,
-              fontWeight: '700',
-              letterSpacing: 0.9,
-            }}
+            variant="caption"
+            tone="muted"
+            style={{ textAlign: 'center', fontWeight: '700' }}
           >
             {(translate('seedbackup.word-n') as string).replace(
               '{n}',
@@ -344,12 +327,12 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
             )}
           </Text>
           <Text
+            variant="caption"
+            tone="muted"
             style={{
               textAlign: 'center',
-              color: HINT_INK,
-              fontSize: 12,
-              marginTop: 4,
-              marginBottom: 12,
+              marginTop: space4,
+              marginBottom: space12,
             }}
           >
             {translate('seedbackup.word-hint') as string}
@@ -358,10 +341,10 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
             style={[
               {
                 height: 60,
-                borderRadius: 12,
+                borderRadius: radiusMd,
                 borderWidth: 1,
                 borderColor: border,
-                backgroundColor: FIELD_BG,
+                backgroundColor: colors.bgCanvas,
                 justifyContent: 'center',
               },
               shakeStyle,
@@ -429,30 +412,26 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
                 top: 0,
                 bottom: 0,
                 opacity: 0,
-                fontSize: 20,
+                fontSize: textVariants.screenTitle.fontSize,
                 textAlign: 'center',
               }}
             />
             {check.status === 'ok' && (
               <Animated.View
                 entering={markPop()}
-                style={{ position: 'absolute', right: 16 }}
+                style={{ position: 'absolute', right: space16 }}
               >
                 <View
                   style={{
                     width: 20,
                     height: 20,
-                    borderRadius: 10,
+                    borderRadius: radiusPill,
                     backgroundColor: colors.bgAccent,
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
                 >
-                  <CheckIcon
-                    size={13}
-                    color={colors.bgCanvas}
-                    strokeWidth={3}
-                  />
+                  <CheckIcon size={iconSizeSm} color={colors.fgOnAccent} />
                 </View>
               </Animated.View>
             )}
@@ -461,13 +440,13 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
       </View>
       <Text
         accessibilityLiveRegion="polite"
+        variant="bodySmall"
+        tone="danger"
         style={{
           marginHorizontal: SIDE,
-          marginTop: 10,
-          minHeight: 16,
+          marginTop: space8,
+          minHeight: 18,
           textAlign: 'center',
-          color: ERROR_INK,
-          fontSize: 12,
         }}
       >
         {check.status === 'err'

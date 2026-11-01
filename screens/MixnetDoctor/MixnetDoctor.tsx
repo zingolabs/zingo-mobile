@@ -18,12 +18,11 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import FadeText from '@ui/primitives/FadeText';
 import RegText from '@ui/primitives/RegText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import Header from '@ui/widgets/Header';
 import { AppDrawerParamList } from '@app/types';
-import { useTheme } from '@app/theme';
+import { useTheme, radiusMd, radiusPill } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum, ScreenEnum } from '@app/AppState';
 import {
   getMixnetBootstrapDetail,
   getMixnetStatus,
@@ -39,7 +38,7 @@ import {
 
 type MixnetDoctorProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.MixnetDoctor
+  'MixnetDoctor'
 >;
 
 const SKELETON_WIDTHS = ['70%', '90%', '55%', '80%'] as const;
@@ -48,6 +47,14 @@ const REPORT_MIN_HEIGHT = 120;
 // enough that the bootstrap narration moves, slow enough that the two probes
 // never overlap.
 const LIVE_REFRESH_MS = 2000;
+
+/**
+ * A URI has no words to keep whole: left to the line breaker it splits at
+ * every `/` and `.`, so a long server spills over three ragged lines. A
+ * zero-width space between characters lets it fill each line instead.
+ */
+const wrapValue = (value: string) =>
+  /^[a-z]+:\/\//.test(value) ? value.split('').join('​') : value;
 
 // One iOS-style row: muted label on the left, value right-aligned.
 const DoctorRow = ({
@@ -75,7 +82,7 @@ const DoctorRow = ({
   >
     <RegText style={{ color: labelColor }}>{row.label}</RegText>
     <RegText style={{ color: valueColor, flex: 1, textAlign: 'right' }}>
-      {row.value}
+      {wrapValue(row.value)}
     </RegText>
   </View>
 );
@@ -115,7 +122,12 @@ const ReportSkeleton = ({ color }: { color: string }) => {
       {SKELETON_WIDTHS.map(width => (
         <View
           key={width}
-          style={{ width, height: 12, borderRadius: 6, backgroundColor: color }}
+          style={{
+            width,
+            height: 12,
+            borderRadius: radiusPill,
+            backgroundColor: color,
+          }}
         />
       ))}
     </Animated.View>
@@ -262,17 +274,18 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
     <View
       accessible={true}
       accessibilityLabel={translate('mixnetdoctor.title-acc') as string}
-      style={{ flex: 1, backgroundColor: colors.bgCanvas }}
+      style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}
     >
       <Header
         title={translate('mixnetdoctor.title') as string}
-        screenName={ScreenEnum.MixnetDoctor}
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
         noPrivacy={true}
         noUfvkIcon={true}
         closeScreen={closeScreen}
+        backTestID="mixnetdoctor.back"
+        backAccessibilityLabel={translate('mixnetdoctor.back-acc') as string}
       />
       <ScrollView contentContainerStyle={{ padding: 20 }}>
         <Animated.View
@@ -281,7 +294,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
             backgroundColor: colors.bgSurface,
             borderColor: colors.bottomSheetBorder,
             borderWidth: 1,
-            borderRadius: 12,
+            borderRadius: radiusMd,
             padding: 20,
             gap: 20,
           }}
@@ -296,7 +309,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
               layout={boxMorph()}
               style={{
                 backgroundColor: colors.bgCanvas,
-                borderRadius: 12,
+                borderRadius: radiusMd,
                 paddingHorizontal: 16,
                 paddingVertical: 4,
                 minHeight: REPORT_MIN_HEIGHT,
@@ -343,14 +356,13 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
             <Animated.View layout={boxMorph()}>
               <Button
                 testID="mixnetdoctor.run"
-                type={ButtonTypeEnum.Primary}
+                variant="primary"
                 title={
                   running
                     ? (translate('mixnetdoctor.running') as string)
                     : (translate('mixnetdoctor.run') as string)
                 }
                 disabled={running || restingOff}
-                style={{ alignSelf: 'center' }}
                 onPress={() => runDoctor()}
               />
             </Animated.View>
@@ -364,9 +376,8 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
             >
               <Button
                 testID="mixnetdoctor.reenable"
-                type={ButtonTypeEnum.Secondary}
+                variant="text"
                 title={translate('mixnet.reenable') as string}
-                style={{ alignSelf: 'center' }}
                 onPress={restartMixnet}
               />
             </Animated.View>
@@ -380,9 +391,8 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
             >
               <Button
                 testID="mixnetdoctor.copy"
-                type={ButtonTypeEnum.Ghost}
+                variant="text"
                 title={translate('mixnetdoctor.copy-report') as string}
-                style={{ alignSelf: 'center' }}
                 onPress={() => copyReport(run)}
               />
             </Animated.View>

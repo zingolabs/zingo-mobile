@@ -40,10 +40,11 @@ import {
   parseAddress,
   planOrchardDrain,
   removeTransaction,
-  sendAllPropose,
-  sendPropose,
+  sendAllPreview,
+  sendPreview,
   setConfigWalletToProd,
   shieldConfirm,
+  shieldPreview,
   shieldPropose,
 } from '@app/walletBackend/utils/walletUtils';
 
@@ -65,8 +66,12 @@ const wrappers: Array<[string, string, () => Promise<FfiResult<string>>]> = [
   ['getBalanceInfo', 'getBalanceInfo', () => getBalanceInfo()],
   ['getVersionInfo', 'getVersionInfo', () => getVersionInfo()],
   ['walletKindInfo', 'getWalletKind', () => getWalletKind()],
-  ['sendProcess', 'sendPropose', () => sendPropose('{}')],
-  ['sendAllProcess', 'sendAllPropose', () => sendAllPropose('u1...', '')],
+  ['previewSendProcess', 'sendPreview', () => sendPreview('{}')],
+  [
+    'previewSendAllProcess',
+    'sendAllPreview',
+    () => sendAllPreview('u1...', ''),
+  ],
   ['planOrchardDrainProcess', 'planOrchardDrain', () => planOrchardDrain()],
   ['drainOrchardProcess', 'drainOrchard', () => drainOrchard()],
   ['drainStatusProcess', 'drainStatus', () => drainStatus()],
@@ -112,6 +117,7 @@ const wrappers: Array<[string, string, () => Promise<FfiResult<string>>]> = [
     'getLatestBlockServerInfo',
     () => getLatestBlockServerInfo('uri'),
   ],
+  ['previewShieldProcess', 'shieldPreview', () => shieldPreview()],
   ['shieldProcess', 'shieldPropose', () => shieldPropose()],
   ['confirmProcess', 'shieldConfirm', () => shieldConfirm()],
 ];

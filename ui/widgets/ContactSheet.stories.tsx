@@ -36,7 +36,6 @@ const meta: Meta<typeof ContactSheet> = {
     book: [sampleContact],
     walletChain: ChainNameEnum.mainChainName,
     onSave: async () => {},
-    onCancel: () => {},
   },
 };
 

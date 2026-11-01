@@ -11,13 +11,14 @@ import {
 } from '@app/context';
 
 import TextInputAddress from '@ui/widgets/TextInputAddress';
-import { RouteEnum, ScreenEnum } from '@app/AppState';
+import { openScanner } from '@app/navigation/navigate';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 
+jest.mock('@app/navigation/navigate', () => ({ openScanner: jest.fn() }));
+
 describe('TextInputAddress - scan', () => {
   test('Tests that the scan button opens the scanner with its words when pressed', () => {
-    const navigate = jest.fn();
     const screen = render(
       <ContextAppLoadedProvider
         value={{
@@ -32,16 +33,15 @@ describe('TextInputAddress - scan', () => {
           setError={() => {}}
           disabled={false}
           showLabel
-          screenName={ScreenEnum.Receive}
-          navigation={{ navigate } as never}
+          scanRequest="receive.address"
         />
       </ContextAppLoadedProvider>,
     );
     fireEvent.press(screen.getByTestId('send.scan-button'));
-    expect(navigate).toHaveBeenCalledWith(
-      RouteEnum.ScannerAddress,
+    expect(openScanner).toHaveBeenCalledWith(
       expect.objectContaining({
-        accepts: expect.any(Function),
+        request: 'receive.address',
+        accepts: { kind: 'zcash', chain: mockServer.chainName },
         texts: expect.objectContaining({ back: expect.any(String) }),
       }),
     );

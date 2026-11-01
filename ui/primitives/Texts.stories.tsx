@@ -1,4 +1,9 @@
+/* eslint-disable react-native/no-inline-styles */
+import React from 'react';
+import { View } from 'react-native';
 import type { Meta, StoryObj } from '@storybook/react-native';
+import type { TextVariant } from '@app/theme';
+import Text from './Text';
 import BoldText from './BoldText';
 import RegText from './RegText';
 import FadeText from './FadeText';
@@ -20,4 +25,50 @@ export const Error: Story = {
   render: () => (
     <ErrorText>Insufficient balance for this transaction</ErrorText>
   ),
+};
+
+const variants: TextVariant[] = [
+  'balance',
+  'screenTitle',
+  'subtitle',
+  'button',
+  'bodyStrong',
+  'body',
+  'bodySmall',
+  'caption',
+  'address',
+];
+
+const Scale = () => (
+  <View style={{ gap: 8 }}>
+    {variants.map(v => (
+      <Text key={v} variant={v}>
+        {v === 'address' ? 'u1qz7r…9k3d' : `${v} 12.3456 ZEC`}
+      </Text>
+    ))}
+  </View>
+);
+export const Variants: Story = { render: Scale };
+
+/** What never happened: an expired swap's amount and its deposit address. */
+export const Strike: Story = {
+  render: () => (
+    <View style={{ gap: 8 }}>
+      <Text variant="balance" tone="muted" strike>
+        +12.5 ZEC
+      </Text>
+      <Text variant="bodyStrong" tone="muted" strike>
+        +12.5 ZEC
+      </Text>
+      <Text variant="address" strike>
+        bc1qar…5mdq
+      </Text>
+    </View>
+  ),
+};
+
+/** The OS text at 200%: each style stops at its cap. */
+export const Variants200: Story = {
+  render: Scale,
+  parameters: { textScale: 2 },
 };

@@ -1,13 +1,14 @@
 import 'react-native';
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { usePreventRemove } from '@react-navigation/native';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
 import {
   ChainNameEnum,
-  RouteEnum,
+  Route,
   SelectServerEnum,
   TranslateType,
 } from '@app/AppState';
@@ -33,6 +34,7 @@ const mount = (setServerOption: jest.Mock) => {
     goBack: jest.fn(),
     canGoBack: jest.fn(() => true),
     addListener: jest.fn(() => () => {}),
+    setOptions: jest.fn(),
   };
   render(
     <ContextAppLoadedProvider
@@ -46,12 +48,12 @@ const mount = (setServerOption: jest.Mock) => {
         selectServer: SelectServerEnum.list,
         walletChainName: ChainNameEnum.mainChainName,
         netInfo: { ...defaultAppContextLoaded.netInfo, isConnected: true },
+        setServerOption,
       }}
     >
       <WalletServer
         navigation={navigation as never}
-        route={{ key: 'server', name: RouteEnum.Server } as never}
-        setServerOption={setServerOption}
+        route={{ key: 'server', name: Route.Server } as never}
       />
     </ContextAppLoadedProvider>,
   );
@@ -104,7 +106,23 @@ test('Tests that a server on another network goes to the recovery screen', async
     true,
     false,
   );
-  expect(navigation.navigate).toHaveBeenCalledWith(RouteEnum.WalletSeed, {
+  expect(navigation.navigate).toHaveBeenCalledWith(Route.WalletSeed, {
     action: 'server',
   });
+});
+
+test('Tests that nothing holds the back when nothing is unsaved, and the back arrow leaves', async () => {
+  const preventRemove = usePreventRemove as jest.Mock;
+  preventRemove.mockClear();
+  const navigation = mount(jest.fn());
+  const calls = preventRemove.mock.calls;
+  expect(calls[calls.length - 1][0]).toBe(false);
+  // Nothing held: iOS's native swipe stays on.
+  expect(navigation.setOptions).toHaveBeenLastCalledWith({
+    gestureEnabled: true,
+  });
+  await act(async () => {
+    fireEvent.press(screen.getByTestId('server.back'));
+  });
+  expect(navigation.goBack).toHaveBeenCalledTimes(1);
 });

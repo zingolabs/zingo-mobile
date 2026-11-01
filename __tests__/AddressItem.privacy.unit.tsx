@@ -12,7 +12,7 @@ import {
 } from '@app/context';
 
 import AddressItem from '@ui/widgets/AddressItem';
-import { AddressBookFileClass, ScreenEnum } from '@app/AppState';
+import { AddressBookFileClass } from '@app/AppState';
 import { REVEAL_MS } from '@app/utils/reveal';
 import { advance } from '../__mocks__/advanceTimers';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
@@ -44,11 +44,7 @@ const item = (
       ...state,
     }}
   >
-    <AddressItem
-      address={mockAddressBook[0].address}
-      screenName={ScreenEnum.History}
-      {...props}
-    />
+    <AddressItem address={mockAddressBook[0].address} {...props} />
   </ContextAppLoadedProvider>
 );
 

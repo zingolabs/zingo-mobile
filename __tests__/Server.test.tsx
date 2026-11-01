@@ -226,15 +226,15 @@ test('Tests that a server on another network fails the test and offers to switch
   expect(screen.getByTestId('server.custom.switch')).toBeOnTheScreen();
 });
 
-test('Tests that an empty port box means port 443', async () => {
+test('Tests that an empty port box hands zingolib a portless address to complete', async () => {
   probe.mockResolvedValue(verified());
   mount({});
   typeCustom('node.myhome.net');
   await act(async () => {
     fireEvent.press(screen.getByTestId('server.custom.test'));
   });
-  expect(probe).toHaveBeenCalledWith('https://node.myhome.net:443');
-  expect(screen.getByText('Testing node.myhome.net:443…')).toBeTruthy();
+  expect(probe).toHaveBeenCalledWith('https://node.myhome.net');
+  expect(screen.getByText('Testing node.myhome.net…')).toBeTruthy();
 });
 
 test('Tests that a host that does not resolve says what to fix', async () => {

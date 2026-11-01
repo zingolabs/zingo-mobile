@@ -8,7 +8,6 @@ const meta: Meta<typeof PrivacyToggle> = {
   args: {
     privacy: false,
     setPrivacyOption: async () => {},
-    addLastSnackbar: () => {},
     translate: mockTranslate,
   },
 };

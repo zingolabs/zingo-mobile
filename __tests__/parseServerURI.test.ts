@@ -68,3 +68,61 @@ describe('parseServerURI — Issue G plaintext rules', () => {
     });
   });
 });
+
+test.each([
+  ['https://example.com:443/', 'https://example.com:443'],
+  ['https://example.com:443/path', 'https://example.com:443'],
+  ['https://example.com:443?x=1', 'https://example.com:443'],
+  ['http://localhost:80/', 'http://localhost:80'],
+])(
+  'Tests that the parser keeps an explicit default port when a path or query follows it. %s',
+  (uri, canonical) => {
+    expect(parseServerURI(uri)).toEqual({
+      kind: 'canonicalUri',
+      uri: canonical,
+    });
+  },
+);
+
+test('Tests that the parser leaves the authority portless when only the path ends with a default port.', () => {
+  expect(parseServerURI('https://example.com/a:443')).toEqual({
+    kind: 'canonicalUri',
+    uri: 'https://example.com',
+  });
+});
+
+test.each([
+  [String.raw`https:\\example.com:443\x`, 'https://example.com:443'],
+  [String.raw`https://example.com:443\x`, 'https://example.com:443'],
+  [String.raw`http:\\localhost:80\x`, 'http://localhost:80'],
+  [String.raw`https:\example.com:443\x`, 'https://example.com:443'],
+  ['https:example.com:443/x', 'https://example.com:443'],
+  ['https:////example.com:443/x', 'https://example.com:443'],
+  [String.raw`https://example.com\a:443`, 'https://example.com'],
+  [String.raw`https:\\example.com:8443\x`, 'https://example.com:8443'],
+])(
+  'Tests that the parser preserves the authority port when separators vary: %s',
+  (uri, canonical) => {
+    expect(parseServerURI(uri)).toEqual({
+      kind: 'canonicalUri',
+      uri: canonical,
+    });
+  },
+);
+
+test.each([
+  ['https://zec.rocks', 'https://zec.rocks'],
+  ['https://EU.ZEC.ROCKS', 'https://eu.zec.rocks'],
+  ['https://zec.rocks.', 'https://zec.rocks.'],
+  ['https://example.com/?x=zec.rocks', 'https://example.com'],
+  ['https://zec.rocks@example.com', 'https://example.com'],
+  ['https://zec.rocks:8443', 'https://zec.rocks:8443'],
+])(
+  'Tests that the parser hands a portless authority on for zingolib to complete when parsing %s',
+  (uri, canonical) => {
+    expect(parseServerURI(uri)).toEqual({
+      kind: 'canonicalUri',
+      uri: canonical,
+    });
+  },
+);

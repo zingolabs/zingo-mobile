@@ -1,12 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useMemo, useState } from 'react';
-import { Linking, Pressable, ScrollView, View } from 'react-native';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
+import { Linking, ScrollView, View, useWindowDimensions } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useTheme } from '@app/theme';
+import { useTheme, iconSize, radiusMd, radiusPill, space4 } from '@app/theme';
+import Pressable, { PressTile } from '@ui/primitives/Pressable';
 
-import BoldText from '@ui/primitives/BoldText';
-import FadeText from '@ui/primitives/FadeText';
-import RegText from '@ui/primitives/RegText';
+import Text from '@ui/primitives/Text';
+import { TextScaleContext } from '@ui/primitives/Text';
 
 import { MenuMorphIcon } from '@ui/widgets/MenuMorphIcon';
 import { MessagesIcon as BoltIcon } from '@ui/primitives/Icons/BoltIcon';
@@ -69,6 +69,13 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
   onSettings,
 }) => {
   const { colors } = useTheme();
+  /**
+   * Four cells fit 12 pt labels in two lines; past 1.3× text (or its
+   * simulation in the visual review) the words outgrow them, so two.
+   */
+  const { fontScale } = useWindowDimensions();
+  const simulated = useContext(TextScaleContext);
+  const columns = Math.max(fontScale, simulated) > 1.3 ? 2 : 4;
   // Caption under the social row — set when the user taps X / GitHub so
   // they can read (and re-copy) the URL just placed on the clipboard.
   // Cleared when a different social with no URL is tapped (e.g. mail).
@@ -99,7 +106,12 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
 
   const tripleChevron = useMemo(
     () => (
-      <Pressable onPress={onClose} hitSlop={12} style={{ padding: 4 }}>
+      <Pressable
+        kind="icon"
+        onPress={onClose}
+        hitSlop={12}
+        style={{ padding: 4 }}
+      >
         <View
           style={{
             width: 25,
@@ -131,18 +143,19 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
         <View
           style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
         >
-          <BoldText style={{ fontSize: 18 }}>{title}</BoldText>
+          <Text variant="subtitle">{title}</Text>
         </View>
         {/* The Settings door. Balances the chevron column, so the title
             stays centred whether or not the button is there. */}
         <View style={{ width: 27, alignItems: 'flex-end' }}>
           {onSettings && (
             <Pressable
+              kind="icon"
               testID="header.settings"
               onPress={onSettings}
               hitSlop={12}
             >
-              <BoltIcon size={25} color="#B1BBC5" />
+              <BoltIcon size={iconSize} color={colors.fgMuted} />
             </Pressable>
           )}
         </View>
@@ -164,22 +177,23 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
         >
           {actions.map(action => (
             <Pressable
+              kind="tile"
               key={action.id}
               testID={action.testID}
               onPress={action.disabled ? undefined : action.onPress}
-              style={({ pressed }) => ({
-                width: '25%',
+              style={{
+                width: columns === 4 ? '25%' : '50%',
                 alignItems: 'center',
                 paddingVertical: 12,
-                opacity: action.disabled ? 0.35 : pressed ? 0.6 : 1,
-              })}
+                opacity: action.disabled ? 0.35 : 1,
+              }}
             >
-              <View
+              <PressTile
                 style={{
                   width: 56,
                   height: 56,
-                  borderRadius: 12,
-                  backgroundColor: '#111c2c',
+                  borderRadius: radiusMd,
+                  backgroundColor: colors.bgSurface,
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginBottom: 6,
@@ -196,7 +210,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
                       right: -4,
                       width: 11,
                       height: 11,
-                      borderRadius: 8,
+                      borderRadius: radiusPill,
                       borderWidth: 2.5,
                       borderColor: colors.bgCanvas,
                       backgroundColor: colors.fgWarning,
@@ -204,17 +218,14 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
                     }}
                   />
                 )}
-              </View>
-              <RegText
-                numberOfLines={2}
-                style={{
-                  fontSize: 12,
-                  textAlign: 'center',
-                  paddingHorizontal: 4,
-                }}
+              </PressTile>
+              <Text
+                variant="caption"
+                numberOfLines={columns === 4 ? 2 : 3}
+                style={{ textAlign: 'center', paddingHorizontal: space4 }}
               >
                 {action.label}
-              </RegText>
+              </Text>
             </Pressable>
           ))}
         </View>
@@ -230,9 +241,14 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
           <View
             style={{ paddingTop: 16, paddingBottom: 4, alignItems: 'center' }}
           >
-            <FadeText style={{ fontSize: 12, textAlign: 'center' }} selectable>
+            <Text
+              variant="caption"
+              tone="muted"
+              style={{ textAlign: 'center' }}
+              selectable
+            >
               {copiedUrl}
-            </FadeText>
+            </Text>
           </View>
         )}
 
@@ -249,6 +265,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
           >
             {socials.map(social => (
               <Pressable
+                kind="icon"
                 key={social.id}
                 onPress={() => handleSocialPress(social)}
                 hitSlop={8}

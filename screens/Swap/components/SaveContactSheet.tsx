@@ -1,0 +1,63 @@
+import React, { forwardRef, useCallback, useContext, useState } from 'react';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { ContextAppLoaded } from '@app/context';
+import type { AddressBookFileClass } from '@app/AppState';
+import AppSheetModal from '@ui/primitives/AppSheetModal';
+import ContactSheet from '@ui/widgets/ContactSheet';
+import TitleBar from '@ui/widgets/TitleBar';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+
+type SaveContactSheetProps = {
+  address: string;
+  /** SwapKit chain code of the address: the contact sheet shows it fixed. */
+  chain: string;
+  book: AddressBookFileClass[];
+  onSave: (name: string) => void;
+};
+
+/**
+ * The address book's own New contact sheet, opened from a swap with the
+ * address filled in and the swap's chain fixed: an address alone often fits
+ * several chains, and the swap already knows which.
+ */
+const SaveContactSheet = forwardRef<BottomSheetModal, SaveContactSheetProps>(
+  ({ address, chain, book, onSave }, ref) => {
+    const { walletChainName, server, translate } = useContext(ContextAppLoaded);
+    /** A fresh form each time the sheet opens. */
+    const [nonce, setNonce] = useState<number>(0);
+
+    const dismiss = useCallback(() => {
+      (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss();
+    }, [ref]);
+
+    return (
+      <AppSheetModal
+        ref={ref}
+        header={
+          <TitleBar
+            title={translate('addressbook.new-contact') as string}
+            right={{
+              icon: XIcon,
+              accessibilityLabel: translate('close') as string,
+              onPress: dismiss,
+            }}
+          />
+        }
+        onDismiss={() => setNonce(n => n + 1)}
+      >
+        <ContactSheet
+          key={`${nonce}:${chain}:${address}`}
+          edit={{ kind: 'new', preset: address, label: '', chain }}
+          book={book}
+          walletChain={walletChainName || server.chainName}
+          onSave={async name => {
+            onSave(name);
+            dismiss();
+          }}
+        />
+      </AppSheetModal>
+    );
+  },
+);
+
+export default SaveContactSheet;

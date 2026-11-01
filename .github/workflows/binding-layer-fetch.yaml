@@ -1,0 +1,51 @@
+name: Prebuilt Bundle fetch
+
+# One required job per platform fetches the Prebuilt Bundle that the
+# Bundle Pin names and checks that the registry's tag for the pinned
+# commit still resolves to the pinned digest (zingo-mobile/0020). Every
+# other job fetches for itself by an anonymous pull verified by digest,
+# with no cache in front of it.
+
+on:
+  workflow_call:
+    inputs:
+      platform:
+        required: true
+        type: string
+      # Fail-all (see CONTEXT.md): when true, a failure here cancels the
+      # whole run. PR CI opts in; ci-nightly does not.
+      fail-all:
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  binding-layer-fetch:
+    name: Fetch the ${{ inputs.platform }} Prebuilt Bundle
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+
+      - name: Yarn install
+        run: yarn install --frozen-lockfile
+
+      - name: Fetch the bundle by the Bundle Pin
+        run: yarn --silent fetch:binding-layer --platform ${{ inputs.platform }} --check-tag
+
+      - name: Cancel the run on failure (fail-all)
+        if: ${{ failure() && inputs.fail-all }}
+        uses: actions/github-script@v9
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });

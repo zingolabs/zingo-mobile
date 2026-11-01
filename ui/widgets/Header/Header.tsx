@@ -1,17 +1,18 @@
+/* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { SnowflakeIcon } from '@ui/primitives/Icons/SnowflakeIcon';
 import { REVEAL_OPEN_MS } from '@ui/widgets/CircularReveal';
 import { ease } from '@app/theme/motion';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import Pressable from '@ui/primitives/Pressable';
 import {
-  NavigationProp,
-  ParamListBase,
+  StackActions,
   useNavigation,
+  useRoute,
 } from '@react-navigation/native';
-import { useTheme } from '@app/theme';
+import { WalletNavigation } from '@app/types';
+import { useTheme, iconSize, slopFor } from '@app/theme';
 import React, { useContext, useEffect, useRef } from 'react';
-import { Image, TouchableOpacity, View } from 'react-native';
+import { Image, View } from 'react-native';
 import Animated, {
   Easing,
   ReduceMotion,
@@ -23,34 +24,52 @@ import { useOptionsPanel } from '@app/context/optionsPanel';
 
 // Mirror the panel host's fade duration so the header dissolves in lockstep
 // with the panel that's appearing over it.
+/** The bar with the menu, the mixnet and Messages: its row and the space under it. */
+const BAR_ROW = 57;
+const BAR_BOTTOM = 10;
+/**
+ * Where every panel's top edge sits, under the top bar's icons: the tabs'
+ * fixed panels and the full panels opened over them, so one covers the
+ * other exactly.
+ */
+export const PANEL_TOP = 59;
+
 const HEADER_FADE_MS = 320;
 import {
   NetInfoType,
-  RouteEnum,
-  ScreenEnum,
+  Route,
   SnackbarDurationEnum,
   TranslateType,
 } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { getZingoLogo } from '@app/utils/ZingoAppData';
-import { useShieldFunds } from '@app/hooks/useShieldFunds';
 import { useSyncStatus } from '@app/hooks/useSyncStatus';
-import BoldText from '@ui/primitives/BoldText';
-import SyncStatusBar from './components/SyncStatusBar';
+import TitleBar from '@ui/widgets/TitleBar';
+import SyncLine from './components/SyncLine';
+import MixnetIcon from '@ui/primitives/Icons/MixnetIcon';
+import { viewPhase } from '@app/walletBackend/transforms/mixnetView';
 import BalanceRow from './components/BalanceRow';
 import PriceRow from './components/PriceRow';
 import { MessagesIcon } from '@ui/primitives/Icons/MessagesIcon';
 import { MenuMorphIcon } from '@ui/widgets/MenuMorphIcon';
+import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 
 type HeaderProps = {
   // general
   testID?: string;
   title: string;
-  screenName: ScreenEnum;
   // side menu
   noDrawMenu?: boolean;
-  toggleMenuDrawer?: () => void;
   closeScreen?: () => void;
+  /** The back arrow does nothing for now (a server being set). */
+  backDisabled?: boolean;
+  /** The back arrow's testID and spoken label, with closeScreen. */
+  backTestID?: string;
+  backAccessibilityLabel?: string;
+  /** Drawn in place of the title text: the title with its tip, say. */
+  titleElement?: React.ReactElement;
+  /** An action at the bar's right end. */
+  right?: React.ComponentProps<typeof TitleBar>['right'];
   // balance
   noBalance?: boolean;
   // syncing icons
@@ -63,8 +82,6 @@ type HeaderProps = {
   addLastSnackbar?: (message: string, duration?: SnackbarDurationEnum) => void;
   // shielding
   setShieldingAmount?: (value: number) => void;
-  setScrollToTop?: (value: boolean) => void;
-  setScrollToBottom?: (value: boolean) => void;
   // seed screen - shared between AppLoading & AppLoaded - different contexts
   translate?: (key: string) => TranslateType;
   netInfo?: NetInfoType;
@@ -84,7 +101,6 @@ type HeaderProps = {
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
-  toggleMenuDrawer,
   title,
   noBalance,
   noSyncingStatus,
@@ -93,23 +109,23 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   translate: translateProp,
   netInfo: netInfoProp,
   privacy: privacyProp,
-  setBackgroundError,
   noPrivacy,
   setPrivacyOption,
-  addLastSnackbar,
-  screenName,
   receivedLegend,
-  setShieldingAmount,
-  setScrollToTop,
-  setScrollToBottom,
   closeScreen,
+  backDisabled,
+  backTestID,
+  backAccessibilityLabel,
+  titleElement,
+  right,
   noUfvkIcon,
   showMessagesIcon,
   onUsdRowLayout,
   onPriceRowLayout,
   noPriceRow,
 }) => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<WalletNavigation>();
+  const route = useRoute();
   const context = useContext(ContextAppLoaded);
   const {
     totalBalance,
@@ -117,12 +133,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     syncingStatus,
     zecPrice,
     readOnly,
-    valueTransfersTotal,
-    somePending,
-    shieldingAmount,
     server,
     mixnetView,
-    sendPermitNow,
     seedBackedUp,
   } = context;
 
@@ -132,7 +144,26 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const { colors } = useTheme();
 
-  const { isOpen: optionsPanelOpen } = useOptionsPanel();
+  const {
+    isOpen: optionsPanelOpen,
+    toggle: toggleOptionsPanel,
+    open: openOptionsPanel,
+  } = useOptionsPanel();
+  const homeTab =
+    route.name === Route.History ||
+    route.name === Route.Send ||
+    route.name === Route.Receive ||
+    route.name === Route.Swap;
+  // The panel lives in the home: from a pushed screen the button pops back
+  // to it and shows the panel there.
+  const toggleMenuDrawer = () => {
+    if (homeTab) {
+      toggleOptionsPanel();
+      return;
+    }
+    navigation.dispatch(StackActions.popToTop());
+    openOptionsPanel();
+  };
   const headerOpacity = useSharedValue(1);
   useEffect(() => {
     headerOpacity.value = withTiming(optionsPanelOpen ? 0 : 1, {
@@ -144,33 +175,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     opacity: headerOpacity.value,
   }));
 
-  const {
-    percentageOutputsScanned,
-    syncInProgress,
-    viewSyncStatus,
-    opacityValue,
-  } = useSyncStatus({ syncingStatus, noSyncingStatus });
-
-  const {
-    showShieldButton,
-    shieldingFee,
-    onPressShieldFunds,
-    calculateAmountToShield,
-    calculatePoolsToShield,
-    calculateDisableButtonToShield,
-  } = useShieldFunds({
-    readOnly,
-    setShieldingAmount,
-    server,
-    somePending,
-    totalBalance,
-    shieldingAmount,
-    translate,
-    addLastSnackbar,
-    setBackgroundError,
-    setScrollToTop,
-    setScrollToBottom,
-    sendPermitNow,
+  const mixnetPhase = viewPhase(mixnetView);
+  const { percentageOutputsScanned, syncInProgress } = useSyncStatus({
+    syncingStatus,
+    noSyncingStatus,
   });
 
   // The viewing key opens as a circle out of the snowflake, which turns 60°
@@ -188,7 +196,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       reduceMotion: ReduceMotion.System,
     });
     snowflake.current?.measureInWindow((x, y, width, height) =>
-      navigation.navigate(RouteEnum.ViewingKey, {
+      navigation.navigate(Route.ViewingKey, {
         entry: {
           kind: 'circle',
           origin: { x: x + width / 2, y: y + height / 2 },
@@ -196,6 +204,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       }),
     );
   };
+
+  const hasTitle = !!title || !!titleElement;
 
   return (
     <>
@@ -209,50 +219,60 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               alignItems: 'center',
               backgroundColor: colors.bgCanvas,
               paddingTop: 0,
-              paddingBottom: 10,
+              /** A screen's title sits right under the row: 40 from the badge's centre to the title's. */
+              paddingBottom: hasTitle ? 0 : BAR_BOTTOM,
               minHeight: 50,
             },
           ]}
         >
-          <SyncStatusBar
-            noSyncingStatus={noSyncingStatus}
-            server={server}
-            netInfo={netInfo}
-            percentageOutputsScanned={percentageOutputsScanned}
-            syncInProgress={syncInProgress}
-            viewSyncStatus={viewSyncStatus}
-            opacityValue={opacityValue}
-            mixnetView={mixnetView}
-            translate={translate}
-            privacy={privacy}
-            noPrivacy={noPrivacy}
-            setPrivacyOption={setPrivacyOption}
-            addLastSnackbar={addLastSnackbar}
-            noBalance={noBalance}
-          />
+          {/* The mixnet icon alone in the middle of the bar, level with the menu. */}
+          <View
+            style={{
+              height: BAR_ROW,
+              alignItems: 'center',
+              justifyContent: 'center',
+              paddingTop: 12,
+            }}
+          >
+            {mixnetPhase !== 'absent' && (
+              <Pressable
+                kind="icon"
+                testID="header.mixnet-status"
+                hitSlop={slopFor(22)}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  translate('settings.nym-diagnostics') as string
+                }
+                onPress={() => navigation.navigate(Route.MixnetDoctor)}
+              >
+                <MixnetIcon phase={mixnetPhase} />
+              </Pressable>
+            )}
+          </View>
 
           <BalanceRow
             noBalance={noBalance}
             noPrivacy={noPrivacy}
             setPrivacyOption={setPrivacyOption}
-            addLastSnackbar={addLastSnackbar}
             privacy={privacy}
             translate={translate}
             totalBalance={totalBalance}
             info={info}
             zecPrice={zecPrice}
             server={server}
-            showShieldButton={showShieldButton}
-            shieldingFee={shieldingFee}
-            valueTransfersTotal={valueTransfersTotal}
-            calculateAmountToShield={calculateAmountToShield}
-            calculatePoolsToShield={calculatePoolsToShield}
-            calculateDisableButtonToShield={calculateDisableButtonToShield}
-            onPressShieldFunds={onPressShieldFunds}
             receivedLegend={receivedLegend}
-            mixnetView={mixnetView}
             onUsdRowLayout={onUsdRowLayout}
           />
+
+          {!noBalance && !noSyncingStatus && (
+            <SyncLine
+              server={server}
+              netInfo={netInfo}
+              percentage={percentageOutputsScanned}
+              syncInProgress={syncInProgress}
+              translate={translate}
+            />
+          )}
 
           {!noBalance && !noPriceRow && (
             <PriceRow
@@ -278,7 +298,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         >
           <View style={{ alignItems: 'center', flexDirection: 'row', gap: 14 }}>
             {!noDrawMenu && (
-              <TouchableOpacity
+              <Pressable
+                kind="icon"
+                hitSlop={slopFor(24)}
                 testID="header.drawmenu"
                 accessible={true}
                 accessibilityLabel={translate('menudrawer-acc') as string}
@@ -303,24 +325,22 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     }}
                   />
                 )}
-              </TouchableOpacity>
+              </Pressable>
             )}
             {readOnly && !noUfvkIcon && (
               <Animated.View style={headerAnimatedStyle}>
-                <TouchableOpacity
+                <Pressable
+                  kind="icon"
+                  hitSlop={slopFor(24)}
                   testID="header.snowflake"
                   accessibilityRole="button"
                   accessibilityLabel={translate('viewingkey.title') as string}
                   onPress={ufvkShowModal}
                 >
                   <Animated.View ref={snowflake} style={snowStyle}>
-                    <SnowflakeIcon
-                      size={22}
-                      color={colors.fgViewOnly}
-                      strokeWidth={1.8}
-                    />
+                    <SnowflakeIcon size={iconSize} color={colors.fgViewOnly} />
                   </Animated.View>
-                </TouchableOpacity>
+                </Pressable>
               </Animated.View>
             )}
           </View>
@@ -341,9 +361,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               panel's header, its single door. With only messages left,
               the corner falls back to the logo when there is nothing to
               show. */}
-          {!noDrawMenu &&
-          screenName !== ScreenEnum.Settings &&
-          showMessagesIcon ? (
+          {!noDrawMenu && showMessagesIcon ? (
             <View
               style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}
             >
@@ -352,13 +370,15 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   corner pads 13, so an 11 half-box lands at 24 without the
                   4.5 below. The nudge rides on the icon alone, leaving the
                   logo this corner falls back to where it already sat. */}
-              <TouchableOpacity
+              <Pressable
+                kind="icon"
+                hitSlop={slopFor(24)}
                 style={{ marginRight: 5, marginTop: 4.5 }}
                 testID="header.messages"
-                onPress={() => navigation.navigate(RouteEnum.Messages)}
+                onPress={() => navigation.navigate(Route.Messages)}
               >
-                <MessagesIcon size={22} color="#B1BBC5" />
-              </TouchableOpacity>
+                <MessagesIcon size={iconSize} color={colors.fgMuted} />
+              </Pressable>
             </View>
           ) : (
             <Image
@@ -374,58 +394,25 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         </Animated.View>
       </View>
 
-      {!!title && (
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            width: '100%',
-            marginVertical: 5,
-          }}
-        >
-          {closeScreen ? (
-            <>
-              <TouchableOpacity onPress={closeScreen}>
-                <FontAwesomeIcon
-                  style={{ marginHorizontal: 10 }}
-                  size={24}
-                  icon={faChevronLeft}
-                  color={colors.fgAccent}
-                />
-              </TouchableOpacity>
-              <BoldText
-                testID={testID}
-                style={{
-                  color: colors.fgDefault,
-                  fontSize: 18,
-                  paddingHorizontal: 5,
-                }}
-              >
-                {title}
-              </BoldText>
-              <View style={{ width: 30, height: 30, marginHorizontal: 10 }} />
-            </>
-          ) : (
-            <>
-              <View style={{ width: 30, height: 30, marginHorizontal: 10 }} />
-              <BoldText
-                testID={testID}
-                style={{
-                  color: colors.fgDefault,
-                  fontSize: 18,
-                  paddingHorizontal: 5,
-                  textAlign: 'center',
-                }}
-              >
-                {title}
-              </BoldText>
-              <View style={{ width: 30, height: 30, marginHorizontal: 10 }} />
-            </>
-          )}
-        </View>
+      {hasTitle && (
+        <TitleBar
+          tight
+          testID={testID}
+          title={titleElement ?? title}
+          right={right}
+          left={
+            closeScreen
+              ? {
+                  icon: ChevronLeft,
+                  accent: true,
+                  onPress: closeScreen,
+                  disabled: backDisabled,
+                  testID: backTestID,
+                  accessibilityLabel: backAccessibilityLabel ?? title,
+                }
+              : undefined
+          }
+        />
       )}
     </>
   );

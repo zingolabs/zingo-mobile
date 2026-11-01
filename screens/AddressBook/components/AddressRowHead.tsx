@@ -1,21 +1,24 @@
+/* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { Platform, Pressable, Text, View } from 'react-native';
+import { Platform, Text, View } from 'react-native';
 
 import { useTheme } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils';
 import { ChainLogo } from '@ui/widgets/ChainSelect';
 import { WalletIcon } from '@ui/primitives/Icons/WalletIcon';
+import { themeTokens } from '@app/theme';
 
-const INK_SOFT = '#8DA0B8';
-const INK_CODE = '#B9C6D6';
-const PUBLIC_INK = '#E6C46A';
-const PUBLIC_BG = 'rgba(230,196,106,0.12)';
-const CURRENT_INK = '#3CC52A';
-const CURRENT_BG = 'rgba(60,197,42,0.12)';
-const WALLET_INK = '#8FB4E6';
-const WALLET_BG = 'rgba(143,180,230,0.14)';
+const INK_SOFT = themeTokens.fgMuted;
+const INK_CODE = themeTokens.fgDefault;
+const PUBLIC_INK = themeTokens.fgTransparent;
+const PUBLIC_BG = themeTokens.bgTransparent;
+const CURRENT_INK = themeTokens.fgAccent;
+const CURRENT_BG = themeTokens.bgAccentSubtle;
+const WALLET_INK = themeTokens.fgViewOnly;
+const WALLET_BG = themeTokens.bgViewOnlySubtle;
 const MONO = Platform.select({ ios: 'Menlo', default: 'monospace' });
 
 export type RowAvatar =
@@ -55,6 +58,7 @@ const AddressRowHead: React.FunctionComponent<AddressRowHeadProps> = ({
 
   return (
     <Pressable
+      kind="row"
       testID={`${testID}.head`}
       accessibilityRole="button"
       accessibilityState={
@@ -86,7 +90,7 @@ const AddressRowHead: React.FunctionComponent<AddressRowHeadProps> = ({
             <Text
               style={{
                 color: avatar.color,
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: '700',
               }}
             >
@@ -111,7 +115,7 @@ const AddressRowHead: React.FunctionComponent<AddressRowHeadProps> = ({
             </View>
           </>
         ) : (
-          <WalletIcon size={18} color={WALLET_INK} strokeWidth={1.7} />
+          <WalletIcon size={20} color={WALLET_INK} />
         )}
       </View>
       <View style={{ flex: 1, minWidth: 0 }}>
@@ -121,7 +125,7 @@ const AddressRowHead: React.FunctionComponent<AddressRowHeadProps> = ({
             style={{
               flexShrink: 1,
               color: colors.fgDefault,
-              fontSize: 13.5,
+              fontSize: 13,
               lineHeight: 18,
               fontWeight: '600',
             }}
@@ -133,7 +137,7 @@ const AddressRowHead: React.FunctionComponent<AddressRowHeadProps> = ({
               style={{
                 marginLeft: 8,
                 color: INK_SOFT,
-                fontSize: 10,
+                fontSize: 12,
                 fontWeight: '600',
                 letterSpacing: 0.5,
               }}
@@ -154,8 +158,8 @@ const AddressRowHead: React.FunctionComponent<AddressRowHeadProps> = ({
             style={{
               color: INK_CODE,
               fontFamily: MONO,
-              fontSize: 11.5,
-              fontWeight: '500',
+              fontSize: 12,
+              fontWeight: '400',
             }}
           >
             {Utils.trimToSmall(address, 7)}
@@ -166,7 +170,7 @@ const AddressRowHead: React.FunctionComponent<AddressRowHeadProps> = ({
               style={{
                 color: tagLook.ink,
                 backgroundColor: tagLook.bg,
-                fontSize: 10,
+                fontSize: 12,
                 fontWeight: '600',
                 letterSpacing: 0.4,
                 paddingHorizontal: 6,

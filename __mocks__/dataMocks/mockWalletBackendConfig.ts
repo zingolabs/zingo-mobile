@@ -14,6 +14,7 @@ export function mockWalletBackendConfig(
     onSyncStatusChanged: jest.fn(),
     onZingolibVersionChanged: jest.fn(),
     onBirthdayChanged: jest.fn(),
+    onBirthdayAdjusted: jest.fn(),
     onError: jest.fn(),
     onPersistentSyncFailure: jest.fn(),
     onMixnetViewChanged: jest.fn(),

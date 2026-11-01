@@ -5,7 +5,7 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import { SeedBackupEntry } from '@app/types';
 import Clipboard from '@react-native-clipboard/clipboard';
 
@@ -49,7 +49,7 @@ const renderFlow = (
         navigation={mockNavigation}
         route={{
           key: 'k',
-          name: RouteEnum.SeedBackup,
+          name: Route.SeedBackup,
           params: { entry },
         }}
       />

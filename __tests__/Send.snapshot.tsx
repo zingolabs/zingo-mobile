@@ -5,13 +5,13 @@
 import 'react-native';
 import React from 'react';
 
-import { render } from '@testing-library/react-native';
+import { render, fireEvent, screen } from '@testing-library/react-native';
 import Send from '@screens/Send';
 import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
@@ -19,19 +19,25 @@ import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppDrawerParamList } from '@app/types';
+import { HomeTabScreenProps } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(): NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Send
-> {
+/** Send mounts its sheet once its container is measured; jest never lays out. */
+const layoutSend = () => {
+  const container = screen.queryByTestId('send.container');
+  if (container) {
+    fireEvent(container, 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 400, height: 800 } },
+    });
+  }
+};
+
+function makeDrawerProps(): HomeTabScreenProps<'Send'> {
   return {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.Send,
+      name: Route.Send,
       params: undefined,
     },
   };
@@ -48,7 +54,6 @@ describe('Component Send - test', () => {
   state.totalBalance = mockTotalBalance;
   // The price ring renders only for a Nym-consenting session.
   state.sendPageState = mockSendPageState;
-  const onFunction = jest.fn();
 
   test('Send privacy normal - snapshot', () => {
     // privacy normal
@@ -56,18 +61,10 @@ describe('Component Send - test', () => {
     const props = makeDrawerProps();
     const send = render(
       <ContextAppLoadedProvider value={state}>
-        <Send
-          {...props}
-          sendTransaction={onFunction}
-          clearToAddr={onFunction}
-          toggleMenuDrawer={onFunction}
-          setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          setScrollToBottom={onFunction}
-          setServerOption={onFunction}
-        />
+        <Send {...props} />
       </ContextAppLoadedProvider>,
     );
+    layoutSend();
     expect(send.toJSON()).toMatchSnapshot();
   });
 
@@ -77,18 +74,10 @@ describe('Component Send - test', () => {
     const props = makeDrawerProps();
     const send = render(
       <ContextAppLoadedProvider value={state}>
-        <Send
-          {...props}
-          sendTransaction={onFunction}
-          clearToAddr={onFunction}
-          toggleMenuDrawer={onFunction}
-          setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          setScrollToBottom={onFunction}
-          setServerOption={onFunction}
-        />
+        <Send {...props} />
       </ContextAppLoadedProvider>,
     );
+    layoutSend();
     expect(send.toJSON()).toMatchSnapshot();
   });
 });

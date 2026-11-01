@@ -1,24 +1,31 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { showConfirm } from '@app/services/showConfirm';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import { WalletNavigation } from '@app/types';
 import {
   PoolToShieldEnum,
-  RouteEnum,
+  Route,
   ServerType,
   SnackbarDurationEnum,
   TranslateType,
 } from '@app/AppState';
 import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
-import { shieldConfirm, shieldPropose } from '@app/walletBackend';
+import {
+  shieldConfirm,
+  shieldPreview,
+  shieldPropose,
+} from '@app/walletBackend';
 import type { FfiResult } from '@app/walletBackend';
 import { RPCShieldProposeType } from '@app/walletBackend/types/RPCShieldProposeType';
-import { shieldEnd } from '@app/walletBackend/transforms/sendSettlement';
+import {
+  ComputingSubject,
+  nowSeconds,
+  shieldEnd,
+} from '@app/walletBackend/transforms/sendSettlement';
+import { isOnTop } from '@app/navigation/navigate';
+import { formatAmount } from '@app/utils/formatAmount';
+import { withSyncStopped } from '@app/walletBackend/utils/syncBracket';
 import { SendPermit } from '@app/walletBackend/transforms/sendPermit';
-import Utils from '@app/utils';
 
 type UseShieldFundsInput = {
   readOnly: boolean;
@@ -40,7 +47,8 @@ type UseShieldFundsResult = {
   showShieldButton: boolean;
   shieldingFee: number;
   onPressShieldFunds: () => void;
-  calculateAmountToShield: () => string;
+  /** Shields at once, for a caller that asked in its own sheet. */
+  shieldNow: () => Promise<void>;
   calculatePoolsToShield: () => string;
   calculateDisableButtonToShield: () => boolean;
 };
@@ -72,7 +80,7 @@ export function useShieldFunds({
   setScrollToBottom,
   sendPermitNow,
 }: UseShieldFundsInput): UseShieldFundsResult {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<WalletNavigation>();
   const [showShieldButton, setShowShieldButton] = useState<boolean>(false);
   const [shieldingFee, setShieldingFee] = useState<number>(0);
   // useRef so the lock persists across re-renders (a `let` inside useEffect resets every invocation)
@@ -90,7 +98,7 @@ export function useShieldFunds({
         };
       }
       shieldProposeLockRef.current = true;
-      const propose = await shieldPropose();
+      const propose = await shieldPreview();
       shieldProposeLockRef.current = false;
       return propose;
     };
@@ -160,21 +168,36 @@ export function useShieldFunds({
       return;
     }
 
-    navigation.navigate(RouteEnum.Computing);
-    await shieldPropose();
-    const shield = await shieldConfirm();
+    const subject: ComputingSubject = {
+      amount: formatAmount(shieldingAmount),
+      who: translate('send.shield-who') as string,
+      kind: 'shield',
+      pair: false,
+    };
+    const since = nowSeconds();
+    navigation.navigate(Route.Computing, { subject });
+    const shield = await withSyncStopped(async () => {
+      await shieldPropose();
+      return shieldConfirm();
+    });
 
     setScrollToTop?.(true);
     setScrollToBottom?.(true);
     setShieldingFee(0);
     setShieldingAmount?.(0);
-    navigation.navigate(RouteEnum.Computing, shieldEnd(shield));
+    const end = shieldEnd(shield, since);
+    if (isOnTop(Route.Computing)) {
+      navigation.navigate(Route.Computing, { ...end, subject });
+    } else if (end.phase === 'failed') {
+      addLastSnackbar(translate('send.shield-failed-away') as string);
+    }
   }, [
     setBackgroundError,
     addLastSnackbar,
     sendPermitNow,
     translate,
     navigation,
+    shieldingAmount,
     setScrollToTop,
     setScrollToBottom,
     setShieldingAmount,
@@ -183,15 +206,6 @@ export function useShieldFunds({
   const calculatePoolsToShield = useCallback(
     (): string => PoolToShieldEnum.transparentPoolToShield,
     [],
-  );
-
-  const calculateAmountToShield = useCallback(
-    (): string =>
-      Utils.parseNumberFloatToStringLocale(
-        somePending ? 0 : shieldingAmount,
-        8,
-      ),
-    [somePending, shieldingAmount],
   );
 
   const calculateDisableButtonToShield = useCallback(
@@ -215,7 +229,7 @@ export function useShieldFunds({
     showShieldButton,
     shieldingFee,
     onPressShieldFunds,
-    calculateAmountToShield,
+    shieldNow: handleShieldFunds,
     calculatePoolsToShield,
     calculateDisableButtonToShield,
   };

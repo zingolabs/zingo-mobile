@@ -19,6 +19,7 @@ const FFI_ERROR_CODES = [
   'Read',
   'Send',
   'Shield',
+  'SendAfterDeshield',
   'InvalidInput',
   'Wallet',
   'Indexer',

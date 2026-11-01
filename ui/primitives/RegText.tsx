@@ -1,6 +1,6 @@
 import React from 'react';
-import { Text, TextStyle } from 'react-native';
-import { useTheme } from '@app/theme';
+import { TextStyle } from 'react-native';
+import Text from './Text';
 
 type RegTextProps = {
   style?: TextStyle;
@@ -13,38 +13,9 @@ type RegTextProps = {
   ellipsizeMode?: 'head' | 'middle' | 'tail' | 'clip';
 };
 
-const RegText: React.FunctionComponent<RegTextProps> = ({
-  style,
-  color,
-  onPress,
-  testID,
-  children,
-  selectable,
-  numberOfLines,
-  ellipsizeMode,
-}) => {
-  const { colors } = useTheme();
-
-  const styleSum: TextStyle = {
-    color: color || colors.fgDefault,
-    fontSize: 15,
-    fontWeight: '400',
-    opacity: 1,
-    ...style,
-  };
-
-  return (
-    <Text
-      testID={testID}
-      style={styleSum}
-      onPress={onPress}
-      selectable={selectable}
-      numberOfLines={numberOfLines}
-      ellipsizeMode={ellipsizeMode}
-    >
-      {children}
-    </Text>
-  );
-};
+/** `Text` in its `body` style. */
+const RegText: React.FunctionComponent<RegTextProps> = props => (
+  <Text variant="body" {...props} />
+);
 
 export default RegText;

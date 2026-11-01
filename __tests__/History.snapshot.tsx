@@ -5,31 +5,27 @@
 import 'react-native';
 import React from 'react';
 
-import { render } from '@testing-library/react-native';
+import { act, render } from '@testing-library/react-native';
 import History from '@screens/History';
 import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppDrawerParamList } from '@app/types';
+import { HomeTabScreenProps } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(): NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.History
-> {
+function makeDrawerProps(): HomeTabScreenProps<'History'> {
   return {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.History,
+      name: Route.History,
       params: undefined,
     },
   };
@@ -49,43 +45,32 @@ describe('Component History - test', () => {
   };
   state.totalBalance = mockTotalBalance;
   // The price ring renders only for a Nym-consenting session.
-  const onFunction = jest.fn();
 
-  test('History privacy normal - snapshot', () => {
+  test('History privacy normal - snapshot', async () => {
     // privacy normal
     state.privacy = false;
     const props = makeDrawerProps();
     const history = render(
       <ContextAppLoadedProvider value={state}>
-        <History
-          {...props}
-          toggleMenuDrawer={onFunction}
-          setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          scrollToTop={false}
-          setScrollToBottom={onFunction}
-        />
+        <History {...props} />
       </ContextAppLoadedProvider>,
     );
+    // Lets the per-wallet notice state load.
+    await act(async () => {});
     expect(history.toJSON()).toMatchSnapshot();
   });
 
-  test('History privacy high - snapshot', () => {
+  test('History privacy high - snapshot', async () => {
     // privacy normal
     state.privacy = true;
     const props = makeDrawerProps();
     const history = render(
       <ContextAppLoadedProvider value={state}>
-        <History
-          {...props}
-          toggleMenuDrawer={onFunction}
-          setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          scrollToTop={false}
-          setScrollToBottom={onFunction}
-        />
+        <History {...props} />
       </ContextAppLoadedProvider>,
     );
+    // Lets the per-wallet notice state load.
+    await act(async () => {});
     expect(history.toJSON()).toMatchSnapshot();
   });
 });

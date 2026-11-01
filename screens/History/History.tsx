@@ -7,53 +7,69 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
+import TitleBar from '@ui/widgets/TitleBar';
 import {
   View,
   RefreshControl,
   ActivityIndicator,
   Dimensions,
-  Platform,
-  Pressable,
   StyleSheet,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
+import { duration } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import {
-  NavigationProp,
-  ParamListBase,
-  useIsFocused,
-  useNavigation,
-} from '@react-navigation/native';
-import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAngleUp, faXmark } from '@fortawesome/free-solid-svg-icons';
+  useTheme,
+  slopFor,
+  radiusMd,
+  radiusPill,
+  iconSizeMd,
+  space4,
+  space8,
+  space16,
+  space20,
+} from '@app/theme';
 
 import {
   ChainNameEnum,
   FilterEnum,
-  GlobalConst,
   isIronwoodActive,
-  RouteEnum,
-  ScreenEnum,
+  Route,
   ValueTransferKindEnum,
   //SelectServerEnum,
   //SendPageStateClass,
   //ServerType,
   ValueTransferType,
 } from '@app/AppState';
-import { AppDrawerParamList } from '@app/types';
+import { HomeTabNavigation, HomeTabScreenProps } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
-import BoldText from '@ui/primitives/BoldText';
 import AppSheet from '@ui/primitives/AppSheet';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import RingBorder from '@ui/primitives/RingBorder';
 import ValueTransferLine from './components/ValueTransferLine';
+import SwapLine from './components/SwapLine';
+import LegLine from './components/LegLine';
+import MonthHeader from './components/MonthHeader';
+import { ITEM_HEIGHT, buildHistoryItems } from './historyItems';
+import type { HistoryItem } from './historyItems';
 import IronwoodMigrationBanner from './components/IronwoodMigrationBanner';
 import SeedBackupNotice from './components/SeedBackupNotice';
+import TransparentNotice from './components/TransparentNotice';
+import ShieldSheet from './components/ShieldSheet';
+import { useShieldFunds } from '@app/hooks/useShieldFunds';
+import { useIronwoodNoticeHide } from '@app/hooks/useIronwoodNoticeHide';
 import ViewOnlyNotice from './components/ViewOnlyNotice';
+import { followsHere } from '@screens/Computing/sendProgress';
+import { transferSubject } from '@screens/Send/sendSubject';
 import NoticeStack, { Notice, NOTICE_RADIUS } from '@ui/widgets/NoticeStack';
 import { PriceCard } from '@ui/widgets/Header/components/PriceRow';
 import { fiatQuote } from '@app/price/fiatQuote';
-import { ContextAppLoaded } from '@app/context';
+import {
+  ContextAppLoaded,
+  useSwapRecords,
+  useValueTransfersWithSwaps,
+} from '@app/context';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
@@ -67,62 +83,40 @@ import {
 } from 'recyclerlistview';
 import { ScrollEvent } from 'recyclerlistview/dist/reactnative/core/scrollcomponent/BaseScrollView';
 import { RecyclerListViewState } from 'recyclerlistview/dist/reactnative/core/RecyclerListView';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Swipeable } from 'react-native-gesture-handler';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
-import Filters from './components/Filters';
+import Filters, { HISTORY_FILTERS, filterOf } from './components/Filters';
+import Text from '@ui/primitives/Text';
+import FreshGlow from './components/FreshGlow';
+import { useFreshRows } from './useFreshRows';
 import { FiltersIcon } from '@ui/primitives/Icons/FiltersIcon';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { onTabScrollY } from '@app/navigation/tabBarScroll';
+import { PANEL_TOP } from '@ui/widgets/Header/Header';
+import { ChevronUp } from '@ui/primitives/Icons/Chevron';
 
 const ViewTypes = {
-  WITH_MONTH: 0,
-  WITHOUT_MONTH: 1,
-  WITH_MONTH_REFRESH: 2,
-  WITHOUT_MONTH_REFRESH: 3,
+  MONTH: 0,
+  ROW: 1,
+  LEG: 2,
 };
 
-type HistoryProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.History
-> & {
-  // side menu
-  toggleMenuDrawer: () => void;
-  // privacy
-  // addLastSnackbar from context
-  // shielding / sending
-  setShieldingAmount: (value: number) => void;
-  setScrollToTop: (value: boolean) => void;
-  scrollToTop: boolean;
-  setScrollToBottom: (value: boolean) => void;
-  //scrollToBottom: boolean;
-  // for messages
-  //sendTransaction: (s: SendPageStateClass) => Promise<String>;
-  //setServerOption: (
-  //  value: ServerType,
-  //  selectServer: SelectServerEnum,
-  //  toast: boolean,
-  //  sameServerChainName: boolean,
-  //) => Promise<void>;
-};
+type HistoryProps = HomeTabScreenProps<'History'>;
 
-const History: React.FunctionComponent<HistoryProps> = ({
-  toggleMenuDrawer,
-  setShieldingAmount,
-  setScrollToTop,
-  scrollToTop,
-  setScrollToBottom,
-  //scrollToBottom,
-  //sendTransaction,
-  //setServerOption,
-}) => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+const History: React.FunctionComponent<HistoryProps> = () => {
+  const navigation = useNavigation<HomeTabNavigation<'History'>>();
   const context = useContext(ContextAppLoaded);
   const {
+    setScrollToTop,
+    scrollToTop,
+    setShieldingAmount,
     translate,
     valueTransfers,
     language,
     setBackgroundError,
     addLastSnackbar,
+    addActionSnackbar,
     server,
     doRefresh,
     setPrivacyOption,
@@ -133,9 +127,29 @@ const History: React.FunctionComponent<HistoryProps> = ({
     seedBackedUp,
     viewOnlyNoticeDismissed,
     dismissViewOnlyNotice,
+    somePending,
+    shieldingAmount,
+    mixnetView,
+    sendPermitNow,
+    setScrollToBottom,
+    addressBook,
   } = context;
+  const shieldSheetRef = useRef<BottomSheetModal>(null);
+  const { showShieldButton, shieldingFee, shieldNow } = useShieldFunds({
+    readOnly,
+    setShieldingAmount,
+    server,
+    somePending,
+    totalBalance,
+    shieldingAmount,
+    translate,
+    addLastSnackbar,
+    setBackgroundError,
+    setScrollToTop,
+    setScrollToBottom,
+    sendPermitNow,
+  });
   const { colors } = useTheme();
-  const screenName = ScreenEnum.History;
 
   const PAGE_SIZE = 50;
   const [numVt, setNumVt] = useState<number>(PAGE_SIZE);
@@ -185,6 +199,19 @@ const History: React.FunctionComponent<HistoryProps> = ({
     !!totalBalance &&
     totalBalance.confirmedOrchardBalance > 0;
   const orchardAmount = totalBalance ? totalBalance.totalOrchardBalance : 0;
+  // Hidden with the X until more lands in Orchard than it held at the time.
+  const ironwoodHide = useIronwoodNoticeHide();
+  const ironwoodHidden =
+    !ironwoodHide.loaded ||
+    (ironwoodHide.hide.kind === 'hidden' &&
+      orchardAmount <= ironwoodHide.hide.orchard);
+  const hideIronwoodNotice = () => {
+    ironwoodHide.setHide({ kind: 'hidden', orchard: orchardAmount });
+    addActionSnackbar(translate('pools.hidden-toast') as string, {
+      label: translate('pools.undo') as string,
+      onPress: () => ironwoodHide.setHide({ kind: 'shown' }),
+    });
+  };
   // The seed notice steps aside while the backup flow grows out of it.
   const focused = useIsFocused();
   const [backingUp, setBackingUp] = useState<boolean>(false);
@@ -193,11 +220,39 @@ const History: React.FunctionComponent<HistoryProps> = ({
       setBackingUp(false);
     }
   }, [focused]);
-  const showSeedNotice = !readOnly && !seedBackedUp;
+  // A backup finished while the flow was open: the card stays a moment once
+  // History is back, so its pill can turn green before it leaves.
+  const [seedLeaving, setSeedLeaving] = useState<boolean>(false);
+  const seedWasPending = useRef<boolean>(!seedBackedUp);
+  useEffect(() => {
+    if (!seedBackedUp) {
+      seedWasPending.current = true;
+      return;
+    }
+    if (!focused || !seedWasPending.current) {
+      return;
+    }
+    seedWasPending.current = false;
+    setSeedLeaving(true);
+    const timer = setTimeout(() => setSeedLeaving(false), duration.noticeLeave);
+    return () => clearTimeout(timer);
+  }, [seedBackedUp, focused]);
+  const showSeedNotice = !readOnly && (!seedBackedUp || seedLeaving);
 
   const showPrice = fiatQuote(zecPrice, server, info.chainName).kind !== 'none';
 
   const notices: Notice[] = [];
+  if (showShieldButton) {
+    notices.push({
+      key: 'transparent',
+      node: (
+        <TransparentNotice
+          amount={shieldingAmount}
+          onShield={() => shieldSheetRef.current?.present()}
+        />
+      ),
+    });
+  }
   if (readOnly && !viewOnlyNoticeDismissed) {
     notices.push({
       key: 'viewonly',
@@ -205,7 +260,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         <ViewOnlyNotice
           onDismiss={dismissViewOnlyNotice}
           onViewKey={from =>
-            navigation.navigate(RouteEnum.ViewingKey, {
+            navigation.navigate(Route.ViewingKey, {
               entry: { kind: 'card', from },
             })
           }
@@ -213,15 +268,15 @@ const History: React.FunctionComponent<HistoryProps> = ({
       ),
     });
   }
-  if (showIronwoodBanner) {
+  if (showIronwoodBanner && !ironwoodHidden) {
     notices.push({
       key: 'ironwood',
       node: (
         <IronwoodMigrationBanner
           amount={orchardAmount}
           currencyName={info.currencyName}
-          onStart={() => navigation.navigate(RouteEnum.MeetIronwood)}
-          onResume={route => navigation.navigate(route)}
+          onStart={() => navigation.navigate(Route.MeetIronwood)}
+          onHide={hideIronwoodNotice}
         />
       ),
     });
@@ -232,9 +287,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
       node: (
         <SeedBackupNotice
           covered={backingUp && !focused}
+          backedUp={seedBackedUp}
           onBackUp={from => {
             setBackingUp(true);
-            navigation.navigate(RouteEnum.SeedBackup, {
+            navigation.navigate(Route.SeedBackup, {
               entry: { kind: 'card', from },
             });
           }}
@@ -261,7 +317,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const historySheetRef = useRef<BottomSheet>(null);
   const internalSnapIndexRef = useRef<number>(0);
 
-  type SnapId = 'balance' | 'usd' | 'max';
+  type SnapId = 'balance' | 'usd' | 'header' | 'max';
   const currentSnapIdRef = useRef<SnapId>('balance');
   useDismissSheetsOnBlur();
   const sheetSlideStyle = useOptionsPanelSheetSlide();
@@ -293,71 +349,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
     });
   }, []);
 
-  const layoutProvider = useMemo(
-    () =>
-      new LayoutProvider(
-        (index: number) => {
-          const lastData = valueTransfersSliced[index - 1];
-          const data = valueTransfersSliced[index];
-
-          if (index === 0) {
-            if (data.confirmations === 0) {
-              return ViewTypes.WITH_MONTH_REFRESH;
-            } else {
-              return ViewTypes.WITH_MONTH;
-            }
-          }
-
-          let lasttxmonth =
-            lastData && lastData.time
-              ? Utils.formatDate(lastData.time * 1000, 'MMM yyyy', language)
-              : '--- ----';
-          let txmonth =
-            data && data.time
-              ? Utils.formatDate(data.time * 1000, 'MMM yyyy', language)
-              : '--- ----';
-
-          if (txmonth !== lasttxmonth) {
-            if (data.confirmations === 0) {
-              return ViewTypes.WITH_MONTH_REFRESH;
-            } else {
-              return ViewTypes.WITH_MONTH;
-            }
-          } else {
-            if (data.confirmations === 0) {
-              return ViewTypes.WITHOUT_MONTH_REFRESH;
-            } else {
-              return ViewTypes.WITHOUT_MONTH;
-            }
-          }
-        },
-        (type, dim) => {
-          if (type === ViewTypes.WITHOUT_MONTH) {
-            // two lines
-            dim.width = Dimensions.get('window').width;
-            dim.height =
-              Platform.OS === GlobalConst.platformOSandroid ? 70 : 60;
-          } else if (type === ViewTypes.WITHOUT_MONTH_REFRESH) {
-            // three lines
-            dim.width = Dimensions.get('window').width;
-            dim.height =
-              (Platform.OS === GlobalConst.platformOSandroid ? 70 : 55) + 15;
-          } else if (type === ViewTypes.WITH_MONTH) {
-            // two lines with month
-            dim.width = Dimensions.get('window').width;
-            dim.height =
-              Platform.OS === GlobalConst.platformOSandroid ? 105 : 90;
-          } else if (type === ViewTypes.WITH_MONTH_REFRESH) {
-            // three lines with month
-            dim.width = Dimensions.get('window').width;
-            dim.height =
-              (Platform.OS === GlobalConst.platformOSandroid ? 105 : 85) + 15;
-          }
-        },
-      ),
-    [language, valueTransfersSliced],
-  );
-
   const _dataProvider = useMemo(
     () =>
       new DataProvider(
@@ -367,15 +358,22 @@ const History: React.FunctionComponent<HistoryProps> = ({
         // existing transfer matter visually: status (pending → confirmed)
         // and confirmations (advance with each new block). txid is the
         // identity guard.
-        (r1: ValueTransferType, r2: ValueTransferType) =>
-          r1.txid !== r2.txid ||
-          r1.status !== r2.status ||
-          r1.confirmations !== r2.confirmations,
+        (r1: HistoryItem, r2: HistoryItem) =>
+          r1.key !== r2.key ||
+          (r1.kind !== 'month' &&
+            r2.kind !== 'month' &&
+            (r1.vt.status !== r2.vt.status ||
+              r1.vt.confirmations !== r2.vt.confirmations ||
+              r1.vt.swapStatus !== r2.vt.swapStatus)) ||
+          (r1.kind === 'swap' &&
+            r2.kind === 'swap' &&
+            (r1.open !== r2.open || r1.legCount !== r2.legCount)),
       ),
     [],
   );
 
-  const [dataProvider, setDataProvider] = useState<DataProvider>(_dataProvider);
+  /** The rows the list holds; each new set is cloned from the last, so the list diffs them. */
+  const dataProviderRef = useRef<DataProvider>(_dataProvider);
 
   // Bottom-sheet that hosts the history list itself. Snap points are ordered
   // from smallest sheet height (most balance area visible above) to largest
@@ -384,7 +382,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
   //   - With USD: 3 snaps -> [ZEC+USD visible, only ZEC visible, only top icons visible]
   //   - Without USD: 2 snaps -> [ZEC visible, only top icons visible]
   // Top icons strip height is a code-side constant (~55 px) — same on any phone.
-  const TOP_ICONS_H = 55;
   const SNAP_GAP = 4;
   // Bump applied to the snaps that sit just below a balance row (low + mid);
   // the max snap (just below the top icons strip) doesn't need it.
@@ -420,14 +417,21 @@ const History: React.FunctionComponent<HistoryProps> = ({
     const snapLow = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
     const snapMid = Math.min(
       Math.max(snapBase + usdRowH + BALANCE_SNAP_BUMP, snapLow + 1),
-      containerH - TOP_ICONS_H - SNAP_GAP,
+      containerH - PANEL_TOP,
     );
-    const snapMax = Math.max(containerH - TOP_ICONS_H - SNAP_GAP, snapLow + 1);
+    const snapMax = Math.max(containerH - PANEL_TOP, snapLow + 1);
 
     if (bannerH > 0) {
-      const bannerSafe = Math.min(Math.max(snapBase, 100), snapMax - 1);
+      // Three stops, as the redesign has them: under the notices, under the
+      // balance (over the notices) and under the top bar.
+      const bannerSafe = Math.min(Math.max(snapBase, 100), snapMax - 2);
+      const underBalance = Math.min(
+        Math.max(containerH - headerH - SNAP_GAP, bannerSafe + 1),
+        snapMax - 1,
+      );
       return [
         { id: 'balance', value: bannerSafe },
+        { id: 'header', value: underBalance },
         { id: 'max', value: snapMax },
       ];
     }
@@ -473,9 +477,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
       ? Math.max(activeSnap - handleH, 0)
       : undefined;
 
-  const mergedValueTransfers = useMemo(() => {
-    return valueTransfers ?? [];
-  }, [valueTransfers]);
+  const mergedValueTransfers = useValueTransfersWithSwaps(
+    useMemo(() => valueTransfers ?? [], [valueTransfers]),
+  );
 
   const fetchValueTransfersFiltered = useMemo(() => {
     if (mergedValueTransfers.length === 0 && valueTransfers === null) {
@@ -497,17 +501,24 @@ const History: React.FunctionComponent<HistoryProps> = ({
             vt.kind === ValueTransferKindEnum.SendToSelf ||
             vt.kind === ValueTransferKindEnum.MemoToSelf ||
             vt.kind === ValueTransferKindEnum.Migration ||
-            vt.kind === ValueTransferKindEnum.Rejection)
+            vt.kind === ValueTransferKindEnum.Rejection ||
+            (vt.kind === ValueTransferKindEnum.Swap && !vt.swapIsInbound))
         ) {
           selectedKind = true;
         } else if (
           filterKind === FilterEnum.received &&
-          vt.kind === ValueTransferKindEnum.Received
+          (vt.kind === ValueTransferKindEnum.Received ||
+            (vt.kind === ValueTransferKindEnum.Swap && vt.swapIsInbound))
         ) {
           selectedKind = true;
         } else if (
           filterKind === FilterEnum.shielded &&
           vt.kind === ValueTransferKindEnum.Shield
+        ) {
+          selectedKind = true;
+        } else if (
+          filterKind === FilterEnum.swaps &&
+          vt.kind === ValueTransferKindEnum.Swap
         ) {
           selectedKind = true;
         }
@@ -550,12 +561,81 @@ const History: React.FunctionComponent<HistoryProps> = ({
       setValueTransfersFiltered(vtf);
       const vtfs = vtf.slice(0, numVt);
       setValueTransfersSliced(vtfs);
-      setDataProvider(data => data.cloneWithRows(vtfs));
       setLoading(false);
     }
   }, [fetchValueTransfersFiltered, numVt, valueTransfers, server.chainName]);
 
   const hasMore = numVt < valueTransfersFiltered.length;
+
+  // The swaps whose Zcash transactions are unfolded under their row.
+  const swapRecords = useSwapRecords();
+  const [openSwaps, setOpenSwaps] = useState<ReadonlySet<string>>(new Set());
+  const toggleSwap = useCallback((recordId: string) => {
+    setOpenSwaps(previous => {
+      const next = new Set(previous);
+      if (next.has(recordId)) {
+        next.delete(recordId);
+      } else {
+        next.add(recordId);
+      }
+      return next;
+    });
+  }, []);
+  const historyItems = useMemo(
+    () =>
+      buildHistoryItems({
+        rows: valueTransfersSliced,
+        all: mergedValueTransfers,
+        records: swapRecords,
+        open: openSwaps,
+        monthOf: timeSec =>
+          Utils.formatDate(timeSec * 1000, 'MMM yyyy', language),
+      }),
+    [
+      valueTransfersSliced,
+      mergedValueTransfers,
+      swapRecords,
+      openSwaps,
+      language,
+    ],
+  );
+  /**
+   * The rows and their layouts change in the same render. Set a render
+   * later, the list laid out one set of rows while it held another, and
+   * read the position of a row it had no layout for ("Cannot read property
+   * 'y' of undefined") whenever the count changed.
+   */
+  const dataProvider = useMemo(() => {
+    dataProviderRef.current =
+      dataProviderRef.current.cloneWithRows(historyItems);
+    return dataProviderRef.current;
+  }, [historyItems]);
+
+  /** One provider for the list's life: each row's type is read from the rows it holds. */
+  const layoutProvider = useMemo(
+    () =>
+      new LayoutProvider(
+        (index: number) => {
+          const item = dataProviderRef.current.getDataForIndex(index) as
+            HistoryItem | undefined;
+          return item?.kind === 'month'
+            ? ViewTypes.MONTH
+            : item?.kind === 'leg'
+              ? ViewTypes.LEG
+              : ViewTypes.ROW;
+        },
+        (type, dim) => {
+          dim.width = Dimensions.get('window').width;
+          dim.height =
+            type === ViewTypes.MONTH
+              ? ITEM_HEIGHT.month
+              : type === ViewTypes.LEG
+                ? ITEM_HEIGHT.leg
+                : ITEM_HEIGHT.transfer;
+        },
+      ),
+    [],
+  );
 
   // Auto-pagination: RecyclerListView fires onEndReached when the user
   // approaches the bottom of the list — bump `numVt` so the next page
@@ -616,8 +696,20 @@ const History: React.FunctionComponent<HistoryProps> = ({
     }
   }, [scrollToTop, handleScrollToTop, setScrollToTop]);
 
+  // A press on the tab while it is open scrolls the list to the top.
+  useEffect(
+    () =>
+      navigation.addListener('tabPress', event => {
+        if (navigation.isFocused() && !event.defaultPrevented) {
+          handleScrollToTop();
+        }
+      }),
+    [navigation, handleScrollToTop],
+  );
+
   const handleScroll = useCallback(
     (_rawEvent: ScrollEvent, _offsetX: number, offsetY: number) => {
+      onTabScrollY(offsetY);
       const isTop = offsetY <= 100;
 
       // If we're scrolling to top and we've reached the top, stop the scrolling state
@@ -637,147 +729,132 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
   const setValueTransferDetailModalShow = useCallback(
     (_index: number, vt: ValueTransferType) => {
+      // A send or a shield still confirming reopens where it is on its way.
+      if (followsHere(vt)) {
+        navigation.navigate(Route.Computing, {
+          phase: 'created',
+          txids: [vt.txid],
+          subject: transferSubject(vt, addressBook, translate),
+        });
+        return;
+      }
       const targetIndex = valueTransfersSliced.indexOf(vt);
       const totalLength =
         valueTransfersFiltered !== null
           ? valueTransfersFiltered.length
           : valueTransfersSliced.length;
-      navigation.navigate(RouteEnum.ValueTransferDetail, {
+      navigation.navigate(Route.ValueTransferDetail, {
         index: targetIndex >= 0 ? targetIndex : 0,
         vt: vt,
         valueTransfersSliced: valueTransfersSliced,
         totalLength,
       });
     },
-    [navigation, valueTransfersSliced, valueTransfersFiltered],
+    [
+      navigation,
+      valueTransfersSliced,
+      valueTransfersFiltered,
+      addressBook,
+      translate,
+    ],
   );
 
+  /** Transactions that turned up while History is open, lit for a moment. */
+  const freshRows = useFreshRows(valueTransfers);
+
   const rowRenderer = (
-    type: string | number,
-    data: ValueTransferType,
+    _type: string | number,
+    item: HistoryItem,
     index: number,
   ) => {
-    let txmonth =
-      data && data.time
-        ? Utils.formatDate(data.time * 1000, 'MMM yyyy', language)
-        : '--- ----';
-
-    return (
-      <ValueTransferLine
-        index={index}
-        vt={data}
-        month={
-          type === ViewTypes.WITH_MONTH || type === ViewTypes.WITH_MONTH_REFRESH
-            ? txmonth
-            : ''
-        }
-        setValueTransferDetailModalShow={setValueTransferDetailModalShow}
-        nextLineWithSameTxid={
-          index >= valueTransfersSliced.length - 1
-            ? false
-            : valueTransfersSliced[index + 1].txid === data.txid
-        }
-        screenName={screenName}
-        registerSwipeable={registerSwipeable(index)}
-        closeAllSwipeables={() => closeAllSwipeables()}
-        closeOtherSwipeables={() => closeAllSwipeables(index)}
-      />
-    );
+    switch (item.kind) {
+      case 'month':
+        return <MonthHeader label={item.label} />;
+      case 'leg':
+        return (
+          <LegLine vt={item.vt} recordId={item.recordId} slot={item.slot} />
+        );
+      case 'swap':
+        return item.record ? (
+          <SwapLine
+            index={index}
+            record={item.record}
+            hairline={!item.first}
+            legCount={item.legCount}
+            open={item.open}
+            onToggle={() => toggleSwap(item.record?.recordId ?? '')}
+          />
+        ) : (
+          <ValueTransferLine
+            index={index}
+            vt={item.vt}
+            hairline={!item.first}
+            setValueTransferDetailModalShow={setValueTransferDetailModalShow}
+            registerSwipeable={registerSwipeable(index)}
+            closeAllSwipeables={() => closeAllSwipeables()}
+            closeOtherSwipeables={() => closeAllSwipeables(index)}
+          />
+        );
+      default:
+        return (
+          <FreshGlow fresh={freshRows.has(item.vt.txid)}>
+            <ValueTransferLine
+              index={index}
+              vt={item.vt}
+              hairline={!item.first}
+              setValueTransferDetailModalShow={setValueTransferDetailModalShow}
+              registerSwipeable={registerSwipeable(index)}
+              closeAllSwipeables={() => closeAllSwipeables()}
+              closeOtherSwipeables={() => closeAllSwipeables(index)}
+            />
+          </FreshGlow>
+        );
+    }
   };
 
   const historyHeader = (
-    <View
-      onLayout={e => setHandleH(e.nativeEvent.layout.height)}
-      style={{
-        paddingTop: 8,
-        paddingBottom: 6,
-        paddingHorizontal: 16,
-      }}
-    >
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <View style={{ width: 48 }} />
-        <BoldText
-          numberOfLines={1}
-          style={{
-            flex: 1,
-            fontSize: 16,
-            lineHeight: 28,
-            textAlign: 'center',
-          }}
-        >
-          {translate('history.title') as string}
-        </BoldText>
-        <Pressable
-          onPress={() => {
-            setShowFilters(true);
-            bottomSheetRef.current?.present();
-          }}
-          hitSlop={8}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            paddingHorizontal: 14,
-            paddingVertical: 4,
-          }}
-        >
-          <FiltersIcon color={colors.fgMuted} size={20} />
-          {(!!filterKind || filterFailed || filterMemos || filterWithFunds) && (
+    <TitleBar
+      title={translate('history.title') as string}
+      onLayout={setHandleH}
+      right={{
+        icon: FiltersIcon,
+        accessibilityLabel: translate('history.filters') as string,
+        onPress: () => {
+          setShowFilters(true);
+          bottomSheetRef.current?.present();
+        },
+        badge:
+          !!filterKind || filterFailed || filterMemos || filterWithFunds ? (
             <View
+              testID="history.filter.dot"
               style={{
-                backgroundColor: colors.fgDefault,
-                width: 7,
-                height: 7,
-                borderRadius: 7,
+                backgroundColor: colors.fgAccent,
+                width: 8,
+                height: 8,
+                borderRadius: radiusPill,
                 marginLeft: -3,
                 marginTop: -8,
+                borderWidth: 2,
+                borderColor: colors.bgSurface,
               }}
             />
-          )}
-        </Pressable>
-      </View>
-    </View>
+          ) : undefined,
+      }}
+    />
   );
 
+  /** The one filter on, for the bar over the list. */
+  const activeFilter = filterOf(filterKind, filterFailed, filterMemos);
+
   const filtersXHeader = (
-    <View
-      style={{
-        paddingTop: 8,
-        paddingBottom: 6,
-        paddingHorizontal: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+    <TitleBar
+      title={translate('history.filters') as string}
+      right={{
+        icon: XIcon,
+        accessibilityLabel: translate('close') as string,
+        onPress: () => bottomSheetRef.current?.dismiss(),
       }}
-    >
-      <View style={{ width: 48 }} />
-      <BoldText
-        numberOfLines={1}
-        style={{
-          flex: 1,
-          fontSize: 16,
-          lineHeight: 28,
-          textAlign: 'center',
-        }}
-      >
-        {translate('history.filters') as string}
-      </BoldText>
-      <Pressable
-        onPress={() => bottomSheetRef.current?.dismiss()}
-        hitSlop={8}
-        style={{
-          paddingHorizontal: 14,
-          paddingVertical: 4,
-        }}
-      >
-        <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
-      </Pressable>
-    </View>
+    />
   );
 
   const hide = useCallback(() => {
@@ -804,13 +881,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
           <Header
             testID="valuetransfer text"
             title={''}
-            toggleMenuDrawer={toggleMenuDrawer}
             setPrivacyOption={setPrivacyOption}
             addLastSnackbar={addLastSnackbar /* context */}
-            screenName={screenName}
             setShieldingAmount={setShieldingAmount}
-            setScrollToTop={setScrollToTop}
-            setScrollToBottom={setScrollToBottom}
             setBackgroundError={setBackgroundError /* context */}
             showMessagesIcon={true}
             onUsdRowLayout={setUsdRowH}
@@ -851,11 +924,66 @@ const History: React.FunctionComponent<HistoryProps> = ({
             {loading ? (
               <ActivityIndicator
                 size="large"
-                color={colors.fgAccent}
+                color={colors.fgMuted}
                 style={{ marginVertical: 20 }}
               />
             ) : (
               <View style={{ flex: 1, width: '100%' }}>
+                {activeFilter !== 'all' && (
+                  <View
+                    testID="history.filter.bar"
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginHorizontal: space20,
+                      marginVertical: space4,
+                      paddingVertical: space8,
+                      paddingLeft: space16,
+                      paddingRight: space8,
+                      borderRadius: radiusMd,
+                      borderWidth: 1,
+                      borderColor: colors.borderAccent,
+                      backgroundColor: colors.bgAccentSubtle,
+                    }}
+                  >
+                    <Text variant="caption" tone="muted">
+                      {`${translate('history.filter-showing') as string} `}
+                      <Text variant="caption" style={{ fontWeight: '700' }}>
+                        {(
+                          translate(
+                            HISTORY_FILTERS.find(
+                              ([key]) => key === activeFilter,
+                            )?.[1] ?? 'history.filter-all',
+                          ) as string
+                        ).trim()}
+                      </Text>
+                    </Text>
+                    <Pressable
+                      kind="link"
+                      testID="history.filter.clear"
+                      accessibilityRole="button"
+                      hitSlop={space8}
+                      onPress={() => {
+                        setFilterKind(null);
+                        setFilterFailed(false);
+                        setFilterMemos(false);
+                        setFilterWithFunds(false);
+                      }}
+                      style={{
+                        paddingHorizontal: space8,
+                        paddingVertical: space4,
+                      }}
+                    >
+                      <Text
+                        variant="caption"
+                        style={{ fontWeight: '700', color: colors.fgAccent }}
+                      >
+                        {translate('clear') as string}
+                      </Text>
+                    </Pressable>
+                  </View>
+                )}
                 {valueTransfersSliced && valueTransfersSliced.length > 0 ? (
                   <RecyclerListView
                     ref={scrollViewRef}
@@ -864,7 +992,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                       refreshControl: (
                         <RefreshControl
                           refreshing={false}
-                          onRefresh={() => doRefresh(screenName)}
+                          onRefresh={() => doRefresh('valueTransfers')}
                           tintColor={colors.fgDefault}
                           title={translate('history.refreshing') as string}
                         />
@@ -879,6 +1007,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                     layoutProvider={layoutProvider}
                     dataProvider={dataProvider}
                     rowRenderer={rowRenderer}
+                    extendedState={{ freshRows }}
                     onEndReached={onEndReached}
                     onEndReachedThreshold={0.5}
                     renderFooter={() =>
@@ -899,7 +1028,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                         >
                           <ActivityIndicator
                             size="small"
-                            color={colors.fgAccent}
+                            color={colors.fgMuted}
                           />
                         </View>
                       ) : !!valueTransfersSliced &&
@@ -913,7 +1042,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                             marginBottom: 200,
                           }}
                         >
-                          <FadeText style={{ color: colors.fgAccent }}>
+                          <FadeText>
                             {translate('history.end') as string}
                           </FadeText>
                         </View>
@@ -929,9 +1058,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                       marginTop: 30,
                     }}
                   >
-                    <FadeText style={{ color: colors.fgAccent }}>
-                      {translate('history.empty') as string}
-                    </FadeText>
+                    <FadeText>{translate('history.empty') as string}</FadeText>
                   </View>
                 )}
               </View>
@@ -946,9 +1073,11 @@ const History: React.FunctionComponent<HistoryProps> = ({
             platforms. */}
         {!isAtTop && (
           <Pressable
+            kind="button"
+            hitSlop={slopFor(36)}
             onPress={handleScrollToTop}
             disabled={isScrollingToTop}
-            style={({ pressed }) => ({
+            style={{
               position: 'absolute',
               // Raised so the button clears the bottom tab bar on every
               // platform — matches the offset used by AddressList. The
@@ -959,30 +1088,21 @@ const History: React.FunctionComponent<HistoryProps> = ({
               height: 36,
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: colors.bgChrome,
-              borderRadius: 50,
-              transform: [{ scale: pressed ? 0.9 : 1 }],
+              backgroundColor: colors.bgSurface,
+              borderRadius: radiusPill,
               opacity: isScrollingToTop ? 0.5 : 1,
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 3 },
-              shadowOpacity: 0.8,
-              shadowRadius: 14,
-              elevation: 9,
-            })}
+              borderWidth: 1,
+              borderColor: colors.bottomSheetBorder,
+            }}
           >
             <RingBorder size={36} />
-            <FontAwesomeIcon
-              size={16}
-              icon={faAngleUp}
-              color={colors.fgMuted}
-            />
+            <ChevronUp size={iconSizeMd} color={colors.fgMuted} />
           </Pressable>
         )}
       </Animated.View>
       <AppSheetModal
         ref={bottomSheetRef}
         header={filtersXHeader}
-        contentStyle={{ paddingBottom: 30 }}
         onDismiss={() => setShowFilters(false)}
       >
         {showFilters && (
@@ -999,6 +1119,13 @@ const History: React.FunctionComponent<HistoryProps> = ({
           />
         )}
       </AppSheetModal>
+      <ShieldSheet
+        ref={shieldSheetRef}
+        amount={shieldingAmount}
+        fee={shieldingFee}
+        mixnetView={mixnetView}
+        onShield={shieldNow}
+      />
     </View>
   );
 };

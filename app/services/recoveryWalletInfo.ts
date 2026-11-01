@@ -111,7 +111,11 @@ export const saveRecoveryWalletInfo = async (
 ): Promise<RecoveryInfoSaveResult> => {
   let result: RecoveryInfoSaveResult = { kind: 'no-keys' };
   if (keys && (keys.seed || keys.ufvk)) {
-    const password = JSON.stringify(keys);
+    const password = JSON.stringify({
+      seed: keys.seed,
+      ufvk: keys.ufvk,
+      birthday: keys.birthday,
+    });
     const error = await writeRecoveryWalletInfo(password);
     if ((await readRecoveryWalletInfo()) === password) {
       return { kind: 'saved' };

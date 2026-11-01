@@ -11,7 +11,6 @@ import {
 } from '@app/context';
 
 import VerifyAddress from '@screens/Receive/components/VerifyAddress';
-import { ScreenEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 
@@ -20,16 +19,11 @@ describe('VerifyAddress - snapshot', () => {
     const state = { ...defaultAppContextLoaded };
     state.translate = mockTranslate;
     state.server = mockServer;
-    const onFn = jest.fn();
 
     expect(
       render(
         <ContextAppLoadedProvider value={state}>
-          <VerifyAddress
-            closeSheet={onFn}
-            screenName={ScreenEnum.Receive}
-            navigation={{ navigate: onFn } as never}
-          />
+          <VerifyAddress />
         </ContextAppLoadedProvider>,
       ).toJSON(),
     ).toMatchSnapshot();

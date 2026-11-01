@@ -1,31 +1,26 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useRef, useState } from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View } from 'react-native';
 
 import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 import FadeText from '@ui/primitives/FadeText';
-import BoldText from '@ui/primitives/BoldText';
 import AppSheet from '@ui/primitives/AppSheet';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
 import DetailLine from '@ui/widgets/DetailLine';
-import { RouteEnum, ScreenEnum } from '@app/AppState';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
-type AboutProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.About>;
+type AboutProps = NativeStackScreenProps<AppDrawerParamList, 'About'>;
 
 const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
   const { zingolibVersion, translate } = context;
   const { colors } = useTheme();
-  const screenName = ScreenEnum.About;
 
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
@@ -45,50 +40,20 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
 
   const aboutSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
-  const aboutHeader = (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingTop: 12,
-        paddingBottom: 8,
-        paddingHorizontal: 16,
-      }}
-    >
-      <TouchableOpacity
-        onPress={closeScreen}
-        hitSlop={8}
-        style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-      >
-        <FontAwesomeIcon
-          icon={faChevronLeft}
-          size={20}
-          color={colors.fgAccent}
-        />
-      </TouchableOpacity>
-      <BoldText
-        numberOfLines={1}
-        style={{ flex: 1, fontSize: 16, lineHeight: 28, textAlign: 'center' }}
-      >
-        {getZingoName() + ' ' + getZingoVersion()}
-      </BoldText>
-      <View style={{ width: 28 }} />
-    </View>
-  );
-
   return (
     <View
       style={{
         flex: 1,
         backgroundColor: colors.bgCanvas,
+        paddingTop: 4,
       }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
       <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <Header
-          title={''}
-          screenName={screenName}
+          title={getZingoName() + ' ' + getZingoVersion()}
+          closeScreen={closeScreen}
+          backAccessibilityLabel={translate('about.back-acc') as string}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
@@ -96,11 +61,7 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
           noUfvkIcon={true}
         />
       </View>
-      <AppSheet
-        ref={aboutSheetRef}
-        snapPoints={aboutSnapPoints}
-        header={aboutHeader}
-      >
+      <AppSheet ref={aboutSheetRef} snapPoints={aboutSnapPoints}>
         <BottomSheetScrollView
           testID="about.scroll-view"
           bounces={false}

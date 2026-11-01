@@ -6,15 +6,24 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { RouteEnum, SendPageStateClass, ToAddrClass } from '@app/AppState';
+import { Route, SendPageStateClass, ToAddrClass } from '@app/AppState';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
+/** Send mounts its sheet once its container is measured; jest never lays out. */
+const layoutSend = () => {
+  const container = screen.queryByTestId('send.container');
+  if (container) {
+    fireEvent(container, 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 400, height: 800 } },
+    });
+  }
+};
+
 test('Tests that the spendable amount fills the amount field with the maximum when it is pressed', async () => {
-  const noop = jest.fn();
   render(
     <ContextAppLoadedProvider
       value={{
@@ -28,21 +37,15 @@ test('Tests that the spendable amount fills the amount field with the maximum wh
     >
       <Send
         navigation={mockNavigation}
-        route={{ key: 'Key-1', name: RouteEnum.Send, params: undefined }}
-        sendTransaction={noop}
-        clearToAddr={noop}
-        toggleMenuDrawer={noop}
-        setShieldingAmount={noop}
-        setScrollToTop={noop}
-        setScrollToBottom={noop}
-        setServerOption={noop}
+        route={{ key: 'Key-1', name: Route.Send, params: undefined }}
       />
     </ContextAppLoadedProvider>,
   );
+  layoutSend();
   await act(async () => {});
   expect(screen.getByTestId('send.amount').props.value).toBe('');
   await act(async () => {
     fireEvent.press(screen.getByTestId('send.max'));
   });
-  expect(screen.getByTestId('send.amount').props.value).toBe('0.50000000');
+  expect(screen.getByTestId('send.amount').props.value).toBe('0.5');
 });

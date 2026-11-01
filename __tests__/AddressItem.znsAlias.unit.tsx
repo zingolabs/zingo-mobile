@@ -12,7 +12,6 @@ import {
 } from '@app/context';
 
 import AddressItem from '@ui/widgets/AddressItem';
-import { ScreenEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
@@ -31,11 +30,7 @@ describe('AddressItem - znsAlias', () => {
   it('names an address the user reached by name', () => {
     render(
       <ContextAppLoadedProvider value={baseState()}>
-        <AddressItem
-          address={UNKNOWN}
-          screenName={ScreenEnum.Confirm}
-          znsAlias="pepe.zcash"
-        />
+        <AddressItem address={UNKNOWN} znsAlias="pepe.zcash" />
       </ContextAppLoadedProvider>,
     );
 
@@ -48,12 +43,7 @@ describe('AddressItem - znsAlias', () => {
 
     render(
       <ContextAppLoadedProvider value={state}>
-        <AddressItem
-          address={UNKNOWN}
-          screenName={ScreenEnum.Confirm}
-          withIcon={true}
-          znsAlias="pepe.zcash"
-        />
+        <AddressItem address={UNKNOWN} withIcon={true} znsAlias="pepe.zcash" />
       </ContextAppLoadedProvider>,
     );
 
@@ -71,7 +61,6 @@ describe('AddressItem - znsAlias', () => {
       <ContextAppLoadedProvider value={baseState()}>
         <AddressItem
           address={mockAddressBook[0].address}
-          screenName={ScreenEnum.Confirm}
           withIcon={true}
           znsAlias="pepe.zcash"
         />

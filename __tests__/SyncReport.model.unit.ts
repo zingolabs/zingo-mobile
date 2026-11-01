@@ -6,8 +6,8 @@ import {
   chainTip,
   heights,
   MAP_CELLS,
+  cellState,
   mapCells,
-  phase,
   scaleMax,
 } from '@screens/SyncReport/syncModel';
 
@@ -46,27 +46,27 @@ test('Tests that the wallet sits at the tip when the wallet is synced.', () => {
   });
 });
 
-test('Tests that the phase follows the most urgent range waiting when ranges of several priorities remain.', () => {
-  expect(
-    phase(
-      status([
-        [Priority.Historic, 0, 1],
-        [Priority.ChainTip, 1, 2],
-      ]),
-      false,
-    ),
-  ).toBe('tip');
-  expect(
-    phase(
-      status([
-        [Priority.Historic, 0, 1],
-        [Priority.FoundNote, 1, 2],
-      ]),
-      false,
-    ),
-  ).toBe('notes');
-  expect(phase(status([[Priority.Historic, 0, 1]]), false)).toBe('historic');
-  expect(phase(status([[Priority.Verify, 0, 1]]), true)).toBe('done');
+test('Tests that a range scanned without mapping reads as scanned with spends pending, and only refetching reads as refetching, when both appear.', () => {
+  expect(cellState(Priority.Scanned)).toBe('scanned');
+  expect(cellState(Priority.ScannedWithoutMapping)).toBe('pending');
+  expect(cellState(Priority.RefetchingNullifiers)).toBe('refetching');
+  expect(cellState(Priority.Scanning)).toBe('scanning');
+  expect(cellState(Priority.ChainTip)).toBe('high');
+  expect(cellState(Priority.Historic)).toBe('low');
+});
+
+test('Tests that the wallet height counts blocks scanned without mapping when they precede the rest.', () => {
+  const h = heights(
+    status([
+      [Priority.Scanned, 1000, 1030],
+      [Priority.ScannedWithoutMapping, 1030, 1090],
+      [Priority.Historic, 1090, 1180],
+    ]),
+    BIRTHDAY,
+    TIP,
+    false,
+  );
+  expect(h.scanned).toBe(90);
 });
 
 test('Tests that each map cell takes the state of the range under its middle block when ranges split the span.', () => {

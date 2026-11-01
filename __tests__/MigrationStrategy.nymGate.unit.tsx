@@ -12,7 +12,7 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
 import {
   MixnetView,
@@ -38,7 +38,7 @@ function renderScreen(mixnetView: MixnetView) {
     navigation: { ...mockNavigation, navigate },
     route: {
       key: 'Key-1',
-      name: RouteEnum.MigrationStrategy,
+      name: Route.MigrationStrategy,
       params: undefined,
     },
   };
@@ -158,6 +158,6 @@ describe('MigrationStrategy nym gate sheet', () => {
     expect(navigate).not.toHaveBeenCalled();
 
     rerenderWith(mixnetReady);
-    expect(navigate).toHaveBeenCalledWith(RouteEnum.MigrationTransactions);
+    expect(navigate).toHaveBeenCalledWith(Route.MigrationTransactions);
   });
 });

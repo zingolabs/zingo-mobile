@@ -8,27 +8,34 @@ import React, {
 } from 'react';
 
 /**
- * State for the global Options panel — a vertical slide-down overlay that
- * replaces the legacy drawer. The active screen slides off the bottom; this
- * panel sits behind it and is revealed.
- *
- * Step 1: state-only (open/close/toggle). The animated translateY and the
- * actual back-gesture / sheet-cleanup wiring come in step 3+.
+ * Where the Options panel is: closed, in front of the home, or under a
+ * screen it opened, where it waits for that screen to pop.
  */
+export type OptionsPanelKind = 'closed' | 'open' | 'under';
+
 export type OptionsPanelContextValue = {
+  kind: OptionsPanelKind;
+  /** The panel is in front of the home. */
   isOpen: boolean;
   open: () => void;
   close: () => void;
   toggle: () => void;
+  /** Keeps the panel open behind a screen pushed from it. */
+  sink: () => void;
+  /** Brings a sunk panel back in front. */
+  surface: () => void;
 };
 
 const noop = () => {};
 
 const defaultValue: OptionsPanelContextValue = {
+  kind: 'closed',
   isOpen: false,
   open: noop,
   close: noop,
   toggle: noop,
+  sink: noop,
+  surface: noop,
 };
 
 const OptionsPanelContext =
@@ -37,11 +44,22 @@ const OptionsPanelContext =
 export const OptionsPanelProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [kind, setKind] = useState<OptionsPanelKind>('closed');
 
-  const open = useCallback(() => setIsOpen(true), []);
-  const close = useCallback(() => setIsOpen(false), []);
-  const toggle = useCallback(() => setIsOpen(prev => !prev), []);
+  const open = useCallback(() => setKind('open'), []);
+  const close = useCallback(() => setKind('closed'), []);
+  const toggle = useCallback(
+    () => setKind(previous => (previous === 'open' ? 'closed' : 'open')),
+    [],
+  );
+  const sink = useCallback(
+    () => setKind(previous => (previous === 'open' ? 'under' : previous)),
+    [],
+  );
+  const surface = useCallback(
+    () => setKind(previous => (previous === 'under' ? 'open' : previous)),
+    [],
+  );
 
   // Register module-level signals so class components and inline render
   // functions (anywhere in the tree below this Provider) can drive the panel
@@ -58,8 +76,16 @@ export const OptionsPanelProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [toggle, open, close]);
 
   const value = useMemo<OptionsPanelContextValue>(
-    () => ({ isOpen, open, close, toggle }),
-    [isOpen, open, close, toggle],
+    () => ({
+      kind,
+      isOpen: kind === 'open',
+      open,
+      close,
+      toggle,
+      sink,
+      surface,
+    }),
+    [kind, open, close, toggle, sink, surface],
   );
 
   return (

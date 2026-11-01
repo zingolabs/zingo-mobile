@@ -5,16 +5,17 @@
 import 'react-native';
 import React from 'react';
 
-import { render } from '@testing-library/react-native';
+import { render, fireEvent, screen } from '@testing-library/react-native';
 import type { ReactTestInstance } from 'react-test-renderer';
 import Send from '@screens/Send';
+import Utils from '@app/utils';
 import ImportUfvk from '@screens/ImportUfvk';
 import Server from '@screens/Server';
 import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { ChainNameEnum, RouteEnum, SelectServerEnum } from '@app/AppState';
+import { ChainNameEnum, Route, SelectServerEnum } from '@app/AppState';
 import { remoteServer } from '@app/AppState/types/ServerType';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
@@ -24,8 +25,17 @@ import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppDrawerParamList } from '@app/types';
+import { HomeTabScreenProps } from '@app/types';
+
+/** Send mounts its sheet once its container is measured; jest never lays out. */
+const layoutSend = () => {
+  const container = screen.queryByTestId('send.container');
+  if (container) {
+    fireEvent(container, 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 400, height: 800 } },
+    });
+  }
+};
 
 /**
  * The accessibility label of the nearest host ancestor that is an
@@ -46,13 +56,11 @@ function accessibleAncestor(element: ReactTestInstance): string | undefined {
   return undefined;
 }
 
-function drawerProps<R extends RouteEnum.Send | RouteEnum.Settings>(
-  name: R,
-): NativeStackScreenProps<AppDrawerParamList, R> {
+function tabProps(): HomeTabScreenProps<'Send'> {
   return {
     navigation: mockNavigation,
-    route: { key: 'Key-1', name, params: undefined },
-  } as unknown as NativeStackScreenProps<AppDrawerParamList, R>;
+    route: { key: 'Key-1', name: Route.Send, params: undefined },
+  } as unknown as HomeTabScreenProps<'Send'>;
 }
 
 function loadedState() {
@@ -72,7 +80,11 @@ function loadedState() {
 describe('Maestro reaches each typed field on iOS', () => {
   const onFunction = jest.fn();
 
-  test('the Send address and memo fields', () => {
+  test('the Send address and memo fields', async () => {
+    jest
+      .spyOn(Utils, 'isValidAddress')
+      .mockResolvedValue({ isValid: true, shieldedOnlyUA: '' });
+    jest.spyOn(Utils, 'isValidOrchardOrSaplingAddress').mockResolvedValue(true);
     const state = loadedState();
     state.valueTransfers = mockValueTransfers;
     state.addresses = mockAddresses;
@@ -80,18 +92,13 @@ describe('Maestro reaches each typed field on iOS', () => {
     state.sendPageState = mockSendPageState;
     const send = render(
       <ContextAppLoadedProvider value={state}>
-        <Send
-          {...drawerProps(RouteEnum.Send)}
-          sendTransaction={onFunction}
-          clearToAddr={onFunction}
-          toggleMenuDrawer={onFunction}
-          setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          setScrollToBottom={onFunction}
-          setServerOption={onFunction}
-        />
+        <Send {...tabProps()} />
       </ContextAppLoadedProvider>,
     );
+    layoutSend();
+    // The memo is inline in the form and shows once a shielded address is
+    // checked, which resolves after the first render.
+    await send.findByTestId('send.memo-field');
     for (const id of [
       'send.addressplaceholder',
       'send.address.clear',
@@ -111,6 +118,7 @@ describe('Maestro reaches each typed field on iOS', () => {
         />
       </ContextAppLoadedProvider>,
     );
+    layoutSend();
     for (const id of ['import.seedufvkinput', 'import.birthdayinput']) {
       expect(accessibleAncestor(importUfvk.getByTestId(id))).toBeUndefined();
     }
@@ -141,6 +149,7 @@ describe('Maestro reaches each typed field on iOS', () => {
         onBack={onFunction}
       />,
     );
+    layoutSend();
     for (const id of [
       'server.custom.host',
       'server.custom.port',

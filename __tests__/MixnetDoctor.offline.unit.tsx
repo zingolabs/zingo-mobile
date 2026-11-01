@@ -18,7 +18,7 @@ import {
 } from '@app/context';
 import {
   ChainNameEnum,
-  RouteEnum,
+  Route,
   ServerType,
   offlineServer,
   remoteServer,
@@ -45,7 +45,7 @@ function renderScreen(
 ) {
   const props: any = {
     navigation: mockNavigation,
-    route: { key: 'Key-1', name: RouteEnum.MixnetDoctor, params: undefined },
+    route: { key: 'Key-1', name: Route.MixnetDoctor, params: undefined },
   };
   return render(
     <ContextAppLoadedProvider

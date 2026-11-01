@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import MigrationTransactions from './MigrationTransactions';
 import {
   screenProps,
@@ -22,7 +22,7 @@ const meta: Meta<typeof MigrationTransactions> = {
     withAppContext({ info: mockInfo, totalBalance: mockTotalBalance }),
     withNavigation,
   ],
-  args: screenProps(RouteEnum.MigrationTransactions),
+  args: screenProps(Route.MigrationTransactions),
 };
 
 export default meta;
