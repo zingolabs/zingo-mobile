@@ -1,13 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useRef } from 'react';
-import { Animated, View, TouchableOpacity } from 'react-native';
+import { Animated, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
 import { slopFor, useTheme, iconSizeMd, iconSize } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import {
   ValueTransferType,
-  ValueTransferKindEnum,
   SendPageStateClass,
   ToAddrClass,
   Route,
@@ -19,11 +19,8 @@ import Utils from '@app/utils';
 import { formatUsd } from '@app/utils/formatAmount';
 import { FileTextIcon } from '@ui/primitives/Icons/FileTextIcon';
 import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
-import { ArrowDownIcon } from '@ui/primitives/Icons/ArrowDownIcon';
-import { ArrowUpIcon } from '@ui/primitives/Icons/ArrowUpIcon';
-import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
-import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
 import { shortWhen, transferRowText } from '@screens/History/historyRowText';
+import { transferIcon } from '@screens/History/transferIcon';
 import HistoryAvatar from './HistoryAvatar';
 import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import HistoryRowBody from './HistoryRowBody';
@@ -111,17 +108,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     t,
     contactName: contact?.label,
   });
-  const iconColor = colors.fgDefault;
-  const icon =
-    vt.kind === ValueTransferKindEnum.Received ? (
-      <ArrowDownIcon size={iconSizeMd} color={iconColor} />
-    ) : vt.kind === ValueTransferKindEnum.Shield ? (
-      <ShieldIcon size={iconSizeMd} color={iconColor} />
-    ) : vt.kind === ValueTransferKindEnum.Migration ? (
-      <SwapIcon size={iconSizeMd} color={iconColor} />
-    ) : (
-      <ArrowUpIcon size={iconSizeMd} color={iconColor} />
-    );
+  const { icon: KindIcon, danger } = transferIcon(vt);
   const haveMemo = !!vt.memos && vt.memos.length > 0 && !!vt.memos.join('');
 
   const handleRenderLeftActions = (
@@ -151,7 +138,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 alignItems: 'center',
               }}
             >
-              <TouchableOpacity
+              <Pressable
+                kind="icon"
                 hitSlop={slopFor(24)}
                 style={{ zIndex: 999, padding: 20 }}
                 onPress={() => {
@@ -164,7 +152,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   size={iconSize}
                   color={colors.fgDefault}
                 />
-              </TouchableOpacity>
+              </Pressable>
             </View>
             {!!vt.address && !readOnly && server.kind !== 'offline' && (
               <View
@@ -174,7 +162,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   alignItems: 'center',
                 }}
               >
-                <TouchableOpacity
+                <Pressable
+                  kind="icon"
                   hitSlop={slopFor(24)}
                   style={{ zIndex: 999, padding: 20 }}
                   onPress={() => {
@@ -188,7 +177,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   }}
                 >
                   <PlaneIcon size={iconSize} color={colors.fgAccent} />
-                </TouchableOpacity>
+                </Pressable>
               </View>
             )}
           </Animated.View>
@@ -202,7 +191,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
       testID={`vt-${index + 1}`}
       style={{ backgroundColor: colors.bgSurface }}
     >
-      <TouchableOpacity
+      <Pressable
+        kind="row"
         style={{ zIndex: 999 }}
         onPress={async () => {
           closeAllSwipeables();
@@ -225,10 +215,15 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   kind="contact"
                   name={contact.label}
                   category={avatarCategoryOf(contact.color)}
+                  chain={GlobalConst.zecSwapChain}
                   size="md"
                 />
+              ) : danger ? (
+                <Avatar kind="icon" icon={KindIcon} danger size="md" />
               ) : (
-                <HistoryAvatar icon={icon} />
+                <HistoryAvatar
+                  icon={<KindIcon size={iconSizeMd} color={colors.fgDefault} />}
+                />
               )
             }
             text={text}
@@ -236,7 +231,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
             memo={haveMemo}
           />
         </Swipeable>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };

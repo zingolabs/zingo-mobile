@@ -15,10 +15,41 @@ export { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
 export {
   SwapStatusEnum,
   isTerminalStatus,
-  canRemoveSwap,
   isPrePaymentStatus,
 } from './enums/SwapStatusEnum';
 export { TrackingStatusEnum } from './enums/TrackingStatusEnum';
+export { canRemoveSwap } from './canRemoveSwap';
+export { hasDepositEvidence } from './depositEvidence';
+export { newlyExpired, newlyRefunding } from './swapTransitions';
+export { prefillFromRecord } from './swapPrefill';
+export { canResendSale, unsentSale } from './unsentSale';
+export { saleDepositRequest } from './saleDepositRequest';
+export type { SaleDepositRequestType } from './saleDepositRequest';
+export {
+  DepositAfterDeshieldError,
+  heldDeshield,
+} from './depositAfterDeshield';
+export { NEAR_NO_REFUND_USD, nearRefusesSmallRefunds } from './nearSmallSwap';
+export type { SwapPrefillType } from './types/SwapPrefillType';
+export {
+  LATE_WATCH_MS,
+  acceptsLateUpdate,
+  isRefunding,
+  watchesLateDeposit,
+} from './lateDeposit';
+export { isThorchainFamily } from './thorchainFamily';
+export {
+  DEPOSIT_WAIT_MS,
+  DEPOSIT_WARN_AFTER_MS,
+  SLOW_DEPOSIT_WARN_AFTER_MS,
+  slowDeposit,
+  awaitsDeposit,
+  depositDeadlineMs,
+  depositOverdue,
+  depositPhase,
+  depositWarnAtMs,
+} from './depositDeadline';
+export type { DepositPhase } from './depositDeadline';
 
 export type { DepositInstructionsType } from './types/DepositInstructionsType';
 export type { FiatValueBasisType } from './types/FiatValueBasisType';
@@ -115,7 +146,7 @@ export {
   buildSwapKitTrackerUrl,
   buildTrackerEntries,
 } from './explorerUrls';
-export type { TrackerEntryType } from './explorerUrls';
+export type { TrackerEntryType, TrackerWhatType } from './explorerUrls';
 export { TokenCatalog } from './TokenCatalog';
 
 export { SwapPoller, DEFAULT_SWAP_POLLER_CONFIG } from './SwapPoller';
@@ -129,6 +160,7 @@ export type {
   CommitRouteArgs,
   CommitRouteResult,
   MarkBroadcastedArgs,
+  MarkDepositSentArgs,
   SetObservedDepositTxHashArgs,
 } from './SwapService';
 

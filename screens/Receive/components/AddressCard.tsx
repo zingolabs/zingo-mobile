@@ -1,13 +1,15 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Animated, {
   ReduceMotion,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
+  withTiming,
 } from 'react-native-reanimated';
+import { duration, ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import {
   iconSizeMd,
   iconSizeSm,
@@ -20,6 +22,7 @@ import {
   useTheme,
   slopFor,
   space4,
+  radiusSm,
 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
@@ -59,9 +62,9 @@ export function PinButton({
   const { colors } = useTheme();
   const tilt = useSharedValue(pinned ? 1 : 0);
   useEffect(() => {
-    tilt.value = withSpring(pinned ? 1 : 0, {
-      damping: 12,
-      stiffness: 220,
+    tilt.value = withTiming(pinned ? 1 : 0, {
+      duration: duration.emphasized,
+      easing: ease.spring,
       reduceMotion: ReduceMotion.System,
     });
   }, [pinned, tilt]);
@@ -71,6 +74,7 @@ export function PinButton({
   const color = pinned ? colors.fgAccent : colors.fgMuted;
   return (
     <Pressable
+      kind="icon"
       testID={testID}
       accessibilityRole="button"
       accessibilityState={{ selected: pinned }}
@@ -79,14 +83,13 @@ export function PinButton({
       }
 
       onPress={onPress}
-      style={({ pressed }) => ({
+      style={{
         width: touchTarget,
         height: touchTarget,
         borderRadius: radiusPill,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: pressed ? colors.bgMutedSubtle : 'transparent',
-      })}
+      }}
     >
       <Animated.View style={style}>
         <PinIcon size={iconSizeMd} color={color} filled={pinned} />
@@ -158,18 +161,19 @@ export default function AddressCard({
               style={{
                 padding: space12,
                 borderRadius: radiusMd,
-                backgroundColor: colors.fgDefault,
+                backgroundColor: colors.bgQrPaper,
               }}
             >
               <QRCode
                 value={address.address}
                 size={QR_SIZE}
                 ecl="L"
-                backgroundColor={colors.fgDefault}
+                color={colors.fgQrInk}
+                backgroundColor={colors.bgQrPaper}
                 logo={getZingoLogo()}
                 logoSize={30}
-                logoBackgroundColor={colors.fgDefault}
-                logoBorderRadius={7}
+                logoBackgroundColor={colors.bgQrPaper}
+                logoBorderRadius={radiusSm}
                 logoMargin={3}
               />
             </View>
@@ -185,6 +189,7 @@ export default function AddressCard({
                 </Text>
               ) : (
                 <Pressable
+                  kind="link"
                   testID="receive.add-tag"
                   accessibilityRole="button"
                   onPress={onAddTag}
@@ -195,7 +200,6 @@ export default function AddressCard({
                     style={{
                       fontWeight: '700',
                       textDecorationLine: 'underline',
-                      textDecorationColor: colors.fgMuted,
                     }}
                   >
                     {t('receive.add-tag')}
@@ -203,6 +207,7 @@ export default function AddressCard({
                 </Pressable>
               )}
               <Pressable
+                kind="link"
                 testID={
                   transparent
                     ? 'receive.transparent-address'

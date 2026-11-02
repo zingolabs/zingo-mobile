@@ -5,6 +5,7 @@ import {
 import { SwapRecordType } from '@app/swap/types/SwapRecordType';
 import { TrackResponseType } from '@app/swap/types/TrackResponseType';
 import { mapSwapStatus, mapTrackingStatus } from './statusMapping';
+import { hasDepositEvidence } from '@app/swap/depositEvidence';
 
 /**
  * Default `/track` -> `SwapRecord` mutation shared by all provider executors.
@@ -60,9 +61,6 @@ export function applyDefaultTrackUpdate(
   // mapSwapStatus returns undefined for unrecognised inputs — preserve
   // the current record.status in that case rather than collapsing to a
   // generic "Unknown". See `mapSwapStatus` for the rationale.
-  const nextStatus = mapSwapStatus(response.status) ?? record.status;
-  const nextTrackingStatus = mapTrackingStatus(response.trackingStatus);
-
   // Prefer a fresh leg hash from the response. If absent, keep the
   // existing record value ONLY when it itself passes the realness check
   // — that scrubs placeholders (empty / all-zero) that older ticks of
@@ -74,6 +72,17 @@ export function applyDefaultTrackUpdate(
     (isRealLegHash(record.observedDepositTxHash)
       ? record.observedDepositTxHash
       : undefined);
+  // A provider that closes an unpaid swap (Maya answers FAILED once its
+  // quote lapses with nothing received) did not fail it: no deposit arrived.
+  // Failed stays for a swap the provider rejected with money in it.
+  const providerStatus = mapSwapStatus(response.status) ?? record.status;
+  const nextStatus =
+    providerStatus === SwapStatusEnum.Failed &&
+    !hasDepositEvidence({ ...record, observedDepositTxHash })
+      ? SwapStatusEnum.Expired
+      : providerStatus;
+  const nextTrackingStatus = mapTrackingStatus(response.trackingStatus);
+
   const destinationTxHash =
     pickLegHash(response, 'outbound', record.receiveAsset.chainId) ??
     (isRealLegHash(record.destinationTxHash)

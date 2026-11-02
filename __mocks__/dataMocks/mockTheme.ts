@@ -42,6 +42,7 @@ const colors: ThemeColors = {
   bgAccentDisabled: '#5a8c5a',
 
   fgSyncing: '#ebff5a',
+  fgScanPending: '#5DBB4C',
   borderSyncing: '#ebff5a',
 
   fgWarning: '#F99D00',
@@ -58,6 +59,7 @@ const colors: ThemeColors = {
   bgViewOnlySubtle: '#8FB4E61F',
 
   bgNym: '#07FF94',
+  fgNym: '#07FF94',
   bgNymSubtle: '#07FF941F',
   bgSwitchOff: '#7E7E7E',
   bgSwitchOnDeep: '#0A4004',
@@ -79,6 +81,7 @@ const colors: ThemeColors = {
   bgIronwood: '#241A12',
   fgTransparent: '#E6C46A',
   bgSproutPot: '#5A3A1E',
+  fgSwapKitMark: '#FFFFFF',
   fgQrInk: '#060B12',
   bgQrPaper: '#FFFFFF',
   bgTransparent: '#E6C46A1F',

@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { radiusMd, space12, useTheme, iconSizeSm } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
@@ -30,6 +31,8 @@ export type DetailRow = {
   block?: React.ReactNode;
   /** A word after the value in Nym green: the review's NYM Enhanced. */
   badge?: string;
+  /** The value struck through: an address nobody should pay anymore. */
+  strike?: boolean;
 };
 
 /** A detail's facts, label on the left and value on the right. */
@@ -43,7 +46,7 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
       : tone === 'warning'
         ? colors.fgWarning
         : tone === 'nym'
-          ? colors.bgNym
+          ? colors.fgNym
           : colors.fgDefault;
   return (
     <View
@@ -114,6 +117,7 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
               {row.leading}
               <Text
                 variant={(row.mono ?? !!row.copy) ? 'address' : 'bodySmall'}
+                strike={row.strike}
                 numberOfLines={row.wrap ? undefined : 1}
                 style={{
                   flexShrink: 1,
@@ -127,13 +131,14 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
               {!!row.badge && (
                 <Text
                   variant="bodySmall"
-                  style={{ fontWeight: '600', color: colors.bgNym }}
+                  style={{ fontWeight: '600', color: colors.fgNym }}
                 >
                   {row.badge}
                 </Text>
               )}
               {!!row.copy && (
                 <Pressable
+                  kind="icon"
                   accessibilityRole="button"
                   accessibilityLabel={translate('swap.copy') as string}
                   hitSlop={8}

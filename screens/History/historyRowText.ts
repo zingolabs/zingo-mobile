@@ -5,17 +5,22 @@ import {
   SwapDirectionEnum,
   SwapStatusEnum,
   formatAmountForDisplay,
+  isRefunding,
   providerShortLabel,
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
 import { formatAmount } from '@app/utils/formatAmount';
+import { transferStatus } from '@app/utils/transferStatus';
 
 type Translate = (key: string) => string;
 
 /** How a row's figures are coloured: arriving value in green, failure muted. */
 export type RowTone = 'default' | 'positive' | 'muted';
-/** A state word before the date: in flight, refunded in amber, failed in red. */
-export type RowState = { text: string; tone: 'default' | 'warning' | 'danger' };
+/** A state word before the date: in flight, refunded in amber, failed in red, expired in grey. */
+export type RowState = {
+  text: string;
+  tone: 'default' | 'warning' | 'danger' | 'muted';
+};
 
 export type RowText = {
   title: string;
@@ -27,6 +32,8 @@ export type RowText = {
   lineAmount?: string;
   top: string;
   topTone: RowTone;
+  /** The top amount struck through: what an expired swap would have got. */
+  topStrike?: boolean;
   bottom: string;
 };
 
@@ -53,8 +60,36 @@ export function shortWhen(
 const shortAddress = (address: string): string =>
   address.length > 15 ? `${address.slice(0, 6)}…${address.slice(-6)}` : address;
 
-/** A transfer's row: what it was, when, and the ZEC with its dollars. */
-export function transferRowText(args: {
+/**
+ * A transfer's row: what it was, when, and the ZEC with its dollars. A
+ * transfer that failed, whatever its kind (a send, a shield, a send to
+ * oneself), or was rejected, reads its amount struck through in grey. Until
+ * it is confirmed, or once it failed, the state word its detail shows comes
+ * before the time and stands for the rest of the line.
+ */
+export function transferRowText(
+  args: Parameters<typeof transferRowTextOf>[0],
+): RowText {
+  const text = transferRowTextOf(args);
+  const status = transferStatus(args.vt, args.t);
+  const stated: RowText =
+    status.tone === 'accent'
+      ? text
+      : {
+          ...text,
+          state: {
+            text: status.text,
+            tone: status.tone === 'danger' ? 'danger' : 'warning',
+          },
+          line: args.when,
+        };
+  return args.vt.status === RPCValueTransfersStatusEnum.failed ||
+    args.vt.kind === ValueTransferKindEnum.Rejection
+    ? { ...stated, topTone: 'muted', topStrike: true }
+    : stated;
+}
+
+function transferRowTextOf(args: {
   vt: ValueTransferType;
   when: string;
   currency: string;
@@ -65,14 +100,8 @@ export function transferRowText(args: {
 }): RowText {
   const { vt, when, currency, usd, t, contactName } = args;
   const failed = vt.status === RPCValueTransfersStatusEnum.failed;
-  const pending = !failed && vt.confirmations === 0;
-  const state: RowState | undefined = failed
-    ? { text: t('history.state-failed'), tone: 'danger' }
-    : pending
-      ? { text: t(`history.${vt.status}`), tone: 'default' }
-      : undefined;
   const amount = `${formatAmount(vt.amount)} ${currency}`;
-  const base = { state, bottom: usd, titleMono: false };
+  const base = { bottom: usd, titleMono: false };
   switch (vt.kind) {
     case ValueTransferKindEnum.Sent:
       return {
@@ -152,7 +181,10 @@ export function swapRowText(args: {
     record.actualReceiveAmount ?? record.expectedReceiveAmount,
   );
   const line = `${providerShortLabel(record.provider)} · ${when}`;
-  const toward = `${t(sell ? 'history.swap-to' : 'history.swap-from')} ${other}`;
+  /** Both coins in the swap's order, what goes out → what comes in. */
+  const pair = (key: string) =>
+    t(key).replace('{from}', sellSym).replace('{to}', getSym);
+  const toward = pair('history.swap-pair');
   const base = { titleMono: false, line };
 
   switch (record.status) {
@@ -165,7 +197,7 @@ export function swapRowText(args: {
               line: `${t('history.swapped-to')} ${other} · ${line}`,
             }
           : {
-              title: `${t(sell ? 'history.swapped-to' : 'history.swapped-from')} ${other}`,
+              title: pair('history.swapped-pair'),
             }),
         top: `+${got} ${getSym}`,
         topTone: 'positive',
@@ -189,24 +221,37 @@ export function swapRowText(args: {
             : '',
       };
     }
-    case SwapStatusEnum.Failed:
     case SwapStatusEnum.Expired:
       return {
         ...base,
         title: toward,
-        state: {
-          text: t(
-            record.status === SwapStatusEnum.Expired
-              ? 'history.state-expired'
-              : 'history.state-failed',
-          ),
-          tone: 'danger',
-        },
+        state: { text: t('history.state-expired'), tone: 'muted' },
+        top: `+${got} ${getSym}`,
+        topTone: 'muted',
+        topStrike: true,
+        bottom: t('history.swap-not-sent').replace('{amount}', sold),
+      };
+    case SwapStatusEnum.Failed:
+      return {
+        ...base,
+        title: toward,
+        state: { text: t('history.state-failed'), tone: 'danger' },
         top: sold,
         topTone: 'muted',
+        topStrike: true,
         bottom: '',
       };
     default:
+      if (isRefunding(record)) {
+        return {
+          ...base,
+          title: toward,
+          state: { text: t('history.state-refunding'), tone: 'warning' },
+          top: sold,
+          topTone: 'default',
+          bottom: t('history.going-back'),
+        };
+      }
       return {
         ...base,
         title: toward,
@@ -215,9 +260,11 @@ export function swapRowText(args: {
             record.status === SwapStatusEnum.AwaitingExternalDeposit ||
               record.status === SwapStatusEnum.PendingDeposit
               ? 'history.state-awaiting-deposit'
-              : 'history.state-swapping',
+              : !sell && record.status === SwapStatusEnum.Pending
+                ? 'history.state-payment-detected'
+                : 'history.state-swapping',
           ),
-          tone: 'default',
+          tone: 'warning',
         },
         top: `≈ +${got} ${getSym}`,
         topTone: 'default',

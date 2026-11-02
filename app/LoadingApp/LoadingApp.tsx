@@ -464,7 +464,11 @@ export class LoadingAppClass extends Component<
       if (!actionButtonsDisabled && !this.serverBackGuard.current?.()) {
         this.closeServer();
       }
-    } else if (route === Route.ServerList || route === Route.ImportChooser) {
+    } else if (
+      route === Route.ServerList ||
+      route === Route.ImportChooser ||
+      route === Route.ImportWallet
+    ) {
       if (!actionButtonsDisabled) {
         goBack();
       }
@@ -1847,6 +1851,7 @@ export class LoadingAppClass extends Component<
       viewRecoveryWallet: this.viewRecoveryWallet,
       openServer: this.openServer,
       closeServer: this.closeServer,
+      stepBack: this.onHardwareBack,
       openCurrentWallet: this.openCurrentWallet,
       createNewWallet: this.createNewWalletChecked,
       getwalletToRestore: this.getwalletToRestore,

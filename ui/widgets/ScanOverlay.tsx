@@ -1,13 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  Vibration,
-  View,
-} from 'react-native';
+import { Platform, StyleSheet, Vibration, View } from 'react-native';
 import Animated, {
   Easing,
   Keyframe,
@@ -26,13 +19,24 @@ import {
 } from 'react-native-vision-camera';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useTheme } from '@app/theme';
+import {
+  iconSize,
+  iconSizeSm,
+  radiusPill,
+  space4,
+  space8,
+  space12,
+  useTheme,
+} from '@app/theme';
+import Text from '@ui/primitives/Text';
 import { ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import CircularReveal, { RevealOrigin } from '@ui/widgets/CircularReveal';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { FlashlightIcon } from '@ui/primitives/Icons/FlashlightIcon';
 import { themeTokens } from '@app/theme';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 
 const FRAME = 240;
 const BRACKET = 28;
@@ -88,6 +92,16 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const [size, setSize] = useState({ width: 0, height: 0 });
+  const root = useRef<View>(null);
+  /** Where the overlay starts in the window: 0 when nothing pads it. */
+  const [originY, setOriginY] = useState<number>(0);
+  /**
+   * The camera fills the screen, under the status bar too; the top bar sits
+   * below the status bar, notch or Dynamic Island wherever the overlay
+   * starts (on iOS the scanner is a modal over the whole window).
+   */
+  const barTop = Math.max(0, insets.top - originY);
+  const bottomPad = useBottomActionPad();
   const device = useCameraDevice('back');
   const { hasPermission, requestPermission } = useCameraPermission();
   const [open, setOpen] = useState(true);
@@ -191,14 +205,16 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
 
   return (
     <View
+      ref={root}
       pointerEvents="box-none"
       style={StyleSheet.absoluteFill}
-      onLayout={e =>
+      onLayout={e => {
         setSize({
           width: e.nativeEvent.layout.width,
           height: e.nativeEvent.layout.height,
-        })
-      }
+        });
+        root.current?.measureInWindow((_x, y) => setOriginY(y));
+      }}
     >
       <CircularReveal origin={origin} open={open} onClosed={closed}>
         <View
@@ -271,7 +287,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
                   right: 12,
                   top: 0,
                   height: 2,
-                  borderRadius: 1,
+                  borderRadius: radiusPill,
                   backgroundColor: colors.fgAccent,
                 },
                 line,
@@ -282,7 +298,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
           <View
             style={{
               position: 'absolute',
-              top: 2,
+              top: barTop,
               left: 0,
               right: 0,
               height: 44,
@@ -291,6 +307,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
             }}
           >
             <Pressable
+              kind="icon"
               testID={`${testID}.back`}
               accessibilityRole="button"
               accessibilityLabel={texts.back}
@@ -298,16 +315,9 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
               hitSlop={8}
               style={{ position: 'absolute', left: 10, padding: 10 }}
             >
-              <ChevronLeft size={24} color={colors.fgAccent} />
+              <ChevronLeft size={iconSize} color={colors.fgAccent} />
             </Pressable>
-            <Text
-              accessibilityRole="header"
-              style={{
-                color: colors.fgDefault,
-                fontSize: 16,
-                fontWeight: '700',
-              }}
-            >
+            <Text accessibilityRole="header" variant="barTitle">
               {texts.title}
             </Text>
           </View>
@@ -327,20 +337,18 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
-                  gap: 6,
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
-                  borderRadius: 14,
+                  gap: space8,
+                  paddingHorizontal: space12,
+                  paddingVertical: space4,
+                  borderRadius: radiusPill,
                   backgroundColor: colors.bgAccentSubtle,
                 }}
               >
-                <CheckIcon size={16} color={colors.fgAccent} />
+                <CheckIcon size={iconSizeSm} color={colors.fgAccent} />
                 <Text
-                  style={{
-                    color: colors.fgAccent,
-                    fontSize: 13,
-                    fontWeight: '700',
-                  }}
+                  variant="bodySmall"
+                  tone="accent"
+                  style={{ fontWeight: '700' }}
                 >
                   {typeof texts.found === 'function'
                     ? texts.found(found.current)
@@ -350,12 +358,9 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
             ) : (
               <Text
                 accessibilityLiveRegion="polite"
-                style={{
-                  textAlign: 'center',
-                  color: stage === 'miss' ? colors.fgWarning : colors.fgDefault,
-                  fontSize: 15,
-                  lineHeight: 20,
-                }}
+                variant="body"
+                tone={stage === 'miss' ? 'warning' : 'default'}
+                style={{ textAlign: 'center' }}
               >
                 {stage === 'miss' ? texts.miss : texts.hint}
               </Text>
@@ -363,6 +368,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
           </View>
 
           <Pressable
+            kind="icon"
             testID={`${testID}.torch`}
             accessibilityRole="button"
             accessibilityLabel={texts.torch}
@@ -371,17 +377,17 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
             style={{
               position: 'absolute',
               alignSelf: 'center',
-              bottom: insets.bottom + 40,
+              bottom: bottomPad,
               width: 52,
               height: 52,
-              borderRadius: 26,
+              borderRadius: radiusPill,
               alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: torch ? colors.fgDefault : colors.bgMutedSubtle,
             }}
           >
             <FlashlightIcon
-              size={24}
+              size={iconSize}
               color={torch ? colors.bgCanvas : colors.fgDefault}
             />
           </Pressable>

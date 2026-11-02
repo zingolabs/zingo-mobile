@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const { FlatCompat } = require('@eslint/eslintrc');
 
 const compat = new FlatCompat({
@@ -35,6 +37,18 @@ const colorLock = [
 ];
 
 /**
+ * The press lock: a control reacts to a press through ui/primitives/Pressable
+ * and its kind, never through a style written by hand (DESIGN.md, Pressing).
+ */
+const pressLock = [
+  {
+    selector: "ConditionalExpression[test.name='pressed']",
+    message:
+      'Press through ui/primitives/Pressable and its kind, not a pressed style written by hand.',
+  },
+];
+
+/**
  * The geometry lock (zingo-adrs zingo-mobile/0024): type, radii and icon
  * sizes come from app/theme and the Text variants, never from a number on
  * a screen. A number is a Literal, a negative one, or an arithmetic
@@ -42,9 +56,9 @@ const colorLock = [
  */
 const NUMBER =
   ':matches(Literal[raw=/^[0-9]/], UnaryExpression[operator="-"], BinaryExpression)';
-/** The value of a style property, or either branch of a ternary there. */
+/** The value of a style property, or a number in either branch of a ternary there (not its test). */
 const VALUE = keys =>
-  `:matches(Property[key.name=${keys}], Property[key.name=${keys}] > ConditionalExpression) > ${NUMBER}`;
+  `:matches(Property[key.name=${keys}] > ${NUMBER}, Property[key.name=${keys}] > ConditionalExpression[consequent.raw=/^[0-9]/], Property[key.name=${keys}] > ConditionalExpression[alternate.raw=/^[0-9]/])`;
 /** Icon components: ui/primitives/Icons, drawn on the Icon base. */
 const ICON =
   '/(Icon|Chevron(Up|Down|Left|Right)|TriangleAlert|RescanArrows|RescanCloud)$/';
@@ -74,95 +88,25 @@ const geometryLock = [
 ];
 
 /**
- * Files the redesign has not reached (DESIGN.md "Known gaps") and the
- * approved exceptions (A: the tab bar). They keep hand-set values until
- * each one moves onto the system; remove a file here when it does.
+ * Files that keep hand-set geometry: the approved exceptions (A: the tab
+ * bar), DESIGN.md "Known gaps" and the screens not yet on the system. Each
+ * one says so in its first line, `/* geometry-gap: <why> *\/`, and loses
+ * that line when it moves onto the system. A marker in the file, not a list
+ * here, so PRs that clean different files never touch the same lines.
  */
-const geometryGaps = [
-  // exception A: the tab bar
-  'app/navigation/CustomTabBar.tsx',
-  'ui/primitives/Icons/TabIcons.tsx',
-  // DESIGN.md "Known gaps": the Header's internals, the Address Book, the
-  // server list, ChainSelect, the migration screens
-  'screens/AddressBook/AddressBook.tsx',
-  'screens/AddressBook/components/AddressRowHead.tsx',
-  'screens/AddressBook/components/ContactRow.tsx',
-  'screens/MeetIronwood/MeetIronwood.tsx',
-  'screens/MigrationSending/MigrationSending.tsx',
-  'screens/MigrationStrategy/MigrationStrategy.tsx',
-  'screens/MigrationStrategy/components/NymGateSheet.tsx',
-  'screens/MigrationTransactions/MigrationTransactions.tsx',
-  'screens/Server/ServerRow.tsx',
-  'ui/widgets/ChainSelect.tsx',
-  'ui/widgets/ChainTypeToggle.tsx',
-  'ui/widgets/ContactSheet.tsx',
-  'ui/widgets/Header/Header.tsx',
-  'ui/widgets/Header/components/PriceRow.tsx',
-  'ui/widgets/SearchField.tsx',
-  'ui/widgets/SegmentedSwitch.tsx',
-  // not yet redesigned: hand-set values until each screen moves onto the
-  // system (counts as of 2026-10-25)
-  'screens/About/About.tsx',
-  'screens/History/History.tsx',
-  'screens/History/components/HistoryAvatar.tsx',
-  'screens/History/components/HistoryRowBody.tsx',
-  'screens/History/components/IronwoodMigrationBanner.tsx',
-  'screens/ImportChooser/ImportChooser.tsx',
-  'screens/ImportUfvk/ImportUfvk.tsx',
-  'screens/Insight/Insight.tsx',
-  'screens/Insight/components/ActivityChart.tsx',
-  'screens/Insight/components/Donut.tsx',
-  'screens/Launching/Launching.tsx',
-  'screens/Messages/MessageList.tsx',
-  'screens/Messages/components/MessageLine.tsx',
-  'screens/MixnetDoctor/MixnetDoctor.tsx',
-  'screens/OptionsPanel/OptionsPanel.tsx',
-  'screens/Pools/Pools.tsx',
-  'screens/SeedBackup/SeedBackup.tsx',
-  'screens/SeedBackup/components/ConfirmStep.tsx',
-  'screens/SeedBackup/components/DoneStep.tsx',
-  'screens/SeedBackup/components/InfoStep.tsx',
-  'screens/SeedBackup/components/ScreenshotSheet.tsx',
-  'screens/SeedBackup/components/SeedParts.tsx',
-  'screens/SeedBackup/components/StepParts.tsx',
-  'screens/SeedBackup/components/WordsStep.tsx',
-  'screens/Send/components/SendErrorSheet.tsx',
-  'screens/Server/CustomServerBox.tsx',
-  'screens/Server/Server.tsx',
-  'screens/Server/ServerLog.tsx',
-  'screens/Settings/Settings.tsx',
-  'screens/StartMenu/StartMenu.tsx',
-  'screens/Swap/components/TokenLogo.tsx',
-  'screens/SwapResult/SwapResult.tsx',
-  'screens/SyncReport/SyncReport.tsx',
-  'screens/ViewingKey/ViewingKey.tsx',
-  'screens/ViewingKey/components/KeyCard.tsx',
-  'screens/ViewingKey/components/KeyQr.tsx',
-  'screens/WalletError/WalletError.tsx',
-  'screens/WalletSeed/WalletSeed.tsx',
-  'ui/primitives/AppSheetModal.tsx',
-  'ui/primitives/ProgressBar.tsx',
-  'ui/primitives/Radio.tsx',
-  'ui/widgets/ActionMenuBottomSheet.tsx',
-  'ui/widgets/Address/Address.tsx',
-  'ui/widgets/BusyButton.tsx',
-  'ui/widgets/CardExpand.tsx',
-  'ui/widgets/ConfirmBottomSheet.tsx',
-  'ui/widgets/CurrencyAmount.tsx',
-  'ui/widgets/DeleteWalletSheet.tsx',
-  'ui/widgets/Flight/SendFlight.tsx',
-  'ui/widgets/Flight/SwapFlight.tsx',
-  'ui/widgets/NewAddressTag.tsx',
-  'ui/widgets/ProgressState.tsx',
-  'ui/widgets/SaveSheet.tsx',
-  'ui/widgets/ScanOverlay.tsx',
-  'ui/widgets/SeedPhraseInput.tsx',
-  'ui/widgets/SeedSheet.tsx',
-  'ui/widgets/SelectBottomSheet.tsx',
-  'ui/widgets/TextInputAddress.tsx',
-  'ui/widgets/ZecAmount.tsx',
-  'ui/widgets/toastConfig.tsx',
-];
+const GAP_MARKER = /^\/\* geometry-gap: /;
+const sourcesUnder = dir =>
+  fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+    const file = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      return sourcesUnder(file);
+    }
+    return /\.tsx?$/.test(entry.name) ? [file] : [];
+  });
+const geometryGaps = ['app/navigation', 'screens', 'ui']
+  .flatMap(dir => sourcesUnder(path.join(__dirname, dir)))
+  .filter(file => GAP_MARKER.test(fs.readFileSync(file, 'utf8')))
+  .map(file => path.relative(__dirname, file).split(path.sep).join('/'));
 
 module.exports = [
   {
@@ -183,6 +127,14 @@ module.exports = [
       'no-restricted-imports': [
         'error',
         {
+          paths: [
+            {
+              name: 'react-native',
+              importNames: ['TouchableOpacity', 'TouchableHighlight'],
+              message:
+                'Press through ui/primitives/Pressable and its kind (DESIGN.md, Pressing).',
+            },
+          ],
           patterns: [
             {
               group: ['@fortawesome/*'],
@@ -206,7 +158,7 @@ module.exports = [
     ignores: ['app/theme/**', '**/*.stories.tsx'],
     rules: {
       'react-native/no-color-literals': 'error',
-      'no-restricted-syntax': ['error', ...colorLock],
+      'no-restricted-syntax': ['error', ...colorLock, ...pressLock],
     },
   },
   {
@@ -215,7 +167,12 @@ module.exports = [
     files: ['screens/**', 'ui/**'],
     ignores: ['**/*.stories.tsx', ...geometryGaps],
     rules: {
-      'no-restricted-syntax': ['error', ...colorLock, ...geometryLock],
+      'no-restricted-syntax': [
+        'error',
+        ...colorLock,
+        ...pressLock,
+        ...geometryLock,
+      ],
     },
   },
   {

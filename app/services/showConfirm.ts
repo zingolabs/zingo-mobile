@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react';
+import { listenerStack } from './listenerStack';
 
 /**
  * Imperative confirmation-sheet trigger. Mirrors `Alert.alert`'s shape so
  * migrating call sites is mechanical, but the dialog is rendered as a
  * BottomSheetModal via <ConfirmBottomSheet/> mounted under the
- * BottomSheetModalProvider. The sheet is registered exactly once per
- * provider; calling showConfirm before mount no-ops (warns in dev).
+ * BottomSheetModalProvider. Each provider mounts one and the last mounted
+ * answers; calling showConfirm before any mount no-ops (warns in dev).
  */
 export type ConfirmButtonStyle = 'default' | 'cancel' | 'destructive' | 'ghost';
 
@@ -28,13 +29,17 @@ export type ConfirmOptions = {
 
 type ConfirmListener = (options: ConfirmOptions) => void;
 
-let listener: ConfirmListener | null = null;
+const listeners = listenerStack<ConfirmListener>();
 
-export function registerConfirmListener(fn: ConfirmListener | null): void {
-  listener = fn;
+/** Called by each ConfirmBottomSheet; returns its removal. */
+export function registerConfirmListener(
+  fn: ConfirmListener | null,
+): () => void {
+  return listeners.register(fn);
 }
 
 export function showConfirm(options: ConfirmOptions): void {
+  const listener = listeners.top();
   if (!listener) {
     if (__DEV__) {
       console.warn(

@@ -4,121 +4,152 @@ exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
 <View
   style={
     {
-      "alignItems": "center",
       "backgroundColor": "#011401",
       "flex": 1,
-      "justifyContent": "center",
     }
   }
 >
-  <View
-    style={
+  <RCTScrollView
+    contentContainerStyle={
       {
         "alignItems": "center",
-        "flex": 1,
         "flexDirection": "column",
+        "flexGrow": 1,
         "justifyContent": "center",
-        "width": "95%",
+        "paddingHorizontal": 20,
+      }
+    }
+    onContentSizeChange={[Function]}
+    onLayout={[Function]}
+    onScroll={[Function]}
+    scrollEventThrottle={16}
+    style={
+      {
+        "flex": 1,
       }
     }
   >
-    <View
-      style={
-        {
-          "alignItems": "center",
-          "flexDirection": "column",
-          "height": "40%",
-          "justifyContent": "flex-end",
-          "marginTop": 20,
-          "padding": 10,
-          "width": "80%",
-        }
-      }
-    >
-      <Text
+    <View>
+      <View
         style={
           {
-            "color": "#888888",
-            "fontSize": 40,
-            "fontWeight": "bold",
+            "alignItems": "center",
+            "alignSelf": "stretch",
+            "flexDirection": "column",
+            "flexGrow": 4,
+            "justifyContent": "flex-end",
+            "marginTop": 20,
           }
         }
       >
-        Zingo
-      </Text>
-      <Text
+        <Text
+          maxFontSizeMultiplier={1.3}
+          style={
+            {
+              "color": "#888888",
+              "fontSize": 36,
+              "fontWeight": "700",
+              "lineHeight": 40,
+            }
+          }
+        >
+          Zingo
+        </Text>
+        <Text
+          maxFontSizeMultiplier={2}
+          style={
+            {
+              "color": "#888888",
+              "fontSize": 12,
+              "fontWeight": "400",
+              "lineHeight": 16,
+            }
+          }
+        >
+          2.0.19 (307)
+        </Text>
+      </View>
+      <View
         style={
           {
-            "color": "#888888",
-            "fontSize": 15,
+            "alignItems": "center",
+            "alignSelf": "stretch",
+            "flexDirection": "column",
+            "flexGrow": 6,
+            "justifyContent": "flex-start",
+            "marginTop": 20,
           }
         }
       >
-        2.0.19 (307)
-      </Text>
+        <View
+          accessibilityElementsHidden={true}
+          importantForAccessibility="no-hide-descendants"
+          style={
+            {
+              "alignItems": "center",
+              "alignSelf": "stretch",
+            }
+          }
+        >
+          <ActivityIndicator
+            color="transparent"
+            size="large"
+          />
+          <Text
+            maxFontSizeMultiplier={1.5}
+            selectable={false}
+            style={
+              {
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "700",
+                "lineHeight": 24,
+                "marginTop": 8,
+                "opacity": 0,
+                "textAlign": "center",
+              }
+            }
+          >
+            updating.firstlaunchingmessage-title
+          </Text>
+          <Text
+            maxFontSizeMultiplier={2}
+            selectable={false}
+            style={
+              {
+                "color": "#c3c3c3",
+                "fontSize": 15,
+                "fontWeight": "400",
+                "lineHeight": 21,
+                "marginTop": 8,
+                "opacity": 0,
+                "textAlign": "center",
+              }
+            }
+          >
+            updating.firstlaunchingmessage-body
+          </Text>
+          <Text
+            maxFontSizeMultiplier={2}
+            selectable={false}
+            style={
+              {
+                "color": "#c3c3c3",
+                "fontSize": 15,
+                "fontWeight": "400",
+                "lineHeight": 21,
+                "marginBottom": 8,
+                "marginTop": 8,
+                "opacity": 0,
+                "textAlign": "center",
+              }
+            }
+          >
+            updating.firstlaunchingmessage-footer
+          </Text>
+        </View>
+      </View>
     </View>
-    <View
-      style={
-        {
-          "alignItems": "center",
-          "flexDirection": "column",
-          "height": "60%",
-          "justifyContent": "flex-start",
-          "marginTop": 20,
-          "padding": 10,
-          "width": "80%",
-        }
-      }
-    >
-      <ActivityIndicator
-        color="transparent"
-        size="large"
-      />
-      <Text
-        selectable={true}
-        style={
-          {
-            "color": "#c3c3c3",
-            "fontSize": 20,
-            "fontWeight": "bold",
-            "marginTop": 10,
-            "opacity": 0,
-            "textAlign": "center",
-          }
-        }
-      >
-        updating.firstlaunchingmessage-title
-      </Text>
-      <Text
-        selectable={true}
-        style={
-          {
-            "color": "#c3c3c3",
-            "fontSize": 15,
-            "marginTop": 10,
-            "opacity": 0,
-            "textAlign": "center",
-          }
-        }
-      >
-        updating.firstlaunchingmessage-body
-      </Text>
-      <Text
-        selectable={true}
-        style={
-          {
-            "color": "#c3c3c3",
-            "fontSize": 15,
-            "marginBottom": 10,
-            "marginTop": 10,
-            "opacity": 0,
-            "textAlign": "center",
-          }
-        }
-      >
-        updating.firstlaunchingmessage-footer
-      </Text>
-    </View>
-  </View>
+  </RCTScrollView>
 </View>
 `;

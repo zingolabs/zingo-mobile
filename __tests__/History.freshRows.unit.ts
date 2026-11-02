@@ -1,6 +1,7 @@
 import { act, renderHook } from '@testing-library/react-native';
 import type { ValueTransferType } from '@app/AppState';
-import { FRESH_MS, useFreshRows } from '@screens/History/useFreshRows';
+import { useFreshRows } from '@screens/History/useFreshRows';
+import { duration } from '@app/theme/motion';
 
 const vt = (txid: string) => ({ txid }) as ValueTransferType;
 
@@ -17,7 +18,7 @@ describe('useFreshRows', () => {
     rerender({ list: [vt('c'), vt('a'), vt('b')] });
     expect([...result.current]).toEqual(['c']);
     act(() => {
-      jest.advanceTimersByTime(FRESH_MS + 300);
+      jest.advanceTimersByTime(duration.fresh + 300);
     });
     expect(result.current.size).toBe(0);
   });

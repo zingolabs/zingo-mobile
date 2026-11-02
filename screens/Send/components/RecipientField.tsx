@@ -1,7 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { ActivityIndicator, Pressable, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { iconSizeSm, space4, space8, space12, useTheme } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { AddressBookFileClass } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils';
@@ -13,6 +15,7 @@ import Card from '@ui/widgets/Card';
 import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
+import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 import { ContactIcon } from '@ui/primitives/Icons/ContactIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
@@ -101,6 +104,7 @@ export default function RecipientField({
   const shortened =
     valid === 1 && !token && !!text && !focused && !editing ? (
       <Pressable
+        kind="row"
         // The input's own id: Maestro taps it and types into the input it brings back.
         testID="send.addressplaceholder"
         accessibilityRole="button"
@@ -283,6 +287,15 @@ export default function RecipientField({
                 onPress={onClear}
               />
             )}
+            {!text && !token && (
+              <FieldAction
+                testID="send.paste-button"
+                icon={ClipboardPasteIcon}
+                label={t('paste')}
+                onPress={async () => onChangeText(await Clipboard.getString())}
+                disabled={busy}
+              />
+            )}
             {!token && (
               <FieldAction
                 testID="send.address-book"
@@ -309,10 +322,10 @@ export default function RecipientField({
           <Card flush>
             {matches.length > 0 && (
               <Text
-                variant="caption"
+                variant="bodySmall"
                 tone="muted"
                 style={{
-                  fontWeight: '700',
+                  fontWeight: '600',
                   paddingHorizontal: space12,
                   paddingTop: space8,
                 }}

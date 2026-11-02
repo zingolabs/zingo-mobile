@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { iconSizeMd, space4, space8, space16, useTheme } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import Text from '@ui/primitives/Text';
 
 /** An icon button at one end of the bar. */
@@ -17,7 +18,11 @@ export type TitleBarAction = {
   badge?: React.ReactNode;
 };
 
-/** Each end keeps this width, so the title stays centred with one action or none. */
+/**
+ * Each end is at least this wide and the two share the space the title
+ * leaves, so the title stays centred with one action, two (SyncReport's
+ * info and rescan) or none.
+ */
 const SIDE = 48;
 /** History's bar in dev, the designer's reference: 8 over the title, 6 under. */
 const PAD_BOTTOM = 6;
@@ -34,6 +39,7 @@ export default function TitleBar({
   left,
   right,
   onLayout,
+  tight = false,
   testID,
 }: {
   /** A string takes the bar's title style; a node (a picker) is drawn as given. */
@@ -42,6 +48,8 @@ export default function TitleBar({
   right?: TitleBarAction | React.ReactElement;
   /** The bar's height, for a sheet that keeps its snap points under it. */
   onLayout?: (height: number) => void;
+  /** Under the Header's top row: 4 over the title instead of 8. */
+  tight?: boolean;
   testID?: string;
 }) {
   const { colors } = useTheme();
@@ -55,6 +63,7 @@ export default function TitleBar({
     const Icon = a.icon;
     return (
       <Pressable
+        kind="icon"
         testID={a.testID}
         accessibilityRole="button"
         accessibilityLabel={a.accessibilityLabel}
@@ -84,15 +93,15 @@ export default function TitleBar({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingTop: space8,
+        paddingTop: tight ? space4 : space8,
         paddingBottom: PAD_BOTTOM,
         paddingHorizontal: space16,
       }}
     >
-      <View style={{ width: SIDE, alignItems: 'flex-start' }}>
+      <View style={{ flex: 1, minWidth: SIDE, alignItems: 'flex-start' }}>
         {action(left)}
       </View>
-      <View style={{ flex: 1, alignItems: 'center' }}>
+      <View style={{ flexShrink: 1, alignItems: 'center' }}>
         {typeof title === 'string' ? (
           <Text variant="barTitle" numberOfLines={1} accessibilityRole="header">
             {title}
@@ -101,7 +110,7 @@ export default function TitleBar({
           title
         )}
       </View>
-      <View style={{ width: SIDE, alignItems: 'flex-end' }}>
+      <View style={{ flex: 1, minWidth: SIDE, alignItems: 'flex-end' }}>
         {action(right)}
       </View>
     </View>

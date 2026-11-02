@@ -109,6 +109,13 @@ interface RPCModuleAPI {
   sendAllProcess(address: string, memo: string): Promise<string>;
   shieldProcess(): Promise<string>;
   confirmProcess(): Promise<string>;
+  // The same answers as the propose calls above, storing no proposal and
+  // pausing no sync: for a fee shown while the user is still deciding.
+  previewSendProcess(sendJson: string): Promise<string>;
+  previewSendAllProcess(address: string, memo: string): Promise<string>;
+  previewShieldProcess(): Promise<string>;
+  // Drops a stored proposal without sending it; sync resumes.
+  declineProcess(): Promise<string>;
 
   // Swap deposits. The amount crosses the bridge as a string of zatoshis.
   sendSwapDepositProcess(

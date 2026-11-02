@@ -8,12 +8,13 @@ import React, {
 } from 'react';
 import {
   BackHandler,
-  Pressable,
+  ScrollView,
   StyleSheet,
   useWindowDimensions,
   View,
 } from 'react-native';
 import Animated, {
+  interpolate,
   FadeIn,
   FadeOut,
   interpolateColor,
@@ -24,17 +25,17 @@ import Animated, {
   withDelay,
   withTiming,
 } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { useTheme, iconSizeMd } from '@app/theme';
+import { useTheme, iconSizeMd, radiusPill, space8, space16 } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { SnackbarDurationEnum } from '@app/AppState';
 import Header from '@ui/widgets/Header';
 import { AppDrawerParamList, CardRect } from '@app/types';
 import { useSecureScreen } from '@app/hooks/useSecureScreen';
-import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { useScreenCapture } from '@app/hooks/useScreenCapture';
 import {
   enactGateAnswer,
@@ -55,6 +56,7 @@ import DoneStep from './components/DoneStep';
 import ScreenshotSheet from './components/ScreenshotSheet';
 import { SIDE, StepActions } from './components/StepParts';
 import Button from '@ui/primitives/Button';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 type SeedBackupProps = NativeStackScreenProps<AppDrawerParamList, 'SeedBackup'>;
 
@@ -104,6 +106,39 @@ const exitFor = (move: Move) =>
         .reduceMotion(ReduceMotion.System)
     : axisExit(-AXIS_PT * move.dir);
 
+/**
+ * A step's content scrolls in the room above its actions, which sit below
+ * it in the flow, so 24 words or a large font never end up under them.
+ */
+const StepPage: React.FunctionComponent<{
+  children: React.ReactNode;
+  footer: React.ReactNode;
+  bottom: number;
+  center?: boolean;
+}> = ({ children, footer, bottom, center = false }) => {
+  const { edges, fades } = useScrollEdges();
+  return (
+    <>
+      <ScrollView
+        {...edges}
+        style={{ flex: 1 }}
+        contentContainerStyle={
+          center
+            ? { flexGrow: 1, justifyContent: 'center', paddingBottom: space16 }
+            : { paddingBottom: space16 }
+        }
+        keyboardShouldPersistTaps="handled"
+      >
+        {children}
+      </ScrollView>
+      {fades}
+      <View style={{ paddingTop: space8, paddingBottom: bottom }}>
+        {footer}
+      </View>
+    </>
+  );
+};
+
 // The confirm step and its actions, remounted for every new attempt.
 const ConfirmPage: React.FunctionComponent<{
   words: string[];
@@ -114,9 +149,9 @@ const ConfirmPage: React.FunctionComponent<{
   const { translate } = useContext(ContextAppLoaded);
   const check = useWordCheck(words, onPassed);
   return (
-    <>
-      <ConfirmStep check={check} />
-      <View style={{ position: 'absolute', left: 0, right: 0, bottom }}>
+    <StepPage
+      bottom={bottom}
+      footer={
         <StepActions
           testID="seedbackup.confirm"
           link={translate('seedbackup.view-phrase') as string}
@@ -125,8 +160,10 @@ const ConfirmPage: React.FunctionComponent<{
           disabled={!check.value}
           onPrimary={check.submit}
         />
-      </View>
-    </>
+      }
+    >
+      <ConfirmStep check={check} />
+    </StepPage>
   );
 };
 
@@ -145,7 +182,6 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
     birthday: walletBirthday,
   } = context;
   const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
   const root = useRef<View>(null);
   const [screen, setScreen] = useState<CardRect>({
     x: 0,
@@ -153,7 +189,8 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
     width: 0,
     height: 0,
   });
-  const keyboard = useKeyboardHeight();
+  /** Every step's actions end at the one bottom distance, above the keyboard too. */
+  const bottom = useBottomActionPad();
   const secured = useSecureScreen();
   const [shot, setShot] = useState<'none' | 'on' | 'leaving'>('none');
   const shotGone = useCallback(() => setShot('none'), []);
@@ -366,7 +403,7 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
       width: from.width + (screen.width - from.width) * g,
       height: from.height + (screen.height - from.height) * g,
       opacity: whole.value,
-      borderRadius: RADIUS * (1 - g),
+      borderRadius: interpolate(g, [0, 1], [RADIUS, 0]),
       backgroundColor: interpolateColor(
         g,
         [0, 0.12, 1],
@@ -381,15 +418,13 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
     transform: [{ translateX: slide.value }],
   }));
 
-  const bottom = Math.max(insets.bottom + 16, keyboard + 12);
-
   const page = () => {
     switch (step) {
       case 'info':
         return (
-          <>
-            <InfoStep keychainNote={keychainNote} />
-            <View style={{ position: 'absolute', left: 0, right: 0, bottom }}>
+          <StepPage
+            bottom={bottom}
+            footer={
               <StepActions
                 testID="seedbackup.info"
                 link={translate('seedbackup.not-now') as string}
@@ -398,12 +433,26 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
                 disabled={loading}
                 onPrimary={toWords}
               />
-            </View>
-          </>
+            }
+          >
+            <InfoStep keychainNote={keychainNote} />
+          </StepPage>
         );
       case 'words':
         return (
-          <>
+          <StepPage
+            bottom={bottom}
+            footer={
+              <StepActions
+                testID="seedbackup.words"
+                link={translate('seedbackup.back') as string}
+                onLink={() => go('info', -1)}
+                primary={translate('seedbackup.saved') as string}
+                disabled={!checked}
+                onPrimary={saved}
+              />
+            }
+          >
             {secured && (
               <WordsStep
                 words={words}
@@ -416,17 +465,7 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
                 onCheck={() => setChecked(c => !c)}
               />
             )}
-            <View style={{ position: 'absolute', left: 0, right: 0, bottom }}>
-              <StepActions
-                testID="seedbackup.words"
-                link={translate('seedbackup.back') as string}
-                onLink={() => go('info', -1)}
-                primary={translate('seedbackup.saved') as string}
-                disabled={!checked}
-                onPrimary={saved}
-              />
-            </View>
-          </>
+          </StepPage>
         );
       case 'confirm':
         return words.length > 0 ? (
@@ -442,26 +481,22 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
         ) : null;
       case 'done':
         return (
-          <>
-            <View style={{ flex: 1, justifyContent: 'center' }}>
-              <DoneStep />
-            </View>
-            <View
-              style={{
-                position: 'absolute',
-                left: SIDE,
-                right: SIDE,
-                bottom: insets.bottom + 28,
-              }}
-            >
-              <Button
-                testID="seedbackup.done"
-                variant="primary"
-                title={translate('seedbackup.done') as string}
-                onPress={finish}
-              />
-            </View>
-          </>
+          <StepPage
+            center
+            bottom={bottom}
+            footer={
+              <View style={{ marginHorizontal: SIDE }}>
+                <Button
+                  testID="seedbackup.done"
+                  variant="primary"
+                  title={translate('seedbackup.done') as string}
+                  onPress={finish}
+                />
+              </View>
+            }
+          >
+            <DoneStep />
+          </StepPage>
         );
     }
   };
@@ -518,18 +553,18 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
                 }}
               >
                 <Pressable
+                  kind="icon"
                   testID="seedbackup.close"
                   accessibilityRole="button"
                   accessibilityLabel={translate('seedbackup.close') as string}
                   onPress={close}
-                  style={({ pressed }) => ({
+                  style={{
                     width: 44,
                     height: 44,
-                    borderRadius: 12,
+                    borderRadius: radiusPill,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
-                  })}
+                  }}
                 >
                   <XIcon size={iconSizeMd} color={colors.fgMuted} />
                 </Pressable>

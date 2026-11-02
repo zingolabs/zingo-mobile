@@ -1,6 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, ScrollView, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Pressable as RNPressable,
+  ScrollView,
+  View,
+} from 'react-native';
 import Animated, {
   ReduceMotion,
   useAnimatedStyle,
@@ -20,6 +25,7 @@ import {
   space4,
   space8,
   useTheme,
+  radiusPill,
 } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
@@ -39,6 +45,7 @@ import { TreeIcon } from '@ui/primitives/Icons/TreeIcon';
 import { SaplingIcon } from '@ui/primitives/Icons/SaplingIcon';
 import { EyeIcon } from '@ui/primitives/Icons/EyeIcon';
 import ShieldSheet from '@screens/History/components/ShieldSheet';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 const SIDE = 21.5;
 const TILE = 36;
@@ -47,6 +54,10 @@ const BAR_GAP = 2;
 /** A pool under 1% still shows. */
 const BAR_MIN = 4;
 const DIM = 0.42;
+/** The segments not picked, while one is, as Sync's bars. */
+const BAR_DIM = 0.35;
+/** A segment is thinner than a finger. */
+const BAR_SLOP = { top: 15, bottom: 15 };
 
 type PoolKey = 'ironwood' | 'orchard' | 'sapling' | 'transparent';
 
@@ -82,6 +93,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
     mixnetView,
   } = context;
   const { colors } = useTheme();
+  const { edges, fades } = useScrollEdges();
   const t = (key: string) => translate(key) as string;
   /** One reveal for the screen: a tap on any amount shows them all. */
   const amounts = useAmountReveal();
@@ -104,6 +116,10 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
     sendPermitNow,
   });
   const orchardResidualOnly = useOrchardResidualOnly();
+  /** The pool picked in the bar or by its card, as Sync's bars and boxes. */
+  const [focus, setFocus] = useState<PoolKey | null>(null);
+  const toggle = (key: PoolKey) =>
+    setFocus(prev => (prev === key ? null : key));
 
   const paint = {
     ironwood: { fg: colors.fgIronwood, bg: colors.bgIronwood, Icon: LogIcon },
@@ -238,6 +254,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
         noUfvkIcon={true}
       />
       <ScrollView
+        {...edges}
         testID="pools.scroll-view"
         contentContainerStyle={{
           paddingHorizontal: SIDE,
@@ -281,6 +298,8 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                   color: paint[pool.key].fg,
                 }))}
                 track={colors.bgMutedSubtle}
+                focus={focus}
+                onPick={key => toggle(key as PoolKey)}
               />
               <View
                 style={{
@@ -303,7 +322,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       style={{
                         width: 8,
                         height: 8,
-                        borderRadius: 3,
+                        borderRadius: radiusPill,
                         backgroundColor: paint[pool.key].fg,
                       }}
                     />
@@ -334,7 +353,15 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                         ? colors.fgWarning
                         : colors.fgAccent;
                 return (
-                  <Card key={pool.key} flush testID={`pools.${pool.key}`}>
+                  <Card
+                    key={pool.key}
+                    flush
+                    testID={`pools.${pool.key}`}
+                    onPress={
+                      pool.total > 0 ? () => toggle(pool.key) : undefined
+                    }
+                    edge={focus === pool.key ? fg : undefined}
+                  >
                     <View style={{ opacity: pool.total === 0 ? DIM : 1 }}>
                       <ListRow
                         leading={
@@ -374,7 +401,11 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                             variant="bodyStrong"
                             testID={`pools.${pool.key}.total`}
                             onPress={onAmount}
-                            style={transparent ? { color: fg } : undefined}
+                            style={
+                              transparent && pool.total > 0
+                                ? { color: fg }
+                                : undefined
+                            }
                           >
                             {zec(pool.total)}{' '}
                             <Text variant="bodyStrong" tone="muted">
@@ -392,6 +423,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
           </>
         )}
       </ScrollView>
+      {fades}
 
       <ShieldSheet
         ref={shieldSheetRef}
@@ -410,10 +442,12 @@ type Share = { key: string; value: number; color: string };
  * One segment per pool with funds, in its colour, eased to its new width
  * when a balance moves.
  */
-const ShareBar: React.FunctionComponent<{ shares: Share[]; track: string }> = ({
-  shares,
-  track,
-}) => {
+const ShareBar: React.FunctionComponent<{
+  shares: Share[];
+  track: string;
+  focus: string | null;
+  onPick: (key: string) => void;
+}> = ({ shares, track, focus, onPick }) => {
   const [width, setWidth] = useState<number>(0);
   const shown = shares.filter(share => share.value > 0);
   const sum = shown.reduce((acc, share) => acc + share.value, 0);
@@ -422,11 +456,12 @@ const ShareBar: React.FunctionComponent<{ shares: Share[]; track: string }> = ({
   const scale = raw.reduce((acc, w) => acc + w, 0) / (room || 1);
   return (
     <View
+      testID="pools.bar"
       accessibilityRole="image"
       onLayout={e => setWidth(e.nativeEvent.layout.width)}
       style={{
         height: BAR_H,
-        borderRadius: BAR_H / 2,
+        borderRadius: radiusPill,
         overflow: 'hidden',
         flexDirection: 'row',
         gap: BAR_GAP,
@@ -437,18 +472,24 @@ const ShareBar: React.FunctionComponent<{ shares: Share[]; track: string }> = ({
         shown.map((share, i) => (
           <Segment
             key={share.key}
+            testID={`pools.bar.${share.key}`}
             width={raw[i] / (scale || 1)}
             color={share.color}
+            dim={!!focus && focus !== share.key}
+            onPress={() => onPick(share.key)}
           />
         ))}
     </View>
   );
 };
 
-const Segment: React.FunctionComponent<{ width: number; color: string }> = ({
-  width,
-  color,
-}) => {
+const Segment: React.FunctionComponent<{
+  testID: string;
+  width: number;
+  color: string;
+  dim: boolean;
+  onPress: () => void;
+}> = ({ testID, width, color, dim, onPress }) => {
   const shown = useSharedValue(width);
   useEffect(() => {
     shown.value = withTiming(width, {
@@ -457,9 +498,27 @@ const Segment: React.FunctionComponent<{ width: number; color: string }> = ({
       reduceMotion: ReduceMotion.System,
     });
   }, [width, shown]);
-  const style = useAnimatedStyle(() => ({ width: shown.value }));
+  const fade = useSharedValue(dim ? BAR_DIM : 1);
+  useEffect(() => {
+    fade.value = withTiming(dim ? BAR_DIM : 1, {
+      duration: duration.base,
+      easing: ease.standard,
+      reduceMotion: ReduceMotion.System,
+    });
+  }, [dim, fade]);
+  const style = useAnimatedStyle(() => ({
+    width: shown.value,
+    opacity: fade.value,
+  }));
   return (
-    <Animated.View style={[{ height: BAR_H, backgroundColor: color }, style]} />
+    <Animated.View style={[{ height: BAR_H, backgroundColor: color }, style]}>
+      <RNPressable
+        testID={testID}
+        hitSlop={BAR_SLOP}
+        onPress={onPress}
+        style={{ flex: 1 }}
+      />
+    </Animated.View>
   );
 };
 

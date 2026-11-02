@@ -4,28 +4,27 @@
 
 import 'react-native';
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { act, render } from '@testing-library/react-native';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
 
 import AddTagModalHost from '@app/LoadedApp/components/AddTagModalHost';
+import { showAddTag } from '@app/services/showAddTag';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 
-const host = (own: boolean) =>
-  render(
+const host = (own: boolean) => {
+  const screen = render(
     <ContextAppLoadedProvider
       value={{ ...defaultAppContextLoaded, translate: mockTranslate }}
     >
-      <AddTagModalHost
-        ref={React.createRef()}
-        target={{ address: 'u1someone', own, swapChain: 'ZEC' }}
-        setAddressBook={() => {}}
-        translate={mockTranslate}
-      />
+      <AddTagModalHost />
     </ContextAppLoadedProvider>,
   );
+  act(() => showAddTag({ address: 'u1someone', own, swapChain: 'ZEC' }));
+  return screen;
+};
 
 describe('AddTagModalHost', () => {
   test('Tests that the host opens the own tag sheet when the address is the wallet’s own', () => {

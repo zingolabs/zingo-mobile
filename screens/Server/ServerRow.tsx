@@ -1,6 +1,7 @@
+/* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useState } from 'react';
-import { LayoutChangeEvent, Pressable, View } from 'react-native';
+import { LayoutChangeEvent, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -8,13 +9,25 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { space20, useTheme } from '@app/theme';
+import {
+  space20,
+  useTheme,
+  radiusMd,
+  radiusPill,
+  rowMinHeight,
+  space8,
+  space12,
+  space16,
+  iconSizeMd,
+} from '@app/theme';
 import { ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import BoldText from '@ui/primitives/BoldText';
-import RegText from '@ui/primitives/RegText';
+import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import { ChevronLeft, ChevronRight } from '@ui/primitives/Icons/Chevron';
 import Radio from '@ui/primitives/Radio';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 
 /** The side margin of the cards, which the Done button lines up with. */
 export const CARD_SIDE = space20;
@@ -40,18 +53,18 @@ export const Latency: React.FC<LatencyProps> = ({ ms, notResponding }) => {
       ? colors.fgAccent
       : colors.fgMuted;
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: space8 }}>
       <View
-        style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: dot }}
-      />
-      <RegText
         style={{
-          fontSize: 12,
-          color: bad ? colors.fgWarning : colors.fgMuted,
+          width: 6,
+          height: 6,
+          borderRadius: radiusPill,
+          backgroundColor: dot,
         }}
-      >
+      />
+      <Text variant="caption" tone={bad ? 'warning' : 'muted'}>
         {bad ? notResponding : `${ms} ms`}
-      </RegText>
+      </Text>
     </View>
   );
 };
@@ -103,42 +116,36 @@ const ServerRow: React.FC<ServerRowProps> = ({
   return (
     <Animated.View style={shakeStyle}>
       <Pressable
+        kind="row"
         testID={testID}
         onPress={onPress}
         disabled={disabled}
         accessibilityRole="radio"
         accessibilityState={{ selected, disabled }}
-        style={({ pressed }) => ({
-          minHeight: 55,
+        style={{
+          minHeight: rowMinHeight,
           flexDirection: 'row',
           alignItems: 'center',
-          gap: 13,
-          paddingVertical: 10,
-          paddingLeft: 14.5,
-          paddingRight: 16,
+          gap: space12,
+          paddingVertical: space8,
+          paddingHorizontal: space16,
           borderTopWidth: first ? 0 : 1,
           borderTopColor: colors.borderSubtle,
-          opacity: pressed ? 0.7 : 1,
-        })}
+        }}
       >
         <Radio selected={selected} />
         <View style={{ flex: 1, minWidth: 0 }}>
-          <RegText
-            numberOfLines={1}
-            style={{ fontSize: 15, lineHeight: 19, fontWeight: '600' }}
-          >
+          <Text variant="bodyStrong" numberOfLines={1}>
             {title}
-          </RegText>
+          </Text>
           {!!sub && (
-            <RegText
-              style={{ fontSize: 12, lineHeight: 16, color: colors.fgMuted }}
-            >
+            <Text variant="bodySmall" tone="muted">
               {sub}
-            </RegText>
+            </Text>
           )}
         </View>
         {right}
-        {chevron && <ChevronRight size={16} color={colors.fgMuted} />}
+        {chevron && <ChevronRight size={iconSizeMd} color={colors.fgMuted} />}
       </Pressable>
     </Animated.View>
   );
@@ -152,7 +159,7 @@ export const RowCard: React.FC<{ children: React.ReactNode }> = ({
     <View
       style={{
         marginHorizontal: CARD_SIDE,
-        borderRadius: 14,
+        borderRadius: radiusMd,
         backgroundColor: colors.bgSurface,
         borderWidth: 1,
         borderColor: colors.bottomSheetBorder,
@@ -173,8 +180,9 @@ export type Placement = 'screen' | 'belowHeader';
 
 /**
  * How far to raise a server screen's content. The prototype's fractions of
- * the screen height leave room for the top bar; under the shared header that
- * room is already taken, so the first block moves up to sit under the title.
+ * the screen height leave room for the top bar; under the shared header,
+ * which draws the title and back itself, the first block moves up to sit
+ * just under that title.
  */
 export const liftFor = (
   placement: Placement,
@@ -182,7 +190,7 @@ export const liftFor = (
   height: number,
 ): number =>
   placement === 'belowHeader'
-    ? Math.max(0, firstTop * height - (TITLE_TOP + TITLE_H + BELOW_TITLE))
+    ? Math.max(0, firstTop * height - BELOW_TITLE)
     : 0;
 
 export const useLift = (placement: Placement, firstTop: number) => {
@@ -204,12 +212,13 @@ export const ScreenHeader: React.FC<{
   return (
     <>
       <Pressable
+        kind="icon"
         testID={testID}
         onPress={onBack}
         disabled={disabled}
         hitSlop={14}
         accessibilityRole="button"
-        style={({ pressed }) => ({
+        style={{
           position: 'absolute',
           left: 17,
           top: TITLE_TOP,
@@ -219,8 +228,7 @@ export const ScreenHeader: React.FC<{
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 3,
-          backgroundColor: pressed ? colors.bgSurface : 'transparent',
-        })}
+        }}
       >
         <ChevronLeft size={20} color={colors.fgAccent} />
       </Pressable>
@@ -246,23 +254,26 @@ export const DoneButton: React.FC<{
   onPress: () => void;
   disabled: boolean;
   testID: string;
-}> = ({ title, onPress, disabled, testID }) => (
-  <View
-    style={{
-      position: 'absolute',
-      bottom: 44,
-      left: CARD_SIDE,
-      right: CARD_SIDE,
-    }}
-  >
-    <Button
-      testID={testID}
-      variant="primary"
-      title={title}
-      onPress={onPress}
-      disabled={disabled}
-    />
-  </View>
-);
+}> = ({ title, onPress, disabled, testID }) => {
+  const bottomPad = useBottomActionPad();
+  return (
+    <View
+      style={{
+        position: 'absolute',
+        bottom: bottomPad,
+        left: CARD_SIDE,
+        right: CARD_SIDE,
+      }}
+    >
+      <Button
+        testID={testID}
+        variant="primary"
+        title={title}
+        onPress={onPress}
+        disabled={disabled}
+      />
+    </View>
+  );
+};
 
 export default ServerRow;

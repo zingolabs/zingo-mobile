@@ -6,6 +6,21 @@ import type { SwapRecordType } from '@app/swap';
 
 type Translate = (key: string) => string;
 
+/**
+ * Where a leg sits among the transfers of its transaction with its kind. A
+ * sale's shielded memo deposit pays the vault and sends the memo in a 0 ZEC
+ * note in the same transaction: two legs, each with its own data, told apart
+ * by this.
+ */
+export function legSlot(
+  legs: ValueTransferType[],
+  leg: ValueTransferType,
+): number {
+  return legs
+    .filter(l => l.txid === leg.txid && l.kind === leg.kind)
+    .indexOf(leg);
+}
+
 /** The Zcash transactions a swap made in this wallet, oldest first. */
 export function legsOf(
   records: SwapRecordType[],
@@ -50,7 +65,7 @@ export function legName(
   );
 }
 
-/** One line on what the leg's address is, and whether to warn off sending to it. */
+/** One line on what the leg's address is (none for the ZEC the swap brought in), and whether to warn off sending to it. */
 export function legRole(
   leg: ValueTransferType,
   record: SwapRecordType,
@@ -74,5 +89,5 @@ export function legRole(
       warn: false,
     };
   }
-  return { note: t('swap.leg-received-note'), warn: false };
+  return { note: '', warn: false };
 }

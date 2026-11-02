@@ -3,6 +3,7 @@ import type {
   CompositeScreenProps,
   NavigatorScreenParams,
 } from '@react-navigation/native';
+import type { SwapPrefillType } from '@app/swap/types/SwapPrefillType';
 import type {
   NativeStackNavigationProp,
   NativeStackScreenProps,
@@ -58,7 +59,7 @@ export type HomeTabParamList = {
   [Route.History]: undefined;
   [Route.Send]: undefined;
   [Route.Receive]: undefined;
-  [Route.Swap]: undefined;
+  [Route.Swap]: { prefill?: SwapPrefillType } | undefined;
 };
 
 // What the loading section hands the wallet section when a wallet opens.
@@ -101,7 +102,7 @@ export type AppDrawerParamList = {
   [Route.History]: undefined;
   [Route.Send]: undefined;
   [Route.Receive]: undefined;
-  [Route.Swap]: undefined;
+  [Route.Swap]: { prefill?: SwapPrefillType } | undefined;
   [Route.Messages]: undefined;
   [Route.Settings]: undefined;
   [Route.Server]: undefined;
@@ -205,6 +206,8 @@ export type SwapTransactionNavigationState = {
   recordId: string;
   txid: string;
   kind: ValueTransferKindEnum;
+  /** Which of the transaction's transfers of that kind (`legSlot`). */
+  slot: number;
 };
 
 // A swap by its local record id; the screen reads the live record.

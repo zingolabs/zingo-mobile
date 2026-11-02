@@ -147,3 +147,36 @@ seedbackup.birthday: 3512840`,
     'walletseed.change-warning-vo',
   );
 });
+
+test('Tests that leaving without the back arrow cancels a pending server change when the swipe removes the screen.', () => {
+  const cancelPendingServer = jest.fn(async () => {});
+  const listeners: Record<string, () => void> = {};
+  (mockNavigation.addListener as jest.Mock).mockImplementation(
+    (event: string, cb: () => void) => {
+      listeners[event] = cb;
+      return () => {};
+    },
+  );
+  render(
+    <ContextAppLoadedProvider
+      value={{
+        ...defaultAppContextLoaded,
+        translate: (k: string) => k,
+        biometrics: false,
+        cancelPendingServer,
+      }}
+    >
+      <WalletSeed
+        navigation={mockNavigation}
+        route={{
+          key: 'k',
+          name: Route.WalletSeed,
+          params: { action: 'server' },
+        }}
+      />
+    </ContextAppLoadedProvider>,
+  );
+  listeners.beforeRemove();
+  expect(cancelPendingServer).toHaveBeenCalledTimes(1);
+  (mockNavigation.addListener as jest.Mock).mockReset();
+});

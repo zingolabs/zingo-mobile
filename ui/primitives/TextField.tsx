@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
-import { Platform, Pressable, TextInput, View } from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
+import { Platform, TextInput, View } from 'react-native';
 import {
   fieldMinHeight,
   fontScaleBody,
@@ -18,6 +19,7 @@ import Text from './Text';
 import { fieldBorder, FieldValidity } from './fieldBorder';
 import { Icon } from './Icons/Icon';
 import { XIcon } from './Icons/XIcon';
+import { singleLineInput } from '@ui/primitives/singleLineInput';
 
 /** An action inside a field: 36 on screen, its tap area grown to 44. */
 const ACTION = 36;
@@ -44,6 +46,7 @@ export const FieldAction = React.forwardRef<
   const { colors } = useTheme();
   return (
     <Pressable
+      kind="icon"
       ref={ref}
       testID={testID}
       accessibilityRole="button"
@@ -94,6 +97,8 @@ type TextFieldProps = {
   helper?: string;
   /** What to fix; turns the edge red. */
   error?: string;
+  /** The invalid edge alone, for a field whose caller shows the error itself. */
+  invalid?: boolean;
   /** Green edge once the value is known to be good. */
   valid?: boolean;
   disabled?: boolean;
@@ -116,6 +121,18 @@ type TextFieldProps = {
   trailing?: React.ReactNode;
   /** Shown in the box instead of the input: a picked contact's token. */
   replacement?: React.ReactNode;
+  /** Fixed text before the value, in fgMuted ("https://"). */
+  prefix?: string;
+  /** After the value, inside the box: a ":" and a port input. */
+  suffix?: React.ReactNode;
+  /** Not editable for a moment (a test running), without the disabled look. */
+  readOnly?: boolean;
+  /** Focus held by an input in the suffix, so the edge lights for it too. */
+  active?: boolean;
+  selectTextOnFocus?: boolean;
+  onSubmitEditing?: () => void;
+  returnKeyType?: React.ComponentProps<typeof TextInput>['returnKeyType'];
+  textContentType?: React.ComponentProps<typeof TextInput>['textContentType'];
   /** A line of its own under the box (a kind, a warning); `error` and `helper` replace it. */
   footer?: React.ReactNode;
   onFocus?: () => void;
@@ -142,6 +159,7 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
   placeholder,
   helper,
   error,
+  invalid = false,
   valid = false,
   disabled = false,
   mono = false,
@@ -156,6 +174,14 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
   clearable = false,
   clearLabel,
   replacement,
+  prefix,
+  suffix,
+  active = false,
+  readOnly = false,
+  selectTextOnFocus,
+  onSubmitEditing,
+  returnKeyType,
+  textContentType,
   footer,
   onFocus,
   onBlur,
@@ -173,8 +199,14 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
   const inset = useInsetFill();
   const [focused, setFocused] = useState(false);
   const validity: FieldValidity =
-    error !== undefined ? 'invalid' : valid ? 'valid' : 'unknown';
+    error !== undefined || invalid ? 'invalid' : valid ? 'valid' : 'unknown';
   const valueStyle = mono ? textVariants.address : textVariants.bodyStrong;
+  /**
+   * The placeholder is an instruction, not a value: the body variant,
+   * regular, never mono, on one line. A TextInput draws its placeholder in
+   * its own font, so the empty field takes the body's.
+   */
+  const shown = value ? valueStyle : textVariants.body;
 
   return (
     <View style={{ gap: space8, opacity: disabled ? 0.5 : 1 }}>
@@ -200,10 +232,15 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
           backgroundColor: inset,
           borderRadius: radiusMd,
           borderWidth: 1,
-          borderColor: fieldBorder(colors, focused, validity),
+          borderColor: fieldBorder(colors, focused || active, validity),
           paddingLeft: space12,
         }}
       >
+        {!!prefix && !replacement && (
+          <Text variant="body" tone="muted">
+            {prefix}
+          </Text>
+        )}
         {replacement ?? (
           <TextInput
             ref={inputRef}
@@ -217,12 +254,17 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
             autoCapitalize={autoCapitalize}
             autoCorrect={autoCorrect}
             spellCheck={autoCorrect}
+            selectTextOnFocus={selectTextOnFocus}
+            onSubmitEditing={onSubmitEditing}
+            returnKeyType={returnKeyType}
+            textContentType={textContentType}
             value={value}
             onChangeText={onChangeText}
             placeholder={placeholder}
             placeholderTextColor={colors.fgMuted}
-            editable={!disabled}
+            editable={!disabled && !readOnly}
             multiline={multiline}
+            numberOfLines={multiline ? undefined : 1}
             onFocus={() => {
               setFocused(true);
               onFocus?.();
@@ -235,17 +277,21 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
             style={{
               flex: 1,
               paddingVertical: space8,
+              ...(multiline ? {} : singleLineInput()),
               ...(multiline && maxLines
                 ? { maxHeight: valueStyle.lineHeight * maxLines + space8 * 2 }
                 : {}),
-              paddingRight: TrailingIcon || trailing || clearable ? 0 : space12,
+              minWidth: 0,
+              paddingRight:
+                TrailingIcon || trailing || clearable || suffix ? 0 : space12,
               color: colors.fgDefault,
-              fontSize: valueStyle.fontSize,
-              fontWeight: valueStyle.fontWeight,
-              ...(mono ? { fontFamily: monoFamily } : {}),
+              fontSize: shown.fontSize,
+              fontWeight: shown.fontWeight,
+              ...(mono && value ? { fontFamily: monoFamily } : {}),
             }}
           />
         )}
+        {suffix}
         {(!!TrailingIcon ||
           (clearable && !!value && !disabled) ||
           !!trailing) && (

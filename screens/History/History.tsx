@@ -13,15 +13,18 @@ import {
   RefreshControl,
   ActivityIndicator,
   Dimensions,
-  Pressable,
   StyleSheet,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
+import { duration } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import {
   useTheme,
   slopFor,
   radiusMd,
+  radiusPill,
+  iconSizeMd,
   space4,
   space8,
   space16,
@@ -57,6 +60,8 @@ import ShieldSheet from './components/ShieldSheet';
 import { useShieldFunds } from '@app/hooks/useShieldFunds';
 import { useIronwoodNoticeHide } from '@app/hooks/useIronwoodNoticeHide';
 import ViewOnlyNotice from './components/ViewOnlyNotice';
+import { followsHere } from '@screens/Computing/sendProgress';
+import { transferSubject } from '@screens/Send/sendSubject';
 import NoticeStack, { Notice, NOTICE_RADIUS } from '@ui/widgets/NoticeStack';
 import { PriceCard } from '@ui/widgets/Header/components/PriceRow';
 import { fiatQuote } from '@app/price/fiatQuote';
@@ -90,9 +95,6 @@ import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { onTabScrollY } from '@app/navigation/tabBarScroll';
 import { PANEL_TOP } from '@ui/widgets/Header/Header';
 import { ChevronUp } from '@ui/primitives/Icons/Chevron';
-
-/** How long a finished backup keeps its green pill before the card leaves. */
-const SEED_LEAVE_MS = 900;
 
 const ViewTypes = {
   MONTH: 0,
@@ -130,6 +132,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     mixnetView,
     sendPermitNow,
     setScrollToBottom,
+    addressBook,
   } = context;
   const shieldSheetRef = useRef<BottomSheetModal>(null);
   const { showShieldButton, shieldingFee, shieldNow } = useShieldFunds({
@@ -231,7 +234,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     }
     seedWasPending.current = false;
     setSeedLeaving(true);
-    const timer = setTimeout(() => setSeedLeaving(false), SEED_LEAVE_MS);
+    const timer = setTimeout(() => setSeedLeaving(false), duration.noticeLeave);
     return () => clearTimeout(timer);
   }, [seedBackedUp, focused]);
   const showSeedNotice = !readOnly && (!seedBackedUp || seedLeaving);
@@ -726,6 +729,15 @@ const History: React.FunctionComponent<HistoryProps> = () => {
 
   const setValueTransferDetailModalShow = useCallback(
     (_index: number, vt: ValueTransferType) => {
+      // A send or a shield still confirming reopens where it is on its way.
+      if (followsHere(vt)) {
+        navigation.navigate(Route.Computing, {
+          phase: 'created',
+          txids: [vt.txid],
+          subject: transferSubject(vt, addressBook, translate),
+        });
+        return;
+      }
       const targetIndex = valueTransfersSliced.indexOf(vt);
       const totalLength =
         valueTransfersFiltered !== null
@@ -738,7 +750,13 @@ const History: React.FunctionComponent<HistoryProps> = () => {
         totalLength,
       });
     },
-    [navigation, valueTransfersSliced, valueTransfersFiltered],
+    [
+      navigation,
+      valueTransfersSliced,
+      valueTransfersFiltered,
+      addressBook,
+      translate,
+    ],
   );
 
   /** Transactions that turned up while History is open, lit for a moment. */
@@ -753,7 +771,9 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       case 'month':
         return <MonthHeader label={item.label} />;
       case 'leg':
-        return <LegLine vt={item.vt} recordId={item.recordId} />;
+        return (
+          <LegLine vt={item.vt} recordId={item.recordId} slot={item.slot} />
+        );
       case 'swap':
         return item.record ? (
           <SwapLine
@@ -811,7 +831,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                 backgroundColor: colors.fgAccent,
                 width: 8,
                 height: 8,
-                borderRadius: 4,
+                borderRadius: radiusPill,
                 marginLeft: -3,
                 marginTop: -8,
                 borderWidth: 2,
@@ -940,6 +960,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                       </Text>
                     </Text>
                     <Pressable
+                      kind="link"
                       testID="history.filter.clear"
                       accessibilityRole="button"
                       hitSlop={space8}
@@ -1052,10 +1073,11 @@ const History: React.FunctionComponent<HistoryProps> = () => {
             platforms. */}
         {!isAtTop && (
           <Pressable
+            kind="button"
             hitSlop={slopFor(36)}
             onPress={handleScrollToTop}
             disabled={isScrollingToTop}
-            style={({ pressed }) => ({
+            style={{
               position: 'absolute',
               // Raised so the button clears the bottom tab bar on every
               // platform — matches the offset used by AddressList. The
@@ -1067,22 +1089,20 @@ const History: React.FunctionComponent<HistoryProps> = () => {
               alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: colors.bgSurface,
-              borderRadius: 50,
-              transform: [{ scale: pressed ? 0.9 : 1 }],
+              borderRadius: radiusPill,
               opacity: isScrollingToTop ? 0.5 : 1,
               borderWidth: 1,
               borderColor: colors.bottomSheetBorder,
-            })}
+            }}
           >
             <RingBorder size={36} />
-            <ChevronUp size={16} color={colors.fgMuted} />
+            <ChevronUp size={iconSizeMd} color={colors.fgMuted} />
           </Pressable>
         )}
       </Animated.View>
       <AppSheetModal
         ref={bottomSheetRef}
         header={filtersXHeader}
-        contentStyle={{ paddingBottom: 30 }}
         onDismiss={() => setShowFilters(false)}
       >
         {showFilters && (

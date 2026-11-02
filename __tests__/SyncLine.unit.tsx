@@ -130,4 +130,36 @@ describe('SyncLine', () => {
       /header\.sync-mobile-data/,
     );
   });
+
+  test('Tests that the line shows only its warning when it falls behind on mobile data', () => {
+    act(() => {
+      noteHeights(100, 100, Date.now() - 8 * MIN);
+      noteHeights(100, 104, Date.now());
+    });
+    const screen = line({
+      netInfo: { ...online, type: NetInfoStateType.cellular },
+    });
+    const text = screen.getByTestId('header.syncline');
+    expect(text).toHaveTextContent(/header.sync-behind/);
+    expect(text).not.toHaveTextContent(/header.sync-mobile-data/);
+  });
+
+  test('Tests that the line shows mobile data and says it aloud when it is synced on mobile data', () => {
+    const screen = line({
+      netInfo: { ...online, type: NetInfoStateType.cellular },
+    });
+    const text = screen.getByTestId('header.syncline');
+    expect(text).toHaveTextContent(/header.sync-mobile-data/);
+    expect(text.props.accessibilityLabel).toContain('header.sync-mobile-data');
+  });
+
+  test('Tests that the line shows only its warning when it is offline on mobile data', () => {
+    const screen = line({
+      server: offlineServer(ChainNameEnum.mainChainName),
+      netInfo: { ...online, type: NetInfoStateType.cellular },
+    });
+    expect(screen.getByTestId('header.syncline')).not.toHaveTextContent(
+      /header.sync-mobile-data/,
+    );
+  });
 });

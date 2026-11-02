@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { BannerPlainContext } from '@ui/widgets/Banner';
-import { Pressable, View } from 'react-native';
+import { Pressable as RNPressable, View } from 'react-native';
 import Text from '@ui/primitives/Text';
 import Animated, {
   Keyframe,
@@ -13,7 +13,8 @@ import Animated, {
   WithTimingConfig,
 } from 'react-native-reanimated';
 
-import { useTheme, radiusMd, space20, iconSizeSm } from '@app/theme';
+import { useTheme, radiusMd, space20, iconSizeSm, slopFor } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { duration, ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { ChevronDown } from '@ui/primitives/Icons/Chevron';
@@ -43,11 +44,11 @@ const RADIUS = NOTICE_RADIUS;
 // As the wallet opens, the stack drops in 8 pt once its cards are measured.
 const DROP_PT = 8;
 const drop: WithTimingConfig = {
-  duration: 420,
+  duration: duration.sheet,
   easing: ease.out,
   reduceMotion: ReduceMotion.System,
 };
-const DROP_DELAY_MS = 200;
+const DROP_DELAY_MS = duration.base;
 
 const move: WithTimingConfig = {
   duration: duration.sheet,
@@ -143,6 +144,8 @@ const Card: React.FunctionComponent<{
           ? to(slot.height, move)
           : slot.height
         : 'auto',
+  }));
+  const look = useAnimatedStyle(() => ({
     opacity: to(slot.opacity, fade),
     transform: [{ scale: to(slot.scale, move) }],
   }));
@@ -168,30 +171,38 @@ const Card: React.FunctionComponent<{
         frame,
       ]}
     >
-      <Animated.View style={content}>
-        <View onLayout={e => onMeasure(e.nativeEvent.layout.height)}>
-          <BannerPlainContext.Provider value={true}>
-            {children}
-          </BannerPlainContext.Provider>
-        </View>
-      </Animated.View>
       <Animated.View
-        pointerEvents="none"
+        pointerEvents="box-none"
         style={[
-          {
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-            borderRadius: RADIUS,
-            borderWidth: 1,
-            borderColor: colors.bottomSheetBorder,
-            backgroundColor: colors.bgSurface,
-          },
-          deck,
+          { flexGrow: 1, overflow: 'hidden', borderRadius: RADIUS },
+          look,
         ]}
-      />
+      >
+        <Animated.View style={content}>
+          <View onLayout={e => onMeasure(e.nativeEvent.layout.height)}>
+            <BannerPlainContext.Provider value={true}>
+              {children}
+            </BannerPlainContext.Provider>
+          </View>
+        </Animated.View>
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            {
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              borderRadius: RADIUS,
+              borderWidth: 1,
+              borderColor: colors.bottomSheetBorder,
+              backgroundColor: colors.bgSurface,
+            },
+            deck,
+          ]}
+        />
+      </Animated.View>
     </Animated.View>
   );
 };
@@ -287,7 +298,7 @@ const NoticeStack: React.FunctionComponent<NoticeStackProps> = ({
           </Card>
         ))}
         {more > 0 && !expanded && (
-          <Pressable
+          <RNPressable
             testID="noticestack.peek"
             accessible={false}
             onPress={() => setOpen(true)}
@@ -315,10 +326,11 @@ const NoticeStack: React.FunctionComponent<NoticeStackProps> = ({
             ]}
           >
             <Pressable
+              kind="link"
               testID="noticestack.toggle"
               accessibilityRole="button"
               accessibilityState={{ expanded }}
-              hitSlop={8}
+              hitSlop={slopFor(LABEL_H - 4)}
               onPress={() => setOpen(o => !o)}
               style={{
                 flexDirection: 'row',

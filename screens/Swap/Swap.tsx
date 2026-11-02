@@ -1,15 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useMemo, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { maxBy } from 'lodash';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import TitleBar from '@ui/widgets/TitleBar';
-import {
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { Platform, ScrollView, StyleSheet, View } from 'react-native';
 import Animated from 'react-native-reanimated';
+import Pressable from '@ui/primitives/Pressable';
+import { duration } from '@app/theme/motion';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import {
   space12,
@@ -17,6 +14,7 @@ import {
   space8,
   space20,
   useTheme,
+  iconSizeMd,
   iconSizeSm,
   radiusPill,
 } from '@app/theme';
@@ -25,14 +23,17 @@ import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import { HomeTabScreenProps } from '@app/types';
 import { ContextAppLoaded, useSwapRecords, useSwapService } from '@app/context';
 import {
+  awaitsDeposit,
   canonicalChainAddress,
   formatAmountForDisplay,
+  isRefunding,
   isTerminalStatus,
+  nearRefusesSmallRefunds,
   providerShortLabel,
   rateLimitedNotice,
   renderSwapText,
 } from '@app/swap';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
+import type { SwapRecordType } from '@app/swap';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
 import {
   sendGateOpen,
@@ -45,6 +46,9 @@ import { useNavigation } from '@react-navigation/native';
 import { useResult } from '@app/navigation/results';
 import { WalletNavigation } from '@app/types';
 import { swapScreenFor } from './swapRoute';
+import { pendingSwapLabel } from './pendingSwapLabel';
+import { useNearSmallWarningHide } from '@app/hooks/useNearSmallWarningHide';
+import DontShowAgain from './components/DontShowAgain';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 import Utils from '@app/utils';
 import {
@@ -66,8 +70,13 @@ import { SlidersIcon } from '@ui/primitives/Icons/SlidersIcon';
 import { HistoryIcon } from '@ui/primitives/Icons/HistoryIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
+import SwapKitLogo from './components/SwapKitLogo';
 import { SheetPresence } from '@ui/primitives/SheetPresence';
-import { ChevronDown, ChevronUp } from '@ui/primitives/Icons/Chevron';
+import {
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
+} from '@ui/primitives/Icons/Chevron';
 import {
   DEFAULT_SLIPPAGE_BPS,
   QUOTE_REFRESH_MS,
@@ -91,7 +100,7 @@ type SwapProps = HomeTabScreenProps<'Swap'>;
  * always one side. The sheet sits fixed under the header's icons; the review
  * and everything after it are screens of their own.
  */
-const Swap: React.FunctionComponent<SwapProps> = () => {
+const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -112,6 +121,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
   const navigation = useNavigation<WalletNavigation>();
   const swapService = useSwapService();
   const records = useSwapRecords();
+  const nearWarning = useNearSmallWarningHide();
   const sheetSlideStyle = useOptionsPanelSheetSlide();
   useDismissSheetsOnBlur();
 
@@ -130,6 +140,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     zecChain: walletChainName,
     mixnetBlocked: !sendGateOpen(mixnetView),
     paused: sheetsOpen > 0,
+    prefill: route.params?.prefill,
   });
 
   const [containerH, setContainerH] = useState<number>(0);
@@ -148,28 +159,55 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     [containerH],
   );
 
-  // The amount can be typed in USD; the swap is always quoted and sent in
-  // the coin. Selling ZEC, the price is the wallet's ZEC price. Buying, it is
-  // the coin's USD price from SwapKit, which only comes with a quote: the
-  // last one seen for each coin is kept, so USD is offered from the first
-  // quote on, and a requote does not rewrite what was typed.
+  // The amount can be typed in USD from the start; the swap is always quoted
+  // and sent in the coin. Selling ZEC, the price is the wallet's ZEC price.
+  // Buying, it is the coin's USD price: asked of SwapKit on its own as soon
+  // as the coin is picked, else the last quote's. USD typed before any price
+  // waits, and turns into the coin amount (and so a quote) once one comes.
   const quote = fiatQuote(zecPrice, server, walletChainName);
+  const coinId = form.selectedToken
+    ? tokenToSwapAsset(form.selectedToken).swapKitId
+    : undefined;
   const sellCoinPrice = useCoinPrice(
     form.quoteContext?.quoteInput.sellAsset.swapKitId,
     form.quoteContext?.fiatValueBasis.sellUsdUnitPrice ?? 0,
-    form.selectedToken
-      ? tokenToSwapAsset(form.selectedToken).swapKitId
-      : undefined,
+    coinId,
   );
+  const [askedPrices, setAskedPrices] = useState<Record<string, number>>({});
+  useEffect(() => {
+    if (
+      form.isOutbound ||
+      !coinId ||
+      !swapService ||
+      askedPrices[coinId] !== undefined
+    ) {
+      return;
+    }
+    let live = true;
+    swapService
+      .usdPrice(coinId)
+      .then(found => {
+        if (live) {
+          setAskedPrices(known => ({ ...known, [coinId]: found ?? 0 }));
+        }
+      })
+      .catch(() => {
+        if (live) {
+          setAskedPrices(known => ({ ...known, [coinId]: 0 }));
+        }
+      });
+    return () => {
+      live = false;
+    };
+  }, [form.isOutbound, coinId, swapService, askedPrices]);
   const price = form.isOutbound
     ? quote.kind === 'quote' && info.currencyName === GlobalConst.zecSwapChain
       ? quote.price
       : 0
-    : sellCoinPrice;
-  const usdAvailable = price > 0;
+    : sellCoinPrice || (coinId ? (askedPrices[coinId] ?? 0) : 0);
   const [unit, setUnit] = useState<'coin' | 'usd'>('coin');
   const [usdText, setUsdText] = useState<string>('');
-  const usdMode = usdAvailable && unit === 'usd';
+  const usdMode = unit === 'usd';
   /** What the amount is typed in, when not in USD. */
   const sellSymbol = form.isOutbound
     ? info.currencyName
@@ -177,23 +215,40 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
   const onChangeAmountText = (text: string) => {
     if (usdMode) {
       setUsdText(text);
-      form.setAmount(toZecText(text, price));
+      // Without a price the coin amount waits; the effect below fills it.
+      form.setAmount(price > 0 ? toZecText(text, price) : '');
     } else {
       form.setAmount(text);
     }
   };
+  /** USD typed before the price was known becomes the coin amount once it is. */
+  useEffect(() => {
+    if (usdMode && price > 0 && usdText && !form.amount) {
+      form.setAmount(toZecText(usdText, price));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [price]);
   const toggleUnit = () => {
     if (usdMode) {
       setUnit('coin');
     } else {
-      setUsdText(toFiatText(form.amount, price));
+      setUsdText(price > 0 ? toFiatText(form.amount, price) : '');
+      if (price <= 0) {
+        form.setAmount('');
+      }
       setUnit('usd');
     }
   };
-  const usdOf = (zecText: string): string => {
-    const text = toFiatText(zecText, price);
-    return text ? `≈ $${text}` : '';
-  };
+  /** The line under the field: the other unit, there from the start. */
+  const altText = usdMode
+    ? price > 0
+      ? `≈ ${formatAmount(parseAmountInput(form.amount))} ${sellSymbol}`
+      : `≈ … ${sellSymbol}`
+    : price > 0
+      ? `≈ $${toFiatText(form.amount || '0', price) || Utils.parseNumberFloatToStringLocale(0, 2)}`
+      : form.amount
+        ? '≈ $…'
+        : `≈ $${Utils.parseNumberFloatToStringLocale(0, 2)}`;
 
   const counterpartyTicker =
     form.selectedToken?.ticker || form.selectedToken?.symbol || '';
@@ -212,11 +267,25 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
       ? `≈ ${formatUsd(parseFloat(form.chosenRoute.expectedReceiveAmount) * receiveUsdUnitPrice)}`
       : '';
 
-  const pending = records.find(r => !isTerminalStatus(r.status));
-  const pendingState =
-    pending?.status === SwapStatusEnum.AwaitingExternalDeposit
-      ? (translate('swap.pending-waiting') as string)
-      : (translate('swap.pending-swapping') as string);
+  // The newest swap in progress. A late payment on its way back is not one;
+  // it has no card.
+  const pending = maxBy(
+    records.filter(r => !isTerminalStatus(r.status) && !isRefunding(r)),
+    r => r.createdAtMs,
+  );
+  // The card turns to its warning half an hour after the payment address.
+  const [nowMs, setNowMs] = useState<number>(() => Date.now());
+  const awaiting = !!pending && awaitsDeposit(pending);
+  useEffect(() => {
+    if (!awaiting) {
+      return;
+    }
+    const timer = setInterval(() => setNowMs(Date.now()), 30_000);
+    return () => clearInterval(timer);
+  }, [awaiting]);
+  const pendingState = pending
+    ? pendingSwapLabel(pending, nowMs, key => translate(key) as string)
+    : null;
 
   /** The address book's contact for the address in the field, on its chain. */
   const savedContact = addressBook.find(
@@ -255,7 +324,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     form.isOutbound &&
     mixnetView.kind === 'transport' &&
     mixnetView.sendBlocked;
-  const ctaEnabled = form.cta === 'ready' || form.cta === 'insufficient';
+  const ctaEnabled = form.cta === 'ready';
   // The review answers under one request: cancelled, done, or a refusal
   // with its provider and reason, which takes the route off the list.
   useResult('swap.contact', address => form.setActiveAddress(address));
@@ -271,13 +340,9 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
     }
     form.cancelReview();
   });
-  const openRecord = (recordId: string, status: SwapStatusEnum) =>
-    navigation.navigate(swapScreenFor(status), { recordId });
+  const openRecord = (record: SwapRecordType) =>
+    navigation.navigate(swapScreenFor(record), { recordId: record.recordId });
   const onContinue = () => {
-    if (form.cta === 'insufficient') {
-      insufficientSheetRef.current?.present();
-      return;
-    }
     const proceed = () => {
       const review = form.review();
       if (review) {
@@ -294,6 +359,46 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
         buttons: [
           { text: translate('swap.close') as string, style: 'cancel' },
           { text: translate('swap.cta-ready') as string, onPress: proceed },
+        ],
+      });
+      return;
+    }
+    // Buying ZEC through NEAR under its no-refunds line: the warning comes
+    // first, once, or until the user asks not to see it again.
+    if (
+      !nearWarning.hidden &&
+      nearRefusesSmallRefunds({
+        provider: form.chosenRoute?.provider,
+        direction: form.direction,
+        sellUsd:
+          form.amountNumber *
+          (form.quoteContext?.fiatValueBasis.sellUsdUnitPrice ?? 0),
+      })
+    ) {
+      const dontShow = { current: false };
+      showConfirm({
+        title: translate('swap.near-small-title') as string,
+        message: translate('swap.near-small-body') as string,
+        content: (
+          <DontShowAgain
+            testID="swap.near-small.dont-show"
+            label={translate('swap.dont-show-again') as string}
+            onChange={checked => {
+              dontShow.current = checked;
+            }}
+          />
+        ),
+        buttons: [
+          {
+            text: translate('swap.cta-ready') as string,
+            onPress: () => {
+              if (dontShow.current) {
+                nearWarning.setHidden(true);
+              }
+              proceed();
+            },
+          },
+          { text: translate('swap.cancel') as string, style: 'cancel' },
         ],
       });
       return;
@@ -359,6 +464,7 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
   return (
     <SheetPresence.Provider value={sheetPresence}>
       <View
+        testID="swap.container"
         accessible={false}
         style={{ flex: 1 }}
         onLayout={e => setContainerH(e.nativeEvent.layout.height)}
@@ -379,507 +485,564 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
           pointerEvents="box-none"
           style={[StyleSheet.absoluteFill, sheetSlideStyle]}
         >
-          <AppSheet
-            ref={sheetRef}
-            snapPoints={snapPoints}
-            header={sheetHeader}
-            animateOnMount={false}
-          >
-            <ScrollView
-              onScroll={onTabScroll}
-              scrollEventThrottle={16}
-              keyboardShouldPersistTaps="handled"
-              testID="swap.scroll-view"
-              contentContainerStyle={{
-                paddingHorizontal: space20,
-                paddingTop: space8,
-                paddingBottom:
-                  Platform.OS === GlobalConst.platformOSandroid ? 120 : 160,
-                rowGap: space12,
-              }}
+          {/* Mounted once measured, at its snap: the tab is in place on its first frame. */}
+          {containerH > 0 && (
+            <AppSheet
+              ref={sheetRef}
+              snapPoints={snapPoints}
+              header={sheetHeader}
+              animateOnMount={false}
             >
-              {!!pending && (
-                <Card
-                  tone="selected"
-                  testID="swap.pending"
-                  onPress={() => openRecord(pending.recordId, pending.status)}
-                >
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      columnGap: space12,
-                    }}
+              <ScrollView
+                onScroll={onTabScroll}
+                scrollEventThrottle={16}
+                keyboardShouldPersistTaps="handled"
+                testID="swap.scroll-view"
+                contentContainerStyle={{
+                  paddingHorizontal: space20,
+                  paddingTop: space8,
+                  paddingBottom:
+                    Platform.OS === GlobalConst.platformOSandroid ? 120 : 160,
+                  rowGap: space12,
+                }}
+              >
+                {!!pending && (
+                  <Card
+                    testID="swap.pending"
+                    onPress={() => openRecord(pending)}
                   >
                     <View
                       style={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: radiusPill,
-                        backgroundColor: colors.bgAccent,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        columnGap: space12,
                       }}
-                    />
-                    <View style={{ flex: 1 }}>
-                      <Text variant="bodyStrong">{swapPairLabel(pending)}</Text>
-                      <Text variant="bodySmall" tone="muted">
-                        {pendingState}
-                      </Text>
-                    </View>
-                  </View>
-                </Card>
-              )}
-
-              {form.catalogUnreachable && (
-                <Banner
-                  tone="warning"
-                  title={translate('swap.service-down') as string}
-                  actionBeside
-                  action={
-                    <Button
-                      inline
-                      size="small"
-                      variant="text"
-                      title={translate('swap.retry') as string}
-                      busy={form.catalogRetrying}
-                      onPress={form.loadCatalog}
-                    />
-                  }
-                />
-              )}
-              {form.catalogEdgeBlocked && (
-                <Banner
-                  tone="warning"
-                  title={translate('swap.edge-blocked-title') as string}
-                >
-                  {translate('swap.edge-blocked-body') as string}
-                </Banner>
-              )}
-              {!!form.catalogError && (
-                <Banner tone="warning" title={form.catalogError} />
-              )}
-
-              <PairCards
-                isOutbound={form.isOutbound}
-                token={form.selectedToken}
-                amountText={usdMode ? usdText : form.amount}
-                onChangeAmountText={onChangeAmountText}
-                amountPlaceholder="0"
-                unit={usdMode ? 'usd' : 'coin'}
-                onToggleUnit={usdAvailable ? toggleUnit : undefined}
-                altText={
-                  usdMode
-                    ? `≈ ${formatAmount(parseAmountInput(form.amount))} ${sellSymbol}`
-                    : usdOf(form.amount)
-                }
-                availableText={
-                  !form.isOutbound
-                    ? undefined
-                    : usdMode
-                      ? toFiatText(String(form.maxSpendableForSwap), price) ||
-                        Utils.parseNumberFloatToStringLocale(0, 2)
-                      : `${formatAmountForDisplay(String(form.maxSpendableForSwap))} ${info.currencyName}`
-                }
-                onUseMax={() =>
-                  onChangeAmountText(
-                    usdMode
-                      ? toFiatText(
-                          toAmountInput(form.maxSpendableForSwap),
-                          price,
-                        )
-                      : toAmountInput(form.maxSpendableForSwap),
-                  )
-                }
-                invalid={form.overBalance}
-                receiveText={receiveText}
-                receivePlaceholder="0"
-                receiveAltText={receiveUsd}
-                ring={
-                  form.routes?.length
-                    ? {
-                        resetKey: form.refreshedAtMs,
-                        durationMs: QUOTE_REFRESH_MS,
-                        fetching: form.quoting,
-                        disabled: form.refreshDisabled,
-                        paused: sheetsOpen > 0,
-                        onPress: form.refreshNow,
-                      }
-                    : undefined
-                }
-                onFlip={form.flip}
-                onPickAsset={() => assetSheetRef.current?.present()}
-                texts={{
-                  youSend: translate('swap.you-send') as string,
-                  youReceive: form.isOutbound
-                    ? (translate('swap.you-receive') as string)
-                    : (translate('swap.receive-in-zingo') as string),
-                  receiveTip: translate('swap.tip-derived') as string,
-                  fromOtherWallet: translate(
-                    'swap.from-other-wallet',
-                  ) as string,
-                  available: translate('swap.available') as string,
-                  pickAsset: translate('swap.pick-asset-acc') as string,
-                  flip: translate('swap.flip-acc') as string,
-                  useMax: translate('swap.use-max-acc') as string,
-                  switchUnit: translate('swap.switch-unit-acc') as string,
-                  refreshNow: translate('swap.refresh') as string,
-                }}
-              />
-
-              {form.overBalance && (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    columnGap: 8,
-                  }}
-                >
-                  <InfoIcon size={iconSizeSm} color={colors.fgDanger} />
-                  <Text
-                    variant="bodySmall"
-                    tone="danger"
-                    style={{ flexShrink: 1 }}
-                  >
-                    {translate('swap.over-balance') as string}
-                  </Text>
-                </View>
-              )}
-
-              {!!form.selectedToken && (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    columnGap: space8,
-                    minHeight: 44,
-                    paddingHorizontal: 4,
-                  }}
-                >
-                  <Text variant="caption" tone="muted" style={{ flex: 1 }}>
-                    {translate('swap.provider') as string}
-                  </Text>
-                  {form.chosenRoute ? (
-                    <>
-                      <Pressable
-                        testID="swap.change-route"
-                        accessibilityRole="button"
-                        accessibilityLabel={
-                          translate('swap.change-route-acc') as string
-                        }
-                        onPress={() => routesSheetRef.current?.present()}
-                        hitSlop={8}
-                        style={{ minHeight: 32, justifyContent: 'center' }}
-                      >
+                    >
+                      <View
+                        style={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: radiusPill,
+                          backgroundColor: colors.fgWarning,
+                        }}
+                      />
+                      <View style={{ flex: 1 }}>
+                        <Text variant="bodyStrong">
+                          {swapPairLabel(pending)}
+                        </Text>
                         <Text
-                          variant="caption"
-                          style={{
-                            fontWeight: '700',
-                            textDecorationLine: 'underline',
-                          }}
+                          variant="bodySmall"
+                          tone={pendingState?.warning ? 'warning' : 'muted'}
                         >
-                          {providerShortLabel(form.chosenRoute.provider)}
+                          {pendingState?.text}
                         </Text>
-                      </Pressable>
-                      {!!form.chosenRoute.estimatedTimeText && (
-                        <Text variant="caption" tone="muted">
-                          {form.chosenRoute.estimatedTimeText}
-                        </Text>
-                      )}
-                    </>
-                  ) : (
-                    <Text variant="caption" tone="muted">
-                      {
-                        translate(
-                          form.cta === 'noRoutes'
-                            ? 'swap.provider-none'
-                            : 'swap.provider-pending',
-                        ) as string
-                      }
-                    </Text>
-                  )}
-                </View>
-              )}
-              {form.rateLimited && (
-                <Text variant="caption" tone="warning">
-                  {renderSwapText(
-                    rateLimitedNotice(form.rateLimitedUntilMs - form.nowMs),
-                    key => (translate(key) as string).trim(),
-                  )}
-                </Text>
-              )}
-              {!!form.quoteNotice && (
-                <Text variant="caption" tone="warning">
-                  {noticeText()}
-                </Text>
-              )}
+                      </View>
+                      <ChevronRight size={iconSizeMd} color={colors.fgMuted} />
+                    </View>
+                  </Card>
+                )}
 
-              {!!form.selectedToken && (
-                <View>
+                {form.catalogUnreachable && (
+                  <Banner
+                    tone="warning"
+                    title={translate('swap.service-down') as string}
+                    actionBeside
+                    action={
+                      <Button
+                        inline
+                        size="small"
+                        variant="text"
+                        title={translate('swap.retry') as string}
+                        busy={form.catalogRetrying}
+                        onPress={form.loadCatalog}
+                      />
+                    }
+                  />
+                )}
+                {form.catalogEdgeBlocked && (
+                  <Banner
+                    tone="warning"
+                    title={translate('swap.edge-blocked-title') as string}
+                  >
+                    {translate('swap.edge-blocked-body') as string}
+                  </Banner>
+                )}
+                {!!form.catalogError && (
+                  <Banner tone="warning" title={form.catalogError} />
+                )}
+
+                <PairCards
+                  isOutbound={form.isOutbound}
+                  token={form.selectedToken}
+                  amountText={usdMode ? usdText : form.amount}
+                  onChangeAmountText={onChangeAmountText}
+                  amountPlaceholder="0"
+                  unit={usdMode ? 'usd' : 'coin'}
+                  onToggleUnit={toggleUnit}
+                  altText={altText}
+                  availableText={
+                    !form.isOutbound
+                      ? undefined
+                      : usdMode
+                        ? toFiatText(String(form.maxSpendableForSwap), price) ||
+                          Utils.parseNumberFloatToStringLocale(0, 2)
+                        : `${formatAmountForDisplay(String(form.maxSpendableForSwap))} ${info.currencyName}`
+                  }
+                  onUseMax={() =>
+                    onChangeAmountText(
+                      usdMode
+                        ? toFiatText(
+                            toAmountInput(form.maxSpendableForSwap),
+                            price,
+                          )
+                        : toAmountInput(form.maxSpendableForSwap),
+                    )
+                  }
+                  invalid={form.overBalance}
+                  receiveText={receiveText}
+                  receivePlaceholder="0"
+                  receiveAltText={receiveUsd}
+                  ring={
+                    form.routes?.length
+                      ? {
+                          resetKey: form.refreshedAtMs,
+                          durationMs: QUOTE_REFRESH_MS,
+                          fetching: form.quoting,
+                          disabled: form.refreshDisabled,
+                          paused: sheetsOpen > 0,
+                          onPress: form.refreshNow,
+                        }
+                      : undefined
+                  }
+                  onFlip={form.flip}
+                  onPickAsset={() => assetSheetRef.current?.present()}
+                  texts={{
+                    youSend: translate('swap.you-send') as string,
+                    youReceive: form.isOutbound
+                      ? (translate('swap.you-receive') as string)
+                      : (translate('swap.receive-in-zingo') as string),
+                    receiveTip: translate('swap.tip-derived') as string,
+                    fromOtherWallet: translate(
+                      'swap.from-other-wallet',
+                    ) as string,
+                    available: translate('swap.available') as string,
+                    pickAsset: translate('swap.pick-asset-acc') as string,
+                    flip: translate('swap.flip-acc') as string,
+                    useMax: translate('swap.use-max-acc') as string,
+                    switchUnit: translate('swap.switch-unit-acc') as string,
+                    refreshNow: translate('swap.refresh') as string,
+                  }}
+                />
+
+                {form.overBalance && (
                   <View
                     style={{
                       flexDirection: 'row',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
+                      columnGap: 8,
+                    }}
+                  >
+                    <InfoIcon size={iconSizeSm} color={colors.fgDanger} />
+                    <Text
+                      variant="bodySmall"
+                      tone="danger"
+                      style={{ flexShrink: 1 }}
+                    >
+                      {translate('swap.over-balance') as string}
+                    </Text>
+                  </View>
+                )}
+
+                {/* The button says what is missing and stays off; the why
+                  (the fee on top of the amount, and what would fit) waits
+                  behind a link, in its sheet. */}
+                {form.cta === 'insufficient' && (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      columnGap: 8,
+                    }}
+                  >
+                    <InfoIcon size={iconSizeSm} color={colors.fgDanger} />
+                    <Text
+                      variant="bodySmall"
+                      tone="danger"
+                      style={{ flexShrink: 1 }}
+                    >
+                      {translate('swap.insufficient-title') as string}
+                    </Text>
+                    <Pressable
+                      kind="link"
+                      testID="swap.insufficient-why"
+                      accessibilityRole="button"
+                      hitSlop={space8}
+                      onPress={() => insufficientSheetRef.current?.present()}
+                      style={{ marginLeft: 'auto' }}
+                    >
+                      <Text
+                        variant="caption"
+                        tone="danger"
+                        style={{
+                          fontWeight: '700',
+                          textDecorationLine: 'underline',
+                        }}
+                      >
+                        {translate('swap.see-why') as string}
+                      </Text>
+                    </Pressable>
+                  </View>
+                )}
+
+                {!!form.selectedToken && (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
                       columnGap: space8,
-                      marginBottom: space8,
+                      minHeight: 44,
                       paddingHorizontal: 4,
                     }}
                   >
                     <Text
-                      variant="caption"
+                      variant="bodySmall"
                       tone="muted"
-                      style={{ fontWeight: '600' }}
+                      style={{ flex: 1, fontWeight: '600' }}
                     >
-                      {
-                        translate(
-                          form.isOutbound
-                            ? 'swap.dest-address'
-                            : 'swap.refund-address',
-                        ) as string
-                      }
+                      {translate('swap.provider') as string}
                     </Text>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        columnGap: 4,
-                        flexShrink: 1,
-                      }}
-                    >
-                      <Text variant="caption" tone="muted" numberOfLines={1}>
-                        {chainLabel}
-                      </Text>
-                      {!form.isOutbound && (
-                        <InfoTooltip
-                          testID="swap.refund-info"
-                          label={translate('swap.refund-address') as string}
-                          text={translate('swap.tip-refund') as string}
+                    {form.chosenRoute ? (
+                      <>
+                        <Pressable
+                          kind="link"
+                          testID="swap.change-route"
+                          accessibilityRole="button"
+                          accessibilityLabel={
+                            translate('swap.change-route-acc') as string
+                          }
+                          onPress={() => routesSheetRef.current?.present()}
+                          hitSlop={8}
+                          style={{ minHeight: 32, justifyContent: 'center' }}
                         >
-                          <></>
-                        </InfoTooltip>
-                      )}
-                    </View>
-                  </View>
-                  <TextInputAddress
-                    address={form.activeAddress}
-                    setAddress={form.setActiveAddress}
-                    setError={() => {}}
-                    disabled={false}
-                    showLabel={false}
-                    swapChain={form.counterpartyChain}
-                    scanRequest="swap.address"
-                    flush
-                    pasteLabel={translate('swap.paste') as string}
-                    onPickContact={() =>
-                      navigation.navigate(Route.AddressBook, {
-                        pick: 'swap.contact',
-                        chain: form.counterpartyChain,
-                      })
-                    }
-                    pickContactLabel={
-                      translate('addressbook.pick-title') as string
-                    }
-                    placeholder={(
-                      translate('swap.address-placeholder') as string
-                    ).replace('{chain}', counterpartyTicker)}
-                  />
-                  {form.addressShowError ? (
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        columnGap: 8,
-                        marginTop: 8,
-                        paddingHorizontal: 4,
-                      }}
-                    >
-                      <InfoIcon size={iconSizeSm} color={colors.fgDanger} />
-                      <Text
-                        variant="bodySmall"
-                        tone="danger"
-                        style={{ flexShrink: 1 }}
-                      >
-                        {form.addressIsZcash
-                          ? (translate('swap.address-zcash') as string)
-                          : (translate('swap.address-bad') as string).replace(
-                              '{network}',
-                              networkLabel,
-                            )}
+                          <Text
+                            variant="bodySmall"
+                            style={{
+                              fontWeight: '600',
+                              textDecorationLine: 'underline',
+                            }}
+                          >
+                            {providerShortLabel(form.chosenRoute.provider)}
+                          </Text>
+                        </Pressable>
+                        {!!form.chosenRoute.estimatedTimeText && (
+                          <Text variant="caption" tone="muted">
+                            {form.chosenRoute.estimatedTimeText}
+                          </Text>
+                        )}
+                      </>
+                    ) : (
+                      <Text variant="caption" tone="muted">
+                        {
+                          translate(
+                            form.cta === 'noRoutes'
+                              ? 'swap.provider-none'
+                              : 'swap.provider-pending',
+                          ) as string
+                        }
                       </Text>
-                    </View>
-                  ) : form.activeAddress.trim().length > 0 &&
-                    form.addressValid ? (
+                    )}
+                  </View>
+                )}
+                {form.rateLimited && (
+                  <Banner
+                    tone="warning"
+                    title={renderSwapText(
+                      rateLimitedNotice(form.rateLimitedUntilMs - form.nowMs),
+                      key => (translate(key) as string).trim(),
+                    )}
+                  />
+                )}
+                {!!form.quoteNotice && (
+                  <Banner tone="warning" title={noticeText()} />
+                )}
+
+                {!!form.selectedToken && (
+                  <View>
                     <View
                       style={{
                         flexDirection: 'row',
                         alignItems: 'center',
-                        columnGap: 8,
-                        marginTop: 8,
+                        justifyContent: 'space-between',
+                        columnGap: space8,
+                        marginBottom: space8,
                         paddingHorizontal: 4,
                       }}
                     >
-                      <CheckIcon size={iconSizeSm} color={colors.fgAccent} />
-                      {savedContact ? (
+                      <Text
+                        variant="caption"
+                        tone="muted"
+                        style={{ fontWeight: '600' }}
+                      >
+                        {
+                          translate(
+                            form.isOutbound
+                              ? 'swap.dest-address'
+                              : 'swap.refund-address',
+                          ) as string
+                        }
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          columnGap: 4,
+                          flexShrink: 1,
+                        }}
+                      >
+                        <Text variant="caption" tone="muted" numberOfLines={1}>
+                          {chainLabel}
+                        </Text>
+                        {!form.isOutbound && (
+                          <InfoTooltip
+                            testID="swap.refund-info"
+                            label={translate('swap.refund-address') as string}
+                            text={translate('swap.tip-refund') as string}
+                          >
+                            <></>
+                          </InfoTooltip>
+                        )}
+                      </View>
+                    </View>
+                    <TextInputAddress
+                      address={form.activeAddress}
+                      setAddress={form.setActiveAddress}
+                      setError={() => {}}
+                      disabled={false}
+                      showLabel={false}
+                      swapChain={form.counterpartyChain}
+                      scanRequest="swap.address"
+                      pasteLabel={translate('paste') as string}
+                      onPickContact={() =>
+                        navigation.navigate(Route.AddressBook, {
+                          pick: 'swap.contact',
+                          chain: form.counterpartyChain,
+                        })
+                      }
+                      pickContactLabel={
+                        translate('addressbook.pick-title') as string
+                      }
+                      placeholder={(
+                        translate('swap.address-placeholder') as string
+                      ).replace('{chain}', counterpartyTicker)}
+                    />
+                    {form.addressShowError ? (
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          columnGap: 8,
+                          marginTop: 8,
+                          paddingHorizontal: 4,
+                        }}
+                      >
+                        <InfoIcon size={iconSizeSm} color={colors.fgDanger} />
                         <Text
-                          testID="swap.address.contact"
-                          variant="caption"
-                          tone="muted"
-                          numberOfLines={1}
+                          variant="bodySmall"
+                          tone="danger"
                           style={{ flexShrink: 1 }}
                         >
-                          <Text variant="caption" style={{ fontWeight: '700' }}>
-                            {savedContact.label}
-                          </Text>
-                          {` · ${translate('swap.address-in-book') as string}`}
+                          {form.addressIsZcash
+                            ? (translate('swap.address-zcash') as string)
+                            : (translate('swap.address-bad') as string).replace(
+                                '{network}',
+                                networkLabel,
+                              )}
                         </Text>
-                      ) : (
-                        <>
+                      </View>
+                    ) : form.activeAddress.trim().length > 0 &&
+                      form.addressValid ? (
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          columnGap: 8,
+                          marginTop: 8,
+                          paddingHorizontal: 4,
+                        }}
+                      >
+                        <CheckIcon size={iconSizeSm} color={colors.fgAccent} />
+                        {savedContact ? (
                           <Text
+                            testID="swap.address.contact"
                             variant="caption"
                             tone="muted"
                             numberOfLines={1}
                             style={{ flexShrink: 1 }}
                           >
-                            {(
-                              translate('swap.address-valid') as string
-                            ).replace('{asset}', chainLabel)}
-                          </Text>
-                          <Pressable
-                            testID="swap.save-contact"
-                            accessibilityRole="button"
-                            hitSlop={8}
-                            onPress={() =>
-                              saveContactSheetRef.current?.present()
-                            }
-                            style={{ marginLeft: 'auto' }}
-                          >
                             <Text
                               variant="caption"
-                              style={{
-                                fontWeight: '700',
-                                color: colors.fgAccent,
-                              }}
+                              style={{ fontWeight: '700' }}
                             >
-                              {translate('swap.save-contact') as string}
+                              {savedContact.label}
                             </Text>
-                          </Pressable>
-                        </>
-                      )}
-                    </View>
-                  ) : null}
-                </View>
-              )}
-
-              {form.cta === 'noRoutes' && (
-                <Banner
-                  tone="warning"
-                  title={translate('swap.no-route-now') as string}
-                >
-                  {form.unavailable.length > 0 && (
-                    <View style={{ rowGap: space4 }}>
-                      <Pressable
-                        testID="swap.see-why"
-                        accessibilityRole="button"
-                        accessibilityState={{ expanded: whyOpen }}
-                        onPress={() => setWhyOpen(open => !open)}
-                        hitSlop={space8}
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          columnGap: space4,
-                        }}
-                      >
-                        <Text
-                          variant="caption"
-                          tone="warning"
-                          style={{ textDecorationLine: 'underline' }}
-                        >
-                          {translate('swap.see-why') as string}
-                        </Text>
-                        {whyOpen ? (
-                          <ChevronUp
-                            size={iconSizeSm}
-                            color={colors.fgWarning}
-                          />
-                        ) : (
-                          <ChevronDown
-                            size={iconSizeSm}
-                            color={colors.fgWarning}
-                          />
-                        )}
-                      </Pressable>
-                      {whyOpen &&
-                        form.unavailable.map(row => (
-                          <Text
-                            key={row.provider}
-                            variant="caption"
-                            tone="muted"
-                          >
-                            {`${providerShortLabel(row.provider)} · ${renderSwapText(
-                              row.reason,
-                              key => (translate(key) as string).trim(),
-                            )}`}
+                            {` · ${translate('swap.address-in-book') as string}`}
                           </Text>
-                        ))}
-                    </View>
-                  )}
-                </Banner>
-              )}
-              {form.cta !== 'noRoutes' &&
-                !!form.quoteError &&
-                !form.routes?.length && (
-                  <Banner tone="warning" title={form.quoteError} />
+                        ) : (
+                          <>
+                            <Text
+                              variant="caption"
+                              tone="muted"
+                              numberOfLines={1}
+                              style={{ flexShrink: 1 }}
+                            >
+                              {(
+                                translate('swap.address-valid') as string
+                              ).replace('{asset}', chainLabel)}
+                            </Text>
+                            <View style={{ marginLeft: 'auto' }}>
+                              <Button
+                                testID="swap.save-contact"
+                                variant="text"
+                                size="small"
+                                inline
+                                title={translate('swap.save-contact') as string}
+                                onPress={() =>
+                                  saveContactSheetRef.current?.present()
+                                }
+                              />
+                            </View>
+                          </>
+                        )}
+                      </View>
+                    ) : null}
+                  </View>
                 )}
 
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  columnGap: space4,
-                  marginTop: space4,
-                }}
-              >
-                <Text variant="caption" tone="muted">
-                  {translate('swap.privacy-note') as string}
-                </Text>
-                <InfoTooltip
-                  testID="swap.privacy-info"
-                  label={translate('swap.privacy-note') as string}
-                  text={translate('swap.tip-privacy') as string}
+                {form.cta === 'noRoutes' && (
+                  <Banner
+                    tone="warning"
+                    title={translate('swap.no-route-now') as string}
+                  >
+                    {form.unavailable.length > 0 && (
+                      <View style={{ rowGap: space4 }}>
+                        <Pressable
+                          kind="link"
+                          testID="swap.see-why"
+                          accessibilityRole="button"
+                          accessibilityState={{ expanded: whyOpen }}
+                          onPress={() => setWhyOpen(open => !open)}
+                          hitSlop={space8}
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            columnGap: space4,
+                          }}
+                        >
+                          <Text
+                            variant="caption"
+                            tone="warning"
+                            style={{
+                              fontWeight: '700',
+                              textDecorationLine: 'underline',
+                            }}
+                          >
+                            {translate('swap.see-why') as string}
+                          </Text>
+                          {whyOpen ? (
+                            <ChevronUp
+                              size={iconSizeSm}
+                              color={colors.fgWarning}
+                            />
+                          ) : (
+                            <ChevronDown
+                              size={iconSizeSm}
+                              color={colors.fgWarning}
+                            />
+                          )}
+                        </Pressable>
+                        {whyOpen &&
+                          form.unavailable.map(row => (
+                            <Text
+                              key={row.provider}
+                              variant="caption"
+                              tone="muted"
+                            >
+                              {`${providerShortLabel(row.provider)} · ${renderSwapText(
+                                row.reason,
+                                key => (translate(key) as string).trim(),
+                              )}`}
+                            </Text>
+                          ))}
+                      </View>
+                    )}
+                  </Banner>
+                )}
+                {form.cta !== 'noRoutes' &&
+                  !!form.quoteError &&
+                  !form.routes?.length && (
+                    <Banner tone="warning" title={form.quoteError} />
+                  )}
+
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    columnGap: space4,
+                    marginTop: space4,
+                  }}
                 >
-                  <></>
-                </InfoTooltip>
-              </View>
-
-              {nymWaiting && (
-                <View style={{ alignItems: 'center', rowGap: space4 }}>
-                  <Text
-                    variant="bodySmall"
-                    tone="muted"
-                    style={{ textAlign: 'center' }}
-                  >
-                    {translate('swap.nym-wait') as string}
+                  {/* The service's credit, in English in every language. */}
+                  <Text variant="caption" tone="muted">
+                    Powered by
                   </Text>
+                  <SwapKitLogo />
                   <Text
-                    variant="body"
-                    style={{ textAlign: 'center', fontWeight: '500' }}
+                    variant="caption"
+                    color={colors.fgDefault}
+                    style={{ fontWeight: '600' }}
                   >
-                    {translate(shownStatusKey(mixnetView)) as string}
+                    SwapKit
                   </Text>
+                  <InfoTooltip
+                    testID="swap.privacy-info"
+                    label="Powered by SwapKit"
+                    text={translate('swap.tip-privacy') as string}
+                  >
+                    <></>
+                  </InfoTooltip>
                 </View>
-              )}
 
-              <View style={{ marginTop: space4 }}>
-                <Button
-                  testID="swap.continue"
-                  variant="primary"
-                  title={ctaLabel}
-                  disabled={!ctaEnabled}
-                  onPress={onContinue}
-                />
-              </View>
-            </ScrollView>
-          </AppSheet>
+                {nymWaiting && (
+                  <View style={{ alignItems: 'center', rowGap: space4 }}>
+                    <Text
+                      variant="bodySmall"
+                      tone="muted"
+                      style={{ textAlign: 'center' }}
+                    >
+                      {translate('swap.nym-wait') as string}
+                    </Text>
+                    <Text
+                      variant="body"
+                      style={{ textAlign: 'center', fontWeight: '500' }}
+                    >
+                      {translate(shownStatusKey(mixnetView)) as string}
+                    </Text>
+                  </View>
+                )}
+
+                <View style={{ marginTop: space4 }}>
+                  <Button
+                    testID="swap.continue"
+                    variant="primary"
+                    title={ctaLabel}
+                    disabled={!ctaEnabled}
+                    onPress={onContinue}
+                  />
+                </View>
+              </ScrollView>
+            </AppSheet>
+          )}
         </Animated.View>
 
         <AssetPickerSheet
@@ -930,9 +1093,14 @@ const Swap: React.FunctionComponent<SwapProps> = () => {
         <SwapHistorySheet
           ref={historySheetRef}
           records={records}
+          nowMs={nowMs}
           onOpen={record => {
-            historySheetRef.current?.dismiss();
-            openRecord(record.recordId, record.status);
+            openRecord(record);
+            // Gone at once under the risen panel, without a motion of its own.
+            setTimeout(
+              () => historySheetRef.current?.dismiss({ duration: 0 }),
+              duration.panelIn,
+            );
           }}
         />
         <InsufficientFundsSheet

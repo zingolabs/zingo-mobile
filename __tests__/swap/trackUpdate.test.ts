@@ -356,10 +356,13 @@ describe('applyDefaultTrackUpdate', () => {
   });
 
   it('captures a failure reason only when the swap actually failed', () => {
-    const failed = applyDefaultTrackUpdate(record(), {
-      status: 'FAILED',
-      failureReason: 'refund issued',
-    });
+    const failed = applyDefaultTrackUpdate(
+      record({ observedDepositTxHash: DEPOSIT_HASH }),
+      {
+        status: 'FAILED',
+        failureReason: 'refund issued',
+      },
+    );
     const running = applyDefaultTrackUpdate(record(), {
       status: 'PROCESSING',
       failureReason: 'refund issued',
@@ -367,6 +370,17 @@ describe('applyDefaultTrackUpdate', () => {
 
     expect(failed.failureReason).toBe('refund issued');
     expect(running.failureReason).toBeUndefined();
+  });
+
+  it('reads a provider failure with no deposit seen as deposit not detected, and one with a deposit as failed', () => {
+    const unpaid = applyDefaultTrackUpdate(record(), { status: 'FAILED' });
+    const paid = applyDefaultTrackUpdate(
+      record({ observedDepositTxHash: DEPOSIT_HASH }),
+      { status: 'FAILED' },
+    );
+
+    expect(unpaid.status).toBe(SwapStatusEnum.Expired);
+    expect(paid.status).toBe(SwapStatusEnum.Failed);
   });
 
   it('finds a provider explorer link at the top level or on a leg', () => {

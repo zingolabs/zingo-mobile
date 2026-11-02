@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   ReduceMotion,
   runOnJS,
@@ -12,11 +12,22 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { radiusSheet, useTheme } from '@app/theme';
+import {
+  iconSize,
+  radiusSheet,
+  radiusSm,
+  space8,
+  space20,
+  space24,
+  space32,
+  useTheme,
+} from '@app/theme';
+import Text from '@ui/primitives/Text';
 import { duration, ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import Button from '@ui/primitives/Button';
+import { useCompact } from '@app/hooks/useCompact';
 
 const OFFSCREEN = 600;
 
@@ -62,6 +73,7 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
 }) => {
   const { translate } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
+  const { gap } = useCompact();
   const insets = useSafeAreaInsets();
   const dim = useSharedValue(0);
   const drop = useSharedValue(OFFSCREEN);
@@ -139,7 +151,7 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
       <Animated.View
         style={[
           StyleSheet.absoluteFill,
-          { backgroundColor: colors.bgCanvas },
+          { backgroundColor: colors.bgScrim },
           dimStyle,
         ]}
       />
@@ -151,9 +163,9 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
             right: 0,
             bottom: 0,
             alignItems: 'center',
-            paddingTop: 32,
-            paddingHorizontal: 40,
-            paddingBottom: insets.bottom + 28,
+            paddingTop: gap(space32),
+            paddingHorizontal: space20,
+            paddingBottom: insets.bottom + space24,
             backgroundColor: colors.bgSurface,
             borderTopWidth: 1,
             borderColor: colors.bottomSheetBorder,
@@ -166,32 +178,31 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
         <Animated.View
           style={[
             {
-              width: 52,
-              height: 52,
-              borderRadius: 14,
+              width: 48,
+              height: 48,
+              borderRadius: radiusSm,
               backgroundColor: colors.bgWarning,
               borderWidth: 1,
               borderColor: colors.borderWarning,
               alignItems: 'center',
               justifyContent: 'center',
-              marginBottom: 18,
+              marginBottom: space20,
             },
             tileStyle,
           ]}
         >
           <Animated.View style={wiggleStyle}>
-            <TriangleAlert size={24} color={colors.fgWarning} />
+            <TriangleAlert size={iconSize} color={colors.fgWarning} />
           </Animated.View>
         </Animated.View>
         <Rise delay={260}>
           <Text
             accessibilityRole="alert"
+            variant="bodyStrong"
             style={{
-              color: colors.fgDefault,
-              fontSize: 16,
               fontWeight: '700',
               textAlign: 'center',
-              marginBottom: 12,
+              marginBottom: space8,
             }}
           >
             {translate('seedbackup.shot-title') as string}
@@ -199,13 +210,9 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
         </Rise>
         <Rise delay={300}>
           <Text
-            style={{
-              color: colors.fgMuted,
-              fontSize: 15,
-              lineHeight: 20,
-              textAlign: 'center',
-              marginBottom: 24,
-            }}
+            variant="caption"
+            tone="muted"
+            style={{ textAlign: 'center', marginBottom: gap(space24) }}
           >
             {translate('seedbackup.shot-body') as string}
           </Text>

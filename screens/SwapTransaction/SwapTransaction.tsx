@@ -8,24 +8,39 @@ import {
 } from '@app/utils/formatAmount';
 import { Linking, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { space12, useTheme, iconSizeMd } from '@app/theme';
+import Clipboard from '@react-native-clipboard/clipboard';
+import {
+  space4,
+  space12,
+  space16,
+  radiusMd,
+  useTheme,
+  iconSizeMd,
+} from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
-import { Route, ValueTransferKindEnum } from '@app/AppState';
+import {
+  Route,
+  SnackbarDurationEnum,
+  ValueTransferKindEnum,
+} from '@app/AppState';
 import { ContextAppLoaded, useSwapRecords } from '@app/context';
 import { fiatQuote } from '@app/price/fiatQuote';
 import Utils from '@app/utils';
+import { transferStatus } from '@app/utils/transferStatus';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
+import Pressable from '@ui/primitives/Pressable';
 import Banner from '@ui/widgets/Banner';
-import { ArrowDownIcon } from '@ui/primitives/Icons/ArrowDownIcon';
-import { ArrowUpIcon } from '@ui/primitives/Icons/ArrowUpIcon';
+import { TxPendingIcon } from '@ui/primitives/Icons/TxPendingIcon';
+import { TxReceivedIcon } from '@ui/primitives/Icons/TxReceivedIcon';
+import { TxSentIcon } from '@ui/primitives/Icons/TxSentIcon';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import DetailHero from '@screens/Swap/components/DetailHero';
 import DetailRows from '@screens/Swap/components/DetailRows';
 import type { DetailRow } from '@screens/Swap/components/DetailRows';
 import ShieldNote from '@screens/Swap/components/ShieldNote';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
-import { legName, legRole } from '@screens/Swap/swapLegs';
+import { legName, legRole, legsOf } from '@screens/Swap/swapLegs';
 
 type SwapTransactionProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -42,7 +57,7 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
   navigation,
   route,
 }) => {
-  const { recordId, txid, kind } = route.params;
+  const { recordId, txid, kind, slot } = route.params;
   const {
     translate,
     language,
@@ -52,13 +67,14 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
     server,
     walletChainName,
     blockExplorer,
+    addLastSnackbar,
   } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
-  useSwapRecords();
+  const records = useSwapRecords();
   const record = useSwapRecord(recordId);
-  const leg = (valueTransfers ?? []).find(
+  const leg = legsOf(records, valueTransfers ?? [], recordId).filter(
     vt => vt.txid === txid && vt.kind === kind,
-  );
+  )[slot ?? 0];
   const t = (key: string) => (translate(key) as string).trim();
   const back = useCallback(() => {
     if (navigation.canGoBack()) {
@@ -79,7 +95,8 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
         ? quote.price
         : 0;
   const role = legRole(leg, record, t);
-  const confirmed = leg.confirmations > 0;
+  const { memo } = Utils.splitMemo(leg.memos);
+  const status = transferStatus(leg, t);
   const rows: DetailRow[] = [
     {
       label: t('swap.detail-date'),
@@ -151,10 +168,13 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
     >
       <DetailHero
         icon={
-          received ? (
-            <ArrowDownIcon size={iconSizeMd} color={colors.fgDefault} />
+          /* The same drawings as History: the clock until it is confirmed. */
+          status.tone === 'warning' ? (
+            <TxPendingIcon size={iconSizeMd} color={colors.fgDefault} />
+          ) : received ? (
+            <TxReceivedIcon size={iconSizeMd} color={colors.fgDefault} />
           ) : (
-            <ArrowUpIcon size={iconSizeMd} color={colors.fgDefault} />
+            <TxSentIcon size={iconSizeMd} color={colors.fgDefault} />
           )
         }
         title={legName(leg, record, t)}
@@ -162,13 +182,48 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
         unit={info.currencyName}
         tone={received ? 'positive' : 'default'}
         line={price > 0 ? `≈ ${formatUsd(leg.amount * price)}` : ''}
-        pill={t(confirmed ? 'swap.tx-confirmed' : 'swap.tx-pending')}
-        pillTone={confirmed ? 'accent' : 'neutral'}
+        pill={status.text}
+        pillTone={status.tone}
       />
       <DetailRows rows={rows} />
-      <Text variant="caption" tone="muted" style={{ marginTop: space12 }}>
-        {role.note}
-      </Text>
+      {!!memo && (
+        <View
+          style={{
+            marginTop: space12,
+            paddingVertical: space12,
+            paddingHorizontal: space16,
+            rowGap: space4,
+            borderRadius: radiusMd,
+            borderWidth: 1,
+            borderColor: colors.bottomSheetBorder,
+            backgroundColor: colors.bgCanvas,
+          }}
+        >
+          <Text variant="caption" tone="muted">
+            {t('history.tx-memo')}
+          </Text>
+          <Pressable
+            kind="link"
+            testID="swap.transaction.memo"
+            onPress={() => {
+              Clipboard.setString(memo);
+              addLastSnackbar(
+                t('history.memocopied'),
+                SnackbarDurationEnum.short,
+              );
+            }}
+          >
+            <Text variant="address" selectable>
+              {memo}
+            </Text>
+          </Pressable>
+        </View>
+      )}
+      {!!role.note && !!leg.address && (
+        <Text variant="caption" tone="muted" style={{ marginTop: space12 }}>
+          {role.note}
+        </Text>
+      )}
       {role.warn && (
         <View style={{ marginTop: space12 }}>
           <Banner tone="warning" title={t('swap.tx-dont-send')} />

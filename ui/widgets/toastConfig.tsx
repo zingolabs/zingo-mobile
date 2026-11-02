@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { View, Text as RNText } from 'react-native';
+import { View } from 'react-native';
 import {
   radiusMd,
   space12,
@@ -20,21 +20,21 @@ export const ACTION_SNACKBAR_MS = 4200;
 const AppInfoToast: React.FC<ToastConfigParams<undefined>> = ({ text1 }) => {
   const { colors } = useTheme();
   return (
-    <View style={{ width: '100%', paddingHorizontal: 10 }}>
+    <View style={{ width: '100%', paddingHorizontal: space16 }}>
       <View
+        testID="toast.info"
         style={{
+          minHeight: touchTarget,
+          justifyContent: 'center',
+          paddingHorizontal: space16,
+          paddingVertical: space8,
           backgroundColor: colors.bgSurface,
-          paddingLeft: 20,
-          paddingRight: 15,
-          paddingVertical: 10,
-          borderWidth: 0.5,
-          borderColor: colors.borderMuted,
-          borderRadius: 6,
+          borderWidth: 1,
+          borderColor: colors.bottomSheetBorder,
+          borderRadius: radiusMd,
         }}
       >
-        <RNText style={{ color: colors.fgDefault, fontSize: 15 }}>
-          {text1}
-        </RNText>
+        <Text variant="bodySmall">{text1}</Text>
       </View>
     </View>
   );

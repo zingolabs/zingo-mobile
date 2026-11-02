@@ -1,13 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {
-  Text,
-  View,
-  TextStyle,
-  TouchableOpacity,
-  useWindowDimensions,
-} from 'react-native';
+import { Text, View, TextStyle, useWindowDimensions } from 'react-native';
 import { useTheme, fontScaleBody } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 
 import { formatAmount } from '@app/utils/formatAmount';
 import { SvgXml } from 'react-native-svg';
@@ -75,7 +70,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
 
   return (
     <View style={{ ...style, flexDirection: 'row', marginHorizontal: 5 }}>
-      <TouchableOpacity disabled={!privacyHigh} onPress={reveal}>
+      <Pressable kind="link" disabled={!privacyHigh} onPress={reveal}>
         <View
           testID={testID}
           style={{
@@ -157,7 +152,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
             </Text>
           )}
         </View>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };
