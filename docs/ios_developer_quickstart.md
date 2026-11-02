@@ -24,7 +24,7 @@ destination.
 1. Clone the repository:
    `git clone https://github.com/zingolabs/zingo-mobile.git`.
 2. Go to the cloned repo `cd zingo-mobile`.
-3. From the root of the project, install JS deps: `yarn setup`
+3. From the root of the project, install JS deps: `yarn setup` (`yarn setup` runs the install scripts the allowlist permits and our own `postinstall`; after a plain `yarn add` or `yarn remove`, run `yarn allow-scripts` again, or the patches are left unapplied)
 4. Fetch the Binding Layer: `yarn --silent fetch:binding-layer --platform ios`.
    The command needs network access to `ghcr.io` the first time. The
    `Zingo` and `Zingo Beta` schemes run the same fetch as a build

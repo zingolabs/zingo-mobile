@@ -438,10 +438,9 @@ dependencies {
 
     // BackgroundSyncWorker consumes the ListenableFuture WorkManager
     // returns, so the class's provider must be declared, not borrowed from
-    // work-runtime's dependency graph. With notifee bringing Guava onto the
-    // runtime classpath, Guava's metadata retires the standalone
-    // listenablefuture jar (the empty 9999.0 placeholder supersedes 1.0),
-    // so Guava itself is the only real provider left.
+    // work-runtime's dependency graph. With Guava on the runtime classpath,
+    // its metadata retires the standalone listenablefuture jar (the empty
+    // 9999.0 placeholder supersedes 1.0), so Guava itself is the provider.
     implementation("com.google.guava:guava:33.3.1-android")
 
     implementation("androidx.work:work-runtime:$workVersion")
