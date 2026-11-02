@@ -14,15 +14,14 @@ import {
   shieldedMemoAddressFromSwap,
 } from './mayaShieldedMemo';
 import { SwapStatusEnum, isTerminalStatus } from './enums/SwapStatusEnum';
+import { DEPOSIT_WAIT_MS } from './depositDeadline';
+import { hasDepositEvidence } from './depositEvidence';
 import { SwapKitError } from './errors';
 import {
   ProviderRegistry,
   createDefaultProviderRegistry,
 } from './providers/ProviderRegistry';
-import {
-  TRACK_CAPTURE_VERSION,
-  isRealLegHash,
-} from './providers/trackUpdateBase';
+import { TRACK_CAPTURE_VERSION } from './providers/trackUpdateBase';
 import { DepositInstructionsType } from './types/DepositInstructionsType';
 import { FiatValueBasisType } from './types/FiatValueBasisType';
 import { QuoteResponseType, QuoteRouteType } from './types/QuoteResponseType';
@@ -45,6 +44,8 @@ import type { UnavailableProviderType } from './unavailableProviders';
  *   - `markBroadcasted(args)` — flip the broadcast bookkeeping once zingolib
  *     reports its tx id. The UI thread is responsible for handing off the
  *     instructions to RPC; this service never touches zingolib directly.
+ *   - `markDepositSent(args)` — keep the moment the user said an inbound
+ *     deposit was sent.
  *   - `listRecords` / `getRecord` — convenience pass-throughs to the store.
  *   - `forceRefresh` — pull-to-refresh via the poller.
  *   - `startPolling` / `stopPolling` — explicit lifecycle, caller-owned.
@@ -127,6 +128,11 @@ export type SetObservedDepositTxHashArgs = {
   hash: string;
 };
 
+export type MarkDepositSentArgs = {
+  /** Locally-minted primary key returned by `commitRoute` on the record. */
+  recordId: string;
+};
+
 export class SwapService {
   private readonly client: SwapKitClient;
   private readonly registry: ProviderRegistry;
@@ -150,6 +156,26 @@ export class SwapService {
    * lifetime of the session; UI screens can call this on every mount without
    * triggering a refetch.
    */
+  /**
+   * The USD price of one coin, before any quote of it: `null` when SwapKit
+   * gives none or answers in a shape this does not read, and the screen
+   * then waits for the coin's first quote, as before.
+   */
+  async usdPrice(swapKitId: string): Promise<number | null> {
+    const answer = await this.client.price([swapKitId]);
+    const rows: Array<Record<string, unknown>> = Array.isArray(answer)
+      ? answer
+      : [];
+    const row =
+      rows.find(
+        r =>
+          typeof r?.identifier === 'string' &&
+          r.identifier.toUpperCase() === swapKitId.toUpperCase(),
+      ) ?? (rows.length === 1 ? rows[0] : undefined);
+    const value = Number(row?.price_usd ?? row?.priceUsd ?? row?.price);
+    return Number.isFinite(value) && value > 0 ? value : null;
+  }
+
   async listTokens() {
     return this.tokenCatalog.listTokens();
   }
@@ -312,7 +338,16 @@ export class SwapService {
       sourceAddress: quoteInput.sourceAddress,
       requestedSlippageBps: quoteInput.slippageBps,
       status: initialStatus,
+      depositDeadlineMs:
+        direction === SwapDirectionEnum.Inbound
+          ? now + DEPOSIT_WAIT_MS
+          : undefined,
+      quoteExpiresAtMs: chosenRoute.expiresAtMs,
       providerData: instructions.providerData,
+      depositFromSourceAddress:
+        direction === SwapDirectionEnum.Outbound
+          ? !!instructions.requiresDepositFromSourceAddress
+          : undefined,
       broadcast:
         direction === SwapDirectionEnum.Outbound
           ? { status: BroadcastStatusEnum.PendingBroadcast }
@@ -327,6 +362,34 @@ export class SwapService {
     // is idempotent so this is a no-op if it is already running.
     this.poller.start();
     return { record, instructions };
+  }
+
+  /**
+   * The deposit's first transaction, the deshield, went out and the second
+   * did not. The record keeps the deshield's txid, so a retry knows the
+   * held deposit is this sale's, and stays pending until the resumed
+   * deposit is marked broadcast.
+   */
+  async markDeshielded(args: {
+    recordId: string;
+    deshieldTxId: string;
+  }): Promise<SwapRecordType> {
+    const record = await this.store.getByRecordId(args.recordId);
+    if (!record) {
+      throw new Error(
+        `SwapService.markDeshielded: no record for ${args.recordId}`,
+      );
+    }
+    const updated: SwapRecordType = {
+      ...record,
+      broadcast: {
+        status: BroadcastStatusEnum.PendingBroadcast,
+        allTxIds: [args.deshieldTxId],
+      },
+      updatedAtMs: Date.now(),
+    };
+    await this.store.upsert(updated);
+    return updated;
   }
 
   async markBroadcasted(args: MarkBroadcastedArgs): Promise<SwapRecordType> {
@@ -400,6 +463,12 @@ export class SwapService {
       ...record,
       observedDepositTxHash: hash,
       status: SwapStatusEnum.Pending,
+      // A hash handed over for an expired purchase names a payment that came
+      // late, which the provider returns.
+      lateDepositAtMs:
+        record.status === SwapStatusEnum.Expired
+          ? (record.lateDepositAtMs ?? now)
+          : record.lateDepositAtMs,
       updatedAtMs: now,
     };
     await this.store.upsert(updated);
@@ -416,6 +485,40 @@ export class SwapService {
       this.poller.tickOnce().catch(() => {
         // tickOnce already logs internally; we intentionally don't await.
       });
+    }
+    return updated;
+  }
+
+  /**
+   * The user says the inbound deposit left their other wallet. The record
+   * keeps the moment; the status moves only when the provider sees the
+   * deposit, and the deadline keeps running either way. Idempotent.
+   */
+  async markDepositSent(args: MarkDepositSentArgs): Promise<SwapRecordType> {
+    const { recordId } = args;
+    const record = await this.store.getByRecordId(recordId);
+    if (!record) {
+      throw new Error(`SwapService.markDepositSent: no record for ${recordId}`);
+    }
+    if (record.direction !== SwapDirectionEnum.Inbound) {
+      throw new Error(
+        `SwapService.markDepositSent: not an inbound record (${recordId})`,
+      );
+    }
+    if (record.depositSentAtMs !== undefined) {
+      return record;
+    }
+    const now = Date.now();
+    const updated: SwapRecordType = {
+      ...record,
+      depositSentAtMs: now,
+      updatedAtMs: now,
+    };
+    await this.store.upsert(updated);
+    const wasRunning = this.poller.isRunning();
+    this.poller.start();
+    if (wasRunning) {
+      this.poller.tickOnce().catch(() => {});
     }
     return updated;
   }
@@ -556,20 +659,6 @@ function parseProviderErrors(
     // sentence is the honest answer.
     return undefined;
   }
-}
-
-/**
- * Whether the provider can already see a deposit for this swap.
- *
- * Outbound gets its evidence from our own broadcast bookkeeping; inbound from
- * the source-chain hash, which reaches the record either from the user or from
- * Midgard. `isRealLegHash` rather than a truthiness check because `/track`
- * emits an all-zero placeholder for a leg that has not landed, and a record
- * written before that filter existed can still be carrying one.
- */
-function hasDepositEvidence(record: SwapRecordType): boolean {
-  if (record.broadcast?.status === BroadcastStatusEnum.Broadcasted) return true;
-  return isRealLegHash(record.observedDepositTxHash);
 }
 
 /**

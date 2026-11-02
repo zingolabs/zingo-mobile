@@ -34,7 +34,13 @@ jest.mock('@gorhom/bottom-sheet', () => {
     BottomSheetView: ({ children }: { children: React.ReactNode }) => (
       <View>{children}</View>
     ),
+    BottomSheetScrollView: ({ children }: { children: React.ReactNode }) => (
+      <View>{children}</View>
+    ),
     BottomSheetBackdrop: () => null,
+    useBottomSheetInternal: () => ({
+      animatedLayoutState: { modify: () => {} },
+    }),
   };
 });
 

@@ -49,6 +49,7 @@ colors:
   fgViewOnly: "#8FB4E6"
   bgViewOnlySubtle: "#8FB4E61F"
   bgNym: "#07FF94"
+  fgNym: "#07FF94"
   bgNymSubtle: "#07FF941F"
   # Switch (exception D): the off track, the deep end of the on gradient
   # (which starts at bgAccent), the nym variant's gradient, the thumb
@@ -145,6 +146,7 @@ typography:
     fontWeight: 400
     lineHeight: 18px
 rounded:
+  xs: 4px
   sm: 8px
   md: 12px
   sheet: 28px
@@ -191,6 +193,10 @@ components:
     height: 44px
   button-quiet:
     textColor: "{colors.fgMuted}"
+    typography: "{typography.button}"
+    height: 44px
+  button-danger-text:
+    textColor: "{colors.fgDanger}"
     typography: "{typography.button}"
     height: 44px
   button-danger:
@@ -456,7 +462,9 @@ confirming, in mempool, offline, no routes, refunds, and every warning note.
 **The transparent pool keeps its yellow.** `fgTransparent` / `bgTransparent`
 (#E6C46A) marks the transparent pool and nothing else, always next to the
 pool's name: the eye icon in Receive, the "public" tag, the line under a field
-when the address is transparent, the Address Book's public rows. A state is
+when the address is transparent, the Address Book's public rows. In Pools its
+total is yellow only while it holds funds; at zero it looks like the other
+pools. A state is
 never painted with it.
 
 **Errors.** `fgDanger` / `bgDanger` (#E5484D) is for errors and destructive
@@ -464,8 +472,12 @@ actions only, never decoration.
 
 **Roles that own their colour.**
 - `bgNym` (#07FF94): only actions and marks that go through the Nym mixnet.
+  `fgNym`, the same green, is for text and icons that say something goes
+  through the mixnet.
 - `fgViewOnly` / `bgViewOnlySubtle`: the view-only (watch-only) wallet: the
-  snowflake, its tiles, its tag and the view-only notice's button.
+  snowflake, its tiles, its tag and the view-only notice's button. Also the
+  viewing key's rows: the viewing key is what makes a view-only wallet, so it
+  takes that role's colour.
 - `fgSyncing` (#EBFF5A): sync progress.
 - `fgOptionIcon` (#B1BBC5): the artwork icons of the options panel (the side
   menu), so they all read at one weight and tone.
@@ -504,6 +516,7 @@ One variant per role. Weight overrides are limited to the cases listed here.
 | Lead under a sheet title, note, hint, counter | `caption`, `fgMuted` |
 | Text of a compact note (warnings outside Home) | `caption`, regular, never bold |
 | Link inside content ("Save contact", "See why", "Clear") | `caption` 700 |
+| A tappable text that isn't green (a link in a warning, "Flashnet", "Add tag", Available) | Underlined, in its own colour. Green text buttons are not |
 | Month label in History | `caption` 600, `fgMuted`, uppercase |
 | Mixnet wait lines | `bodySmall` `fgMuted` + `body` 500 for the state |
 | Address, key, transaction id | `address` (mono 13/18) |
@@ -514,13 +527,32 @@ never rounded up. Fiat shows two decimals. Only money in or out carries a
 sign: "+" on a receipt, "−" on a send, no sign on a move within the wallet
 (a shield, a send to oneself, a migration), in History and in the detail.
 
+**Struck text.** What never happened is struck through (`Text`'s `strike`),
+in `fgMuted`: the amount of a swap that is Failed or Deposit not detected,
+with every provider, and of a Zingo transaction that failed or was rejected,
+in its History row and its detail; and the deposit address nobody should pay anymore.
+Nothing else.
+
 **Short addresses.** In rows, detail rows, tokens and fields: first 6 … last
 6. On Receive's address card: first 10 … last 10. A field that holds an
 address stays one line and shortens it in the middle when not focused.
 
 **Large text.** Variants grow with the OS text size up to their cap (body ×2,
 titles ×1.5, the balance ×1.3). Layouts wrap instead of clipping: text beside
-an icon has `flexShrink: 1`.
+an icon has `flexShrink: 1`. A label never breaks inside a control; the
+space around it adapts:
+- Buttons, chips, tags and pills stay on one line (`numberOfLines={1}`); the
+  control grows in width to fit its label.
+- A row of controls that no longer fits wraps to the next line (History's
+  filters, Insight's range chips).
+- Rows of information can truncate with "…" (a contact's name), never a
+  button or an amount.
+- Text keeps growing up to its variant's cap; scaling is never turned off.
+- Words are cut at the end ("tail"). Only an address, a key or a transaction
+  id is cut in the middle, where both ends matter.
+- A field's placeholder is an instruction, not a value: one line, in `body`
+  regular `fgMuted`, never mono, cut at the end if it does not fit, at any
+  text size. The value keeps its own style (mono for an address).
 
 ## Layout
 
@@ -552,6 +584,12 @@ and the notice stack.
 - Content starts `space8` under the `TitleBar`.
 - The `TitleBar` keeps its own inset: 16 from the edge plus each action's 14,
   as History's bar draws it. `space20` is the gutter for the content under it.
+- A bottom sheet's content ends `space24` above the navigation bar
+  (`insets.bottom + space24`), set once in `AppSheetModal`. A sheet pads its
+  own bottom only to clear the keyboard.
+- A list in a sheet that sizes to its content is a `SheetScrollView`: the
+  sheet opens at the full height of its title, rows and bottom inset, and the
+  list scrolls under the fixed title only when that is taller than the screen.
 
 **Menu screens.** What the options panel (the side menu) opens (Settings,
 Pools, Server, the seed, the Address Book…) is a full screen on the canvas,
@@ -568,9 +606,21 @@ pool always shows with its own colour and its name.
 **Lists.** History is a flat list on the panel, no cards: rows of 64 with a
 hairline that starts at the text. Month labels scroll with their rows; nothing
 is pinned over the list. While a filter is on, its "Showing … · Clear" bar
-stays above the list. Lists
+stays above the list.
+
+**History's icons.** A row leads with its kind's icon (`screens/History/transferIcon.ts`):
+received, sent, sent to yourself (a memo to yourself too), shielded, migration,
+swap. Until a transaction has the wallet's minimum confirmations it shows the
+clock instead, and its state word from `transferStatus` ("In mempool",
+"Confirming 1 of 3") before the time, as its detail's pill says it. A failed
+or rejected one keeps its kind's icon, in red on the red tint. A send to a
+saved contact shows the contact's Avatar with the ZEC badge, pending or not.
+A swap shows its icon, or the clock while it moves, with the other coin's
+badge. Lists
 of choices (routes, coins, networks, addresses, servers) are `RadioRow`s
 inside one `RadioList` card.
+
+**Swaps and SwapKit.** The swap form credits the service in one centred line, "Powered by" + SwapKit's emblem (16 high, their white version) + "SwapKit" in 600 + ⓘ, in English in every language; the ⓘ names both services that see the swap. A swap detail's footer opens SwapKit Explorer once the swap has a deposit hash. A swap that did not finish well (Failed, Refunding, Refunded, Deposit not detected) gets a "Track this swap" fold instead, built like "Zcash transactions": every link from `buildTrackerEntries` (SwapKit, the provider, each leg's chain explorer, Zcash last), each row with the explorer's own name, what it shows, the id it opens and an external-link icon, and "Copy all links" under the card. It always opens closed.
 
 **Fields.** One line, `fieldMinHeight` 48, label above in `bodySmall` 600
 muted. Actions inside a field (clear, paste, book, scan) are `FieldAction`s:
@@ -592,7 +642,7 @@ inset), not from shadows or blur.
 
 ## Shapes
 
-**Radii.** `radiusSm` 8: tags and icon tiles. `radiusMd` 12: cards, groups of
+**Radii.** `radiusXs` 4: the checkbox. `radiusSm` 8: tags and icon tiles. `radiusMd` 12: cards, groups of
 rows, fields, notices, notes, detail rows, the QR plate. `radiusPill`: buttons,
 chips, toggles, avatars, the tab bar and its capsule. `radiusSheet` 28: the top
 corners of every panel and sheet. Nothing else.
@@ -618,13 +668,17 @@ Use the shared component; never build a second one that looks the same.
 | For | Use |
 |---|---|
 | Any text | `Text` with a variant and a tone. `BoldText`, `RegText` and `FadeText` are legacy and leave the screens they are found in |
-| Any button | `Button`: `primary` (the one main action of a view), `secondary` (outlined, beside others of the same weight: Copy, Verify), `text` (green: Back, Skip, secondary moves), `quiet` (grey: only Cancel and a Close that leaves a flow), `danger` (deletes or cannot be undone), `nym` (only through the mixnet), `viewOnly` (the view-only notice). `small` only inside notices and rows |
-| A field | `TextField` with `FieldAction`s |
+| Any button | `Button`: `primary` (the one main action of a view), `secondary` (outlined, beside others of the same weight: Copy, Verify), `text` (green: Back, Skip, secondary moves), `quiet` (grey: only Cancel and a Close that leaves a flow), `danger` (the filled confirm of a delete, or of what cannot be undone, in its sheet), `dangerText` (Delete on a screen: the red label with no fill, which opens that sheet), `nym` (only through the mixnet), `viewOnly` (the view-only notice). `small` only inside notices and rows |
+| A field | `TextField` with `FieldAction`s. With a prefix and a suffix (the custom server): same measures as every field, `fieldMinHeight` 48, `radiusMd` 12, the value's text variant; the prefix ("https://") and the suffix (":" and the port) in `fgMuted` |
 | A card | `Card` (tones `default`, `selected`, pools) |
 | Label and value rows | `DetailRows` |
 | A list row | `ListRow`; a choice is a `RadioRow` in a `RadioList` |
 | A filter | `Chip` (it never navigates) |
+| Anything pressed that none of these covers | `Pressable` with its `kind`: `button`, `row`, `icon`, `link` or `tile` (see Motion, Pressing) |
+| A delete | `dangerText` "Delete" on the screen; the confirmation sheet titled "Delete", with its own message, a filled `danger` "Delete" and Cancel under it. Every delete says "Delete", on the screen and in the sheet, the same word in every language. The Address Book's red bin opens the same sheet |
+| Leaving a sheet | Two kinds, one way out each. A sheet you pick from or fill in (lists, pickers, filters, forms: New address, Add tag, a contact) has a `TitleBar` with the X, no handle and no Cancel; closing it any way (the X, a swipe, the scrim) leaves it empty for next time. A sheet that asks a question (confirmations, Delete, Shield, Authorize, Delete wallet, the seed sheet, "I sent it") has the handle and ends with Cancel, no X. Confirm and the swap review keep the back arrow with Cancel: the arrow steps back, Cancel leaves the flow |
 | An on/off setting | `Switch` (exception D), the only toggle in the app |
+| A checkbox | `Checkbox`: box 16 × 16 (`iconSizeSm`), radius 4 as `radiusXs` (`radiusSm` 8 would read as a radio at that size), border 1.5 in `borderMuted` when off; `bgAccent` with the tick in `fgOnAccent` when on. The label next to it is part of the tap area, at least 44 high |
 | An amount to type | `AmountCard` (exception C) |
 | A short status | `Tag` (read, not tapped) |
 | A person or the wallet | `Avatar` |
@@ -635,10 +689,18 @@ Use the shared component; never build a second one that looks the same.
 
 **Notices on Home.** The notice stack shows `Banner`s that all share one
 background and edge (`bgSurface`, `bottomSheetBorder`), whatever the notice:
-transparent funds, seed backup, view-only, Ironwood. Only the content changes:
-the icon in its 36 tile, the title (`bodyStrong`), the tag, the body
-(`bodySmall` muted) and the action, a `small` button beside the text,
-vertically centred. A notice the user can hide has an X: in the card's
+transparent funds, seed backup, view-only, Ironwood. Only the content changes.
+The first row holds the icon in a 24 tile (`radiusXs`, the tone's subtle fill,
+the icon at `iconSizeSm` in the tone's colour) and the title (`bodyStrong`),
+vertically centred. No tag says what the tile and the text already say
+(public, not backed up); only a finished backup shows its green pill before
+the notice leaves.
+The body (`bodySmall` muted) goes under it from the notice's left edge. The
+action, a `small` button, stays on the right, vertically centred on the
+notice. Wallet Seed's backup strip is built the same way. A 36 tile stays for
+a list row's leading image (Import, Your swaps, Pools), titleless lists of
+points and a sheet's centred hero icon; the compact notes outside Home have
+no tile. A notice the user can hide has an X: in the card's
 top-right corner, outside the row (the view-only notice, whose button is
 `viewOnly`), or beside the button (`dismissBeside`) when the card is too short
 for a corner X (Ironwood, once only a residual is left in Orchard). Hiding a
@@ -665,6 +727,9 @@ deposit, Confirm, Receive, the swap sheets) is a compact note: the icon inline
 at 16 with no tile, the text in `caption` regular with no bold, padding 12,
 `radiusMd`, in the tone's own colours. Long explanations hide behind a link
 ("See why"). There is no danger note: errors sit next to what failed.
+With a button beside it, the text block is centred against the button and the
+icon stays on the first line of text: one line of text puts the icon, the text
+and the button on one centred line.
 
 ## Do's and Don'ts
 
@@ -676,6 +741,10 @@ at 16 with no tile, the text in `caption` regular with no bold, padding 12,
 - Show a contact's name and avatar wherever their address appears, and offer
   "Save contact" wherever an outside address is not in the Address Book.
 - Write every new string in the five catalogs.
+- Keep the reserved space of text that is invisible for now (Launching's), so
+  the logo doesn't jump, but hide it from screen readers while it's invisible
+  (`importantForAccessibility="no-hide-descendants"` /
+  `accessibilityElementsHidden`), and don't make it `selectable`.
 
 **Don't**
 - Don't set `fontSize`, `lineHeight`, `letterSpacing`, `borderRadius`, a
@@ -692,14 +761,57 @@ at 16 with no tile, the text in `caption` regular with no bold, padding 12,
 Durations and curves live in `app/theme/motion.ts`; nothing hand-times an
 animation.
 
+**Pressing.** Everything that reacts to a press reacts one way for its kind,
+through the shared `Pressable` and its `kind`, in `duration.fast` (140 ms) on
+`ease.standard`, in and out. A disabled control does not react.
+- Buttons and pills (every `Button`, small buttons, chips, the unit pill, the
+  coin button, the flip button, the round scroll-to-top and scroll-to-bottom
+  buttons): scale to 0.97. Their opacity stays.
+- Rows and tappable cards (`ListRow`, `RadioRow`, History's rows, swap rows,
+  Messages' rows, Server's rows, a tappable `Card`, the pending swap card):
+  their background takes `bgMutedSubtle`.
+- Icon-only buttons (the `TitleBar`'s and the `Header`'s actions, back
+  included, `FieldAction`s, the close X, the eye, an info icon, copy, the
+  Address Book's action circles, the options panel's chevron, gear and
+  socials, the tab bar's icons): the icon scales to 0.88, never a background.
+- The options panel's tiles: the 56 tile scales to 0.94 (`kind="tile"`, the
+  tile in a `PressTile`); its label stays still. The cell is the tap target,
+  with no background.
+- A message bubble: the bubble scales to 0.97 (`kind="tile"`, the bubble in
+  a `PressTile large`) and keeps its colours and corners. The row is the tap
+  target, with no background.
+- Text links ("Save contact", "See why", "Clear", "Add tag", Available): fade
+  to 0.6.
+- `TouchableOpacity` is not used: its default fades a control to 0.2.
+
+**Expanding.** A row that opens in place (a contact in the Address Book)
+unfolds in `duration.medium` on `ease.emphasized`; its actions fade in
+`duration.base` on `ease.standard`, and fold back the same way. What an
+action draws after the press (the plane leaving, the pen, the bin's lid)
+belongs to that action and keeps the press above.
+
+**One motion at a time.** Opening something moves one thing.
+- A tab's panel is in place on its first frame; switching tabs only
+  cross-fades the content.
+- A full panel rises over the screen it came from, and nothing else moves.
+  From a sheet (Your swaps), the panel rises over it and the sheet leaves
+  underneath without its own motion.
+- Nothing flashes between screens: the screen behind stays drawn until the
+  panel covers it.
+
 - Sheets open and close in 420 ms on (.2, 0, 0, 1).
 - A full panel rises in 560 ms on (.32, .72, 0, 1) while its content fades
   in, and lowers in 460 ms. Steps inside it (review, sending, sent) only
   cross-fade their content in 150 ms.
 - Home's tabs cross-fade their content in 240 ms.
-- Menu screens slide in from the right.
+- Menu screens slide in from the right and back out to it: every screen
+  the options panel opens and Settings, through one shared option. The panel waits behind them under `bgScrim`, which fades in
+  `duration.screen` and out in `duration.sheetClose`.
 - Closing a flow lowers only the panel on top; the ones under it leave with
   it.
+- A swap waiting for a payment from another wallet: the coin sent breathes
+  in place (`duration.breathe`, in and out on `ease.standard`) and nothing
+  travels until the provider sees the payment (`SwapFlight`'s `waiting`).
 - The tab bar's capsule slides in 360 ms on (.2, 0, 0, 1), its colours change
   in 220 ms, and it shrinks and grows in 360 ms.
 - Every animation honours Reduce Motion (`ReduceMotion.System`).
@@ -707,8 +819,8 @@ animation.
 ## Exceptions
 
 Approved by the designer. Nothing else departs from the system. There are
-four: the tab bar (A), Swap's two cards (B), the amount card (C) and the
-switch (D).
+five: the tab bar (A), Swap's two cards (B), the amount card (C), the
+switch (D) and the brand (E).
 
 **A. The tab bar** is drawn at the prototype's own values:
 - 366 wide, 60 tall (icon 28 with 10 above and below), radius 33, padding 5,
@@ -717,7 +829,7 @@ switch (D).
 - Idle: strokes and leaf `fgTabIdle`, veins `bgTabBar`. Selected: strokes
   `fgTabSelected`, leaf `fgAccent`, veins `bottomSheetBorder`.
 - One capsule (`bgTabCapsule`) slides to the selected tab. On press the icon
-  scales to 0.88.
+  scales to 0.88, as every icon-only button (Motion, Pressing).
 - Scrolling a tab's list down shrinks the bar to 250 × 50 (padding 4, icons at
   0.86); scrolling up or changing tab brings it back.
 
@@ -759,9 +871,8 @@ today, and every toggle in the app uses it:
   `bgSwitchNymDeep` and `fgSwitchThumb`. It replaced the switch drawings
   in `assets/img` and the one Server drew.
 
-**Pending.** The labels inside the swap tracking animation (`SwapFlight`, 10
-and 11 pt) wait for the designer's decision: an approved exception, or moved
-onto the scale.
+**E. The brand.** StartMenu's 49 pt "Zingo" keeps its size as a named
+exception. It is the wordmark, used once, not text.
 
 ## Changing the system
 
@@ -771,6 +882,11 @@ onto the scale.
    commit.
 3. Only then use it on the screen.
 
+CI holds step 2: a PR that changes a value in `app/theme` (tokens, radii,
+sizes, spacing, typography, motion) without changing this file fails the
+static checks. The `design-md-unchanged` label lets through a change with
+nothing visible, such as a comment. The PR template asks the same.
+
 The decision that this file and `app/theme` govern the interface is recorded
 in zingo-adrs (`zingo-mobile/0024`). `AGENTS.md` points every UI change here.
 
@@ -778,13 +894,7 @@ in zingo-adrs (`zingo-mobile/0024`). `AGENTS.md` points every UI change here.
 internals, the Address Book, the server list, `ChainSelect`, the migration
 screens) still hold some hand-set values and legacy text components; they move
 onto the system as each is redesigned. Also open:
-- Send (Available, fee) and Confirm (amount, fee, total) still show 4 fixed
-  decimals; they follow the amount rule above.
-- `formatZecAmount` always writes a dot, while Send and Confirm use the
-  phone's decimal separator; one of the two has to win.
 - `AuthorizeSheet`'s title is `subtitle`; dialog-like sheets use
   `bodyStrong` 700.
 - `DetailRows` lives in `screens/Swap/components` but is shared, and belongs
   in `ui/widgets`.
-- Pools still sets a few sizes by hand (its header's 44 and 12, the legend's
-  dots); they move to tokens.

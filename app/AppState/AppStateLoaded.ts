@@ -16,16 +16,4 @@ export default interface AppStateLoaded {
 
   // to do scroll to bottom in messages
   scrollToBottom: boolean;
-
-  // Address+ownership pair for the shared "Add Tag/Contact" BottomSheetModal
-  // hosted at LoadedApp level. `null` while hidden.
-  addTagModalTarget: {
-    address: string;
-    own: boolean;
-    swapChain: string;
-    // What to put in the label field before the user types, when the launcher
-    // knows a name for the address (a ZNS alias, say). The user is free to
-    // replace it.
-    initialLabel?: string;
-  } | null;
 }

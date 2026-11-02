@@ -1,7 +1,9 @@
+/* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import { SnowflakeIcon } from '@ui/primitives/Icons/SnowflakeIcon';
 import { REVEAL_OPEN_MS } from '@ui/widgets/CircularReveal';
 import { ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import {
   StackActions,
   useNavigation,
@@ -10,7 +12,7 @@ import {
 import { WalletNavigation } from '@app/types';
 import { useTheme, iconSize, slopFor } from '@app/theme';
 import React, { useContext, useEffect, useRef } from 'react';
-import { Image, TouchableOpacity, View } from 'react-native';
+import { Image, View } from 'react-native';
 import Animated, {
   Easing,
   ReduceMotion,
@@ -59,9 +61,15 @@ type HeaderProps = {
   // side menu
   noDrawMenu?: boolean;
   closeScreen?: () => void;
+  /** The back arrow does nothing for now (a server being set). */
+  backDisabled?: boolean;
   /** The back arrow's testID and spoken label, with closeScreen. */
   backTestID?: string;
   backAccessibilityLabel?: string;
+  /** Drawn in place of the title text: the title with its tip, say. */
+  titleElement?: React.ReactElement;
+  /** An action at the bar's right end. */
+  right?: React.ComponentProps<typeof TitleBar>['right'];
   // balance
   noBalance?: boolean;
   // syncing icons
@@ -105,8 +113,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   setPrivacyOption,
   receivedLegend,
   closeScreen,
+  backDisabled,
   backTestID,
   backAccessibilityLabel,
+  titleElement,
+  right,
   noUfvkIcon,
   showMessagesIcon,
   onUsdRowLayout,
@@ -194,6 +205,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     );
   };
 
+  const hasTitle = !!title || !!titleElement;
+
   return (
     <>
       <View>
@@ -206,7 +219,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               alignItems: 'center',
               backgroundColor: colors.bgCanvas,
               paddingTop: 0,
-              paddingBottom: BAR_BOTTOM,
+              /** A screen's title sits right under the row: 40 from the badge's centre to the title's. */
+              paddingBottom: hasTitle ? 0 : BAR_BOTTOM,
               minHeight: 50,
             },
           ]}
@@ -221,7 +235,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             }}
           >
             {mixnetPhase !== 'absent' && (
-              <TouchableOpacity
+              <Pressable
+                kind="icon"
                 testID="header.mixnet-status"
                 hitSlop={slopFor(22)}
                 accessibilityRole="button"
@@ -231,7 +246,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 onPress={() => navigation.navigate(Route.MixnetDoctor)}
               >
                 <MixnetIcon phase={mixnetPhase} />
-              </TouchableOpacity>
+              </Pressable>
             )}
           </View>
 
@@ -283,7 +298,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         >
           <View style={{ alignItems: 'center', flexDirection: 'row', gap: 14 }}>
             {!noDrawMenu && (
-              <TouchableOpacity
+              <Pressable
+                kind="icon"
                 hitSlop={slopFor(24)}
                 testID="header.drawmenu"
                 accessible={true}
@@ -309,11 +325,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     }}
                   />
                 )}
-              </TouchableOpacity>
+              </Pressable>
             )}
             {readOnly && !noUfvkIcon && (
               <Animated.View style={headerAnimatedStyle}>
-                <TouchableOpacity
+                <Pressable
+                  kind="icon"
                   hitSlop={slopFor(24)}
                   testID="header.snowflake"
                   accessibilityRole="button"
@@ -323,7 +340,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   <Animated.View ref={snowflake} style={snowStyle}>
                     <SnowflakeIcon size={iconSize} color={colors.fgViewOnly} />
                   </Animated.View>
-                </TouchableOpacity>
+                </Pressable>
               </Animated.View>
             )}
           </View>
@@ -353,14 +370,15 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   corner pads 13, so an 11 half-box lands at 24 without the
                   4.5 below. The nudge rides on the icon alone, leaving the
                   logo this corner falls back to where it already sat. */}
-              <TouchableOpacity
+              <Pressable
+                kind="icon"
                 hitSlop={slopFor(24)}
                 style={{ marginRight: 5, marginTop: 4.5 }}
                 testID="header.messages"
                 onPress={() => navigation.navigate(Route.Messages)}
               >
                 <MessagesIcon size={iconSize} color={colors.fgMuted} />
-              </TouchableOpacity>
+              </Pressable>
             </View>
           ) : (
             <Image
@@ -376,16 +394,19 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         </Animated.View>
       </View>
 
-      {!!title && (
+      {hasTitle && (
         <TitleBar
+          tight
           testID={testID}
-          title={title}
+          title={titleElement ?? title}
+          right={right}
           left={
             closeScreen
               ? {
                   icon: ChevronLeft,
                   accent: true,
                   onPress: closeScreen,
+                  disabled: backDisabled,
                   testID: backTestID,
                   accessibilityLabel: backAccessibilityLabel ?? title,
                 }

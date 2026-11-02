@@ -63,6 +63,7 @@ export const defaultAppContextLoading: AppContextLoading = {
   viewRecoveryWallet: () => {},
   openServer: () => {},
   closeServer: () => {},
+  stepBack: () => false,
   openCurrentWallet: () => {},
   createNewWallet: () => {},
   getwalletToRestore: () => {},

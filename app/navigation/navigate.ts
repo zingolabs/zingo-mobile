@@ -29,6 +29,10 @@ export const navigateWallet = (
   navigationRef.navigate(Route.Wallet, target);
 };
 
+/** Whether `name` is the screen on top: what settles late leaves alone a user who walked away from it. */
+export const isOnTop = (name: string): boolean =>
+  navigationRef.isReady() && navigationRef.getCurrentRoute()?.name === name;
+
 // Opens the scanner, a root route, from any widget: the ones inside a
 // bottom sheet render outside the navigator tree.
 export const openScanner = (params: ScannerNavigationState): void => {

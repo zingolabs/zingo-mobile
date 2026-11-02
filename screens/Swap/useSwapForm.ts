@@ -32,9 +32,10 @@ import {
   validateAddressForChain,
   zecNetworkFeeReserve,
 } from '@app/swap';
-import { parseAmountInput } from '@app/utils/formatAmount';
+import { decimalSeparator, parseAmountInput } from '@app/utils/formatAmount';
 import { selectionAcrossRefresh } from '@app/swap/selectionAcrossRefresh';
 import type {
+  SwapPrefillType,
   FiatValueBasisType,
   QuoteInput,
   RouteOptionType,
@@ -46,6 +47,7 @@ import type {
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
 import { deriveRefundAddress } from '@app/walletBackend';
 import {
+  tokenEntryOf,
   ZEC_ASSET,
   isQuotableToken,
   isZecWrapper,
@@ -105,6 +107,8 @@ export type SwapFormArgs = {
   mixnetBlocked: boolean;
   /** A sheet is open over the form: the quote countdown holds until it closes. */
   paused: boolean;
+  /** A purchase to ask about again: the form fills itself and arms the review. */
+  prefill?: SwapPrefillType;
 };
 
 /**
@@ -120,6 +124,7 @@ export function useSwapForm({
   zecChain,
   mixnetBlocked,
   paused,
+  prefill,
 }: SwapFormArgs) {
   const [direction, setDirection] = useState<SwapDirectionEnum>(() =>
     spendable > 0 ? SwapDirectionEnum.Outbound : SwapDirectionEnum.Inbound,
@@ -331,6 +336,61 @@ export function useSwapForm({
   const setActiveAddress = isOutbound
     ? setDestinationAddress
     : setRefundAddress;
+
+  // A prefill lands in three steps, each a render after the last: the
+  // direction, then the coin once that direction's catalog is in, then the
+  // amount and the address once the coin's chain has cleared the fields.
+  // The prefill only fills the form: the user sees the new quote and goes on.
+  const [pendingPrefill, setPendingPrefill] = useState<SwapPrefillType | null>(
+    null,
+  );
+  const [prefillStage, setPrefillStage] = useState<'coin' | 'fields' | null>(
+    null,
+  );
+  const handledPrefillAt = useRef<number | null>(null);
+  useEffect(() => {
+    if (!prefill || handledPrefillAt.current === prefill.requestedAtMs) {
+      return;
+    }
+    handledPrefillAt.current = prefill.requestedAtMs;
+    setDirection(prefill.direction);
+    setPendingPrefill(prefill);
+    setPrefillStage('coin');
+  }, [prefill]);
+  useEffect(() => {
+    if (
+      prefillStage !== 'coin' ||
+      !pendingPrefill ||
+      !tokens ||
+      tokensDirection !== pendingPrefill.direction
+    ) {
+      return;
+    }
+    setSelectedToken(
+      tokens.find(t => t.identifier === pendingPrefill.asset.swapKitId) ??
+        tokenEntryOf(pendingPrefill.asset),
+    );
+    setPrefillStage('fields');
+  }, [prefillStage, pendingPrefill, tokens, tokensDirection]);
+  useEffect(() => {
+    if (
+      prefillStage !== 'fields' ||
+      !pendingPrefill ||
+      selectedToken?.identifier !== pendingPrefill.asset.swapKitId
+    ) {
+      return;
+    }
+    setAmount(
+      pendingPrefill.sellAmountHumanDecimal.replace('.', decimalSeparator()),
+    );
+    if (pendingPrefill.direction === SwapDirectionEnum.Outbound) {
+      setDestinationAddress(pendingPrefill.address);
+    } else {
+      setRefundAddress(pendingPrefill.address);
+    }
+    setPrefillStage(null);
+    setPendingPrefill(null);
+  }, [prefillStage, pendingPrefill, selectedToken]);
 
   useEffect(() => {
     let cancelled = false;

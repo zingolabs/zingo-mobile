@@ -226,15 +226,9 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
         ]}
       />
 
-      {showExactAmount && !memo && (
-        <Banner
-          tone="warning"
-          title={
-            utxo && bitcoin
-              ? `${t('swap.exact-amount')} ${t('swap.exact-amount-btc')}`
-              : t('swap.exact-amount')
-          }
-        />
+      {/* The row and its tip already say exactly; only a BTC wallet's fee needs a word. */}
+      {showExactAmount && !memo && utxo && bitcoin && (
+        <Banner tone="warning" title={t('swap.exact-amount-btc')} />
       )}
     </View>
   );

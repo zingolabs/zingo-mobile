@@ -2,12 +2,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useTheme } from '@app/theme';
-import AppSheetModal from '@ui/primitives/AppSheetModal';
-import BoldText from '@ui/primitives/BoldText';
-import RegText from '@ui/primitives/RegText';
+import { space4, space8 } from '@app/theme';
+import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
+import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import {
   ConfirmButton,
@@ -18,19 +16,16 @@ import {
 // The confirmation sheet behind showConfirm: title, message, the actions as
 // full-width pills (red when destructive) and Cancel as a link under them.
 const ConfirmBottomSheet: React.FC = () => {
-  const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
   const ref = useRef<BottomSheetModal>(null);
   const [options, setOptions] = useState<ConfirmOptions | null>(null);
   const resolvedRef = useRef<boolean>(false);
 
   useEffect(() => {
-    registerConfirmListener(opts => {
+    return registerConfirmListener(opts => {
       resolvedRef.current = false;
       setOptions(opts);
       ref.current?.present();
     });
-    return () => registerConfirmListener(null);
   }, []);
 
   const handleButton = useCallback((button: ConfirmButton) => {
@@ -64,63 +59,57 @@ const ConfirmBottomSheet: React.FC = () => {
       onDismiss={handleSheetDismissed}
       contentStyle={{
         paddingHorizontal: 20,
-        paddingBottom: insets.bottom + 24,
       }}
     >
-      <BoldText
+      <Text
         testID="confirm.title"
-        style={{
-          marginTop: 4,
-          textAlign: 'center',
-          fontSize: 15,
-          lineHeight: 21,
-        }}
+        variant="bodyStrong"
+        style={{ marginTop: space4, textAlign: 'center' }}
       >
         {options?.title ?? ''}
-      </BoldText>
+      </Text>
       {!!options?.message && (
-        <RegText
+        <Text
           testID="confirm.message"
-          color={
-            options.messageTone === 'danger' ? colors.fgDanger : colors.fgMuted
-          }
+          variant="caption"
+          tone={options.messageTone === 'danger' ? 'danger' : 'muted'}
           style={{
-            marginTop: 6,
-            fontSize: 12,
-            lineHeight: 18,
+            marginTop: space8,
             textAlign: options.messageAlign ?? 'center',
           }}
         >
           {options.message}
-        </RegText>
+        </Text>
       )}
       {options?.content}
-      <View style={{ marginTop: 20, gap: 10 }}>
-        {actions.map((b, i) => (
+      <SheetFooter style={{ paddingHorizontal: 0 }}>
+        <View style={{ marginTop: 20, gap: 10 }}>
+          {actions.map((b, i) => (
+            <Button
+              key={`${i}-${b.text}`}
+              testID={`confirm.action.${i}`}
+              variant={
+                b.style === 'destructive'
+                  ? 'danger'
+                  : b.style === 'ghost'
+                    ? 'text'
+                    : 'primary'
+              }
+              title={b.text}
+              onPress={() => handleButton(b)}
+            />
+          ))}
+        </View>
+        {!!cancel && (
           <Button
-            key={`${i}-${b.text}`}
-            testID={`confirm.action.${i}`}
-            variant={
-              b.style === 'destructive'
-                ? 'danger'
-                : b.style === 'ghost'
-                  ? 'text'
-                  : 'primary'
-            }
-            title={b.text}
-            onPress={() => handleButton(b)}
+            testID="confirm.cancel"
+            variant="quiet"
+            title={cancel.text}
+            onPress={() => handleButton(cancel)}
+            style={{ marginTop: 8 }}
           />
-        ))}
-      </View>
-      {!!cancel && (
-        <Button
-          testID="confirm.cancel"
-          variant="quiet"
-          title={cancel.text}
-          onPress={() => handleButton(cancel)}
-          style={{ marginTop: 8 }}
-        />
-      )}
+        )}
+      </SheetFooter>
     </AppSheetModal>
   );
 };

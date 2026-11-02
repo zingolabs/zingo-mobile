@@ -11,6 +11,244 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
 >
   <View
     style={
+      {
+        "height": 59,
+        "left": 0,
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+      }
+    }
+  >
+    <View>
+      <View
+        style={
+          [
+            {},
+            {
+              "alignItems": "center",
+              "backgroundColor": "#011401",
+              "display": "flex",
+              "minHeight": 50,
+              "paddingBottom": 10,
+              "paddingTop": 0,
+            },
+          ]
+        }
+        testID="header"
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "height": 57,
+              "justifyContent": "center",
+              "paddingTop": 12,
+            }
+          }
+        />
+      </View>
+      <View
+        style={
+          {
+            "left": 0,
+            "paddingBottom": 11.5,
+            "paddingLeft": 20,
+            "paddingRight": 11.5,
+            "paddingTop": 16,
+            "position": "absolute",
+            "top": 0,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 14,
+            }
+          }
+        >
+          <View
+            accessibilityLabel="text translated"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            hitSlop={
+              {
+                "bottom": 10,
+                "left": 10,
+                "right": 10,
+                "top": 10,
+              }
+            }
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                undefined,
+                {},
+              ]
+            }
+            testID="header.drawmenu"
+          />
+        </View>
+      </View>
+      <View
+        style={
+          [
+            {},
+            {
+              "padding": 13,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+            },
+          ]
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 14,
+            }
+          }
+        >
+          <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            hitSlop={
+              {
+                "bottom": 10,
+                "left": 10,
+                "right": 10,
+                "top": 10,
+              }
+            }
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                {
+                  "marginRight": 5,
+                  "marginTop": 4.5,
+                },
+                {},
+              ]
+            }
+            testID="header.messages"
+          />
+        </View>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      [
+        {
+          "backgroundColor": "#02060C9E",
+          "bottom": 0,
+          "left": 0,
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
+        },
+        {},
+      ]
+    }
+  >
+    <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={false}
+      collapsable={false}
+      focusable={true}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "flex": 1,
+        }
+      }
+      testID="addresslist.outside"
+    />
+  </View>
+  <View
+    style={
       [
         {
           "backgroundColor": "#031124",
@@ -64,7 +302,8 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
           style={
             {
               "alignItems": "flex-start",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         >
@@ -102,12 +341,15 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "paddingHorizontal": 14,
-                "paddingVertical": 4,
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "paddingHorizontal": 14,
+                  "paddingVertical": 4,
+                },
+                {},
+              ]
             }
             testID="addresslist.back"
           />
@@ -116,7 +358,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
           style={
             {
               "alignItems": "center",
-              "flex": 1,
+              "flexShrink": 1,
             }
           }
         >
@@ -140,7 +382,8 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
           style={
             {
               "alignItems": "flex-end",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         />
@@ -271,26 +514,47 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "backgroundColor": "transparent",
-                  "columnGap": 12,
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "minHeight": 56,
-                  "paddingLeft": 16,
-                  "paddingRight": 0,
-                  "paddingVertical": 12,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "columnGap": 12,
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "minHeight": 56,
+                    "paddingLeft": 16,
+                    "paddingRight": 0,
+                    "paddingVertical": 12,
+                  },
+                  {},
+                ]
               }
               testID="addresslist.row.UA-orchard-sapling12345678901234567890"
             >
+              <View
+                pointerEvents="none"
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": undefined,
+                    },
+                    {},
+                  ]
+                }
+              />
               <View
                 style={
                   {
                     "alignItems": "center",
                     "borderColor": "#18bd18",
-                    "borderRadius": 9,
+                    "borderRadius": 999,
                     "borderWidth": 2,
                     "height": 18,
                     "justifyContent": "center",
@@ -303,7 +567,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                     [
                       {
                         "backgroundColor": "#18bd18",
-                        "borderRadius": 4.5,
+                        "borderRadius": 999,
                         "height": 9,
                         "width": 9,
                       },
@@ -415,14 +679,16 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "backgroundColor": "transparent",
-                    "borderRadius": 999,
-                    "height": 44,
-                    "justifyContent": "center",
-                    "width": 44,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderRadius": 999,
+                      "height": 44,
+                      "justifyContent": "center",
+                      "width": 44,
+                    },
+                    {},
+                  ]
                 }
               >
                 <View
@@ -462,14 +728,16 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "backgroundColor": "transparent",
-                    "borderRadius": 999,
-                    "height": 44,
-                    "justifyContent": "center",
-                    "width": 44,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderRadius": 999,
+                      "height": 44,
+                      "justifyContent": "center",
+                      "width": 44,
+                    },
+                    {},
+                  ]
                 }
               />
             </View>
@@ -516,26 +784,47 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "backgroundColor": "transparent",
-                  "columnGap": 12,
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "minHeight": 56,
-                  "paddingLeft": 16,
-                  "paddingRight": 0,
-                  "paddingVertical": 12,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "columnGap": 12,
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "minHeight": 56,
+                    "paddingLeft": 16,
+                    "paddingRight": 0,
+                    "paddingVertical": 12,
+                  },
+                  {},
+                ]
               }
               testID="addresslist.row.UA-sapling-12345678901234567890"
             >
+              <View
+                pointerEvents="none"
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": undefined,
+                    },
+                    {},
+                  ]
+                }
+              />
               <View
                 style={
                   {
                     "alignItems": "center",
                     "borderColor": "#4A6487",
-                    "borderRadius": 9,
+                    "borderRadius": 999,
                     "borderWidth": 1.5,
                     "height": 18,
                     "justifyContent": "center",
@@ -548,7 +837,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                     [
                       {
                         "backgroundColor": "#18bd18",
-                        "borderRadius": 4.5,
+                        "borderRadius": 999,
                         "height": 9,
                         "width": 9,
                       },
@@ -660,14 +949,16 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "backgroundColor": "transparent",
-                    "borderRadius": 999,
-                    "height": 44,
-                    "justifyContent": "center",
-                    "width": 44,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderRadius": 999,
+                      "height": 44,
+                      "justifyContent": "center",
+                      "width": 44,
+                    },
+                    {},
+                  ]
                 }
               >
                 <View
@@ -707,14 +998,16 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "backgroundColor": "transparent",
-                    "borderRadius": 999,
-                    "height": 44,
-                    "justifyContent": "center",
-                    "width": 44,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderRadius": 999,
+                      "height": 44,
+                      "justifyContent": "center",
+                      "width": 44,
+                    },
+                    {},
+                  ]
                 }
               />
             </View>
@@ -761,26 +1054,47 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "backgroundColor": "transparent",
-                  "columnGap": 12,
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "minHeight": 56,
-                  "paddingLeft": 16,
-                  "paddingRight": 0,
-                  "paddingVertical": 12,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "columnGap": 12,
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "minHeight": 56,
+                    "paddingLeft": 16,
+                    "paddingRight": 0,
+                    "paddingVertical": 12,
+                  },
+                  {},
+                ]
               }
               testID="addresslist.row.UA-orchard-12345678901234567890"
             >
+              <View
+                pointerEvents="none"
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": undefined,
+                    },
+                    {},
+                  ]
+                }
+              />
               <View
                 style={
                   {
                     "alignItems": "center",
                     "borderColor": "#4A6487",
-                    "borderRadius": 9,
+                    "borderRadius": 999,
                     "borderWidth": 1.5,
                     "height": 18,
                     "justifyContent": "center",
@@ -793,7 +1107,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                     [
                       {
                         "backgroundColor": "#18bd18",
-                        "borderRadius": 4.5,
+                        "borderRadius": 999,
                         "height": 9,
                         "width": 9,
                       },
@@ -905,14 +1219,16 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "backgroundColor": "transparent",
-                    "borderRadius": 999,
-                    "height": 44,
-                    "justifyContent": "center",
-                    "width": 44,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderRadius": 999,
+                      "height": 44,
+                      "justifyContent": "center",
+                      "width": 44,
+                    },
+                    {},
+                  ]
                 }
               >
                 <View
@@ -952,14 +1268,16 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "backgroundColor": "transparent",
-                    "borderRadius": 999,
-                    "height": 44,
-                    "justifyContent": "center",
-                    "width": 44,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderRadius": 999,
+                      "height": 44,
+                      "justifyContent": "center",
+                      "width": 44,
+                    },
+                    {},
+                  ]
                 }
               />
             </View>
@@ -1059,26 +1377,47 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "backgroundColor": "transparent",
-                  "columnGap": 12,
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "minHeight": 56,
-                  "paddingLeft": 16,
-                  "paddingRight": 0,
-                  "paddingVertical": 12,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "columnGap": 12,
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "minHeight": 56,
+                    "paddingLeft": 16,
+                    "paddingRight": 0,
+                    "paddingVertical": 12,
+                  },
+                  {},
+                ]
               }
               testID="addresslist.row.transparent-1-12345678901234567890"
             >
+              <View
+                pointerEvents="none"
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": undefined,
+                    },
+                    {},
+                  ]
+                }
+              />
               <View
                 style={
                   {
                     "alignItems": "center",
                     "borderColor": "#4A6487",
-                    "borderRadius": 9,
+                    "borderRadius": 999,
                     "borderWidth": 1.5,
                     "height": 18,
                     "justifyContent": "center",
@@ -1091,7 +1430,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                     [
                       {
                         "backgroundColor": "#18bd18",
-                        "borderRadius": 4.5,
+                        "borderRadius": 999,
                         "height": 9,
                         "width": 9,
                       },
@@ -1145,6 +1484,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                   >
                     <Text
                       maxFontSizeMultiplier={2}
+                      numberOfLines={1}
                       style={
                         {
                           "color": "#E6C46A",
@@ -1228,14 +1568,16 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "backgroundColor": "transparent",
-                    "borderRadius": 999,
-                    "height": 44,
-                    "justifyContent": "center",
-                    "width": 44,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderRadius": 999,
+                      "height": 44,
+                      "justifyContent": "center",
+                      "width": 44,
+                    },
+                    {},
+                  ]
                 }
               >
                 <View
@@ -1275,14 +1617,16 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "backgroundColor": "transparent",
-                    "borderRadius": 999,
-                    "height": 44,
-                    "justifyContent": "center",
-                    "width": 44,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderRadius": 999,
+                      "height": 44,
+                      "justifyContent": "center",
+                      "width": 44,
+                    },
+                    {},
+                  ]
                 }
               />
             </View>
@@ -1329,26 +1673,47 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "backgroundColor": "transparent",
-                  "columnGap": 12,
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "minHeight": 56,
-                  "paddingLeft": 16,
-                  "paddingRight": 0,
-                  "paddingVertical": 12,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "columnGap": 12,
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "minHeight": 56,
+                    "paddingLeft": 16,
+                    "paddingRight": 0,
+                    "paddingVertical": 12,
+                  },
+                  {},
+                ]
               }
               testID="addresslist.row.transparent-2-12345678901234567890"
             >
+              <View
+                pointerEvents="none"
+                style={
+                  [
+                    {
+                      "bottom": 0,
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                    },
+                    {
+                      "backgroundColor": "#8888881F",
+                      "borderRadius": undefined,
+                    },
+                    {},
+                  ]
+                }
+              />
               <View
                 style={
                   {
                     "alignItems": "center",
                     "borderColor": "#4A6487",
-                    "borderRadius": 9,
+                    "borderRadius": 999,
                     "borderWidth": 1.5,
                     "height": 18,
                     "justifyContent": "center",
@@ -1361,7 +1726,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                     [
                       {
                         "backgroundColor": "#18bd18",
-                        "borderRadius": 4.5,
+                        "borderRadius": 999,
                         "height": 9,
                         "width": 9,
                       },
@@ -1415,6 +1780,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                   >
                     <Text
                       maxFontSizeMultiplier={2}
+                      numberOfLines={1}
                       style={
                         {
                           "color": "#E6C46A",
@@ -1498,14 +1864,16 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "backgroundColor": "transparent",
-                    "borderRadius": 999,
-                    "height": 44,
-                    "justifyContent": "center",
-                    "width": 44,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderRadius": 999,
+                      "height": 44,
+                      "justifyContent": "center",
+                      "width": 44,
+                    },
+                    {},
+                  ]
                 }
               >
                 <View
@@ -1545,14 +1913,16 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
-                    "alignItems": "center",
-                    "backgroundColor": "transparent",
-                    "borderRadius": 999,
-                    "height": 44,
-                    "justifyContent": "center",
-                    "width": 44,
-                  }
+                  [
+                    {
+                      "alignItems": "center",
+                      "borderRadius": 999,
+                      "height": 44,
+                      "justifyContent": "center",
+                      "width": 44,
+                    },
+                    {},
+                  ]
                 }
               />
             </View>
@@ -1568,6 +1938,7 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
               },
               {
                 "backgroundColor": "#031124",
+                "paddingBottom": 24,
               },
               undefined,
             ]
@@ -1581,8 +1952,123 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
                 "flexGrow": 1,
               }
             }
-          />
+          >
+            <View
+              onLayout={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "paddingBottom": 6,
+                  "paddingHorizontal": 16,
+                  "paddingTop": 8,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "flex-start",
+                    "flex": 1,
+                    "minWidth": 48,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flexShrink": 1,
+                  }
+                }
+              >
+                <Text
+                  accessibilityRole="header"
+                  maxFontSizeMultiplier={1.5}
+                  numberOfLines={1}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 16,
+                      "fontWeight": "700",
+                      "lineHeight": 28,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "flex-end",
+                    "flex": 1,
+                    "minWidth": 48,
+                  }
+                }
+              >
+                <View
+                  accessibilityLabel="text translated"
+                  accessibilityRole="button"
+                  accessibilityState={
+                    {
+                      "busy": undefined,
+                      "checked": undefined,
+                      "disabled": undefined,
+                      "expanded": undefined,
+                      "selected": undefined,
+                    }
+                  }
+                  accessibilityValue={
+                    {
+                      "max": undefined,
+                      "min": undefined,
+                      "now": undefined,
+                      "text": undefined,
+                    }
+                  }
+                  accessible={true}
+                  collapsable={false}
+                  focusable={true}
+                  hitSlop={8}
+                  onBlur={[Function]}
+                  onClick={[Function]}
+                  onFocus={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                  style={
+                    [
+                      {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "paddingHorizontal": 14,
+                        "paddingVertical": 4,
+                      },
+                      {},
+                    ]
+                  }
+                />
+              </View>
+            </View>
+          </View>
         </View>
+        <View
+          onLayout={[Function]}
+          pointerEvents="none"
+          style={
+            {
+              "left": 0,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+            }
+          }
+        />
       </View>
     </View>
   </View>

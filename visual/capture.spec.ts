@@ -64,8 +64,10 @@ for (const entry of entries) {
     // time that varies with the runner, so a loop inside it (the send
     // flight) would land on a different frame each run. Reduced motion
     // makes reanimated settle every loop on its end frame; the page reads
-    // the media query as it loads, so it is set before the navigation.
-    if (entry.tags?.includes('static')) {
+    // the media query as it loads, so it is set before the navigation. A
+    // `loop` story (the swap flight) draws its loops without a sheet, so it
+    // takes the same settling and the plain capture below.
+    if (entry.tags?.includes('static') || entry.tags?.includes('loop')) {
       await page.emulateMedia({ reducedMotion: 'reduce' });
     }
     await page.goto(`/iframe.html?id=${entry.id}&viewMode=story`);

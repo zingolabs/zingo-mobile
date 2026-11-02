@@ -1,10 +1,11 @@
+/* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useRef, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { useScrollToTop } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import { useTheme } from '@app/theme';
@@ -22,7 +23,6 @@ import { ContextAppLoaded } from '@app/context';
 import { useOptionsPanel } from '@app/context/optionsPanel';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
-import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { showConfirm } from '@app/services/showConfirm';
 import { deliver } from '@app/navigation/results';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
@@ -34,8 +34,14 @@ import ContactRow, { ROW_LINE } from './components/ContactRow';
 import AddressRowHead from './components/AddressRowHead';
 import SegmentedSwitch from '@ui/widgets/SegmentedSwitch';
 import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
-import ContactSheet, { ContactEdit } from '@ui/widgets/ContactSheet';
+import ContactSheet, {
+  ContactEdit,
+  contactSheetTitleKey,
+} from '@ui/widgets/ContactSheet';
+import TitleBar from '@ui/widgets/TitleBar';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { themeTokens } from '@app/theme';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 const SIDE = 22;
 const SOFT_INK = themeTokens.fgMuted;
@@ -147,8 +153,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   } = useContext(ContextAppLoaded);
   const optionsPanel = useOptionsPanel();
   const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
-  const keyboardHeight = useKeyboardHeight();
+  const { edges, fades } = useScrollEdges();
+  const bottomPad = useBottomActionPad();
   const walletChain = walletChainName || server.chainName;
 
   const [query, setQuery] = useState('');
@@ -240,7 +246,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     // The book was opened from the options panel, which waits under it for
     // the pop. Sending leaves for the Send tab, not back to the panel.
     optionsPanel.close();
-    navigation.navigate(Route.Home, { screen: Route.Send });
+    navigation.navigate(Route.Home, { screen: Route.Send }, { pop: true });
   };
 
   const copy = (contact: AddressBookFileClass) => {
@@ -359,13 +365,14 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       </View>
 
       <ScrollView
+        {...edges}
         ref={scrollRef}
         testID="addressbook.scroll-view"
         keyboardShouldPersistTaps="handled"
         style={{ flex: 1, marginTop: 12 }}
         contentContainerStyle={{
           paddingHorizontal: SIDE,
-          paddingBottom: pick ? insets.bottom + 16 : 16,
+          paddingBottom: pick ? bottomPad : 16,
         }}
       >
         {tab === 'wallet' && pickZcash ? (
@@ -524,13 +531,14 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           </Text>
         )}
       </ScrollView>
+      {fades}
 
       {!pick && (
         <View
           style={{
             paddingHorizontal: SIDE,
             paddingTop: 12,
-            paddingBottom: insets.bottom + 16,
+            paddingBottom: bottomPad,
             alignItems: 'center',
           }}
         >
@@ -545,11 +553,16 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
 
       <AppSheetModal
         ref={contactSheet}
-        handle
-        contentStyle={{
-          paddingBottom:
-            keyboardHeight > 0 ? keyboardHeight + 20 : insets.bottom + 24,
-        }}
+        header={
+          <TitleBar
+            title={translate(contactSheetTitleKey(edit)) as string}
+            right={{
+              icon: XIcon,
+              accessibilityLabel: translate('close') as string,
+              onPress: () => contactSheet.current?.dismiss(),
+            }}
+          />
+        }
       >
         <ContactSheet
           key={`contact-${editNonce}`}
@@ -557,7 +570,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           book={addressBook}
           walletChain={walletChain}
           onSave={save}
-          onCancel={() => contactSheet.current?.dismiss()}
         />
       </AppSheetModal>
     </View>

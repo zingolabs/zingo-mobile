@@ -12,7 +12,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
             "backgroundColor": "#011401",
             "display": "flex",
             "minHeight": 50,
-            "paddingBottom": 10,
+            "paddingBottom": 0,
             "paddingTop": 0,
           },
         ]
@@ -97,6 +97,12 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
           onResponderTerminate={[Function]}
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
+          style={
+            [
+              undefined,
+              {},
+            ]
+          }
         >
           <Text
             maxFontSizeMultiplier={1.3}
@@ -158,7 +164,9 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
               "top": 12,
             }
           }
+          onBlur={[Function]}
           onClick={[Function]}
+          onFocus={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -166,9 +174,10 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "opacity": 1,
-            }
+            [
+              undefined,
+              {},
+            ]
           }
         >
           <View
@@ -223,31 +232,75 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "borderRadius": 999,
-            "columnGap": 8,
-            "flexDirection": "row",
-            "height": 28,
-            "marginTop": 10,
-            "paddingHorizontal": 12,
-          }
+          [
+            {
+              "alignItems": "center",
+              "borderRadius": 999,
+              "flexDirection": "row",
+              "marginTop": 10,
+              "maxWidth": 710,
+              "minHeight": 28,
+              "paddingHorizontal": 12,
+            },
+            {},
+          ]
         }
         testID="header.syncline"
       >
-        <Text
-          maxFontSizeMultiplier={2}
+        <View
+          pointerEvents="none"
+          style={
+            [
+              {
+                "bottom": 0,
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+              {
+                "backgroundColor": "#8888881F",
+                "borderRadius": 999,
+              },
+              {},
+            ]
+          }
+        />
+        <View
           style={
             {
-              "color": "#F99D00",
+              "flexShrink": 0,
+              "marginRight": 8,
+            }
+          }
+        />
+        <Text
+          ellipsizeMode="tail"
+          maxFontSizeMultiplier={2}
+          numberOfLines={1}
+          style={
+            {
+              "color": "#888888",
+              "flexShrink": 1,
               "fontSize": 12,
-              "fontWeight": "600",
+              "fontWeight": "400",
               "lineHeight": 16,
             }
           }
         >
-          text translated
+          <Text
+            maxFontSizeMultiplier={2}
+            style={
+              {
+                "color": "#F99D00",
+                "fontSize": 12,
+                "fontWeight": "600",
+                "lineHeight": 16,
+              }
+            }
+          >
+            text translated
+          </Text>
         </Text>
       </View>
     </View>
@@ -303,7 +356,9 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
               "top": 10,
             }
           }
+          onBlur={[Function]}
           onClick={[Function]}
+          onFocus={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -311,9 +366,10 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "opacity": 1,
-            }
+            [
+              undefined,
+              {},
+            ]
           }
           testID="header.drawmenu"
         />
@@ -358,7 +414,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
         "justifyContent": "space-between",
         "paddingBottom": 6,
         "paddingHorizontal": 16,
-        "paddingTop": 8,
+        "paddingTop": 4,
       }
     }
     testID="valuetransfer text"
@@ -367,7 +423,8 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
       style={
         {
           "alignItems": "flex-start",
-          "width": 48,
+          "flex": 1,
+          "minWidth": 48,
         }
       }
     />
@@ -375,7 +432,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "flex": 1,
+          "flexShrink": 1,
         }
       }
     >
@@ -399,7 +456,8 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
       style={
         {
           "alignItems": "flex-end",
-          "width": 48,
+          "flex": 1,
+          "minWidth": 48,
         }
       }
     />
@@ -419,7 +477,7 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
             "backgroundColor": "#011401",
             "display": "flex",
             "minHeight": 50,
-            "paddingBottom": 10,
+            "paddingBottom": 0,
             "paddingTop": 0,
           },
         ]
@@ -499,7 +557,7 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
         "justifyContent": "space-between",
         "paddingBottom": 6,
         "paddingHorizontal": 16,
-        "paddingTop": 8,
+        "paddingTop": 4,
       }
     }
   >
@@ -507,7 +565,8 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
       style={
         {
           "alignItems": "flex-start",
-          "width": 48,
+          "flex": 1,
+          "minWidth": 48,
         }
       }
     >
@@ -545,12 +604,15 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          {
-            "alignItems": "center",
-            "flexDirection": "row",
-            "paddingHorizontal": 14,
-            "paddingVertical": 4,
-          }
+          [
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "paddingHorizontal": 14,
+              "paddingVertical": 4,
+            },
+            {},
+          ]
         }
       />
     </View>
@@ -558,7 +620,7 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "flex": 1,
+          "flexShrink": 1,
         }
       }
     >
@@ -582,7 +644,8 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
       style={
         {
           "alignItems": "flex-end",
-          "width": 48,
+          "flex": 1,
+          "minWidth": 48,
         }
       }
     />

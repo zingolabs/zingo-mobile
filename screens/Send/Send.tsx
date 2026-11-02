@@ -51,13 +51,15 @@ import { hasUnconfirmedFunds } from '@app/AppState/classes/TotalBalanceClass';
 import { isZnsAlias, resolveZnsName } from '@app/uris/resolveZnsName';
 import {
   getSpendableBalanceWithAddress,
-  sendAllPropose,
-  sendPropose,
+  sendAllPreview,
+  sendPreview,
 } from '@app/walletBackend';
 import {
   computingEnd,
+  nowSeconds,
   settleSend,
 } from '@app/walletBackend/transforms/sendSettlement';
+import { isOnTop } from '@app/navigation/navigate';
 import Utils from '@app/utils';
 import {
   formatAmount,
@@ -67,6 +69,7 @@ import {
 /** After utils: the uris barrel and utils import each other, and this order resolves it. */
 import { parseZcashURI } from '@app/uris';
 import { useResult } from '@app/navigation/results';
+import { sendSubject } from './sendSubject';
 import {
   fiatEligible,
   fiatQuote,
@@ -217,7 +220,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
   const sendSheetRef = useRef<BottomSheet>(null);
   const sendErrorSheetRef = useRef<BottomSheetModal>(null);
 
-  // Fee (`sendPropose`) and/or spendable-balance RPC error → the CTA turns into
+  // Fee (`sendPreview`) and/or spendable-balance RPC error → the CTA turns into
   // a tappable "calculation error" button that opens SendErrorSheet, which
   // lists BOTH errors (they are often the same failure, shown under each label
   // so that is explicit).
@@ -333,7 +336,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
       // balance reports is sized by zingolib's send-max proposal, which an
       // ordinary send request for the same amount can be refused for.
       const runPropose = isSendAllAmount(amountPar)
-        ? await sendAllPropose(
+        ? await sendAllPreview(
             addressPar,
             memoEnabled
               ? Utils.buildMemo(
@@ -343,7 +346,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                 )
               : '',
           )
-        : await sendPropose(JSON.stringify(sendJson));
+        : await sendPreview(JSON.stringify(sendJson));
 
       // discard result if a newer calculation (or a clear) has superseded this one
       if (feeCalculationGenRef.current !== generation) {
@@ -803,24 +806,24 @@ const Send: React.FunctionComponent<SendProps> = () => {
     } as SendPageStateClass;
   };
 
+  // Confirm has already replaced itself with the sending screen, so a send
+  // that went never has its review under it.
   const confirmSend = async (sendPageStatePar: SendPageStateClass) => {
+    const subject = sendSubject(sendPageStatePar.toaddr, addressBook);
     const permit = sendPermitNow();
     if (permit.kind === 'error') {
-      addLastSnackbar(translate(permit.errorKey) as string);
+      navigation.navigate(Route.Computing, {
+        phase: 'failed',
+        failure: {
+          kind: 'verbatim',
+          text: translate(permit.errorKey) as string,
+        },
+        stage: 'create',
+        since: nowSeconds(),
+        subject,
+      });
       return;
     }
-
-    // The sending screen says how much goes and to whom: the contact, the
-    // Zcash Name, or the short address.
-    const to = sendPageStatePar.toaddr;
-    const subject = {
-      amount: formatAmount(Utils.parseStringLocaleToNumberFloat(to.amount)),
-      who:
-        addressBook.find(entry => entry.address === to.to)?.label ||
-        to.znsAlias ||
-        Utils.trimToSmall(to.to, 6),
-    };
-    navigation.navigate(Route.Computing, { subject });
 
     // The MAX send travels the send-all path all the way: quoted and sent by
     // the same proposal, so the amount confirmed is the amount broadcast.
@@ -842,10 +845,18 @@ const Send: React.FunctionComponent<SendProps> = () => {
       setScrollToTop(true);
       setScrollToBottom(true);
     }
-    navigation.navigate(Route.Computing, {
-      ...computingEnd(settlement),
-      subject,
-    });
+    if (isOnTop(Route.Computing)) {
+      navigation.navigate(Route.Computing, {
+        ...computingEnd(settlement),
+        subject,
+      });
+    } else if (settlement.kind === 'failed') {
+      addLastSnackbar(
+        (translate('send.failed-away') as string)
+          .replace('{amount}', subject.amount)
+          .replace('{who}', subject.who),
+      );
+    }
   };
 
   const scanButton = useRef<View>(null);
@@ -970,6 +981,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
 
   const returnPage = (
     <View
+      testID="send.container"
       style={{ flex: 1 }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
@@ -1004,357 +1016,369 @@ const Send: React.FunctionComponent<SendProps> = () => {
         pointerEvents="box-none"
         style={[StyleSheet.absoluteFill, sheetSlideStyle]}
       >
-        <AppSheet
-          ref={sendSheetRef}
-          snapPoints={sendSnapPoints}
-          animateOnMount={false}
-          header={sendHeader}
-        >
-          <ScrollView
-            onScroll={onTabScroll}
-            scrollEventThrottle={16}
-            ref={scrollViewRef}
-            onContentSizeChange={(_, height) => setContentHeight(height)}
-            keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{}}
-            testID="send.scroll-view"
-            bounces={false}
-            alwaysBounceVertical={false}
+        {/* Mounted once measured, at its snap: a tab is in place on its first frame. */}
+        {containerH > 0 && (
+          <AppSheet
+            ref={sendSheetRef}
+            snapPoints={sendSnapPoints}
+            animateOnMount={false}
+            header={sendHeader}
           >
-            <View
-              style={{
-                marginBottom:
-                  Platform.OS === GlobalConst.platformOSandroid ? 30 : 250,
-                paddingHorizontal: space20,
-                paddingTop: space8,
-              }}
+            <ScrollView
+              onScroll={onTabScroll}
+              scrollEventThrottle={16}
+              ref={scrollViewRef}
+              onContentSizeChange={(_, height) => setContentHeight(height)}
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={{}}
+              testID="send.scroll-view"
+              bounces={false}
+              alwaysBounceVertical={false}
             >
-              <RecipientField
-                text={addressText}
-                onChangeText={text =>
-                  updateToField(text, null, null, null, null)
-                }
-                onClear={() => updateToField('', null, null, null, null)}
-                valid={validAddress}
-                focused={focusedField === 'address'}
-                onFocus={() => setFocusedField('address')}
-                onBlur={() => setFocusedField('none')}
-                contact={recipientContact}
-                pickedName={
-                  !recipientContact && zns?.address === addressText
-                    ? zns.alias
-                    : ''
-                }
-                matches={contactMatches}
-                lookup={nameLookup}
-                onPickContact={entry =>
-                  updateToField(entry.address, null, null, null, null)
-                }
-                onPickName={(name, address) => {
-                  setZns({ alias: name, address });
-                  updateToField(address, null, null, null, null);
+              <View
+                style={{
+                  marginBottom:
+                    Platform.OS === GlobalConst.platformOSandroid ? 30 : 250,
+                  paddingHorizontal: space20,
+                  paddingTop: space8,
                 }}
-                onOpenBook={openBook}
-                onScan={setQrcodeModalShow}
-                scanRef={scanButton}
-                onSaveContact={() =>
-                  launchAddTagModal(
-                    addressText,
-                    undefined,
-                    zns?.address === addressText ? zns.alias : undefined,
-                  )
-                }
-                busy={updatingToField}
-              />
-
-              <AmountCard
-                value={inputZec ? amountText : amountCurrencyText}
-                onChangeText={text => {
-                  // typing an amount drops the MAX intent
-                  sendAllRef.current = false;
-                  if (inputZec) {
-                    updateToField(
-                      null,
-                      text.substring(0, 20),
-                      null,
-                      null,
-                      null,
-                    );
-                  } else {
-                    updateToField(
-                      null,
-                      null,
-                      text.substring(0, 15),
-                      null,
-                      null,
-                    );
+              >
+                <RecipientField
+                  text={addressText}
+                  onChangeText={text =>
+                    updateToField(text, null, null, null, null)
                   }
-                }}
-                unit={inputZec ? info.currencyName : 'USD'}
-                onToggleUnit={
-                  showFiat && quote.kind !== 'none'
-                    ? () => {
-                        if (inputZec && !amountCurrencyText) {
-                          setAmountCurrencyText(
-                            toFiatText(amountText, zecPrice.zecPrice),
-                          );
-                        }
-                        setInputZec(!inputZec);
-                      }
-                    : undefined
-                }
-                converted={
-                  inputZec
-                    ? quote.kind === 'quote'
-                      ? `≈ ${formatUsd(
-                          (Utils.parseStringLocaleToNumberFloat(amountText) ||
-                            0) * quote.price,
-                        )}`
+                  onClear={() => updateToField('', null, null, null, null)}
+                  valid={validAddress}
+                  focused={focusedField === 'address'}
+                  onFocus={() => setFocusedField('address')}
+                  onBlur={() => setFocusedField('none')}
+                  contact={recipientContact}
+                  pickedName={
+                    !recipientContact && zns?.address === addressText
+                      ? zns.alias
                       : ''
-                    : `≈ ${formatAmount(
-                        Utils.parseStringLocaleToNumberFloat(amountText) || 0,
-                      )} ${info.currencyName}`
-                }
-                available={`${formatAmount(maxAmount)} ${info.currencyName}`}
-                availableError={spendableError}
-                onMax={() => {
-                  if (spendableBalanceLastError || proposeSendLastError) {
-                    sendErrorSheetRef.current?.present();
-                    return;
                   }
-                  if (maxAmount <= 0) {
-                    return;
+                  matches={contactMatches}
+                  lookup={nameLookup}
+                  onPickContact={entry =>
+                    updateToField(entry.address, null, null, null, null)
                   }
-                  const maxStr = toAmountInput(maxAmount);
-                  sendAllRef.current = true;
-                  updateToField(null, maxStr, null, null, null);
-                  calculateFeeWithPropose(
-                    maxStr,
-                    addressText,
-                    memoText,
-                    includeUAMemoBoolean,
-                  );
-                }}
-                fee={fee > 0 ? `${formatAmount(fee)} ${info.currencyName}` : ''}
-                invalid={validAmount < 0}
-                focused={focusedField === 'amount'}
-                onFocus={() => setFocusedField('amount')}
-                onBlur={() => setFocusedField('none')}
-              />
-              {validAmount < 0 && (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: space8,
-                    marginTop: space8,
+                  onPickName={(name, address) => {
+                    setZns({ alias: name, address });
+                    updateToField(address, null, null, null, null);
                   }}
-                >
-                  <InfoIcon size={iconSizeSm} color={colors.fgDanger} />
-                  <Text
-                    testID="send.amount.error"
-                    variant="bodySmall"
-                    tone="danger"
-                    style={{ flexShrink: 1 }}
-                  >
-                    {validAmount === -1
-                      ? (translate('send.amount-zero') as string)
-                      : confirmingAmount > 0
-                        ? (translate('send.amount-confirming') as string)
-                            .replace(
-                              '{confirming}',
-                              `${formatAmount(confirmingAmount)} ${info.currencyName}`,
-                            )
-                            .replace(
-                              '{max}',
-                              `${formatAmount(maxAmount)} ${info.currencyName}`,
-                            )
-                        : (translate('send.amount-over') as string)}
-                  </Text>
-                </View>
-              )}
+                  onOpenBook={openBook}
+                  onScan={setQrcodeModalShow}
+                  scanRef={scanButton}
+                  onSaveContact={() =>
+                    launchAddTagModal(
+                      addressText,
+                      undefined,
+                      zns?.address === addressText ? zns.alias : undefined,
+                    )
+                  }
+                  busy={updatingToField}
+                />
 
-              {memoEnabled === true &&
-                (memoOpen || !!memoText ? (
-                  <View style={{ marginTop: space16 }}>
-                    <TextField
-                      testID="send.memo-field"
-                      label={translate('send.memo') as string}
-                      labelRight={
-                        <Text variant="caption" tone="muted">
-                          {translate('send.memo-private') as string}
-                        </Text>
-                      }
-                      accessibilityLabel={translate('send.memo-acc') as string}
-                      placeholder={translate('send.memo-placeholder') as string}
-                      multiline
-                      value={memoText}
-                      error={
-                        memoTooLong
-                          ? (translate('send.memo-count') as string)
+                <AmountCard
+                  value={inputZec ? amountText : amountCurrencyText}
+                  onChangeText={text => {
+                    // typing an amount drops the MAX intent
+                    sendAllRef.current = false;
+                    if (inputZec) {
+                      updateToField(
+                        null,
+                        text.substring(0, 20),
+                        null,
+                        null,
+                        null,
+                      );
+                    } else {
+                      updateToField(
+                        null,
+                        null,
+                        text.substring(0, 15),
+                        null,
+                        null,
+                      );
+                    }
+                  }}
+                  unit={inputZec ? info.currencyName : 'USD'}
+                  onToggleUnit={
+                    showFiat && quote.kind !== 'none'
+                      ? () => {
+                          if (inputZec && !amountCurrencyText) {
+                            setAmountCurrencyText(
+                              toFiatText(amountText, zecPrice.zecPrice),
+                            );
+                          }
+                          setInputZec(!inputZec);
+                        }
+                      : undefined
+                  }
+                  converted={
+                    inputZec
+                      ? quote.kind === 'quote'
+                        ? `≈ ${formatUsd(
+                            (Utils.parseStringLocaleToNumberFloat(amountText) ||
+                              0) * quote.price,
+                          )}`
+                        : ''
+                      : `≈ ${formatAmount(
+                          Utils.parseStringLocaleToNumberFloat(amountText) || 0,
+                        )} ${info.currencyName}`
+                  }
+                  available={`${formatAmount(maxAmount)} ${info.currencyName}`}
+                  availableError={spendableError}
+                  onMax={() => {
+                    if (spendableBalanceLastError || proposeSendLastError) {
+                      sendErrorSheetRef.current?.present();
+                      return;
+                    }
+                    if (maxAmount <= 0) {
+                      return;
+                    }
+                    const maxStr = toAmountInput(maxAmount);
+                    sendAllRef.current = true;
+                    updateToField(null, maxStr, null, null, null);
+                    calculateFeeWithPropose(
+                      maxStr,
+                      addressText,
+                      memoText,
+                      includeUAMemoBoolean,
+                    );
+                  }}
+                  fee={
+                    fee > 0 ? `${formatAmount(fee)} ${info.currencyName}` : ''
+                  }
+                  invalid={validAmount < 0}
+                  focused={focusedField === 'amount'}
+                  onFocus={() => setFocusedField('amount')}
+                  onBlur={() => setFocusedField('none')}
+                />
+                {validAmount < 0 && (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: space8,
+                      marginTop: space8,
+                    }}
+                  >
+                    <InfoIcon size={iconSizeSm} color={colors.fgDanger} />
+                    <Text
+                      testID="send.amount.error"
+                      variant="bodySmall"
+                      tone="danger"
+                      style={{ flexShrink: 1 }}
+                    >
+                      {validAmount === -1
+                        ? (translate('send.amount-zero') as string)
+                        : confirmingAmount > 0
+                          ? (translate('send.amount-confirming') as string)
+                              .replace(
+                                '{confirming}',
+                                `${formatAmount(confirmingAmount)} ${info.currencyName}`,
+                              )
+                              .replace(
+                                '{max}',
+                                `${formatAmount(maxAmount)} ${info.currencyName}`,
+                              )
+                          : (translate('send.amount-over') as string)}
+                    </Text>
+                  </View>
+                )}
+
+                {memoEnabled === true &&
+                  (memoOpen || !!memoText ? (
+                    <View style={{ marginTop: space16 }}>
+                      <TextField
+                        testID="send.memo-field"
+                        label={translate('send.memo') as string}
+                        labelRight={
+                          <Text variant="caption" tone="muted">
+                            {translate('send.memo-private') as string}
+                          </Text>
+                        }
+                        accessibilityLabel={
+                          translate('send.memo-acc') as string
+                        }
+                        placeholder={
+                          translate('send.memo-placeholder') as string
+                        }
+                        multiline
+                        value={memoText}
+                        error={
+                          memoTooLong
+                            ? (translate('send.memo-count') as string)
+                                .replace('{n}', String(memoBytes))
+                                .replace(
+                                  '{max}',
+                                  String(GlobalConst.memoMaxLength),
+                                )
+                            : undefined
+                        }
+                        footer={
+                          <Text
+                            testID="send.memo-count"
+                            variant="caption"
+                            tone="muted"
+                            style={{ textAlign: 'right' }}
+                          >
+                            {(translate('send.memo-count') as string)
                               .replace('{n}', String(memoBytes))
                               .replace(
                                 '{max}',
                                 String(GlobalConst.memoMaxLength),
-                              )
-                          : undefined
-                      }
-                      footer={
-                        <Text
-                          testID="send.memo-count"
-                          variant="caption"
-                          tone="muted"
-                          style={{ textAlign: 'right' }}
-                        >
-                          {(translate('send.memo-count') as string)
-                            .replace('{n}', String(memoBytes))
-                            .replace(
-                              '{max}',
-                              String(GlobalConst.memoMaxLength),
-                            )}
-                        </Text>
-                      }
-                      onChangeText={(text: string) => {
-                        updateToField(
-                          null,
-                          !amountText && !!text ? '0' : null,
-                          null,
-                          text,
-                          null,
-                        );
-                      }}
-                      onEndEditing={(
-                        e: NativeSyntheticEvent<TextInputEndEditingEventData>,
-                      ) => {
-                        updateToField(
-                          null,
-                          !amountText && !!e.nativeEvent.text ? '0' : null,
-                          null,
-                          e.nativeEvent.text,
-                          null,
-                        );
-                        calculateFeeWithPropose(
-                          amountText,
-                          addressText,
-                          e.nativeEvent.text,
-                          includeUAMemoBoolean,
-                        );
-                      }}
-                      maxLines={4}
-                      maxLength={GlobalConst.memoMaxLength}
-                      onBlur={() => setFocusedField('none')}
-                      onFocus={() => {
-                        setFocusedField('memo');
-                        if (keyboardVisible) {
-                          scrollToEnd();
-                        } else {
-                          setTimeout(() => scrollToEnd(), 1000);
+                              )}
+                          </Text>
                         }
-                      }}
-                      trailing={
-                        memoText ? (
-                          <FieldAction
-                            icon={XIcon}
-                            label={translate('clear') as string}
-                            onPress={() =>
-                              updateToField(null, null, null, '', null)
-                            }
-                          />
-                        ) : undefined
-                      }
-                    />
-                  </View>
-                ) : (
-                  <View
-                    style={{ marginTop: space16, alignItems: 'flex-start' }}
-                  >
-                    <Button
-                      testID="send.memo-open"
-                      variant="text"
-                      size="small"
-                      inline
-                      icon={PlusIcon}
-                      title={translate('send.memo-add') as string}
-                      onPress={() => setMemoOpen(true)}
-                    />
-                  </View>
-                ))}
+                        onChangeText={(text: string) => {
+                          updateToField(
+                            null,
+                            !amountText && !!text ? '0' : null,
+                            null,
+                            text,
+                            null,
+                          );
+                        }}
+                        onEndEditing={(
+                          e: NativeSyntheticEvent<TextInputEndEditingEventData>,
+                        ) => {
+                          updateToField(
+                            null,
+                            !amountText && !!e.nativeEvent.text ? '0' : null,
+                            null,
+                            e.nativeEvent.text,
+                            null,
+                          );
+                          calculateFeeWithPropose(
+                            amountText,
+                            addressText,
+                            e.nativeEvent.text,
+                            includeUAMemoBoolean,
+                          );
+                        }}
+                        maxLines={4}
+                        maxLength={GlobalConst.memoMaxLength}
+                        onBlur={() => setFocusedField('none')}
+                        onFocus={() => {
+                          setFocusedField('memo');
+                          if (keyboardVisible) {
+                            scrollToEnd();
+                          } else {
+                            setTimeout(() => scrollToEnd(), 1000);
+                          }
+                        }}
+                        trailing={
+                          memoText ? (
+                            <FieldAction
+                              icon={XIcon}
+                              label={translate('clear') as string}
+                              onPress={() =>
+                                updateToField(null, null, null, '', null)
+                              }
+                            />
+                          ) : undefined
+                        }
+                      />
+                    </View>
+                  ) : (
+                    <View
+                      style={{ marginTop: space16, alignItems: 'flex-start' }}
+                    >
+                      <Button
+                        testID="send.memo-open"
+                        variant="text"
+                        size="small"
+                        inline
+                        icon={PlusIcon}
+                        title={translate('send.memo-add') as string}
+                        onPress={() => setMemoOpen(true)}
+                      />
+                    </View>
+                  ))}
 
-              {/* The button waits while the mixnet cannot carry a send, and says
+                {/* The button waits while the mixnet cannot carry a send, and says
                   why and what the transport is doing. */}
-              {mixnetView.kind === 'transport' && mixnetView.sendBlocked && (
-                <View
-                  testID="send.mixnet-blocked"
-                  style={{
-                    alignItems: 'center',
-                    rowGap: space4,
-                    marginTop: space16,
-                  }}
-                >
-                  <Text
-                    variant="bodySmall"
-                    tone="muted"
-                    style={{ textAlign: 'center' }}
-                  >
-                    {translate('send.nym-blocked') as string}
-                  </Text>
-                  <Text
-                    variant="body"
-                    style={{ textAlign: 'center', fontWeight: '500' }}
-                  >
-                    {translate(shownStatusKey(mixnetView)) as string}
-                  </Text>
-                </View>
-              )}
-              <View style={{ marginTop: space16, marginBottom: space20 }}>
-                {showCalcError ? (
-                  <Button
-                    variant="text"
-                    title={`${translate('send.calc-error') as string} ⓘ`}
-                    onPress={() => sendErrorSheetRef.current?.present()}
-                    testID="send.calc-error"
-                  />
-                ) : (
-                  <Button
-                    testID={
-                      sendButtonEnabled ? 'send.button' : 'send.button-disabled'
-                    }
-                    variant="primary"
-                    title={translate('send.review') as string}
-                    disabled={!sendButtonEnabled}
-                    onPress={async () => {
-                      setSendButtonEnabled(false);
-                      updateToField(null, null, null, memoText, null);
-                      if (!netInfo.isConnected || server.kind === 'offline') {
-                        addLastSnackbar(
-                          translate('loadedapp.connection-error') as string,
-                        );
-                        return;
-                      }
-                      if (
-                        validAmount === 1 &&
-                        amountText &&
-                        isSendAllAmount(amountText)
-                      ) {
-                        addLastSnackbar(
-                          `${translate('send.sendall-message') as string}`,
-                        );
-                      }
-                      // A transparent address carries no memo.
-                      if (!memoEnabled) {
-                        setMemoText('');
-                        updateToField(null, null, null, '', false);
-                      }
-                      setConfirmModalShow();
-                      Keyboard.dismiss();
-                      setSendButtonEnabled(true);
+                {mixnetView.kind === 'transport' && mixnetView.sendBlocked && (
+                  <View
+                    testID="send.mixnet-blocked"
+                    style={{
+                      alignItems: 'center',
+                      rowGap: space4,
+                      marginTop: space16,
                     }}
-                  />
+                  >
+                    <Text
+                      variant="bodySmall"
+                      tone="muted"
+                      style={{ textAlign: 'center' }}
+                    >
+                      {translate('send.nym-blocked') as string}
+                    </Text>
+                    <Text
+                      variant="body"
+                      style={{ textAlign: 'center', fontWeight: '500' }}
+                    >
+                      {translate(shownStatusKey(mixnetView)) as string}
+                    </Text>
+                  </View>
                 )}
+                <View style={{ marginTop: space16, marginBottom: space20 }}>
+                  {showCalcError ? (
+                    <Button
+                      variant="text"
+                      icon={InfoIcon}
+                      title={translate('send.calc-error') as string}
+                      onPress={() => sendErrorSheetRef.current?.present()}
+                      testID="send.calc-error"
+                    />
+                  ) : (
+                    <Button
+                      testID={
+                        sendButtonEnabled
+                          ? 'send.button'
+                          : 'send.button-disabled'
+                      }
+                      variant="primary"
+                      title={translate('send.review') as string}
+                      disabled={!sendButtonEnabled}
+                      onPress={async () => {
+                        setSendButtonEnabled(false);
+                        updateToField(null, null, null, memoText, null);
+                        if (!netInfo.isConnected || server.kind === 'offline') {
+                          addLastSnackbar(
+                            translate('loadedapp.connection-error') as string,
+                          );
+                          return;
+                        }
+                        if (
+                          validAmount === 1 &&
+                          amountText &&
+                          isSendAllAmount(amountText)
+                        ) {
+                          addLastSnackbar(
+                            `${translate('send.sendall-message') as string}`,
+                          );
+                        }
+                        // A transparent address carries no memo.
+                        if (!memoEnabled) {
+                          setMemoText('');
+                          updateToField(null, null, null, '', false);
+                        }
+                        setConfirmModalShow();
+                        Keyboard.dismiss();
+                        setSendButtonEnabled(true);
+                      }}
+                    />
+                  )}
+                </View>
               </View>
-            </View>
-          </ScrollView>
-        </AppSheet>
+            </ScrollView>
+          </AppSheet>
+        )}
       </Animated.View>
       <SendErrorSheet
         ref={sendErrorSheetRef}

@@ -104,7 +104,7 @@ const MixnetIcon = ({ phase }: { phase: MixnetPhase }) => {
             height={SIDE}
             rx={RADIUS}
             ry={RADIUS}
-            stroke={phase === 'reconnecting' ? colors.fgWarning : colors.bgNym}
+            stroke={phase === 'reconnecting' ? colors.fgWarning : colors.fgNym}
             strokeWidth={STROKE}
             fill="none"
             strokeLinecap="round"

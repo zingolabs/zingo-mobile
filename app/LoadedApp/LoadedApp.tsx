@@ -79,6 +79,7 @@ import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
 import { AppTheme } from '@app/theme';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
+import SwapExpiryNotice from '@screens/Swap/components/SwapExpiryNotice';
 import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
 import { ContextAppLoadedProvider, SwapServiceProvider } from '@app/context';
 import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
@@ -102,11 +103,9 @@ import {
 import ShowAddressAlertAsync from '@app/services/showAddressAlertAsync';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import {
-  BottomSheetModal,
-  BottomSheetModalProvider,
-} from '@gorhom/bottom-sheet';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import AddTagModalHost from './components/AddTagModalHost';
+import { showAddTag } from '@app/services/showAddTag';
 import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
 import FadeInOnMount from '@ui/widgets/FadeInOnMount';
@@ -606,9 +605,6 @@ export class LoadedAppClass extends Component<
   recoveringServer: boolean = false;
   appstate: NativeEventSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
-  addTagModalRef: React.RefObject<React.ComponentRef<
-    typeof BottomSheetModal
-  > | null>;
   constructor(props: LoadedAppClassProps) {
     super(props);
 
@@ -713,7 +709,6 @@ export class LoadedAppClass extends Component<
       pendingServer: { kind: 'none' },
       scrollToTop: false,
       scrollToBottom: false,
-      addTagModalTarget: null,
     };
 
     this.rpc = new WalletBackend({
@@ -740,7 +735,6 @@ export class LoadedAppClass extends Component<
 
     this.appstate = {} as NativeEventSubscription;
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
-    this.addTagModalRef = React.createRef();
   }
 
   componentDidMount = async () => {
@@ -1990,12 +1984,7 @@ export class LoadedAppClass extends Component<
     initialLabel?: string,
   ) => {
     const own = await isWalletAddress(address);
-    this.setState(
-      { addTagModalTarget: { address, own, swapChain, initialLabel } },
-      () => {
-        this.addTagModalRef.current?.present();
-      },
-    );
+    showAddTag({ address, own, swapChain, initialLabel });
   };
 
   setScrollToTop = (value: boolean) => {
@@ -2097,6 +2086,7 @@ export class LoadedAppClass extends Component<
         <ContextAppLoadedProvider value={context}>
           <SwapServiceProvider chainName={this.state.walletChainName}>
             <PriceTrafficDriver />
+            <SwapExpiryNotice />
             <GestureHandlerRootView>
               <BottomSheetModalProvider>
                 <BottomSheetBackHandler />
@@ -2109,12 +2099,7 @@ export class LoadedAppClass extends Component<
                     </TooltipHost>
                   </FadeInOnMount>
                 </OptionsPanelProvider>
-                <AddTagModalHost
-                  ref={this.addTagModalRef}
-                  target={this.state.addTagModalTarget}
-                  setAddressBook={this.setAddressBook}
-                  translate={this.state.translate}
-                />
+                <AddTagModalHost />
               </BottomSheetModalProvider>
             </GestureHandlerRootView>
           </SwapServiceProvider>

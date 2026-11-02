@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable as RNPressable, ScrollView, View } from 'react-native';
 import Animated, {
   ReduceMotion,
   useAnimatedStyle,
@@ -12,8 +12,25 @@ import Animated, {
 import Svg, { Path, Rect, Text as SvgText } from 'react-native-svg';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { useTheme } from '@app/theme';
+import {
+  iconSize,
+  iconSizeMd,
+  radiusMd,
+  radiusPill,
+  radiusSm,
+  slopFor,
+  space4,
+  space8,
+  space12,
+  space16,
+  space20,
+  space32,
+  textVariants,
+  useTheme,
+} from '@app/theme';
+import Text from '@ui/primitives/Text';
 import { ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import { SnackbarDurationEnum } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
@@ -29,7 +46,6 @@ import Utils from '@app/utils';
 import { formatInteger } from '@app/utils/formatAmount';
 import CircularProgress from '@ui/primitives/CircularProgress';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
-import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import Header from '@ui/widgets/Header';
 import { BanIcon } from '@ui/primitives/Icons/BanIcon';
 import { BlocksIcon } from '@ui/primitives/Icons/BlocksIcon';
@@ -47,13 +63,13 @@ import {
   MAP_COLS,
   MAP_ROWS,
   mapCells,
-  phase,
-  Phase,
   scaleMax,
 } from '@screens/SyncReport/syncModel';
 import { themeTokens } from '@app/theme';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
+import { useCompact } from '@app/hooks/useCompact';
 
-const SIDE = 21.5;
+const SIDE = space20;
 const SOFT_INK = themeTokens.fgMuted;
 const CODE_INK = themeTokens.fgDefault;
 const AXIS_INK = themeTokens.fgMuted;
@@ -67,18 +83,11 @@ const TILE_BG = themeTokens.bgMutedSubtle;
 
 const CELL_COLOR: Record<CellState, string> = {
   scanned: GREEN,
+  pending: themeTokens.fgScanPending,
   scanning: AMBER,
   refetching: themeTokens.fgSyncing,
   high: themeTokens.fgCategory2,
   low: themeTokens.borderMuted,
-};
-
-const PHASE_KEY: Record<Phase, string> = {
-  done: 'sync.all-scanned',
-  verifying: 'sync.phase-verifying',
-  tip: 'sync.phase-tip',
-  notes: 'sync.phase-notes',
-  historic: 'sync.phase-historic',
 };
 
 const BG_KEY: Record<BackgroundOutcome, string> = {
@@ -95,10 +104,11 @@ const BG_INK: Record<BackgroundOutcome, string> = {
   interrupted: AMBER,
 };
 
-const BG_ICON = 18;
+const BG_ICON = iconSizeMd;
 
 const LEGEND: { state: CellState; key: string }[] = [
   { state: 'scanned', key: 'sync.legend-scanned' },
+  { state: 'pending', key: 'sync.legend-scanned-pending' },
   { state: 'scanning', key: 'sync.legend-scanning' },
   { state: 'refetching', key: 'sync.legend-refetching' },
   { state: 'high', key: 'sync.legend-high' },
@@ -108,7 +118,7 @@ const LEGEND: { state: CellState; key: string }[] = [
 const RING = 76;
 const RING_STROKE = 6.5;
 const TURN_MS = 700;
-const RESCAN_ICON = 25;
+const RESCAN_ICON = iconSize;
 /**
  * The arrows' centre, (25.33, 23.33) on the icon's 32 grid, from the icon's
  * centre. The turn moves there, rotates and moves back: a percentage
@@ -117,6 +127,8 @@ const RESCAN_ICON = 25;
 const ARROWS_DX = (RESCAN_ICON * 25.333) / 32 - RESCAN_ICON / 2;
 const ARROWS_DY = (RESCAN_ICON * 23.333) / 32 - RESCAN_ICON / 2;
 const PULSE_MS = 550;
+/** The bar not picked, while the other is. */
+const BAR_DIM = 0.35;
 const TL_W = 315;
 const TL_H = 88;
 const MAP_H = 63;
@@ -151,6 +163,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     addLastSnackbar,
   } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
+  const { edges, fades } = useScrollEdges();
+  const { gap } = useCompact();
   const { percentageOutputsScanned, syncInProgress } = useSyncStatus({
     syncingStatus,
     noSyncingStatus: true,
@@ -158,13 +172,16 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
 
   const [tip, setTip] = useState(false);
   const [cardW, setCardW] = useState(TL_W);
+  /** The bar and its card picked, as Insight's chart and its rows. */
+  const [focus, setFocus] = useState<'server' | 'wallet' | null>(null);
+  const toggle = (next: 'server' | 'wallet' | null) =>
+    setFocus(prev => (next === null || prev === next ? null : next));
 
   const serverTip = chainTip(syncingStatus, birthday, info.latestBlock || 0);
   const synced = !syncInProgress && percentageOutputsScanned > 0;
   const pct = synced ? 100 : Math.floor(percentageOutputsScanned);
   const h = heights(syncingStatus, birthday, serverTip, synced);
   const cells = mapCells(syncingStatus, birthday, serverTip, synced);
-  const step = phase(syncingStatus, synced);
 
   const turn = useSharedValue(0);
   const pulse = useSharedValue(1);
@@ -253,9 +270,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   };
 
   const card = {
-    marginTop: 12,
-    padding: 16,
-    borderRadius: 16,
+    marginTop: space12,
+    padding: space16,
+    borderRadius: radiusMd,
     borderWidth: 1,
     borderColor: colors.bottomSheetBorder,
     backgroundColor: colors.bgSurface,
@@ -266,15 +283,13 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 10,
+        marginBottom: space8,
       }}
     >
-      <Text
-        style={{ color: colors.fgDefault, fontSize: 15, fontWeight: '700' }}
-      >
-        {title}
+      <Text variant="bodyStrong">{title}</Text>
+      <Text variant="caption" tone="muted">
+        {note}
       </Text>
-      <Text style={{ color: SOFT_INK, fontSize: 12 }}>{note}</Text>
     </View>
   );
 
@@ -337,14 +352,14 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const startText = translate('sync.sheet-start') as string;
   const [startBefore, startAfter] = startText.split('{n}');
   const rescanRows = (
-    <View style={{ marginTop: 10 }}>
+    <View style={{ marginTop: space8 }}>
       {[
         {
           icon: <BlocksIcon color={colors.fgMuted} />,
           text: (
-            <Text>
+            <Text variant="bodySmall">
               {startBefore}
-              <Text style={{ fontWeight: '700' }}>
+              <Text variant="bodySmall" style={{ fontWeight: '700' }}>
                 {formatInteger(birthday)}
               </Text>
               {startAfter}
@@ -365,18 +380,18 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 12,
-            paddingVertical: 13,
-            paddingHorizontal: 4,
+            gap: space12,
+            paddingVertical: space12,
+            paddingHorizontal: space4,
             borderTopWidth: i === 0 ? 0 : 1,
             borderTopColor: colors.bottomSheetBorder,
           }}
         >
           <View
             style={{
-              width: 32,
-              height: 32,
-              borderRadius: 9,
+              width: 36,
+              height: 36,
+              borderRadius: radiusSm,
               backgroundColor: TILE_BG,
               alignItems: 'center',
               justifyContent: 'center',
@@ -384,14 +399,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           >
             {row.icon}
           </View>
-          <Text
-            style={{
-              flex: 1,
-              color: colors.fgDefault,
-              fontSize: 12,
-              lineHeight: 17,
-            }}
-          >
+          <Text variant="bodySmall" style={{ flex: 1 }}>
             {row.text}
           </Text>
         </View>
@@ -405,114 +413,76 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
       style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}
     >
       <Header
-        title={''}
+        title={translate('sync.title') as string}
+        closeScreen={() => navigation.goBack()}
+        backTestID="syncreport.back"
+        backAccessibilityLabel={translate('sync.back-acc') as string}
+        right={
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            {/* Its own box: a stretching tooltip in the row would sit at the top. */}
+            <View>
+              <InfoTooltip
+                testID="syncreport.info"
+                alignEnd
+                below
+                label={translate('sync.info-acc') as string}
+                title={translate('sync.tip-title') as string}
+                text={translate('sync.tip-text') as string}
+                open={tip}
+                onToggle={setTip}
+              >
+                <View />
+              </InfoTooltip>
+            </View>
+            <Pressable
+              kind="icon"
+              testID="syncreport.rescan"
+              accessibilityRole="button"
+              accessibilityLabel={translate('sync.rescan-acc') as string}
+              onPress={openRescan}
+              hitSlop={slopFor(RESCAN_ICON)}
+              style={{ paddingHorizontal: space12 }}
+            >
+              <Animated.View
+                style={[
+                  { width: RESCAN_ICON, height: RESCAN_ICON },
+                  rescanStyle,
+                ]}
+              >
+                <RescanCloud size={RESCAN_ICON} color={colors.fgMuted} />
+                <Animated.View
+                  style={[
+                    {
+                      position: 'absolute',
+                      left: 0,
+                      top: 0,
+                      width: RESCAN_ICON,
+                      height: RESCAN_ICON,
+                    },
+                    arrowsStyle,
+                  ]}
+                >
+                  <RescanArrows size={RESCAN_ICON} color={colors.fgAccent} />
+                </Animated.View>
+              </Animated.View>
+            </Pressable>
+          </View>
+        }
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
         noPrivacy={true}
         noUfvkIcon={true}
       />
-      <View
-        style={{
-          height: 44,
-          marginTop: 6,
-          zIndex: 3,
-          marginBottom: 10,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Pressable
-          testID="syncreport.back"
-          accessibilityRole="button"
-          accessibilityLabel={translate('sync.back-acc') as string}
-          onPress={() => navigation.goBack()}
-          style={({ pressed }) => ({
-            position: 'absolute',
-            left: 10,
-            width: 44,
-            height: 44,
-            borderRadius: 12,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
-          })}
-        >
-          <ChevronLeft size={24} color={colors.fgAccent} />
-        </Pressable>
-        <Text
-          accessibilityRole="header"
-          style={{ color: colors.fgDefault, fontSize: 18, fontWeight: '700' }}
-        >
-          {translate('sync.title') as string}
-        </Text>
-        <View
-          pointerEvents="box-none"
-          style={{
-            position: 'absolute',
-            left: 16,
-            right: 54,
-            top: 0,
-            bottom: 0,
-            justifyContent: 'center',
-            zIndex: 3,
-          }}
-        >
-          <InfoTooltip
-            testID="syncreport.info"
-            alignEnd
-            below
-            label={translate('sync.info-acc') as string}
-            title={translate('sync.tip-title') as string}
-            text={translate('sync.tip-text') as string}
-            open={tip}
-            onToggle={setTip}
-          >
-            <View />
-          </InfoTooltip>
-        </View>
-        <Pressable
-          testID="syncreport.rescan"
-          accessibilityRole="button"
-          accessibilityLabel={translate('sync.rescan-acc') as string}
-          onPress={openRescan}
-          style={({ pressed }) => ({
-            position: 'absolute',
-            right: 10,
-            width: 44,
-            height: 44,
-            borderRadius: 12,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
-          })}
-        >
-          <Animated.View
-            style={[{ width: RESCAN_ICON, height: RESCAN_ICON }, rescanStyle]}
-          >
-            <RescanCloud size={RESCAN_ICON} color={colors.fgMuted} />
-            <Animated.View
-              style={[
-                {
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
-                  width: RESCAN_ICON,
-                  height: RESCAN_ICON,
-                },
-                arrowsStyle,
-              ]}
-            >
-              <RescanArrows size={RESCAN_ICON} color={colors.fgAccent} />
-            </Animated.View>
-          </Animated.View>
-        </Pressable>
-      </View>
 
       <ScrollView
+        {...edges}
         testID="syncreport.scroll-view"
         onTouchStart={() => tip && setTip(false)}
-        contentContainerStyle={{ paddingHorizontal: SIDE, paddingBottom: 28 }}
+        contentContainerStyle={{
+          paddingHorizontal: SIDE,
+          paddingBottom: gap(space32),
+        }}
       >
         <View
           style={[
@@ -521,16 +491,16 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               marginTop: 0,
               flexDirection: 'row',
               alignItems: 'center',
-              gap: 16,
+              gap: space16,
             },
           ]}
         >
-          <View style={{ margin: -10 }}>
+          <View>
             <CircularProgress
               size={RING}
               strokeWidth={RING_STROKE}
               bgColor={TRACK}
-              pgColor={synced ? GREEN : AMBER}
+              pgColor={synced ? GREEN : colors.fgSyncing}
               textSize={14}
               textColor={colors.fgDefault}
               textWeight="bold"
@@ -539,67 +509,63 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             />
           </View>
           <View style={{ flex: 1, minWidth: 0 }}>
-            <Text
-              testID="syncreport.status"
-              style={{
-                color: colors.fgDefault,
-                fontSize: 15,
-                fontWeight: '600',
-              }}
-            >
+            <Text testID="syncreport.status" variant="bodyStrong">
               {status}
             </Text>
-            <Text
-              style={{
-                marginTop: 2,
-                color: SOFT_INK,
-                fontSize: 12,
-                lineHeight: 16,
-              }}
-            >
+            <Text variant="bodySmall" tone="muted">
               {sub}
             </Text>
           </View>
         </View>
 
-        <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+        <View style={{ flexDirection: 'row', gap: space8, marginTop: space12 }}>
           {[
             { key: 'sync.server', dot: BLUE, value: h.server },
             { key: 'sync.wallet', dot: GREEN, value: h.wallet },
             { key: 'sync.behind', dot: AMBER, value: h.behind },
-          ].map(t => (
-            <View
-              key={t.key}
-              testID={`syncreport.${t.key.split('.')[1]}`}
-              style={[card, { flex: 1, marginTop: 0, padding: 12 }]}
-            >
-              <View
-                style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+          ].map(t => {
+            const which = t.key.split('.')[1];
+            const pickable = which === 'server' || which === 'wallet';
+            const picked = focus === which;
+            const Box = pickable ? Pressable : View;
+            return (
+              <Box
+                kind="row"
+                key={t.key}
+                testID={`syncreport.${which}`}
+                accessibilityRole={pickable ? 'button' : undefined}
+                accessibilityState={pickable ? { selected: picked } : undefined}
+                onPress={pickable ? () => toggle(which) : undefined}
+                style={[
+                  card,
+                  { flex: 1, marginTop: 0, padding: space12 },
+                  picked ? { borderColor: t.dot } : null,
+                ]}
               >
                 <View
-                  style={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: 3,
-                    backgroundColor: t.dot,
-                  }}
-                />
-                <Text style={{ color: SOFT_INK, fontSize: 12 }}>
-                  {translate(t.key) as string}
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+                >
+                  <View
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: radiusPill,
+                      backgroundColor: t.dot,
+                    }}
+                  />
+                  <Text variant="caption" tone="muted">
+                    {translate(t.key) as string}
+                  </Text>
+                </View>
+                <Text
+                  variant="bodySmall"
+                  style={{ marginTop: space4, fontWeight: '700' }}
+                >
+                  {formatInteger(t.value)}
                 </Text>
-              </View>
-              <Text
-                style={{
-                  marginTop: 6,
-                  color: colors.fgDefault,
-                  fontSize: 13,
-                  fontWeight: '700',
-                }}
-              >
-                {formatInteger(t.value)}
-              </Text>
-            </View>
-          ))}
+              </Box>
+            );
+          })}
         </View>
 
         <View
@@ -612,68 +578,110 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               n: formatInteger(h.scanned),
             }),
           )}
-          <Svg
-            width={cardW}
-            height={(TL_H * cardW) / TL_W}
-            viewBox={`0 0 ${TL_W} ${TL_H}`}
-          >
-            <Rect x={0} y={22} width={TL_W} height={14} rx={7} fill={TRACK} />
-            <Rect x={0} y={22} width={xTip} height={14} rx={7} fill={BLUE} />
-            {ticks.map((v, i) => (
+          <View>
+            <Svg
+              width={cardW}
+              height={(TL_H * cardW) / TL_W}
+              viewBox={`0 0 ${TL_W} ${TL_H}`}
+            >
+              <Rect x={0} y={22} width={TL_W} height={14} rx={7} fill={TRACK} />
+              <Rect
+                x={0}
+                y={22}
+                width={xTip}
+                height={14}
+                rx={7}
+                fill={BLUE}
+                opacity={focus === 'wallet' ? BAR_DIM : 1}
+              />
+              {ticks.map((v, i) => (
+                <SvgText
+                  key={v}
+                  x={i === 0 ? 0 : x(v)}
+                  y={12}
+                  fontSize={textVariants.caption.fontSize}
+                  fill={AXIS_INK}
+                  textAnchor={i === 0 ? 'start' : 'middle'}
+                >
+                  {v ? `${v / 1_000_000}M` : '0'}
+                </SvgText>
+              ))}
+              <Rect
+                x={x0}
+                y={20}
+                width={x1 - x0 + (h.scanned > 0 ? 2 : 0)}
+                height={18}
+                rx={4}
+                fill={GREEN}
+                stroke={colors.bgSurface}
+                strokeWidth={2}
+                opacity={focus === 'server' ? BAR_DIM : 1}
+              />
+              <Path d={`M${x0} 42V54`} stroke={GREEN} strokeWidth={1.5} />
               <SvgText
-                key={v}
-                x={i === 0 ? 0 : x(v)}
-                y={12}
-                fontSize={10}
-                fill={AXIS_INK}
-                textAnchor={i === 0 ? 'start' : 'middle'}
+                x={birthdayLeft ? x0 + 5 : x0 - 5}
+                y={58}
+                fontSize={textVariants.caption.fontSize}
+                fill={CODE_INK}
+                textAnchor={birthdayLeft ? 'start' : 'end'}
               >
-                {v ? `${v / 1_000_000}M` : '0'}
+                {fill(translate('sync.birthday-at') as string, {
+                  n: formatInteger(birthday),
+                })}
               </SvgText>
-            ))}
-            <Rect
-              x={x0}
-              y={20}
-              width={x1 - x0 + (h.scanned > 0 ? 2 : 0)}
-              height={18}
-              rx={4}
-              fill={GREEN}
-              stroke={colors.bgSurface}
-              strokeWidth={2}
+              <Path d={`M${xTip} 42V68`} stroke={BLUE} strokeWidth={1.5} />
+              <SvgText
+                x={xTip - 5}
+                y={76}
+                fontSize={textVariants.caption.fontSize}
+                fill={CODE_INK}
+                textAnchor="end"
+              >
+                {fill(translate('sync.tip-at') as string, {
+                  n: formatInteger(serverTip),
+                })}
+              </SvgText>
+            </Svg>
+            {/* Over the chart: the wallet's green bar sits on the server's blue one. */}
+            <RNPressable
+              testID="syncreport.blocks.hit"
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                right: 0,
+                bottom: 0,
+              }}
+              onPress={e => {
+                const scale = TL_W / cardW;
+                const bx = e.nativeEvent.locationX * scale;
+                const by = e.nativeEvent.locationY * scale;
+                const onBars = by >= 12 && by <= 46;
+                toggle(
+                  !onBars
+                    ? null
+                    : bx >= x0 - 4 && bx <= x1 + 6
+                      ? 'wallet'
+                      : bx <= xTip
+                        ? 'server'
+                        : null,
+                );
+              }}
             />
-            <Path d={`M${x0} 42V54`} stroke={GREEN} strokeWidth={1.5} />
-            <SvgText
-              x={birthdayLeft ? x0 + 5 : x0 - 5}
-              y={58}
-              fontSize={10}
-              fill={CODE_INK}
-              textAnchor={birthdayLeft ? 'start' : 'end'}
-            >
-              {fill(translate('sync.birthday-at') as string, {
-                n: formatInteger(birthday),
-              })}
-            </SvgText>
-            <Path d={`M${xTip} 42V68`} stroke={BLUE} strokeWidth={1.5} />
-            <SvgText
-              x={xTip - 5}
-              y={76}
-              fontSize={10}
-              fill={CODE_INK}
-              textAnchor="end"
-            >
-              {fill(translate('sync.tip-at') as string, {
-                n: formatInteger(serverTip),
-              })}
-            </SvgText>
-          </Svg>
+          </View>
         </View>
 
         <View style={card}>
           {cardHead(
             translate('sync.map') as string,
-            step === 'done'
-              ? (translate(PHASE_KEY.done) as string)
-              : `${translate(PHASE_KEY[step]) as string} · ${pct}%`,
+            /**
+             * zingolib reports what is scanning only as Scanning, without the
+             * priority it had (Verify, ChainTip, FoundNote…): the map names no
+             * phase it cannot know.
+             */
+            synced
+              ? (translate('sync.all-scanned') as string)
+              : `${translate('sync.legend-scanning') as string} · ${pct}%`,
           )}
           <Svg
             testID="syncreport.map"
@@ -701,9 +709,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             style={{
               flexDirection: 'row',
               flexWrap: 'wrap',
-              rowGap: 6,
-              columnGap: 14,
-              marginTop: 12,
+              rowGap: space4,
+              columnGap: space12,
+              marginTop: space12,
             }}
           >
             {LEGEND.map(l => (
@@ -715,11 +723,11 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                   style={{
                     width: 8,
                     height: 8,
-                    borderRadius: 3,
+                    borderRadius: radiusPill,
                     backgroundColor: CELL_COLOR[l.state],
                   }}
                 />
-                <Text style={{ color: SOFT_INK, fontSize: 12 }}>
+                <Text variant="caption" tone="muted">
                   {translate(l.key) as string}
                 </Text>
               </View>
@@ -729,6 +737,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
 
         {bgStart > 0 && (
           <Pressable
+            kind="row"
             testID="syncreport.background"
             disabled={!backgroundSyncInfo.error}
             onPress={reportError}
@@ -737,45 +746,37 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               {
                 flexDirection: 'row',
                 alignItems: 'center',
-                gap: 12,
-                paddingVertical: 14,
+                gap: space12,
+                paddingVertical: space12,
               },
             ]}
           >
             {bgIcon[bgOutcome]}
             <View style={{ flex: 1, minWidth: 0 }}>
-              <Text
-                style={{
-                  color: colors.fgDefault,
-                  fontSize: 13,
-                  lineHeight: 18,
-                  fontWeight: '600',
-                }}
-              >
+              <Text variant="bodySmall" style={{ fontWeight: '600' }}>
                 {translate('sync.last-background') as string}
               </Text>
-              <Text style={{ color: SOFT_INK, fontSize: 12, lineHeight: 16 }}>
+              <Text variant="caption" tone="muted">
                 {bgWhen}
               </Text>
               {!!backgroundSyncInfo.message && (
-                <Text style={{ color: SOFT_INK, fontSize: 12, lineHeight: 16 }}>
+                <Text variant="caption" tone="muted">
                   {backgroundSyncInfo.message}
                 </Text>
               )}
             </View>
             <Text
               testID="syncreport.background-outcome"
-              style={{
-                color: BG_INK[bgOutcome],
-                fontSize: 12,
-                fontWeight: '600',
-              }}
+              variant="caption"
+              color={BG_INK[bgOutcome]}
+              style={{ fontWeight: '600' }}
             >
               {translate(bgLabel) as string}
             </Text>
           </Pressable>
         )}
       </ScrollView>
+      {fades}
     </View>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
-import { Pressable } from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
+
 import { ContextAppLoaded } from '@app/context';
 import { useTimedReveal } from '@app/hooks/useTimedReveal';
 import Text from '@ui/primitives/Text';
@@ -63,7 +64,12 @@ export default function PrivateAmount({
   }
   const body = <Text {...textProps}>{show(text)}</Text>;
   return hidden ? (
-    <Pressable accessibilityRole="button" onPress={onReveal} hitSlop={8}>
+    <Pressable
+      kind="link"
+      accessibilityRole="button"
+      onPress={onReveal}
+      hitSlop={8}
+    >
       {body}
     </Pressable>
   ) : (

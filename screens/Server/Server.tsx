@@ -14,7 +14,16 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { useTheme } from '@app/theme';
+import {
+  useTheme,
+  radiusMd,
+  radiusPill,
+  rowMinHeight,
+  space8,
+  space12,
+  space16,
+  space20,
+} from '@app/theme';
 import Switch from '@ui/primitives/Switch';
 import { duration, ease } from '@app/theme/motion';
 import {
@@ -24,8 +33,7 @@ import {
   ServerUrisType,
   TranslateType,
 } from '@app/AppState';
-import RegText from '@ui/primitives/RegText';
-import BoldText from '@ui/primitives/BoldText';
+import Text from '@ui/primitives/Text';
 import { ServerStatus } from '@app/AppState/types/ServerStatus';
 import { formatInteger } from '@app/utils/formatAmount';
 import ServerRow, {
@@ -42,6 +50,7 @@ import CustomServerBox from './CustomServerBox';
 import SaveSheet from '@ui/widgets/SaveSheet';
 import { LogLine } from './ServerLog';
 import { hostOf, useCustomServer } from './useCustomServer';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 export type ServerProps = {
   translate: (key: string) => TranslateType;
@@ -69,6 +78,9 @@ export type ServerProps = {
   // Set to a guard the host calls on a system back; true when the screen
   // handled it (an unsaved custom server asks first).
   backGuard?: React.MutableRefObject<(() => boolean) | null>;
+  // Told whether a back must be held now (a test running, the question up,
+  // an unsaved custom server), so the host can block the iOS swipe too.
+  onGuard?: (guarded: boolean) => void;
   placement?: Placement;
 };
 
@@ -151,20 +163,33 @@ const StatusDot: React.FC<StatusDotProps> = ({ status, offline }) => {
       : status === 'bad'
         ? colors.fgDanger
         : colors.fgAccent;
+  /** The dot's halo: its colour's subtle fill. */
+  const halo = offline
+    ? colors.bgMutedSubtle
+    : status === 'wait'
+      ? colors.bgWarningSubtle
+      : status === 'bad'
+        ? colors.bgDangerSubtle
+        : colors.bgAccentSubtle;
   return (
     <View
       style={{
         width: 16,
         height: 16,
-        borderRadius: 8,
-        backgroundColor: `${inner}38`,
+        borderRadius: radiusPill,
+        backgroundColor: halo,
         alignItems: 'center',
         justifyContent: 'center',
       }}
     >
       <Animated.View
         style={[
-          { width: 8, height: 8, borderRadius: 4, backgroundColor: inner },
+          {
+            width: 8,
+            height: 8,
+            borderRadius: radiusPill,
+            backgroundColor: inner,
+          },
           pulseStyle,
         ]}
       />
@@ -196,10 +221,12 @@ const Server: React.FunctionComponent<ServerProps> = ({
   onUnreachable,
   onBack,
   backGuard,
+  onGuard,
   placement = 'screen',
 }) => {
   const { lift, onLayout } = useLift(placement, CARD_TOP);
   const { colors } = useTheme();
+  const { edges, fades } = useScrollEdges();
   const t = (key: string, values: Record<string, string> = {}) =>
     fill(translate(`server.${key}`) as string, values);
   const offline = server.kind === 'offline';
@@ -325,6 +352,8 @@ const Server: React.FunctionComponent<ServerProps> = ({
     }
     onBack();
   };
+  const guarded = working || asking || dirty;
+  useEffect(() => onGuard?.(guarded), [guarded, onGuard]);
   if (backGuard) {
     backGuard.current = () => {
       if (working || asking || dirty) {
@@ -367,6 +396,17 @@ const Server: React.FunctionComponent<ServerProps> = ({
     }
   };
 
+  /**
+   * A network switch only cross-fades the lists: the cards under them take
+   * their new place at once. They glide only when the Custom box opens or
+   * closes on the same network.
+   */
+  const shownTab = React.useRef(tab);
+  useEffect(() => {
+    shownTab.current = tab;
+  }, [tab]);
+  const glide = shownTab.current === tab ? layout() : undefined;
+
   const customBlock = (
     <CustomServerBox
       chain={tab}
@@ -400,16 +440,18 @@ const Server: React.FunctionComponent<ServerProps> = ({
 
   const body = regtest ? (
     <>
-      <BoldText
+      <Text
+        variant="bodySmall"
+        tone="muted"
         style={{
           marginHorizontal: CARD_SIDE,
-          marginTop: 8,
-          marginBottom: 18,
-          fontSize: 13,
+          marginTop: space8,
+          marginBottom: space16,
+          fontWeight: '600',
         }}
       >
         {t('regtest-label')}
-      </BoldText>
+      </Text>
       <View style={{ marginHorizontal: CARD_SIDE }}>{customBlock}</View>
     </>
   ) : (
@@ -450,7 +492,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
           />
         ))}
       </RowCard>
-      <Animated.View layout={layout()} style={{ marginTop: 14 }}>
+      <Animated.View layout={glide} style={{ marginTop: 14 }}>
         <RowCard>
           <ServerRow
             testID="server.other"
@@ -476,7 +518,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
             <Animated.View
               entering={fadeIn()}
               exiting={fadeOut()}
-              style={{ paddingHorizontal: 14.5, paddingBottom: 14 }}
+              style={{ paddingHorizontal: space16, paddingBottom: space16 }}
             >
               {customBlock}
             </Animated.View>
@@ -496,42 +538,35 @@ const Server: React.FunctionComponent<ServerProps> = ({
         accessible
         style={{
           position: 'absolute',
-          left: 22.5,
-          right: 22.5,
+          left: space20,
+          right: space20,
           top: `${CARD_TOP * 100}%`,
           marginTop: -lift,
-          height: 61,
-          borderRadius: 14,
+          minHeight: rowMinHeight,
+          borderRadius: radiusMd,
           backgroundColor: colors.bgSurface,
           borderWidth: 1,
           borderColor: colors.bottomSheetBorder,
           flexDirection: 'row',
           alignItems: 'center',
-          paddingLeft: 13,
-          paddingRight: 16,
-          gap: 12,
+          paddingHorizontal: space16,
+          paddingVertical: space8,
+          gap: space12,
         }}
       >
         <StatusDot status={cardStatus} offline={offline} />
         <Animated.View style={[{ flex: 1, minWidth: 0 }, cardFade]}>
-          <RegText
-            numberOfLines={1}
-            style={{ fontSize: 15, lineHeight: 19, fontWeight: '600' }}
-          >
+          <Text variant="bodyStrong" numberOfLines={1}>
             {cardName}
-          </RegText>
-          <RegText
+          </Text>
+          <Text
             testID="server.card.sub"
+            variant="bodySmall"
+            tone="muted"
             numberOfLines={1}
-            style={{
-              fontSize: 12,
-              lineHeight: 16,
-              marginTop: 1,
-              color: colors.fgMuted,
-            }}
           >
             {cardSub}
-          </RegText>
+          </Text>
         </Animated.View>
       </View>
 
@@ -548,8 +583,8 @@ const Server: React.FunctionComponent<ServerProps> = ({
         style={[
           {
             position: 'absolute',
-            left: 22.5,
-            right: 22.5,
+            left: space20,
+            right: space20,
             top: `${SEGMENT_TOP * 100}%`,
             marginTop: -lift,
           },
@@ -573,6 +608,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
         }}
       >
         <KeyboardAwareScrollView
+          {...edges}
           bottomOffset={16}
           style={{ flex: 1 }}
           contentContainerStyle={{ paddingBottom: 16 }}
@@ -586,32 +622,27 @@ const Server: React.FunctionComponent<ServerProps> = ({
             {body}
           </Animated.View>
           <Animated.View
-            layout={layout()}
+            layout={glide}
             style={{
               marginHorizontal: CARD_SIDE,
-              marginTop: 17,
-              minHeight: 66,
-              borderRadius: 14,
+              marginTop: space16,
+              minHeight: rowMinHeight,
+              borderRadius: radiusMd,
               backgroundColor: colors.bgSurface,
               borderWidth: 1,
               borderColor: colors.bottomSheetBorder,
               flexDirection: 'row',
               alignItems: 'center',
-              paddingVertical: 10,
-              paddingLeft: 16.5,
-              paddingRight: 16,
-              gap: 12,
+              paddingVertical: space8,
+              paddingHorizontal: space16,
+              gap: space12,
             }}
           >
             <View style={{ flex: 1 }}>
-              <BoldText style={{ fontSize: 15, lineHeight: 19 }}>
-                {t('offline')}
-              </BoldText>
-              <RegText
-                style={{ fontSize: 12, lineHeight: 17, color: colors.fgMuted }}
-              >
+              <Text variant="bodyStrong">{t('offline')}</Text>
+              <Text variant="bodySmall" tone="muted">
                 {t('offline-sub')}
-              </RegText>
+              </Text>
             </View>
             <Switch
               testID="server.offline"
@@ -628,6 +659,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
             />
           </Animated.View>
         </KeyboardAwareScrollView>
+        {fades}
       </View>
 
       <DoneButton
@@ -636,12 +668,14 @@ const Server: React.FunctionComponent<ServerProps> = ({
         onPress={leave}
         disabled={busy || working}
       />
-      <ScreenHeader
-        testID="server.back"
-        title={t('title')}
-        onBack={leave}
-        disabled={busy || working}
-      />
+      {placement !== 'belowHeader' && (
+        <ScreenHeader
+          testID="server.back"
+          title={t('title')}
+          onBack={leave}
+          disabled={busy || working}
+        />
+      )}
       {asking && (
         <SaveSheet
           testID="server.unsaved"

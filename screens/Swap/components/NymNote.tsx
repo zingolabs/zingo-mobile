@@ -18,7 +18,7 @@ export default function NymNote({ text }: { text: string }) {
         paddingHorizontal: 16,
         borderRadius: radiusMd,
         borderWidth: 1,
-        borderColor: colors.bgNym,
+        borderColor: colors.fgNym,
         backgroundColor: colors.bgNymSubtle,
       }}
     >

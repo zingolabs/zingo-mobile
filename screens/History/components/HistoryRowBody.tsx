@@ -45,8 +45,9 @@ export default function HistoryRowBody({
       ? colors.fgWarning
       : text.state?.tone === 'danger'
         ? colors.fgDanger
-        : colors.fgDefault;
-  const titleSize = compact ? 13 : 15;
+        : text.state?.tone === 'muted'
+          ? colors.fgMuted
+          : colors.fgDefault;
   return (
     <View
       style={{
@@ -79,17 +80,20 @@ export default function HistoryRowBody({
             bottom: 0,
             left: space20 + AVATAR_SIZE / 2,
             width: 1,
-            backgroundColor: colors.sheetHandle,
+            backgroundColor: colors.borderMuted,
           }}
         />
       )}
       {leading}
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text
-          variant={text.titleMono ? 'address' : 'bodyStrong'}
+          variant={
+            text.titleMono ? 'address' : compact ? 'bodySmall' : 'bodyStrong'
+          }
           numberOfLines={1}
-          ellipsizeMode="middle"
-          style={{ fontSize: text.titleMono ? titleSize - 2 : titleSize }}
+          // Words are cut at the end; only an address keeps both ends.
+          ellipsizeMode={text.titleMono ? 'middle' : 'tail'}
+          style={compact && !text.titleMono ? { fontWeight: '600' } : undefined}
         >
           {text.title}
         </Text>
@@ -101,21 +105,21 @@ export default function HistoryRowBody({
             marginTop: 4,
           }}
         >
-          {!!text.state && (
-            <Text
-              variant="caption"
-              numberOfLines={1}
-              style={{ color: stateColor, fontWeight: '600' }}
-            >
-              {`${text.state.text} ·`}
-            </Text>
-          )}
+          {/* One Text, so " · " is plain spaces and the line truncates as one. */}
           <Text
             variant="caption"
             tone="muted"
             numberOfLines={1}
             style={{ flexShrink: 1 }}
           >
+            {!!text.state && (
+              <>
+                <Text variant="caption" style={{ color: stateColor }}>
+                  {text.state.text}
+                </Text>
+                {' · '}
+              </>
+            )}
             {text.line}
             {!!text.lineAmount && amounts.show(text.lineAmount)}
           </Text>
@@ -126,9 +130,10 @@ export default function HistoryRowBody({
         <PrivateAmount
           reveal={amounts}
           text={text.top}
-          variant="bodyStrong"
+          variant={compact ? 'bodySmall' : 'bodyStrong'}
+          strike={text.topStrike}
           numberOfLines={1}
-          style={{ color: topColor, fontSize: titleSize }}
+          style={{ color: topColor, ...(compact ? { fontWeight: '600' } : {}) }}
         />
         {!!text.bottom && (
           <PrivateAmount

@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { Pressable, TextInput, View } from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
+import { TextInput, View } from 'react-native';
 import {
   chipMinHeight,
   fontScaleDisplay,
@@ -13,12 +14,14 @@ import {
   space16,
   textVariants,
   useTheme,
+  slopFor,
 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import Text from '@ui/primitives/Text';
 import PrivateAmount from '@ui/widgets/PrivateAmount';
 import { useInsetFill } from '@ui/primitives/Surface';
 import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
+import { singleLineInput } from '@ui/primitives/singleLineInput';
 
 type AmountCardProps = {
   value: string;
@@ -108,19 +111,21 @@ export default function AmountCard({
               flex: 1,
               minWidth: 0,
               fontSize: amountStyle.fontSize,
-              lineHeight: amountStyle.lineHeight,
               fontWeight: amountStyle.fontWeight,
               fontVariant: ['tabular-nums'],
               color: invalid ? colors.fgDanger : colors.fgDefault,
               padding: 0,
+              ...singleLineInput(amountStyle.lineHeight),
             }}
           />
           <Pressable
+            kind="button"
             testID="send.swap-entry"
             accessibilityRole="button"
             accessibilityLabel={t('send.switch-unit-acc')}
             disabled={!onToggleUnit}
             onPress={onToggleUnit}
+            hitSlop={slopFor(chipMinHeight)}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -162,10 +167,11 @@ export default function AmountCard({
           }}
         >
           <Pressable
+            kind="link"
             testID="send.max"
             accessibilityRole="button"
             onPress={onMax}
-            hitSlop={space8}
+            hitSlop={slopFor(iconSizeSm)}
             style={{ flexDirection: 'row', gap: space4 }}
           >
             <Text

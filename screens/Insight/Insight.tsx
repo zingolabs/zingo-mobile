@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import Animated, {
   ReduceMotion,
   useAnimatedStyle,
@@ -9,8 +9,24 @@ import Animated, {
 } from 'react-native-reanimated';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { useTheme } from '@app/theme';
+import {
+  iconSizeMd,
+  radiusMd,
+  radiusPill,
+  slopFor,
+  space8,
+  space12,
+  space16,
+  space20,
+  space32,
+  textVariants,
+  useTheme,
+} from '@app/theme';
+import Text from '@ui/primitives/Text';
+import Button from '@ui/primitives/Button';
+import Chip from '@ui/primitives/Chip';
 import { ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { formatAmount, formatInteger } from '@app/utils/formatAmount';
@@ -35,17 +51,15 @@ import {
   weekEnd,
 } from '@screens/Insight/insightModel';
 import { themeTokens } from '@app/theme';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
+import { useCompact } from '@app/hooks/useCompact';
 
-const SIDE = 21.5;
+const SIDE = space20;
 const SOFT_INK = themeTokens.fgMuted;
-const HINT_INK = themeTokens.fgMuted;
 const CODE_INK = themeTokens.fgDefault;
 const ROW_LINE = themeTokens.borderSubtle;
-const SELECTED = themeTokens.bgViewOnlySubtle;
 const THUMB_BG = themeTokens.bgAccentSubtle;
 const THUMB_LINE = themeTokens.borderAccent;
-const PRESET_ON_BG = themeTokens.bgViewOnlySubtle;
-const PRESET_ON_LINE = themeTokens.borderMuted;
 const SWEEP_MS = 460;
 const DEFAULT_WEEKS = 13;
 const SEG_W = 212;
@@ -79,6 +93,7 @@ function RowAddress({
     body
   ) : (
     <Pressable
+      kind="link"
       accessibilityRole="button"
       accessibilityLabel={translate('insight.reveal-address') as string}
       onPress={reveal}
@@ -92,6 +107,16 @@ function RowAddress({
 // What the wallet sent and to whom: weekly activity, the share per recipient
 // and the ranked recipients, by amount or by number of sends.
 const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
+  const { colors: palette } = useTheme();
+  /** A category's subtle tint, for the avatar behind its initial. */
+  const tintOf = (color: string): string => {
+    const i = [1, 2, 3, 4, 5].find(
+      n => palette[`fgCategory${n}` as keyof typeof palette] === color,
+    );
+    return i
+      ? palette[`bgCategory${i}` as keyof typeof palette]
+      : palette.bgMutedSubtle;
+  };
   const {
     translate,
     valueTransfers,
@@ -103,6 +128,8 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
     launchAddTagModal,
   } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
+  const { edges, fades } = useScrollEdges();
+  const { gap } = useCompact();
   const insight = buildInsight(valueTransfers ?? [], addressBook, new Date());
   const last = insight.weeks - 1;
 
@@ -210,20 +237,16 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
             price={price}
             amtZec={centerAmount}
             privacy={privacy}
-            style={{ fontSize: 13, fontWeight: '600', color: CODE_INK }}
+            style={{
+              fontSize: textVariants.bodySmall.fontSize,
+              fontWeight: '600',
+              color: CODE_INK,
+            }}
           />
         )}
       </>
     ) : (
-      <Text
-        testID="insight.donut.value"
-        style={{
-          color: colors.fgDefault,
-          fontSize: 22,
-          lineHeight: 26,
-          fontWeight: '700',
-        }}
-      >
+      <Text testID="insight.donut.value" variant="screenTitle">
         {slices.length === 0
           ? (translate('insight.nothing') as string)
           : String(centerAmount)}
@@ -242,9 +265,9 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
   const ranked = [...slices].sort((x, y) => y.value - x.value);
   const span = to - from + 1;
   const card = {
-    marginTop: 14,
-    padding: 16,
-    borderRadius: 20,
+    marginTop: space16,
+    padding: space16,
+    borderRadius: radiusMd,
     borderWidth: 1,
     borderColor: colors.bottomSheetBorder,
     backgroundColor: colors.bgSurface,
@@ -258,11 +281,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
         minHeight: 24,
       }}
     >
-      <Text
-        style={{ color: colors.fgDefault, fontSize: 15, fontWeight: '700' }}
-      >
-        {title}
-      </Text>
+      <Text variant="bodyStrong">{title}</Text>
       {right}
     </View>
   );
@@ -284,8 +303,12 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
         noUfvkIcon={true}
       />
       <ScrollView
+        {...edges}
         testID="insight.scroll-view"
-        contentContainerStyle={{ paddingHorizontal: SIDE, paddingBottom: 36 }}
+        contentContainerStyle={{
+          paddingHorizontal: SIDE,
+          paddingBottom: gap(space32),
+        }}
       >
         <View
           accessibilityRole="tablist"
@@ -296,7 +319,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
             marginTop: 2,
             padding: 3,
             flexDirection: 'row',
-            borderRadius: 999,
+            borderRadius: radiusPill,
             borderWidth: 1,
             borderColor: colors.bottomSheetBorder,
             backgroundColor: colors.bgSurface,
@@ -310,7 +333,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                 bottom: 3,
                 left: 3,
                 width: (SEG_W - 8) / 2,
-                borderRadius: 999,
+                borderRadius: radiusPill,
                 borderWidth: 1,
                 borderColor: THUMB_LINE,
                 backgroundColor: THUMB_BG,
@@ -320,6 +343,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
           />
           {(['amount', 'sends'] as Metric[]).map(m => (
             <Pressable
+              kind="button"
               key={m}
               testID={`insight.metric.${m}`}
               accessibilityRole="tab"
@@ -332,11 +356,9 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
               }}
             >
               <Text
-                style={{
-                  color: metric === m ? colors.fgDefault : SOFT_INK,
-                  fontSize: 13,
-                  fontWeight: '600',
-                }}
+                variant="bodySmall"
+                tone={metric === m ? 'default' : 'muted'}
+                style={{ fontWeight: '600' }}
               >
                 {translate(`insight.metric-${m}`) as string}
               </Text>
@@ -348,41 +370,18 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
           {cardHead(
             translate('insight.activity') as string,
             (from > 0 || to < last) && (
-              <Pressable
+              <Button
                 testID="insight.zoom-out"
-                accessibilityRole="button"
+                variant="text"
+                size="small"
+                inline
+                icon={ChevronLeft}
+                title={translate('insight.zoom-out') as string}
                 onPress={() => goTo(0, last)}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 2,
-                  height: 30,
-                  marginRight: -6,
-                  paddingHorizontal: 8,
-                  borderRadius: 8,
-                }}
-              >
-                <ChevronLeft size={16} color={colors.fgAccent} />
-                <Text
-                  style={{
-                    color: colors.fgAccent,
-                    fontSize: 13,
-                    fontWeight: '600',
-                  }}
-                >
-                  {translate('insight.zoom-out') as string}
-                </Text>
-              </Pressable>
+              />
             ),
           )}
-          <Text
-            style={{
-              marginTop: 2,
-              marginBottom: 8,
-              color: SOFT_INK,
-              fontSize: 12,
-            }}
-          >
+          <Text variant="caption" tone="muted" style={{ marginBottom: space8 }}>
             {`${day(weekStart(from))} – ${Utils.formatDate(
               weekEnd(insight, to).getTime(),
               'MMM d, yyyy',
@@ -406,41 +405,32 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
             totalLabel={translate('insight.total') as string}
             noneLabel={translate('insight.no-sends') as string}
           />
-          <View style={{ flexDirection: 'row', gap: 6, marginTop: 12 }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              gap: space8,
+              marginTop: space12,
+            }}
+          >
             {PRESETS.map(p => {
               const n =
                 p.weeks === 'all'
                   ? insight.weeks
                   : Math.min(p.weeks, insight.weeks);
-              const on = to === last && span === n;
+              /** A preset as long as the history or longer is All: only All lights. */
+              const covered = p.weeks !== 'all' && p.weeks >= insight.weeks;
+              const on = to === last && span === n && !covered;
               return (
-                <Pressable
+                <Chip
+                  grow
                   key={p.key}
                   testID={`insight.${p.key.split('.')[1]}`}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: on }}
+                  selected={on}
                   onPress={() => !on && goTo(insight.weeks - n, last)}
-                  style={{
-                    flex: 1,
-                    height: 32,
-                    borderRadius: 10,
-                    borderWidth: 1,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderColor: on ? PRESET_ON_LINE : colors.bottomSheetBorder,
-                    backgroundColor: on ? PRESET_ON_BG : undefined,
-                  }}
                 >
-                  <Text
-                    style={{
-                      color: on ? colors.fgDefault : SOFT_INK,
-                      fontSize: 12,
-                      fontWeight: '600',
-                    }}
-                  >
-                    {translate(p.key) as string}
-                  </Text>
-                </Pressable>
+                  {translate(p.key) as string}
+                </Chip>
               );
             })}
           </View>
@@ -459,28 +449,24 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
           />
         </View>
 
-        <View style={[card, { paddingBottom: 22 }]}>
+        <View style={[card, { paddingBottom: space20 }]}>
           {cardHead(
             translate('insight.recipients') as string,
-            <Text style={{ color: HINT_INK, fontSize: 12 }}>
+            <Text variant="caption" tone="muted">
               {translate('insight.recipients-hint') as string}
             </Text>,
           )}
           {ranked.length === 0 && (
             <Text
               testID="insight.empty"
-              style={{
-                marginVertical: 22,
-                marginHorizontal: 10,
-                textAlign: 'center',
-                color: SOFT_INK,
-                fontSize: 13,
-              }}
+              variant="body"
+              tone="muted"
+              style={{ marginVertical: space20, textAlign: 'center' }}
             >
               {translate('insight.empty') as string}
             </Text>
           )}
-          <View style={{ marginTop: 6, marginHorizontal: -6 }}>
+          <View style={{ marginTop: space8, marginHorizontal: -space8 }}>
             {ranked.map((s, i) => {
               const group = insight.groups[s.g];
               const t = groups[s.g].total;
@@ -489,20 +475,19 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
               const canAdd = group.kind === 'recipient' && !group.contact;
               return (
                 <Pressable
+                  kind="row"
                   key={s.g}
                   testID={`insight.row.${s.g}`}
                   accessibilityRole="button"
                   accessibilityState={{ selected: on }}
                   onPress={() => setSelected(on ? -1 : s.g)}
                   style={{
-                    paddingVertical: 11,
-                    paddingHorizontal: 6,
-                    borderRadius: 12,
-                    borderTopLeftRadius: i === 0 ? 12 : 0,
-                    borderTopRightRadius: i === 0 ? 12 : 0,
+                    paddingVertical: space12,
+                    paddingHorizontal: space8,
+                    borderRadius: radiusMd,
                     borderTopWidth: i === 0 ? 0 : 1,
                     borderTopColor: ROW_LINE,
-                    backgroundColor: on ? SELECTED : undefined,
+                    backgroundColor: on ? colors.bgAccentSubtle : undefined,
                   }}
                 >
                   <View
@@ -516,18 +501,16 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                       style={{
                         width: 36,
                         height: 36,
-                        borderRadius: 18,
+                        borderRadius: radiusPill,
                         alignItems: 'center',
                         justifyContent: 'center',
-                        backgroundColor: `${group.color}29`,
+                        backgroundColor: tintOf(group.color),
                       }}
                     >
                       <Text
-                        style={{
-                          color: group.color,
-                          fontSize: 15,
-                          fontWeight: '700',
-                        }}
+                        variant="bodyStrong"
+                        color={group.color}
+                        style={{ fontWeight: '700' }}
                       >
                         {group.kind === 'others'
                           ? `+${group.count}`
@@ -540,23 +523,15 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                       {group.kind === 'recipient' && !group.name ? (
                         <RowAddress address={group.address} privacy={privacy} />
                       ) : (
-                        <Text
-                          numberOfLines={1}
-                          style={{
-                            color: colors.fgDefault,
-                            fontSize: 13.5,
-                            lineHeight: 18,
-                            fontWeight: '600',
-                          }}
-                        >
+                        <Text variant="bodyStrong" numberOfLines={1}>
                           {name(group)}
                         </Text>
                       )}
                       <View
                         style={{
                           height: 5,
-                          marginTop: 6,
-                          borderRadius: 3,
+                          marginTop: space8,
+                          borderRadius: radiusPill,
                           overflow: 'hidden',
                           backgroundColor: ROW_LINE,
                         }}
@@ -565,7 +540,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                           style={{
                             width: `${share * 100}%`,
                             height: '100%',
-                            borderRadius: 3,
+                            borderRadius: radiusPill,
                             backgroundColor: group.color,
                           }}
                         />
@@ -582,27 +557,14 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                           smallPrefix
                         />
                       ) : (
-                        <Text
-                          style={{
-                            color: colors.fgDefault,
-                            fontSize: 13,
-                            lineHeight: 18,
-                            fontWeight: '700',
-                          }}
-                        >
+                        <Text variant="bodySmall" style={{ fontWeight: '700' }}>
                           {sendsText(s.value)}
                         </Text>
                       )}
                       <View
                         style={{ flexDirection: 'row', alignItems: 'baseline' }}
                       >
-                        <Text
-                          style={{
-                            color: SOFT_INK,
-                            fontSize: 12,
-                            lineHeight: 16,
-                          }}
-                        >
+                        <Text variant="caption" tone="muted">
                           {`${percent(share)}${price > 0 ? ' · ' : ''}`}
                         </Text>
                         {price > 0 && (
@@ -611,7 +573,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                             amtZec={t.amount}
                             privacy={privacy}
                             style={{
-                              fontSize: 12,
+                              fontSize: textVariants.caption.fontSize,
                               fontWeight: '400',
                               color: SOFT_INK,
                             }}
@@ -621,39 +583,36 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                     </View>
                     {canAdd && (
                       <Pressable
+                        kind="icon"
                         testID={`insight.row.${s.g}.add`}
                         accessibilityRole="button"
                         accessibilityLabel={
                           translate('insight.add-contact') as string
                         }
                         onPress={() => launchAddTagModal(group.address)}
-                        style={({ pressed }) => ({
+                        hitSlop={slopFor(36)}
+                        style={{
                           width: 36,
                           height: 36,
-                          marginRight: -6,
-                          borderRadius: 10,
+                          borderRadius: radiusPill,
                           alignItems: 'center',
                           justifyContent: 'center',
-                          backgroundColor: pressed
-                            ? colors.bgAccentSubtle
-                            : undefined,
-                        })}
+                        }}
                       >
-                        <UserPlusIcon size={20} color={colors.fgAccent} />
+                        <UserPlusIcon
+                          size={iconSizeMd}
+                          color={colors.fgAccent}
+                        />
                       </Pressable>
                     )}
                   </View>
                   {on && (
                     <Text
                       testID={`insight.row.${s.g}.detail`}
+                      variant="caption"
+                      tone="muted"
                       onPress={onAmount}
-                      style={{
-                        marginTop: 8,
-                        marginLeft: 48,
-                        color: SOFT_INK,
-                        fontSize: 12,
-                        lineHeight: 17,
-                      }}
+                      style={{ marginTop: space8, marginLeft: 48 }}
                     >
                       {`${sendsText(t.sends)} · ${info.currencyName} ${zecText(t.amount)} · ${formatInteger(t.bytes)} ${translate('insight.bytes') as string}`}
                     </Text>
@@ -664,6 +623,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
           </View>
         </View>
       </ScrollView>
+      {fades}
     </View>
   );
 };

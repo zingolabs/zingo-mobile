@@ -1,22 +1,53 @@
+import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
 import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
 
-/** The three steps a swap walks, as the tracking screen draws them. */
-export const SWAP_STEP_COUNT = 3;
+type Progress = {
+  direction: SwapDirectionEnum;
+  status: SwapStatusEnum;
+  /**
+   * The provider's deposit is already seen (its hash is known) while the
+   * status still awaits it: the payment counts as detected.
+   */
+  depositSeen?: boolean;
+};
 
 /**
- * Which step a status sits on: 0 while the deposit is on its way, 1 while
- * the provider swaps, 2 once it paid out. A step is `done` below the current
- * one, `now` at it, and `next` above it.
+ * The steps a swap walks, as the tracking screen draws them. A sale has
+ * three: the ZEC leaves, the provider swaps, it pays out. A purchase has
+ * four: the payment is awaited, then seen, then swapped, then the ZEC lands.
  */
-export function swapStepIndex(status: SwapStatusEnum): number {
+export function swapStepKeys(direction: SwapDirectionEnum): string[] {
+  return direction === SwapDirectionEnum.Outbound
+    ? ['swap.step-sell-1', 'swap.step-sell-2', 'swap.step-sell-3']
+    : [
+        'swap.step-buy-1',
+        'swap.step-buy-2',
+        'swap.step-buy-3',
+        'swap.step-buy-4',
+      ];
+}
+
+/**
+ * Which step a swap sits on. A step is `done` below the current one, `now`
+ * at it, and `next` above it; a completed swap sits past the last.
+ */
+export function swapStepIndex({
+  direction,
+  status,
+  depositSeen = false,
+}: Progress): number {
+  const count = swapStepKeys(direction).length;
+  if (status === SwapStatusEnum.Completed) return count;
+  if (direction === SwapDirectionEnum.Outbound) {
+    return status === SwapStatusEnum.PendingDeposit ? 0 : 1;
+  }
   switch (status) {
-    case SwapStatusEnum.PendingDeposit:
     case SwapStatusEnum.AwaitingExternalDeposit:
-      return 0;
-    case SwapStatusEnum.Completed:
-      return SWAP_STEP_COUNT;
-    default:
+      return depositSeen ? 1 : 0;
+    case SwapStatusEnum.Pending:
       return 1;
+    default:
+      return 2;
   }
 }
 
@@ -39,21 +70,4 @@ export function swapOutcome(status: SwapStatusEnum): SwapOutcome {
     default:
       return 'inFlight';
   }
-}
-
-/** How long a deposit address waits for its payment. */
-export const DEPOSIT_WINDOW_MS = 15 * 60 * 1000;
-
-/** When the deposit must be paid by: the route's expiry, or the window. */
-export function depositDeadlineMs(record: {
-  createdAtMs: number;
-  expiresAtMs?: number;
-}): number {
-  return record.expiresAtMs ?? record.createdAtMs + DEPOSIT_WINDOW_MS;
-}
-
-/** `m:ss` of what is left, never below zero. */
-export function countdownText(remainingMs: number): string {
-  const seconds = Math.max(0, Math.ceil(remainingMs / 1000));
-  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
 }

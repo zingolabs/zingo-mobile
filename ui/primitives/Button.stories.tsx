@@ -18,7 +18,15 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'text', 'quiet', 'danger', 'nym', 'secondary'],
+      options: [
+        'primary',
+        'text',
+        'quiet',
+        'danger',
+        'dangerText',
+        'nym',
+        'secondary',
+      ],
     },
   },
 };
@@ -31,6 +39,10 @@ export const Text: Story = { args: { variant: 'text', title: 'Back' } };
 export const Quiet: Story = { args: { variant: 'quiet', title: 'Cancel' } };
 export const Danger: Story = {
   args: { variant: 'danger', title: 'Delete wallet' },
+};
+/** Delete on a screen; the sheet it opens confirms with `danger`. */
+export const DangerText: Story = {
+  args: { variant: 'dangerText', title: 'Delete' },
 };
 export const Nym: Story = { args: { variant: 'nym', title: 'Send via Nym' } };
 /** Outlined, on the inset fill of its surface; for actions of equal weight. */

@@ -1,12 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { View } from 'react-native';
+import { Pressable as RNPressable, View } from 'react-native';
+import { GestureDetector } from 'react-native-gesture-handler';
+import { useEdgeSwipeBack } from '@app/hooks/useEdgeSwipeBack';
 import { useNavigation } from '@react-navigation/native';
 import {
   useSafeAreaFrame,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 import Animated, {
+  Extrapolation,
+  interpolate,
   ReduceMotion,
   useAnimatedStyle,
   useSharedValue,
@@ -14,15 +18,17 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import { radiusSheet, space20, useTheme } from '@app/theme';
+import { radiusSheet, rowMinHeight, space20, useTheme } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { contentTopPad } from '@app/navigation/safeArea';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import TitleBar from '@ui/widgets/TitleBar';
 import TooltipHost from '@ui/widgets/TooltipHost';
-import { PANEL_TOP } from '@ui/widgets/Header/Header';
+import Header, { PANEL_TOP } from '@ui/widgets/Header/Header';
 import SheetRim from '@ui/primitives/SheetRim';
 import { SurfaceContext } from '@ui/primitives/Surface';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 
@@ -40,6 +46,8 @@ const PANEL_OUT = {
 };
 /** The content fades in as the panel nears its place. */
 const CONTENT_DELAY = 160;
+/** The footer's top pad and button, and the gap above them. */
+const FOOTER_CLEAR = 108;
 
 type FullPanelProps = {
   title: string;
@@ -61,8 +69,16 @@ type FullPanelProps = {
   /**
    * Sizes the panel to its content, up to the full height, and scrolls past
    * that. It waits out of sight until the content is measured, then rises.
+   * Like a sheet, it dims what is behind it, and a tap there goes back or
+   * closes as its bar does.
    */
   fit?: boolean;
+  /**
+   * The content brings its own scroller (a list that pages, a chat that
+   * scrolls from the bottom, a jump-back button over it); the panel only
+   * gives it the room under the title bar, without padding.
+   */
+  ownScroll?: boolean;
   testID?: string;
   children: React.ReactNode;
 };
@@ -84,6 +100,7 @@ export default function FullPanel({
   center,
   motion = 'rise',
   fit = false,
+  ownScroll = false,
   testID,
   children,
 }: FullPanelProps) {
@@ -92,6 +109,7 @@ export default function FullPanel({
   const navigation = useNavigation();
   const frame = useSafeAreaFrame();
   const insets = useSafeAreaInsets();
+  const bottomPad = useBottomActionPad();
   const rises = motion === 'rise';
 
   /** The screen under the app's top pad, less the top bar that stays above. */
@@ -101,10 +119,15 @@ export default function FullPanel({
   );
   const [headerH, setHeaderH] = useState<number>(0);
   const [contentH, setContentH] = useState<number>(0);
+  const [footerH, setFooterH] = useState<number>(0);
+  const { edges, fades } = useScrollEdges({
+    bottomInset: footer ? footerH : 0,
+    surface: 'surface',
+  });
   const fitted = fit && headerH > 0 && contentH > 0;
-  const height = fitted
-    ? Math.min(full, Math.max(headerH, radiusSheet) + contentH)
-    : full;
+  const fitHeight = Math.max(headerH, radiusSheet) + contentH;
+  /** Never so tall that only a sliver of the title behind shows. */
+  const height = fitted && full - fitHeight >= rowMinHeight ? fitHeight : full;
   /** Fitting, nothing shows until the height is known. */
   const ready = !fit || fitted;
 
@@ -126,6 +149,17 @@ export default function FullPanel({
   const panelStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: drop.value }],
   }));
+  /** The scrim follows the panel: in as it rises, out as it lowers. */
+  const scrimStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(drop.value, [0, height], [1, 0], Extrapolation.CLAMP),
+  }));
+
+  /**
+   * iOS gives a modal no edge swipe: a swipe from the left edge does what
+   * the bar's back (or close) does, and the panel lowers as it leaves.
+   */
+  const leave = onBack ?? onClose;
+  const swipeBack = useEdgeSwipeBack(leave);
 
   const fade = useSharedValue(0);
   useEffect(() => {
@@ -171,103 +205,172 @@ export default function FullPanel({
   }, [navigation, rises, drop]);
 
   return (
-    <View style={{ flex: 1 }} pointerEvents="box-none">
-      <Animated.View
-        style={[
-          {
+    <GestureDetector gesture={swipeBack}>
+      <View style={{ flex: 1 }} pointerEvents="box-none">
+        {/*
+        The top bar of the screen behind stays in sight above the panel, but
+        a modal route takes every touch, so its menu, mixnet and messages
+        icons did nothing. The panel draws the same bar over it, exactly in
+        its place, so they answer.
+      */}
+        <View
+          style={{
             position: 'absolute',
+            top: 0,
             left: 0,
             right: 0,
-            bottom: 0,
-            height,
-            backgroundColor: colors.bgSurface,
-            borderTopLeftRadius: radiusSheet,
-            borderTopRightRadius: radiusSheet,
-            overflow: 'hidden',
-          },
-          panelStyle,
-        ]}
-      >
-        <View
-          style={{ minHeight: radiusSheet }}
-          onLayout={
-            fit ? e => setHeaderH(e.nativeEvent.layout.height) : undefined
-          }
+            height: PANEL_TOP,
+          }}
         >
-          <SheetRim />
-          <TitleBar
-            title={title}
-            left={
-              onBack
-                ? {
-                    icon: ChevronLeft,
-                    accent: true,
-                    testID: `${testID ?? 'swap.flow'}.back`,
-                    accessibilityLabel: translate('swap.back') as string,
-                    onPress: onBack,
-                  }
-                : undefined
-            }
-            right={
-              onClose
-                ? {
-                    icon: XIcon,
-                    testID: `${testID ?? 'swap.flow'}.close`,
-                    accessibilityLabel: translate('swap.close') as string,
-                    onPress: onClose,
-                  }
-                : undefined
-            }
+          <Header
+            title={''}
+            noBalance={true}
+            noSyncingStatus={true}
+            noPrivacy={true}
+            showMessagesIcon={true}
           />
         </View>
-        <SurfaceContext.Provider value="surface">
-          <TooltipHost>
-            <KeyboardAwareScrollView
-              testID={testID}
-              bottomOffset={16}
-              keyboardShouldPersistTaps="handled"
-              bounces={false}
-              alwaysBounceVertical={false}
-              style={{ flex: 1 }}
-              onContentSizeChange={
-                fit ? (_: number, h: number) => setContentH(h) : undefined
-              }
-              contentContainerStyle={{
-                flexGrow: center ? 1 : undefined,
-                justifyContent: center ? 'center' : 'flex-start',
-                paddingHorizontal: space20,
-                paddingTop: 8,
-                paddingBottom: footer ? 140 : 60,
-              }}
-            >
-              <Animated.View
-                style={[
-                  contentStyle,
-                  center ? { flexGrow: 1, justifyContent: 'center' } : null,
-                ]}
-              >
-                {children}
-              </Animated.View>
-            </KeyboardAwareScrollView>
-          </TooltipHost>
-        </SurfaceContext.Provider>
-        {!!footer && (
-          <View
-            style={{
+        {fit && (
+          <Animated.View
+            style={[
+              {
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: colors.bgScrim,
+              },
+              scrimStyle,
+            ]}
+          >
+            {!!leave && (
+              <RNPressable
+                testID={`${testID ?? 'swap.flow'}.outside`}
+                accessible={false}
+                onPress={leave}
+                style={{ flex: 1 }}
+              />
+            )}
+          </Animated.View>
+        )}
+        <Animated.View
+          style={[
+            {
               position: 'absolute',
               left: 0,
               right: 0,
               bottom: 0,
-              paddingHorizontal: space20,
-              paddingTop: 12,
-              paddingBottom: 32,
+              height,
               backgroundColor: colors.bgSurface,
-            }}
+              borderTopLeftRadius: radiusSheet,
+              borderTopRightRadius: radiusSheet,
+              overflow: 'hidden',
+            },
+            panelStyle,
+          ]}
+        >
+          <View
+            style={{ minHeight: radiusSheet }}
+            onLayout={
+              fit ? e => setHeaderH(e.nativeEvent.layout.height) : undefined
+            }
           >
-            {footer}
+            <SheetRim />
+            <TitleBar
+              title={title}
+              left={
+                onBack
+                  ? {
+                      icon: ChevronLeft,
+                      accent: true,
+                      testID: `${testID ?? 'swap.flow'}.back`,
+                      accessibilityLabel: translate('swap.back') as string,
+                      onPress: onBack,
+                    }
+                  : undefined
+              }
+              right={
+                onClose
+                  ? {
+                      icon: XIcon,
+                      testID: `${testID ?? 'swap.flow'}.close`,
+                      accessibilityLabel: translate('swap.close') as string,
+                      onPress: onClose,
+                    }
+                  : undefined
+              }
+            />
           </View>
-        )}
-      </Animated.View>
-    </View>
+          <SurfaceContext.Provider value="surface">
+            <TooltipHost>
+              {ownScroll ? (
+                <Animated.View
+                  testID={testID}
+                  style={[{ flex: 1 }, contentStyle]}
+                >
+                  {children}
+                </Animated.View>
+              ) : (
+                <>
+                  <KeyboardAwareScrollView
+                    {...edges}
+                    testID={testID}
+                    bottomOffset={16}
+                    keyboardShouldPersistTaps="handled"
+                    bounces={false}
+                    alwaysBounceVertical={false}
+                    style={{ flex: 1 }}
+                    onContentSizeChange={(w: number, h: number) => {
+                      edges.onContentSizeChange(w, h);
+                      if (fit) {
+                        setContentH(h);
+                      }
+                    }}
+                    contentContainerStyle={{
+                      flexGrow: center ? 1 : undefined,
+                      justifyContent: center ? 'center' : 'flex-start',
+                      paddingHorizontal: space20,
+                      paddingTop: 8,
+                      /** Clears the footer (its top pad and button) and the bottom pad. */
+                      paddingBottom: bottomPad + (footer ? FOOTER_CLEAR : 28),
+                    }}
+                  >
+                    <Animated.View
+                      style={[
+                        contentStyle,
+                        center
+                          ? { flexGrow: 1, justifyContent: 'center' }
+                          : null,
+                      ]}
+                    >
+                      {children}
+                    </Animated.View>
+                  </KeyboardAwareScrollView>
+                  {fades}
+                </>
+              )}
+            </TooltipHost>
+          </SurfaceContext.Provider>
+          {!!footer && (
+            <View
+              onLayout={e => setFooterH(e.nativeEvent.layout.height)}
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: 0,
+                paddingHorizontal: space20,
+                paddingTop: 12,
+                paddingBottom: bottomPad,
+                backgroundColor: colors.bgSurface,
+              }}
+            >
+              {footer}
+            </View>
+          )}
+        </Animated.View>
+      </View>
+    </GestureDetector>
   );
 }

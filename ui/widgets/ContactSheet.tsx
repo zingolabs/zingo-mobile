@@ -1,8 +1,11 @@
+/* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
+import { Keyboard, TextInput, View } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 import { useTheme, slopFor, iconSizeMd } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { AddressBookFileClass, ChainNameEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { openScanner } from '@app/navigation/navigate';
@@ -18,14 +21,16 @@ import {
   isValidChainAddress,
 } from '@app/swap';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
-import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
 import RegText from '@ui/primitives/RegText';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import ChainSelect from '@ui/widgets/ChainSelect';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
+import { singleLineInput } from '@ui/primitives/singleLineInput';
+import { SheetFooter } from '@ui/primitives/AppSheetModal';
 
 const ZEC = 'ZEC';
 const NAME_MAX = 32;
@@ -65,8 +70,11 @@ type ContactSheetProps = {
   walletChain: ChainNameEnum;
   /** `chain` is the SwapKit code the contact is filed under ('ZEC', 'BTC'…). */
   onSave: (name: string, address: string, chain: string) => Promise<void>;
-  onCancel: () => void;
 };
+
+/** The title of the sheet it opens in, which the host puts in its bar with the X. */
+export const contactSheetTitleKey = (edit: ContactEdit): string =>
+  edit.kind === 'edit' ? 'addressbook.edit-contact' : 'addressbook.new-contact';
 
 /** The catalog key naming a Zcash address kind, from its prefix. */
 const kindKey = (address: string): string =>
@@ -89,7 +97,6 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
   book,
   walletChain,
   onSave,
-  onCancel,
 }) => {
   const { translate } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
@@ -322,23 +329,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
       testID={`addressbook.sheet.${edit.kind}`}
       style={{ paddingHorizontal: 20 }}
     >
-      <BoldText
-        style={{
-          marginTop: 4,
-          textAlign: 'center',
-          fontSize: 15,
-          lineHeight: 21,
-        }}
-      >
-        {
-          translate(
-            edit.kind === 'edit'
-              ? 'addressbook.edit-contact'
-              : 'addressbook.new-contact',
-          ) as string
-        }
-      </BoldText>
-      <View style={{ marginTop: 10 }}>
+      <View>
         <RegText>{translate('addressbook.name') as string}</RegText>
         <View
           style={{
@@ -369,16 +360,21 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
               color: colors.fgDefault,
               fontWeight: '600',
               fontSize: 15,
+              ...singleLineInput(),
             }}
           />
           {!!name && (
-            <TouchableOpacity hitSlop={slopFor(20)} onPress={() => setName('')}>
+            <Pressable
+              kind="icon"
+              hitSlop={slopFor(20)}
+              onPress={() => setName('')}
+            >
               <XIcon
                 style={{ marginRight: 10 }}
                 size={iconSizeMd}
                 color={colors.fgMuted}
               />
-            </TouchableOpacity>
+            </Pressable>
           )}
         </View>
       </View>
@@ -443,7 +439,8 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             }}
           />
           <View style={{ alignItems: 'center', paddingVertical: 6, gap: 6 }}>
-            <TouchableOpacity
+            <Pressable
+              kind="icon"
               ref={scanButton}
               testID="addressbook.scan-button"
               accessibilityLabel={translate('scanner.title') as string}
@@ -455,9 +452,27 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
                 size={24}
                 color={colors.fgMuted}
               />
-            </TouchableOpacity>
+            </Pressable>
+            {!address && (
+              <Pressable
+                kind="icon"
+                hitSlop={slopFor(20)}
+                testID="addressbook.address-paste"
+                accessibilityLabel={translate('paste') as string}
+                onPress={async () =>
+                  setAddress((await Clipboard.getString()).replace(/\s+/g, ''))
+                }
+              >
+                <ClipboardPasteIcon
+                  style={{ marginRight: 5 }}
+                  size={iconSizeMd}
+                  color={colors.fgMuted}
+                />
+              </Pressable>
+            )}
             {!!address && (
-              <TouchableOpacity
+              <Pressable
+                kind="icon"
                 hitSlop={slopFor(20)}
                 testID="addressbook.address-clear"
                 onPress={() => setAddress('')}
@@ -467,7 +482,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
                   size={iconSizeMd}
                   color={colors.fgMuted}
                 />
-              </TouchableOpacity>
+              </Pressable>
             )}
           </View>
         </View>
@@ -503,26 +518,18 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
         </View>
       </View>
 
-      <Button
-        testID="addressbook.save"
-        variant="primary"
-        title={translate('save') as string}
-        disabled={saving || !ready}
-        onPress={save}
-        style={{
-          marginTop: 20,
-        }}
-      />
-      <Button
-        testID="addressbook.cancel"
-        variant="quiet"
-        title={translate('cancel') as string}
-        onPress={() => {
-          Keyboard.dismiss();
-          onCancel();
-        }}
-        style={{ marginTop: 8 }}
-      />
+      <SheetFooter style={{ paddingHorizontal: 20 }}>
+        <Button
+          testID="addressbook.save"
+          variant="primary"
+          title={translate('save') as string}
+          disabled={saving || !ready}
+          onPress={save}
+          style={{
+            marginTop: 20,
+          }}
+        />
+      </SheetFooter>
     </View>
   );
 };

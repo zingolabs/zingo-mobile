@@ -50,6 +50,23 @@ const Scale = () => (
 );
 export const Variants: Story = { render: Scale };
 
+/** What never happened: an expired swap's amount and its deposit address. */
+export const Strike: Story = {
+  render: () => (
+    <View style={{ gap: 8 }}>
+      <Text variant="balance" tone="muted" strike>
+        +12.5 ZEC
+      </Text>
+      <Text variant="bodyStrong" tone="muted" strike>
+        +12.5 ZEC
+      </Text>
+      <Text variant="address" strike>
+        bc1qar…5mdq
+      </Text>
+    </View>
+  ),
+};
+
 /** The OS text at 200%: each style stops at its cap. */
 export const Variants200: Story = {
   render: Scale,

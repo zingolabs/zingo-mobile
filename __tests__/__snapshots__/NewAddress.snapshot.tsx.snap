@@ -92,26 +92,47 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "columnGap": 12,
-            "flex": 1,
-            "flexDirection": "row",
-            "minHeight": 56,
-            "paddingLeft": 16,
-            "paddingRight": 16,
-            "paddingVertical": 12,
-          }
+          [
+            {
+              "alignItems": "center",
+              "columnGap": 12,
+              "flex": 1,
+              "flexDirection": "row",
+              "minHeight": 56,
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingVertical": 12,
+            },
+            {},
+          ]
         }
         testID="receive.new-kind.orchard"
       >
+        <View
+          pointerEvents="none"
+          style={
+            [
+              {
+                "bottom": 0,
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+              {
+                "backgroundColor": "#8888881F",
+                "borderRadius": undefined,
+              },
+              {},
+            ]
+          }
+        />
         <View
           style={
             {
               "alignItems": "center",
               "borderColor": "#18bd18",
-              "borderRadius": 9,
+              "borderRadius": 999,
               "borderWidth": 2,
               "height": 18,
               "justifyContent": "center",
@@ -124,7 +145,7 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
               [
                 {
                   "backgroundColor": "#18bd18",
-                  "borderRadius": 4.5,
+                  "borderRadius": 999,
                   "height": 9,
                   "width": 9,
                 },
@@ -178,6 +199,7 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
             >
               <Text
                 maxFontSizeMultiplier={2}
+                numberOfLines={1}
                 style={
                   {
                     "color": "#18bd18",
@@ -249,26 +271,47 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "columnGap": 12,
-            "flex": 1,
-            "flexDirection": "row",
-            "minHeight": 56,
-            "paddingLeft": 16,
-            "paddingRight": 16,
-            "paddingVertical": 12,
-          }
+          [
+            {
+              "alignItems": "center",
+              "columnGap": 12,
+              "flex": 1,
+              "flexDirection": "row",
+              "minHeight": 56,
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingVertical": 12,
+            },
+            {},
+          ]
         }
         testID="receive.new-kind.orchardSapling"
       >
         <View
+          pointerEvents="none"
+          style={
+            [
+              {
+                "bottom": 0,
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+              {
+                "backgroundColor": "#8888881F",
+                "borderRadius": undefined,
+              },
+              {},
+            ]
+          }
+        />
+        <View
           style={
             {
               "alignItems": "center",
               "borderColor": "#4A6487",
-              "borderRadius": 9,
+              "borderRadius": 999,
               "borderWidth": 1.5,
               "height": 18,
               "justifyContent": "center",
@@ -281,7 +324,7 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
               [
                 {
                   "backgroundColor": "#18bd18",
-                  "borderRadius": 4.5,
+                  "borderRadius": 999,
                   "height": 9,
                   "width": 9,
                 },
@@ -381,26 +424,47 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "columnGap": 12,
-            "flex": 1,
-            "flexDirection": "row",
-            "minHeight": 56,
-            "paddingLeft": 16,
-            "paddingRight": 16,
-            "paddingVertical": 12,
-          }
+          [
+            {
+              "alignItems": "center",
+              "columnGap": 12,
+              "flex": 1,
+              "flexDirection": "row",
+              "minHeight": 56,
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingVertical": 12,
+            },
+            {},
+          ]
         }
         testID="receive.new-kind.sapling"
       >
         <View
+          pointerEvents="none"
+          style={
+            [
+              {
+                "bottom": 0,
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+              {
+                "backgroundColor": "#8888881F",
+                "borderRadius": undefined,
+              },
+              {},
+            ]
+          }
+        />
+        <View
           style={
             {
               "alignItems": "center",
               "borderColor": "#4A6487",
-              "borderRadius": 9,
+              "borderRadius": 999,
               "borderWidth": 1.5,
               "height": 18,
               "justifyContent": "center",
@@ -413,7 +477,7 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
               [
                 {
                   "backgroundColor": "#18bd18",
-                  "borderRadius": 4.5,
+                  "borderRadius": 999,
                   "height": 9,
                   "width": 9,
                 },
@@ -513,26 +577,47 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "columnGap": 12,
-            "flex": 1,
-            "flexDirection": "row",
-            "minHeight": 56,
-            "paddingLeft": 16,
-            "paddingRight": 16,
-            "paddingVertical": 12,
-          }
+          [
+            {
+              "alignItems": "center",
+              "columnGap": 12,
+              "flex": 1,
+              "flexDirection": "row",
+              "minHeight": 56,
+              "paddingLeft": 16,
+              "paddingRight": 16,
+              "paddingVertical": 12,
+            },
+            {},
+          ]
         }
         testID="receive.new-kind.transparent"
       >
+        <View
+          pointerEvents="none"
+          style={
+            [
+              {
+                "bottom": 0,
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+              {
+                "backgroundColor": "#8888881F",
+                "borderRadius": undefined,
+              },
+              {},
+            ]
+          }
+        />
         <View
           style={
             {
               "alignItems": "center",
               "borderColor": "#4A6487",
-              "borderRadius": 9,
+              "borderRadius": 999,
               "borderWidth": 1.5,
               "height": 18,
               "justifyContent": "center",
@@ -545,7 +630,7 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
               [
                 {
                   "backgroundColor": "#18bd18",
-                  "borderRadius": 4.5,
+                  "borderRadius": 999,
                   "height": 9,
                   "width": 9,
                 },
@@ -599,6 +684,7 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
             >
               <Text
                 maxFontSizeMultiplier={2}
+                numberOfLines={1}
                 style={
                   {
                     "color": "#E6C46A",
@@ -699,6 +785,7 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
           maxFontSizeMultiplier={2}
           maxLength={50}
           multiline={false}
+          numberOfLines={1}
           onBlur={[Function]}
           onChangeText={[Function]}
           onFocus={[Function]}
@@ -706,12 +793,14 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
           placeholderTextColor="#888888"
           style={
             {
+              "alignSelf": "stretch",
               "color": "#c3c3c3",
               "flex": 1,
               "fontSize": 15,
-              "fontWeight": "600",
+              "fontWeight": "400",
+              "minWidth": 0,
               "paddingRight": 0,
-              "paddingVertical": 8,
+              "paddingVertical": 0,
             }
           }
           testID="receive.new-tag"
@@ -759,7 +848,9 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
         accessible={true}
         collapsable={false}
         focusable={true}
+        onBlur={[Function]}
         onClick={[Function]}
+        onFocus={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -767,79 +858,21 @@ exports[`NewAddress - snapshots NewAddress kinds and tag 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          {
-            "alignItems": "center",
-            "alignSelf": "stretch",
-            "backgroundColor": undefined,
-            "borderRadius": 999,
-            "justifyContent": "center",
-            "maxWidth": "100%",
-            "minHeight": 44,
-            "opacity": 1,
-            "paddingHorizontal": 24,
-            "paddingVertical": 8,
-            "width": "100%",
-          }
-        }
-      >
-        <Text
-          maxFontSizeMultiplier={1.5}
-          style={
+          [
             {
-              "color": "#888888",
-              "fontSize": 16,
-              "fontWeight": "700",
-              "lineHeight": 20,
-              "textAlign": "center",
-            }
-          }
-        >
-          text translated
-        </Text>
-      </View>
-      <View
-        accessibilityRole="button"
-        accessibilityState={
-          {
-            "busy": false,
-            "checked": undefined,
-            "disabled": false,
-            "expanded": undefined,
-            "selected": undefined,
-          }
-        }
-        accessibilityValue={
-          {
-            "max": undefined,
-            "min": undefined,
-            "now": undefined,
-            "text": undefined,
-          }
-        }
-        accessible={true}
-        collapsable={false}
-        focusable={true}
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          {
-            "alignItems": "center",
-            "alignSelf": "stretch",
-            "backgroundColor": "#18bd18",
-            "borderRadius": 999,
-            "justifyContent": "center",
-            "maxWidth": "100%",
-            "minHeight": 44,
-            "opacity": 1,
-            "paddingHorizontal": 24,
-            "paddingVertical": 8,
-            "width": "100%",
-          }
+              "alignItems": "center",
+              "alignSelf": "stretch",
+              "backgroundColor": "#18bd18",
+              "borderRadius": 999,
+              "justifyContent": "center",
+              "maxWidth": "100%",
+              "minHeight": 44,
+              "paddingHorizontal": 24,
+              "paddingVertical": 8,
+              "width": "100%",
+            },
+            {},
+          ]
         }
         testID="receive.new-create"
       >

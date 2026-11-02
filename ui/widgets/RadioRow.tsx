@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { Pressable, View } from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
+import { View } from 'react-native';
 import {
   radiusMd,
   useTheme,
@@ -86,11 +87,12 @@ export default function RadioRow({
       }}
     >
       <Pressable
+        kind="row"
         testID={testID}
         accessibilityRole="radio"
         accessibilityState={{ checked: selected }}
         onPress={onPress}
-        style={({ pressed }) => ({
+        style={{
           flex: 1,
           flexDirection: 'row',
           alignItems: 'center',
@@ -99,8 +101,7 @@ export default function RadioRow({
           paddingVertical: space12,
           paddingLeft: space16,
           paddingRight: trailing ? 0 : space16,
-          backgroundColor: pressed ? colors.bgMutedSubtle : 'transparent',
-        })}
+        }}
       >
         <Radio selected={selected} />
         {leading}

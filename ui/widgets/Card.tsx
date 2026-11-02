@@ -1,6 +1,7 @@
 import React from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { radiusMd, space12, space16, touchTarget, useTheme } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { SurfaceContext, useInsetFill } from '@ui/primitives/Surface';
 
 export type CardTone =
@@ -13,6 +14,8 @@ type CardProps = {
   flush?: boolean;
   /** Only when the whole card is tappable; it then shows a pressed state. */
   onPress?: () => void;
+  /** The border of a card a chart picked, in that chart's colour for it. */
+  edge?: string;
   testID?: string;
 };
 
@@ -27,6 +30,7 @@ const Card: React.FunctionComponent<CardProps> = ({
   tone = 'default',
   flush = false,
   onPress,
+  edge,
   testID,
 }) => {
   const { colors } = useTheme();
@@ -45,7 +49,7 @@ const Card: React.FunctionComponent<CardProps> = ({
   }[tone];
   const style = {
     backgroundColor: paint.bg,
-    borderColor: paint.edge,
+    borderColor: edge ?? paint.edge,
     borderWidth: 1,
     borderRadius: radiusMd,
     overflow: 'hidden' as const,
@@ -53,15 +57,15 @@ const Card: React.FunctionComponent<CardProps> = ({
   };
   return onPress ? (
     <Pressable
+      kind="row"
       testID={testID}
       accessibilityRole="button"
-      accessibilityState={{ selected: tone === 'selected' }}
+      accessibilityState={{ selected: tone === 'selected' || !!edge }}
       onPress={onPress}
-      style={({ pressed }) => ({
+      style={{
         ...style,
         minHeight: touchTarget,
-        opacity: pressed ? 0.8 : 1,
-      })}
+      }}
     >
       {body}
     </Pressable>

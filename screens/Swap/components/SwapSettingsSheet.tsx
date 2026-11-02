@@ -2,15 +2,14 @@
 import React, { forwardRef, useCallback, useContext, useState } from 'react';
 import { View } from 'react-native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { space12, space16, space8 } from '@app/theme';
+import { space12, space16, space8, space20 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import AppSheetModal from '@ui/primitives/AppSheetModal';
+import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
 import Chip from '@ui/primitives/Chip';
 import TextField from '@ui/primitives/TextField';
 import Button from '@ui/primitives/Button';
 import Banner from '@ui/widgets/Banner';
-import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { DEFAULT_SLIPPAGE_BPS } from '@screens/Swap/useSwapForm';
 import SheetTitle from './SheetTitle';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
@@ -46,7 +45,6 @@ export function formatSlippagePercent(bps: number): string {
 const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
   ({ slippageBps, onChange }, ref) => {
     const { translate } = useContext(ContextAppLoaded);
-    const keyboardHeight = useKeyboardHeight();
     const [editing, setEditing] = useState<boolean>(
       !PRESETS_BPS.includes(slippageBps),
     );
@@ -99,11 +97,8 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
             closeLabel={translate('swap.close') as string}
           />
         }
-        contentStyle={{
-          paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
-        }}
       >
-        <View style={{ paddingHorizontal: space16 }}>
+        <View style={{ paddingHorizontal: space20 }}>
           {/* One row when it fits; the chips drop under the label when not. */}
           <View
             style={{
@@ -198,18 +193,20 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
               />
             </View>
           )}
-          <View style={{ marginTop: space16 }}>
-            <Button
-              testID="swap.slippage.done"
-              variant="primary"
-              title={translate('swap.done') as string}
-              disabled={editing && !customValid}
-              onPress={() => {
-                onChange(editing && customValid ? parsedCustom : preset);
-                dismiss();
-              }}
-            />
-          </View>
+          <SheetFooter style={{ paddingHorizontal: space20 }}>
+            <View style={{ marginTop: space16 }}>
+              <Button
+                testID="swap.slippage.done"
+                variant="primary"
+                title={translate('swap.done') as string}
+                disabled={editing && !customValid}
+                onPress={() => {
+                  onChange(editing && customValid ? parsedCustom : preset);
+                  dismiss();
+                }}
+              />
+            </View>
+          </SheetFooter>
         </View>
       </AppSheetModal>
     );

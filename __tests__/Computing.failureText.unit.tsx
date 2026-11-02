@@ -26,7 +26,7 @@ function makeProps(
     route: {
       key: 'Key-1',
       name: Route.Computing,
-      params: { phase: 'failed', failure },
+      params: { phase: 'failed', failure, stage: 'create', since: 0 },
     },
   };
 }

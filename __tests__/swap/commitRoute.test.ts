@@ -85,3 +85,69 @@ describe('SwapService.commitRoute', () => {
     expect(record.requestedSlippageBps).toBeUndefined();
   });
 });
+
+/**
+ * The deadline is what ends a deposit that never comes, so the commit has to
+ * keep it: an internal 24 hours from the payment address, never shown.
+ */
+describe('SwapService.commitRoute deposit deadline', () => {
+  const commitInbound = (expiresAtMs?: number) => {
+    const service = new SwapService({
+      client: {
+        swap: jest.fn(async () => ({
+          tx: { to: 'bc1qdeposit' },
+          inboundAddress: 'bc1qdeposit',
+        })),
+      } as unknown as SwapKitClient,
+      registry: createDefaultProviderRegistry(),
+      store: {
+        getByRecordId: async () => null,
+        upsert: jest.fn(async () => undefined),
+      } as unknown as typeof SwapStore,
+      poller: { start: jest.fn() } as unknown as SwapPoller,
+      tokenCatalog: null as unknown as TokenCatalog,
+    });
+    return service.commitRoute({
+      quoteInput: {
+        sellAsset: BTC,
+        receiveAsset: ZEC,
+        sellAmountHumanDecimal: '0.03',
+        sourceAddress: 'bc1qrefund',
+        destinationAddress: 't1ephemeral',
+      },
+      chosenRoute: {
+        routeId: 'route-1',
+        provider: SwapKitProviderEnum.Near,
+        expectedReceiveAmount: '12.5',
+        minReceiveAmount: '12.4',
+        expiresAtMs,
+      },
+      direction: SwapDirectionEnum.Inbound,
+      fiatValueBasis: {
+        sellUsdUnitPrice: 100000,
+        receiveUsdUnitPrice: 1000,
+        capturedAt: 0,
+      },
+    });
+  };
+
+  it('waits 12 hours from the commit', async () => {
+    const { record } = await commitInbound(1_800_000_000_000);
+
+    expect(record.depositDeadlineMs).toBe(
+      record.createdAtMs + 12 * 60 * 60 * 1000,
+    );
+  });
+
+  it('keeps the quote’s expiry, for a sale whose ZEC did not leave', async () => {
+    const { record } = await commitInbound(1_800_000_000_000);
+
+    expect(record.quoteExpiresAtMs).toBe(1_800_000_000_000);
+  });
+
+  it('leaves an outbound swap without a deadline', async () => {
+    const { record } = await commit(100);
+
+    expect(record.depositDeadlineMs).toBeUndefined();
+  });
+});

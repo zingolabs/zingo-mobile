@@ -1,3 +1,4 @@
+/* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import { leaveFlow } from '@app/navigation/navigate';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
@@ -16,6 +17,7 @@ import { Route } from '@app/AppState';
 import { planOrchardDrain } from '@app/walletBackend';
 import { RPCDrainPlanType } from '@app/walletBackend/types/RPCDrainPlanType';
 import { themeTokens } from '@app/theme';
+import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 
 type MigrationTransactionsProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -99,6 +101,8 @@ const MigrationTransactions: React.FunctionComponent<
   const context = useContext(ContextAppLoaded);
   const { translate, info, totalBalance } = context;
   const { colors } = useTheme();
+  /** The footer's lowest action ends at the one bottom distance. */
+  const bottomPad = useBottomActionPad();
 
   const [plan, setPlan] = useState<RPCDrainPlanType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -231,7 +235,7 @@ const MigrationTransactions: React.FunctionComponent<
           style={{
             flexDirection: 'row',
             justifyContent: 'center',
-            paddingBottom: 24,
+            paddingBottom: bottomPad,
             paddingHorizontal: 24,
           }}
         >
@@ -282,7 +286,7 @@ const MigrationTransactions: React.FunctionComponent<
             flexDirection: 'row',
             justifyContent: 'space-evenly',
             alignItems: 'center',
-            paddingBottom: 24,
+            paddingBottom: bottomPad,
             paddingHorizontal: 24,
           }}
         >
@@ -342,7 +346,7 @@ const MigrationTransactions: React.FunctionComponent<
           style={{
             flexDirection: 'row',
             justifyContent: 'center',
-            paddingBottom: 24,
+            paddingBottom: bottomPad,
             paddingHorizontal: 24,
           }}
         >
@@ -483,7 +487,7 @@ const MigrationTransactions: React.FunctionComponent<
           flexDirection: 'row',
           justifyContent: 'space-evenly',
           alignItems: 'center',
-          paddingBottom: 24,
+          paddingBottom: bottomPad,
           paddingHorizontal: 24,
         }}
       >

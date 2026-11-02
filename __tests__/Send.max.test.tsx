@@ -13,6 +13,16 @@ import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
+/** Send mounts its sheet once its container is measured; jest never lays out. */
+const layoutSend = () => {
+  const container = screen.queryByTestId('send.container');
+  if (container) {
+    fireEvent(container, 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 400, height: 800 } },
+    });
+  }
+};
+
 test('Tests that the spendable amount fills the amount field with the maximum when it is pressed', async () => {
   render(
     <ContextAppLoadedProvider
@@ -31,6 +41,7 @@ test('Tests that the spendable amount fills the amount field with the maximum wh
       />
     </ContextAppLoadedProvider>,
   );
+  layoutSend();
   await act(async () => {});
   expect(screen.getByTestId('send.amount').props.value).toBe('');
   await act(async () => {
