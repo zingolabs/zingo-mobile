@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { Pressable } from 'react-native';
+
 import { slopFor, useTheme, radiusSm, iconSizeMd } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { TranslateType } from '@app/AppState';
 import { EyeIcon } from '@ui/primitives/Icons/EyeIcon';
 import { EyeOffIcon } from '@ui/primitives/Icons/EyeOffIcon';
@@ -23,6 +24,7 @@ const PrivacyToggle: React.FC<PrivacyToggleProps> = React.memo(
     const Icon = privacy ? EyeOffIcon : EyeIcon;
     return (
       <Pressable
+        kind="icon"
         testID="header.privacy"
         accessibilityRole="button"
         accessibilityLabel={

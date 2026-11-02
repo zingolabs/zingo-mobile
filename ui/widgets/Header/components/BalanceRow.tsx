@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
-import { Pressable, TouchableOpacity, View } from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
+import { View } from 'react-native';
 import Animated, {
   Easing,
   EntryExitAnimationFunction,
@@ -172,6 +173,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
             }}
           >
             <Pressable
+              kind="link"
               accessibilityRole="button"
               disabled={!balanceReveal.hidden}
               onPress={balanceReveal.reveal}
@@ -191,7 +193,8 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               {info.currencyName}
             </Text>
             {totalBalance && poolsWorthALook(totalBalance) && (
-              <TouchableOpacity
+              <Pressable
+                kind="icon"
                 hitSlop={slopFor(20)}
                 onPress={() => {
                   navigation.navigate(Route.Pools);
@@ -214,7 +217,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                 >
                   <InfoIcon size={iconSizeMd} color={colors.fgAccent} />
                 </View>
-              </TouchableOpacity>
+              </Pressable>
             )}
           </View>
         )}

@@ -7,21 +7,13 @@ import React, {
   useState,
 } from 'react';
 import { formatZecAmount } from '@app/utils/formatZecAmount';
-import { formatInteger, formatUsd } from '@app/utils/formatAmount';
-import Animated from 'react-native-reanimated';
+import { formatUsd } from '@app/utils/formatAmount';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { Linking, Pressable, View } from 'react-native';
+import { Linking, View } from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import {
-  radiusMd,
-  space12,
-  space8,
-  useTheme,
-  iconSizeMd,
-  radiusSm,
-  iconSizeSm,
-} from '@app/theme';
+import { space12, space8, useTheme, iconSizeMd, iconSizeSm } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import {
   Route,
@@ -29,34 +21,32 @@ import {
   ValueTransferKindEnum,
 } from '@app/AppState';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
-import { useUnfold } from '@app/hooks/useUnfold';
 import { ContextAppLoaded, useSwapRecords, useSwapService } from '@app/context';
 import {
   SwapDirectionEnum,
-  SwapStore,
-  buildChainExplorerUrl,
+  buildSwapKitTrackerUrl,
   canonicalChainAddress,
   canRemoveSwap,
   formatAmountForDisplay,
-  isPrePaymentStatus,
   isRealLegHash,
+  isRefunding,
   isTerminalStatus,
+  prefillFromRecord,
   providerLongLabel,
 } from '@app/swap';
-import { showConfirm } from '@app/services/showConfirm';
 import Utils from '@app/utils';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
 import TextField from '@ui/primitives/TextField';
 import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
-import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
-import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
-import {
-  ChevronDown,
-  ChevronRight,
-  ChevronUp,
-} from '@ui/primitives/Icons/Chevron';
+import { TxSwapIcon } from '@ui/primitives/Icons/TxSwapIcon';
+import { TxPendingIcon } from '@ui/primitives/Icons/TxPendingIcon';
+import { swapInFlight } from '@screens/History/historyRowText';
+import { ChevronRight } from '@ui/primitives/Icons/Chevron';
+import Banner from '@ui/widgets/Banner';
+import FoldSection from './components/FoldSection';
+import TrackSwap from './components/TrackSwap';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import DepositSlip from '@screens/Swap/components/DepositSlip';
 import DetailHero from '@screens/Swap/components/DetailHero';
@@ -68,7 +58,8 @@ import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import SaveContactButton from '@ui/widgets/SaveContactButton';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
 import { swapOutcome } from '@screens/Swap/swapProgress';
-import { legName, legsOf } from '@screens/Swap/swapLegs';
+import { useRemoveSwap } from '@screens/Swap/useRemoveSwap';
+import { legName, legSlot, legsOf } from '@screens/Swap/swapLegs';
 
 type SwapDetailProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -148,30 +139,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
     }
   }, [hash, swapService, record, recordId]);
 
-  const remove = useCallback(() => {
-    if (!record) {
-      return;
-    }
-    showConfirm({
-      title: t('swap.detail-remove-title'),
-      message: t(
-        isPrePaymentStatus(record.status)
-          ? 'swap.detail-remove-unpaid'
-          : 'swap.detail-remove-body',
-      ),
-      buttons: [
-        { text: t('swap.close'), style: 'cancel' },
-        {
-          text: t('swap.detail-remove'),
-          style: 'destructive',
-          onPress: () => {
-            SwapStore.deleteByRecordId(recordId).then(close);
-          },
-        },
-      ],
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [record, recordId, close]);
+  const removeSwap = useRemoveSwap(close);
 
   if (!record) {
     return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
@@ -180,10 +148,11 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
   const sell = record.direction === SwapDirectionEnum.Outbound;
   const outcome = swapOutcome(record.status);
   const done = outcome === 'completed';
+  const expired = outcome === 'expired';
+  const refunding = isRefunding(record);
   const sellSym = record.sellAsset.ticker ?? record.sellAsset.symbol;
   const getSym = record.receiveAsset.ticker ?? record.receiveAsset.symbol;
   const other = sell ? record.receiveAsset : record.sellAsset;
-  const otherSym = sell ? getSym : sellSym;
   const got = record.actualReceiveAmount ?? record.expectedReceiveAmount;
   const back = record.refundInfo?.refundedAmountText;
   const usd = (amount: string, unit: number) => {
@@ -191,7 +160,9 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
     return unit > 0 && Number.isFinite(v) ? `≈ ${formatUsd(v)}` : '';
   };
 
-  const title = `${t(sell ? 'history.swap-to' : 'history.swap-from')} ${otherSym}`;
+  const title = t(done ? 'history.swapped-pair' : 'history.swap-pair')
+    .replace('{from}', sellSym)
+    .replace('{to}', getSym);
   const hero =
     outcome === 'refunded'
       ? {
@@ -206,20 +177,39 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
               ? `${formatAmountForDisplay(back)} ${t('swap.detail-of')} ${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym} ${t('swap.detail-came-back')}`
               : '',
         }
-      : {
-          amount: `${done ? '+' : '≈ +'}${formatAmountForDisplay(got)}`,
-          unit: getSym,
-          tone: done ? ('positive' as const) : ('default' as const),
-          line: `−${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}${usd(got, record.fiatValueBasis.receiveUsdUnitPrice) ? ` · ${usd(got, record.fiatValueBasis.receiveUsdUnitPrice)}` : ''}`,
-        };
+      : expired
+        ? {
+            amount: `+${formatAmountForDisplay(got)}`,
+            unit: getSym,
+            tone: 'muted' as const,
+            line: t('history.swap-not-sent').replace(
+              '{amount}',
+              `${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}`,
+            ),
+          }
+        : {
+            amount: `${done ? '+' : '≈ +'}${formatAmountForDisplay(got)}`,
+            unit: getSym,
+            tone: done
+              ? ('positive' as const)
+              : outcome === 'failed'
+                ? ('muted' as const)
+                : ('default' as const),
+            line: `−${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}${usd(got, record.fiatValueBasis.receiveUsdUnitPrice) ? ` · ${usd(got, record.fiatValueBasis.receiveUsdUnitPrice)}` : ''}`,
+          };
   const pill =
     outcome === 'completed'
       ? { text: t('swap.history-done'), tone: 'accent' as const }
       : outcome === 'refunded'
         ? { text: t('swap.history-refunded'), tone: 'warning' as const }
-        : outcome === 'failed' || outcome === 'expired'
+        : outcome === 'failed'
           ? { text: t('swap.history-failed'), tone: 'danger' as const }
-          : { text: t('swap.history-in-progress'), tone: 'neutral' as const };
+          : expired
+            ? { text: t('history.state-expired'), tone: 'neutral' as const }
+            : {
+                text: t('swap.history-in-progress'),
+                tone: 'neutral' as const,
+              };
 
   const feesUsd =
     record.totalFeesInReceiveAsset &&
@@ -257,7 +247,24 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
       ),
     },
     { label: t('swap.provider'), value: providerLongLabel(record.provider) },
-    ...(feesUsd ? [{ label: t('swap.review-fees'), value: feesUsd }] : []),
+    ...(expired
+      ? [
+          {
+            label: t('swap.result-reason'),
+            value: t('swap.expired-why'),
+            wrap: true,
+          },
+          {
+            label: t('swap.deposit-address'),
+            value: Utils.trimToSmall(record.depositAddress, 6),
+            mono: true,
+            strike: true,
+          },
+        ]
+      : []),
+    ...(feesUsd && !expired
+      ? [{ label: t('swap.review-fees'), value: feesUsd }]
+      : []),
     ...(done && sell
       ? [
           {
@@ -277,10 +284,37 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
           },
         ]
       : []),
-    ...(!done && reason
+    ...(!done && !expired && reason
       ? [{ label: t('swap.result-reason'), value: reason, wrap: true }]
       : []),
   ];
+  const sold = `${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}`;
+  /** A payment that came after the quote expired, on its way back. */
+  const view = refunding
+    ? {
+        hero: {
+          amount: formatAmountForDisplay(record.sellAmountHumanDecimal),
+          unit: sellSym,
+          tone: 'default' as const,
+          line: t('swap.going-back-line').replace('{amount}', sold),
+        },
+        pill: { text: t('history.state-refunding'), tone: 'warning' as const },
+        rows: [
+          rows[0],
+          rows[1],
+          {
+            label: t('swap.result-reason'),
+            value: t('swap.late-why'),
+            wrap: true,
+          },
+          {
+            label: t('swap.goes-back-to'),
+            value: Utils.trimToSmall(record.sourceAddress, 6),
+            copy: record.sourceAddress,
+          },
+        ] as DetailRow[],
+      }
+    : { hero, pill, rows };
 
   const hasDepositEvidence =
     isRealLegHash(record.broadcast?.txId) ||
@@ -292,28 +326,10 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
     l => l.kind === ValueTransferKindEnum.Received,
   );
 
-  const explorerHash = isRealLegHash(record.broadcast?.txId)
-    ? { chain: record.sellAsset.chain, hash: record.broadcast?.txId as string }
-    : isRealLegHash(record.destinationTxHash)
-      ? {
-          chain: record.receiveAsset.chain,
-          hash: record.destinationTxHash as string,
-        }
-      : isRealLegHash(record.observedDepositTxHash)
-        ? {
-            chain: record.sellAsset.chain,
-            hash: record.observedDepositTxHash as string,
-          }
-        : undefined;
-  const explorerUrl = explorerHash
-    ? buildChainExplorerUrl({
-        chain: explorerHash.chain,
-        hash: explorerHash.hash,
-        zecChainName: walletChainName,
-        zecBlockExplorer: blockExplorer,
-      })
-    : null;
-  const LegsChevron = legsOpen ? ChevronUp : ChevronDown;
+  /** Didn't finish well: the Track section lists every link, SwapKit's first. */
+  const troubled =
+    outcome === 'failed' || outcome === 'refunded' || expired || refunding;
+  const swapKitUrl = troubled ? null : buildSwapKitTrackerUrl(record);
 
   return (
     <SwapFlowScreen
@@ -322,20 +338,41 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
       onBack={close}
       footer={
         <ButtonStack>
-          {canRemoveSwap(record.status) && (
+          {/* The last child shows on top: explorer, new quote, Delete. */}
+          {canRemoveSwap(record) && (
             <Button
               testID="swap.detail.remove"
-              variant="quiet"
-              title={t('swap.detail-remove')}
-              onPress={remove}
+              variant="dangerText"
+              title={t('swap.delete')}
+              onPress={() => removeSwap(record)}
             />
           )}
-          {!!explorerUrl && (
+          {(expired || outcome === 'failed') && (
+            <Button
+              testID="swap.detail.new-quote"
+              variant="primary"
+              title={t('swap.get-new-quote')}
+              onPress={() =>
+                navigation.navigate(
+                  Route.Home,
+                  {
+                    screen: Route.Swap,
+                    params: { prefill: prefillFromRecord(record, Date.now()) },
+                  },
+                  { pop: true },
+                )
+              }
+            />
+          )}
+          {!!swapKitUrl && (
             <Button
               testID="swap.detail.explorer"
               variant="text"
-              title={t('swap.detail-explorer')}
-              onPress={() => Linking.openURL(explorerUrl)}
+              title={t('swap.detail-view-on').replace(
+                '{name}',
+                'SwapKit Explorer',
+              )}
+              onPress={() => Linking.openURL(swapKitUrl)}
             />
           )}
         </ButtonStack>
@@ -343,20 +380,21 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
     >
       <DetailHero
         icon={
-          isTerminalStatus(record.status) ? (
-            <SwapIcon size={iconSizeMd} color={colors.fgDefault} />
+          swapInFlight(record) ? (
+            <TxPendingIcon size={iconSizeMd} color={colors.fgDefault} />
           ) : (
-            <ClockIcon size={iconSizeMd} color={colors.fgDefault} />
+            <TxSwapIcon size={iconSizeMd} color={colors.fgDefault} />
           )
         }
         badge={other}
         title={title}
-        amount={hero.amount}
-        unit={hero.unit}
-        tone={hero.tone}
-        line={hero.line}
-        pill={pill.text}
-        pillTone={pill.tone}
+        amount={view.hero.amount}
+        unit={view.hero.unit}
+        tone={view.hero.tone}
+        line={view.hero.line}
+        pill={view.pill.text}
+        pillTone={view.pill.tone}
+        strike={expired || outcome === 'failed'}
       />
 
       {awaitingDeposit && (
@@ -366,11 +404,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
           </Text>
           <DepositSlip record={record} paid={sell} />
           <Text variant="bodySmall" tone="muted">
-            {t(
-              sell
-                ? 'swap.deposit-paid-elsewhere'
-                : 'swap.deposit-already-paid',
-            )}
+            {t(sell ? 'swap.deposit-left-anyway' : 'swap.deposit-already-paid')}
           </Text>
           <TextField
             testID="swap.detail.hash"
@@ -381,7 +415,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
             mono
             error={attachError || undefined}
             trailingIcon={ClipboardPasteIcon}
-            trailingLabel={t('swap.paste')}
+            trailingLabel={t('paste')}
             onTrailingPress={async () =>
               setHash((await Clipboard.getString()).trim())
             }
@@ -397,7 +431,26 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         </View>
       )}
 
-      <DetailRows rows={rows} />
+      <DetailRows rows={view.rows} />
+
+      {refunding && (
+        <Text variant="bodySmall" tone="muted" style={{ marginTop: space12 }}>
+          {t('swap.late-note').replace(
+            '{provider}',
+            providerLongLabel(record.provider),
+          )}
+        </Text>
+      )}
+
+      {expired && (
+        <View style={{ marginTop: space12, rowGap: space12 }}>
+          <Banner
+            testID="swap.detail.dont-send"
+            tone="warning"
+            title={t('swap.expired-dont-send')}
+          />
+        </View>
+      )}
 
       {!!outside.address && !contact && (
         <SaveContactButton
@@ -409,107 +462,83 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
 
       {legs.length > 0 && (
         <View style={{ marginTop: space12 }}>
-          <Pressable
+          <FoldSection
             testID="swap.detail.legs"
-            accessibilityRole="button"
-            accessibilityState={{ expanded: legsOpen }}
-            onPress={() => setLegsOpen(open => !open)}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingVertical: 12,
-            }}
+            title={t('swap.detail-transactions')}
+            count={legs.length}
+            open={legsOpen}
+            onToggle={() => setLegsOpen(open => !open)}
           >
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                columnGap: 8,
-              }}
-            >
-              <Text variant="bodySmall" tone={legsOpen ? 'default' : 'muted'}>
-                {t('swap.detail-transactions')}
-              </Text>
-              <View
-                style={{
-                  minWidth: 20,
-                  paddingHorizontal: 8,
-                  borderRadius: radiusSm,
-                  backgroundColor: colors.bgMutedSubtle,
-                  alignItems: 'center',
-                }}
-              >
-                <Text variant="caption" tone="muted">
-                  {formatInteger(legs.length)}
-                </Text>
-              </View>
-            </View>
-            <LegsChevron size={iconSizeSm} color={colors.fgMuted} />
-          </Pressable>
-          {legsOpen && (
-            <LegsCard>
-              {legs.map((leg, index) => {
-                const received = leg.kind === ValueTransferKindEnum.Received;
-                return (
-                  <Pressable
-                    key={`${leg.txid}:${leg.kind}`}
-                    testID={`swap.detail.leg.${index}`}
-                    accessibilityRole="button"
-                    onPress={() =>
-                      navigation.navigate(Route.SwapTransaction, {
-                        recordId,
-                        txid: leg.txid,
-                        kind: leg.kind,
-                      })
-                    }
+            {legs.map((leg, index) => {
+              const received = leg.kind === ValueTransferKindEnum.Received;
+              return (
+                <Pressable
+                  kind="row"
+                  key={`${leg.txid}:${leg.kind}:${legSlot(legs, leg)}`}
+                  testID={`swap.detail.leg.${index}`}
+                  accessibilityRole="button"
+                  onPress={() =>
+                    navigation.navigate(Route.SwapTransaction, {
+                      recordId,
+                      txid: leg.txid,
+                      kind: leg.kind,
+                      slot: legSlot(legs, leg),
+                    })
+                  }
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    columnGap: space12,
+                    minHeight: 44,
+                    paddingVertical: 12,
+                    paddingHorizontal: 16,
+                    borderTopWidth: index === 0 ? 0 : 1,
+                    borderTopColor: colors.borderSubtle,
+                  }}
+                >
+                  <View style={{ flexShrink: 1 }}>
+                    <Text variant="bodySmall" style={{ fontWeight: '700' }}>
+                      {legName(leg, record, t)}
+                    </Text>
+                    <Text variant="caption" tone="muted">
+                      {Utils.formatDate(
+                        leg.time * 1000,
+                        'MMM d, h:mm aaa',
+                        language,
+                      )}
+                    </Text>
+                  </View>
+                  <View
                     style={{
                       flexDirection: 'row',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
-                      columnGap: space12,
-                      minHeight: 44,
-                      paddingVertical: 12,
-                      paddingHorizontal: 16,
-                      borderTopWidth: index === 0 ? 0 : 1,
-                      borderTopColor: colors.borderSubtle,
+                      columnGap: space8,
                     }}
                   >
-                    <View style={{ flexShrink: 1 }}>
-                      <Text variant="bodySmall" style={{ fontWeight: '700' }}>
-                        {legName(leg, record, t)}
-                      </Text>
-                      <Text variant="caption" tone="muted">
-                        {Utils.formatDate(
-                          leg.time * 1000,
-                          'MMM d, h:mm aaa',
-                          language,
-                        )}
-                      </Text>
-                    </View>
-                    <View
+                    <Text
+                      variant="bodyStrong"
                       style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        columnGap: space8,
+                        color: received ? colors.fgAccent : colors.fgDefault,
                       }}
                     >
-                      <Text
-                        variant="bodyStrong"
-                        style={{
-                          color: received ? colors.fgAccent : colors.fgDefault,
-                        }}
-                      >
-                        {`${received ? '+' : '−'}${formatZecAmount(leg.amount)} ${info.currencyName}`}
-                      </Text>
-                      <ChevronRight size={iconSizeSm} color={colors.fgMuted} />
-                    </View>
-                  </Pressable>
-                );
-              })}
-            </LegsCard>
-          )}
+                      {`${received ? '+' : '−'}${formatZecAmount(leg.amount)} ${info.currencyName}`}
+                    </Text>
+                    <ChevronRight size={iconSizeSm} color={colors.fgMuted} />
+                  </View>
+                </Pressable>
+              );
+            })}
+          </FoldSection>
         </View>
+      )}
+
+      {troubled && (
+        <TrackSwap
+          record={record}
+          zecChainName={walletChainName}
+          zecBlockExplorer={blockExplorer}
+        />
       )}
 
       {receivedTransparent && (
@@ -541,27 +570,5 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
     </SwapFlowScreen>
   );
 };
-
-/** The swap's Zcash transactions, unfolding as the summary opens. */
-function LegsCard({ children }: { children: React.ReactNode }) {
-  const { colors } = useTheme();
-  const unfold = useUnfold();
-  return (
-    <Animated.View
-      style={[
-        {
-          borderWidth: 1,
-          borderColor: colors.bottomSheetBorder,
-          borderRadius: radiusMd,
-          backgroundColor: colors.bgCanvas,
-          marginTop: 4,
-        },
-        unfold,
-      ]}
-    >
-      {children}
-    </Animated.View>
-  );
-}
 
 export default SwapDetail;

@@ -6,7 +6,7 @@ import type { SwapAssetType } from '@app/swap';
 import Text from '@ui/primitives/Text';
 import HistoryAvatar from '@screens/History/components/HistoryAvatar';
 
-export type HeroTone = 'positive' | 'default';
+export type HeroTone = 'positive' | 'default' | 'muted';
 export type PillTone = 'accent' | 'warning' | 'danger' | 'neutral';
 
 /**
@@ -23,6 +23,7 @@ export default function DetailHero({
   line,
   pill,
   pillTone,
+  strike = false,
 }: {
   icon: React.ReactNode;
   badge?: SwapAssetType;
@@ -33,6 +34,8 @@ export default function DetailHero({
   line: string;
   pill: string;
   pillTone: PillTone;
+  /** The amount struck through: what an expired swap would have got. */
+  strike?: boolean;
 }) {
   const { colors } = useTheme();
   const paint = {
@@ -51,7 +54,14 @@ export default function DetailHero({
       </Text>
       <Text
         variant="balance"
-        color={tone === 'positive' ? colors.fgAccent : colors.fgDefault}
+        color={
+          tone === 'positive'
+            ? colors.fgAccent
+            : tone === 'muted'
+              ? colors.fgMuted
+              : colors.fgDefault
+        }
+        strike={strike}
       >
         {`${amount} `}
         <Text variant="subtitle" tone="muted">

@@ -116,16 +116,19 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "borderRadius": 8,
-                  "height": 30,
-                  "justifyContent": "center",
-                  "marginLeft": -2,
-                  "marginRight": -6,
-                  "marginVertical": -4,
-                  "width": 30,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "borderRadius": 8,
+                    "height": 30,
+                    "justifyContent": "center",
+                    "marginLeft": -2,
+                    "marginRight": -6,
+                    "marginVertical": -4,
+                    "width": 30,
+                  },
+                  {},
+                ]
               }
               testID="header.privacy"
             />
@@ -173,6 +176,12 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
               onResponderTerminate={[Function]}
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
+              style={
+                [
+                  undefined,
+                  {},
+                ]
+              }
             >
               <Text
                 maxFontSizeMultiplier={1.3}
@@ -234,7 +243,9 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                   "top": 12,
                 }
               }
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -242,9 +253,10 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "opacity": 1,
-                }
+                [
+                  undefined,
+                  {},
+                ]
               }
             >
               <View
@@ -299,31 +311,75 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "backgroundColor": "transparent",
-                "borderRadius": 999,
-                "columnGap": 8,
-                "flexDirection": "row",
-                "height": 28,
-                "marginTop": 10,
-                "paddingHorizontal": 12,
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "borderRadius": 999,
+                  "flexDirection": "row",
+                  "marginTop": 10,
+                  "maxWidth": 710,
+                  "minHeight": 28,
+                  "paddingHorizontal": 12,
+                },
+                {},
+              ]
             }
             testID="header.syncline"
           >
-            <Text
-              maxFontSizeMultiplier={2}
+            <View
+              pointerEvents="none"
+              style={
+                [
+                  {
+                    "bottom": 0,
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                  },
+                  {
+                    "backgroundColor": "#8888881F",
+                    "borderRadius": 999,
+                  },
+                  {},
+                ]
+              }
+            />
+            <View
               style={
                 {
-                  "color": "#F99D00",
+                  "flexShrink": 0,
+                  "marginRight": 8,
+                }
+              }
+            />
+            <Text
+              ellipsizeMode="tail"
+              maxFontSizeMultiplier={2}
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#888888",
+                  "flexShrink": 1,
                   "fontSize": 12,
-                  "fontWeight": "600",
+                  "fontWeight": "400",
                   "lineHeight": 16,
                 }
               }
             >
-              text translated
+              <Text
+                maxFontSizeMultiplier={2}
+                style={
+                  {
+                    "color": "#F99D00",
+                    "fontSize": 12,
+                    "fontWeight": "600",
+                    "lineHeight": 16,
+                  }
+                }
+              >
+                text translated
+              </Text>
             </Text>
           </View>
         </View>
@@ -379,7 +435,9 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                   "top": 10,
                 }
               }
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -387,9 +445,10 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "opacity": 1,
-                }
+                [
+                  undefined,
+                  {},
+                ]
               }
               testID="header.drawmenu"
             />
@@ -446,7 +505,9 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                   "top": 10,
                 }
               }
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -454,11 +515,13 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "marginRight": 5,
-                  "marginTop": 4.5,
-                  "opacity": 1,
-                }
+                [
+                  {
+                    "marginRight": 5,
+                    "marginTop": 4.5,
+                  },
+                  {},
+                ]
               }
               testID="header.messages"
             />
@@ -499,205 +562,235 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
           }
         >
           <View
-            style={{}}
+            pointerEvents="box-none"
+            style={
+              [
+                {
+                  "borderRadius": 12,
+                  "flexGrow": 1,
+                  "overflow": "hidden",
+                },
+                {},
+              ]
+            }
           >
             <View
-              onLayout={[Function]}
+              style={{}}
             >
               <View
-                entering={AnimationBuilder {}}
+                onLayout={[Function]}
               >
                 <View
-                  style={
-                    {
-                      "backgroundColor": "#031124",
-                      "borderColor": "#05234C",
-                      "borderRadius": 12,
-                      "borderWidth": 1,
-                      "padding": 16,
-                    }
-                  }
+                  entering={AnimationBuilder {}}
                 >
                   <View
                     style={
-                      [
-                        {
-                          "flexDirection": "row",
-                          "gap": 12,
-                        },
-                        undefined,
-                      ]
+                      {
+                        "alignSelf": "stretch",
+                        "backgroundColor": "#031124",
+                        "borderColor": "#05234C",
+                        "borderRadius": 12,
+                        "borderWidth": 1,
+                        "padding": 16,
+                      }
                     }
                   >
                     <View
                       style={
-                        {
-                          "alignItems": "center",
-                          "backgroundColor": "#F99D001F",
-                          "borderRadius": 8,
-                          "height": 36,
-                          "justifyContent": "center",
-                          "width": 36,
-                        }
-                      }
-                    />
-                    <View
-                      style={
-                        {
-                          "flex": 1,
-                          "gap": 4,
-                        }
+                        [
+                          {
+                            "flexDirection": "row",
+                            "gap": 12,
+                          },
+                          undefined,
+                        ]
                       }
                     >
                       <View
                         style={
                           {
-                            "alignItems": "center",
-                            "flexDirection": "row",
-                            "flexWrap": "wrap",
+                            "flex": 1,
                             "gap": 4,
-                            "paddingRight": 0,
                           }
                         }
                       >
-                        <Text
-                          maxFontSizeMultiplier={2}
+                        <View
                           style={
                             {
-                              "color": "#c3c3c3",
-                              "fontSize": 15,
-                              "fontWeight": "600",
-                              "lineHeight": 21,
+                              "alignItems": "center",
+                              "columnGap": 8,
+                              "flexDirection": "row",
+                              "flexWrap": "nowrap",
+                              "paddingRight": 0,
                             }
                           }
                         >
-                          text translated
-                        </Text>
-                      </View>
-                      <Text
-                        maxFontSizeMultiplier={2}
-                        style={
-                          {
-                            "color": "#888888",
-                            "fontSize": 13,
-                            "fontWeight": "400",
-                            "lineHeight": 18,
-                          }
-                        }
-                      >
-                        text translated
-                         
+                          <View
+                            style={
+                              {
+                                "alignItems": "center",
+                                "backgroundColor": "#F99D001F",
+                                "borderRadius": 4,
+                                "flexShrink": 0,
+                                "height": 24,
+                                "justifyContent": "center",
+                                "width": 24,
+                              }
+                            }
+                          />
+                          <Text
+                            ellipsizeMode="tail"
+                            maxFontSizeMultiplier={2}
+                            numberOfLines={1}
+                            style={
+                              {
+                                "color": "#c3c3c3",
+                                "flexShrink": 1,
+                                "fontSize": 15,
+                                "fontWeight": "600",
+                                "lineHeight": 21,
+                              }
+                            }
+                          >
+                            text translated
+                          </Text>
+                        </View>
                         <Text
                           maxFontSizeMultiplier={2}
-                          onPress={[Function]}
                           style={
                             {
-                              "color": "#c3c3c3",
+                              "color": "#888888",
                               "fontSize": 13,
-                              "fontWeight": "700",
+                              "fontWeight": "400",
                               "lineHeight": 18,
                             }
                           }
                         >
-                          •••••
+                          text translated
+                           
+                          <Text
+                            maxFontSizeMultiplier={2}
+                            onPress={[Function]}
+                            style={
+                              {
+                                "color": "#c3c3c3",
+                                "fontSize": 13,
+                                "fontWeight": "700",
+                                "lineHeight": 18,
+                              }
+                            }
+                          >
+                            •••••
+                          </Text>
+                           
+                          ZEC
                         </Text>
-                         
-                        ZEC
-                      </Text>
-                    </View>
-                    <View
-                      style={
-                        {
-                          "alignItems": "center",
-                          "alignSelf": "center",
-                          "flexDirection": "row",
-                          "gap": 8,
-                        }
-                      }
-                    >
+                      </View>
                       <View
-                        accessibilityRole="button"
-                        accessibilityState={
-                          {
-                            "busy": false,
-                            "checked": undefined,
-                            "disabled": false,
-                            "expanded": undefined,
-                            "selected": undefined,
-                          }
-                        }
-                        accessibilityValue={
-                          {
-                            "max": undefined,
-                            "min": undefined,
-                            "now": undefined,
-                            "text": undefined,
-                          }
-                        }
-                        accessible={true}
-                        collapsable={false}
-                        focusable={true}
-                        onClick={[Function]}
-                        onResponderGrant={[Function]}
-                        onResponderMove={[Function]}
-                        onResponderRelease={[Function]}
-                        onResponderTerminate={[Function]}
-                        onResponderTerminationRequest={[Function]}
-                        onStartShouldSetResponder={[Function]}
                         style={
                           {
                             "alignItems": "center",
-                            "backgroundColor": "#18bd18",
-                            "borderRadius": 999,
-                            "justifyContent": "center",
-                            "maxWidth": "100%",
-                            "minHeight": 0,
-                            "opacity": 1,
-                            "paddingHorizontal": 22,
-                            "paddingVertical": 10,
+                            "alignSelf": "center",
+                            "flexDirection": "row",
+                            "gap": 5,
                           }
                         }
-                        testID="ironwoodbanner.start"
                       >
-                        <Text
-                          maxFontSizeMultiplier={1.5}
-                          style={
+                        <View
+                          accessibilityRole="button"
+                          accessibilityState={
                             {
-                              "color": "#060B12",
-                              "fontSize": 15,
-                              "fontWeight": "700",
-                              "textAlign": "center",
+                              "busy": false,
+                              "checked": undefined,
+                              "disabled": false,
+                              "expanded": undefined,
+                              "selected": undefined,
                             }
                           }
+                          accessibilityValue={
+                            {
+                              "max": undefined,
+                              "min": undefined,
+                              "now": undefined,
+                              "text": undefined,
+                            }
+                          }
+                          accessible={true}
+                          collapsable={false}
+                          focusable={true}
+                          hitSlop={
+                            {
+                              "bottom": 6,
+                              "top": 6,
+                            }
+                          }
+                          onBlur={[Function]}
+                          onClick={[Function]}
+                          onFocus={[Function]}
+                          onResponderGrant={[Function]}
+                          onResponderMove={[Function]}
+                          onResponderRelease={[Function]}
+                          onResponderTerminate={[Function]}
+                          onResponderTerminationRequest={[Function]}
+                          onStartShouldSetResponder={[Function]}
+                          style={
+                            [
+                              {
+                                "alignItems": "center",
+                                "backgroundColor": "#18bd18",
+                                "borderRadius": 999,
+                                "justifyContent": "center",
+                                "maxWidth": "100%",
+                                "minHeight": 32,
+                                "paddingHorizontal": 16,
+                                "paddingVertical": 0,
+                              },
+                              {},
+                            ]
+                          }
+                          testID="ironwoodbanner.start"
                         >
-                          text translated
-                        </Text>
+                          <Text
+                            maxFontSizeMultiplier={1.5}
+                            style={
+                              {
+                                "color": "#060B12",
+                                "fontSize": 13,
+                                "fontWeight": "700",
+                                "lineHeight": 18,
+                                "textAlign": "center",
+                              }
+                            }
+                          >
+                            text translated
+                          </Text>
+                        </View>
                       </View>
                     </View>
                   </View>
                 </View>
               </View>
             </View>
+            <View
+              pointerEvents="none"
+              style={
+                [
+                  {
+                    "backgroundColor": "#031124",
+                    "borderColor": "#05234C",
+                    "borderRadius": 12,
+                    "borderWidth": 1,
+                    "bottom": 0,
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                  },
+                  {},
+                ]
+              }
+            />
           </View>
-          <View
-            pointerEvents="none"
-            style={
-              [
-                {
-                  "backgroundColor": "#031124",
-                  "borderColor": "#05234C",
-                  "borderRadius": 12,
-                  "borderWidth": 1,
-                  "bottom": 0,
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                },
-                {},
-              ]
-            }
-          />
         </View>
       </View>
     </View>
@@ -1014,10 +1107,9 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
         },
         {
           "backgroundColor": "#031124",
+          "paddingBottom": 24,
         },
-        {
-          "paddingBottom": 30,
-        },
+        undefined,
       ]
     }
   >
@@ -1047,7 +1139,8 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
           style={
             {
               "alignItems": "flex-start",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         />
@@ -1055,7 +1148,7 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
           style={
             {
               "alignItems": "center",
-              "flex": 1,
+              "flexShrink": 1,
             }
           }
         >
@@ -1079,7 +1172,8 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
           style={
             {
               "alignItems": "flex-end",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         >
@@ -1117,12 +1211,15 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "paddingHorizontal": 14,
-                "paddingVertical": 4,
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "paddingHorizontal": 14,
+                  "paddingVertical": 4,
+                },
+                {},
+              ]
             }
           />
         </View>
@@ -1151,10 +1248,9 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
         },
         {
           "backgroundColor": "#031124",
-        },
-        {
           "paddingBottom": 24,
         },
+        undefined,
       ]
     }
   >
@@ -1513,6 +1609,19 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
             </View>
           </View>
         </View>
+      </View>
+      <View
+        style={
+          [
+            {
+              "paddingHorizontal": 20,
+            },
+            {
+              "paddingHorizontal": 20,
+            },
+          ]
+        }
+      >
         <View
           style={
             {
@@ -1543,7 +1652,9 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
+            onBlur={[Function]}
             onClick={[Function]}
+            onFocus={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -1551,19 +1662,21 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "alignSelf": "stretch",
-                "backgroundColor": "#18bd18",
-                "borderRadius": 999,
-                "justifyContent": "center",
-                "maxWidth": "100%",
-                "minHeight": 44,
-                "opacity": 1,
-                "paddingHorizontal": 24,
-                "paddingVertical": 8,
-                "width": "100%",
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "alignSelf": "stretch",
+                  "backgroundColor": "#18bd18",
+                  "borderRadius": 999,
+                  "justifyContent": "center",
+                  "maxWidth": "100%",
+                  "minHeight": 44,
+                  "paddingHorizontal": 24,
+                  "paddingVertical": 8,
+                  "width": "100%",
+                },
+                {},
+              ]
             }
             testID="shield.confirm"
           >
@@ -1604,7 +1717,9 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
+            onBlur={[Function]}
             onClick={[Function]}
+            onFocus={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -1612,19 +1727,21 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "alignSelf": "stretch",
-                "backgroundColor": undefined,
-                "borderRadius": 999,
-                "justifyContent": "center",
-                "maxWidth": "100%",
-                "minHeight": 44,
-                "opacity": 1,
-                "paddingHorizontal": 24,
-                "paddingVertical": 8,
-                "width": "100%",
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "alignSelf": "stretch",
+                  "backgroundColor": undefined,
+                  "borderRadius": 999,
+                  "justifyContent": "center",
+                  "maxWidth": "100%",
+                  "minHeight": 44,
+                  "paddingHorizontal": 24,
+                  "paddingVertical": 8,
+                  "width": "100%",
+                },
+                {},
+              ]
             }
             testID="shield.cancel"
           >
@@ -1766,16 +1883,19 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "alignItems": "center",
-                  "borderRadius": 8,
-                  "height": 30,
-                  "justifyContent": "center",
-                  "marginLeft": -2,
-                  "marginRight": -6,
-                  "marginVertical": -4,
-                  "width": 30,
-                }
+                [
+                  {
+                    "alignItems": "center",
+                    "borderRadius": 8,
+                    "height": 30,
+                    "justifyContent": "center",
+                    "marginLeft": -2,
+                    "marginRight": -6,
+                    "marginVertical": -4,
+                    "width": 30,
+                  },
+                  {},
+                ]
               }
               testID="header.privacy"
             />
@@ -1823,6 +1943,12 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
               onResponderTerminate={[Function]}
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
+              style={
+                [
+                  undefined,
+                  {},
+                ]
+              }
             >
               <Text
                 maxFontSizeMultiplier={1.3}
@@ -1884,7 +2010,9 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                   "top": 12,
                 }
               }
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -1892,9 +2020,10 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "opacity": 1,
-                }
+                [
+                  undefined,
+                  {},
+                ]
               }
             >
               <View
@@ -1949,31 +2078,75 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "backgroundColor": "transparent",
-                "borderRadius": 999,
-                "columnGap": 8,
-                "flexDirection": "row",
-                "height": 28,
-                "marginTop": 10,
-                "paddingHorizontal": 12,
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "borderRadius": 999,
+                  "flexDirection": "row",
+                  "marginTop": 10,
+                  "maxWidth": 710,
+                  "minHeight": 28,
+                  "paddingHorizontal": 12,
+                },
+                {},
+              ]
             }
             testID="header.syncline"
           >
-            <Text
-              maxFontSizeMultiplier={2}
+            <View
+              pointerEvents="none"
+              style={
+                [
+                  {
+                    "bottom": 0,
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                  },
+                  {
+                    "backgroundColor": "#8888881F",
+                    "borderRadius": 999,
+                  },
+                  {},
+                ]
+              }
+            />
+            <View
               style={
                 {
-                  "color": "#F99D00",
+                  "flexShrink": 0,
+                  "marginRight": 8,
+                }
+              }
+            />
+            <Text
+              ellipsizeMode="tail"
+              maxFontSizeMultiplier={2}
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#888888",
+                  "flexShrink": 1,
                   "fontSize": 12,
-                  "fontWeight": "600",
+                  "fontWeight": "400",
                   "lineHeight": 16,
                 }
               }
             >
-              text translated
+              <Text
+                maxFontSizeMultiplier={2}
+                style={
+                  {
+                    "color": "#F99D00",
+                    "fontSize": 12,
+                    "fontWeight": "600",
+                    "lineHeight": 16,
+                  }
+                }
+              >
+                text translated
+              </Text>
             </Text>
           </View>
         </View>
@@ -2029,7 +2202,9 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                   "top": 10,
                 }
               }
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -2037,9 +2212,10 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "opacity": 1,
-                }
+                [
+                  undefined,
+                  {},
+                ]
               }
               testID="header.drawmenu"
             />
@@ -2096,7 +2272,9 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                   "top": 10,
                 }
               }
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -2104,11 +2282,13 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "marginRight": 5,
-                  "marginTop": 4.5,
-                  "opacity": 1,
-                }
+                [
+                  {
+                    "marginRight": 5,
+                    "marginTop": 4.5,
+                  },
+                  {},
+                ]
               }
               testID="header.messages"
             />
@@ -2149,204 +2329,234 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
           }
         >
           <View
-            style={{}}
+            pointerEvents="box-none"
+            style={
+              [
+                {
+                  "borderRadius": 12,
+                  "flexGrow": 1,
+                  "overflow": "hidden",
+                },
+                {},
+              ]
+            }
           >
             <View
-              onLayout={[Function]}
+              style={{}}
             >
               <View
-                entering={AnimationBuilder {}}
+                onLayout={[Function]}
               >
                 <View
-                  style={
-                    {
-                      "backgroundColor": "#031124",
-                      "borderColor": "#05234C",
-                      "borderRadius": 12,
-                      "borderWidth": 1,
-                      "padding": 16,
-                    }
-                  }
+                  entering={AnimationBuilder {}}
                 >
                   <View
                     style={
-                      [
-                        {
-                          "flexDirection": "row",
-                          "gap": 12,
-                        },
-                        undefined,
-                      ]
+                      {
+                        "alignSelf": "stretch",
+                        "backgroundColor": "#031124",
+                        "borderColor": "#05234C",
+                        "borderRadius": 12,
+                        "borderWidth": 1,
+                        "padding": 16,
+                      }
                     }
                   >
                     <View
                       style={
-                        {
-                          "alignItems": "center",
-                          "backgroundColor": "#F99D001F",
-                          "borderRadius": 8,
-                          "height": 36,
-                          "justifyContent": "center",
-                          "width": 36,
-                        }
-                      }
-                    />
-                    <View
-                      style={
-                        {
-                          "flex": 1,
-                          "gap": 4,
-                        }
+                        [
+                          {
+                            "flexDirection": "row",
+                            "gap": 12,
+                          },
+                          undefined,
+                        ]
                       }
                     >
                       <View
                         style={
                           {
-                            "alignItems": "center",
-                            "flexDirection": "row",
-                            "flexWrap": "wrap",
+                            "flex": 1,
                             "gap": 4,
-                            "paddingRight": 0,
                           }
                         }
                       >
-                        <Text
-                          maxFontSizeMultiplier={2}
+                        <View
                           style={
                             {
-                              "color": "#c3c3c3",
-                              "fontSize": 15,
-                              "fontWeight": "600",
-                              "lineHeight": 21,
+                              "alignItems": "center",
+                              "columnGap": 8,
+                              "flexDirection": "row",
+                              "flexWrap": "nowrap",
+                              "paddingRight": 0,
                             }
                           }
                         >
-                          text translated
-                        </Text>
-                      </View>
-                      <Text
-                        maxFontSizeMultiplier={2}
-                        style={
-                          {
-                            "color": "#888888",
-                            "fontSize": 13,
-                            "fontWeight": "400",
-                            "lineHeight": 18,
-                          }
-                        }
-                      >
-                        text translated
-                         
+                          <View
+                            style={
+                              {
+                                "alignItems": "center",
+                                "backgroundColor": "#F99D001F",
+                                "borderRadius": 4,
+                                "flexShrink": 0,
+                                "height": 24,
+                                "justifyContent": "center",
+                                "width": 24,
+                              }
+                            }
+                          />
+                          <Text
+                            ellipsizeMode="tail"
+                            maxFontSizeMultiplier={2}
+                            numberOfLines={1}
+                            style={
+                              {
+                                "color": "#c3c3c3",
+                                "flexShrink": 1,
+                                "fontSize": 15,
+                                "fontWeight": "600",
+                                "lineHeight": 21,
+                              }
+                            }
+                          >
+                            text translated
+                          </Text>
+                        </View>
                         <Text
                           maxFontSizeMultiplier={2}
                           style={
                             {
-                              "color": "#c3c3c3",
+                              "color": "#888888",
                               "fontSize": 13,
-                              "fontWeight": "700",
+                              "fontWeight": "400",
                               "lineHeight": 18,
                             }
                           }
                         >
-                          0.6
+                          text translated
+                           
+                          <Text
+                            maxFontSizeMultiplier={2}
+                            style={
+                              {
+                                "color": "#c3c3c3",
+                                "fontSize": 13,
+                                "fontWeight": "700",
+                                "lineHeight": 18,
+                              }
+                            }
+                          >
+                            0.6
+                          </Text>
+                           
+                          ZEC
                         </Text>
-                         
-                        ZEC
-                      </Text>
-                    </View>
-                    <View
-                      style={
-                        {
-                          "alignItems": "center",
-                          "alignSelf": "center",
-                          "flexDirection": "row",
-                          "gap": 8,
-                        }
-                      }
-                    >
+                      </View>
                       <View
-                        accessibilityRole="button"
-                        accessibilityState={
-                          {
-                            "busy": false,
-                            "checked": undefined,
-                            "disabled": false,
-                            "expanded": undefined,
-                            "selected": undefined,
-                          }
-                        }
-                        accessibilityValue={
-                          {
-                            "max": undefined,
-                            "min": undefined,
-                            "now": undefined,
-                            "text": undefined,
-                          }
-                        }
-                        accessible={true}
-                        collapsable={false}
-                        focusable={true}
-                        onClick={[Function]}
-                        onResponderGrant={[Function]}
-                        onResponderMove={[Function]}
-                        onResponderRelease={[Function]}
-                        onResponderTerminate={[Function]}
-                        onResponderTerminationRequest={[Function]}
-                        onStartShouldSetResponder={[Function]}
                         style={
                           {
                             "alignItems": "center",
-                            "backgroundColor": "#18bd18",
-                            "borderRadius": 999,
-                            "justifyContent": "center",
-                            "maxWidth": "100%",
-                            "minHeight": 0,
-                            "opacity": 1,
-                            "paddingHorizontal": 22,
-                            "paddingVertical": 10,
+                            "alignSelf": "center",
+                            "flexDirection": "row",
+                            "gap": 5,
                           }
                         }
-                        testID="ironwoodbanner.start"
                       >
-                        <Text
-                          maxFontSizeMultiplier={1.5}
-                          style={
+                        <View
+                          accessibilityRole="button"
+                          accessibilityState={
                             {
-                              "color": "#060B12",
-                              "fontSize": 15,
-                              "fontWeight": "700",
-                              "textAlign": "center",
+                              "busy": false,
+                              "checked": undefined,
+                              "disabled": false,
+                              "expanded": undefined,
+                              "selected": undefined,
                             }
                           }
+                          accessibilityValue={
+                            {
+                              "max": undefined,
+                              "min": undefined,
+                              "now": undefined,
+                              "text": undefined,
+                            }
+                          }
+                          accessible={true}
+                          collapsable={false}
+                          focusable={true}
+                          hitSlop={
+                            {
+                              "bottom": 6,
+                              "top": 6,
+                            }
+                          }
+                          onBlur={[Function]}
+                          onClick={[Function]}
+                          onFocus={[Function]}
+                          onResponderGrant={[Function]}
+                          onResponderMove={[Function]}
+                          onResponderRelease={[Function]}
+                          onResponderTerminate={[Function]}
+                          onResponderTerminationRequest={[Function]}
+                          onStartShouldSetResponder={[Function]}
+                          style={
+                            [
+                              {
+                                "alignItems": "center",
+                                "backgroundColor": "#18bd18",
+                                "borderRadius": 999,
+                                "justifyContent": "center",
+                                "maxWidth": "100%",
+                                "minHeight": 32,
+                                "paddingHorizontal": 16,
+                                "paddingVertical": 0,
+                              },
+                              {},
+                            ]
+                          }
+                          testID="ironwoodbanner.start"
                         >
-                          text translated
-                        </Text>
+                          <Text
+                            maxFontSizeMultiplier={1.5}
+                            style={
+                              {
+                                "color": "#060B12",
+                                "fontSize": 13,
+                                "fontWeight": "700",
+                                "lineHeight": 18,
+                                "textAlign": "center",
+                              }
+                            }
+                          >
+                            text translated
+                          </Text>
+                        </View>
                       </View>
                     </View>
                   </View>
                 </View>
               </View>
             </View>
+            <View
+              pointerEvents="none"
+              style={
+                [
+                  {
+                    "backgroundColor": "#031124",
+                    "borderColor": "#05234C",
+                    "borderRadius": 12,
+                    "borderWidth": 1,
+                    "bottom": 0,
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                  },
+                  {},
+                ]
+              }
+            />
           </View>
-          <View
-            pointerEvents="none"
-            style={
-              [
-                {
-                  "backgroundColor": "#031124",
-                  "borderColor": "#05234C",
-                  "borderRadius": 12,
-                  "borderWidth": 1,
-                  "bottom": 0,
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                },
-                {},
-              ]
-            }
-          />
         </View>
       </View>
     </View>
@@ -2663,10 +2873,9 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
         },
         {
           "backgroundColor": "#031124",
+          "paddingBottom": 24,
         },
-        {
-          "paddingBottom": 30,
-        },
+        undefined,
       ]
     }
   >
@@ -2696,7 +2905,8 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
           style={
             {
               "alignItems": "flex-start",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         />
@@ -2704,7 +2914,7 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
           style={
             {
               "alignItems": "center",
-              "flex": 1,
+              "flexShrink": 1,
             }
           }
         >
@@ -2728,7 +2938,8 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
           style={
             {
               "alignItems": "flex-end",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         >
@@ -2766,12 +2977,15 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "paddingHorizontal": 14,
-                "paddingVertical": 4,
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "paddingHorizontal": 14,
+                  "paddingVertical": 4,
+                },
+                {},
+              ]
             }
           />
         </View>
@@ -2800,10 +3014,9 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
         },
         {
           "backgroundColor": "#031124",
-        },
-        {
           "paddingBottom": 24,
         },
+        undefined,
       ]
     }
   >
@@ -3162,6 +3375,19 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
             </View>
           </View>
         </View>
+      </View>
+      <View
+        style={
+          [
+            {
+              "paddingHorizontal": 20,
+            },
+            {
+              "paddingHorizontal": 20,
+            },
+          ]
+        }
+      >
         <View
           style={
             {
@@ -3192,7 +3418,9 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
+            onBlur={[Function]}
             onClick={[Function]}
+            onFocus={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -3200,19 +3428,21 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "alignSelf": "stretch",
-                "backgroundColor": "#18bd18",
-                "borderRadius": 999,
-                "justifyContent": "center",
-                "maxWidth": "100%",
-                "minHeight": 44,
-                "opacity": 1,
-                "paddingHorizontal": 24,
-                "paddingVertical": 8,
-                "width": "100%",
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "alignSelf": "stretch",
+                  "backgroundColor": "#18bd18",
+                  "borderRadius": 999,
+                  "justifyContent": "center",
+                  "maxWidth": "100%",
+                  "minHeight": 44,
+                  "paddingHorizontal": 24,
+                  "paddingVertical": 8,
+                  "width": "100%",
+                },
+                {},
+              ]
             }
             testID="shield.confirm"
           >
@@ -3253,7 +3483,9 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
+            onBlur={[Function]}
             onClick={[Function]}
+            onFocus={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -3261,19 +3493,21 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "alignSelf": "stretch",
-                "backgroundColor": undefined,
-                "borderRadius": 999,
-                "justifyContent": "center",
-                "maxWidth": "100%",
-                "minHeight": 44,
-                "opacity": 1,
-                "paddingHorizontal": 24,
-                "paddingVertical": 8,
-                "width": "100%",
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "alignSelf": "stretch",
+                  "backgroundColor": undefined,
+                  "borderRadius": 999,
+                  "justifyContent": "center",
+                  "maxWidth": "100%",
+                  "minHeight": 44,
+                  "paddingHorizontal": 24,
+                  "paddingVertical": 8,
+                  "width": "100%",
+                },
+                {},
+              ]
             }
             testID="shield.cancel"
           >

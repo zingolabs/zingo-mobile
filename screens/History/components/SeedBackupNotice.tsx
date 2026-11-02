@@ -6,7 +6,7 @@ import {
   withTiming,
 } from 'react-native-reanimated';
 
-import { ease } from '@app/theme/motion';
+import { duration, ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { CardRect } from '@app/types';
 import Button from '@ui/primitives/Button';
@@ -21,9 +21,6 @@ type SeedBackupNoticeProps = {
   onBackUp: (from: CardRect) => void;
 };
 
-const COVER_MS = 120;
-const UNCOVER_MS = 200;
-
 // The seed phrase notice on History. Back up opens the flow from this card.
 const SeedBackupNotice: React.FunctionComponent<SeedBackupNoticeProps> = ({
   covered,
@@ -35,9 +32,9 @@ const SeedBackupNotice: React.FunctionComponent<SeedBackupNoticeProps> = ({
 
   const contents = useAnimatedStyle(() => ({
     opacity: withTiming(covered ? 0 : 1, {
-      duration: covered ? COVER_MS : UNCOVER_MS,
+      duration: covered ? duration.fast : duration.base,
       easing: ease.standard,
-      reduceMotion: ReduceMotion.Never,
+      reduceMotion: ReduceMotion.System,
     }),
   }));
 
@@ -52,12 +49,12 @@ const SeedBackupNotice: React.FunctionComponent<SeedBackupNoticeProps> = ({
       testID="seedbackup.notice"
       tone="seed"
       title={translate('seednotice.title') as string}
+      // Only the green pill a finished backup shows before the notice leaves:
+      // the tile and the text already say it is not backed up.
       tag={
         backedUp ? (
           <Tag tone="accent">{translate('seednotice.done') as string}</Tag>
-        ) : (
-          <Tag tone="warning">{translate('seednotice.pending') as string}</Tag>
-        )
+        ) : undefined
       }
       contentStyle={contents}
       actionBeside

@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useRef, useState } from 'react';
-import { Keyboard, Pressable, View } from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
+import { Keyboard, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import {
@@ -21,7 +22,11 @@ import Utils from '@app/utils';
 import Text from '@ui/primitives/Text';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import FullPanel from '@ui/widgets/FullPanel';
-import NewAddressTag from '@ui/widgets/NewAddressTag';
+import NewAddressTag, {
+  newAddressTagTitleKey,
+} from '@ui/widgets/NewAddressTag';
+import TitleBar from '@ui/widgets/TitleBar';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
 import RadioRow, { RadioList } from '@ui/widgets/RadioRow';
 import { PencilIcon } from '@ui/primitives/Icons/PencilIcon';
 import { TagIcon } from '@ui/primitives/Icons/TagIcon';
@@ -122,19 +127,19 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
               onPress={() => togglePin(address.address)}
             />
             <Pressable
+              kind="icon"
               accessibilityRole="button"
               accessibilityLabel={t(
                 tag ? 'receive.edit-tag' : 'addressbook.add-tag',
               )}
               onPress={() => openTag(address.address)}
-              style={({ pressed }) => ({
+              style={{
                 width: touchTarget,
                 height: touchTarget,
                 borderRadius: radiusPill,
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: pressed ? colors.bgMutedSubtle : 'transparent',
-              })}
+              }}
             >
               {tag ? (
                 <PencilIcon size={iconSizeMd} color={colors.fgMuted} />
@@ -201,7 +206,20 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
           </RadioList>
         </>
       )}
-      <AppSheetModal ref={tagSheetRef} handle>
+      <AppSheetModal
+        ref={tagSheetRef}
+        onDismiss={() => setTagging('')}
+        header={
+          <TitleBar
+            title={t(newAddressTagTitleKey(tagOf(tagging)))}
+            right={{
+              icon: XIcon,
+              accessibilityLabel: t('close'),
+              onPress: closeTag,
+            }}
+          />
+        }
+      >
         {!!tagging && (
           <NewAddressTag
             address={tagging}

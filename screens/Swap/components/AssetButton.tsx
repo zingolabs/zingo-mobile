@@ -1,6 +1,7 @@
 import React from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { radiusPill, space8, useTheme, iconSizeSm } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import type { TokenEntryType } from '@app/swap';
 import Text from '@ui/primitives/Text';
 import { ChevronDown } from '@ui/primitives/Icons/Chevron';
@@ -35,12 +36,13 @@ export default function AssetButton({
   const network = token && !isNative ? chainDisplayName(token.chain) : '';
   return (
     <Pressable
+      kind="button"
       testID={testID}
       accessibilityRole={onPress ? 'button' : undefined}
       accessibilityLabel={accessibilityLabel}
       onPress={onPress}
       disabled={!onPress}
-      style={({ pressed }) => ({
+      style={{
         flexDirection: 'row',
         alignItems: 'center',
         columnGap: space8,
@@ -50,8 +52,7 @@ export default function AssetButton({
         borderRadius: radiusPill,
         borderWidth: onPress ? 1 : 0,
         borderColor: colors.bottomSheetBorder,
-        opacity: pressed ? 0.7 : 1,
-      })}
+      }}
     >
       <TokenLogo
         token={token}

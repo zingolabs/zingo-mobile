@@ -1,14 +1,13 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
-  Easing,
   ReduceMotion,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
 import { useTheme } from '@app/theme';
-import { FRESH_MS } from '@screens/History/useFreshRows';
+import { duration, ease } from '@app/theme/motion';
 
 /**
  * A row that just arrived: it starts lit in green and fades back to the
@@ -29,8 +28,8 @@ export default function FreshGlow({
     }
     lit.value = 1;
     lit.value = withTiming(0, {
-      duration: FRESH_MS,
-      easing: Easing.out(Easing.quad),
+      duration: duration.fresh,
+      easing: ease.out,
       reduceMotion: ReduceMotion.System,
     });
   }, [fresh, lit]);

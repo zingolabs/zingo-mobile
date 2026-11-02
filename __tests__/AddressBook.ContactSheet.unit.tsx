@@ -48,7 +48,6 @@ const sheet = (onSave = jest.fn(), translate = mockTranslate) => {
         book={[alice]}
         walletChain={ChainNameEnum.mainChainName}
         onSave={onSave}
-        onCancel={() => {}}
       />
     </ContextAppLoadedProvider>,
   );
@@ -160,7 +159,6 @@ describe('ContactSheet chain', () => {
           book={[]}
           walletChain={ChainNameEnum.mainChainName}
           onSave={onSave}
-          onCancel={() => {}}
         />
       </ContextAppLoadedProvider>,
     );
@@ -195,7 +193,6 @@ describe('ContactSheet chain', () => {
           book={[]}
           walletChain={ChainNameEnum.mainChainName}
           onSave={jest.fn()}
-          onCancel={() => {}}
         />
       </ContextAppLoadedProvider>,
     );

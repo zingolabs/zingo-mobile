@@ -3,6 +3,7 @@
  * These tests change the app state after that render and then confirm.
  */
 jest.mock('@app/walletBackend', () => ({
+  shieldPreview: jest.fn(() => Promise.resolve({ ok: true, value: '{}' })),
   shieldPropose: jest.fn(),
   shieldConfirm: jest.fn(),
 }));

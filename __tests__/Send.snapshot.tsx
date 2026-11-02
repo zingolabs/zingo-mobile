@@ -5,7 +5,7 @@
 import 'react-native';
 import React from 'react';
 
-import { render } from '@testing-library/react-native';
+import { render, fireEvent, screen } from '@testing-library/react-native';
 import Send from '@screens/Send';
 import {
   defaultAppContextLoaded,
@@ -21,6 +21,16 @@ import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
 import { HomeTabScreenProps } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
+
+/** Send mounts its sheet once its container is measured; jest never lays out. */
+const layoutSend = () => {
+  const container = screen.queryByTestId('send.container');
+  if (container) {
+    fireEvent(container, 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 400, height: 800 } },
+    });
+  }
+};
 
 function makeDrawerProps(): HomeTabScreenProps<'Send'> {
   return {
@@ -54,6 +64,7 @@ describe('Component Send - test', () => {
         <Send {...props} />
       </ContextAppLoadedProvider>,
     );
+    layoutSend();
     expect(send.toJSON()).toMatchSnapshot();
   });
 
@@ -66,6 +77,7 @@ describe('Component Send - test', () => {
         <Send {...props} />
       </ContextAppLoadedProvider>,
     );
+    layoutSend();
     expect(send.toJSON()).toMatchSnapshot();
   });
 });

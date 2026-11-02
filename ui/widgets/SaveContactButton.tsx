@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { Pressable } from 'react-native';
+
 import { iconSizeMd, space8, touchTarget, useTheme } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import Text from '@ui/primitives/Text';
 import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
 
@@ -20,6 +21,7 @@ export default function SaveContactButton({
   const { colors } = useTheme();
   return (
     <Pressable
+      kind="link"
       testID={testID}
       accessibilityRole="button"
       onPress={onPress}

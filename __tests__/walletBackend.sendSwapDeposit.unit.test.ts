@@ -4,6 +4,10 @@ jest.mock('@app/RPCModule', () =>
 
 import RPCModule from '@app/RPCModule';
 import { TransactionService } from '@app/walletBackend/modules/TransactionService';
+import {
+  DepositAfterDeshieldError,
+  heldDeshield,
+} from '@app/swap/depositAfterDeshield';
 
 const bridge = RPCModule as unknown as Record<string, jest.Mock>;
 
@@ -119,4 +123,51 @@ test('Tests that a refused deposit rejects with the native error when the entry 
       memoBytes: MEMO,
     }),
   ).rejects.toThrow('send after deshield');
+});
+
+const HELD = 'ab'.repeat(32);
+const rejection = (code: string, message: string) =>
+  Object.assign(new Error(message), { code });
+
+test('Tests that a deposit whose vault payment fails after the deshield rejects typed and holds the deshield when the FFI says SendAfterDeshield', async () => {
+  bridge.sendSwapDepositProcess.mockRejectedValueOnce(
+    rejection(
+      'SendAfterDeshield',
+      `Error: send after deshield: OP_RETURN send failed after the deshield ${HELD} was transmitted. timeout`,
+    ),
+  );
+
+  const sent = service().sendSwapDeposit({
+    depositAddress: VAULT,
+    amountAtomic: 150_000_000,
+    memoBytes: MEMO,
+  });
+
+  await expect(sent).rejects.toBeInstanceOf(DepositAfterDeshieldError);
+  await expect(sent).rejects.toMatchObject({
+    kind: 'failed',
+    deshieldTxId: HELD,
+  });
+  expect(heldDeshield(HELD)).toBe(true);
+});
+
+test('Tests that a resumed deposit releases the held deshield when its vault payment goes', async () => {
+  bridge.confirmProcess.mockResolvedValueOnce(
+    JSON.stringify({ txids: ['deposit'] }),
+  );
+  expect(await service().resumeSwapDeposit()).toEqual(['deposit']);
+  expect(heldDeshield(HELD)).toBe(false);
+});
+
+test('Tests that any other deposit rejection passes through as it came when the FFI code is not SendAfterDeshield', async () => {
+  const other = rejection('Send', 'Error: send: insufficient funds');
+  bridge.sendSwapDepositProcess.mockRejectedValueOnce(other);
+
+  await expect(
+    service().sendSwapDeposit({
+      depositAddress: VAULT,
+      amountAtomic: 150_000_000,
+      memoBytes: MEMO,
+    }),
+  ).rejects.toBe(other);
 });

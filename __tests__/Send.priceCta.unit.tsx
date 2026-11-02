@@ -26,7 +26,7 @@ jest.mock('@ui/widgets/priceFetcherStore', () => ({
 
 import 'react-native';
 import React from 'react';
-import { fireEvent, render } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import Send from '@screens/Send';
 import Confirm from '@screens/Confirm';
 import {
@@ -47,6 +47,16 @@ import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
 import { HomeTabScreenProps } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
+
+/** Send mounts its sheet once its container is measured; jest never lays out. */
+const layoutSend = () => {
+  const container = screen.queryByTestId('send.container');
+  if (container) {
+    fireEvent(container, 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 400, height: 800 } },
+    });
+  }
+};
 
 const storeHook = usePriceFetcherStore as jest.MockedFunction<
   typeof usePriceFetcherStore
@@ -102,6 +112,7 @@ test('F8: the in-form USD amount dims when the price is stale', () => {
   const view = render(
     sendUi({ zecPrice: 33.33, date: Date.now() - 11 * 60_000 }),
   );
+  layoutSend();
 
   const { StyleSheet } = require('react-native');
   const line = view.getByTestId('send.zec-derived');
@@ -111,6 +122,7 @@ test('F8: the in-form USD amount dims when the price is stale', () => {
 
 test('P8: an absent price hides the in-form USD amounts and the ring', () => {
   const view = render(sendUi({ zecPrice: 0, date: 0 }));
+  layoutSend();
 
   expect(view.getByTestId('send.zec-derived')).not.toHaveTextContent(/\$/);
   expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
@@ -143,6 +155,7 @@ test('N7: the send-confirmation conversion dims on a stale price too', () => {
       <Confirm {...confirmProps} />
     </ContextAppLoadedProvider>,
   );
+  layoutSend();
 
   const { StyleSheet } = require('react-native');
   const fiat = view.getByTestId('send.confirm.fiat');
@@ -154,6 +167,7 @@ test('H3: the USD-entry derived ZEC amount dims on a stale price', () => {
   const view = render(
     sendUi({ zecPrice: 33.33, date: Date.now() - 11 * 60_000 }),
   );
+  layoutSend();
 
   fireEvent.press(view.getByTestId('send.swap-entry'));
   const { StyleSheet } = require('react-native');
@@ -169,6 +183,7 @@ test('the amount being typed shows in both currencies with privacy on', () => {
       {ui.props.children}
     </ContextAppLoadedProvider>,
   );
+  layoutSend();
 
   // A masked amount would read "•••••"; the typed one shows its digits.
   expect(view.getByTestId('send.zec-derived')).toHaveTextContent(/≈ \$\d/);

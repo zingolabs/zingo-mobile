@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { View } from 'react-native';
+import { GestureDetector } from 'react-native-gesture-handler';
 import {
   createNavigatorFactory,
   StackRouter,
@@ -17,6 +19,17 @@ import {
 } from '@react-navigation/native';
 
 import OnboardingStage from '@ui/widgets/OnboardingStage';
+import { Route } from '@app/AppState';
+import { ContextAppLoading } from '@app/context';
+import { useEdgeSwipeBack } from '@app/hooks/useEdgeSwipeBack';
+
+/** The steps with a back of their own; the rest start a flow. */
+const STEPS_WITH_BACK: string[] = [
+  Route.Server,
+  Route.ServerList,
+  Route.ImportChooser,
+  Route.ImportWallet,
+];
 
 // The stage draws every transition itself, so a screen has no options.
 export type OnboardingScreenOptions = Record<string, never>;
@@ -89,9 +102,25 @@ function OnboardingNavigator({
     UNSTABLE_router,
   });
 
+  /**
+   * The stage draws its own transitions, so iOS has no edge swipe: a swipe
+   * from the left edge does what the step's back does.
+   */
+  const { stepBack } = useContext(ContextAppLoading);
+  const swipeBack = useEdgeSwipeBack(
+    STEPS_WITH_BACK.includes(state.routes[state.index].name)
+      ? stepBack
+      : undefined,
+  );
+
   return (
     <NavigationContent>
-      <OnboardingStage state={state} descriptors={descriptors} />
+      <GestureDetector gesture={swipeBack}>
+        {/* eslint-disable-next-line react-native/no-inline-styles */}
+        <View style={{ flex: 1 }}>
+          <OnboardingStage state={state} descriptors={descriptors} />
+        </View>
+      </GestureDetector>
     </NavigationContent>
   );
 }

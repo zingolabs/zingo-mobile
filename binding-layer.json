@@ -1,10 +1,10 @@
 {
-  "commit": "625f617b63070855d1a4b2a2f61d071cb27c6f82",
+  "commit": "81d799775f11e882896e8710e8af12d6d4d29a41",
   "digests": {
-    "android": "sha256:3b4884c448854abb540d17e6fe5e9d5f517f5b4250ceba98a850531a8759eceb",
-    "ios": "sha256:5175312fa492e9e76bc6640019633e76075b810951747438a65c82c0a45a5934"
+    "android": "sha256:31e3e370e42b8d8d3a36fd732562343e2c99aa20bbc07f78b2d699d06315638b",
+    "ios": "sha256:5ebccd1eb10ebf5b2741f8dfe4a9a1a839289fc7a74180fdef53755c1dc1d183"
   },
   "coordinates": {
-    "android": "org.zingolabs:zingo-binding-layer:7.0.0-625f617b63070855"
+    "android": "org.zingolabs:zingo-binding-layer:8.0.0-81d799775f11e882"
   }
 }

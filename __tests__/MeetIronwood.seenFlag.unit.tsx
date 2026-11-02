@@ -46,7 +46,7 @@ jest.mock('react-native-reanimated', () => {
   }
   return {
     __esModule: true,
-    default: { View },
+    default: { View, createAnimatedComponent: (c: unknown) => c },
     FadeInUp: builder,
     ReduceMotion: { System: 'system' },
     Extrapolation: { CLAMP: 'clamp' },
@@ -54,6 +54,8 @@ jest.mock('react-native-reanimated', () => {
     useDerivedValue: (fn: () => unknown) => ({ value: fn() }),
     useAnimatedStyle: () => ({}),
     withSpring: (v: unknown) => v,
+    withTiming: (v: unknown) => v,
+    Easing: { bezier: () => () => 0 },
     cancelAnimation: () => {},
     runOnJS: (fn: unknown) => fn,
     interpolate: (v: number) => v,

@@ -19,6 +19,7 @@ const renderNotice = () =>
 
 test('Tests that the notice asks for a backup when the seed is not backed up.', () => {
   renderNotice();
-  expect(screen.getByText('seednotice.pending')).toBeTruthy();
+  // No tag: the tile and the text already say it.
+  expect(screen.queryByText('seednotice.pending')).toBeNull();
   expect(screen.getByText('seednotice.body-pending')).toBeTruthy();
 });

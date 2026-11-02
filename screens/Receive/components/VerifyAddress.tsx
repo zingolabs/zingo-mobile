@@ -1,7 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
 import { View, Keyboard } from 'react-native';
-import { space8, space20, useTheme } from '@app/theme';
+import {
+  space8,
+  space20,
+  useTheme,
+  space4,
+  space16,
+  iconSizeSm,
+} from '@app/theme';
 
 import { GlobalConst, SnackbarDurationEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
@@ -15,13 +22,9 @@ import Text from '@ui/primitives/Text';
 import { RPCCheckAddressType } from '@app/walletBackend/types/RPCCheckAddressType';
 import { VerifyCheckIcon } from '@ui/primitives/Icons/VerifyCheckIcon';
 import { VerifyXIcon } from '@ui/primitives/Icons/VerifyXIcon';
+import { SheetFooter } from '@ui/primitives/AppSheetModal';
 
-type VerifyAddressProps = {
-  closeSheet: () => void;
-};
-const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
-  closeSheet,
-}) => {
+const VerifyAddress: React.FunctionComponent = () => {
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar, server } = context;
   const { colors } = useTheme();
@@ -88,20 +91,11 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
   };
 
   return (
-    <View
-      style={{
-        backgroundColor: colors.bgSurface,
-        paddingHorizontal: 10,
-      }}
-    >
+    <View style={{ paddingHorizontal: space20 }}>
       <Text
         variant="caption"
         tone="muted"
-        style={{
-          textAlign: 'center',
-          marginHorizontal: space20,
-          marginBottom: space8,
-        }}
+        style={{ textAlign: 'center', marginBottom: space8 }}
       >
         {translate('receive.verify-sub') as string}
       </Text>
@@ -112,13 +106,10 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
         disabled={false}
         showLabel={false}
         scanRequest="receive.address"
+        pasteLabel={translate('paste') as string}
       />
       {!!errorAddress && (
-        <Text
-          variant="bodySmall"
-          tone="danger"
-          style={{ marginTop: space8, marginHorizontal: space20 }}
-        >
+        <Text variant="bodySmall" tone="danger" style={{ marginTop: space8 }}>
           {errorAddress}
         </Text>
       )}
@@ -129,8 +120,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
-            marginVertical: 5,
-            paddingHorizontal: 10,
+            marginVertical: space4,
           }}
         >
           {verifyOK ? (
@@ -143,8 +133,9 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
               }}
             >
               <VerifyCheckIcon
+                size={iconSizeSm}
                 color={colors.fgAccent}
-                style={{ marginRight: 10 }}
+                style={{ marginRight: space8 }}
               />
               <Text
                 testID="receive.verify-mine"
@@ -165,8 +156,9 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
               }}
             >
               <VerifyXIcon
+                size={iconSizeSm}
                 color={colors.fgDanger}
-                style={{ marginRight: 10 }}
+                style={{ marginRight: space8 }}
               />
               <Text
                 testID="receive.verify-not-mine"
@@ -180,43 +172,31 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
           )}
         </View>
       )}
-      <View style={{ display: 'flex', flexDirection: 'column', margin: 0 }}>
-        <View
-          style={{
-            flexGrow: 1,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 10,
-            marginVertical: 5,
-            marginTop: 15,
-            paddingHorizontal: 10,
-          }}
-        >
-          <ButtonStack>
-            <Button
-              variant="quiet"
-              title={translate('cancel') as string}
-              onPress={() => {
-                setAddress('');
-                setVerifyOK(null);
-                Keyboard.dismiss();
-                setTimeout(() => {
-                  closeSheet();
-                }, 100);
-              }}
-            />
-            <Button
-              variant="primary"
-              title={translate('verify') as string}
-              onPress={() => {
-                verifyAddress();
-              }}
-              disabled={!address || !!errorAddress}
-            />
-          </ButtonStack>
+      <SheetFooter style={{ paddingHorizontal: space20 }}>
+        <View style={{ display: 'flex', flexDirection: 'column', margin: 0 }}>
+          <View
+            style={{
+              flexGrow: 1,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: space16,
+              marginBottom: space4,
+            }}
+          >
+            <ButtonStack>
+              <Button
+                variant="primary"
+                title={translate('verify') as string}
+                onPress={() => {
+                  verifyAddress();
+                }}
+                disabled={!address || !!errorAddress}
+              />
+            </ButtonStack>
+          </View>
         </View>
-      </View>
+      </SheetFooter>
     </View>
   );
 };

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { View, useWindowDimensions } from 'react-native';
 import Animated, {
   Easing,
   ReduceMotion,
@@ -13,7 +13,15 @@ import Animated, {
 import { useNavigation } from '@react-navigation/native';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import { WalletNavigation } from '@app/types';
-import { radiusPill, useTheme, iconSizeSm } from '@app/theme';
+import {
+  iconSizeSm,
+  radiusPill,
+  space20,
+  space4,
+  space8,
+  useTheme,
+} from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { Route, ServerType, TranslateType } from '@app/AppState';
 import NetInfoType from '@app/AppState/types/NetInfoType';
 import { useSyncFreshness } from '@app/hooks/lastSynced';
@@ -104,6 +112,8 @@ export default function SyncLine({
   const { colors } = useTheme();
   const t = (key: string) => translate(key) as string;
   const freshness = useSyncFreshness();
+  /** Never wider than the screen inside its gutters; the words give way. */
+  const maxWidth = useWindowDimensions().width - 2 * space20;
   const [nowMs, setNowMs] = useState<number>(Date.now());
 
   const state: SyncState = !netInfo.isConnected
@@ -121,6 +131,10 @@ export default function SyncLine({
     !!netInfo.isConnected &&
     (netInfo.type === NetInfoStateType.cellular ||
       !!netInfo.isConnectionExpensive);
+  /** One thing at a time: mobile data only when the line warns about nothing else. */
+  const showMetered =
+    metered &&
+    (state === 'synced' || state === 'syncing' || state === 'starting');
 
   useEffect(() => {
     const timer = setInterval(() => setNowMs(Date.now()), 30 * 1000);
@@ -136,122 +150,88 @@ export default function SyncLine({
           ago(lastSynced, nowMs, t),
         )
       : '';
-  const sep = (
-    <Text variant="caption" tone="muted">
-      ·
-    </Text>
-  );
   const strong = (text: string, color: string) => (
     <Text variant="caption" style={{ color, fontWeight: '600' }}>
       {text}
     </Text>
   );
+  /** What the line says, the strong part first; " · " and the age follow. */
+  const aged = (head: React.ReactNode): React.ReactNode => (
+    <>
+      {head}
+      {!!balanceAge && ` · ${balanceAge}`}
+    </>
+  );
 
-  let body: React.ReactNode;
+  let lead: React.ReactNode;
+  let words: React.ReactNode;
   let label: string;
   switch (state) {
     case 'noInternet':
-      body = (
-        <>
-          <CloudDownloadIcon size={iconSizeSm} color={colors.fgWarning} />
-          {strong(t('header.sync-no-internet'), colors.fgWarning)}
-          {!!balanceAge && sep}
-          {!!balanceAge && (
-            <Text variant="caption" tone="muted">
-              {balanceAge}
-            </Text>
-          )}
-        </>
-      );
+      lead = <CloudDownloadIcon size={iconSizeSm} color={colors.fgWarning} />;
+      words = aged(strong(t('header.sync-no-internet'), colors.fgWarning));
       label = [t('header.sync-no-internet'), balanceAge]
         .filter(Boolean)
         .join('. ');
       break;
     case 'offline':
-      body = (
-        <>
-          <View
-            style={{
-              width: 7,
-              height: 7,
-              borderRadius: radiusPill,
-              backgroundColor: colors.borderMuted,
-            }}
-          />
-          {strong(t('header.sync-offline'), colors.fgWarning)}
-          {!!balanceAge && sep}
-          {!!balanceAge && (
-            <Text variant="caption" tone="muted">
-              {balanceAge}
-            </Text>
-          )}
-        </>
+      lead = (
+        <View
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: radiusPill,
+            backgroundColor: colors.borderMuted,
+          }}
+        />
       );
+      words = aged(strong(t('header.sync-offline'), colors.fgWarning));
       label = [t('header.sync-offline'), balanceAge].filter(Boolean).join('. ');
       break;
     case 'behind':
-      body = (
-        <>
-          <View
-            testID="header.sync-behind"
-            style={{
-              width: 7,
-              height: 7,
-              borderRadius: radiusPill,
-              backgroundColor: colors.fgWarning,
-            }}
-          />
-          {strong(t('header.sync-behind'), colors.fgWarning)}
-          {!!balanceAge && sep}
-          {!!balanceAge && (
-            <Text variant="caption" tone="muted">
-              {balanceAge}
-            </Text>
-          )}
-        </>
+      lead = (
+        <View
+          testID="header.sync-behind"
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: radiusPill,
+            backgroundColor: colors.fgWarning,
+          }}
+        />
       );
+      words = aged(strong(t('header.sync-behind'), colors.fgWarning));
       label = [t('header.sync-behind'), balanceAge].filter(Boolean).join('. ');
       break;
     case 'starting':
-      body = (
-        <>
-          <Spinner track={colors.sheetHandle} arc={colors.fgMuted} />
-          <Text variant="caption" tone="muted">
-            {t('header.sync-connecting').replace('{host}', hostOf(server))}
-          </Text>
-        </>
-      );
+      lead = <Spinner track={colors.sheetHandle} arc={colors.fgMuted} />;
+      words = t('header.sync-connecting').replace('{host}', hostOf(server));
       label = t('header.sync-connecting').replace('{host}', hostOf(server));
       break;
     case 'syncing':
-      body = (
-        <>
+      lead = (
+        <View
+          style={{
+            width: 56,
+            height: 4,
+            borderRadius: radiusPill,
+            backgroundColor: colors.sheetHandle,
+            overflow: 'hidden',
+          }}
+        >
           <View
             style={{
-              width: 56,
+              width: `${Math.min(100, Math.max(0, percentage))}%`,
               height: 4,
               borderRadius: radiusPill,
-              backgroundColor: colors.sheetHandle,
-              overflow: 'hidden',
+              backgroundColor: colors.fgSyncing,
             }}
-          >
-            <View
-              style={{
-                width: `${Math.min(100, Math.max(0, percentage))}%`,
-                height: 4,
-                borderRadius: radiusPill,
-                backgroundColor: colors.fgSyncing,
-              }}
-            />
-          </View>
-          {strong(
-            t('header.sync-syncing').replace(
-              '{n}',
-              String(Math.floor(percentage)),
-            ),
-            colors.fgSyncing,
-          )}
-        </>
+          />
+        </View>
+      );
+      words = strong(
+        t('header.sync-syncing').replace('{n}', String(Math.floor(percentage))),
+        colors.fgSyncing,
       );
       label = t('header.sync-syncing').replace(
         '{n}',
@@ -259,50 +239,71 @@ export default function SyncLine({
       );
       break;
     default:
-      body = (
-        <>
-          <View
-            testID="header.checkicon"
-            style={{
-              width: 7,
-              height: 7,
-              borderRadius: radiusPill,
-              backgroundColor: colors.fgAccent,
-            }}
-          />
-          <Text variant="caption" tone="muted">
-            {t('header.sync-synced')}
-          </Text>
-        </>
+      lead = (
+        <View
+          testID="header.checkicon"
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: radiusPill,
+            backgroundColor: colors.fgAccent,
+          }}
+        />
       );
+      words = t('header.sync-synced');
       label = t('header.sync-synced');
   }
 
   return (
     <Pressable
+      kind="row"
       testID="header.syncline"
       accessibilityRole="button"
-      accessibilityLabel={`${label}. ${t('header.sync-open-report')}`}
+      accessibilityLabel={[
+        label,
+        showMetered ? t('header.sync-mobile-data') : '',
+        t('header.sync-open-report'),
+      ]
+        .filter(Boolean)
+        .join('. ')}
       onPress={() => navigation.navigate(Route.SyncReport)}
-      style={({ pressed }) => ({
+      style={{
         flexDirection: 'row',
         alignItems: 'center',
-        columnGap: 8,
-        height: 28,
+        minHeight: 28,
+        maxWidth,
         /** The price card sits this far below; the same above centres the line. */
         marginTop: CARD_MARGIN_TOP,
         paddingHorizontal: 12,
         borderRadius: radiusPill,
-        backgroundColor: pressed ? colors.bgMutedSubtle : 'transparent',
-      })}
+      }}
     >
-      {body}
-      {metered && (
-        <>
-          {sep}
-          <CloudDownloadIcon size={iconSizeSm} color={colors.fgWarning} />
-          {strong(t('header.sync-mobile-data'), colors.fgWarning)}
-        </>
+      <View style={{ marginRight: space8, flexShrink: 0 }}>{lead}</View>
+      {/* The words in one Text, cut at the end when the line runs out of room. */}
+      <Text
+        variant="caption"
+        tone="muted"
+        numberOfLines={1}
+        ellipsizeMode="tail"
+        style={{ flexShrink: 1 }}
+      >
+        {words}
+      </Text>
+      {showMetered && (
+        <View
+          style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 0 }}
+        >
+          <Text variant="caption" tone="muted">
+            {' · '}
+          </Text>
+          {/* 1, off the spacing scale on purpose: the icon clears the " · " in this line only. */}
+          <View style={{ marginLeft: 1 }}>
+            <CloudDownloadIcon size={iconSizeSm} color={colors.fgWarning} />
+          </View>
+          <View style={{ marginLeft: space4 }}>
+            {strong(t('header.sync-mobile-data'), colors.fgWarning)}
+          </View>
+        </View>
       )}
     </Pressable>
   );

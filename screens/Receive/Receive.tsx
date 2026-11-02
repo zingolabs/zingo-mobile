@@ -25,9 +25,10 @@ import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import NewAddress from './components/NewAddress';
 import VerifyAddress from './components/VerifyAddress';
 import AddressCard from './components/AddressCard';
-import NewAddressTag from '@ui/widgets/NewAddressTag';
+import NewAddressTag, {
+  newAddressTagTitleKey,
+} from '@ui/widgets/NewAddressTag';
 import { useResult } from '@app/navigation/results';
-import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 import { usePinnedAddress } from '@app/hooks/usePinnedAddress';
@@ -38,6 +39,7 @@ import { useOwnAddresses } from './ownAddresses';
 import { onTabScroll } from '@app/navigation/tabBarScroll';
 import { PANEL_TOP } from '@ui/widgets/Header/Header';
 import { useReceiveSelection } from './useReceiveSelection';
+import { useCompact } from '@app/hooks/useCompact';
 
 type ReceiveProps = HomeTabScreenProps<'Receive'>;
 
@@ -76,7 +78,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const receiveSheetRef = useRef<BottomSheet>(null);
   const sheetSlideStyle = useOptionsPanelSheetSlide();
-  const keyboardHeight = useKeyboardHeight();
   useDismissSheetsOnBlur();
 
   // Fixed under the header's icons, as Swap: no stops to drag between.
@@ -104,6 +105,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
     bottomSheetRef.current?.present();
   }, []);
 
+  const { gap } = useCompact();
   const hide = useCallback(() => {
     setSheetType(null);
     Keyboard.dismiss();
@@ -133,7 +135,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
       ? t('receive.new-title')
       : sheetType === 'VA'
         ? t('receive.verify-title')
-        : '';
+        : sheetType === 'NAT'
+          ? t(newAddressTagTitleKey())
+          : '';
 
   const xHeader = (
     <TitleBar
@@ -222,7 +226,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
                 <Text
                   variant="body"
                   tone="muted"
-                  style={{ textAlign: 'center', marginTop: space32 }}
+                  style={{ textAlign: 'center', marginTop: gap(space32) }}
                 >
                   {t('receive.noaddress')}
                 </Text>
@@ -233,11 +237,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
       </Animated.View>
       <AppSheetModal
         ref={bottomSheetRef}
-        header={sheetType === 'NAT' ? undefined : xHeader}
-        handle={sheetType === 'NAT'}
-        contentStyle={{
-          paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
-        }}
+        // However it closes (the X, a swipe, the backdrop), its content unmounts and opens empty next time.
+        onDismiss={() => setSheetType(null)}
+        header={xHeader}
       >
         {sheetType === 'NA' && (
           <NewAddress closeSheet={hide} setAddressBook={setAddressBook} />
@@ -249,7 +251,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
             setAddressBook={setAddressBook}
           />
         )}
-        {sheetType === 'VA' && <VerifyAddress closeSheet={hide} />}
+        {sheetType === 'VA' && <VerifyAddress />}
       </AppSheetModal>
     </View>
   );

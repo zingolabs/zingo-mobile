@@ -9,8 +9,8 @@ import React, {
 import {
   NativeSyntheticEvent,
   Platform,
-  Pressable,
-  Text,
+  Pressable as RNPressable,
+  Text as RNText,
   TextInput,
   TextInputKeyPressEventData,
   View,
@@ -27,8 +27,17 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { useTheme } from '@app/theme';
+import {
+  radiusMd,
+  radiusPill,
+  space4,
+  space12,
+  textVariants,
+  useTheme,
+} from '@app/theme';
+import Text from '@ui/primitives/Text';
 import { duration, ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import { TranslateType } from '@app/AppState';
 import {
   SEED_WORD_COUNT,
@@ -391,7 +400,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
         style={[
           {
             borderWidth: 1,
-            borderRadius: 12,
+            borderRadius: radiusMd,
             borderColor,
             backgroundColor: colors.bgSurface,
             paddingTop: 14,
@@ -412,14 +421,14 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
               right: -1,
               top: -1,
               bottom: -1,
-              borderRadius: 12,
+              borderRadius: radiusMd,
               borderWidth: 2,
               borderColor: colors.borderAccent,
             },
             pulseStyle,
           ]}
         />
-        <Pressable
+        <RNPressable
           accessible={false}
           onPress={() => inputRef.current?.focus()}
           style={{
@@ -453,8 +462,8 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
                 flex: 1,
                 color: colors.fgDefault,
                 fontFamily: MONO,
-                fontSize: 13,
-                lineHeight: 21,
+                fontSize: textVariants.address.fontSize,
+                lineHeight: textVariants.body.lineHeight,
                 padding: 0,
                 textAlignVertical: 'top',
               }}
@@ -472,6 +481,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
                   layout={chipLayout()}
                 >
                   <Pressable
+                    kind="button"
                     onPress={() => removeWordAt(i)}
                     accessibilityRole="button"
                     accessibilityLabel={word}
@@ -480,7 +490,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
                       alignItems: 'center',
                       gap: 6,
                       height: CHIP_HEIGHT,
-                      borderRadius: CHIP_HEIGHT / 2,
+                      borderRadius: radiusPill,
                       paddingLeft: 10,
                       paddingRight: 11,
                       backgroundColor: valid
@@ -490,15 +500,10 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
                       borderColor: colors.borderDanger,
                     }}
                   >
-                    <Text style={{ color: colors.fgMuted, fontSize: 12 }}>
+                    <Text variant="caption" tone="muted">
                       {i + 1}
                     </Text>
-                    <Text
-                      style={{
-                        color: valid ? colors.fgDefault : colors.fgDanger,
-                        fontSize: 15,
-                      }}
-                    >
+                    <Text variant="body" tone={valid ? 'default' : 'danger'}>
                       {word}
                     </Text>
                   </Pressable>
@@ -516,18 +521,18 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
                 justifyContent: 'center',
               }}
             >
-              <Text
+              <RNText
                 pointerEvents="none"
                 style={{
                   position: 'absolute',
                   left: 3,
                   color: colors.fgMuted,
-                  fontSize: 15,
+                  fontSize: textVariants.body.fontSize,
                 }}
               >
-                <Text style={{ opacity: 0 }}>{draft}</Text>
+                <RNText style={{ opacity: 0 }}>{draft}</RNText>
                 {ghost}
-              </Text>
+              </RNText>
               <TextInput
                 ref={inputRef}
                 testID={testID}
@@ -549,7 +554,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
                 cursorColor={colors.fgAccent}
                 style={{
                   color: colors.fgDefault,
-                  fontSize: 15,
+                  fontSize: textVariants.body.fontSize,
                   paddingVertical: 0,
                   paddingLeft: 3,
                   paddingRight: 0,
@@ -558,15 +563,13 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
               />
             </Animated.View>
           )}
-        </Pressable>
+        </RNPressable>
         {!!draftHint && (
           <Text
             testID={testID ? `${testID}.hint` : undefined}
-            style={{
-              marginTop: 14,
-              color: colors.fgMuted,
-              fontSize: 13,
-            }}
+            variant="bodySmall"
+            tone="muted"
+            style={{ marginTop: space12 }}
           >
             {draftHint}
           </Text>
@@ -583,12 +586,13 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
           >
             {suggestions.map((s, i) => (
               <Pressable
+                kind="button"
                 key={s}
                 onPress={() => acceptWord(s, nativeRef.current)}
                 accessibilityRole="button"
                 style={{
                   height: CHIP_HEIGHT,
-                  borderRadius: CHIP_HEIGHT / 2,
+                  borderRadius: radiusPill,
                   paddingHorizontal: 11,
                   justifyContent: 'center',
                   borderWidth: 1,
@@ -598,22 +602,22 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
                     i === 0 ? colors.bgAccentSubtle : colors.bgCanvas,
                 }}
               >
-                <Text
+                <RNText
                   style={{
                     color: i === 0 ? colors.fgAccent : colors.fgMuted,
-                    fontSize: 13,
+                    fontSize: textVariants.bodySmall.fontSize,
                   }}
                 >
-                  <Text
+                  <RNText
                     style={{
                       color: i === 0 ? colors.fgAccent : colors.fgDefault,
                       fontWeight: '600',
                     }}
                   >
                     {draft.toLowerCase()}
-                  </Text>
+                  </RNText>
                   {s.slice(draft.length)}
-                </Text>
+                </RNText>
               </Pressable>
             ))}
           </Animated.View>
@@ -629,7 +633,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
                 : complete
                   ? colors.fgAccent
                   : colors.fgMuted,
-              fontSize: 12,
+              fontSize: textVariants.caption.fontSize,
             },
             counterStyle,
           ]}
@@ -640,13 +644,9 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
       {fieldError && (
         <Text
           testID={testID ? `${testID}.error` : undefined}
-          style={{
-            marginTop: 6,
-            marginHorizontal: 2,
-            color: colors.fgDanger,
-            fontSize: 12,
-            lineHeight: 15,
-          }}
+          variant="caption"
+          tone="danger"
+          style={{ marginTop: space4, marginHorizontal: 2 }}
         >
           {(keyFault ? fieldError : (translate(fieldError) as string)).replace(
             '{count}',

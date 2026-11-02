@@ -1110,6 +1110,42 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    /** `sendProcess`'s answer without storing a proposal or pausing sync: a fee read. */
+    @ReactMethod
+    fun previewSendProcess(send_json: String, promise: Promise) {
+        FfiOutcome.settling(promise, "preview_send") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.previewSend(sendJson = send_json)
+        }
+    }
+
+    /** `sendAllProcess`'s answer without storing a proposal or pausing sync. */
+    @ReactMethod
+    fun previewSendAllProcess(address: String, memo: String, promise: Promise) {
+        FfiOutcome.settling(promise, "preview_send_all") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.previewSendAll(address = address, memo = memo)
+        }
+    }
+
+    /** `shieldProcess`'s answer without storing a proposal or pausing sync. */
+    @ReactMethod
+    fun previewShieldProcess(promise: Promise) {
+        FfiOutcome.settling(promise, "preview_shield") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.previewShield()
+        }
+    }
+
+    /** Drops the stored proposal without sending it, and lets sync resume. */
+    @ReactMethod
+    fun declineProcess(promise: Promise) {
+        FfiOutcome.settling(promise, "decline") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.decline()
+        }
+    }
+
     @ReactMethod
     fun sendSwapDepositProcess(vaultAddress: String, amount: String, memoHex: String, promise: Promise) {
         FfiOutcome.settling(promise, "send_swap_deposit") {

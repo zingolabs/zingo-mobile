@@ -285,6 +285,24 @@ export class SwapKitClient {
   }
 
   /**
+   * The USD prices SwapKit has for `identifiers`, without a quote: what lets
+   * an amount be typed in USD before the coin has been quoted. The answer's
+   * shape is read loosely by `SwapService.usdPrice`.
+   */
+  async price(identifiers: string[]): Promise<unknown> {
+    return this.request<unknown>({
+      operation: SwapOperationEnum.Quote,
+      method: 'POST',
+      path: '/price',
+      timeoutMs: TOKENS_TIMEOUT_MS,
+      body: {
+        tokens: identifiers.map(identifier => ({ identifier })),
+        metadata: false,
+      },
+    });
+  }
+
+  /**
    * Send a request, retrying a repeatable one that failed in transport.
    *
    * SwapKit's edge answers 504 often enough that a single one used to surface

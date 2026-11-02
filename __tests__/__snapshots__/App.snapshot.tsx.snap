@@ -6,9 +6,6 @@ exports[`Component App - test App - snapshot 1`] = `
     {
       "backgroundColor": "#011401",
       "flex": 1,
-      "paddingLeft": 0,
-      "paddingRight": 0,
-      "paddingTop": 0,
     }
   }
 >

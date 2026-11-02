@@ -47,7 +47,9 @@ exports[`Component Components - test CurrencyAmount High Privacy - snapshot 1`] 
     accessible={true}
     collapsable={false}
     focusable={true}
+    onBlur={[Function]}
     onClick={[Function]}
+    onFocus={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -55,9 +57,10 @@ exports[`Component Components - test CurrencyAmount High Privacy - snapshot 1`] 
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "opacity": 1,
-      }
+      [
+        undefined,
+        {},
+      ]
     }
   >
     <View
@@ -169,7 +172,9 @@ exports[`Component Components - test ZecAmount High Privacy - snapshot 1`] = `
     accessible={true}
     collapsable={false}
     focusable={true}
+    onBlur={[Function]}
     onClick={[Function]}
+    onFocus={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -177,9 +182,10 @@ exports[`Component Components - test ZecAmount High Privacy - snapshot 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "opacity": 1,
-      }
+      [
+        undefined,
+        {},
+      ]
     }
   >
     <View
@@ -264,8 +270,10 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
     }
     accessible={true}
     collapsable={false}
-    focusable={false}
+    focusable={true}
+    onBlur={[Function]}
     onClick={[Function]}
+    onFocus={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -273,9 +281,10 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "opacity": 1,
-      }
+      [
+        undefined,
+        {},
+      ]
     }
   >
     <View

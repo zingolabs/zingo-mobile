@@ -21,7 +21,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             "backgroundColor": "#011401",
             "display": "flex",
             "minHeight": 50,
-            "paddingBottom": 10,
+            "paddingBottom": 0,
             "paddingTop": 0,
           },
         ]
@@ -93,238 +93,281 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
     </View>
   </View>
   <View
+    onLayout={[Function]}
     style={
       {
         "alignItems": "center",
-        "height": 44,
-        "justifyContent": "center",
-        "marginBottom": 10,
-        "marginTop": 6,
-        "zIndex": 3,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "paddingBottom": 6,
+        "paddingHorizontal": 16,
+        "paddingTop": 4,
       }
     }
   >
     <View
-      accessibilityLabel="text translated"
-      accessibilityRole="button"
-      accessibilityState={
-        {
-          "busy": undefined,
-          "checked": undefined,
-          "disabled": undefined,
-          "expanded": undefined,
-          "selected": undefined,
-        }
-      }
-      accessibilityValue={
-        {
-          "max": undefined,
-          "min": undefined,
-          "now": undefined,
-          "text": undefined,
-        }
-      }
-      accessible={true}
-      collapsable={false}
-      focusable={true}
-      onBlur={[Function]}
-      onClick={[Function]}
-      onFocus={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
       style={
         {
-          "alignItems": "center",
-          "backgroundColor": undefined,
-          "borderRadius": 12,
-          "height": 44,
-          "justifyContent": "center",
-          "left": 10,
-          "position": "absolute",
-          "width": 44,
-        }
-      }
-      testID="syncreport.back"
-    />
-    <Text
-      accessibilityRole="header"
-      style={
-        {
-          "color": "#c3c3c3",
-          "fontSize": 18,
-          "fontWeight": "700",
-        }
-      }
-    >
-      text translated
-    </Text>
-    <View
-      pointerEvents="box-none"
-      style={
-        {
-          "bottom": 0,
-          "justifyContent": "center",
-          "left": 16,
-          "position": "absolute",
-          "right": 54,
-          "top": 0,
-          "zIndex": 3,
+          "alignItems": "flex-start",
+          "flex": 1,
+          "minWidth": 48,
         }
       }
     >
       <View
+        accessibilityLabel="text translated"
+        accessibilityRole="button"
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        hitSlop={8}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
         style={
           [
-            {
-              "alignItems": "flex-end",
-              "alignSelf": "stretch",
-            },
-            null,
-          ]
-        }
-      >
-        <View
-          style={
             {
               "alignItems": "center",
               "flexDirection": "row",
-              "gap": 8,
-            }
-          }
-        >
-          <View />
-          <View
-            style={null}
-          >
-            <View
-              accessibilityLabel="text translated"
-              accessibilityRole="button"
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": false,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              hitSlop={14}
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              testID="syncreport.info"
-            >
-              <View
-                style={{}}
-              />
-            </View>
-          </View>
-        </View>
-      </View>
-    </View>
-    <View
-      accessibilityLabel="text translated"
-      accessibilityRole="button"
-      accessibilityState={
-        {
-          "busy": undefined,
-          "checked": undefined,
-          "disabled": undefined,
-          "expanded": undefined,
-          "selected": undefined,
-        }
-      }
-      accessibilityValue={
-        {
-          "max": undefined,
-          "min": undefined,
-          "now": undefined,
-          "text": undefined,
-        }
-      }
-      accessible={true}
-      collapsable={false}
-      focusable={true}
-      onBlur={[Function]}
-      onClick={[Function]}
-      onFocus={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-      style={
-        {
-          "alignItems": "center",
-          "backgroundColor": undefined,
-          "borderRadius": 12,
-          "height": 44,
-          "justifyContent": "center",
-          "position": "absolute",
-          "right": 10,
-          "width": 44,
-        }
-      }
-      testID="syncreport.rescan"
-    >
-      <View
-        style={
-          [
-            {
-              "height": 25,
-              "width": 25,
+              "paddingHorizontal": 14,
+              "paddingVertical": 4,
             },
             {},
           ]
         }
+        testID="syncreport.back"
+      />
+    </View>
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "flexShrink": 1,
+        }
+      }
+    >
+      <Text
+        accessibilityRole="header"
+        maxFontSizeMultiplier={1.5}
+        numberOfLines={1}
+        style={
+          {
+            "color": "#c3c3c3",
+            "fontSize": 16,
+            "fontWeight": "700",
+            "lineHeight": 28,
+          }
+        }
       >
+        text translated
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "alignItems": "flex-end",
+          "flex": 1,
+          "minWidth": 48,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+          }
+        }
+      >
+        <View>
+          <View
+            style={
+              [
+                {
+                  "alignItems": "flex-end",
+                  "alignSelf": "stretch",
+                },
+                null,
+              ]
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "gap": 8,
+                }
+              }
+            >
+              <View />
+              <View
+                style={null}
+              >
+                <View
+                  accessibilityLabel="text translated"
+                  accessibilityRole="button"
+                  accessibilityState={
+                    {
+                      "busy": undefined,
+                      "checked": undefined,
+                      "disabled": undefined,
+                      "expanded": false,
+                      "selected": undefined,
+                    }
+                  }
+                  accessibilityValue={
+                    {
+                      "max": undefined,
+                      "min": undefined,
+                      "now": undefined,
+                      "text": undefined,
+                    }
+                  }
+                  accessible={true}
+                  collapsable={false}
+                  focusable={true}
+                  hitSlop={14}
+                  onBlur={[Function]}
+                  onClick={[Function]}
+                  onFocus={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                  style={
+                    [
+                      undefined,
+                      {},
+                    ]
+                  }
+                  testID="syncreport.info"
+                >
+                  <View
+                    style={{}}
+                  />
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
         <View
+          accessibilityLabel="text translated"
+          accessibilityRole="button"
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          hitSlop={
+            {
+              "bottom": 10,
+              "left": 10,
+              "right": 10,
+              "top": 10,
+            }
+          }
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             [
               {
-                "height": 25,
-                "left": 0,
-                "position": "absolute",
-                "top": 0,
-                "width": 25,
+                "paddingHorizontal": 12,
               },
               {},
             ]
           }
-        />
+          testID="syncreport.rescan"
+        >
+          <View
+            style={
+              [
+                {
+                  "height": 24,
+                  "width": 24,
+                },
+                {},
+              ]
+            }
+          >
+            <View
+              style={
+                [
+                  {
+                    "height": 24,
+                    "left": 0,
+                    "position": "absolute",
+                    "top": 0,
+                    "width": 24,
+                  },
+                  {},
+                ]
+              }
+            />
+          </View>
+        </View>
       </View>
     </View>
   </View>
   <RCTScrollView
     contentContainerStyle={
       {
-        "paddingBottom": 28,
-        "paddingHorizontal": 21.5,
+        "paddingBottom": 32,
+        "paddingHorizontal": 20,
       }
     }
+    onContentSizeChange={[Function]}
+    onLayout={[Function]}
+    onScroll={[Function]}
     onTouchStart={[Function]}
+    scrollEventThrottle={16}
     testID="syncreport.scroll-view"
   >
     <View>
@@ -334,7 +377,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             {
               "backgroundColor": "#031124",
               "borderColor": "#05234C",
-              "borderRadius": 16,
+              "borderRadius": 12,
               "borderWidth": 1,
               "marginTop": 12,
               "padding": 16,
@@ -348,13 +391,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           ]
         }
       >
-        <View
-          style={
-            {
-              "margin": -10,
-            }
-          }
-        >
+        <View>
           <View
             style={
               {
@@ -372,11 +409,13 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
                 "fontWeight": "600",
+                "lineHeight": 21,
               }
             }
             testID="syncreport.status"
@@ -384,12 +423,13 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             text translated
           </Text>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#888888",
-                "fontSize": 12,
-                "lineHeight": 16,
-                "marginTop": 2,
+                "fontSize": 13,
+                "fontWeight": "400",
+                "lineHeight": 18,
               }
             }
           >
@@ -407,25 +447,78 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         }
       >
         <View
+          accessibilityRole="button"
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": false,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             [
-              {
-                "backgroundColor": "#031124",
-                "borderColor": "#05234C",
-                "borderRadius": 16,
-                "borderWidth": 1,
-                "marginTop": 12,
-                "padding": 16,
-              },
-              {
-                "flex": 1,
-                "marginTop": 0,
-                "padding": 12,
-              },
+              [
+                {
+                  "backgroundColor": "#031124",
+                  "borderColor": "#05234C",
+                  "borderRadius": 12,
+                  "borderWidth": 1,
+                  "marginTop": 12,
+                  "padding": 16,
+                },
+                {
+                  "flex": 1,
+                  "marginTop": 0,
+                  "padding": 12,
+                },
+                null,
+              ],
+              {},
             ]
           }
           testID="syncreport.server"
         >
+          <View
+            pointerEvents="none"
+            style={
+              [
+                {
+                  "bottom": 0,
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                },
+                {
+                  "backgroundColor": "#8888881F",
+                  "borderRadius": 12,
+                },
+                {},
+              ]
+            }
+          />
           <View
             style={
               {
@@ -439,17 +532,20 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#8FB4E6",
-                  "borderRadius": 3,
+                  "borderRadius": 999,
                   "height": 8,
                   "width": 8,
                 }
               }
             />
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#888888",
                   "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
                 }
               }
             >
@@ -457,12 +553,14 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             </Text>
           </View>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 13,
                 "fontWeight": "700",
-                "marginTop": 6,
+                "lineHeight": 18,
+                "marginTop": 4,
               }
             }
           >
@@ -470,25 +568,78 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           </Text>
         </View>
         <View
+          accessibilityRole="button"
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": false,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             [
-              {
-                "backgroundColor": "#031124",
-                "borderColor": "#05234C",
-                "borderRadius": 16,
-                "borderWidth": 1,
-                "marginTop": 12,
-                "padding": 16,
-              },
-              {
-                "flex": 1,
-                "marginTop": 0,
-                "padding": 12,
-              },
+              [
+                {
+                  "backgroundColor": "#031124",
+                  "borderColor": "#05234C",
+                  "borderRadius": 12,
+                  "borderWidth": 1,
+                  "marginTop": 12,
+                  "padding": 16,
+                },
+                {
+                  "flex": 1,
+                  "marginTop": 0,
+                  "padding": 12,
+                },
+                null,
+              ],
+              {},
             ]
           }
           testID="syncreport.wallet"
         >
+          <View
+            pointerEvents="none"
+            style={
+              [
+                {
+                  "bottom": 0,
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                },
+                {
+                  "backgroundColor": "#8888881F",
+                  "borderRadius": 12,
+                },
+                {},
+              ]
+            }
+          />
           <View
             style={
               {
@@ -502,17 +653,20 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#18bd18",
-                  "borderRadius": 3,
+                  "borderRadius": 999,
                   "height": 8,
                   "width": 8,
                 }
               }
             />
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#888888",
                   "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
                 }
               }
             >
@@ -520,12 +674,14 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             </Text>
           </View>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 13,
                 "fontWeight": "700",
-                "marginTop": 6,
+                "lineHeight": 18,
+                "marginTop": 4,
               }
             }
           >
@@ -533,12 +689,13 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           </Text>
         </View>
         <View
+          kind="row"
           style={
             [
               {
                 "backgroundColor": "#031124",
                 "borderColor": "#05234C",
-                "borderRadius": 16,
+                "borderRadius": 12,
                 "borderWidth": 1,
                 "marginTop": 12,
                 "padding": 16,
@@ -548,6 +705,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
                 "marginTop": 0,
                 "padding": 12,
               },
+              null,
             ]
           }
           testID="syncreport.behind"
@@ -565,17 +723,20 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#F99D00",
-                  "borderRadius": 3,
+                  "borderRadius": 999,
                   "height": 8,
                   "width": 8,
                 }
               }
             />
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#888888",
                   "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
                 }
               }
             >
@@ -583,12 +744,14 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             </Text>
           </View>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 13,
                 "fontWeight": "700",
-                "marginTop": 6,
+                "lineHeight": 18,
+                "marginTop": 4,
               }
             }
           >
@@ -602,7 +765,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           {
             "backgroundColor": "#031124",
             "borderColor": "#05234C",
-            "borderRadius": 16,
+            "borderRadius": 12,
             "borderWidth": 1,
             "marginTop": 12,
             "padding": 16,
@@ -615,31 +778,79 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               "alignItems": "center",
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "marginBottom": 10,
+              "marginBottom": 8,
             }
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
-                "fontWeight": "700",
+                "fontWeight": "600",
+                "lineHeight": 21,
               }
             }
           >
             text translated
           </Text>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#888888",
                 "fontSize": 12,
+                "fontWeight": "400",
+                "lineHeight": 16,
               }
             }
           >
             text translated
           </Text>
+        </View>
+        <View>
+          <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "bottom": 0,
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              }
+            }
+            testID="syncreport.blocks.hit"
+          />
         </View>
       </View>
       <View
@@ -647,7 +858,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           {
             "backgroundColor": "#031124",
             "borderColor": "#05234C",
-            "borderRadius": 16,
+            "borderRadius": 12,
             "borderWidth": 1,
             "marginTop": 12,
             "padding": 16,
@@ -660,26 +871,31 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               "alignItems": "center",
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "marginBottom": 10,
+              "marginBottom": 8,
             }
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
-                "fontWeight": "700",
+                "fontWeight": "600",
+                "lineHeight": 21,
               }
             }
           >
             text translated
           </Text>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#888888",
                 "fontSize": 12,
+                "fontWeight": "400",
+                "lineHeight": 16,
               }
             }
           >
@@ -689,11 +905,11 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         <View
           style={
             {
-              "columnGap": 14,
+              "columnGap": 12,
               "flexDirection": "row",
               "flexWrap": "wrap",
               "marginTop": 12,
-              "rowGap": 6,
+              "rowGap": 4,
             }
           }
         >
@@ -710,17 +926,53 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#18bd18",
-                  "borderRadius": 3,
+                  "borderRadius": 999,
                   "height": 8,
                   "width": 8,
                 }
               }
             />
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#888888",
                   "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
+                }
+              }
+            >
+              text translated
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 6,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "backgroundColor": "#5DBB4C",
+                  "borderRadius": 999,
+                  "height": 8,
+                  "width": 8,
+                }
+              }
+            />
+            <Text
+              maxFontSizeMultiplier={2}
+              style={
+                {
+                  "color": "#888888",
+                  "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
                 }
               }
             >
@@ -740,17 +992,20 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#F99D00",
-                  "borderRadius": 3,
+                  "borderRadius": 999,
                   "height": 8,
                   "width": 8,
                 }
               }
             />
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#888888",
                   "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
                 }
               }
             >
@@ -770,17 +1025,20 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#ebff5a",
-                  "borderRadius": 3,
+                  "borderRadius": 999,
                   "height": 8,
                   "width": 8,
                 }
               }
             />
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#888888",
                   "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
                 }
               }
             >
@@ -800,17 +1058,20 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#8FB4E6",
-                  "borderRadius": 3,
+                  "borderRadius": 999,
                   "height": 8,
                   "width": 8,
                 }
               }
             />
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#888888",
                   "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
                 }
               }
             >
@@ -830,17 +1091,20 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#4A6487",
-                  "borderRadius": 3,
+                  "borderRadius": 999,
                   "height": 8,
                   "width": 8,
                 }
               }
             />
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#888888",
                   "fontSize": 12,
+                  "fontWeight": "400",
+                  "lineHeight": 16,
                 }
               }
             >

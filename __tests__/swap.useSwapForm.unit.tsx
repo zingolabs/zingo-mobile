@@ -11,6 +11,7 @@ jest.mock('@app/walletBackend', () => ({
 import { act, renderHook, waitFor } from '@testing-library/react-native';
 import { ChainNameEnum } from '@app/AppState';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
+import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
 import type {
   QuoteInput,
   RouteOptionType,
@@ -201,4 +202,63 @@ test('Tests that the quote countdown holds while a sheet is open and carries on 
   expect(quote).toHaveBeenCalledTimes(1);
   await settle(7_000);
   await waitFor(() => expect(quote).toHaveBeenCalledTimes(2));
+});
+
+const PREFILL = {
+  direction: SwapDirectionEnum.Inbound,
+  asset: {
+    swapKitId: 'BTC.BTC',
+    chain: 'BTC',
+    symbol: 'BTC',
+    ticker: 'BTC',
+    chainId: 'bitcoin',
+    decimals: 8,
+  },
+  sellAmountHumanDecimal: '0.03',
+  address: BTC_ADDRESS,
+  requestedAtMs: 1,
+};
+
+test('Tests that a purchase asked about again fills the coin, the amount and the refund address, buying ZEC, and leaves the review to the user', async () => {
+  const { swapService } = service();
+  const { result } = renderHook(() =>
+    useSwapForm({
+      swapService,
+      spendable: 10,
+      zecChain: ChainNameEnum.mainChainName,
+      mixnetBlocked: false,
+      paused: false,
+      prefill: PREFILL,
+    }),
+  );
+
+  await waitFor(() => expect(result.current.amount).not.toBe(''));
+  expect(result.current.isOutbound).toBe(false);
+  expect(result.current.selectedToken).toEqual(BTC);
+  expect(result.current.amount).toBe('0.03');
+  expect(result.current.activeAddress).toBe(BTC_ADDRESS);
+});
+
+test('Tests that a sale asked about again fills the coin received, the amount and the destination, selling ZEC, and leaves the review to the user', async () => {
+  const { swapService } = service();
+  const { result } = renderHook(() =>
+    useSwapForm({
+      swapService,
+      spendable: 10,
+      zecChain: ChainNameEnum.mainChainName,
+      mixnetBlocked: false,
+      paused: false,
+      prefill: {
+        ...PREFILL,
+        direction: SwapDirectionEnum.Outbound,
+        sellAmountHumanDecimal: '0.01',
+      },
+    }),
+  );
+
+  await waitFor(() => expect(result.current.amount).not.toBe(''));
+  expect(result.current.isOutbound).toBe(true);
+  expect(result.current.selectedToken).toEqual(BTC);
+  expect(result.current.amount).toBe('0.01');
+  expect(result.current.activeAddress).toBe(BTC_ADDRESS);
 });

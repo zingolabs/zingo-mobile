@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Pressable, TextStyle, View, useWindowDimensions } from 'react-native';
+import { TextStyle, View, useWindowDimensions } from 'react-native';
 import Animated, {
   Keyframe,
   ReduceMotion,
@@ -19,6 +19,7 @@ import {
   useTheme,
 } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import Text from '@ui/primitives/Text';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import { TooltipHostContext } from './TooltipHost';
@@ -284,6 +285,7 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
         )}
         <View style={open && !host ? { zIndex: 10, elevation: 10 } : null}>
           <Pressable
+            kind="icon"
             ref={iconRef}
             testID={testID}
             onPress={toggle}

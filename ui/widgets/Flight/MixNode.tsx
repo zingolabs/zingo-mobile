@@ -47,7 +47,7 @@ export default function MixNode({
         cx={x}
         cy={y}
         fill={colors.bgNymSubtle}
-        stroke={colors.bgNym}
+        stroke={colors.fgNym}
         strokeWidth={2}
         animatedProps={lit}
       />

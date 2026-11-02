@@ -2,10 +2,17 @@
 import React, { forwardRef, useCallback, useContext } from 'react';
 import { View } from 'react-native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { space16, space8, useTheme, radiusPill, iconSize } from '@app/theme';
+import {
+  space16,
+  space8,
+  useTheme,
+  radiusPill,
+  iconSize,
+  space20,
+} from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import { askGate, enactGateAnswer } from '@app/services/gateController';
-import AppSheetModal from '@ui/primitives/AppSheetModal';
+import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
@@ -46,11 +53,11 @@ const AuthorizeSheet = forwardRef<BottomSheetModal, AuthorizeSheetProps>(
     }, [translate, addLastSnackbar, dismiss, onAuthorized]);
 
     return (
-      <AppSheetModal ref={ref} handle contentStyle={{ paddingBottom: 32 }}>
+      <AppSheetModal ref={ref} handle>
         <View
           style={{
             alignItems: 'center',
-            paddingHorizontal: space16,
+            paddingHorizontal: space20,
             paddingTop: space8,
           }}
         >
@@ -76,21 +83,23 @@ const AuthorizeSheet = forwardRef<BottomSheetModal, AuthorizeSheetProps>(
           >
             {summary}
           </Text>
-          <View style={{ alignSelf: 'stretch', marginTop: 16 }}>
-            <ButtonStack>
-              <Button
-                variant="quiet"
-                title={translate('swap.cancel') as string}
-                onPress={dismiss}
-              />
-              <Button
-                testID="swap.auth.ok"
-                variant="primary"
-                title={translate('swap.auth-use') as string}
-                onPress={authorize}
-              />
-            </ButtonStack>
-          </View>
+          <SheetFooter style={{ paddingHorizontal: space20 }}>
+            <View style={{ alignSelf: 'stretch', marginTop: 16 }}>
+              <ButtonStack>
+                <Button
+                  variant="quiet"
+                  title={translate('swap.cancel') as string}
+                  onPress={dismiss}
+                />
+                <Button
+                  testID="swap.auth.ok"
+                  variant="primary"
+                  title={translate('swap.auth-use') as string}
+                  onPress={authorize}
+                />
+              </ButtonStack>
+            </View>
+          </SheetFooter>
         </View>
       </AppSheetModal>
     );

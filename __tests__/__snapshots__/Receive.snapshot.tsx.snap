@@ -101,7 +101,9 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
                 "top": 10,
               }
             }
+            onBlur={[Function]}
             onClick={[Function]}
+            onFocus={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -109,9 +111,10 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "opacity": 1,
-              }
+              [
+                undefined,
+                {},
+              ]
             }
             testID="header.drawmenu"
           />
@@ -168,7 +171,9 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
                 "top": 10,
               }
             }
+            onBlur={[Function]}
             onClick={[Function]}
+            onFocus={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -176,11 +181,13 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "marginRight": 5,
-                "marginTop": 4.5,
-                "opacity": 1,
-              }
+              [
+                {
+                  "marginRight": 5,
+                  "marginTop": 4.5,
+                },
+                {},
+              ]
             }
             testID="header.messages"
           />
@@ -213,10 +220,9 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
         },
         {
           "backgroundColor": "#031124",
+          "paddingBottom": 24,
         },
-        {
-          "paddingBottom": 30,
-        },
+        undefined,
       ]
     }
   >
@@ -246,7 +252,8 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
           style={
             {
               "alignItems": "flex-start",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         />
@@ -254,7 +261,7 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
           style={
             {
               "alignItems": "center",
-              "flex": 1,
+              "flexShrink": 1,
             }
           }
         >
@@ -276,7 +283,8 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
           style={
             {
               "alignItems": "flex-end",
-              "width": 48,
+              "flex": 1,
+              "minWidth": 48,
             }
           }
         >
@@ -314,12 +322,15 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "paddingHorizontal": 14,
-                "paddingVertical": 4,
-              }
+              [
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "paddingHorizontal": 14,
+                  "paddingVertical": 4,
+                },
+                {},
+              ]
             }
           />
         </View>

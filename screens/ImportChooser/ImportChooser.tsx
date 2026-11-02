@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { Platform, Pressable, View } from 'react-native';
+import { Platform, ScrollView, View } from 'react-native';
 import Animated, {
   interpolateColor,
   useAnimatedStyle,
@@ -8,15 +8,29 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { useTheme } from '@app/theme';
-import { ease } from '@app/theme/motion';
+import {
+  iconSizeSm,
+  radiusMd,
+  radiusPill,
+  rowMinHeight,
+  space8,
+  space12,
+  space16,
+  space20,
+  space24,
+  useTheme,
+} from '@app/theme';
+import { duration, ease } from '@app/theme/motion';
+import Pressable from '@ui/primitives/Pressable';
 import { ContextAppLoading } from '@app/context';
-import RegText from '@ui/primitives/RegText';
-import BoldText from '@ui/primitives/BoldText';
+import Text from '@ui/primitives/Text';
+import TitleBar from '@ui/widgets/TitleBar';
 import { ChevronLeft, ChevronRight } from '@ui/primitives/Icons/Chevron';
 import { HistoryIcon } from '@ui/primitives/Icons/HistoryIcon';
 import { Icon } from '@ui/primitives/Icons/Icon';
 import { KeyboardIcon } from '@ui/primitives/Icons/KeyboardIcon';
+import { useCompact } from '@app/hooks/useCompact';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 type ImportChooserProps = {
   busy: boolean;
@@ -27,10 +41,9 @@ type ImportChooserProps = {
 
 // The system store that keeps the recovery phrase, by its platform name.
 const SECURE_STORE = Platform.OS === 'ios' ? 'Keychain' : 'Keystore';
-const SIDE = 22.5;
-const FIRST_TOP = 150.5;
+const ICON_DISC = 40;
 // On touch the card shrinks a little and its border brightens.
-const PRESS_MS = 100;
+const PRESS_MS = duration.fast;
 const PRESS_SCALE = 0.985;
 
 type OptionProps = {
@@ -71,6 +84,7 @@ const Option: React.FC<OptionProps> = ({
   }));
   return (
     <Pressable
+      kind="row"
       testID={testID}
       onPress={onPress}
       onPressIn={() => to(1)}
@@ -81,45 +95,38 @@ const Option: React.FC<OptionProps> = ({
       <Animated.View
         style={[
           {
-            height: 69,
-            borderRadius: 14,
+            minHeight: rowMinHeight,
+            borderRadius: radiusMd,
             borderWidth: 1,
             backgroundColor: colors.bgSurface,
             flexDirection: 'row',
             alignItems: 'center',
-            paddingLeft: 15,
-            paddingRight: 16,
-            gap: 15,
+            paddingHorizontal: space16,
+            paddingVertical: space12,
+            gap: space12,
           },
           pressStyle,
         ]}
       >
         <View
           style={{
-            width: 39,
-            height: 39,
-            borderRadius: 20,
+            width: ICON_DISC,
+            height: ICON_DISC,
+            borderRadius: radiusPill,
             backgroundColor: iconBg,
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <OptionIcon size={16} color={iconColor} />
+          <OptionIcon size={iconSizeSm} color={iconColor} />
         </View>
         <View style={{ flex: 1 }}>
-          <BoldText style={{ fontSize: 15, lineHeight: 19 }}>{title}</BoldText>
-          <RegText
-            style={{
-              fontSize: 12,
-              lineHeight: 17,
-              marginTop: 1,
-              color: subColor,
-            }}
-          >
+          <Text variant="bodyStrong">{title}</Text>
+          <Text variant="caption" color={subColor}>
             {sub}
-          </RegText>
+          </Text>
         </View>
-        <ChevronRight size={16} color={colors.fgMuted} />
+        <ChevronRight size={iconSizeSm} color={colors.fgMuted} />
       </Animated.View>
     </Pressable>
   );
@@ -133,101 +140,70 @@ const ImportChooser: React.FunctionComponent<ImportChooserProps> = ({
 }) => {
   const { translate } = useContext(ContextAppLoading);
   const { colors } = useTheme();
+  const { gap } = useCompact();
+  const { edges, fades } = useScrollEdges();
 
   return (
     <View style={{ flex: 1 }}>
-      <BoldText
-        style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          top: 14,
-          fontSize: 16,
-          lineHeight: 22,
-          textAlign: 'center',
+      <TitleBar
+        title={translate('import.screen-title') as string}
+        left={{
+          icon: ChevronLeft,
+          onPress: onBack,
+          accessibilityLabel: translate('import.back-acc') as string,
+          testID: 'import.chooser.back',
+          accent: true,
+          disabled: busy,
         }}
-      >
-        {translate('import.screen-title') as string}
-      </BoldText>
-      <RegText
-        style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          top: 95,
-          fontSize: 12,
-          lineHeight: 20,
-          textAlign: 'center',
-          color: colors.fgMuted,
-        }}
-      >
-        {translate('import.chooser-sub') as string}
-      </RegText>
-      <View
-        style={{
-          position: 'absolute',
-          left: SIDE,
-          right: SIDE,
-          top: FIRST_TOP,
-        }}
-      >
-        <Option
-          testID="import.chooser.previous"
-          icon={HistoryIcon}
-          iconBg={colors.bgAccentSubtle}
-          iconColor={colors.fgAccent}
-          title={translate('import.chooser-previous') as string}
-          sub={(translate('import.chooser-previous-sub') as string).replace(
-            '{store}',
-            SECURE_STORE,
-          )}
-          subColor={colors.fgMuted}
-          disabled={busy}
-          onPress={onPrevious}
-        />
-        <RegText
+      />
+      <ScrollView {...edges} style={{ flex: 1 }}>
+        <Text
+          variant="caption"
+          tone="muted"
           style={{
+            marginTop: gap(space24),
+            marginHorizontal: space20,
             textAlign: 'center',
-            fontSize: 12,
-            lineHeight: 18,
-            marginVertical: 9,
-            color: colors.fgMuted,
           }}
         >
-          {translate('import.chooser-or') as string}
-        </RegText>
-        <Option
-          testID="import.chooser.seed"
-          icon={KeyboardIcon}
-          iconBg={colors.bgAccentSubtle}
-          iconColor={colors.fgAccent}
-          title={translate('import.chooser-seed') as string}
-          sub={translate('import.chooser-seed-sub') as string}
-          subColor={colors.fgWarning}
-          disabled={busy}
-          onPress={onSeed}
-        />
-      </View>
-      <Pressable
-        testID="import.chooser.back"
-        onPress={onBack}
-        disabled={busy}
-        hitSlop={14}
-        accessibilityRole="button"
-        style={({ pressed }) => ({
-          position: 'absolute',
-          left: 17,
-          top: 2,
-          width: 44,
-          height: 44,
-          borderRadius: 10,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: pressed ? colors.bgSurface : undefined,
-        })}
-      >
-        <ChevronLeft size={20} color={colors.fgAccent} />
-      </Pressable>
+          {translate('import.chooser-sub') as string}
+        </Text>
+        <View style={{ marginTop: space16, marginHorizontal: space20 }}>
+          <Option
+            testID="import.chooser.previous"
+            icon={HistoryIcon}
+            iconBg={colors.bgAccentSubtle}
+            iconColor={colors.fgAccent}
+            title={translate('import.chooser-previous') as string}
+            sub={(translate('import.chooser-previous-sub') as string).replace(
+              '{store}',
+              SECURE_STORE,
+            )}
+            subColor={colors.fgMuted}
+            disabled={busy}
+            onPress={onPrevious}
+          />
+          <Text
+            variant="caption"
+            tone="muted"
+            style={{ textAlign: 'center', marginVertical: space8 }}
+          >
+            {translate('import.chooser-or') as string}
+          </Text>
+          <Option
+            testID="import.chooser.seed"
+            icon={KeyboardIcon}
+            iconBg={colors.bgAccentSubtle}
+            iconColor={colors.fgAccent}
+            title={translate('import.chooser-seed') as string}
+            sub={translate('import.chooser-seed-sub') as string}
+            subColor={colors.fgWarning}
+            disabled={busy}
+            onPress={onSeed}
+          />
+        </View>
+      </ScrollView>
+      {fades}
     </View>
   );
 };

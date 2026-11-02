@@ -6,7 +6,8 @@ import { getNumberFormatSettings } from 'react-native-localize';
  * device's grouping separator.
  */
 
-const decimalSeparator = () => getNumberFormatSettings().decimalSeparator;
+export const decimalSeparator = () =>
+  getNumberFormatSettings().decimalSeparator;
 
 const localize = (dotted: string) => dotted.replace('.', decimalSeparator());
 

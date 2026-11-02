@@ -48,6 +48,8 @@ export type ThemeColors = {
 
   fgSyncing: string;
   borderSyncing: string;
+  /** Scanned, its spends still to be refetched: a lighter green than scanned. */
+  fgScanPending: string;
 
   fgWarning: string;
   borderWarning: string;
@@ -66,6 +68,8 @@ export type ThemeColors = {
 
   /** Nym's own green, only on actions that go through the mixnet. */
   bgNym: string;
+  /** Text and icons that say something goes through the mixnet. */
+  fgNym: string;
   bgNymSubtle: string;
   /** The switch (exception D): its off track. */
   bgSwitchOff: string;
@@ -93,6 +97,8 @@ export type ThemeColors = {
   fgTransparent: string;
   /** The brown pot of the sprout mark, part of the brand. */
   bgSproutPot: string;
+  /** SwapKit's emblem, in the white version they publish for dark backgrounds. */
+  fgSwapKitMark: string;
   /** A QR code needs dark on white to scan, whatever the theme. */
   fgQrInk: string;
   bgQrPaper: string;
@@ -155,6 +161,7 @@ export const themeTokens: ThemeColors = {
 
   fgSyncing: syncing,
   borderSyncing: syncing,
+  fgScanPending: '#5DBB4C',
 
   fgWarning: '#F99D00',
   borderWarning: '#65491C',
@@ -170,6 +177,7 @@ export const themeTokens: ThemeColors = {
   bgViewOnlySubtle: '#8FB4E61F',
 
   bgNym: '#07FF94',
+  fgNym: '#07FF94',
   bgNymSubtle: '#07FF941F',
   bgSwitchOff: '#7E7E7E',
   bgSwitchOnDeep: '#0A4004',
@@ -191,6 +199,7 @@ export const themeTokens: ThemeColors = {
   bgIronwood: '#241A12',
   fgTransparent: '#E6C46A',
   bgSproutPot: '#5A3A1E',
+  fgSwapKitMark: '#FFFFFF',
   fgQrInk: '#060B12',
   bgQrPaper: '#FFFFFF',
   bgTransparent: '#E6C46A1F',

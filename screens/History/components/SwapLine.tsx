@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { Pressable, View } from 'react-native';
+import Pressable from '@ui/primitives/Pressable';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
 import { slopFor, useTheme, iconSizeMd, iconSizeSm } from '@app/theme';
@@ -12,8 +12,8 @@ import {
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
 import Utils from '@app/utils';
-import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
-import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
+import { TxSwapIcon } from '@ui/primitives/Icons/TxSwapIcon';
+import { TxPendingIcon } from '@ui/primitives/Icons/TxPendingIcon';
 import { ChevronDown, ChevronUp } from '@ui/primitives/Icons/Chevron';
 import { swapScreenFor } from '@screens/Swap/swapRoute';
 import {
@@ -79,24 +79,25 @@ function SwapLine({
       ? record.receiveAsset
       : record.sellAsset;
   const icon = swapInFlight(record) ? (
-    <ClockIcon size={iconSizeMd} color={colors.fgDefault} />
+    <TxPendingIcon size={iconSizeMd} color={colors.fgDefault} />
   ) : (
-    <SwapIcon size={iconSizeMd} color={colors.fgDefault} />
+    <TxSwapIcon size={iconSizeMd} color={colors.fgDefault} />
   );
   const Chevron = open ? ChevronUp : ChevronDown;
 
   return (
     <Pressable
+      kind="row"
       testID={`swap-${index + 1}`}
       accessibilityRole="button"
       onPress={() =>
-        navigation.navigate(swapScreenFor(record.status), {
+        navigation.navigate(swapScreenFor(record), {
           recordId: record.recordId,
         })
       }
-      style={({ pressed }) => ({
-        backgroundColor: pressed ? colors.bgMutedSubtle : colors.bgSurface,
-      })}
+      style={{
+        backgroundColor: colors.bgSurface,
+      }}
     >
       <HistoryRowBody
         leading={
@@ -117,6 +118,7 @@ function SwapLine({
         trailing={
           legCount > 0 ? (
             <Pressable
+              kind="icon"
               testID={`swap-${index + 1}.expand`}
               accessibilityRole="button"
               accessibilityState={{ expanded: open }}
@@ -127,9 +129,7 @@ function SwapLine({
             >
               <Chevron size={iconSizeSm} color={colors.fgMuted} />
             </Pressable>
-          ) : (
-            <View style={{ width: 20 }} />
-          )
+          ) : undefined
         }
       />
     </Pressable>

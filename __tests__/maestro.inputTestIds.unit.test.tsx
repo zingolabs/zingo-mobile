@@ -5,7 +5,7 @@
 import 'react-native';
 import React from 'react';
 
-import { render } from '@testing-library/react-native';
+import { render, fireEvent, screen } from '@testing-library/react-native';
 import type { ReactTestInstance } from 'react-test-renderer';
 import Send from '@screens/Send';
 import Utils from '@app/utils';
@@ -26,6 +26,16 @@ import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 import { HomeTabScreenProps } from '@app/types';
+
+/** Send mounts its sheet once its container is measured; jest never lays out. */
+const layoutSend = () => {
+  const container = screen.queryByTestId('send.container');
+  if (container) {
+    fireEvent(container, 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 400, height: 800 } },
+    });
+  }
+};
 
 /**
  * The accessibility label of the nearest host ancestor that is an
@@ -85,6 +95,7 @@ describe('Maestro reaches each typed field on iOS', () => {
         <Send {...tabProps()} />
       </ContextAppLoadedProvider>,
     );
+    layoutSend();
     // The memo is inline in the form and shows once a shielded address is
     // checked, which resolves after the first render.
     await send.findByTestId('send.memo-field');
@@ -107,6 +118,7 @@ describe('Maestro reaches each typed field on iOS', () => {
         />
       </ContextAppLoadedProvider>,
     );
+    layoutSend();
     for (const id of ['import.seedufvkinput', 'import.birthdayinput']) {
       expect(accessibleAncestor(importUfvk.getByTestId(id))).toBeUndefined();
     }
@@ -137,6 +149,7 @@ describe('Maestro reaches each typed field on iOS', () => {
         onBack={onFunction}
       />,
     );
+    layoutSend();
     for (const id of [
       'server.custom.host',
       'server.custom.port',

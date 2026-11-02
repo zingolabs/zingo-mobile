@@ -55,24 +55,6 @@ export function isTerminalStatus(status: SwapStatusEnum): boolean {
 }
 
 /**
- * Whether the user may prune a record at this status. Money in flight
- * (`Pending`, `Processing`) and confirmed history (`Completed`) stay
- * immutable. Everything else is removable, because either the user abandoned
- * the swap or the network already returned its verdict and no further state
- * will arrive.
- */
-export function canRemoveSwap(status: SwapStatusEnum): boolean {
-  switch (status) {
-    case SwapStatusEnum.Completed:
-    case SwapStatusEnum.Pending:
-    case SwapStatusEnum.Processing:
-      return false;
-    default:
-      return true;
-  }
-}
-
-/**
  * Whether the record sits before the on-chain evidence tracking needs, which
  * covers both the inbound and outbound waits. Removing one of these warrants
  * a stronger warning: the swap can still resolve on-chain after the local

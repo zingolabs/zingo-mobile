@@ -7,11 +7,12 @@ import PrivateAmount from '@ui/widgets/PrivateAmount';
 import { ContextAppLoaded } from '@app/context';
 import { useOrchardResidualOnly } from '@app/hooks/useOrchardResidualOnly';
 import { formatAmount } from '@app/utils/formatAmount';
+import { duration } from '@app/theme/motion';
 
 // Colour and opacity are what reduced motion keeps, so the fade runs either
 // way.
 const variantEnter = () =>
-  FadeIn.duration(200).reduceMotion(ReduceMotion.Never);
+  FadeIn.duration(duration.base).reduceMotion(ReduceMotion.Never);
 
 type IronwoodMigrationBannerProps = {
   // Orchard balance still sitting in the pool, in ZEC.
@@ -50,8 +51,6 @@ const IronwoodMigrationBanner: React.FunctionComponent<
               variant="primary"
               size="small"
               inline
-              /** Narrower, to make room for the X beside it. */
-              style={{ paddingHorizontal: 14 }}
               title={translate('ironwoodbanner.start') as string}
               onPress={onStart}
             />
@@ -59,14 +58,8 @@ const IronwoodMigrationBanner: React.FunctionComponent<
             <Button
               testID="ironwoodbanner.start"
               variant="primary"
+              size="small"
               inline
-              /** The pill it had beside the pool text. */
-              style={{
-                minHeight: 0,
-                paddingHorizontal: 22,
-                paddingVertical: 10,
-              }}
-              textStyle={{ fontSize: 15 }}
               title={translate('ironwoodbanner.start') as string}
               onPress={onStart}
             />

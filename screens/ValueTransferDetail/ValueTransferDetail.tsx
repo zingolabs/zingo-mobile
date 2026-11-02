@@ -7,12 +7,13 @@ import {
   toAmountInput,
 } from '@app/utils/formatAmount';
 import Tag from '@ui/widgets/Tag';
-import { Linking, Pressable, View } from 'react-native';
+import { Linking, View } from 'react-native';
 import { useAmountReveal } from '@ui/widgets/PrivateAmount';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { radiusMd, useTheme, iconSizeSm } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import {
   BlockExplorerEnum,
   ChainNameEnum,
@@ -29,6 +30,7 @@ import Utils from '@app/utils';
 import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { transferStatus } from '@app/utils/transferStatus';
 import { removeTransaction } from '@app/walletBackend';
 import { createAlert } from '@app/services/createAlert';
 import { showConfirm } from '@app/services/showConfirm';
@@ -36,15 +38,11 @@ import { fiatQuote } from '@app/price/fiatQuote';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import FullPanel from '@ui/widgets/FullPanel';
-import { ArrowDownIcon } from '@ui/primitives/Icons/ArrowDownIcon';
-import { ArrowUpIcon } from '@ui/primitives/Icons/ArrowUpIcon';
-import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
-import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
-import { RefreshIcon } from '@ui/primitives/Icons/RefreshIcon';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import SaveContactButton from '@ui/widgets/SaveContactButton';
 import DetailRows from '@screens/Swap/components/DetailRows';
 import type { DetailRow } from '@screens/Swap/components/DetailRows';
+import { transferIcon } from '@screens/History/transferIcon';
 import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 
 type ValueTransferDetailProps = NativeStackScreenProps<
@@ -87,10 +85,6 @@ const ValueTransferDetail: React.FunctionComponent<
   const failed = vt.status === RPCValueTransfersStatusEnum.failed;
   const received = vt.kind === ValueTransferKindEnum.Received;
   const sent = vt.kind === ValueTransferKindEnum.Sent;
-  const pending =
-    !failed &&
-    vt.confirmations >= 0 &&
-    vt.confirmations < GlobalConst.minConfirmations;
   const contact = vt.address
     ? addressBook.find(entry => entry.address === vt.address)
     : undefined;
@@ -132,43 +126,17 @@ const ValueTransferDetail: React.FunctionComponent<
           kind="contact"
           name={contact.label}
           category={avatarCategoryOf(contact.color)}
+          chain={GlobalConst.zecSwapChain}
           size="lg"
         />
       );
     }
-    const icon = pending
-      ? ClockIcon
-      : received
-        ? ArrowDownIcon
-        : vt.kind === ValueTransferKindEnum.Shield
-          ? ShieldIcon
-          : vt.kind === ValueTransferKindEnum.SendToSelf
-            ? RefreshIcon
-            : ArrowUpIcon;
-    return <Avatar kind="icon" icon={icon} danger={failed} size="lg" />;
+    /** The same drawing as the transaction's History row. */
+    const { icon, danger } = transferIcon(vt);
+    return <Avatar kind="icon" icon={icon} danger={danger} size="lg" />;
   })();
 
-  const status = failed
-    ? {
-        text: t('history.state-failed'),
-        tone: 'danger' as const,
-      }
-    : vt.confirmations === 0
-      ? {
-          text: t('history.in-mempool'),
-          tone: 'warning' as const,
-        }
-      : pending
-        ? {
-            text: t('history.confirming')
-              .replace('{n}', String(vt.confirmations))
-              .replace('{of}', String(GlobalConst.minConfirmations)),
-            tone: 'warning' as const,
-          }
-        : {
-            text: t('swap.tx-confirmed'),
-            tone: 'accent' as const,
-          };
+  const status = transferStatus(vt, t);
 
   const quote = fiatQuote(zecPrice, server, info.chainName);
   const todayUsd =
@@ -244,7 +212,7 @@ const ValueTransferDetail: React.FunctionComponent<
     state.toaddr.amount = toAmountInput(vt.amount);
     state.toaddr.memo = memo ?? '';
     setSendPageState(state);
-    navigation.navigate(Route.Home, { screen: Route.Send });
+    navigation.navigate(Route.Home, { screen: Route.Send }, { pop: true });
   };
 
   const remove = () =>
@@ -253,7 +221,8 @@ const ValueTransferDetail: React.FunctionComponent<
       message: t('history.remove-alert'),
       buttons: [
         {
-          text: t('confirm'),
+          text: t('history.remove'),
+          style: 'destructive',
           onPress: async () => {
             if (!setBackgroundError || !addLastSnackbar) {
               return;
@@ -275,7 +244,11 @@ const ValueTransferDetail: React.FunctionComponent<
               result.ok,
               translate,
             );
-            navigation.navigate(Route.Home, { screen: Route.History });
+            navigation.navigate(
+              Route.Home,
+              { screen: Route.History },
+              { pop: true },
+            );
           },
         },
         { text: t('cancel'), style: 'cancel' },
@@ -290,6 +263,15 @@ const ValueTransferDetail: React.FunctionComponent<
       footer={
         failed || explorerUrl ? (
           <View style={{ rowGap: 8 }}>
+            {/* As the swap detail: explorer, Try again, Delete, from the top. */}
+            {!!explorerUrl && (
+              <Button
+                testID="valuetransferdetail.explorer"
+                variant="text"
+                title={t('history.tx-explorer')}
+                onPress={() => Linking.openURL(explorerUrl)}
+              />
+            )}
             {failed && sent && (
               <Button
                 testID="valuetransferdetail.try-again"
@@ -301,17 +283,9 @@ const ValueTransferDetail: React.FunctionComponent<
             {failed && vt.confirmations === 0 && (
               <Button
                 testID="valuetransferdetail.remove"
-                variant="quiet"
+                variant="dangerText"
                 title={t('history.remove')}
                 onPress={remove}
-              />
-            )}
-            {!!explorerUrl && (
-              <Button
-                testID="valuetransferdetail.explorer"
-                variant="text"
-                title={t('history.tx-explorer')}
-                onPress={() => Linking.openURL(explorerUrl)}
               />
             )}
           </View>
@@ -327,13 +301,16 @@ const ValueTransferDetail: React.FunctionComponent<
           {head}
         </Text>
         <Pressable
+          kind="link"
           accessibilityRole="button"
           disabled={!amounts.hidden}
           onPress={amounts.reveal}
+          style={{ alignItems: 'center' }}
         >
           <Text
             testID="valuetransferdetail.amount"
             variant="balance"
+            strike={failed}
             color={
               failed
                 ? colors.fgMuted
@@ -349,7 +326,11 @@ const ValueTransferDetail: React.FunctionComponent<
             </Text>
           </Text>
           {!!todayUsd && (
-            <Text variant="bodySmall" tone="muted" style={{ marginTop: 4 }}>
+            <Text
+              variant="bodySmall"
+              tone="muted"
+              style={{ marginTop: 4, textAlign: 'center' }}
+            >
               {t('history.today-price').replace(
                 '{usd}',
                 amounts.show(todayUsd),
@@ -392,6 +373,7 @@ const ValueTransferDetail: React.FunctionComponent<
           </Text>
           {!!memo && (
             <Pressable
+              kind="link"
               testID="valuetransferdetail.memo"
               onPress={() => {
                 Clipboard.setString(memo);
@@ -408,6 +390,7 @@ const ValueTransferDetail: React.FunctionComponent<
           )}
           {!!memoUA && (
             <Pressable
+              kind="link"
               onPress={() => {
                 Clipboard.setString(memoUA);
                 if (!ownAddress(memoUA)) {

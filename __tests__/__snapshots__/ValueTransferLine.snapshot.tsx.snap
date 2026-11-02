@@ -30,7 +30,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
     accessible={true}
     collapsable={false}
     focusable={true}
+    onBlur={[Function]}
     onClick={[Function]}
+    onFocus={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -38,12 +40,33 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "opacity": 1,
-        "zIndex": 999,
-      }
+      [
+        {
+          "zIndex": 999,
+        },
+        {},
+      ]
     }
   >
+    <View
+      pointerEvents="none"
+      style={
+        [
+          {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          },
+          {
+            "backgroundColor": "#8888881F",
+            "borderRadius": undefined,
+          },
+          {},
+        ]
+      }
+    />
     <View
       collapsable={false}
       handlerTag={8}
@@ -129,7 +152,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                   "top": 10,
                 }
               }
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -137,11 +162,13 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "opacity": 1,
-                  "padding": 20,
-                  "zIndex": 999,
-                }
+                [
+                  {
+                    "padding": 20,
+                    "zIndex": 999,
+                  },
+                  {},
+                ]
               }
             />
           </View>
@@ -183,7 +210,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                   "top": 10,
                 }
               }
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -191,11 +220,13 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "opacity": 1,
-                  "padding": 20,
-                  "zIndex": 999,
-                }
+                [
+                  {
+                    "padding": 20,
+                    "zIndex": 999,
+                  },
+                  {},
+                ]
               }
             />
           </View>
@@ -251,8 +282,8 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
             style={
               {
                 "alignItems": "center",
-                "backgroundColor": "#8888881F",
-                "borderRadius": 18,
+                "backgroundColor": "#E5484D1F",
+                "borderRadius": 999,
                 "height": 36,
                 "justifyContent": "center",
                 "width": 36,
@@ -277,6 +308,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                   "fontFamily": "Menlo",
                   "fontSize": 13,
                   "fontWeight": "400",
+                  "lineHeight": 18,
                 }
               }
             >
@@ -297,20 +329,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                 numberOfLines={1}
                 style={
                   {
-                    "color": "#E5484D",
-                    "fontSize": 12,
-                    "fontWeight": "600",
-                    "lineHeight": 16,
-                  }
-                }
-              >
-                text translated ·
-              </Text>
-              <Text
-                maxFontSizeMultiplier={2}
-                numberOfLines={1}
-                style={
-                  {
                     "color": "#888888",
                     "flexShrink": 1,
                     "fontSize": 12,
@@ -319,7 +337,21 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                   }
                 }
               >
-                text translated · Jan 1
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#E5484D",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                      "lineHeight": 16,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+                 · 
+                Jan 1
               </Text>
             </View>
           </View>
@@ -338,6 +370,8 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                   "color": "#888888",
                   "fontSize": 15,
                   "fontWeight": "600",
+                  "lineHeight": 21,
+                  "textDecorationLine": "line-through",
                 }
               }
             >
@@ -396,7 +430,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
     accessible={true}
     collapsable={false}
     focusable={true}
+    onBlur={[Function]}
     onClick={[Function]}
+    onFocus={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -404,12 +440,33 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "opacity": 1,
-        "zIndex": 999,
-      }
+      [
+        {
+          "zIndex": 999,
+        },
+        {},
+      ]
     }
   >
+    <View
+      pointerEvents="none"
+      style={
+        [
+          {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          },
+          {
+            "backgroundColor": "#8888881F",
+            "borderRadius": undefined,
+          },
+          {},
+        ]
+      }
+    />
     <View
       collapsable={false}
       handlerTag={6}
@@ -495,7 +552,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                   "top": 10,
                 }
               }
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -503,11 +562,13 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "opacity": 1,
-                  "padding": 20,
-                  "zIndex": 999,
-                }
+                [
+                  {
+                    "padding": 20,
+                    "zIndex": 999,
+                  },
+                  {},
+                ]
               }
             />
           </View>
@@ -549,7 +610,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                   "top": 10,
                 }
               }
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -557,11 +620,13 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "opacity": 1,
-                  "padding": 20,
-                  "zIndex": 999,
-                }
+                [
+                  {
+                    "padding": 20,
+                    "zIndex": 999,
+                  },
+                  {},
+                ]
               }
             />
           </View>
@@ -618,7 +683,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
               {
                 "alignItems": "center",
                 "backgroundColor": "#8888881F",
-                "borderRadius": 18,
+                "borderRadius": 999,
                 "height": 36,
                 "justifyContent": "center",
                 "width": 36,
@@ -643,6 +708,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                   "fontFamily": "Menlo",
                   "fontSize": 13,
                   "fontWeight": "400",
+                  "lineHeight": 18,
                 }
               }
             >
@@ -663,20 +729,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                 numberOfLines={1}
                 style={
                   {
-                    "color": "#c3c3c3",
-                    "fontSize": 12,
-                    "fontWeight": "600",
-                    "lineHeight": 16,
-                  }
-                }
-              >
-                text translated ·
-              </Text>
-              <Text
-                maxFontSizeMultiplier={2}
-                numberOfLines={1}
-                style={
-                  {
                     "color": "#888888",
                     "flexShrink": 1,
                     "fontSize": 12,
@@ -685,7 +737,21 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                   }
                 }
               >
-                text translated · Jan 1
+                <Text
+                  maxFontSizeMultiplier={2}
+                  style={
+                    {
+                      "color": "#F99D00",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                      "lineHeight": 16,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+                 · 
+                Jan 1
               </Text>
             </View>
           </View>
@@ -704,6 +770,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                   "color": "#c3c3c3",
                   "fontSize": 15,
                   "fontWeight": "600",
+                  "lineHeight": 21,
                 }
               }
             >
@@ -762,7 +829,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
     accessible={true}
     collapsable={false}
     focusable={true}
+    onBlur={[Function]}
     onClick={[Function]}
+    onFocus={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -770,12 +839,33 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "opacity": 1,
-        "zIndex": 999,
-      }
+      [
+        {
+          "zIndex": 999,
+        },
+        {},
+      ]
     }
   >
+    <View
+      pointerEvents="none"
+      style={
+        [
+          {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          },
+          {
+            "backgroundColor": "#8888881F",
+            "borderRadius": undefined,
+          },
+          {},
+        ]
+      }
+    />
     <View
       collapsable={false}
       handlerTag={4}
@@ -861,7 +951,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                   "top": 10,
                 }
               }
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -869,11 +961,13 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "opacity": 1,
-                  "padding": 20,
-                  "zIndex": 999,
-                }
+                [
+                  {
+                    "padding": 20,
+                    "zIndex": 999,
+                  },
+                  {},
+                ]
               }
             />
           </View>
@@ -930,7 +1024,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
               {
                 "alignItems": "center",
                 "backgroundColor": "#8888881F",
-                "borderRadius": 18,
+                "borderRadius": 999,
                 "height": 36,
                 "justifyContent": "center",
                 "width": 36,
@@ -946,7 +1040,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
             }
           >
             <Text
-              ellipsizeMode="middle"
+              ellipsizeMode="tail"
               maxFontSizeMultiplier={2}
               numberOfLines={1}
               style={
@@ -954,6 +1048,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                   "color": "#c3c3c3",
                   "fontSize": 15,
                   "fontWeight": "600",
+                  "lineHeight": 21,
                 }
               }
             >
@@ -1001,6 +1096,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                   "color": "#18bd18",
                   "fontSize": 15,
                   "fontWeight": "600",
+                  "lineHeight": 21,
                 }
               }
             >
@@ -1059,7 +1155,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
     accessible={true}
     collapsable={false}
     focusable={true}
+    onBlur={[Function]}
     onClick={[Function]}
+    onFocus={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -1067,12 +1165,33 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      {
-        "opacity": 1,
-        "zIndex": 999,
-      }
+      [
+        {
+          "zIndex": 999,
+        },
+        {},
+      ]
     }
   >
+    <View
+      pointerEvents="none"
+      style={
+        [
+          {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          },
+          {
+            "backgroundColor": "#8888881F",
+            "borderRadius": undefined,
+          },
+          {},
+        ]
+      }
+    />
     <View
       collapsable={false}
       handlerTag={2}
@@ -1158,7 +1277,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                   "top": 10,
                 }
               }
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -1166,11 +1287,13 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "opacity": 1,
-                  "padding": 20,
-                  "zIndex": 999,
-                }
+                [
+                  {
+                    "padding": 20,
+                    "zIndex": 999,
+                  },
+                  {},
+                ]
               }
             />
           </View>
@@ -1212,7 +1335,9 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                   "top": 10,
                 }
               }
+              onBlur={[Function]}
               onClick={[Function]}
+              onFocus={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -1220,11 +1345,13 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
               style={
-                {
-                  "opacity": 1,
-                  "padding": 20,
-                  "zIndex": 999,
-                }
+                [
+                  {
+                    "padding": 20,
+                    "zIndex": 999,
+                  },
+                  {},
+                ]
               }
             />
           </View>
@@ -1281,7 +1408,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
               {
                 "alignItems": "center",
                 "backgroundColor": "#8888881F",
-                "borderRadius": 18,
+                "borderRadius": 999,
                 "height": 36,
                 "justifyContent": "center",
                 "width": 36,
@@ -1306,6 +1433,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                   "fontFamily": "Menlo",
                   "fontSize": 13,
                   "fontWeight": "400",
+                  "lineHeight": 18,
                 }
               }
             >
@@ -1353,6 +1481,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                   "color": "#c3c3c3",
                   "fontSize": 15,
                   "fontWeight": "600",
+                  "lineHeight": 21,
                 }
               }
             >

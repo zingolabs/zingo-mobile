@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect } from 'react';
-import { Text, View, TextStyle, TouchableOpacity } from 'react-native';
+import { Text, View, TextStyle } from 'react-native';
 import { useTheme, fontScaleBody } from '@app/theme';
+import Pressable from '@ui/primitives/Pressable';
 import { getNumberFormatSettings } from 'react-native-localize';
 import Animated, {
   ReduceMotion,
@@ -13,6 +14,9 @@ import { formatUsd } from '@app/utils/formatAmount';
 import { usePriceHealth } from './priceFetcherStore';
 import { useTimedReveal } from '@app/hooks/useTimedReveal';
 import { MASK } from '@ui/widgets/PrivateAmount';
+
+/** The fiat beside a ZEC amount, at ZecAmount's default size. */
+const AMOUNT_SIZE = 20;
 
 type CurrencyAmountProps = {
   price?: number;
@@ -56,7 +60,7 @@ const TintedText: React.FunctionComponent<{
       style={[
         {
           color: base,
-          fontSize: 20,
+          fontSize: AMOUNT_SIZE,
           fontWeight: '700',
           fontVariant: ['tabular-nums'],
           ...style,
@@ -112,14 +116,14 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
 
   return (
     <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-      <TouchableOpacity disabled={!privacyHigh} onPress={reveal}>
+      <Pressable kind="link" disabled={!privacyHigh} onPress={reveal}>
         <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
           {privacyHigh ? (
             <Text
               maxFontSizeMultiplier={fontScaleBody}
               style={{
                 color: baseColor,
-                fontSize: 20,
+                fontSize: AMOUNT_SIZE,
                 fontWeight: '700',
                 ...style,
               }}
@@ -140,7 +144,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
               maxFontSizeMultiplier={fontScaleBody}
               style={{
                 color: baseColor,
-                fontSize: 20,
+                fontSize: AMOUNT_SIZE,
                 fontWeight: '700',
                 ...style,
               }}
@@ -150,7 +154,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
             </Text>
           )}
         </View>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };

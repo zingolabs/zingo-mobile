@@ -37,7 +37,7 @@ type AvatarProps =
   | {
       kind: 'icon';
       icon: React.ComponentType<{ size?: number; color?: string }>;
-      /** A transaction that failed. */
+      /** A transaction that failed: the icon in red on a red tint. */
       danger?: boolean;
       size?: 'md' | 'lg';
     };
@@ -68,7 +68,7 @@ const Avatar: React.FunctionComponent<AvatarProps> = props => {
       >
         <Mark
           size={props.size === 'lg' ? iconSize : iconSizeMd}
-          color={colors.fgDefault}
+          color={props.danger ? colors.fgDanger : colors.fgDefault}
         />
       </View>
     );

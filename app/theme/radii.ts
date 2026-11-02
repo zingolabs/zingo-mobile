@@ -1,5 +1,7 @@
 // Corner radius values used in the app
 
+/** A checkbox: at 16, radiusSm would read as a radio. */
+export const radiusXs = 4;
 /** Tags, icon tiles, small fields. */
 export const radiusSm = 8;
 /** Cards, grouped rows, text fields and banners. */
