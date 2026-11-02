@@ -46,12 +46,14 @@ const row = (
         first
         open={open}
         sendable={sendable}
+        swappable={false}
         editable
         flash={false}
         leaving={false}
         onToggle={noop}
         onSwipe={noop}
         onSend={noop}
+        onSwap={noop}
         onCopy={noop}
         onEdit={noop}
         onDelete={noop}
