@@ -85,6 +85,25 @@ export function isZecWrapper(token: TokenEntryType): boolean {
   );
 }
 
+/**
+ * The coin of a chain in the catalog, what a contact saved under that chain
+ * swaps with by default: its entry with no contract. Read from the catalog
+ * because the coin cannot be told from the chain (TON pays in GRAM, Base in
+ * ETH) and SwapKit can change it.
+ */
+export function chainCoin(
+  tokens: TokenEntryType[],
+  chain: string,
+): TokenEntryType | undefined {
+  return tokens.find(
+    token =>
+      isQuotableToken(token) &&
+      token.chain.toUpperCase() === chain.toUpperCase() &&
+      !token.address &&
+      !token.identifier.includes('-'),
+  );
+}
+
 export function tokenToSwapAsset(token: TokenEntryType): SwapAssetType {
   return {
     swapKitId: token.identifier,

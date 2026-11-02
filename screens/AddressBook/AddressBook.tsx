@@ -21,12 +21,9 @@ import {
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded, useSwapService } from '@app/context';
 import { useOptionsPanel } from '@app/context/optionsPanel';
-import {
-  SwapDirectionEnum,
-  chainNativeAsset,
-  prefillFromContact,
-} from '@app/swap';
-import type { SwapAssetType } from '@app/swap';
+import { SwapDirectionEnum, prefillFromContact } from '@app/swap';
+import type { TokenEntryType } from '@app/swap';
+import { tokenToSwapAsset } from '@screens/Swap/swapAssets';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import { showConfirm } from '@app/services/showConfirm';
@@ -39,7 +36,9 @@ import { ChevronDown } from '@ui/primitives/Icons/Chevron';
 import ContactRow, { ROW_LINE } from './components/ContactRow';
 import AddressRowHead from './components/AddressRowHead';
 import ContactSwapSheet, {
+  SwapCoins,
   contactSwapText,
+  loadSwapCoins,
 } from './components/ContactSwapSheet';
 import SegmentedSwitch from '@ui/widgets/SegmentedSwitch';
 import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
@@ -62,7 +61,7 @@ type Victim =
 
 type SwapWith =
   | { kind: 'none' }
-  | { kind: 'contact'; contact: AddressBookFileClass; asset: SwapAssetType };
+  | { kind: 'contact'; contact: AddressBookFileClass; coins: SwapCoins };
 
 type Tab = 'contacts' | 'wallet';
 
@@ -267,16 +266,26 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     navigation.navigate(Route.Home, { screen: Route.Send }, { pop: true });
   };
 
-  const askSwap = (contact: AddressBookFileClass, asset: SwapAssetType) => {
-    setSwapWith({ kind: 'contact', contact, asset });
+  const askSwap = async (contact: AddressBookFileClass) => {
+    if (!swapService) {
+      return;
+    }
+    setSwapWith({ kind: 'contact', contact, coins: { kind: 'loading' } });
     swapSheet.current?.present();
+    const coins = await loadSwapCoins(swapService, contact.swapChain);
+    // The user may have closed this sheet and opened another contact's.
+    setSwapWith(current =>
+      current.kind === 'contact' && current.contact === contact
+        ? { ...current, coins }
+        : current,
+    );
   };
 
-  const swap = (direction: SwapDirectionEnum) => {
+  const swap = (direction: SwapDirectionEnum, coin: TokenEntryType) => {
     if (swapWith.kind === 'none') {
       return;
     }
-    const { contact, asset } = swapWith;
+    const { contact } = swapWith;
     swapSheet.current?.dismiss();
     toast(
       contactSwapText(
@@ -286,7 +295,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
             : 'addressbook.swap-from-toast',
         ) as string,
         contact,
-        asset,
+        coin.ticker,
       ),
     );
     optionsPanel.close();
@@ -297,7 +306,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
         params: {
           prefill: prefillFromContact(
             direction,
-            asset,
+            tokenToSwapAsset(coin),
             contact.address,
             Date.now(),
           ),
@@ -545,7 +554,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
             >
               {contacts.map((contact, index) => {
                 const zcash = contact.swapChain === GlobalConst.zecSwapChain;
-                const swapAsset = chainNativeAsset(contact.swapChain);
                 return (
                   <ContactRow
                     key={contact.address}
@@ -553,7 +561,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                     first={index === 0}
                     open={!pick && openAddress === contact.address}
                     sendable={!pick && canSend && zcash}
-                    swappable={!pick && canSwap && !zcash && !!swapAsset}
+                    swappable={!pick && canSwap && !zcash}
                     editable
                     flash={flashAddress === contact.address}
                     leaving={leavingAddress === contact.address}
@@ -566,7 +574,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                     }
                     onSwipe={() => setOpenAddress('')}
                     onSend={() => send(contact)}
-                    onSwap={() => swapAsset && askSwap(contact, swapAsset)}
+                    onSwap={() => askSwap(contact)}
                     onCopy={() => copy(contact)}
                     onEdit={() => openContact({ kind: 'edit', contact })}
                     onDelete={() => askDelete(contact)}
@@ -643,7 +651,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                 ? contactSwapText(
                     translate('addressbook.swap-title') as string,
                     swapWith.contact,
-                    swapWith.asset,
                   )
                 : ''
             }
@@ -658,7 +665,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
         {swapWith.kind === 'contact' && (
           <ContactSwapSheet
             contact={swapWith.contact}
-            asset={swapWith.asset}
+            coins={swapWith.coins}
             onChoose={swap}
           />
         )}

@@ -12,11 +12,15 @@ import { OptionsPanelProvider } from '@app/context/optionsPanel';
 import { AddressBook } from '@screens/AddressBook';
 import { AddressBookFileClass, ChainNameEnum, Route } from '@app/AppState';
 import { remoteServer } from '@app/AppState/types/ServerType';
-import { SwapDirectionEnum, chainNativeAsset } from '@app/swap';
+import { SwapDirectionEnum } from '@app/swap';
+import type { TokenEntryType } from '@app/swap';
+import { chainCoin } from '@screens/Swap/swapAssets';
 import en from '@app/translations/en.json';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-let mockSwapService: object | null = {};
+let mockSwapService: {
+  listRoutableTokens: (direction: string) => Promise<TokenEntryType[]>;
+} | null;
 jest.mock('@app/context', () => ({
   ...jest.requireActual('@app/context'),
   useSwapService: () => mockSwapService,
@@ -30,6 +34,24 @@ const translate = (key: string) => {
   return group?.[name] ?? key;
 };
 
+const token = (
+  identifier: string,
+  ticker: string,
+  address?: string,
+): TokenEntryType => ({
+  chain: identifier.split('.')[0],
+  chainId: '1',
+  ticker,
+  identifier,
+  symbol: identifier.split('.')[1],
+  name: ticker,
+  decimals: 8,
+  address,
+});
+
+const BTC = token('BTC.BTC', 'BTC');
+const GRAM = token('TON.GRAM', 'GRAM');
+
 const contact = (label: string, address: string, swapChain: string) =>
   new AddressBookFileClass(
     label,
@@ -40,8 +62,9 @@ const contact = (label: string, address: string, swapChain: string) =>
     swapChain,
   );
 
+const ana = 'bc1qanaanaanaanaanaana0wlh';
 const book = [
-  contact('Ana', 'bc1qanaanaanaanaanaana0wlh', 'BTC'),
+  contact('Ana', ana, 'BTC'),
   contact('Lolo', 'u1lolo', 'ZEC'),
   contact('Xmr', '4xmr', 'XMR'),
 ];
@@ -74,12 +97,16 @@ const renderBook = (readOnly = false) => {
   return addLastSnackbar;
 };
 
-const swapId = 'addressbook.row.bc1qanaanaanaanaanaana0wlh.swap';
+const openSheet = async (address: string) => {
+  await act(async () => {
+    fireEvent.press(screen.getByTestId(`addressbook.row.${address}.swap`));
+  });
+};
 
 describe('AddressBook swap', () => {
   beforeEach(() => {
     jest.useFakeTimers();
-    mockSwapService = {};
+    mockSwapService = { listRoutableTokens: async () => [BTC, GRAM] };
     mockNavigation.navigate.mockClear();
   });
 
@@ -89,7 +116,7 @@ describe('AddressBook swap', () => {
 
   test('Tests that a contact on another coin offers Swap and a Zcash one offers Send when the Swap tab exists.', () => {
     renderBook();
-    expect(screen.getByTestId(swapId)).toBeTruthy();
+    expect(screen.getByTestId(`addressbook.row.${ana}.swap`)).toBeTruthy();
     expect(screen.queryByTestId('addressbook.row.u1lolo.swap')).toBeNull();
     expect(screen.getByTestId('addressbook.row.u1lolo.send')).toBeTruthy();
   });
@@ -97,18 +124,42 @@ describe('AddressBook swap', () => {
   test('Tests that Swap is absent when the swap service is not up.', () => {
     mockSwapService = null;
     renderBook();
-    expect(screen.queryByTestId(swapId)).toBeNull();
+    expect(screen.queryByTestId(`addressbook.row.${ana}.swap`)).toBeNull();
   });
 
   test('Tests that Swap is absent when the wallet cannot spend.', () => {
     renderBook(true);
-    expect(screen.queryByTestId(swapId)).toBeNull();
+    expect(screen.queryByTestId(`addressbook.row.${ana}.swap`)).toBeNull();
   });
 
-  test('Tests that Swap is absent when the chain has no coin that swaps with ZEC.', () => {
+  test('Tests that the sheet says there is no route when the catalog has no coin for the chain.', async () => {
     renderBook();
-    expect(screen.queryByTestId('addressbook.row.4xmr.swap')).toBeNull();
-    expect(screen.getByTestId('addressbook.row.4xmr.copy')).toBeTruthy();
+    await openSheet('4xmr');
+    expect(screen.getByTestId('addressbook.swap.none')).toBeTruthy();
+    expect(screen.queryByTestId('addressbook.swap.to')).toBeNull();
+    expect(screen.queryByTestId('addressbook.swap.from')).toBeNull();
+  });
+
+  test('Tests that the sheet says there is no route when the catalog cannot be read.', async () => {
+    mockSwapService = {
+      listRoutableTokens: async () => {
+        throw new Error('down');
+      },
+    };
+    renderBook();
+    await openSheet(ana);
+    expect(screen.getByTestId('addressbook.swap.none')).toBeTruthy();
+  });
+
+  test('Tests that the sheet offers only the direction the catalog routes.', async () => {
+    mockSwapService = {
+      listRoutableTokens: async direction =>
+        direction === 'inbound' ? [BTC] : [],
+    };
+    renderBook();
+    await openSheet(ana);
+    expect(screen.queryByTestId('addressbook.swap.to')).toBeNull();
+    expect(screen.getByTestId('addressbook.swap.from')).toBeTruthy();
   });
 
   test.each([
@@ -124,9 +175,9 @@ describe('AddressBook swap', () => {
     ],
   ])(
     'Tests that %s opens Swap filled in that direction with the contact and an empty amount.',
-    (row, direction, message) => {
+    async (row, direction, message) => {
       const snackbar = renderBook();
-      fireEvent.press(screen.getByTestId(swapId));
+      await openSheet(ana);
       expect(screen.getByTestId('addressbook.swap.address')).toHaveTextContent(
         /Bitcoin address$/,
       );
@@ -142,8 +193,8 @@ describe('AddressBook swap', () => {
           params: {
             prefill: expect.objectContaining({
               direction,
-              asset: chainNativeAsset('BTC'),
-              address: 'bc1qanaanaanaanaanaana0wlh',
+              asset: expect.objectContaining({ swapKitId: 'BTC.BTC' }),
+              address: ana,
               sellAmountHumanDecimal: '',
             }),
           },
@@ -155,11 +206,19 @@ describe('AddressBook swap', () => {
   );
 });
 
-describe('chainNativeAsset', () => {
-  test('Tests that the coin is the one the chain pays in when it is not named after the chain.', () => {
-    expect(chainNativeAsset('TON')?.swapKitId).toBe('TON.GRAM');
-    expect(chainNativeAsset('BASE')?.swapKitId).toBe('BASE.ETH');
-    expect(chainNativeAsset('btc')?.swapKitId).toBe('BTC.BTC');
-    expect(chainNativeAsset('XMR')).toBeUndefined();
+describe('chainCoin', () => {
+  const usdc = token('ETH.USDC-0xA0b8', 'USDC', '0xA0b8');
+  const eth = token('ETH.ETH', 'ETH');
+
+  test('Tests that the coin is the entry with no contract when the chain also lists tokens.', () => {
+    expect(chainCoin([usdc, eth], 'ETH')).toBe(eth);
+  });
+
+  test('Tests that the coin comes from the catalog when it is not named after the chain.', () => {
+    expect(chainCoin([GRAM], 'ton')).toBe(GRAM);
+  });
+
+  test('Tests that there is no coin when the catalog does not list the chain.', () => {
+    expect(chainCoin([eth], 'XMR')).toBeUndefined();
   });
 });
