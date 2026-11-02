@@ -95,7 +95,7 @@ jobs:
       - name: Yarn install
         env:
           SWAPKIT_API_KEY: ${{ secrets.SWAPKIT_API_KEY }}
-        run: yarn install --frozen-lockfile
+        run: yarn setup
 
       - name: Assemble APKs (4 ABI splits + universal)
         working-directory: android

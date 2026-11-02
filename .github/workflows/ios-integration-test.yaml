@@ -64,7 +64,7 @@ jobs:
           cache: yarn
 
       - name: Yarn
-        run: yarn
+        run: yarn setup
 
       # The fetch extracts the ZingoBindings package under ios/binding-layer,
       # where the Xcode project references it.

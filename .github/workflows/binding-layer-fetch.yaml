@@ -34,7 +34,7 @@ jobs:
           cache: yarn
 
       - name: Yarn install
-        run: yarn install --frozen-lockfile
+        run: yarn setup
 
       - name: Fetch the bundle by the Bundle Pin
         run: yarn --silent fetch:binding-layer --platform ${{ inputs.platform }} --check-tag
