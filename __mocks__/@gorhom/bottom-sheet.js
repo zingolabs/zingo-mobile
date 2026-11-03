@@ -1,4 +1,5 @@
 import React from 'react';
+import { FlatList } from 'react-native';
 
 const BottomSheet = ({ children }) => <>{children}</>;
 /** A modal's methods, one spy each, shared by every mounted modal. */
@@ -18,6 +19,7 @@ const BottomSheetModal = React.forwardRef(({ children }, ref) => {
 });
 const BottomSheetView = ({ children }) => <>{children}</>;
 const BottomSheetScrollView = ({ children }) => <>{children}</>;
+const BottomSheetFlatList = props => <FlatList {...props} />;
 const BottomSheetBackdrop = ({ children }) => <>{children}</>;
 const BottomSheetFooter = ({ children }) => <>{children}</>;
 const BottomSheetModalProvider = ({ children }) => <>{children}</>;
@@ -37,6 +39,7 @@ export {
   BottomSheetModal,
   BottomSheetView,
   BottomSheetScrollView,
+  BottomSheetFlatList,
   BottomSheetBackdrop,
   BottomSheetFooter,
   BottomSheetModalProvider,
