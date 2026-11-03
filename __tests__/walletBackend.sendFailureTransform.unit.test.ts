@@ -1,4 +1,5 @@
 import {
+  OWNED_MIXNET_MARKER,
   SendFailureClass,
   classifySendFailure,
   retryOnAnotherServer,
@@ -164,8 +165,7 @@ describe('sendFailureText', () => {
  */
 describe('the mobile-owned refusal marker (#1229)', () => {
   it('classifies our own mixnet prefix as a refusal, whatever zingolib says inside', () => {
-    const reworded =
-      'Error: mixnet: the tunnel is not ready to carry this operation';
+    const reworded = `${OWNED_MIXNET_MARKER} the tunnel is not ready to carry this operation`;
     const failure = classifySendFailure(reworded);
     expect(failure.kind).toBe('mixnetRefusal');
     expect(retryOnAnotherServer(failure)).toBe(false);

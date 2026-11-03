@@ -37,11 +37,8 @@ const DUPLICATE_NULLIFIER_MARKERS = [
   '18: bad-txns-orchard-duplicate-nullifier',
 ] as const;
 
-/**
- * The display prefix of `ZingolibError::Mixnet`, which zingolib's own test
- * pins where the Binding Layer mints it.
- */
-const OWNED_MIXNET_MARKER = 'Error: mixnet:';
+/** The display prefix of `ZingolibError::Mixnet`, which `check:mixnet-marker` compares with the pinned zingolib. */
+export const OWNED_MIXNET_MARKER = 'Error: mixnet:';
 
 /**
  * Both fail-closed refusal texts (bootstrapping and died) carry this phrase;

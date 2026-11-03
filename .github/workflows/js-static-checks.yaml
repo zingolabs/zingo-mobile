@@ -35,6 +35,11 @@ jobs:
       - name: Check formatting
         run: yarn prettier:check
 
+      # The pinned zingolib's source is the one place that mints the
+      # display prefix the send classifier matches on.
+      - name: Mixnet marker matches the pinned zingolib
+        run: yarn --silent check:mixnet-marker
+
       # DESIGN.md mirrors app/theme ("Changing the system" in it): a PR that
       # changes a theme value changes DESIGN.md too. The label
       # design-md-unchanged lets a change with no visible effect through.
