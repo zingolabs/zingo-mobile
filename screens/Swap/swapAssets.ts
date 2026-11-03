@@ -86,21 +86,25 @@ export function isZecWrapper(token: TokenEntryType): boolean {
 }
 
 /**
- * The coin of a chain in the catalog, what a contact saved under that chain
- * swaps with by default: its entry with no contract. Read from the catalog
- * because the coin cannot be told from the chain (TON pays in GRAM, Base in
- * ETH) and SwapKit can change it.
+ * What a contact saved under `chain` swaps with by default: the chain's entry
+ * with no contract, or its first token where it routes only tokens (USDC on
+ * `HYPE`). Read from the catalog because this cannot be told from the chain
+ * (TON pays in GRAM, Base in ETH) and SwapKit can change it. The catalog comes
+ * sorted by popularity, so the first token is the likeliest one.
  */
 export function chainCoin(
   tokens: TokenEntryType[],
   chain: string,
 ): TokenEntryType | undefined {
-  return tokens.find(
+  const onChain = tokens.filter(
     token =>
       isQuotableToken(token) &&
-      token.chain.toUpperCase() === chain.toUpperCase() &&
-      !token.address &&
-      !token.identifier.includes('-'),
+      !isZecWrapper(token) &&
+      token.chain.toUpperCase() === chain.toUpperCase(),
+  );
+  return (
+    onChain.find(token => !token.address && !token.identifier.includes('-')) ??
+    onChain[0]
   );
 }
 

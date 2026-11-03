@@ -218,6 +218,17 @@ describe('chainCoin', () => {
     expect(chainCoin([GRAM], 'ton')).toBe(GRAM);
   });
 
+  test('Tests that the first token is the coin when the chain routes only tokens.', () => {
+    const hypeUsdc = token('HYPE.USDC-USDC:0x6d1e', 'USDC', '0x6d1e');
+    const hypeWnear = token('HYPE.wNEAR-0x20b8', 'wNEAR', '0x20b8');
+    expect(chainCoin([hypeUsdc, hypeWnear], 'HYPE')).toBe(hypeUsdc);
+  });
+
+  test('Tests that wrapped ZEC is not the coin when it is all the chain lists.', () => {
+    const wrapped = token('STRK.ZEC-0x05ce', 'ZEC', '0x05ce');
+    expect(chainCoin([wrapped], 'STRK')).toBeUndefined();
+  });
+
   test('Tests that there is no coin when the catalog does not list the chain.', () => {
     expect(chainCoin([eth], 'XMR')).toBeUndefined();
   });

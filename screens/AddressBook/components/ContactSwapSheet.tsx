@@ -17,7 +17,7 @@ import { ZEC_TOKEN_ENTRY, chainCoin } from '@screens/Swap/swapAssets';
 const LOGO = 28;
 const LOGO_OVERLAP = -8;
 
-/** The contact's coin in each direction; a direction SwapKit does not route has none. */
+/** What the contact swaps with in each direction; a direction SwapKit does not route has none. */
 export type SwapCoins =
   | { kind: 'loading' }
   | { kind: 'loaded'; to?: TokenEntryType; from?: TokenEntryType };
