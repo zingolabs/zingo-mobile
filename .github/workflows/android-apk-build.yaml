@@ -8,9 +8,6 @@ name: Android APK build
 on:
   workflow_call:
     inputs:
-      cache-key:
-        required: true
-        type: string
       abi:
         required: true
         type: string
@@ -41,9 +38,6 @@ jobs:
   android-apk-build:
     name: Andr APK build
     runs-on: ${{ inputs.runner }}
-    env:
-      RUSTFLAGS: -D warnings
-      CACHE-KEY: ${{ inputs.cache-key }}
 
     steps:
       - name: Set envs for zingolib CI
@@ -65,11 +59,6 @@ jobs:
         uses: ./.github/actions/gradle-cache
         with:
           writer: ${{ inputs.gradle-cache-writer }}
-
-      # The unit tests of the cache fill read the proxy crate's Kotlin
-      # wire-contract test from the submodule.
-      - name: Check out zingolib
-        uses: ./.github/actions/zingolib-submodule
 
       - name: Remove unnecessary directories to free up space
         run: |
@@ -119,7 +108,7 @@ jobs:
       - name: Upload Android build artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: android-build-outputs-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          name: android-build-outputs-${{ env.ABI }}
           path: |
             android/app/build/outputs
           retention-days: 3

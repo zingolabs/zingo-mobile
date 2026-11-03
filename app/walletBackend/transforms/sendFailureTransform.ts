@@ -38,10 +38,10 @@ const DUPLICATE_NULLIFIER_MARKERS = [
 ] as const;
 
 /**
- * The display prefix of `ZingolibError::Mixnet`, which a jest test compares
- * with zingolib/zingo-ffi/lib/src/lib.rs at the pinned commit.
+ * The display prefix of `ZingolibError::Mixnet`, which zingolib's own test
+ * pins where the Binding Layer mints it.
  */
-export const OWNED_MIXNET_MARKER = 'Error: mixnet:';
+const OWNED_MIXNET_MARKER = 'Error: mixnet:';
 
 /**
  * Both fail-closed refusal texts (bootstrapping and died) carry this phrase;

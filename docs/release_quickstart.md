@@ -13,8 +13,8 @@ Zingo ships as two parallel apps from this single repo:
 | **Beta** | `org.ZingoLabs.Zingo.Beta` | `org.ZingoLabs.Zingo.Beta` | "Zingo Beta" | TestFlight External / Play Open Testing |
 
 Both apps share the same JS bundle (`app/`, `screens/`, `ui/`),
-the same Rust libs (`libuniffi_zingo.so`, `Zingolib.xcframework`, both built
-from the `zingolib` submodule), the same
+the same Rust libs (`libuniffi_zingo.so`, `Zingolib.xcframework`, both from
+the Prebuilt Bundles that `binding-layer.json` pins), the same
 keystores and certificates. They differ only in bundle ID, display name, and
 app icon (Beta has a red `BETA` band). The channel is detected at runtime from
 the native binary — there is no JS-side toggle.

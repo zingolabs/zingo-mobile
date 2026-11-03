@@ -61,8 +61,7 @@ The Binding Layer comes from the Android Prebuilt Bundle that
 `binding-layer.json` pins. The Gradle build fetches it the first time
 through `yarn --silent fetch:binding-layer --platform android`, which needs
 network access to `ghcr.io`, and resolves the AAR from the fetched Maven
-repository. The Android unit tests also read the `zingolib` submodule:
-`git submodule update --init zingolib`.
+repository.
 
 ## Launching the app
 ### Android Studio

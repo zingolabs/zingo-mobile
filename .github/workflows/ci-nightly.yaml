@@ -23,29 +23,13 @@ jobs:
     with:
       platform: ios
 
-  create-cache-key:
-    uses: ./.github/workflows/create-cache-key.yaml
-
-  android-build:
-    strategy:
-      matrix:
-        arch: [ x86_64, x86, arm64-v8a, armeabi-v7a ]
-      fail-fast: false
-    uses: ./.github/workflows/android-build.yaml
-    needs: create-cache-key
-    with:
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-      arch: ${{ matrix.arch }}
-
   android-apk-build:
     strategy:
       matrix:
         abi: [ x86_64, x86 ]
       fail-fast: false
     uses: ./.github/workflows/android-apk-build.yaml
-    needs: create-cache-key
     with:
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       abi: ${{ matrix.abi }}
 
   android-ubuntu-integration-test-ci:
@@ -63,14 +47,6 @@ jobs:
       abi: ${{ matrix.config.abi }}
       api-level: ${{ matrix.config['api-level'] }}
       target: ${{ matrix.config.target }}
-
-  ios-build:
-    strategy:
-      fail-fast: false
-    uses: ./.github/workflows/ios-build.yaml
-    needs: create-cache-key
-    with:
-      cache-key: ${{ needs.create-cache-key.outputs.ios-cache-key }}
 
   ios-integration-test:
     strategy:
