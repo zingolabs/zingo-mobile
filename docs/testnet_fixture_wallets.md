@@ -35,8 +35,9 @@ was built from.
 ```bash
 # Check zingolib out at the pinned commit, beside this repository.
 commit="$(node --print 'require("./binding-layer.json").commit')"
-git clone https://github.com/zingolabs/zingolib.git ../zingolib
-git -C ../zingolib checkout --detach "$commit"
+git init --quiet ../zingolib
+git -C ../zingolib fetch --depth 1 https://github.com/zingolabs/zingolib.git "$commit"
+git -C ../zingolib checkout --detach FETCH_HEAD
 ```
 
 ## Starting from zingolib's testnet wallet
