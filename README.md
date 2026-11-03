@@ -38,8 +38,9 @@ tag ships naming its commit instead of the tag.
 See [Release order](./docs/release_quickstart.md#release-order-tag-first-then-build).
 
 Pushing a `zingo-<version>-<build>` or `zingo-beta-<version>-<build>` tag
-triggers a CI workflow that builds the 4 ABI APKs + a universal APK from
-source on the tagged commit and publishes them to a fresh GitHub Release.
+triggers a CI workflow that builds the 4 ABI APKs and a universal APK on the
+tagged commit, against the Binding Layer AAR that the Bundle Pin names, and
+publishes them to a fresh GitHub Release.
 
 Full step-by-step for both stores, signing setup, and the underlying iOS/Android
 flavor architecture: see [docs/release_quickstart.md](./docs/release_quickstart.md).
