@@ -2077,10 +2077,10 @@
   resolved "https://registry.yarnpkg.com/@react-native-community/netinfo/-/netinfo-12.0.1.tgz#fec75f4093c27778479d8927b4f51f133b8a13a4"
   integrity sha512-P/3caXIvfYSJG8AWJVefukg+ZGRPs+M4Lp3pNJtgcTYoJxCjWrKQGNnCkj/Cz//zWa/avGed0i/wzm0T8vV2IQ==
 
-"@react-native-community/slider@^5.2.1":
-  version "5.2.1"
-  resolved "https://registry.yarnpkg.com/@react-native-community/slider/-/slider-5.2.1.tgz#163243898394256af76dcaabde994a9ff1464717"
-  integrity sha512-HBDPRFRIN47hRtd5tdDWZp3kkVN1z98jGbK9wHOfUfVO+PbBDZzD7xjiiyBqNpg6Rom2QPFOpBZzsB2bHy4yAQ==
+"@react-native-community/slider@^5.2.2":
+  version "5.2.2"
+  resolved "https://registry.yarnpkg.com/@react-native-community/slider/-/slider-5.2.2.tgz#3b6696a497201227fd7866f8792dda90850c99c2"
+  integrity sha512-KdWURcFqHZ/nvQwt9S7P2PHBREl83GZeflWZU1VpR/qJ+lF/mdiOBZshJQztE2hBDgW5iBIrRb3RY9uAie5k/w==
 
 "@react-native/assets-registry@0.81.6":
   version "0.81.6"
@@ -2194,14 +2194,14 @@
     serve-static "^1.16.2"
     ws "^6.2.3"
 
-"@react-native/eslint-config@^0.88.0":
-  version "0.88.0"
-  resolved "https://registry.yarnpkg.com/@react-native/eslint-config/-/eslint-config-0.88.0.tgz#0c032950a1da23b8d7539faf6ce054f821d1301a"
-  integrity sha512-bymFycPvegqTCcPvIZlg0soClW4jN9I2IcEmzabGAyL6ctnbT3dI7ml6eL5VlqxbHsbKFampNU2a00lvyQaj8g==
+"@react-native/eslint-config@^0.88.1":
+  version "0.88.1"
+  resolved "https://registry.yarnpkg.com/@react-native/eslint-config/-/eslint-config-0.88.1.tgz#a158f7432bfcad4158ca09499c0fef3b6fc9a27a"
+  integrity sha512-zZ/3URu9tNIipCDBEO5h72j8pKE/macMeDUPLeLyG0f0bjNFSxIqIpc8/bc3HL6dxcM/Bc/bBUpuYpOAcK8tGQ==
   dependencies:
     "@babel/core" "^7.25.2"
     "@babel/eslint-parser" "^7.25.1"
-    "@react-native/eslint-plugin" "0.88.0"
+    "@react-native/eslint-plugin" "0.88.1"
     "@typescript-eslint/eslint-plugin" "^8.59.2"
     "@typescript-eslint/parser" "^8.59.2"
     eslint-config-prettier "^8.5.0"
@@ -2212,10 +2212,10 @@
     eslint-plugin-react-hooks "^7.0.1"
     eslint-plugin-react-native "^5.0.0"
 
-"@react-native/eslint-plugin@0.88.0":
-  version "0.88.0"
-  resolved "https://registry.yarnpkg.com/@react-native/eslint-plugin/-/eslint-plugin-0.88.0.tgz#e9ce925c07b94ae3524070f46bf7c2016d48c4f3"
-  integrity sha512-R/8stvb7ddQEH14dDcNYtQ9C7mG4wfyT7fLAA1GQxQRbDy+cOFM1XeSCuc4/udvLj+pf8JhJCvu6bMz3MobfxA==
+"@react-native/eslint-plugin@0.88.1":
+  version "0.88.1"
+  resolved "https://registry.yarnpkg.com/@react-native/eslint-plugin/-/eslint-plugin-0.88.1.tgz#e32fb6a42e910c099cb4588817bd05ec0e85e373"
+  integrity sha512-v06B1CI2MJuflhxBG1DpUbYaDOwafpXoxFmMaMQOiYiDkDljFb9C1+d6khDECaJMVlyzkMMzvGSbNxfY7b5m4g==
 
 "@react-native/gradle-plugin@0.81.6":
   version "0.81.6"
@@ -2770,10 +2770,17 @@
   resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.5.tgz#ec10755e871497bcd83efe927e43ec46e8c0747e"
   integrity sha512-hov8bUuiLiyFPGyFPE1lwWhmzYbirOXQNNo40+y3zow8aFVTeyn3VWL0VFFfdNddA8S4Vf0Tc062rzyNr7Paag==
 
-"@types/node@*", "@types/node@^26.6.5":
+"@types/node@*":
   version "26.6.5"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-26.6.5.tgz#cb35209e7767c503551b5fa42a48231c7441d979"
   integrity sha512-uMzsv9stDdofIZBx4UGh4Z9ZgXnGC9seRDscilBcTHAeOFk67MZg/k9bWVfO+bk4qZmG+l52hRnLwUiH2LnJTg==
+  dependencies:
+    undici-types "~8.9.0"
+
+"@types/node@^26.6.6":
+  version "26.6.6"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-26.6.6.tgz#9ed7b5817e728ed9216ef7c5b7d373fe3b777104"
+  integrity sha512-MzQj+8Kx3XI40OmUAE6Qoh58ZMNstNNMwn2nfd3qWsfe7nDNSqJNzes4njhz6AHwrSHOffSLwXU6yb474Q4aog==
   dependencies:
     undici-types "~8.9.0"
 
@@ -6786,10 +6793,10 @@ jpeg-js@^0.4.2, jpeg-js@^0.4.4:
   resolved "https://registry.yarnpkg.com/jpeg-js/-/jpeg-js-0.4.4.tgz#a9f1c6f1f9f0fa80cdb3484ed9635054d28936aa"
   integrity sha512-WZzeDOEtTOBK4Mdsar0IqEU5sMr3vSV2RqkAIzUEV2BHnUfKGyswWFPFwK5EeDo93K3FohSHbLAjj0s1Wzd+dg==
 
-js-base64@^3.9.4:
-  version "3.9.4"
-  resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.9.4.tgz#bc4d811fd52105848df55bc80ca401d963020e6d"
-  integrity sha512-PtOMXpEGuP0RRiRXsjzHzl44dMHxSu2CPvAhinupR1tBa88me+1DPqsobl7eupn5UukjLkln1ZnAOAOXOrYG0Q==
+js-base64@^3.9.5:
+  version "3.9.6"
+  resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.9.6.tgz#f4a84265b5d56fd2870f368a4ea6ba7bbdff7157"
+  integrity sha512-LjkzbLtU6Lx6fjXMYGEACEB7rdtqZtxkBe9aS1ZpDNUyWgUivw3yBEIhQ37OVygJYRt+C+9e9fVT8PpFzH2Hww==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
@@ -8443,10 +8450,10 @@ react-native-modal-datetime-picker@^18.0.0:
   dependencies:
     prop-types "^15.7.2"
 
-react-native-qrcode-svg@^6.3.27:
-  version "6.3.27"
-  resolved "https://registry.yarnpkg.com/react-native-qrcode-svg/-/react-native-qrcode-svg-6.3.27.tgz#69c05c787f944a35ac906ba1436e5097a17c47b7"
-  integrity sha512-ETMIYT9nhdjGYoFu0GrpQcrpk4md+Ceej0JP4Xxm547k3MIc6od+bi12Qs6M3fPVRbohuwSfOS6n4HqBtJus4w==
+react-native-qrcode-svg@^6.3.48:
+  version "6.3.50"
+  resolved "https://registry.yarnpkg.com/react-native-qrcode-svg/-/react-native-qrcode-svg-6.3.50.tgz#f9ae18fd4475554d84b4f0e671213ccb0625562d"
+  integrity sha512-I9sg0n/PmUg1RQkS7Qf8q1mfNNA/HKvHpx2OwE08H2EPtkjNlclpoYL8N24oNzmd/N6Jtf7C2xzvjeyYQ74f6g==
   dependencies:
     prop-types "^15.8.0"
     qrcode "^1.5.4"
@@ -8465,10 +8472,10 @@ react-native-restart@^0.0.28:
   resolved "https://registry.yarnpkg.com/react-native-restart/-/react-native-restart-0.0.28.tgz#c2f9572c39c4bafc70df228040f25c60ff74f42e"
   integrity sha512-FUGr24ZDCC2AwuhDcK8SRoDxqCyFMSlhJaR4u5nSEAcAkn4S26VxrZSpiBdI1CxC6rnbaV+vh9kdxv8YIS+pdw==
 
-react-native-safe-area-context@^5.10.1:
-  version "5.10.1"
-  resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-5.10.1.tgz#d05ecf41d18c1a748b49c40a700936e5235a172d"
-  integrity sha512-ax0T3cAHQIhuAjDQpJ9C1Le96aRiM9PF+Kmgg7Y8+mD7QJMEIx04cG0eG3EGUTdvymgOkCrkakgZFwuOIuNQGw==
+react-native-safe-area-context@^5.11.0:
+  version "5.11.0"
+  resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-5.11.0.tgz#550f1bf2b3aa4d7d224647d07ac5de87a18cf5d5"
+  integrity sha512-+QuWQSFt9N+GXg9SEGvB+nG1FdjDd8cTTNcNxZBARu5T0n490VsoRm7CsMkEkjY0mneA342LTpkqgOKxpt5tOQ==
 
 react-native-screens@4.25.2:
   version "4.25.2"
