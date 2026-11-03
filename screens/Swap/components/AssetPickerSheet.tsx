@@ -31,6 +31,7 @@ import { ChevronRight } from '@ui/primitives/Icons/Chevron';
 import { ChainLogo } from '@ui/widgets/ChainSelect';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import { formatInteger } from '@app/utils/formatAmount';
+import { repeatedCoins, shortContract } from '@screens/Swap/swapAssets';
 import TokenLogo from './TokenLogo';
 import SheetTitle from './SheetTitle';
 
@@ -212,6 +213,10 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
       [tokens, query],
     );
 
+    const repeated = useMemo(() => repeatedCoins(tokens), [tokens]);
+    const contractOf = (token: TokenEntryType): string =>
+      repeated.has(token.identifier) ? shortContract(token.address ?? '') : '';
+
     const pick = (token: TokenEntryType) => {
       onSelect(token);
       setNetworksOf(null);
@@ -297,9 +302,14 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
           />
         }
         title={(token.ticker || token.symbol || '').toUpperCase()}
-        sub={t('swap.asset-on')
-          .replace('{asset}', token.name ?? token.ticker ?? '')
-          .replace('{network}', networkName(token))}
+        sub={[
+          t('swap.asset-on')
+            .replace('{asset}', token.name ?? token.ticker ?? '')
+            .replace('{network}', networkName(token)),
+          contractOf(token),
+        ]
+          .filter(Boolean)
+          .join(' · ')}
         onPress={() => pick(token)}
       />
     );
@@ -404,6 +414,7 @@ const AssetPickerSheet = forwardRef<BottomSheetModal, AssetPickerSheetProps>(
                   first={index === 0}
                   leading={<ChainLogo chain={token.chain} size={32} />}
                   title={networkName(token)}
+                  sub={contractOf(token)}
                   selected={token.identifier === selected?.identifier}
                   onPress={() => pick(token)}
                 />

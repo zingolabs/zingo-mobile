@@ -1,5 +1,6 @@
 import type { TokenEntryType } from '@app/swap';
 import { assetMatches } from '@screens/Swap/components/AssetPickerSheet';
+import { repeatedCoins, shortContract } from '@screens/Swap/swapAssets';
 
 const coin = (
   ticker: string,
@@ -18,6 +19,40 @@ const coin = (
 const manyCoins = Array.from({ length: 100 }, (_, i) =>
   coin(`A${String(i).padStart(3, '0')}`, `Alpha ${i}`),
 );
+
+describe('repeatedCoins', () => {
+  const on = (identifier: string, chain: string, ticker: string) => ({
+    ...coin(ticker, ticker, chain),
+    identifier,
+  });
+
+  test('Tests that coins are repeated when they share chain and ticker, whatever the casing.', () => {
+    expect(
+      repeatedCoins([
+        on('NEAR.wBTC-a', 'NEAR', 'wBTC'),
+        on('NEAR.WBTC-b', 'NEAR', 'WBTC'),
+      ]),
+    ).toEqual(new Set(['NEAR.wBTC-a', 'NEAR.WBTC-b']));
+  });
+
+  test('Tests that a coin is not repeated when its other entries are on other chains.', () => {
+    expect(
+      repeatedCoins([
+        on('ETH.ETH', 'ETH', 'ETH'),
+        on('BASE.ETH', 'BASE', 'ETH'),
+      ]).size,
+    ).toBe(0);
+  });
+});
+
+describe('shortContract', () => {
+  test('Tests that a contract is cut in the middle when it is long, and left alone when it is not.', () => {
+    expect(
+      shortContract('miden-0x419f8f4bff72959132aa7cea15a4c1.omft.near'),
+    ).toBe('miden-0x419f…omft.near');
+    expect(shortContract('eth.bridge.near')).toBe('eth.bridge.near');
+  });
+});
 
 describe('assetMatches', () => {
   test('Tests that every coin is listed when nothing is typed, up to the last of the alphabet.', () => {
