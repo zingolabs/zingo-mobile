@@ -32,7 +32,6 @@ on:
         default: ubuntu-24.04
 
 env:
-  REPO-OWNER: ${{ github.repository_owner }}
   ABI: ${{ inputs.abi }}
   API-LEVEL: ${{ inputs.api-level }}
   TARGET: ${{ inputs.target }}
@@ -43,14 +42,8 @@ jobs:
     name: Avd Cache Integration
     runs-on: ubuntu-24.04
     steps:
-      - name: Set envs for zingolib CI
-        if: ${{ contains(github.repository, 'zingolib') }}
-        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
-
       - name: Checkout repository
         uses: actions/checkout@v7
-        with:
-          repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
       - name: Set envs for x86_64
         if: ${{ env.ABI == 'x86_64' }}
@@ -142,14 +135,8 @@ jobs:
     # test has its own limit in android/app/build.gradle.kts.
     timeout-minutes: 70
     steps:
-      - name: Set envs for zingolib CI
-        if: ${{ contains(github.repository, 'zingolib') }}
-        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
-
       - name: Checkout repository
         uses: actions/checkout@v7
-        with:
-          repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
       - name: Set envs for x86_64
         if: ${{ env.ABI == 'x86_64' }}

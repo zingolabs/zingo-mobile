@@ -7,9 +7,7 @@
 
 1. Yarn
 2. NodeJS at the version pinned in `.nvmrc` (`nvm install` reads the file and installs it)
-3. Rust (https://www.rust-lang.org/tools/install)
-4. Rustup iOS targets (`rustup target add aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios`)
-5. CocoaPods (`sudo gem install cocoapods`)
+3. CocoaPods (`sudo gem install cocoapods`)
 
 ## Building
 

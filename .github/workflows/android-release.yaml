@@ -68,7 +68,6 @@ jobs:
                       /usr/local/share/chromium \
                       /usr/local/.ghcup \
                       /opt/hostedtoolcache/CodeQL \
-                      /usr/local/lib/android/sdk/ndk \
                       /usr/share/dotnet \
                       /opt/ghc \
                       /usr/local/share/boost

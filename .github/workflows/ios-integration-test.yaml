@@ -18,7 +18,6 @@ on:
         type: boolean
 
 env:
-  REPO-OWNER: ${{ github.repository_owner }}
   # The destination pins no arch: it resolves arm64 on Apple-silicon
   # runners and x86_64 on the Intel larger-runner pool; the
   # XCFrameworks' simulator slices are fat arm64+x86_64 binaries
@@ -48,14 +47,8 @@ jobs:
         run: |
           xcodebuild -runFirstLaunch || true
 
-      - name: Set envs for zingolib CI
-        if: ${{ contains(github.repository, 'zingolib') }}
-        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
-
       - name: Checkout repository
         uses: actions/checkout@v7
-        with:
-          repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

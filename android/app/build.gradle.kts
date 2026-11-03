@@ -272,16 +272,6 @@ android {
         fatal += "NewApi"
     }
 
-    sourceSets {
-        getByName("main") {
-            // The Binding Layer AAR carries the native libraries. A build from
-            // before the Prebuilt Bundles left copies under the gitignored
-            // src/main/jniLibs, and packaging them beside the AAR's copies
-            // fails the merge or ships the stale library.
-            jniLibs.setSrcDirs(emptyList<String>())
-        }
-    }
-
     testOptions {
         // Each instrumented test runs in its own process.
         execution = "ANDROIDX_TEST_ORCHESTRATOR"
