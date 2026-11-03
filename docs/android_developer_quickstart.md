@@ -2,24 +2,20 @@
 ## Prerequisites
 1. Yarn
 2. NodeJS at the version pinned in `.nvmrc` (`nvm install` reads the file and installs it)
-3. Rust (https://www.rust-lang.org/tools/install)
-4. Podman or Docker. The Binding Layer build runs in zingo-mobile's Android
-   builder image, and it tries Podman first.
-5. OpenJDK 18 (https://jdk.java.net/archive/)
+3. OpenJDK 18 (https://jdk.java.net/archive/)
    - **macOS**: `brew install openjdk@18` or via SDKMAN: `sdk install java 18.0.2-zulu`
    - **Linux**: download from the link above and extract, or `sudo apt install openjdk-18-jdk`
    - **Windows**: download from the link above, or `choco install openjdk --version=18.0.2`
-6. Android SDK Command-line Tools.
+4. Android SDK Command-line Tools.
    Install via Android Studio SDK Manager: https://developer.android.com/studio/install
    or as standalone: https://developer.android.com/tools
-7. Android SDK components (via SDK Manager): Platform API 36, Build-Tools 35.0.0,
+5. Android SDK components (via SDK Manager): Platform API 36, Build-Tools 35.0.0,
    NDK 28.2.13676358, CMake. Required to build the app (New Architecture / C++).
-8. ccache (must be on `PATH`). React Native uses it as the C++ compiler launcher;
+6. ccache (must be on `PATH`). React Native uses it as the C++ compiler launcher;
    the build fails without it.
    - **macOS**: `brew install ccache`
    - **Linux**: `sudo apt install ccache`
    - **Windows**: `winget install Ccache.Ccache`
-9. Cargo nextest (https://nexte.st/book/installing-from-source.html)
 
 ## Environment variables
 The React Native tools need `ANDROID_HOME`, `JAVA_HOME` and some entries on `PATH`.

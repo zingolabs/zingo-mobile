@@ -31,7 +31,6 @@ on:
         default: zingo-android-gradle-16
 
 env:
-  REPO-OWNER: ${{ github.repository_owner }}
   ABI: ${{ inputs.abi }}
 
 jobs:
@@ -40,14 +39,8 @@ jobs:
     runs-on: ${{ inputs.runner }}
 
     steps:
-      - name: Set envs for zingolib CI
-        if: ${{ contains(github.repository, 'zingolib') }}
-        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
-
       - name: Checkout repository
         uses: actions/checkout@v7
-        with:
-          repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
       - name: Setup Java
         uses: actions/setup-java@v6
@@ -59,38 +52,6 @@ jobs:
         uses: ./.github/actions/gradle-cache
         with:
           writer: ${{ inputs.gradle-cache-writer }}
-
-      - name: Remove unnecessary directories to free up space
-        run: |
-          set -eux
-          echo "Disk space before cleanup:"
-          df -h
-
-          sudo apt-get update
-
-          sudo apt-get remove -y '^dotnet-.*' || true
-          sudo apt-get remove -y 'php.*' || true
-          sudo apt-get remove -y '^mongodb-.*' || true
-          sudo apt-get remove -y '^mysql-.*' || true
-          sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel libgl1-mesa-dri || true
-          sudo apt-get autoremove -y || true
-          sudo apt-get clean || true
-
-          sudo rm -rf /usr/local/graalvm/
-          sudo rm -rf /usr/local/share/powershell
-          sudo rm -rf /usr/local/share/chromium
-          sudo rm -rf /usr/local/.ghcup
-          sudo rm -rf /opt/hostedtoolcache/CodeQL
-          sudo rm -rf /usr/local/lib/android/sdk/ndk
-          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
-          sudo rm -rf /opt/ghc
-          sudo rm -rf /usr/local/share/boost
-
-          podman image prune --all --force || true
-          podman system prune --all --force || true
-
-          echo "Disk space after cleanup:"
-          df -h
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
