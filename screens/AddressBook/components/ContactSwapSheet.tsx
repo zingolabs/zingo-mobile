@@ -10,6 +10,7 @@ import type { SwapService, TokenEntryType } from '@app/swap';
 import Utils from '@app/utils';
 import ListRow from '@ui/primitives/ListRow';
 import Text from '@ui/primitives/Text';
+import Card from '@ui/widgets/Card';
 import { ChainLogo } from '@ui/widgets/ChainSelect';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import TokenLogo from '@screens/Swap/components/TokenLogo';
@@ -79,7 +80,7 @@ const Zec = () => {
     <TokenLogo
       token={ZEC_TOKEN_ENTRY}
       size={LOGO}
-      surfaceColor={colors.bgSurface}
+      surfaceColor={colors.bgCanvas}
     />
   );
 };
@@ -89,7 +90,7 @@ const Other = ({ chain, coin }: { chain: string; coin: ContactCoin }) => {
   return coin.several ? (
     <ChainLogo chain={chain} size={LOGO} />
   ) : (
-    <TokenLogo token={coin.coin} size={LOGO} surfaceColor={colors.bgSurface} />
+    <TokenLogo token={coin.coin} size={LOGO} surfaceColor={colors.bgCanvas} />
   );
 };
 
@@ -155,30 +156,38 @@ const ContactSwapSheet: React.FunctionComponent<{
           {(translate('swap.msg-no-route') as string).trim()}
         </Text>
       )}
-      {coins.kind === 'loaded' && !!coins.to && (
-        <ListRow
-          testID="addressbook.swap.to"
-          leading={<Pair from={<Zec />} to={other(coins.to)} />}
-          title={sayFor('addressbook.swap-to', coins.to)}
-          subtitle={sayFor('addressbook.swap-to', coins.to, '-line')}
-          chevron
-          onPress={() =>
-            coins.to && onChoose(SwapDirectionEnum.Outbound, coins.to.coin)
-          }
-        />
-      )}
-      {coins.kind === 'loaded' && !!coins.from && (
-        <ListRow
-          testID="addressbook.swap.from"
-          leading={<Pair from={other(coins.from)} to={<Zec />} />}
-          title={sayFor('addressbook.swap-from', coins.from)}
-          subtitle={sayFor('addressbook.swap-from', coins.from, '-line')}
-          chevron
-          divider={!!coins.to}
-          onPress={() =>
-            coins.from && onChoose(SwapDirectionEnum.Inbound, coins.from.coin)
-          }
-        />
+      {coins.kind === 'loaded' && (!!coins.to || !!coins.from) && (
+        <View style={{ marginHorizontal: space20 }}>
+          <Card flush>
+            {!!coins.to && (
+              <ListRow
+                testID="addressbook.swap.to"
+                leading={<Pair from={<Zec />} to={other(coins.to)} />}
+                title={sayFor('addressbook.swap-to', coins.to)}
+                subtitle={sayFor('addressbook.swap-to', coins.to, '-line')}
+                chevron
+                onPress={() =>
+                  coins.to &&
+                  onChoose(SwapDirectionEnum.Outbound, coins.to.coin)
+                }
+              />
+            )}
+            {!!coins.from && (
+              <ListRow
+                testID="addressbook.swap.from"
+                leading={<Pair from={other(coins.from)} to={<Zec />} />}
+                title={sayFor('addressbook.swap-from', coins.from)}
+                subtitle={sayFor('addressbook.swap-from', coins.from, '-line')}
+                chevron
+                divider={!!coins.to}
+                onPress={() =>
+                  coins.from &&
+                  onChoose(SwapDirectionEnum.Inbound, coins.from.coin)
+                }
+              />
+            )}
+          </Card>
+        </View>
       )}
     </View>
   );
