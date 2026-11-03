@@ -275,31 +275,16 @@ android {
     sourceSets {
         getByName("main") {
             // The Binding Layer AAR carries the native libraries. A build from
-            // before the zingolib submodule left copies under the gitignored
+            // before the Prebuilt Bundles left copies under the gitignored
             // src/main/jniLibs, and packaging them beside the AAR's copies
             // fails the merge or ships the stale library.
             jniLibs.setSrcDirs(emptyList<String>())
-        }
-        getByName("test") {
-            // The nym proxy shim's Kotlin wire-contract test, read from the
-            // crate itself. No copy lives under src/test.
-            java.srcDir("../../zingolib/zingo-netutils/nym-proxy-ffi/contract-tests/kotlin")
         }
     }
 
     testOptions {
         // Each instrumented test runs in its own process.
         execution = "ANDROIDX_TEST_ORCHESTRATOR"
-        unitTests.all {
-            // The golden wire-contract pins for GoldenWireContractTest, read
-            // from the crate itself.
-            it.systemProperty(
-                "zingo.golden.dir",
-                layout.projectDirectory
-                    .dir("../../zingolib/zingo-netutils/nym-proxy-ffi/test-data/golden")
-                    .asFile.absolutePath
-            )
-        }
         managedDevices {
             val pixel2api29 = localDevices.create("pixel2api29_x86") {
                 device = "Pixel 2"

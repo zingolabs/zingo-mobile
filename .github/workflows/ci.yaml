@@ -77,13 +77,6 @@ jobs:
     with:
       fail-all: true
 
-  # zingolib's CI leaves the wallet crate and the proxy crate untested, and
-  # this job tests both at the pinned commit.
-  binding-layer-check:
-    uses: ./.github/workflows/binding-layer-check.yaml
-    with:
-      fail-all: true
-
   js-depcheck:
     uses: ./.github/workflows/js-depcheck.yaml
     with:
@@ -107,52 +100,14 @@ jobs:
   create-timestamp:
     uses: ./.github/workflows/create-timestamp.yaml
 
-  create-cache-key:
-    uses: ./.github/workflows/create-cache-key.yaml
-
-  # The Binding Layer build from the submodule still runs below, and
-  # nothing consumes it. Step 6 of zingolib#2930 deletes it, and until
-  # then one revert of the consumption restores the old path.
-  #
   # PR CI executes tests on the emulator ABI (x86_64 / API 34), not the
   # device ABIs: KVM accelerates an AVD only when the guest matches the
   # x86_64 host, so arm64-v8a and armeabi-v7a can never run on hosted
-  # runners. The x86 / API 29 emulator lane runs on ci-nightly.
-  andr-build:
-    strategy:
-      matrix:
-        arch: [ x86_64 ]
-    uses: ./.github/workflows/android-build.yaml
-    needs: create-cache-key
-    with:
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-      arch: ${{ matrix.arch }}
-      runner: ${{ vars.CI_NATIVE_RUNNER || 'zingo-android-native-16' }}
-      fail-all: true
-
-  # The other three ABIs cross-compile per PR: proof that the Rust code
-  # still builds for the device ABIs and 32-bit x86 without waiting for
-  # ci-nightly. They block like every other check. The standard-runner
-  # fallback keeps these off the zingo-android-native-16 pool; the
-  # per-arch caches make them no-ops on pushes that leave the zingolib
-  # pin untouched.
-  andr-build-other-abis:
-    strategy:
-      matrix:
-        arch: [ x86, arm64-v8a, armeabi-v7a ]
-    uses: ./.github/workflows/android-build.yaml
-    needs: create-cache-key
-    with:
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-      arch: ${{ matrix.arch }}
-      runner: ${{ vars.CI_NATIVE_RUNNER || 'ubuntu-24.04' }}
-      fail-all: true
-
+  # runners. The x86 / API 29 emulator lane runs on ci-nightly. The AAR
+  # carries every ABI, so the device ABIs need no build of their own.
   andr-apk-build:
     uses: ./.github/workflows/android-apk-build.yaml
-    needs: create-cache-key
     with:
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       abi: x86_64
       runner: ${{ vars.CI_GRADLE_RUNNER || 'zingo-android-gradle-16' }}
       fail-all: true
@@ -177,16 +132,7 @@ jobs:
       fail-all: true
 
   # iOS starts at workflow launch, in parallel with the Android chain,
-  # and its jobs are blocking checks.
-  ios-build:
-    uses: ./.github/workflows/ios-build.yaml
-    needs: create-cache-key
-    with:
-      cache-key: ${{ needs.create-cache-key.outputs.ios-cache-key }}
-      fail-all: true
-
-  # The test job starts at workflow launch and fetches the iOS Prebuilt
-  # Bundle itself.
+  # and fetches the iOS Prebuilt Bundle itself.
   ios-integration-test:
     uses: ./.github/workflows/ios-integration-test.yaml
     secrets: inherit

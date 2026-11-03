@@ -2,7 +2,3 @@
 	path = docs/adr
 	url = https://github.com/zingolabs/zingo-adrs.git
 	branch = dev
-[submodule "zingolib"]
-	path = zingolib
-	url = https://github.com/zingolabs/zingolib.git
-	shallow = true

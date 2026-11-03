@@ -26,15 +26,28 @@ The Maestro shield-offer flow (#1493) restores it and checks that the app offers
 to shield the note. The flow stops before the send gate. A flow that shields the
 note spends the fixture.
 
+## The zingolib checkout
+
+Every zingolib path below is relative to a checkout of zingolib at the commit
+that `binding-layer.json` pins, which is the commit the app's Binding Layer
+was built from.
+
+```bash
+# Check zingolib out at the pinned commit, beside this repository.
+commit="$(node --print 'require("./binding-layer.json").commit')"
+git clone https://github.com/zingolabs/zingolib.git ../zingolib
+git -C ../zingolib checkout --detach "$commit"
+```
+
 ## Starting from zingolib's testnet wallet
 
 zingolib already publishes a funded testnet wallet,
 `TestnetSeedVersion::GloryGoddess` in
-`zingolib/zingolib/src/wallet/disk/testing/examples.rs`. The file holds its
+`zingolib/src/wallet/disk/testing/examples.rs`. The file holds its
 seed phrase, its transparent address `tmF7QpuKsLF7nsMvThu4wQBpiKVGJXGCSJF`, and
 its unified address, which has no Sapling receiver. Its saved wallet file is
-`zingolib/zingolib/src/wallet/disk/testing/examples/testnet/glory_goddess/latest/zingo-wallet.dat`.
-The ignored networked tests of `zingolib/zingolib/src/lightclient/send.rs`
+`zingolib/src/wallet/disk/testing/examples/testnet/glory_goddess/latest/zingo-wallet.dat`.
+The ignored networked tests of `zingolib/src/lightclient/send.rs`
 (`testnet_send_to_self_orchard_glory_goddess` and its siblings) spend from it.
 
 Anyone who runs those tests changes the wallet's history. The shared fixture
@@ -65,8 +78,8 @@ seconds until the spendable shielded balance reaches its minimum.
 
 The birthday and the current history of this wallet come from one sync of the
 saved wallet. Read them from that sync.
-`zingolib/docs/testing/testnet.md` gives the command, run from the root of the
-zingolib submodule.
+`docs/testing/testnet.md` gives the command, run from the root of the
+zingolib checkout.
 
 ```bash
 cargo run -- -c=testnet --server="https://testnet.zec.rocks:9067" --data-dir=zingolib/src/wallet/disk/testing/examples/testnet/glory_goddess/latest
@@ -75,17 +88,17 @@ cargo run -- -c=testnet --server="https://testnet.zec.rocks:9067" --data-dir=zin
 Three changes adapt it to the pinned CLI. The CLI aborts an online session that
 finds no `nym-proxy` binary, and `makers run-cli` places one beside the CLI.
 Port 9067 of `testnet.zec.rocks` gave no answer on 2026-10-02, and port 443
-did. The command also writes the synced wallet back into the submodule, and a
-copy outside the repository keeps the saved file unchanged.
+did. The command also writes the synced wallet back into the checkout, and a
+copy outside it keeps the saved file unchanged.
 
 ```bash
-# Copy the saved wallet out of the submodule.
+# Copy the saved wallet out of the checkout.
 cp --recursive \
-  zingolib/zingolib/src/wallet/disk/testing/examples/testnet/glory_goddess/latest \
+  ../zingolib/zingolib/src/wallet/disk/testing/examples/testnet/glory_goddess/latest \
   "$HOME/fixture-wallets/glory-goddess"
 
 # Sync the copy once, on testnet, through the mixnet-capable CLI.
-cd zingolib
+cd ../zingolib
 makers run-cli \
   --chain testnet \
   --server="https://testnet.zec.rocks:443" \
@@ -102,7 +115,7 @@ fixture wallet takes a new seed and the history below.
 The history reproduces the two regtest scenarios that the tests replace,
 `funded_orchard_with_3_txs_mobileclient` and
 `funded_orchard_sapling_transparent_shielded_mobileclient` in
-`zingolib/zingolib_testutils/src/scenarios.rs`. Both scenarios ran with a value
+`zingolib_testutils/src/scenarios.rs`. Both scenarios ran with a value
 of 1,000,000 zatoshis. The amounts below keep that value, and the Kotlin
 expectations change as little as possible.
 
@@ -191,17 +204,15 @@ confirms that proposal.
 
 Every transmission goes through the mixnet. A wallet with no mixnet refuses to
 transmit (`zingo-adrs zingolib/0011`). The zingo-cli of the pinned zingolib
-submodule authors the history. Its default build carries the `nym` feature, and
+checkout authors the history. Its default build carries the `nym` feature, and
 an online session forces Mixnet Mode on at the go-online moment
-(`zingolib/zingo-cli/src/lib.rs`, the `MixnetStartPolicy::ForcedOn` call). A
+(`zingo-cli/src/lib.rs`, the `MixnetStartPolicy::ForcedOn` call). A
 failure to start the proxy aborts the session.
 
-The `run-cli` task of `zingolib/Makefile.toml` builds the CLI, places the
+The `run-cli` task of zingolib's `Makefile.toml` builds the CLI, places the
 `nym-proxy` binary beside it, and launches it. It needs cargo-make.
 
 ```bash
-# The CLI sources come from the zingolib submodule.
-git submodule update --init zingolib
 cargo install cargo-make
 ```
 
@@ -212,7 +223,7 @@ consent to go online.
 
 ```bash
 # Launch an interactive session on testnet for the shared wallet.
-cd zingolib
+cd ../zingolib
 makers run-cli \
   --chain testnet \
   --server https://testnet.zec.rocks:443 \
@@ -241,8 +252,8 @@ These commands of the interactive session author and read the history.
 | `quit`                               | Saves the wallet and ends the session.                             |
 
 The `help` command lists every command, and `help <command>` describes one. The
-commands are defined in `zingolib/zingo-cli/src/commands.rs`, and the session
-options in `build_clap_app` of `zingolib/zingo-cli/src/lib.rs`.
+commands are defined in `zingo-cli/src/commands.rs`, and the session
+options in `build_clap_app` of `zingo-cli/src/lib.rs`.
 
 The app can also author the history (verify). Mixnet Mode is always on in the
 app. The header shows the indicator (`header.mixnet-status`), and the NYM
@@ -257,7 +268,7 @@ and the port `443` (`server.custom.port`). The Save button is
 
 The funding wallet receives testnet coins from a testnet faucet:
 `<TESTNET_FAUCET_URL: the maintainer supplies it>`. Neither this repository nor
-the zingolib submodule names a faucet.
+zingolib names a faucet.
 
 The funding wallet sends 1,750,000 zatoshis in steps 1, 4, 5, and 10, plus four
 fees. The shared wallet pays the fees of steps 2, 3, 6, 7, 8, and 9 from its own
@@ -317,7 +328,7 @@ birthday has finished.
 - The testnet servers. The fixture tests read the first one that answers,
   `https://testnet.zec.rocks:443` and then
   `https://zaino.testnet.unsafe.zec.rocks:443`, which zingolib lists in
-  `zingolib/zingo-netutils/src/indexers.rs`.
+  `zingo-netutils/src/indexers.rs`.
 - The txid of each step.
 - The value transfers as the Binding Layer reports them.
 - The total and confirmed balances of the Ironwood, Orchard, Sapling, and
@@ -325,9 +336,9 @@ birthday has finished.
 - The recipient address of step 2, which the value-transfer test checks.
 
 The CLI lists value transfers oldest first (`value_transfers` in
-`zingolib/zingo-cli/src/commands.rs`). The Binding Layer lists them newest
+`zingo-cli/src/commands.rs`). The Binding Layer lists them newest
 first and adds the migrated value to an Orchard to Ironwood migration
-(`get_value_transfers` in `zingolib/zingo-ffi/lib/src/lib.rs`). Take the test
+(`get_value_transfers` in `zingo-ffi/lib/src/lib.rs`). Take the test
 constants from the JSON that a device run of the fixture test prints, and check
 them against the CLI.
 

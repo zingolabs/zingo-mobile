@@ -61,15 +61,8 @@ zingolib commit in `binding-layer.json`, the Bundle Pin (ADR
 zingo-mobile/0020). The Android and iOS builds fetch the pinned bundles
 through the `fetch:binding-layer` script. A build host needs Node and
 network access to `ghcr.io` the first time. `yarn pin <commit>` moves the
-pin to another published commit.
-
-The zingolib submodule at `zingolib/` holds the same commit for the tests
-that read zingolib's source, and zingolib#2930 removes it. Initialise it
-before `yarn test` or the Android unit tests.
-
-```sh
-git submodule update --init zingolib
-```
+pin to another published commit. The tests that read zingolib's source
+run in zingolib.
 
 ## Testing
 ### Yarn Tests

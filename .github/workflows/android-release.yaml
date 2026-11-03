@@ -5,9 +5,8 @@ name: Android Release
 #
 # Reliability note: this workflow does NOT read from or write to any
 # cross-run `actions/cache`. The Binding Layer, the Rust libraries and their
-# Kotlin bindings, is built from source on the tagged commit's zingolib
-# submodule and passed between jobs via `upload-artifact` (which is
-# run-scoped and disappears after the workflow finishes). The gradle
+# Kotlin bindings, is the Android Prebuilt Bundle that the tagged commit's
+# Bundle Pin names, which Gradle fetches by digest. The gradle
 # `setup-gradle` step keeps Maven dependency caching enabled because Maven
 # artifacts are content-addressed and signed — that cache cannot affect what
 # code ends up in the APK.
