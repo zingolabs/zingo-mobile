@@ -85,6 +85,19 @@ export function isZecWrapper(token: TokenEntryType): boolean {
   );
 }
 
+/** The coins a contact saved under `chain` can swap with. */
+export function chainCoins(
+  tokens: TokenEntryType[],
+  chain: string,
+): TokenEntryType[] {
+  return tokens.filter(
+    token =>
+      isQuotableToken(token) &&
+      !isZecWrapper(token) &&
+      token.chain.toUpperCase() === chain.toUpperCase(),
+  );
+}
+
 /**
  * What a contact saved under `chain` swaps with by default: the chain's entry
  * with no contract, or its first token where it routes only tokens (USDC on
@@ -96,12 +109,7 @@ export function chainCoin(
   tokens: TokenEntryType[],
   chain: string,
 ): TokenEntryType | undefined {
-  const onChain = tokens.filter(
-    token =>
-      isQuotableToken(token) &&
-      !isZecWrapper(token) &&
-      token.chain.toUpperCase() === chain.toUpperCase(),
-  );
+  const onChain = chainCoins(tokens, chain);
   return (
     onChain.find(token => !token.address && !token.identifier.includes('-')) ??
     onChain[0]

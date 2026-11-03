@@ -10,17 +10,33 @@ import type { SwapService, TokenEntryType } from '@app/swap';
 import Utils from '@app/utils';
 import ListRow from '@ui/primitives/ListRow';
 import Text from '@ui/primitives/Text';
+import { ChainLogo } from '@ui/widgets/ChainSelect';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import TokenLogo from '@screens/Swap/components/TokenLogo';
-import { ZEC_TOKEN_ENTRY, chainCoin } from '@screens/Swap/swapAssets';
+import {
+  ZEC_TOKEN_ENTRY,
+  chainCoin,
+  chainCoins,
+} from '@screens/Swap/swapAssets';
 
 const LOGO = 28;
 const LOGO_OVERLAP = -8;
 
+/** The coin a row opens Swap with; with `several` on the chain, the row names none of them. */
+type ContactCoin = { coin: TokenEntryType; several: boolean };
+
 /** What the contact swaps with in each direction; a direction SwapKit does not route has none. */
 export type SwapCoins =
   | { kind: 'loading' }
-  | { kind: 'loaded'; to?: TokenEntryType; from?: TokenEntryType };
+  | { kind: 'loaded'; to?: ContactCoin; from?: ContactCoin };
+
+const contactCoin = (
+  tokens: TokenEntryType[],
+  chain: string,
+): ContactCoin | undefined => {
+  const coin = chainCoin(tokens, chain);
+  return coin && { coin, several: chainCoins(tokens, chain).length > 1 };
+};
 
 /**
  * What the contact's chain swaps with, from the catalog the Swap tab quotes
@@ -38,8 +54,8 @@ export const loadSwapCoins = async (
     ]);
     return {
       kind: 'loaded',
-      to: chainCoin(outbound, chain),
-      from: chainCoin(inbound, chain),
+      to: contactCoin(outbound, chain),
+      from: contactCoin(inbound, chain),
     };
   } catch {
     return { kind: 'loaded' };
@@ -57,17 +73,32 @@ export const contactSwapText = (
     .replace(/\{coin\}/g, coin)
     .replace('{chain}', chainDisplayName(contact.swapChain));
 
-const Pair = ({ from, to }: { from: TokenEntryType; to: TokenEntryType }) => {
+const Zec = () => {
   const { colors } = useTheme();
   return (
-    <View style={{ flexDirection: 'row' }}>
-      <TokenLogo token={from} size={LOGO} surfaceColor={colors.bgSurface} />
-      <View style={{ marginLeft: LOGO_OVERLAP }}>
-        <TokenLogo token={to} size={LOGO} surfaceColor={colors.bgSurface} />
-      </View>
-    </View>
+    <TokenLogo
+      token={ZEC_TOKEN_ENTRY}
+      size={LOGO}
+      surfaceColor={colors.bgSurface}
+    />
   );
 };
+
+const Other = ({ chain, coin }: { chain: string; coin: ContactCoin }) => {
+  const { colors } = useTheme();
+  return coin.several ? (
+    <ChainLogo chain={chain} size={LOGO} />
+  ) : (
+    <TokenLogo token={coin.coin} size={LOGO} surfaceColor={colors.bgSurface} />
+  );
+};
+
+const Pair = ({ from, to }: { from: React.ReactNode; to: React.ReactNode }) => (
+  <View style={{ flexDirection: 'row' }}>
+    {from}
+    <View style={{ marginLeft: LOGO_OVERLAP }}>{to}</View>
+  </View>
+);
 
 /** Which way a swap with a contact goes; the title bar names the contact. */
 const ContactSwapSheet: React.FunctionComponent<{
@@ -79,6 +110,14 @@ const ContactSwapSheet: React.FunctionComponent<{
   const { colors } = useTheme();
   const say = (key: string, coin?: TokenEntryType) =>
     contactSwapText(translate(key) as string, contact, coin?.ticker);
+  /** `key` names the coin; `key-any` is the same text for a chain with several. */
+  const sayFor = (key: string, coin: ContactCoin, suffix = '') =>
+    coin.several
+      ? say(`${key}-any${suffix}`)
+      : say(`${key}${suffix}`, coin.coin);
+  const other = (coin: ContactCoin) => (
+    <Other chain={contact.swapChain} coin={coin} />
+  );
 
   return (
     <View style={{ paddingBottom: space16 }}>
@@ -119,25 +158,25 @@ const ContactSwapSheet: React.FunctionComponent<{
       {coins.kind === 'loaded' && !!coins.to && (
         <ListRow
           testID="addressbook.swap.to"
-          leading={<Pair from={ZEC_TOKEN_ENTRY} to={coins.to} />}
-          title={say('addressbook.swap-to', coins.to)}
-          subtitle={say('addressbook.swap-to-line', coins.to)}
+          leading={<Pair from={<Zec />} to={other(coins.to)} />}
+          title={sayFor('addressbook.swap-to', coins.to)}
+          subtitle={sayFor('addressbook.swap-to', coins.to, '-line')}
           chevron
           onPress={() =>
-            coins.to && onChoose(SwapDirectionEnum.Outbound, coins.to)
+            coins.to && onChoose(SwapDirectionEnum.Outbound, coins.to.coin)
           }
         />
       )}
       {coins.kind === 'loaded' && !!coins.from && (
         <ListRow
           testID="addressbook.swap.from"
-          leading={<Pair from={coins.from} to={ZEC_TOKEN_ENTRY} />}
-          title={say('addressbook.swap-from', coins.from)}
-          subtitle={say('addressbook.swap-from-line', coins.from)}
+          leading={<Pair from={other(coins.from)} to={<Zec />} />}
+          title={sayFor('addressbook.swap-from', coins.from)}
+          subtitle={sayFor('addressbook.swap-from', coins.from, '-line')}
           chevron
           divider={!!coins.to}
           onPress={() =>
-            coins.from && onChoose(SwapDirectionEnum.Inbound, coins.from)
+            coins.from && onChoose(SwapDirectionEnum.Inbound, coins.from.coin)
           }
         />
       )}

@@ -51,6 +51,8 @@ const token = (
 
 const BTC = token('BTC.BTC', 'BTC');
 const GRAM = token('TON.GRAM', 'GRAM');
+const ETH = token('ETH.ETH', 'ETH');
+const USDC = token('ETH.USDC-0xa0b8', 'USDC', '0xa0b8');
 
 const contact = (label: string, address: string, swapChain: string) =>
   new AddressBookFileClass(
@@ -67,6 +69,7 @@ const book = [
   contact('Ana', ana, 'BTC'),
   contact('Lolo', 'u1lolo', 'ZEC'),
   contact('Xmr', '4xmr', 'XMR'),
+  contact('Eve', '0xeve', 'ETH'),
 ];
 
 const renderBook = (readOnly = false) => {
@@ -160,6 +163,42 @@ describe('AddressBook swap', () => {
     await openSheet(ana);
     expect(screen.queryByTestId('addressbook.swap.to')).toBeNull();
     expect(screen.getByTestId('addressbook.swap.from')).toBeTruthy();
+  });
+
+  test('Tests that the rows name the coin when the chain has only one.', async () => {
+    renderBook();
+    await openSheet(ana);
+    expect(screen.getByText('Swap to BTC')).toBeTruthy();
+    expect(screen.getByText('Swap from BTC')).toBeTruthy();
+  });
+
+  test('Tests that the rows name no coin when the chain has several, and still open Swap.', async () => {
+    mockSwapService = { listRoutableTokens: async () => [USDC, ETH] };
+    renderBook();
+    await openSheet('0xeve');
+    expect(screen.getByText('Swap to')).toBeTruthy();
+    expect(screen.getByText('Swap from')).toBeTruthy();
+    for (const row of ['addressbook.swap.to', 'addressbook.swap.from']) {
+      expect(screen.getByTestId(row)).not.toHaveTextContent(/ETH|USDC/);
+    }
+
+    fireEvent.press(screen.getByTestId('addressbook.swap.to'));
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
+    expect(mockNavigation.navigate).toHaveBeenCalledWith(
+      Route.Home,
+      {
+        screen: Route.Swap,
+        params: {
+          prefill: expect.objectContaining({
+            asset: expect.objectContaining({ swapKitId: 'ETH.ETH' }),
+            address: '0xeve',
+          }),
+        },
+      },
+      { pop: true },
+    );
   });
 
   test.each([
