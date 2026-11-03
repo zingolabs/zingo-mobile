@@ -17,4 +17,8 @@ RCT_EXTERN_METHOD(stopMixnetTransport:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(takeProxyDeathReason:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+
 @end

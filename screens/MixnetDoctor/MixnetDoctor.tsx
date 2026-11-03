@@ -1,52 +1,60 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import Animated, {
-  Easing,
-  FadeIn,
-  FadeOut,
-  LinearTransition,
-  ReduceMotion,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withTiming,
-} from 'react-native-reanimated';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import FadeText from '@ui/primitives/FadeText';
-import RegText from '@ui/primitives/RegText';
 import Button from '@ui/primitives/Button';
+import FadeText from '@ui/primitives/FadeText';
+import Pressable from '@ui/primitives/Pressable';
+import RegText from '@ui/primitives/RegText';
 import Header from '@ui/widgets/Header';
 import { AppDrawerParamList } from '@app/types';
-import { useTheme, radiusMd, radiusPill } from '@app/theme';
+import { Route } from '@app/AppState';
+import { useTheme, radiusMd } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
+import { probeServer } from '@app/walletBackend';
+import { mixnetJournal } from '@app/walletBackend/modules/MixnetJournal';
 import {
   getMixnetBootstrapDetail,
   getMixnetStatus,
 } from '@app/walletBackend/utils/mixnetUtils';
-import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
 import { viewPhase } from '@app/walletBackend/transforms/mixnetView';
 import {
+  MixnetDirectProbe,
   MixnetDoctorRow,
   MixnetDoctorRun,
   mixnetDoctorReport,
   mixnetDoctorRows,
+  mixnetJournalLine,
 } from '@app/walletBackend/transforms/mixnetDoctorReport';
+import {
+  MixnetDoctorStepState,
+  MixnetDoctorTone,
+  mixnetDoctorSteps,
+  mixnetDoctorVerdict,
+} from '@app/walletBackend/transforms/mixnetDoctorVerdict';
 
 type MixnetDoctorProps = NativeStackScreenProps<
   AppDrawerParamList,
   'MixnetDoctor'
 >;
 
-const SKELETON_WIDTHS = ['70%', '90%', '55%', '80%'] as const;
-const REPORT_MIN_HEIGHT = 120;
-// How often the report re-probes while the transport is still settling. Fast
-// enough that the bootstrap narration moves, slow enough that the two probes
-// never overlap.
-const LIVE_REFRESH_MS = 2000;
+/**
+ * How often the screen re-reads the wallet's state and the journal. Both are
+ * local, so it costs no network.
+ */
+const REFRESH_MS = 2000;
+
+const NOT_RUN: MixnetDirectProbe = { kind: 'not-run' };
+
+const STEP_MARK: Record<MixnetDoctorStepState, string> = {
+  ok: '✓',
+  fail: '✗',
+  running: '…',
+  unchecked: '–',
+};
 
 /**
  * A URI has no words to keep whole: left to the line breaker it splits at
@@ -56,7 +64,6 @@ const LIVE_REFRESH_MS = 2000;
 const wrapValue = (value: string) =>
   /^[a-z]+:\/\//.test(value) ? value.split('').join('​') : value;
 
-// One iOS-style row: muted label on the left, value right-aligned.
 const DoctorRow = ({
   row,
   last,
@@ -87,70 +94,6 @@ const DoctorRow = ({
   </View>
 );
 
-// No entrance animation on the screen itself. These drive state changes only:
-// the box and its skeleton/report swap fade in place while the box and the
-// buttons below it morph to the new layout in sync, so nothing snaps ahead of
-// the frame. Fades survive reduced motion; the layout shift does not.
-const contentEnter = () =>
-  FadeIn.duration(200).reduceMotion(ReduceMotion.Never);
-const contentExit = () =>
-  FadeOut.duration(140).reduceMotion(ReduceMotion.Never);
-const boxMorph = () =>
-  LinearTransition.duration(260).reduceMotion(ReduceMotion.System);
-
-// The running placeholder: pulsing bars that occupy the space the report lines
-// will fill, so the box does not jump when the run lands.
-const ReportSkeleton = ({ color }: { color: string }) => {
-  const pulse = useSharedValue(0.4);
-
-  useEffect(() => {
-    pulse.value = withRepeat(
-      withTiming(1, { duration: 700, easing: Easing.inOut(Easing.ease) }),
-      -1,
-      true,
-    );
-  }, [pulse]);
-
-  const pulseStyle = useAnimatedStyle(() => ({ opacity: pulse.value }));
-
-  return (
-    <Animated.View
-      entering={contentEnter()}
-      exiting={contentExit()}
-      style={[{ gap: 12 }, pulseStyle]}
-    >
-      {SKELETON_WIDTHS.map(width => (
-        <View
-          key={width}
-          style={{
-            width,
-            height: 12,
-            borderRadius: radiusPill,
-            backgroundColor: color,
-          }}
-        />
-      ))}
-    </Animated.View>
-  );
-};
-
-// A run the user can act on: the transport is down for good, so restarting it
-// is the remedy rather than waiting. A bootstrap is not one of these — it
-// arrives on its own — and neither is a reachable mixnet.
-//
-// `attachInFlight` is what the probe alone cannot see. The library reports a
-// transport that has not attached yet as `died` (Unattached fails closed, so
-// the mixnet-only surfaces stay shut), which during a connect in progress is
-// a state the app is already leaving. Restarting it there would cancel the
-// attach and start the same wait again.
-const runIsTerminal = (
-  finished: MixnetDoctorRun,
-  attachInFlight: boolean,
-): boolean =>
-  !attachInFlight &&
-  (finished.status.kind === 'failure' ||
-    finished.status.indicator === RPCMixnetIndicatorEnum.died);
-
 const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
   navigation,
 }) => {
@@ -159,17 +102,18 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
     context;
   const { colors } = useTheme();
 
-  // The coordinator's own view of the session, which the probes cannot see:
-  // it knows an attach is under way while the library still answers `died`.
+  /**
+   * The coordinator's own view of the session, which the probes cannot see:
+   * it knows an attach is under way while the library still answers `died`.
+   */
   const phase = viewPhase(mixnetView);
   const attachInFlight = phase === 'connecting' || phase === 'reconnecting';
-  // Nym rests at `off` because the session is Offline or the device has no
-  // network. The probes have nothing to reach: they would time a local FFI
-  // call and report the state the header already shows, so the screen says
-  // why instead of measuring nothing and offering it for copying.
+  /**
+   * Nym rests at `off` because the session is Offline or the device has no
+   * network: there is nothing to reach, so the screen says why instead of
+   * measuring nothing and offering it for copying.
+   */
   const restingOff = phase === 'off';
-  // Off on a remote server means the device has no network: the transport
-  // rests as in Offline and comes back by itself with the network.
   const offReason =
     server.kind === 'remote'
       ? 'mixnetdoctor.nonetwork'
@@ -177,6 +121,10 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
 
   const [run, setRun] = useState<MixnetDoctorRun | null>(null);
   const [running, setRunning] = useState<boolean>(false);
+  const [direct, setDirect] = useState<MixnetDirectProbe>(NOT_RUN);
+  const [directPhase, setDirectPhase] = useState<string>('');
+  const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
+  const [nowMillis, setNowMillis] = useState<number>(Date.now());
 
   const closeScreen = useCallback(() => {
     if (navigation.canGoBack()) {
@@ -184,91 +132,120 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
     }
   }, [navigation]);
 
-  // Both probes reach the mixnet surface from the real IP. Each is timed, so
-  // the report carries a latency the user can compare across runs.
-  //
-  // A silent run replaces the report in place, without the skeleton: it is the
-  // screen following a transport that is still settling, not a run the user
-  // asked for.
-  const runDoctor = useCallback(
-    async (silent: boolean = false) => {
-      if (!silent) {
-        setRunning(true);
-        setRun(null);
-      }
-      const statusStart = Date.now();
-      const status = await getMixnetStatus();
-      const statusMillis = Date.now() - statusStart;
-      const detailStart = Date.now();
-      const detail = await getMixnetBootstrapDetail();
-      const detailMillis = Date.now() - detailStart;
-      setRun({
-        serverUri: server.kind === 'remote' ? server.uri : 'offline',
-        chainName: server.chainName,
-        status,
-        statusMillis,
-        detail,
-        detailMillis,
-      });
-      setRunning(false);
-    },
-    [server],
-  );
+  /** Reads the wallet's state, which is local: this touches no network. */
+  const readState = useCallback(async () => {
+    const statusStart = Date.now();
+    const status = await getMixnetStatus();
+    const statusMillis = Date.now() - statusStart;
+    const detailStart = Date.now();
+    const detail = await getMixnetBootstrapDetail();
+    const detailMillis = Date.now() - detailStart;
+    setRun({
+      serverUri: server.kind === 'remote' ? server.uri : 'offline',
+      chainName: server.chainName,
+      status,
+      statusMillis,
+      detail,
+      detailMillis,
+      direct: NOT_RUN,
+    });
+    setNowMillis(Date.now());
+  }, [server]);
 
-  // The screen is opened because something looks wrong, so it answers without
-  // being asked twice: the first run starts on entry — unless nym is resting,
-  // where there is nothing to ask.
-  useEffect(() => {
-    if (restingOff) {
-      return;
+  /**
+   * The direct probe leaves from the real IP, so it waits for the button and
+   * never runs because a screen was opened.
+   */
+  const runDiagnostics = useCallback(async () => {
+    setRunning(true);
+    await readState();
+    if (server.kind === 'remote') {
+      const result = await probeServer(server.uri);
+      setDirect(
+        result.ok
+          ? { kind: 'probed', probe: result.value }
+          : { kind: 'refused', cause: result.error.message },
+      );
+      setDirectPhase(phase);
     }
-    runDoctor();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setRunning(false);
+  }, [phase, readState, server]);
 
-  // While the transport is still settling the report follows it, so a mixnet
-  // that comes up cannot leave a dead verdict on screen. Once it settles the
-  // polling stops and the last run stays put: from then on the values only
-  // change because the user ran the diagnostics again or restarted the
-  // transport.
-  useEffect(() => {
-    if (!attachInFlight) {
-      return;
-    }
-    const tick = setInterval(() => runDoctor(true), LIVE_REFRESH_MS);
-    return () => clearInterval(tick);
-  }, [attachInFlight, runDoctor]);
-
-  // The settling itself is worth a run: the moment the transport lands, or
-  // gives up, the report says so rather than showing the state before it.
-  // Reaching `off` is the exception: the report belonged to a transport this
-  // session no longer has, so it goes rather than lingering as stale numbers.
+  /**
+   * It keeps following the transport while open, whatever state that is in, so
+   * nothing on screen outlives what it describes.
+   */
   useEffect(() => {
     if (restingOff) {
       setRun(null);
-      setRunning(false);
       return;
     }
-    runDoctor(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase]);
+    readState();
+    const tick = setInterval(readState, REFRESH_MS);
+    return () => clearInterval(tick);
+  }, [restingOff, readState]);
 
-  // Restart the transport and diagnose again, so the screen that reported the
-  // trouble also shows whether the remedy worked.
-  const restartMixnet = useCallback(async () => {
-    setRunning(true);
-    setRun(null);
+  const restart = useCallback(async () => {
+    setDirect(NOT_RUN);
     await reenableMixnet();
-    await runDoctor();
-  }, [reenableMixnet, runDoctor]);
+    await readState();
+  }, [reenableMixnet, readState]);
+
+  const journal = mixnetJournal.list();
+
+  /**
+   * A direct answer speaks for the transport it was taken against: once the
+   * transport has moved on, the screen says what is true now, and the probe stays
+   * only for the details and the report.
+   */
+  const input =
+    run === null
+      ? null
+      : {
+          status: run.status,
+          attachInFlight,
+          direct: directPhase === phase ? direct : NOT_RUN,
+          recentLosses: mixnetJournal.recentLosses(nowMillis),
+        };
+  const verdict = input === null ? null : mixnetDoctorVerdict(input);
+  const steps =
+    input !== null && (running || input.direct.kind !== 'not-run')
+      ? mixnetDoctorSteps(input, running)
+      : [];
+  const measured = run === null ? null : { ...run, direct };
 
   const copyReport = useCallback(
     (finished: MixnetDoctorRun) => {
-      Clipboard.setString(mixnetDoctorReport(finished));
+      Clipboard.setString(mixnetDoctorReport(finished, mixnetJournal.list()));
       addLastSnackbar(translate('mixnetdoctor.report-copied') as string);
     },
     [addLastSnackbar, translate],
   );
+
+  const toneColor = (tone: MixnetDoctorTone): string => {
+    switch (tone) {
+      case 'ok':
+        return colors.fgAccent;
+      case 'warn':
+        return colors.fgWarning;
+      case 'bad':
+        return colors.fgDanger;
+      case 'neutral':
+        return colors.fgDefault;
+    }
+  };
+
+  const stepColor = (state: MixnetDoctorStepState): string => {
+    switch (state) {
+      case 'ok':
+        return colors.fgAccent;
+      case 'fail':
+        return colors.fgDanger;
+      case 'running':
+      case 'unchecked':
+        return colors.fgMuted;
+    }
+  };
 
   return (
     <View
@@ -288,8 +265,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
         backAccessibilityLabel={translate('mixnetdoctor.back-acc') as string}
       />
       <ScrollView contentContainerStyle={{ padding: 20 }}>
-        <Animated.View
-          layout={boxMorph()}
+        <View
           style={{
             backgroundColor: colors.bgSurface,
             borderColor: colors.bottomSheetBorder,
@@ -303,101 +279,137 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
             {translate(restingOff ? offReason : 'mixnetdoctor.intro') as string}
           </FadeText>
 
-          {!restingOff && (running || run !== null) && (
-            <Animated.View
-              entering={contentEnter()}
-              layout={boxMorph()}
-              style={{
-                backgroundColor: colors.bgCanvas,
-                borderRadius: radiusMd,
-                paddingHorizontal: 16,
-                paddingVertical: 4,
-                minHeight: REPORT_MIN_HEIGHT,
-                justifyContent: 'center',
-              }}
-            >
-              {run !== null ? (
-                <Animated.View
-                  key="report"
-                  entering={contentEnter()}
-                  exiting={contentExit()}
-                >
-                  {mixnetDoctorRows(run).map((row, i, rows) => (
-                    <DoctorRow
-                      key={i}
-                      row={row}
-                      last={i === rows.length - 1}
-                      labelColor={colors.fgMuted}
-                      valueColor={colors.fgDefault}
-                      dividerColor={colors.bottomSheetBorder}
-                    />
-                  ))}
-                </Animated.View>
-              ) : (
-                <ReportSkeleton color={colors.bottomSheetBorder} />
-              )}
-            </Animated.View>
-          )}
-
-          {/* A connect in progress reads as lost in the report above, because
-              a transport that has not attached fails closed. Say so, rather
-              than leave the user with a verdict the app is already undoing. */}
-          {attachInFlight && !running && (
-            <Animated.View entering={contentEnter()} layout={boxMorph()}>
-              <FadeText style={{ textAlign: 'center' }}>
-                {translate('mixnetdoctor.attaching') as string}
+          {!restingOff && verdict !== null && (
+            <View style={{ gap: 4 }}>
+              <RegText
+                testID="mixnetdoctor.headline"
+                style={{ color: toneColor(verdict.tone) }}
+              >
+                {translate(`mixnetdoctor.${verdict.headlineKey}`) as string}
+              </RegText>
+              <FadeText>
+                {translate(`mixnetdoctor.${verdict.detailKey}`) as string}
               </FadeText>
-            </Animated.View>
+            </View>
           )}
 
-          {/* No run to ask for while the screen is already following the
-              transport; the button returns once the report is frozen. */}
-          {!attachInFlight && (
-            <Animated.View layout={boxMorph()}>
-              <Button
-                testID="mixnetdoctor.run"
-                variant="primary"
-                title={
-                  running
-                    ? (translate('mixnetdoctor.running') as string)
-                    : (translate('mixnetdoctor.run') as string)
+          {steps.length > 0 && (
+            <View style={{ gap: 4 }}>
+              {steps.map(step => (
+                <View
+                  key={step.labelKey}
+                  style={{ flexDirection: 'row', gap: 8 }}
+                >
+                  <RegText style={{ color: stepColor(step.state) }}>
+                    {STEP_MARK[step.state]}
+                  </RegText>
+                  <RegText style={{ color: stepColor(step.state) }}>
+                    {translate(`mixnetdoctor.${step.labelKey}`) as string}
+                  </RegText>
+                  {step.state === 'unchecked' && (
+                    <FadeText>
+                      {translate('mixnetdoctor.not-checked') as string}
+                    </FadeText>
+                  )}
+                </View>
+              ))}
+            </View>
+          )}
+
+          {verdict?.action === 'server' && (
+            <Button
+              testID="mixnetdoctor.server"
+              variant="primary"
+              title={translate('mixnetdoctor.choose-server') as string}
+              onPress={() => navigation.navigate(Route.Server)}
+            />
+          )}
+
+          {verdict?.action === 'restart' && (
+            <Button
+              testID="mixnetdoctor.reenable"
+              variant="primary"
+              title={translate('mixnetdoctor.restart') as string}
+              onPress={restart}
+            />
+          )}
+
+          <Button
+            testID="mixnetdoctor.run"
+            variant={verdict?.action === 'none' ? 'primary' : 'text'}
+            title={
+              running
+                ? (translate('mixnetdoctor.running') as string)
+                : (translate('mixnetdoctor.run') as string)
+            }
+            disabled={running || restingOff}
+            onPress={runDiagnostics}
+          />
+
+          {!restingOff && measured !== null && (
+            <Button
+              testID="mixnetdoctor.copy"
+              variant="text"
+              title={translate('mixnetdoctor.copy-report') as string}
+              onPress={() => copyReport(measured)}
+            />
+          )}
+
+          {!restingOff && measured !== null && (
+            <Pressable
+              kind="row"
+              testID="mixnetdoctor.details"
+              onPress={() => setDetailsOpen(!detailsOpen)}
+            >
+              <RegText style={{ color: colors.fgMuted, textAlign: 'center' }}>
+                {
+                  translate(
+                    detailsOpen
+                      ? 'mixnetdoctor.details-hide'
+                      : 'mixnetdoctor.details',
+                  ) as string
                 }
-                disabled={running || restingOff}
-                onPress={() => runDoctor()}
-              />
-            </Animated.View>
+              </RegText>
+            </Pressable>
           )}
 
-          {!running && run !== null && runIsTerminal(run, attachInFlight) && (
-            <Animated.View
-              layout={boxMorph()}
-              entering={contentEnter()}
-              exiting={contentExit()}
-            >
-              <Button
-                testID="mixnetdoctor.reenable"
-                variant="text"
-                title={translate('mixnet.reenable') as string}
-                onPress={restartMixnet}
-              />
-            </Animated.View>
+          {!restingOff && measured !== null && detailsOpen && (
+            <View style={{ gap: 12 }}>
+              <View
+                style={{
+                  backgroundColor: colors.bgCanvas,
+                  borderRadius: radiusMd,
+                  paddingHorizontal: 16,
+                  paddingVertical: 4,
+                }}
+              >
+                {mixnetDoctorRows(measured).map((row, i, rows) => (
+                  <DoctorRow
+                    key={row.label + i}
+                    row={row}
+                    last={i === rows.length - 1}
+                    labelColor={colors.fgMuted}
+                    valueColor={colors.fgDefault}
+                    dividerColor={colors.bottomSheetBorder}
+                  />
+                ))}
+              </View>
+              <View testID="mixnetdoctor.journal" style={{ gap: 4 }}>
+                {journal.length === 0 && (
+                  <FadeText>
+                    {translate('mixnetdoctor.journal-empty') as string}
+                  </FadeText>
+                )}
+                {[...journal].reverse().map((entry, i) => (
+                  <FadeText key={entry.atMillis + entry.kind + i}>
+                    {mixnetJournalLine(entry)}
+                  </FadeText>
+                ))}
+              </View>
+              <FadeText>{translate('mixnetdoctor.privacy') as string}</FadeText>
+            </View>
           )}
-
-          {!restingOff && !running && run !== null && (
-            <Animated.View
-              layout={boxMorph()}
-              entering={contentEnter()}
-              exiting={contentExit()}
-            >
-              <Button
-                testID="mixnetdoctor.copy"
-                variant="text"
-                title={translate('mixnetdoctor.copy-report') as string}
-                onPress={() => copyReport(run)}
-              />
-            </Animated.View>
-          )}
-        </Animated.View>
+        </View>
       </ScrollView>
     </View>
   );

@@ -33,6 +33,7 @@ export default class WalletBackend {
       config.startMixnetTransport,
       config.onMixnetViewChanged,
       config.stopMixnetTransport,
+      config.takeMixnetProxyDeath,
     );
     this.dataService.onSyncError = async () => {
       await this.syncCoordinator.clearTimers();

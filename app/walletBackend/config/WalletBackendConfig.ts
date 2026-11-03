@@ -11,6 +11,7 @@ import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformance
 import {
   StartMixnetTransport,
   StopMixnetTransport,
+  TakeProxyDeathReason,
 } from '@app/walletBackend/modules/MixnetCoordinator';
 import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
 
@@ -35,6 +36,7 @@ export type WalletBackendConfig = {
   onMixnetViewChanged: (view: MixnetTransportView) => void;
   startMixnetTransport: StartMixnetTransport;
   stopMixnetTransport: StopMixnetTransport;
+  takeMixnetProxyDeath: TakeProxyDeathReason;
   // Tests inject false to keep the coordinator unstarted.
   mixnetSupported: boolean;
   keepAwake: (keep: boolean) => void;

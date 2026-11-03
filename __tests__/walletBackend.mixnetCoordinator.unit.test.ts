@@ -12,6 +12,7 @@ import {
   StartMixnetTransport,
   StopMixnetTransport,
 } from '@app/walletBackend/modules/MixnetCoordinator';
+import { mixnetJournal } from '@app/walletBackend/modules/MixnetJournal';
 import {
   ABSENT_MIXNET_VIEW,
   MixnetTransportView,
@@ -983,5 +984,65 @@ describe('MixnetCoordinator bootstrap deadline', () => {
     await flushPromises();
 
     expect(startTransport).not.toHaveBeenCalled();
+  });
+});
+
+describe('MixnetCoordinator journal', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    mixnetJournal.clear();
+    mockedBridge.mixnetIndicatorInfo.mockResolvedValue(statusPayload('died'));
+    mockedBridge.mixnetBootstrapDetailInfo.mockResolvedValue(
+      JSON.stringify({ detail: '' }),
+    );
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('Tests that a refused start keeps its cause when the transport cannot start', async () => {
+    const coordinator = new MixnetCoordinator(
+      async () => {
+        throw new Error('every exit failed');
+      },
+      jest.fn(),
+      async () => {},
+      async () => 'listener refused',
+    );
+
+    await coordinator.ensureForConnectedSession();
+    await settleMicrotasks();
+    coordinator.stop();
+
+    const entries = mixnetJournal.list();
+    const refused = entries.find(entry => entry.kind === 'refused');
+    expect(refused?.text).toContain('every exit failed');
+    expect(entries.map(entry => entry.kind)).toEqual(
+      expect.arrayContaining(['draw', 'status', 'retry', 'proxy-death']),
+    );
+  });
+
+  it('Tests that the transport is unaffected when reading the death reason fails', async () => {
+    const onChange = jest.fn();
+    const coordinator = new MixnetCoordinator(
+      async () => {
+        throw new Error('every exit failed');
+      },
+      onChange,
+      async () => {},
+      () => {
+        throw new TypeError('NymTransportModule is not registered');
+      },
+    );
+
+    await expect(
+      coordinator.ensureForConnectedSession(),
+    ).resolves.toBeUndefined();
+    await settleMicrotasks();
+    coordinator.stop();
+
+    expect(onChange).toHaveBeenCalled();
+    expect(mixnetJournal.count('proxy-death')).toBe(0);
   });
 });
