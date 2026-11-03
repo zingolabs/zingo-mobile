@@ -14,6 +14,7 @@ import DetailLine from '@ui/widgets/DetailLine';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 type AboutProps = NativeStackScreenProps<AppDrawerParamList, 'About'>;
 
@@ -21,6 +22,7 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
   const { zingolibVersion, translate } = context;
   const { colors } = useTheme();
+  const { edges, fades } = useScrollEdges({ surface: 'surface' });
 
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
@@ -63,6 +65,7 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
       </View>
       <AppSheet ref={aboutSheetRef} snapPoints={aboutSnapPoints}>
         <BottomSheetScrollView
+          {...edges}
           testID="about.scroll-view"
           bounces={false}
           alwaysBounceVertical={false}
@@ -89,6 +92,7 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
             ))}
           </View>
         </BottomSheetScrollView>
+        {fades}
       </AppSheet>
     </View>
   );

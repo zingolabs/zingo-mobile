@@ -97,6 +97,7 @@ import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import { PANEL_TOP } from '@ui/widgets/Header/Header';
 import { onTabScroll } from '@app/navigation/tabBarScroll';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 type SendProps = HomeTabScreenProps<'Send'>;
 
@@ -109,6 +110,10 @@ const ADDRESS_LIKE =
 const BARE_NAME = /^[a-z0-9]{1,62}$/;
 
 const Send: React.FunctionComponent<SendProps> = () => {
+  const { edges, fades } = useScrollEdges({
+    sides: 'top',
+    surface: 'surface',
+  });
   const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
   const {
@@ -1025,7 +1030,11 @@ const Send: React.FunctionComponent<SendProps> = () => {
             header={sendHeader}
           >
             <ScrollView
-              onScroll={onTabScroll}
+              onScroll={e => {
+                onTabScroll(e);
+                edges.onScroll(e);
+              }}
+              onLayout={edges.onLayout}
               scrollEventThrottle={16}
               ref={scrollViewRef}
               onContentSizeChange={(_, height) => setContentHeight(height)}
@@ -1377,6 +1386,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                 </View>
               </View>
             </ScrollView>
+            {fades}
           </AppSheet>
         )}
       </Animated.View>

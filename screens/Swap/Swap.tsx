@@ -90,6 +90,7 @@ import SwapHistorySheet, { swapPairLabel } from './components/SwapHistorySheet';
 import { tokenToSwapAsset } from './swapAssets';
 import { useCoinPrice } from './useCoinPrice';
 import { onTabScroll } from '@app/navigation/tabBarScroll';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { PANEL_TOP } from '@ui/widgets/Header/Header';
 import InsufficientFundsSheet from './components/InsufficientFundsSheet';
 
@@ -101,6 +102,10 @@ type SwapProps = HomeTabScreenProps<'Swap'>;
  * and everything after it are screens of their own.
  */
 const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
+  const { edges, fades } = useScrollEdges({
+    sides: 'top',
+    surface: 'surface',
+  });
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -494,7 +499,11 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
               animateOnMount={false}
             >
               <ScrollView
-                onScroll={onTabScroll}
+                onScroll={e => {
+                  onTabScroll(e);
+                  edges.onScroll(e);
+                }}
+                onLayout={edges.onLayout}
                 scrollEventThrottle={16}
                 keyboardShouldPersistTaps="handled"
                 testID="swap.scroll-view"
@@ -1041,6 +1050,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                   />
                 </View>
               </ScrollView>
+              {fades}
             </AppSheet>
           )}
         </Animated.View>

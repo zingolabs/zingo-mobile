@@ -43,6 +43,7 @@ import { Route, SettingsNameEnum } from '@app/AppState';
 import { ArrowRightIcon } from '@ui/primitives/Icons/ArrowRightIcon';
 import { themeTokens } from '@app/theme';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 // Pool artwork palette — Orchard teal and Ironwood gold are one-off brand
 // accents for this onboarding, not part of the app theme.
@@ -703,6 +704,7 @@ const PagerPage: React.FunctionComponent<PagerPageProps> = ({
   progress,
   children,
 }) => {
+  const { edges, fades } = useScrollEdges();
   const style = useAnimatedStyle(() => {
     const distance = progress.value - i;
     return {
@@ -718,6 +720,7 @@ const PagerPage: React.FunctionComponent<PagerPageProps> = ({
   return (
     <Animated.View style={[{ width }, style]}>
       <ScrollView
+        {...edges}
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingHorizontal: 30, paddingBottom: 12 }}
         showsVerticalScrollIndicator={false}
@@ -725,6 +728,7 @@ const PagerPage: React.FunctionComponent<PagerPageProps> = ({
       >
         {children}
       </ScrollView>
+      {fades}
     </Animated.View>
   );
 };

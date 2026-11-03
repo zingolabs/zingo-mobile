@@ -35,6 +35,7 @@ import {
   mixnetDoctorReport,
   mixnetDoctorRows,
 } from '@app/walletBackend/transforms/mixnetDoctorReport';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 type MixnetDoctorProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -158,6 +159,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
   const { translate, server, addLastSnackbar, reenableMixnet, mixnetView } =
     context;
   const { colors } = useTheme();
+  const { edges, fades } = useScrollEdges();
 
   // The coordinator's own view of the session, which the probes cannot see:
   // it knows an attach is under way while the library still answers `died`.
@@ -287,7 +289,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
         backTestID="mixnetdoctor.back"
         backAccessibilityLabel={translate('mixnetdoctor.back-acc') as string}
       />
-      <ScrollView contentContainerStyle={{ padding: 20 }}>
+      <ScrollView {...edges} contentContainerStyle={{ padding: 20 }}>
         <Animated.View
           layout={boxMorph()}
           style={{
@@ -399,6 +401,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
           )}
         </Animated.View>
       </ScrollView>
+      {fades}
     </View>
   );
 };

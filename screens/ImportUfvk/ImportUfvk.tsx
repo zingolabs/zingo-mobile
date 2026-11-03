@@ -40,6 +40,7 @@ import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { useCompact } from '@app/hooks/useCompact';
+import { EDGE_FADE, useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 // Positions from the 402 x 874 design.
 const FIELD_WIDTH = 270;
@@ -78,6 +79,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   >({ kind: 'closed' });
   const [pulse, setPulse] = useState(0);
   const keyboardHeight = useKeyboardHeight();
+  const [noteH, setNoteH] = useState<number>(0);
 
   const status = seedStatus(seedufvkText);
   const typedKey = status.kind === 'ufvk' ? status.key : '';
@@ -244,6 +246,12 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
 
   /** The one bottom distance, above the keyboard too. */
   const buttonBottom = bottomPad;
+  /** The note and the button lie over the scroll, whose content ends above them. */
+  const covered =
+    keyboardHeight === 0
+      ? bottomPad + NOTE_ABOVE_BUTTON + noteH
+      : buttonBottom + BUTTON_HEIGHT + space12;
+  const { edges, fades } = useScrollEdges({ bottomInset: covered });
 
   return (
     <View style={{ flex: 1 }}>
@@ -260,8 +268,9 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
       />
 
       <KeyboardAwareScrollView
+        {...edges}
         keyboardShouldPersistTaps="handled"
-        bottomOffset={BUTTON_HEIGHT + space12 + space16}
+        bottomOffset={BUTTON_HEIGHT + space12 + space16 + EDGE_FADE}
         bounces={false}
         onScrollBeginDrag={() => setTipOpen(false)}
         style={{ flex: 1 }}
@@ -361,10 +370,23 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           </View>
         </View>
       </KeyboardAwareScrollView>
+      {fades}
+      <View
+        pointerEvents="none"
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: covered,
+          backgroundColor: colors.bgCanvas,
+        }}
+      />
 
       {keyboardHeight === 0 && (
         <View
           pointerEvents="none"
+          onLayout={e => setNoteH(e.nativeEvent.layout.height)}
           style={{
             position: 'absolute',
             left: space20,

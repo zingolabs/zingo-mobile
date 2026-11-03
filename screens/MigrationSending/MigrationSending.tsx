@@ -19,6 +19,7 @@ import { drainOrchard, drainStatus } from '@app/walletBackend';
 import { RPCDrainType } from '@app/walletBackend/types/RPCDrainType';
 import { RPCDrainStatusType } from '@app/walletBackend/types/RPCDrainStatusType';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 type MigrationSendingProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -78,6 +79,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
   const { colors } = useTheme();
   /** The footer's lowest action ends at the one bottom distance. */
   const bottomPad = useBottomActionPad();
+  const { edges, fades } = useScrollEdges();
 
   const transactions = route.params?.transactions ?? [];
   const txCount = transactions.length;
@@ -237,6 +239,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
     return (
       <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <ScrollView
+          {...edges}
           contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
         >
           {title}
@@ -265,6 +268,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
             </Text>
           </View>
         </ScrollView>
+        {fades}
         <View
           style={{
             paddingBottom: bottomPad,
@@ -286,6 +290,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
       <ScrollView
+        {...edges}
         contentContainerStyle={{
           paddingHorizontal: 24,
           paddingTop: 40,
@@ -384,6 +389,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
           );
         })}
       </ScrollView>
+      {fades}
 
       {/* Pinned above the hint. Proving reports no discrete steps, so the
           trickle keeps a continuous bar moving rather than counting pieces. */}
