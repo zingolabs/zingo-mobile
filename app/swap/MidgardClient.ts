@@ -18,10 +18,11 @@ import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
  * has indexed the matching action; it does NOT try to model status, fees,
  * or completion — `/track` remains the source of truth for those.
  *
- * Per-provider host (xchainjs and the SwapKit SDK use the same URLs):
+ * Per-provider host:
  *
  *   - Mayachain → https://midgard.mayachain.info
- *   - THORChain → https://midgard.ninerealms.com
+ *   - THORChain → https://gateway.liquify.com/chain/thorchain_midgard, since
+ *     midgard.ninerealms.com stopped resolving
  *
  * Both speak the same `/v2/actions?address=…&type=swap` schema, so a single
  * client class handles both providers with only the host swap.
@@ -29,7 +30,8 @@ import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
 
 const MIDGARD_HOSTS: Partial<Record<SwapKitProviderEnum, string>> = {
   [SwapKitProviderEnum.MayachainStreaming]: 'https://midgard.mayachain.info',
-  [SwapKitProviderEnum.ThorchainStreaming]: 'https://midgard.ninerealms.com',
+  [SwapKitProviderEnum.ThorchainStreaming]:
+    'https://gateway.liquify.com/chain/thorchain_midgard',
 };
 
 const MIDGARD_TIMEOUT_MS = 10_000;
