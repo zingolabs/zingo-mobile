@@ -21,7 +21,7 @@ export { TrackingStatusEnum } from './enums/TrackingStatusEnum';
 export { canRemoveSwap } from './canRemoveSwap';
 export { hasDepositEvidence } from './depositEvidence';
 export { newlyExpired, newlyRefunding } from './swapTransitions';
-export { prefillFromRecord } from './swapPrefill';
+export { prefillFromContact, prefillFromRecord } from './swapPrefill';
 export { canResendSale, unsentSale } from './unsentSale';
 export { saleDepositRequest } from './saleDepositRequest';
 export type { SaleDepositRequestType } from './saleDepositRequest';

@@ -19,8 +19,11 @@ import {
   ToAddrClass,
 } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
-import { ContextAppLoaded } from '@app/context';
+import { ContextAppLoaded, useSwapService } from '@app/context';
 import { useOptionsPanel } from '@app/context/optionsPanel';
+import { SwapDirectionEnum, prefillFromContact } from '@app/swap';
+import type { TokenEntryType } from '@app/swap';
+import { tokenToSwapAsset } from '@screens/Swap/swapAssets';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import { showConfirm } from '@app/services/showConfirm';
@@ -32,6 +35,11 @@ import SearchField from '@ui/widgets/SearchField';
 import { ChevronDown } from '@ui/primitives/Icons/Chevron';
 import ContactRow, { ROW_LINE } from './components/ContactRow';
 import AddressRowHead from './components/AddressRowHead';
+import ContactSwapSheet, {
+  SwapCoins,
+  contactSwapText,
+  loadSwapCoins,
+} from './components/ContactSwapSheet';
 import SegmentedSwitch from '@ui/widgets/SegmentedSwitch';
 import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
 import ContactSheet, {
@@ -50,6 +58,10 @@ const FLASH_MS = 1400;
 
 type Victim =
   { kind: 'none' } | { kind: 'contact'; contact: AddressBookFileClass };
+
+type SwapWith =
+  | { kind: 'none' }
+  | { kind: 'contact'; contact: AddressBookFileClass; coins: SwapCoins };
 
 type Tab = 'contacts' | 'wallet';
 
@@ -152,6 +164,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     setSendPageState,
   } = useContext(ContextAppLoaded);
   const optionsPanel = useOptionsPanel();
+  const swapService = useSwapService();
   const { colors } = useTheme();
   const { edges, fades } = useScrollEdges();
   const bottomPad = useBottomActionPad();
@@ -168,6 +181,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   });
   const [editNonce, setEditNonce] = useState(0);
   const [victim, setVictim] = useState<Victim>({ kind: 'none' });
+  const [swapWith, setSwapWith] = useState<SwapWith>({ kind: 'none' });
   const [tab, setTab] = useState<Tab>('contacts');
   const pick = route.params?.pick;
   const pickChain = route.params?.chain ?? GlobalConst.zecSwapChain;
@@ -176,9 +190,12 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
 
   const scrollRef = useRef<ScrollView>(null);
   const contactSheet = useRef<BottomSheetModal>(null);
+  const swapSheet = useRef<BottomSheetModal>(null);
   useScrollToTop(scrollRef);
 
   const canSend = !readOnly && server.kind !== 'offline';
+  /** The same test as the Swap tab, which the sheet's choices land on. */
+  const canSwap = !readOnly && server.kind === 'remote' && !!swapService;
   const contacts = listedContacts(addressBook, walletChain, query).filter(
     contact =>
       !pick || contact.swapChain.toUpperCase() === pickChain.toUpperCase(),
@@ -247,6 +264,56 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     // the pop. Sending leaves for the Send tab, not back to the panel.
     optionsPanel.close();
     navigation.navigate(Route.Home, { screen: Route.Send }, { pop: true });
+  };
+
+  const askSwap = async (contact: AddressBookFileClass) => {
+    if (!swapService) {
+      return;
+    }
+    setSwapWith({ kind: 'contact', contact, coins: { kind: 'loading' } });
+    swapSheet.current?.present();
+    const coins = await loadSwapCoins(swapService, contact.swapChain);
+    // The user may have closed this sheet and opened another contact's.
+    setSwapWith(current =>
+      current.kind === 'contact' && current.contact === contact
+        ? { ...current, coins }
+        : current,
+    );
+  };
+
+  const swap = (direction: SwapDirectionEnum, coin: TokenEntryType) => {
+    if (swapWith.kind === 'none') {
+      return;
+    }
+    const { contact } = swapWith;
+    swapSheet.current?.dismiss();
+    toast(
+      contactSwapText(
+        translate(
+          direction === SwapDirectionEnum.Outbound
+            ? 'addressbook.swap-to-toast'
+            : 'addressbook.swap-from-toast',
+        ) as string,
+        contact,
+        coin.ticker,
+      ),
+    );
+    optionsPanel.close();
+    navigation.navigate(
+      Route.Home,
+      {
+        screen: Route.Swap,
+        params: {
+          prefill: prefillFromContact(
+            direction,
+            tokenToSwapAsset(coin),
+            contact.address,
+            Date.now(),
+          ),
+        },
+      },
+      { pop: true },
+    );
   };
 
   const copy = (contact: AddressBookFileClass) => {
@@ -494,6 +561,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                     first={index === 0}
                     open={!pick && openAddress === contact.address}
                     sendable={!pick && canSend && zcash}
+                    swappable={!pick && canSwap && !zcash}
                     editable
                     flash={flashAddress === contact.address}
                     leaving={leavingAddress === contact.address}
@@ -506,6 +574,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                     }
                     onSwipe={() => setOpenAddress('')}
                     onSend={() => send(contact)}
+                    onSwap={() => askSwap(contact)}
                     onCopy={() => copy(contact)}
                     onEdit={() => openContact({ kind: 'edit', contact })}
                     onDelete={() => askDelete(contact)}
@@ -571,6 +640,35 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           walletChain={walletChain}
           onSave={save}
         />
+      </AppSheetModal>
+
+      <AppSheetModal
+        ref={swapSheet}
+        header={
+          <TitleBar
+            title={
+              swapWith.kind === 'contact'
+                ? contactSwapText(
+                    translate('addressbook.swap-title') as string,
+                    swapWith.contact,
+                  )
+                : ''
+            }
+            right={{
+              icon: XIcon,
+              accessibilityLabel: translate('close') as string,
+              onPress: () => swapSheet.current?.dismiss(),
+            }}
+          />
+        }
+      >
+        {swapWith.kind === 'contact' && (
+          <ContactSwapSheet
+            contact={swapWith.contact}
+            coins={swapWith.coins}
+            onChoose={swap}
+          />
+        )}
       </AppSheetModal>
     </View>
   );

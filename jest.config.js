@@ -5,15 +5,9 @@ module.exports = {
   resolver: '<rootDir>/jest.resolver.js',
   testEnvironment: '<rootDir>/jest-environment-react-native.js',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'mjs', 'jsx', 'json', 'node'],
-  // The zingolib submodule holds the Binding Layer's target and build
-  // directories, and no JavaScript, so the haste map skips it as Metro does.
-  modulePathIgnorePatterns: ['<rootDir>/.claude/', '<rootDir>/zingolib/'],
+  modulePathIgnorePatterns: ['<rootDir>/.claude/'],
   // visual/ holds Playwright specs, run by `yarn visual:capture`.
-  testPathIgnorePatterns: [
-    '/node_modules/',
-    '<rootDir>/visual/',
-    '<rootDir>/zingolib/',
-  ],
+  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/visual/'],
   // @noble/hashes, @react-navigation and zingolib-bundle-pin ship ESM only,
   // so babel transforms them like React Native's own packages.
   transformIgnorePatterns: [

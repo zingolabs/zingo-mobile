@@ -35,11 +35,6 @@ jobs:
       - name: Gradle cache
         uses: ./.github/actions/gradle-cache
 
-      # The test source set reads the proxy crate's Kotlin wire-contract
-      # test from the submodule, which the Bundle Pin holds at one commit.
-      - name: Check out zingolib
-        uses: ./.github/actions/zingolib-submodule
-
       # The plain-JVM test source set: the FfiOutcome/FfiArgs bridge
       # contracts and their kin. These are the only executable tests of
       # the Kotlin bridge, so they gate the PR.
