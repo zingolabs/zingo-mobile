@@ -6,6 +6,7 @@ import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
 import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
 import { awaitsDeposit, depositOverdue } from './depositDeadline';
 import { acceptsLateUpdate, watchesLateDeposit } from './lateDeposit';
+import { lacksDelivery, watchesDelivery } from './deliveryWatch';
 import { isThorchainFamily } from './thorchainFamily';
 import { SwapStatusEnum, isTerminalStatus } from './enums/SwapStatusEnum';
 import { TrackingStatusEnum } from './enums/TrackingStatusEnum';
@@ -246,7 +247,11 @@ export class SwapPoller {
    * writes a hash and re-arms the poller through `SwapService`.
    */
   private isPollable(record: SwapRecordType, nowMs: number): boolean {
-    if (isTerminalStatus(record.status) && !watchesLateDeposit(record, nowMs)) {
+    if (
+      isTerminalStatus(record.status) &&
+      !watchesLateDeposit(record, nowMs) &&
+      !watchesDelivery(record, nowMs)
+    ) {
       return false;
     }
     if (!this.registry.has(record.provider)) return false;
@@ -280,11 +285,11 @@ export class SwapPoller {
   }
 
   /**
-   * Try to discover the source-chain tx hash via Midgard when the record is
-   * an inbound Maya/THORChain swap that does not yet have one. Returns the
-   * updated record if Midgard surfaced a hash and we persisted it; returns
-   * `null` otherwise (record not eligible, indexer empty, transport error,
-   * memo mismatch).
+   * Try to discover the source-chain tx hash and the delivery via Midgard when
+   * the record is an inbound Maya/THORChain swap that lacks either. Returns the
+   * updated record if Midgard surfaced something new and we persisted it;
+   * returns `null` otherwise (record not eligible, indexer empty, transport
+   * error, memo mismatch).
    *
    * The Midgard probe is rate-limited independently of `/track`: even if
    * the record's poll interval is "now", we only re-probe Midgard at most
@@ -299,7 +304,8 @@ export class SwapPoller {
     record: SwapRecordType,
     now: number,
   ): Promise<SwapRecordType | null> {
-    if (!canDiscoverHashViaMidgard(record)) return null;
+    const wantsHash = canDiscoverHashViaMidgard(record);
+    if (!wantsHash && !lacksDelivery(record)) return null;
     const memo = extractInboundMemo(record);
     if (!memo) return null;
 
@@ -321,6 +327,8 @@ export class SwapPoller {
         memo,
         provider: record.provider,
         chainIdForNormalization: record.sellAsset.chainId,
+        receiveAssetId: record.receiveAsset.swapKitId,
+        receiveChainId: record.receiveAsset.chainId,
       });
     } catch (err) {
       // Midgard transport failures stay in the log: a sustained outage
@@ -337,20 +345,30 @@ export class SwapPoller {
 
     this.midgardFailureCounts.delete(record.recordId);
     if (!discovery) return null;
+    if (!wantsHash && !discovery.delivery) return null;
 
     // A payment found on an expired purchase came late: it reads as
     // refunding from now on, as a hash the user pastes does, so the record
     // stays polled whatever this tick's /track answers.
-    const late = record.status === SwapStatusEnum.Expired;
+    const late = wantsHash && record.status === SwapStatusEnum.Expired;
     const updated: SwapRecordType = {
       ...record,
-      observedDepositTxHash: discovery.sourceTxHash,
+      ...(discovery.delivery && {
+        destinationTxHash: discovery.delivery.txHash,
+        actualReceiveAmount:
+          record.actualReceiveAmount ?? discovery.delivery.amount,
+      }),
+      observedDepositTxHash: wantsHash
+        ? discovery.sourceTxHash
+        : record.observedDepositTxHash,
       // The provider has now observed our deposit on-chain — transition out
       // of the pre-evidence "awaiting external" state into the same Pending
       // state we use right after our own outbound broadcast. Subsequent
       // /track responses promote it further (Processing → Completed).
       status:
-        record.status === SwapStatusEnum.AwaitingExternalDeposit || late
+        (wantsHash &&
+          record.status === SwapStatusEnum.AwaitingExternalDeposit) ||
+        late
           ? SwapStatusEnum.Pending
           : record.status,
       lateDepositAtMs: late

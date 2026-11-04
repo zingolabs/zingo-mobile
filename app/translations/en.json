@@ -882,6 +882,8 @@
     "expired-toast": "No {coin} deposit was detected. Nothing was sent.",
     "late-why": "Your payment arrived after this swap closed, so it can’t be swapped",
     "goes-back-to": "Goes back to",
+    "delivery-tx": "ZEC transaction",
+    "no-delivery": "We don’t have the ZEC transaction for this swap, so we can’t confirm the delivery. Check your balance.",
     "late-note": "{provider} sends it back to your refund address, minus the network fee. You don’t need to do anything.",
     "late-toast": "Your {coin} arrived after this swap closed. It’s going back to your refund address.",
     "going-back-line": "{amount} going back to you",

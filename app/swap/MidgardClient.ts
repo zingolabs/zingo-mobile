@@ -13,10 +13,11 @@ import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
  * That discovery closes the only real gap in our SwapKit `/track` integration
  * for Maya/THORChain inbound: once we have the source-chain hash, `/track`
  * does the rest of the work with its normalized status pipeline and 4-leg
- * decomposition. So this client's sole job is to take `{destinationAddress,
- * memo, provider}` and return the source hash + chain prefix when Midgard
- * has indexed the matching action; it does NOT try to model status, fees,
- * or completion — `/track` remains the source of truth for those.
+ * decomposition. So this client takes `{destinationAddress, memo, provider}`
+ * and returns the source hash + chain prefix when Midgard has indexed the
+ * matching action, plus the delivery once the action succeeded, because
+ * `/track` does not always report one. It does NOT try to model status or
+ * fees — `/track` remains the source of truth for those.
  *
  * Per-provider host (xchainjs and the SwapKit SDK use the same URLs):
  *
@@ -80,7 +81,16 @@ export type MidgardInboundDiscoveryType = {
    *  `"ETH.ETH"`). Caller can use this to sanity-check it matches the
    *  record's sellAsset.chain. */
   sourceChainPrefix: string;
+  /** What the swap paid to the destination address, once it succeeded. */
+  delivery?: {
+    txHash: string;
+    /** Display units, as `actualReceiveAmount` holds them. */
+    amount: string;
+  };
 };
+
+/** Midgard counts every asset in 1e8 base units. */
+const MIDGARD_BASE_UNITS = 100_000_000;
 
 export class MidgardClient {
   /**
@@ -114,6 +124,9 @@ export class MidgardClient {
     memo: string;
     provider: SwapKitProviderEnum;
     chainIdForNormalization: string;
+    /** The bought asset (`ZEC.ZEC`), so a fee paid out in RUNE never counts. */
+    receiveAssetId: string;
+    receiveChainId: string;
   }): Promise<MidgardInboundDiscoveryType | null> {
     const host = MIDGARD_HOSTS[args.provider];
     if (!host) return null;
@@ -162,6 +175,17 @@ export class MidgardClient {
     if (/^0+$/.test(rawTxId)) return null;
 
     const sourceChainPrefix = (firstIn.coins?.[0]?.asset ?? '').split('.')[0];
+    const paid =
+      match.status === 'success'
+        ? (match.out ?? []).find(
+            out =>
+              out.address === args.destinationAddress &&
+              !!out.txID &&
+              !/^0+$/.test(out.txID) &&
+              out.coins?.[0]?.asset.toUpperCase() ===
+                args.receiveAssetId.toUpperCase(),
+          )
+        : undefined;
 
     return {
       sourceTxHash: normalizeHashForTrack(
@@ -169,6 +193,14 @@ export class MidgardClient {
         args.chainIdForNormalization,
       ),
       sourceChainPrefix,
+      ...(paid && {
+        delivery: {
+          txHash: normalizeHashForTrack(paid.txID, args.receiveChainId),
+          amount: (Number(paid.coins[0].amount) / MIDGARD_BASE_UNITS).toFixed(
+            8,
+          ),
+        },
+      }),
     };
   }
 }

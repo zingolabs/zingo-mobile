@@ -32,6 +32,7 @@ import {
   isRefunding,
   isTerminalStatus,
   isThorchainFamily,
+  lacksDelivery,
   prefillFromRecord,
   providerLongLabel,
 } from '@app/swap';
@@ -254,6 +255,16 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
       ),
     },
     { label: t('swap.provider'), value: providerLongLabel(record.provider) },
+    ...(!sell && sharedVault && isRealLegHash(record.destinationTxHash)
+      ? [
+          {
+            label: t('swap.delivery-tx'),
+            value: Utils.trimToSmall(record.destinationTxHash, 6),
+            mono: true,
+            copy: record.destinationTxHash,
+          },
+        ]
+      : []),
     ...(expired
       ? [
           {
@@ -565,6 +576,16 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
           zecChainName={walletChainName}
           zecBlockExplorer={blockExplorer}
         />
+      )}
+
+      {done && lacksDelivery(record) && (
+        <View style={{ marginTop: space12 }}>
+          <Banner
+            testID="swap.detail.no-delivery"
+            tone="warning"
+            title={t('swap.no-delivery')}
+          />
+        </View>
       )}
 
       {receivedTransparent && (

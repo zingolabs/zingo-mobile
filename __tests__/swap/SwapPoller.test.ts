@@ -7,6 +7,7 @@ import { ProviderRegistry } from '@app/swap/providers/ProviderRegistry';
 import type { MidgardClient } from '@app/swap/MidgardClient';
 import { FlashnetExecutor } from '@app/swap/providers/FlashnetExecutor';
 import { MayaExecutor } from '@app/swap/providers/MayaExecutor';
+import { ThorchainExecutor } from '@app/swap/providers/ThorchainExecutor';
 import { NearIntentsExecutor } from '@app/swap/providers/NearIntentsExecutor';
 import type { SwapKitClient } from '@app/swap/SwapKitClient';
 import type { SwapStore } from '@app/swap/SwapStore';
@@ -554,6 +555,107 @@ describe('SwapPoller on an expired purchase', () => {
     await poller.tickOnce();
     expect(track).not.toHaveBeenCalled();
     expect(poller.isRunning()).toBe(false);
+  });
+});
+
+describe.each([
+  SwapKitProviderEnum.MayachainStreaming,
+  SwapKitProviderEnum.ThorchainStreaming,
+])('SwapPoller on a completed %s purchase with no delivery', provider => {
+  const T0 = 1_700_000_000_000;
+  const hash = 'cd'.repeat(32);
+  const delivered = 'ef'.repeat(32);
+  const completed = makeRecord({
+    recordId: 'rec-no-delivery',
+    provider,
+    direction: SwapDirectionEnum.Inbound,
+    sellAsset: BTC,
+    receiveAsset: ZEC,
+    depositAddress: 'bc1qvault',
+    destinationAddress: 't1wallet',
+    providerData: { kind: provider, memo: '=:z:t1wallet' },
+    broadcast: undefined,
+    observedDepositTxHash: hash,
+    status: SwapStatusEnum.Completed,
+    createdAtMs: T0,
+    updatedAtMs: T0,
+    terminalAtMs: T0,
+  } as Partial<SwapRecordType>);
+
+  const harness = (nowMs: number, delivery?: object) => {
+    jest.useFakeTimers({ now: nowMs });
+    const upsert = jest.fn(async (_record: SwapRecordType) => undefined);
+    const track = jest.fn(async () => ({
+      status: 'completed',
+      trackingStatus: 'completed',
+      type: 'native_send',
+      toAsset: 'BTC.BTC',
+      legs: [{ hash, chainId: 'bitcoin', type: 'native_send' }],
+    }));
+    const find = jest.fn(async () => ({
+      sourceTxHash: hash,
+      sourceChainPrefix: 'BTC',
+      delivery,
+    }));
+    const registry = new ProviderRegistry([
+      new MayaExecutor(),
+      new ThorchainExecutor(),
+    ]);
+    const poller = new SwapPoller({
+      client: { track } as unknown as SwapKitClient,
+      registry,
+      store: {
+        readAll: jest.fn(async () => [completed]),
+        upsert,
+      } as unknown as typeof SwapStore,
+      midgardClient: {
+        findInboundActionByMemo: find,
+      } as unknown as MidgardClient,
+      config: {
+        tickIntervalMs: 10_000,
+        activePollIntervalMs: 0,
+        idlePollIntervalMs: 0,
+      },
+    });
+    return { poller, upsert, track, find };
+  };
+
+  it('keeps it completed and adds the ZEC transaction Midgard reports', async () => {
+    const { poller, upsert, track } = harness(T0 + 60_000, {
+      txHash: delivered,
+      amount: '0.01477710',
+    });
+
+    await poller.tickOnce();
+
+    expect(track).toHaveBeenCalled();
+    expect(upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: SwapStatusEnum.Completed,
+        destinationTxHash: delivered,
+        actualReceiveAmount: '0.01477710',
+        observedDepositTxHash: hash,
+      }),
+    );
+  });
+
+  it('keeps tracking it while neither source reports the delivery', async () => {
+    const { poller, upsert, track, find } = harness(T0 + 60_000);
+
+    await poller.tickOnce();
+
+    expect(find).toHaveBeenCalled();
+    expect(track).toHaveBeenCalled();
+    expect(upsert.mock.calls.at(-1)?.[0]?.destinationTxHash).toBeUndefined();
+  });
+
+  it('stops asking once the watch is over', async () => {
+    const { poller, track, find } = harness(T0 + 25 * 60 * 60 * 1000);
+
+    await poller.tickOnce();
+
+    expect(find).not.toHaveBeenCalled();
+    expect(track).not.toHaveBeenCalled();
   });
 });
 
