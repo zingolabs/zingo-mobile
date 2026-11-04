@@ -32,7 +32,11 @@ import { ContextAppLoading } from '@app/context';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import Tag from '@ui/widgets/Tag';
-import { WalletErrorKind } from '@app/AppState/types/WalletErrorInfo';
+import {
+  WalletErrorCause,
+  WalletLoadKind,
+} from '@app/AppState/types/WalletErrorInfo';
+import { WalletErrorAction, walletErrorModel } from './walletErrorModel';
 import { ChainNameEnum } from '@app/AppState';
 import { showConfirm } from '@app/services/showConfirm';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
@@ -42,18 +46,21 @@ import { WalletIcon } from '@ui/primitives/Icons/WalletIcon';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 type WalletErrorProps = {
-  kind: WalletErrorKind;
+  cause: WalletErrorCause;
+  load: WalletLoadKind;
   details: string;
-  // The wallet's network, for the 'chain' kind.
+  // The wallet's network, for the 'chain' cause.
   walletChain?: ChainNameEnum;
   busy: boolean;
   // Changes on every failed retry; the icon shakes once per change.
   shake: number;
   onRetry: () => void;
+  onBack: () => void;
+  onReport: (title: string) => void;
   onImport: () => void;
   onCreate: () => void;
   onServer: () => void;
-  // The 'chain' kind's fix: Automatic on the wallet's network, then open.
+  // The 'chain' cause's fix: Automatic on the wallet's network, then open.
   onSwitchChain: (chain: ChainNameEnum) => void;
   // A retry worked: the badge shrinks away and the server dot turns green.
   resolved?: boolean;
@@ -141,12 +148,15 @@ const DetailsBox: React.FunctionComponent<{
 };
 
 const WalletError: React.FunctionComponent<WalletErrorProps> = ({
-  kind,
+  cause,
+  load,
   details,
   walletChain,
   busy,
   shake,
   onRetry,
+  onBack,
+  onReport,
   onImport,
   onCreate,
   onServer,
@@ -208,13 +218,12 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
   const offline = server.kind === 'offline';
   const dotColor = resolved
     ? colors.fgAccent
-    : !netInfo.isConnected || kind === 'server'
+    : !netInfo.isConnected || cause === 'server'
       ? colors.fgDanger
       : offline
         ? colors.fgMuted
         : colors.fgAccent;
-  const host =
-    server.kind === 'remote' ? server.uri.replace(/^https?:\/\//, '') : '';
+  const model = walletErrorModel(cause, load);
   const netName = (chain: ChainNameEnum) =>
     translate(
       chain === ChainNameEnum.testChainName
@@ -223,32 +232,20 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
           ? 'settings.value-chainname-regtest'
           : 'settings.value-chainname-main',
     ) as string;
-  // On the chain kind the retry cannot succeed, so the primary action is a
+  // On the chain cause the retry cannot succeed, so the primary action is a
   // server on the wallet's network.
-  const chain = kind === 'chain' && walletChain ? walletChain : null;
+  const chain = cause === 'chain' && walletChain ? walletChain : null;
   const title = chain
     ? (translate('walleterror.chain-title') as string).replace(
         '{net}',
         netName(chain),
       )
-    : (translate(
-        kind === 'server'
-          ? 'walleterror.server-title'
-          : 'walleterror.open-title',
-      ) as string);
+    : (translate(model.titleKey) as string);
   const sub = chain
     ? (translate('walleterror.chain-sub') as string)
         .replace('{server}', netName(server.chainName))
         .replace('{net}', netName(chain))
-    : kind === 'server'
-      ? (translate('walleterror.server-sub') as string).replace('{host}', host)
-      : (translate('walleterror.open-sub') as string);
-  const primaryLabel = chain
-    ? (translate('walleterror.chain-action') as string).replace(
-        '{net}',
-        netName(chain),
-      )
-    : (translate('walleterror.open') as string);
+    : (translate(model.subKey) as string);
 
   // Import and Create are not needed to fix a network mismatch; they wait in
   // a sheet that says they replace this wallet.
@@ -300,16 +297,58 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
    * The lowest action ends at the one bottom distance; the others keep
    * their gaps above it.
    */
-  const buttonBottom = chain ? bottomPad : bottomPad + LINK_TO_BUTTON;
+  const buttonBottom =
+    model.below === 'none' ? bottomPad : bottomPad + LINK_TO_BUTTON;
   const topLinkBottom = buttonBottom + BUTTON_TO_LINK;
 
-  const link = (
-    label: string,
-    onPress: () => void,
-    bottom: number,
-    testID: string,
-    top = false,
-  ) => (
+  const actions: Record<
+    WalletErrorAction,
+    { label: string; onPress: () => void; testID: string }
+  > = {
+    retry: {
+      label: translate(model.retryKey) as string,
+      onPress: onRetry,
+      testID: 'walleterror.open',
+    },
+    server: {
+      label: translate('walleterror.change-server') as string,
+      onPress: () => onServer(),
+      testID: 'walleterror.change-server',
+    },
+    back: {
+      label: translate('walleterror.back') as string,
+      onPress: onBack,
+      testID: 'walleterror.back',
+    },
+    import: {
+      label: translate('walleterror.import') as string,
+      onPress: onImport,
+      testID: 'walleterror.import',
+    },
+    create: {
+      label: translate('walleterror.create') as string,
+      onPress: onCreate,
+      testID: 'walleterror.create',
+    },
+    chain: {
+      label: chain
+        ? (translate('walleterror.chain-action') as string).replace(
+            '{net}',
+            netName(chain),
+          )
+        : '',
+      onPress: () => chain && onSwitchChain(chain),
+      testID: 'walleterror.chain',
+    },
+    more: {
+      label: translate('walleterror.more') as string,
+      onPress: () => moreOptions(),
+      testID: 'walleterror.more',
+    },
+    none: { label: '', onPress: () => {}, testID: '' },
+  };
+
+  const link = (action: WalletErrorAction, bottom: number, top = false) => (
     <View
       onLayout={top ? e => setFooterTop(e.nativeEvent.layout.y) : undefined}
       style={{
@@ -321,12 +360,12 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
       }}
     >
       <Button
-        testID={testID}
+        testID={actions[action].testID}
         variant="text"
         inline
         disabled={busy}
-        title={label}
-        onPress={onPress}
+        title={actions[action].label}
+        onPress={actions[action].onPress}
       />
     </View>
   );
@@ -388,7 +427,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
           iconStyle,
         ]}
       >
-        {kind === 'server' ? (
+        {cause === 'server' ? (
           <DatabaseIcon color={colors.fgDefault} size={iconSize} />
         ) : (
           <WalletIcon color={colors.fgDefault} size={iconSize} />
@@ -528,28 +567,28 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
               <Text selectable variant="address">
                 {details}
               </Text>
+              <View style={{ alignItems: 'center', marginTop: space8 }}>
+                <Button
+                  testID="walleterror.report"
+                  variant="text"
+                  inline
+                  title={translate('walleterror.report') as string}
+                  onPress={() => onReport(title)}
+                />
+              </View>
             </View>
           </DetailsBox>
         </View>
       </ScrollView>
       {fades}
 
-      {chain
-        ? link(
-            translate('walleterror.more') as string,
-            moreOptions,
-            topLinkBottom,
-            'walleterror.more',
-            true,
-          )
-        : link(
-            translate('walleterror.import') as string,
-            onImport,
-            topLinkBottom,
-            'walleterror.import',
-            true,
-          )}
+      {model.above !== 'none' && link(model.above, topLinkBottom, true)}
       <View
+        onLayout={
+          model.above === 'none'
+            ? e => setFooterTop(e.nativeEvent.layout.y)
+            : undefined
+        }
         style={{
           position: 'absolute',
           bottom: buttonBottom,
@@ -558,20 +597,14 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         }}
       >
         <Button
-          testID={chain ? 'walleterror.chain' : 'walleterror.open'}
+          testID={actions[model.primary].testID}
           variant="primary"
           busy={busy}
-          title={primaryLabel}
-          onPress={chain ? () => onSwitchChain(chain) : onRetry}
+          title={actions[model.primary].label}
+          onPress={actions[model.primary].onPress}
         />
       </View>
-      {!chain &&
-        link(
-          translate('walleterror.create') as string,
-          onCreate,
-          bottomPad,
-          'walleterror.create',
-        )}
+      {model.below !== 'none' && link(model.below, bottomPad)}
     </View>
   );
 };

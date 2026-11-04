@@ -126,7 +126,13 @@ import {
 import SeedSheet from '@ui/widgets/SeedSheet';
 import DeleteWalletSheet from '@ui/widgets/DeleteWalletSheet';
 import { DeleteWalletContext } from '@app/AppState/types/DeleteWalletContext';
-import { walletErrorKind } from './walletErrorKind';
+import { causeOf, restoreKeyUsable } from './walletLoadFailure';
+import { walletErrorModel } from '@screens/WalletError/walletErrorModel';
+import {
+  WalletErrorCause,
+  WalletLoadKind,
+} from '@app/AppState/types/WalletErrorInfo';
+import { FfiErrorCode } from '@app/walletBackend';
 import { sanitizePaths } from '@app/utils/sanitizePaths';
 import { duration as motionDuration } from '@app/theme/motion';
 
@@ -380,6 +386,8 @@ type LoadingAppClassState = AppStateLoading &
 const RETRY_MIN_MS = 1400;
 const ERROR_RESOLVE_MS = 200;
 
+type FailedLoad = { retry: () => Promise<void>; origin: OnboardingRoute };
+
 export class LoadingAppClass extends Component<
   LoadingAppClassProps,
   LoadingAppClassState
@@ -391,6 +399,13 @@ export class LoadingAppClass extends Component<
   // Runs once the hold completes; set with the sheet's context.
   afterDelete: () => void = () => {};
   retryStartedAt = 0;
+  // What a retry reruns and where Back goes. Outside the state and the context
+  // because a restore's retry holds the key.
+  openLoad = (): FailedLoad => ({
+    retry: () => this.loadExistingWalletOnBoot(),
+    origin: Route.Welcome,
+  });
+  failedLoad: FailedLoad = this.openLoad();
 
   constructor(props: LoadingAppClassProps) {
     super(props);
@@ -840,7 +855,7 @@ export class LoadingAppClass extends Component<
   showChainError = async (walletChain: ChainNameEnum) => {
     const details = await this.chainDetails(walletChain);
     this.setState({
-      walletError: { kind: 'chain', details, walletChain },
+      walletError: { load: 'open', cause: 'chain', details, walletChain },
       errorResolved: false,
       retrying: false,
       actionButtonsDisabled: false,
@@ -863,6 +878,7 @@ export class LoadingAppClass extends Component<
 
   // Loads the wallet file found on disk. Also the retry after a file repair.
   loadExistingWalletOnBoot = async () => {
+    this.failedLoad = this.openLoad();
     const walletChain = await this.walletChainMismatch();
     if (walletChain) {
       await this.showChainError(walletChain);
@@ -877,6 +893,7 @@ export class LoadingAppClass extends Component<
 
     let error = false;
     let errorText = '';
+    let errorCode: FfiErrorCode = 'Unknown';
     if (result.ok && result.value) {
       try {
         // here result can have an `error` field for watch-only which is actually OK.
@@ -969,17 +986,19 @@ export class LoadingAppClass extends Component<
       }
       error = true;
       errorText = result.ok ? result.value : result.error.message;
+      errorCode = result.ok ? 'Unknown' : result.error.code;
     }
     if (error) {
       await this.walletLoadFailed(
         Utils.humanizeChainTokens(errorText, this.state.translate),
+        errorCode,
       );
     }
   };
 
   // A repairable file is repaired and reloaded once; anything else lands on
   // the error screen with the error text behind its details toggle.
-  walletLoadFailed = async (errorText: string) => {
+  walletLoadFailed = async (errorText: string, code: FfiErrorCode) => {
     const report = await walletFileDiagnosis();
     if (!this.state.retrying && hasRepairableWalletFile(report.files)) {
       this.addLastSnackbar(
@@ -996,10 +1015,29 @@ export class LoadingAppClass extends Component<
     }
     const diagnosisLines = this.walletFileDiagnosisLines(report.files);
     this.showWalletError(
+      'open',
+      causeOf(code),
       sanitizePaths(
         diagnosisLines ? `${errorText}\n\n${diagnosisLines}` : errorText,
       ),
     );
+  };
+
+  // A create or a restore that failed: the screen it started from stays below
+  // the error screen, so Back finds the form as the user left it.
+  initLoadFailed = (
+    load: 'create' | 'restore',
+    origin: OnboardingRoute,
+    retry: () => Promise<void>,
+    code: FfiErrorCode,
+    details: string,
+  ) => {
+    this.failedLoad = { retry, origin };
+    this.setState({ actionButtonsDisabled: false });
+    if (currentRoute() !== Route.OpenError) {
+      returnTo(origin);
+    }
+    this.showWalletError(load, causeOf(code), sanitizePaths(details));
   };
 
   walletFileDiagnosisLines = (diagnosis: WalletFileDiagnosis[]): string =>
@@ -1015,21 +1053,22 @@ export class LoadingAppClass extends Component<
 
   // A retry that fails again shakes the icon and says so; its dots stay up
   // for at least RETRY_MIN_MS so the attempt reads as one.
-  showWalletError = (details: string) => {
-    const kind = walletErrorKind(details);
+  showWalletError = (
+    load: WalletLoadKind,
+    cause: WalletErrorCause,
+    details: string,
+  ) => {
     const again = currentRoute() === Route.OpenError;
     const apply = () => {
       if (again) {
         this.addLastSnackbar(
           this.state.translate(
-            kind === 'server'
-              ? 'walleterror.still-server'
-              : 'walleterror.still-open',
+            walletErrorModel(cause, load).stillKey,
           ) as string,
         );
       }
       this.setState(state => ({
-        walletError: { kind, details },
+        walletError: { load, cause, details },
         errorResolved: false,
         retrying: false,
         errorShake: again ? state.errorShake + 1 : state.errorShake,
@@ -1042,10 +1081,26 @@ export class LoadingAppClass extends Component<
     setTimeout(apply, wait);
   };
 
-  retryOpenWallet = async () => {
+  retryWalletLoad = async () => {
     this.retryStartedAt = Date.now();
     this.setState({ retrying: true, actionButtonsDisabled: true });
-    await this.loadExistingWalletOnBoot();
+    await this.failedLoad.retry();
+  };
+
+  // Back from a failed create or restore. The retry holds the key, so it goes.
+  leaveWalletError = () => {
+    const { origin } = this.failedLoad;
+    this.failedLoad = this.openLoad();
+    returnTo(origin);
+  };
+
+  reportWalletError = (title: string) => {
+    sendEmail(
+      this.state.translate,
+      this.state.zingolibVersion,
+      title,
+      this.state.walletError?.details ?? '',
+    );
   };
 
   // Moves to Automatic on the wallet's network, then opens the wallet. A
@@ -1141,6 +1196,7 @@ export class LoadingAppClass extends Component<
       );
       return;
     }
+    this.failedLoad = this.openLoad();
     this.setState(s => ({ wallet: { ...s.wallet, seed: '', ufvk: '' } }));
     this.props.openWallet({
       readOnly,
@@ -1154,30 +1210,30 @@ export class LoadingAppClass extends Component<
   };
 
   createNewWallet = async (): Promise<void> => {
-    const offline = this.state.server.kind === 'offline';
-    // Block only when the device is genuinely offline AND not in explicit
-    // Offline mode. Offline mode is a deliberate no-server flow: the wallet is
-    // created locally and simply won't sync until a server is chosen.
-    if (!this.state.netInfo.isConnected && !offline) {
-      this.addLastSnackbar(
-        this.state.translate('loadedapp.connection-error') as string,
-      );
-      return;
-    }
     this.setState({ actionButtonsDisabled: true });
     // The leaves part at once and the creating screen fades up in their
     // place; no button collapse first.
-    const showProgress = setTimeout(
-      () =>
+    const showProgress = setTimeout(() => {
+      if (!this.state.retrying) {
         navigateOnboarding({
           screen: Route.Progress,
           params: { kind: 'create' },
-        }),
-      0,
-    );
+        });
+      }
+    }, 0);
+    const failed = (code: FfiErrorCode, details: string) => {
+      clearTimeout(showProgress);
+      this.initLoadFailed(
+        'create',
+        Route.Welcome,
+        this.createNewWallet,
+        code,
+        details,
+      );
+    };
     // Pass "0" in both modes. Online, the Indexer supplies the chain tip.
-    // Offline (Indexerless), the FFI falls back to zingolib's Library Birthday
-    // — a per-chain height already mined when the linked zingolib release was
+    // Offline, or with a server that does not answer, the FFI falls back to
+    // zingolib's Library Birthday — a per-chain height already mined when the linked zingolib release was
     // cut, so a brand-new wallet starts its first sync from that recent floor
     // instead of scanning the whole chain from Sapling activation (zingolib
     // ADR 0007). A non-zero value here would act as an explicit override.
@@ -1196,35 +1252,11 @@ export class LoadingAppClass extends Component<
       try {
         seedJSON = await JSON.parse(seed.value);
         if (seedJSON.error) {
-          clearTimeout(showProgress);
-          this.setState({ actionButtonsDisabled: false });
-          returnTo(Route.Welcome);
-          createAlert(
-            this.setBackgroundError,
-            this.addLastSnackbar,
-            this.state.translate('loadingapp.creatingwallet-label') as string,
-            seedJSON.error,
-            false,
-            this.state.translate,
-            sendEmail,
-            this.state.zingolibVersion,
-          );
+          failed('Unknown', seedJSON.error);
           return;
         }
       } catch (e: unknown) {
-        clearTimeout(showProgress);
-        this.setState({ actionButtonsDisabled: false });
-        returnTo(Route.Welcome);
-        createAlert(
-          this.setBackgroundError,
-          this.addLastSnackbar,
-          this.state.translate('loadingapp.creatingwallet-label') as string,
-          e instanceof Error ? e.message : String(e),
-          false,
-          this.state.translate,
-          sendEmail,
-          this.state.zingolibVersion,
-        );
+        failed('Unknown', e instanceof Error ? e.message : String(e));
         return;
       }
       const wallet: WalletType = {
@@ -1257,20 +1289,10 @@ export class LoadingAppClass extends Component<
         LaunchingModeEnum.opening,
         this.state.server.chainName,
       );
+    } else if (seed.ok) {
+      failed('Unknown', seed.value);
     } else {
-      clearTimeout(showProgress);
-      this.setState({ actionButtonsDisabled: false });
-      returnTo(Route.Welcome);
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        this.state.translate('loadingapp.creatingwallet-label') as string,
-        seed.ok ? seed.value : seed.error.message,
-        false,
-        this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
-      );
+      failed(seed.error.code, seed.error.message);
     }
   };
 
@@ -1301,43 +1323,20 @@ export class LoadingAppClass extends Component<
       );
       return;
     }
-    if (seedUfvk.startsWith(GlobalConst.uview)) {
-      // it is a UFVK
-      let parsingError: boolean = false;
-      if (
-        this.state.server.chainName === ChainNameEnum.mainChainName &&
-        (seedUfvk.startsWith(GlobalConst.uviewtest) ||
-          seedUfvk.startsWith(GlobalConst.uviewregtest))
-      ) {
-        // the ufvk is not correct
-        parsingError = true;
-      }
-      if (
-        this.state.server.chainName === ChainNameEnum.testChainName &&
-        !seedUfvk.startsWith(GlobalConst.uviewtest)
-      ) {
-        // the ufvk is not correct
-        parsingError = true;
-      }
-      if (
-        this.state.server.chainName === ChainNameEnum.regtestChainName &&
-        !seedUfvk.startsWith(GlobalConst.uviewregtest)
-      ) {
-        // the ufvk is not correct
-        parsingError = true;
-      }
-      if (parsingError) {
-        // no reporting button, no needed.
-        createAlert(
-          this.setBackgroundError,
-          this.addLastSnackbar,
-          this.state.translate('loadingapp.invalidseedufvk-label') as string,
-          this.state.translate('loadingapp.invalidseedufvk-error') as string,
-          false,
-          this.state.translate,
-        );
-        return;
-      }
+    const failed = (code: FfiErrorCode, details: string) =>
+      this.initLoadFailed(
+        'restore',
+        origin,
+        () => this.doRestore(seedUfvk, birthday, origin),
+        code,
+        details,
+      );
+    if (!restoreKeyUsable(seedUfvk, this.state.server.chainName)) {
+      failed(
+        'InitKey',
+        this.state.translate('loadingapp.invalidseedufvk-error') as string,
+      );
+      return;
     }
 
     const walletBirthday = String(defaultTo(birthday, 0));
@@ -1346,11 +1345,14 @@ export class LoadingAppClass extends Component<
     // From the form, the Import button collapses first; from the Keychain
     // card, the leaves part at once.
     const showImporting = setTimeout(
-      () =>
-        navigateOnboarding({
-          screen: Route.Progress,
-          params: { kind: 'import' },
-        }),
+      () => {
+        if (!this.state.retrying) {
+          navigateOnboarding({
+            screen: Route.Progress,
+            params: { kind: 'import' },
+          });
+        }
+      },
       origin === Route.ImportWallet ? motionDuration.emphasized : 0,
     );
     let type: RestoreFromTypeEnum = RestoreFromTypeEnum.seedRestoreFrom;
@@ -1386,6 +1388,7 @@ export class LoadingAppClass extends Component<
 
     let error = false;
     let errorText = '';
+    let errorCode: FfiErrorCode = 'Unknown';
     if (result.ok && result.value) {
       try {
         // here result can have an `error` field for watch-only which is actually OK.
@@ -1464,7 +1467,7 @@ export class LoadingAppClass extends Component<
             transparentPool,
             true,
             LaunchingModeEnum.opening,
-            // restore requires a live server → its chain is the wallet's chain.
+            // A restore takes its chain from the selected server, up or not.
             this.state.server.chainName,
           );
         } else {
@@ -1478,21 +1481,11 @@ export class LoadingAppClass extends Component<
     } else {
       error = true;
       errorText = result.ok ? result.value : result.error.message;
+      errorCode = result.ok ? 'Unknown' : result.error.code;
     }
     if (error) {
       clearTimeout(showImporting);
-      this.setState({ actionButtonsDisabled: false });
-      returnTo(origin);
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        this.state.translate('loadingapp.readingwallet-label') as string,
-        errorText,
-        false,
-        this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
-      );
+      failed(errorCode, errorText);
     }
   };
 
@@ -1512,6 +1505,7 @@ export class LoadingAppClass extends Component<
     this.probeCurrentServer();
   };
 
+  // Back on a server error, the load runs again on the server now selected.
   // Back on a chain error, the wallet opens by itself once the server is on
   // its network, or offline.
   closeServer = () => {
@@ -1519,12 +1513,13 @@ export class LoadingAppClass extends Component<
     const below = focusedStackRouteNames().at(-2);
     const fixed =
       below === Route.OpenError &&
-      walletError?.kind === 'chain' &&
-      (server.kind === 'offline' ||
-        server.chainName === walletError.walletChain);
+      (walletError?.cause === 'server' ||
+        (walletError?.cause === 'chain' &&
+          (server.kind === 'offline' ||
+            server.chainName === walletError.walletChain)));
     goBack();
     if (fixed) {
-      this.retryOpenWallet();
+      this.retryWalletLoad();
     }
   };
 
@@ -1855,7 +1850,9 @@ export class LoadingAppClass extends Component<
       openCurrentWallet: this.openCurrentWallet,
       createNewWallet: this.createNewWalletChecked,
       getwalletToRestore: this.getwalletToRestore,
-      retryOpenWallet: this.retryOpenWallet,
+      retryWalletLoad: this.retryWalletLoad,
+      leaveWalletError: this.leaveWalletError,
+      reportWalletError: this.reportWalletError,
       deleteThenImport: this.deleteThenImport,
       deleteThenCreate: this.deleteThenCreate,
       switchToWalletChain: this.switchToWalletChain,

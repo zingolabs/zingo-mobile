@@ -82,7 +82,9 @@ export interface OnboardingContext {
   openCurrentWallet: () => void;
   createNewWallet: () => void;
   getwalletToRestore: () => void;
-  retryOpenWallet: () => void;
+  retryWalletLoad: () => void;
+  leaveWalletError: () => void;
+  reportWalletError: (title: string) => void;
   // The hold-to-delete sheet, then the import or the create.
   deleteThenImport: () => void;
   deleteThenCreate: () => void;
