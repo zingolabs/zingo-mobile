@@ -71,7 +71,9 @@ export function OpenErrorScreen() {
     errorResolved,
     retrying,
     errorShake,
-    retryOpenWallet,
+    retryWalletLoad,
+    leaveWalletError,
+    reportWalletError,
     deleteThenImport,
     deleteThenCreate,
     openServer,
@@ -82,13 +84,16 @@ export function OpenErrorScreen() {
   }
   return (
     <WalletError
-      kind={walletError.kind}
+      cause={walletError.cause}
+      load={walletError.load}
       details={walletError.details}
       walletChain={walletError.walletChain}
       resolved={errorResolved}
       busy={retrying}
       shake={errorShake}
-      onRetry={retryOpenWallet}
+      onRetry={retryWalletLoad}
+      onBack={leaveWalletError}
+      onReport={reportWalletError}
       onImport={deleteThenImport}
       onCreate={deleteThenCreate}
       onServer={() => openServer(walletError.walletChain)}

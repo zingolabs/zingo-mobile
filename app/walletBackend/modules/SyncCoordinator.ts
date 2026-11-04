@@ -14,6 +14,7 @@
  *
  * To add a new periodic task, push it into taskPromises inside runTaskPromises.
  */
+import { toFfiError } from '@app/walletBackend/ffi';
 import { TotalBalanceClass, GlobalConst } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
@@ -32,7 +33,6 @@ import {
 } from '@app/walletBackend/utils/syncBracket';
 
 // zingolib's refusal to sync a client that has no indexer configured.
-const INDEXERLESS = /no indexer configured/i;
 
 // Consecutive failed sync launches before onPersistentSyncFailure fires.
 // Three failures span ~15 s of the 5 s tick: long enough to ride out a
@@ -268,7 +268,7 @@ export class SyncCoordinator {
       // runSyncProcess and runRescanProcess reject on failure (typed FFI
       // errors); this catch owns the error path for both.
       const { server } = this.config;
-      if (INDEXERLESS.test(String(error)) && server.kind === 'remote') {
+      if (toFfiError(error).code === 'Offline' && server.kind === 'remote') {
         // The wallet opened without an indexer because its server did not
         // answer then (leaving Offline mode on a network that was still
         // coming up). Attach the server again; the next tick syncs. Not an

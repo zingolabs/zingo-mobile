@@ -448,7 +448,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         style={
           {
             "gap": 8,
-            "opacity": 0.5,
+            "opacity": 1,
           }
         }
       >
@@ -468,7 +468,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         >
           <TextInput
             accessibilityLabel=""
-            editable={false}
+            editable={true}
             keyboardType="number-pad"
             maxFontSizeMultiplier={2}
             multiline={false}
