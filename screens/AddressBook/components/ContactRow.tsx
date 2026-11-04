@@ -23,6 +23,7 @@ import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
 import { PencilIcon } from '@ui/primitives/Icons/PencilIcon';
 import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
+import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
 import { TrashCan, TrashLid } from '@ui/primitives/Icons/TrashIcon';
 import { themeTokens } from '@app/theme';
 
@@ -48,7 +49,7 @@ const ACTION_SLOP = {
   bottom: LABEL_GAP + textVariants.caption.lineHeight,
 };
 
-type Button = 'send' | 'copy' | 'edit' | 'delete';
+type Button = 'send' | 'swap' | 'copy' | 'edit' | 'delete';
 
 type ContactRowProps = {
   contact: AddressBookFileClass;
@@ -56,6 +57,8 @@ type ContactRowProps = {
   open: boolean;
   /** The wallet can pay this contact: a Zcash address, spending keys and a server. */
   sendable: boolean;
+  /** The wallet can swap with this contact: another coin, and the Swap tab exists. */
+  swappable: boolean;
   /** Only Zcash contacts take an edit; the chain is fixed to Zcash. */
   editable: boolean;
   flash: boolean;
@@ -63,6 +66,7 @@ type ContactRowProps = {
   onToggle: () => void;
   onSwipe: () => void;
   onSend: () => void;
+  onSwap: () => void;
   onCopy: () => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -115,12 +119,14 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
   first,
   open,
   sendable,
+  swappable,
   editable,
   flash,
   leaving,
   onToggle,
   onSwipe,
   onSend,
+  onSwap,
   onCopy,
   onEdit,
   onDelete,
@@ -295,6 +301,12 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
           busy.current = false;
         });
         return;
+      case 'swap':
+        onSwap();
+        later(ACTION_RESET_MS, () => {
+          busy.current = false;
+        });
+        return;
       case 'copy':
         onCopy();
         copyScale.value = withSequence(
@@ -402,6 +414,15 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
                   <Animated.View style={flyStyle}>
                     <PlaneIcon size={24} color={colors.fgAccent} />
                   </Animated.View>
+                </Action>
+              )}
+              {swappable && (
+                <Action
+                  testID={`addressbook.row.${contact.address}.swap`}
+                  label={translate('addressbook.swap') as string}
+                  onPress={() => press('swap')}
+                >
+                  <SwapIcon size={24} color={colors.fgAccent} />
                 </Action>
               )}
               <Action

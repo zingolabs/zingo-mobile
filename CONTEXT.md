@@ -163,11 +163,10 @@ _Avoid_: clamped, floored
 
 **Blocking check** — a PR CI job that runs under fail-all and that
 branch protection requires; its failure withholds the merge verdict.
-Jest, the Binding Layer crate tests,
-js-depcheck, the JS static checks, andr-dependency-analysis, the Android
-Kotlin compile, the Android JVM unit tests, the Android build chain for
-every ABI, the offline device tests, the iOS Binding Layer build, and
-the iOS integration test are blocking checks.
+Jest, js-depcheck, the JS static checks, andr-dependency-analysis, the
+two Binding Layer fetches, the Android Kotlin compile, the Android JVM
+unit tests, the Android APK build, the offline device tests, and the iOS
+integration test are blocking checks.
 
 **Advisory stage** — a PR CI job that records its result without
 affecting the pull request verdict. No PR stage currently runs in
@@ -182,12 +181,6 @@ included. It arrives after the merge verdict.
 **Verdict path** — the longest chain of blocking checks; its wall-clock
 length, queue waits included, is the time from push to merge verdict.
 Advisory stages and trailing stages are never on the verdict path.
-
-**Hit path** — the verdict path of a run whose Binding Layer caches
-already hold every ABI. The native builds are absent from it.
-
-**Miss path** — the verdict path of a run that must build the Binding
-Layer. It runs through the native build and the device tests.
 
 **Trailing stage** — a PR CI job that starts only after every blocking
 check has passed. Its failure fails the run and leaves the merge verdict

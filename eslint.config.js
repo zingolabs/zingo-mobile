@@ -110,12 +110,7 @@ const geometryGaps = ['app/navigation', 'screens', 'ui']
 
 module.exports = [
   {
-    ignores: [
-      'node_modules/**',
-      'coverage/**',
-      'zingolib/**',
-      'scripts/release/**',
-    ],
+    ignores: ['node_modules/**', 'coverage/**', 'scripts/release/**'],
   },
   ...compat.extends('@react-native'),
   {
