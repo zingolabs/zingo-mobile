@@ -31,6 +31,7 @@ import {
   isRealLegHash,
   isRefunding,
   isTerminalStatus,
+  isThorchainFamily,
   prefillFromRecord,
   providerLongLabel,
 } from '@app/swap';
@@ -150,6 +151,10 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
   const done = outcome === 'completed';
   const expired = outcome === 'expired';
   const refunding = isRefunding(record);
+  /** Paid to a vault every user shares, so its address says nothing of this swap. */
+  const sharedVault = isThorchainFamily(record.provider);
+  /** A purchase whose deposit we did not find, which is not to say it wasn't sent. */
+  const unfoundPurchase = expired && sharedVault && !sell;
   const sellSym = record.sellAsset.ticker ?? record.sellAsset.symbol;
   const getSym = record.receiveAsset.ticker ?? record.receiveAsset.symbol;
   const other = sell ? record.receiveAsset : record.sellAsset;
@@ -182,10 +187,12 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
             amount: `+${formatAmountForDisplay(got)}`,
             unit: getSym,
             tone: 'muted' as const,
-            line: t('history.swap-not-sent').replace(
-              '{amount}',
-              `${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}`,
-            ),
+            line: unfoundPurchase
+              ? `${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}`
+              : t('history.swap-not-sent').replace(
+                  '{amount}',
+                  `${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}`,
+                ),
           }
         : {
             amount: `${done ? '+' : '≈ +'}${formatAmountForDisplay(got)}`,
@@ -251,15 +258,30 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
       ? [
           {
             label: t('swap.result-reason'),
-            value: t('swap.expired-why'),
+            value: t(
+              unfoundPurchase ? 'swap.expired-why-vault' : 'swap.expired-why',
+            ),
             wrap: true,
           },
-          {
-            label: t('swap.deposit-address'),
-            value: Utils.trimToSmall(record.depositAddress, 6),
-            mono: true,
-            strike: true,
-          },
+          ...(unfoundPurchase
+            ? [
+                {
+                  label: t('swap.your-address'),
+                  value: Utils.trimToSmall(record.sourceAddress, 6),
+                  mono: true,
+                  copy: record.sourceAddress,
+                },
+              ]
+            : sharedVault
+              ? []
+              : [
+                  {
+                    label: t('swap.deposit-address'),
+                    value: Utils.trimToSmall(record.depositAddress, 6),
+                    mono: true,
+                    strike: true,
+                  },
+                ]),
         ]
       : []),
     ...(feesUsd && !expired
@@ -394,15 +416,19 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         line={view.hero.line}
         pill={view.pill.text}
         pillTone={view.pill.tone}
-        strike={expired || outcome === 'failed'}
+        strike={(expired && !unfoundPurchase) || outcome === 'failed'}
       />
 
-      {awaitingDeposit && (
+      {(awaitingDeposit || unfoundPurchase) && (
         <View style={{ marginVertical: space12, rowGap: space12 }}>
-          <Text variant="bodyStrong">
-            {t(sell ? 'swap.deposit-unsent-title' : 'swap.deposit-title')}
-          </Text>
-          <DepositSlip record={record} paid={sell} />
+          {awaitingDeposit && (
+            <>
+              <Text variant="bodyStrong">
+                {t(sell ? 'swap.deposit-unsent-title' : 'swap.deposit-title')}
+              </Text>
+              <DepositSlip record={record} paid={sell} />
+            </>
+          )}
           <Text variant="bodySmall" tone="muted">
             {t(sell ? 'swap.deposit-left-anyway' : 'swap.deposit-already-paid')}
           </Text>
@@ -442,7 +468,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         </Text>
       )}
 
-      {expired && (
+      {expired && !sharedVault && (
         <View style={{ marginTop: space12, rowGap: space12 }}>
           <Banner
             testID="swap.detail.dont-send"

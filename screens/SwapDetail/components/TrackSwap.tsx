@@ -45,6 +45,11 @@ function describe(what: TrackerWhatType, t: (key: string) => string): string {
         '{chain}',
         chain(what.chain),
       );
+    case 'sourceAddress':
+      return t('swap.track-source-address').replace(
+        '{chain}',
+        chain(what.chain),
+      );
   }
 }
 

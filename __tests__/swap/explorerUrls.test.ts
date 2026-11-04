@@ -330,6 +330,65 @@ describe('buildTrackerEntries', () => {
     ]);
   });
 
+  describe('on a shared vault with no deposit seen', () => {
+    const BTC_ASSET = {
+      swapKitId: 'BTC.BTC',
+      chain: 'BTC',
+      symbol: 'BTC',
+      ticker: 'BTC',
+      chainId: 'bitcoin',
+      decimals: 8,
+    };
+
+    it.each([
+      SwapKitProviderEnum.MayachainStreaming,
+      SwapKitProviderEnum.ThorchainStreaming,
+    ])(
+      'a %s purchase links the address the user gave, not the vault',
+      provider => {
+        const entries = buildTrackerEntries({
+          record: record({
+            provider,
+            direction: SwapDirectionEnum.Inbound,
+            sellAsset: BTC_ASSET,
+            receiveAsset: ZEC,
+            depositAddress: 'bc1qvault',
+            sourceAddress: 'bc1quser',
+            broadcast: undefined,
+            observedDepositTxHash: undefined,
+          }),
+          ...explorer,
+        });
+
+        expect(entries).toEqual([
+          {
+            key: 'source-address',
+            name: 'mempool.space',
+            what: { kind: 'sourceAddress', chain: 'BTC' },
+            url: 'https://mempool.space/address/bc1quser',
+            id: 'bc1quser',
+            onZcash: false,
+          },
+        ]);
+      },
+    );
+
+    it('a sale links nothing', () => {
+      const entries = buildTrackerEntries({
+        record: record({
+          provider: SwapKitProviderEnum.ThorchainStreaming,
+          direction: SwapDirectionEnum.Outbound,
+          depositAddress: 't1vault',
+          broadcast: undefined,
+          observedDepositTxHash: undefined,
+        }),
+        ...explorer,
+      });
+
+      expect(entries).toEqual([]);
+    });
+  });
+
   it('links the Maya explorer by the deposit hash', () => {
     const entries = buildTrackerEntries({
       record: record({
