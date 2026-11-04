@@ -85,6 +85,37 @@ export function isZecWrapper(token: TokenEntryType): boolean {
   );
 }
 
+/** The coins a contact saved under `chain` can swap with. */
+export function chainCoins(
+  tokens: TokenEntryType[],
+  chain: string,
+): TokenEntryType[] {
+  return tokens.filter(
+    token =>
+      isQuotableToken(token) &&
+      !isZecWrapper(token) &&
+      token.chain.toUpperCase() === chain.toUpperCase(),
+  );
+}
+
+/**
+ * What a contact saved under `chain` swaps with by default: the chain's entry
+ * with no contract, or its first token where it routes only tokens (USDC on
+ * `HYPE`). Read from the catalog because this cannot be told from the chain
+ * (TON pays in GRAM, Base in ETH) and SwapKit can change it. The catalog comes
+ * sorted by popularity, so the first token is the likeliest one.
+ */
+export function chainCoin(
+  tokens: TokenEntryType[],
+  chain: string,
+): TokenEntryType | undefined {
+  const onChain = chainCoins(tokens, chain);
+  return (
+    onChain.find(token => !token.address && !token.identifier.includes('-')) ??
+    onChain[0]
+  );
+}
+
 export function tokenToSwapAsset(token: TokenEntryType): SwapAssetType {
   return {
     swapKitId: token.identifier,

@@ -1,4 +1,5 @@
 import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
+import { SwapAssetType } from './types/SwapAssetType';
 import { SwapRecordType } from './types/SwapRecordType';
 import { SwapPrefillType } from './types/SwapPrefillType';
 
@@ -13,6 +14,25 @@ export function prefillFromRecord(
     asset: selling ? record.receiveAsset : record.sellAsset,
     sellAmountHumanDecimal: record.sellAmountHumanDecimal,
     address: selling ? record.destinationAddress : record.sourceAddress,
+    requestedAtMs: nowMs,
+  };
+}
+
+/**
+ * A new swap with a saved contact: `address` is the destination selling ZEC
+ * and the refund address buying it. The amount is left to the user.
+ */
+export function prefillFromContact(
+  direction: SwapDirectionEnum,
+  asset: SwapAssetType,
+  address: string,
+  nowMs: number,
+): SwapPrefillType {
+  return {
+    direction,
+    asset,
+    sellAmountHumanDecimal: '',
+    address,
     requestedAtMs: nowMs,
   };
 }
