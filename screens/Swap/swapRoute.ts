@@ -18,6 +18,7 @@ export function swapScreenFor(
   record: Pick<
     SwapRecordType,
     | 'direction'
+    | 'provider'
     | 'status'
     | 'lateDepositAtMs'
     | 'depositSentAtMs'

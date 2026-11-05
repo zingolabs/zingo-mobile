@@ -897,6 +897,8 @@
     "expired-toast": "{coin} depozitosu algılanmadı. Hiçbir şey gönderilmedi.",
     "late-why": "Ödemeniz bu takas kapandıktan sonra geldi, bu yüzden takas edilemez",
     "goes-back-to": "Geri döneceği adres",
+    "delivery-tx": "ZEC işlemi",
+    "no-delivery": "Bu swap için ZEC işlemi elimizde yok, bu yüzden teslimatı doğrulayamıyoruz. Bakiyenizi kontrol edin.",
     "late-note": "{provider} parayı ağ ücreti düşülerek iade adresinize geri gönderir. Bir şey yapmanız gerekmez.",
     "late-toast": "{coin} bu takas kapandıktan sonra geldi. İade adresinize geri dönüyor.",
     "going-back-line": "{amount} size geri dönüyor",

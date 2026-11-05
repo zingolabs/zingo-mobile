@@ -13,6 +13,7 @@ import {
   fetchMayaShieldedMemoTarget,
   shieldedMemoAddressFromSwap,
 } from './mayaShieldedMemo';
+import { lacksDelivery } from './deliveryWatch';
 import { SwapStatusEnum, isTerminalStatus } from './enums/SwapStatusEnum';
 import { DEPOSIT_WAIT_MS } from './depositDeadline';
 import { hasDepositEvidence } from './depositEvidence';
@@ -462,6 +463,12 @@ export class SwapService {
    * is asked about, and each swap at most once a session, whatever the
    * outcome, so stepping back and forth does not repeat a failing request.
    *
+   * A Maya or THORChain purchase with no ZEC transaction also asks Midgard,
+   * every time it is shown, since that is how a payment `/track` cannot find
+   * turns up. What Midgard finds is stored, and earns the `/track` question
+   * whatever the record's stamp says. A found payment on an expired purchase
+   * reopens it as in progress, and the poller takes over.
+   *
    * A finished swap stays finished. `/track` has been seen to answer an old
    * swap in a way that maps to no terminal state, and the history must not
    * reopen a swap on that account, so the status is kept.
@@ -471,15 +478,19 @@ export class SwapService {
   async backfillFinishedRecord(
     recordId: string,
   ): Promise<SwapRecordType | undefined> {
-    if (this.backfillAttempted.has(recordId)) return undefined;
-    const record = await this.store.getByRecordId(recordId);
+    const stored = await this.store.getByRecordId(recordId);
+    if (!stored || !isTerminalStatus(stored.status)) return undefined;
+    const found = lacksDelivery(stored)
+      ? await this.poller.discoverViaMidgard(stored)
+      : null;
     if (
-      !record ||
-      !needsBackfill(record) ||
-      !this.registry.has(record.provider)
+      !found &&
+      (this.backfillAttempted.has(recordId) || !needsBackfill(stored))
     )
       return undefined;
+    if (!this.registry.has(stored.provider)) return found ?? undefined;
     this.backfillAttempted.add(recordId);
+    const record = found ?? stored;
 
     let response: TrackResponseType;
     try {
@@ -489,7 +500,8 @@ export class SwapService {
         `SwapService: backfill /track failed for ${record.recordId}:`,
         err,
       );
-      return undefined;
+      this.followIfReopened(found);
+      return found ?? undefined;
     }
 
     const tracked = this.registry
@@ -504,7 +516,24 @@ export class SwapService {
           terminalAtMs: record.terminalAtMs,
         };
     await this.store.upsert(updated);
+    this.followIfReopened(updated);
     return updated;
+  }
+
+  /**
+   * The poller may have stopped with nothing left to ask about, so it starts
+   * again for a reopened swap. `start()` ticks when it was stopped; the extra
+   * tick is for when it was running all along.
+   */
+  private followIfReopened(record: SwapRecordType | null): void {
+    if (!record || isTerminalStatus(record.status)) return;
+    const wasRunning = this.poller.isRunning();
+    this.poller.start();
+    if (wasRunning) {
+      this.poller.tickOnce().catch(() => {
+        // tickOnce already logs internally; we intentionally don't await.
+      });
+    }
   }
 
   async getRecord(recordId: string): Promise<SwapRecordType | undefined> {

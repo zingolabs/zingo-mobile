@@ -344,6 +344,7 @@ test('Tests that a purchase whose deposit was not detected reads grey with the Z
 test('Tests that a purchase paid after its quote expired reads refunding in amber with the coin going back', () => {
   const text = swapRowText({
     record: record({
+      provider: SwapKitProviderEnum.Near,
       direction: SwapDirectionEnum.Inbound,
       status: SwapStatusEnum.Pending,
       lateDepositAtMs: 1,

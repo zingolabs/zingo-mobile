@@ -37,6 +37,7 @@ export {
   isRefunding,
   watchesLateDeposit,
 } from './lateDeposit';
+export { lacksDelivery, watchesDelivery } from './deliveryWatch';
 export { isThorchainFamily } from './thorchainFamily';
 export {
   DEPOSIT_WAIT_MS,

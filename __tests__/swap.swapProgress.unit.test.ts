@@ -1,3 +1,4 @@
+import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
 import { UNKNOWN_HASH_MS } from '@app/swap/canRemoveSwap';
 jest.mock('@app/RPCModule', () => ({ __esModule: true, default: {} }));
 
@@ -12,11 +13,13 @@ import { swapScreenFor } from '@screens/Swap/swapRoute';
 import { Route } from '@app/AppState';
 
 const buy = (status: SwapStatusEnum) => ({
+  provider: SwapKitProviderEnum.Near,
   updatedAtMs: 0,
   direction: SwapDirectionEnum.Inbound,
   status,
 });
 const sell = (status: SwapStatusEnum) => ({
+  provider: SwapKitProviderEnum.Near,
   updatedAtMs: 0,
   direction: SwapDirectionEnum.Outbound,
   status,
