@@ -238,13 +238,13 @@ export class SwapPoller {
    *     `/track` keyed on the source-chain hash — the deposit address is a
    *     rotating vault, and passing it returns `Insufficient parameters for
    *     tracking method detection`. Outbound gets the hash from our broadcast,
-   *     inbound from the user or from Midgard, and Midgard only covers
+   *     inbound from Midgard, and Midgard only covers
    *     Maya/THORChain inbound. Anything left over has nothing to ask about,
    *     and asking anyway would fill the log with failures the user reads as
    *     something being broken.
    *
-   * The third is recoverable from outside: attaching a deposit transaction
-   * writes a hash and re-arms the poller through `SwapService`.
+   * The third is recoverable from outside: opening a finished swap asks Midgard
+   * and re-arms the poller through `SwapService` if it reopens.
    */
   private isPollable(record: SwapRecordType, nowMs: number): boolean {
     if (
@@ -284,6 +284,13 @@ export class SwapPoller {
     return now - lastPolled >= requiredDelta;
   }
 
+  /** Asks Midgard about a finished swap the user has just opened. */
+  async discoverViaMidgard(
+    record: SwapRecordType,
+  ): Promise<SwapRecordType | null> {
+    return this.maybeDiscoverHashViaMidgard(record, Date.now());
+  }
+
   /**
    * Try to discover the source-chain tx hash and the delivery via Midgard when
    * the record is an inbound Maya/THORChain swap that lacks either. Returns the
@@ -300,13 +307,6 @@ export class SwapPoller {
    * so a Midgard outage does not exhaust the `/track` failure budget for an
    * otherwise healthy record.
    */
-  /** The same question, for a finished swap the user has just opened. */
-  async discoverViaMidgard(
-    record: SwapRecordType,
-  ): Promise<SwapRecordType | null> {
-    return this.maybeDiscoverHashViaMidgard(record, Date.now());
-  }
-
   private async maybeDiscoverHashViaMidgard(
     record: SwapRecordType,
     now: number,
