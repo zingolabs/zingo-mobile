@@ -7,9 +7,8 @@ import React, {
   useState,
 } from 'react';
 import { View } from 'react-native';
-import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { space12, space16, space8, useTheme } from '@app/theme';
+import { space12, space8, useTheme } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import { Route } from '@app/AppState';
 import { ContextAppLoaded, useSwapService } from '@app/context';
@@ -32,8 +31,6 @@ import { leaveFlow } from '@app/navigation/navigate';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
-import TextField from '@ui/primitives/TextField';
-import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 import Banner from '@ui/widgets/Banner';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import DepositSlip from '@screens/Swap/components/DepositSlip';
@@ -68,9 +65,6 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   const record = useSwapRecord(recordId);
 
   const [nowMs, setNowMs] = useState<number>(() => Date.now());
-  const [hash, setHash] = useState<string>('');
-  const [attaching, setAttaching] = useState<boolean>(false);
-  const [attachError, setAttachError] = useState<string>('');
   const [retryError, setRetryError] = useState<string>(broadcastError ?? '');
   const [retrying, setRetrying] = useState<boolean>(false);
   const sentSheetRef = useRef<BottomSheetModal>(null);
@@ -123,27 +117,6 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
     navigation,
     recordId,
   ]);
-
-  const attach = useCallback(async () => {
-    const trimmed = hash.trim();
-    if (!trimmed || !swapService || !record) {
-      return;
-    }
-    setAttaching(true);
-    setAttachError('');
-    try {
-      if (isOutbound) {
-        await swapService.markBroadcasted({ recordId, txId: trimmed });
-      } else {
-        await swapService.setObservedDepositTxHash({ recordId, hash: trimmed });
-      }
-      navigation.replace(Route.SwapTracking, { recordId });
-    } catch (e) {
-      setAttachError(`${e}`);
-    } finally {
-      setAttaching(false);
-    }
-  }, [hash, swapService, record, isOutbound, recordId, navigation]);
 
   const retry = useCallback(async () => {
     if (!record || !swapService) {
@@ -222,34 +195,6 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
     return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
   }
 
-  const hashBox = (
-    <View style={{ rowGap: space8 }}>
-      <TextField
-        testID="swap.deposit.hash"
-        label={translate('swap.deposit-hash') as string}
-        value={hash}
-        onChangeText={setHash}
-        placeholder={translate('swap.deposit-hash-placeholder') as string}
-        mono
-        error={attachError || undefined}
-        trailingIcon={ClipboardPasteIcon}
-        trailingLabel={translate('paste') as string}
-        onTrailingPress={async () =>
-          setHash((await Clipboard.getString()).trim())
-        }
-      />
-      <Button
-        testID="swap.deposit.attach"
-        inline
-        variant="text"
-        title={translate('swap.deposit-follow') as string}
-        disabled={attaching || hash.trim().length === 0}
-        busy={attaching}
-        onPress={attach}
-      />
-    </View>
-  );
-
   if (isOutbound) {
     // Past its quote the ZEC is not sent again: a new quote takes over.
     const resendable = canResendSale(record, nowMs);
@@ -312,13 +257,6 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
         </Banner>
         <View style={{ height: space12 }} />
         <DepositSlip record={record} paid />
-        <View style={{ marginTop: space16 }}>
-          <Text variant="caption" tone="muted">
-            {translate('swap.deposit-left-anyway') as string}
-          </Text>
-          <View style={{ height: space8 }} />
-          {hashBox}
-        </View>
         <AuthorizeSheet
           ref={authSheetRef}
           summary={`${translate('swap.auth-line-1') as string} ${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${record.sellAsset.symbol} ${translate('swap.auth-line-2') as string} ${providerShortLabel(record.provider)}.`}

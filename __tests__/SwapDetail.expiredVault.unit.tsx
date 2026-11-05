@@ -1,6 +1,5 @@
 jest.mock('@app/RPCModule', () => ({ __esModule: true, default: {} }));
 
-const mockSetObservedDepositTxHash = jest.fn(async () => undefined);
 let mockRecord: unknown;
 
 jest.mock('@screens/Swap/useSwapRecord', () => ({
@@ -11,13 +10,12 @@ jest.mock('@app/context', () => ({
   useSwapRecords: () => [],
   useSwapService: () => ({
     backfillFinishedRecord: jest.fn(async () => undefined),
-    setObservedDepositTxHash: mockSetObservedDepositTxHash,
   }),
 }));
 
 import 'react-native';
 import React from 'react';
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { render, screen } from '@testing-library/react-native';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
@@ -89,19 +87,11 @@ describe.each([
     expect(screen.getByText('swap.expired-why-vault')).toBeTruthy();
   });
 
-  test('Tests that a pasted hash is attached to the swap when its deposit was not found', async () => {
-    mockSetObservedDepositTxHash.mockClear();
+  test('Tests that no hash can be entered when its deposit was not found', () => {
     renderDetail(expiredPurchase(provider));
 
-    fireEvent.changeText(screen.getByTestId('swap.detail.hash'), 'ab12');
-    await act(async () => {
-      fireEvent.press(screen.getByText('swap.deposit-follow'));
-    });
-
-    expect(mockSetObservedDepositTxHash).toHaveBeenCalledWith({
-      recordId: 'rec-1',
-      hash: 'ab12',
-    });
+    expect(screen.queryByTestId('swap.detail.hash')).toBeNull();
+    expect(screen.queryByText('swap.deposit-follow')).toBeNull();
   });
 });
 
@@ -110,5 +100,4 @@ test('Tests that an expired NEAR purchase keeps its own deposit address and no h
 
   expect(screen.getByText('swap.deposit-address')).toBeTruthy();
   expect(screen.getByTestId('swap.detail.dont-send')).toBeTruthy();
-  expect(screen.queryByTestId('swap.detail.hash')).toBeNull();
 });

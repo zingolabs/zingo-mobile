@@ -117,17 +117,6 @@ export type MarkBroadcastedArgs = {
   allTxIds?: string[];
 };
 
-export type SetObservedDepositTxHashArgs = {
-  /** Locally-minted primary key returned by `commitRoute` on the record. */
-  recordId: string;
-  /** Source-chain tx hash the user pasted after paying the deposit from
-   *  their external wallet. For Maya/THORChain inbound the provider keys
-   *  `/track` observations by this hash, so until it lands on the record
-   *  the poller has nothing to query. Format validation is intentionally
-   *  loose here — SwapKit returns the authoritative error on /track. */
-  hash: string;
-};
-
 export type MarkDepositSentArgs = {
   /** Locally-minted primary key returned by `commitRoute` on the record. */
   recordId: string;
@@ -422,70 +411,6 @@ export class SwapService {
     // Status transitioned from PendingDeposit to Pending; the poller now has
     // something concrete to track. Idempotent.
     this.poller.start();
-    return updated;
-  }
-
-  /**
-   * Inbound counterpart to `markBroadcasted`: the user has paid the deposit
-   * from an external wallet (Maya/THORChain inbound flow) and pasted the
-   * source-chain tx hash they got from that wallet. Persist it so the poller
-   * can switch from "no hash → skip" to `/track?hash=…&chainId=…` and start
-   * surfacing the swap's real progress.
-   *
-   * Why this exists rather than reusing `markBroadcasted`: that method
-   * rejects non-outbound records and writes to the `broadcast` block, which
-   * is reserved for our own zingolib broadcasts. Inbound has no broadcast
-   * block — the user paid from outside — so we use the inbound-only
-   * `observedDepositTxHash` slot that `buildTrackParams` already reads.
-   *
-   * Status transitions PendingDeposit / AwaitingExternalDeposit → Pending so
-   * the History row stops showing "awaiting external" and starts showing
-   * "swapping" as soon as the user confirms they paid; the poller then
-   * promotes it to `Processing`/`Completed` based on `/track` responses.
-   */
-  async setObservedDepositTxHash(
-    args: SetObservedDepositTxHashArgs,
-  ): Promise<SwapRecordType> {
-    const { recordId, hash } = args;
-    const record = await this.store.getByRecordId(recordId);
-    if (!record) {
-      throw new Error(
-        `SwapService.setObservedDepositTxHash: no record for ${recordId}`,
-      );
-    }
-    if (record.direction !== SwapDirectionEnum.Inbound) {
-      throw new Error(
-        `SwapService.setObservedDepositTxHash: not an inbound record (${recordId})`,
-      );
-    }
-    const now = Date.now();
-    const updated: SwapRecordType = {
-      ...record,
-      observedDepositTxHash: hash,
-      status: SwapStatusEnum.Pending,
-      // A hash handed over for an expired purchase names a payment that came
-      // late, which the provider returns.
-      lateDepositAtMs:
-        record.status === SwapStatusEnum.Expired
-          ? (record.lateDepositAtMs ?? now)
-          : record.lateDepositAtMs,
-      updatedAtMs: now,
-    };
-    await this.store.upsert(updated);
-    // The poller had nothing to ask about for this record (Maya/THORChain
-    // inbound with no hash) and may well have stopped over it — that is
-    // exactly the case its auto-stop exists to catch. Re-arm first, then fire
-    // an immediate tick so the History flips to a real provider-reported
-    // status in seconds rather than at the next idle interval. `start()`
-    // already ticks when it was stopped, so the extra tick is only for the
-    // case where it was running all along.
-    const wasRunning = this.poller.isRunning();
-    this.poller.start();
-    if (wasRunning) {
-      this.poller.tickOnce().catch(() => {
-        // tickOnce already logs internally; we intentionally don't await.
-      });
-    }
     return updated;
   }
 
