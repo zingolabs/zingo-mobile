@@ -678,7 +678,7 @@ describe('SwapPoller on an expired Maya purchase Midgard finds a payment for', (
     terminalAtMs: expiredAt,
   });
 
-  const harness = (track: jest.Mock) => {
+  const harness = (track: jest.Mock, delivery?: object) => {
     jest.useFakeTimers({ now });
     const upsert = jest.fn(async (_record: SwapRecordType) => undefined);
     const poller = new SwapPoller({
@@ -692,6 +692,7 @@ describe('SwapPoller on an expired Maya purchase Midgard finds a payment for', (
         findInboundActionByMemo: jest.fn(async () => ({
           sourceTxHash: 'cd'.repeat(32),
           sourceChainPrefix: 'BTC',
+          delivery,
         })),
       } as unknown as MidgardClient,
       config: {
@@ -702,6 +703,20 @@ describe('SwapPoller on an expired Maya purchase Midgard finds a payment for', (
     });
     return { poller, upsert };
   };
+
+  it('Tests that it does not read as refunding when Midgard also shows the delivery', async () => {
+    const { poller, upsert } = harness(
+      jest.fn(async () => {
+        throw new Error('offline');
+      }),
+      { txHash: 'ef'.repeat(32), amount: '0.01477710' },
+    );
+    await poller.tickOnce();
+    const stored = upsert.mock.calls[0][0];
+    expect(stored.status).toBe(SwapStatusEnum.Pending);
+    expect(stored.destinationTxHash).toBe('ef'.repeat(32));
+    expect(stored.lateDepositAtMs).toBeUndefined();
+  });
 
   it('reads as refunding even when that tick cannot ask /track', async () => {
     const { poller, upsert } = harness(

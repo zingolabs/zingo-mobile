@@ -300,6 +300,13 @@ export class SwapPoller {
    * so a Midgard outage does not exhaust the `/track` failure budget for an
    * otherwise healthy record.
    */
+  /** The same question, for a finished swap the user has just opened. */
+  async discoverViaMidgard(
+    record: SwapRecordType,
+  ): Promise<SwapRecordType | null> {
+    return this.maybeDiscoverHashViaMidgard(record, Date.now());
+  }
+
   private async maybeDiscoverHashViaMidgard(
     record: SwapRecordType,
     now: number,
@@ -348,9 +355,12 @@ export class SwapPoller {
     if (!wantsHash && !discovery.delivery) return null;
 
     // A payment found on an expired purchase came late: it reads as
-    // refunding from now on, so the record
-    // stays polled whatever this tick's /track answers.
-    const late = wantsHash && record.status === SwapStatusEnum.Expired;
+    // refunding from now on, so the record stays polled whatever this tick's
+    // /track answers. One that delivered is not coming back.
+    const late =
+      wantsHash &&
+      record.status === SwapStatusEnum.Expired &&
+      !discovery.delivery;
     const updated: SwapRecordType = {
       ...record,
       ...(discovery.delivery && {
@@ -366,9 +376,9 @@ export class SwapPoller {
       // state we use right after our own outbound broadcast. Subsequent
       // /track responses promote it further (Processing → Completed).
       status:
-        (wantsHash &&
-          record.status === SwapStatusEnum.AwaitingExternalDeposit) ||
-        late
+        wantsHash &&
+        (record.status === SwapStatusEnum.AwaitingExternalDeposit ||
+          record.status === SwapStatusEnum.Expired)
           ? SwapStatusEnum.Pending
           : record.status,
       lateDepositAtMs: late
