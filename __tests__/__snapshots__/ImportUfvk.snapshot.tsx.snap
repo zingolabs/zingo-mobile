@@ -501,6 +501,20 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
     pointerEvents="none"
     style={
       {
+        "backgroundColor": "#011401",
+        "bottom": 0,
+        "height": 89,
+        "left": 0,
+        "position": "absolute",
+        "right": 0,
+      }
+    }
+  />
+  <View
+    onLayout={[Function]}
+    pointerEvents="none"
+    style={
+      {
         "bottom": 89,
         "flexDirection": "row",
         "gap": 12,

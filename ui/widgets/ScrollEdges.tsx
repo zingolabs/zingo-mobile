@@ -70,13 +70,22 @@ const Fade: React.FunctionComponent<{
  * view with its own `onScroll` or the rest calls these from its own.
  * `bottomInset` lifts the bottom fade above a footer laid over the scroll;
  * `surface` names what the scroll sits on where the context does not yet.
+ * `sides: 'top'` leaves the bottom to what already covers it (the tab bar's
+ * gradient). `scrolledTo` reports the offset of a list whose events are not a
+ * scroll view's.
  */
 export function useScrollEdges({
   bottomInset = 0,
   surface: on,
-}: { bottomInset?: number; surface?: SurfaceKind } = {}): {
+  sides = 'both',
+}: {
+  bottomInset?: number;
+  surface?: SurfaceKind;
+  sides?: 'both' | 'top';
+} = {}): {
   edges: ScrollEdgeProps;
   fades: React.ReactNode;
+  scrolledTo: (y: number) => void;
 } {
   const { colors } = useTheme();
   const context = useContext(SurfaceContext);
@@ -94,6 +103,14 @@ export function useScrollEdges({
     setAbove(offset.current > 1);
     setBelow(offset.current + frame.current < content.current - 1);
   }, []);
+
+  const scrolledTo = useCallback(
+    (y: number) => {
+      offset.current = y;
+      update();
+    },
+    [update],
+  );
 
   const edges: ScrollEdgeProps = {
     onScroll: e => {
@@ -125,18 +142,20 @@ export function useScrollEdges({
         left={box.x}
         width={box.width}
       />
-      <Fade
-        shown={below}
-        side="bottom"
-        color={color}
-        top={box.y + box.height - bottomInset - EDGE_FADE}
-        left={box.x}
-        width={box.width}
-      />
+      {sides === 'both' && (
+        <Fade
+          shown={below}
+          side="bottom"
+          color={color}
+          top={box.y + box.height - bottomInset - EDGE_FADE}
+          left={box.x}
+          width={box.width}
+        />
+      )}
     </>
   );
 
-  return { edges, fades };
+  return { edges, fades, scrolledTo };
 }
 
 const styles = StyleSheet.create({

@@ -201,10 +201,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
           </View>
         }
       >
-        <SheetScrollView
-          keyboardShouldPersistTaps="handled"
-          style={{ flex: 1 }}
-        >
+        <SheetScrollView keyboardShouldPersistTaps="handled">
           {filteredOptions.map(chain => {
             const selected = chain === value;
             return (

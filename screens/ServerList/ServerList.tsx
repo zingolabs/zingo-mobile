@@ -12,6 +12,7 @@ import ServerRow, {
   ScreenHeader,
   useLift,
 } from '@screens/Server/ServerRow';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 type ServerListProps = {
   translate: (key: string) => TranslateType;
@@ -47,10 +48,12 @@ const ServerList: React.FunctionComponent<ServerListProps> = ({
 }) => {
   const [shakes, setShakes] = useState<Record<string, number>>({});
   const { lift, onLayout } = useLift(placement, BODY_TOP);
+  const { edges, fades } = useScrollEdges();
 
   return (
     <View style={{ flex: 1 }} onLayout={onLayout}>
       <ScrollView
+        {...edges}
         style={{
           position: 'absolute',
           left: 0,
@@ -100,6 +103,7 @@ const ServerList: React.FunctionComponent<ServerListProps> = ({
           </RowCard>
         )}
       </ScrollView>
+      {fades}
       <DoneButton
         testID="serverlist.done"
         title={translate('server.done') as string}

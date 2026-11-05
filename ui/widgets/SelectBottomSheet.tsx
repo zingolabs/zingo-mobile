@@ -144,11 +144,7 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
         }
       >
         {searchable ? (
-          <SheetScrollView
-            testID={testID}
-            keyboardShouldPersistTaps="handled"
-            style={{ flex: 1 }}
-          >
+          <SheetScrollView testID={testID} keyboardShouldPersistTaps="handled">
             {rows}
           </SheetScrollView>
         ) : (

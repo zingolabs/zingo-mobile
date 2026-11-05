@@ -37,6 +37,7 @@ import { ListIcon } from '@ui/primitives/Icons/ListIcon';
 import { PlusIcon } from '@ui/primitives/Icons/PlusIcon';
 import { useOwnAddresses } from './ownAddresses';
 import { onTabScroll } from '@app/navigation/tabBarScroll';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { PANEL_TOP } from '@ui/widgets/Header/Header';
 import { useReceiveSelection } from './useReceiveSelection';
 import { useCompact } from '@app/hooks/useCompact';
@@ -51,6 +52,10 @@ type SheetType = 'NA' | 'VA' | 'NAT';
  * the current one. The list icon opens Your addresses, the "+" a new one.
  */
 const Receive: React.FunctionComponent<ReceiveProps> = () => {
+  const { edges, fades } = useScrollEdges({
+    sides: 'top',
+    surface: 'surface',
+  });
   const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
   const {
@@ -202,7 +207,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
             header={receiveHeader}
           >
             <ScrollView
-              onScroll={onTabScroll}
+              onScroll={e => {
+                onTabScroll(e);
+                edges.onScroll(e);
+              }}
+              onLayout={edges.onLayout}
               scrollEventThrottle={16}
               bounces={false}
               alwaysBounceVertical={false}
@@ -232,6 +241,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
                 </Text>
               )}
             </ScrollView>
+            {fades}
           </AppSheet>
         )}
       </Animated.View>

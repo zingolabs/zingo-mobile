@@ -46,6 +46,46 @@ export function RadioList({
   );
 }
 
+/**
+ * One row's share of the card, for a virtualized list, which cannot wrap its
+ * rows in a `RadioList`: together they draw the same card.
+ */
+export function RadioListSlice({
+  first,
+  last,
+  children,
+}: {
+  first: boolean;
+  last: boolean;
+  children: React.ReactNode;
+}) {
+  const { colors } = useTheme();
+  const inset = useInsetFill();
+  return (
+    <View
+      style={{
+        borderColor: colors.bottomSheetBorder,
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderTopWidth: first ? 1 : 0,
+        borderBottomWidth: last ? 1 : 0,
+        ...(first && {
+          borderTopLeftRadius: radiusMd,
+          borderTopRightRadius: radiusMd,
+        }),
+        ...(last && {
+          borderBottomLeftRadius: radiusMd,
+          borderBottomRightRadius: radiusMd,
+        }),
+        backgroundColor: inset,
+        overflow: 'hidden',
+      }}
+    >
+      {children}
+    </View>
+  );
+}
+
 type RadioRowProps = {
   title: string;
   pill?: { text: string; tone: PillTone };

@@ -18,6 +18,7 @@ import { planOrchardDrain } from '@app/walletBackend';
 import { RPCDrainPlanType } from '@app/walletBackend/types/RPCDrainPlanType';
 import { themeTokens } from '@app/theme';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 type MigrationTransactionsProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -103,6 +104,7 @@ const MigrationTransactions: React.FunctionComponent<
   const { colors } = useTheme();
   /** The footer's lowest action ends at the one bottom distance. */
   const bottomPad = useBottomActionPad();
+  const { edges, fades } = useScrollEdges();
 
   const [plan, setPlan] = useState<RPCDrainPlanType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -199,6 +201,7 @@ const MigrationTransactions: React.FunctionComponent<
     return (
       <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <ScrollView
+          {...edges}
           contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
         >
           {title}
@@ -231,6 +234,7 @@ const MigrationTransactions: React.FunctionComponent<
             </Text>
           </View>
         </ScrollView>
+        {fades}
         <View
           style={{
             flexDirection: 'row',
@@ -253,6 +257,7 @@ const MigrationTransactions: React.FunctionComponent<
     return (
       <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <ScrollView
+          {...edges}
           contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
         >
           {title}
@@ -281,6 +286,7 @@ const MigrationTransactions: React.FunctionComponent<
             </Text>
           </View>
         </ScrollView>
+        {fades}
         <View
           style={{
             flexDirection: 'row',
@@ -314,6 +320,7 @@ const MigrationTransactions: React.FunctionComponent<
     return (
       <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <ScrollView
+          {...edges}
           contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
         >
           {title}
@@ -342,6 +349,7 @@ const MigrationTransactions: React.FunctionComponent<
             </Text>
           </View>
         </ScrollView>
+        {fades}
         <View
           style={{
             flexDirection: 'row',
@@ -374,6 +382,7 @@ const MigrationTransactions: React.FunctionComponent<
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
       <ScrollView
+        {...edges}
         style={{ flex: 1 }}
         contentContainerStyle={{
           paddingHorizontal: 20,
@@ -481,6 +490,7 @@ const MigrationTransactions: React.FunctionComponent<
           </Card>
         ))}
       </ScrollView>
+      {fades}
 
       <View
         style={{

@@ -35,6 +35,7 @@ import {
   mixnetDoctorSteps,
   mixnetDoctorVerdict,
 } from '@app/walletBackend/transforms/mixnetDoctorVerdict';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 type MixnetDoctorProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -101,6 +102,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
   const { translate, server, addLastSnackbar, reenableMixnet, mixnetView } =
     context;
   const { colors } = useTheme();
+  const { edges, fades } = useScrollEdges();
 
   /**
    * The coordinator's own view of the session, which the probes cannot see:
@@ -264,7 +266,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
         backTestID="mixnetdoctor.back"
         backAccessibilityLabel={translate('mixnetdoctor.back-acc') as string}
       />
-      <ScrollView contentContainerStyle={{ padding: 20 }}>
+      <ScrollView {...edges} contentContainerStyle={{ padding: 20 }}>
         <View
           style={{
             backgroundColor: colors.bgSurface,
@@ -411,6 +413,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
           )}
         </View>
       </ScrollView>
+      {fades}
     </View>
   );
 };

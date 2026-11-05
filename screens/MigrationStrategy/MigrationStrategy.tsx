@@ -25,6 +25,7 @@ import { formatAmount } from '@app/utils/formatAmount';
 import { Route } from '@app/AppState';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 type MigrationStrategyProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -185,6 +186,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   const { colors } = useTheme();
   /** The footer's lowest action ends at the one bottom distance. */
   const bottomPad = useBottomActionPad();
+  const { edges, fades } = useScrollEdges();
   const [selected, setSelected] = useState<StrategyOption>('none');
 
   const nymSheetRef = useRef<BottomSheetModal>(null);
@@ -266,6 +268,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
           <XIcon size={iconSizeMd} color={colors.fgMuted} />
         </Pressable>
         <ScrollView
+          {...edges}
           style={{ flex: 1 }}
           contentContainerStyle={{
             paddingHorizontal: 24,
@@ -305,6 +308,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
             accent={colors.fgWarning}
           />
         </ScrollView>
+        {fades}
 
         <View
           style={{

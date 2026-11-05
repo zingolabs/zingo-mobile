@@ -13,6 +13,7 @@ import { MessagesIcon as BoltIcon } from '@ui/primitives/Icons/BoltIcon';
 import XSocial from '../../assets/img/options/x.svg';
 import Github from '../../assets/img/options/github.svg';
 import Mail from '../../assets/img/options/mail.svg';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 export type OptionsPanelAction = {
   /** Unique key for the action (typically a MenuItemEnum value). */
@@ -69,6 +70,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
   onSettings,
 }) => {
   const { colors } = useTheme();
+  const { edges, fades } = useScrollEdges({ surface: 'canvas' });
   /**
    * Four cells fit 12 pt labels in two lines; past 1.3× text (or its
    * simulation in the visual review) the words outgrow them, so two.
@@ -163,6 +165,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
 
       {/* Grid of actions — 4 columns */}
       <ScrollView
+        {...edges}
         contentContainerStyle={{
           paddingTop: 28,
           paddingHorizontal: 8,
@@ -230,6 +233,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
           ))}
         </View>
       </ScrollView>
+      {fades}
 
       {/* Footer: socials */}
       <View style={{ paddingHorizontal: 24, paddingBottom: 24 }}>

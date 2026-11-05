@@ -93,6 +93,7 @@ import { useFreshRows } from './useFreshRows';
 import { FiltersIcon } from '@ui/primitives/Icons/FiltersIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { onTabScrollY } from '@app/navigation/tabBarScroll';
+import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { PANEL_TOP } from '@ui/widgets/Header/Header';
 import { ChevronUp } from '@ui/primitives/Icons/Chevron';
 
@@ -105,6 +106,10 @@ const ViewTypes = {
 type HistoryProps = HomeTabScreenProps<'History'>;
 
 const History: React.FunctionComponent<HistoryProps> = () => {
+  const { edges, fades, scrolledTo } = useScrollEdges({
+    sides: 'top',
+    surface: 'surface',
+  });
   const navigation = useNavigation<HomeTabNavigation<'History'>>();
   const context = useContext(ContextAppLoaded);
   const {
@@ -707,9 +712,18 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     [navigation, handleScrollToTop],
   );
 
+  /** A list that comes back starts at its top, with no scroll to report it. */
+  const listShown = !loading && !!valueTransfersSliced?.length;
+  useEffect(() => {
+    if (!listShown) {
+      scrolledTo(0);
+    }
+  }, [listShown, scrolledTo]);
+
   const handleScroll = useCallback(
     (_rawEvent: ScrollEvent, _offsetX: number, offsetY: number) => {
       onTabScrollY(offsetY);
+      scrolledTo(offsetY);
       const isTop = offsetY <= 100;
 
       // If we're scrolling to top and we've reached the top, stop the scrolling state
@@ -724,7 +738,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       // Always update isAtTop for manual scrolling
       setIsAtTop(isTop);
     },
-    [isScrollingToTop],
+    [isScrollingToTop, scrolledTo],
   );
 
   const setValueTransferDetailModalShow = useCallback(
@@ -985,70 +999,75 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                   </View>
                 )}
                 {valueTransfersSliced && valueTransfersSliced.length > 0 ? (
-                  <RecyclerListView
-                    ref={scrollViewRef}
-                    renderAheadOffset={500}
-                    scrollViewProps={{
-                      refreshControl: (
-                        <RefreshControl
-                          refreshing={false}
-                          onRefresh={() => doRefresh('valueTransfers')}
-                          tintColor={colors.fgDefault}
-                          title={translate('history.refreshing') as string}
-                        />
-                      ),
-                      style: {
-                        flexGrow: 1,
-                        width: '100%',
-                      },
-                    }}
-                    onScroll={handleScroll}
-                    scrollThrottle={100}
-                    layoutProvider={layoutProvider}
-                    dataProvider={dataProvider}
-                    rowRenderer={rowRenderer}
-                    extendedState={{ freshRows }}
-                    onEndReached={onEndReached}
-                    onEndReachedThreshold={0.5}
-                    renderFooter={() =>
-                      // Generous bottom margin so the last transaction (and
-                      // the loading spinner / "end of list" label) can be
-                      // scrolled clear of the bottom tab bar on small
-                      // screens — otherwise the final row sits hidden
-                      // behind the navigator chrome.
-                      hasMore ? (
-                        <View
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'flex-start',
-                            marginTop: 20,
-                            marginBottom: 200,
-                          }}
-                        >
-                          <ActivityIndicator
-                            size="small"
-                            color={colors.fgMuted}
-                          />
-                        </View>
-                      ) : !!valueTransfersSliced &&
-                        !!valueTransfersSliced.length ? (
-                        <View
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'flex-start',
-                            marginTop: 20,
-                            marginBottom: 200,
-                          }}
-                        >
-                          <FadeText>
-                            {translate('history.end') as string}
-                          </FadeText>
-                        </View>
-                      ) : null
-                    }
-                  />
+                  <>
+                    <View style={{ flex: 1 }} onLayout={edges.onLayout}>
+                      <RecyclerListView
+                        ref={scrollViewRef}
+                        renderAheadOffset={500}
+                        scrollViewProps={{
+                          refreshControl: (
+                            <RefreshControl
+                              refreshing={false}
+                              onRefresh={() => doRefresh('valueTransfers')}
+                              tintColor={colors.fgDefault}
+                              title={translate('history.refreshing') as string}
+                            />
+                          ),
+                          style: {
+                            flexGrow: 1,
+                            width: '100%',
+                          },
+                        }}
+                        onScroll={handleScroll}
+                        scrollThrottle={100}
+                        layoutProvider={layoutProvider}
+                        dataProvider={dataProvider}
+                        rowRenderer={rowRenderer}
+                        extendedState={{ freshRows }}
+                        onEndReached={onEndReached}
+                        onEndReachedThreshold={0.5}
+                        renderFooter={() =>
+                          // Generous bottom margin so the last transaction (and
+                          // the loading spinner / "end of list" label) can be
+                          // scrolled clear of the bottom tab bar on small
+                          // screens — otherwise the final row sits hidden
+                          // behind the navigator chrome.
+                          hasMore ? (
+                            <View
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'flex-start',
+                                marginTop: 20,
+                                marginBottom: 200,
+                              }}
+                            >
+                              <ActivityIndicator
+                                size="small"
+                                color={colors.fgMuted}
+                              />
+                            </View>
+                          ) : !!valueTransfersSliced &&
+                            !!valueTransfersSliced.length ? (
+                            <View
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'flex-start',
+                                marginTop: 20,
+                                marginBottom: 200,
+                              }}
+                            >
+                              <FadeText>
+                                {translate('history.end') as string}
+                              </FadeText>
+                            </View>
+                          ) : null
+                        }
+                      />
+                    </View>
+                    {fades}
+                  </>
                 ) : (
                   <View
                     style={{

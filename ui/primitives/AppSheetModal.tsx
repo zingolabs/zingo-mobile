@@ -10,6 +10,7 @@ import React, {
   useState,
 } from 'react';
 import {
+  FlatListProps,
   Keyboard,
   StyleProp,
   StyleSheet,
@@ -21,6 +22,7 @@ import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
   BottomSheetBackgroundProps,
+  BottomSheetFlatList,
   BottomSheetFooterProps,
   BottomSheetModal,
   BottomSheetScrollView,
@@ -42,6 +44,9 @@ import { SheetPresence } from './SheetPresence';
 
 /** The measured height of a dynamic sheet's whole body, for its `SheetScrollView`. */
 const SheetBodyHeight = createContext<number>(0);
+
+/** A sheet of a set height, whose list takes the room left under its title. */
+const FixedSheet = createContext<boolean>(false);
 
 /** What a sheet's `SheetFooter` holds, and the outlet that draws it. */
 type FooterStore = { node: React.ReactNode; redraw?: () => void };
@@ -289,7 +294,9 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
       >
         {fixed ? (
           /** A fixed sheet holds a list: BottomSheetView measures static content and stops a scroll view inside it. */
-          <View style={styles.fill}>{body}</View>
+          <View style={styles.fill}>
+            <FixedSheet.Provider value={true}>{body}</FixedSheet.Provider>
+          </View>
         ) : (
           <BottomSheetView
             onLayout={e => setBodyHeight(e.nativeEvent.layout.height)}
@@ -329,7 +336,9 @@ export default AppSheetModal;
  * the title above the list and the bottom inset, so the sheet opened short.
  * This one reports its content plus the rest of the body, and is capped at
  * what the screen holds: the sheet opens at its full height and the list
- * scrolls, under a fixed title, only when it does not fit.
+ * scrolls, under a fixed title, only when it does not fit. A fixed sheet has
+ * its height already: the list fills what its title leaves, or its end would
+ * be clipped out of reach.
  */
 export function SheetScrollView({
   children,
@@ -346,6 +355,7 @@ export function SheetScrollView({
 }) {
   const { animatedLayoutState } = useBottomSheetInternal();
   const bodyHeight = useContext(SheetBodyHeight);
+  const fixed = useContext(FixedSheet);
   const insets = useSafeAreaInsets();
   const { height: windowHeight } = useWindowDimensions();
   const frame = useRef<number>(0);
@@ -375,7 +385,12 @@ export function SheetScrollView({
       <BottomSheetScrollView
         testID={testID}
         onScroll={edges.onScroll}
-        style={[style, { maxHeight: windowHeight - insets.top - chrome }]}
+        style={[
+          style,
+          fixed
+            ? styles.fill
+            : { maxHeight: windowHeight - insets.top - chrome },
+        ]}
         contentContainerStyle={contentContainerStyle}
         keyboardShouldPersistTaps={keyboardShouldPersistTaps}
         onLayout={e => {
@@ -391,6 +406,27 @@ export function SheetScrollView({
       >
         {children}
       </BottomSheetScrollView>
+      {fades}
+    </>
+  );
+}
+
+/** A fixed sheet's list too long to render whole: only the rows in view are. */
+export function SheetFlatList<T>(
+  props: Pick<
+    FlatListProps<T>,
+    | 'data'
+    | 'renderItem'
+    | 'keyExtractor'
+    | 'ListHeaderComponent'
+    | 'keyboardShouldPersistTaps'
+    | 'contentContainerStyle'
+  >,
+) {
+  const { edges, fades } = useScrollEdges({ surface: 'surface' });
+  return (
+    <>
+      <BottomSheetFlatList {...props} {...edges} style={styles.fill} />
       {fades}
     </>
   );

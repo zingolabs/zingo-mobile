@@ -85,6 +85,32 @@ export function isZecWrapper(token: TokenEntryType): boolean {
   );
 }
 
+/**
+ * The ids of the coins that share their chain and ticker with another entry, as
+ * `NEAR.ETH-eth.bridge.near` and `NEAR.ETH-miden-…` do. Different tokens, and
+ * the contract is the only thing the catalog says that tells them apart.
+ */
+export function repeatedCoins(tokens: TokenEntryType[]): Set<string> {
+  const seen = new Map<string, TokenEntryType[]>();
+  for (const token of tokens) {
+    const key = `${token.chain}|${token.ticker || token.symbol}`.toUpperCase();
+    seen.set(key, [...(seen.get(key) ?? []), token]);
+  }
+  return new Set(
+    [...seen.values()]
+      .filter(same => same.length > 1)
+      .flat()
+      .map(token => token.identifier),
+  );
+}
+
+/** A contract short enough for one line: `miden-0x419f…omft.near`. */
+export function shortContract(address: string): string {
+  return address.length <= 24
+    ? address
+    : `${address.slice(0, 12)}…${address.slice(-9)}`;
+}
+
 /** The coins a contact saved under `chain` can swap with. */
 export function chainCoins(
   tokens: TokenEntryType[],
