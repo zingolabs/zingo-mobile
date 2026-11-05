@@ -23,13 +23,7 @@
 			"pnpmVersion": "none",
 			"nvmVersion": "latest"
 		},
-		"ghcr.io/devcontainers/features/rust:1": {
-			"version": "latest",
-			"profile": "complete",
-			"targets": "aarch64-unknown-linux-gnu"
-		},
-		"ghcr.io/nordcominc/devcontainer-features/android-sdk:1": {},
-		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
+		"ghcr.io/nordcominc/devcontainer-features/android-sdk:1": {}
 	},
 	// Node comes from .nvmrc, the one pin: nvm install reads it, and corepack
 	// provides the yarn named in package.json packageManager.
