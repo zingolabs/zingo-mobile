@@ -10,15 +10,17 @@
 
 ## The codebase is old. Do not copy it.
 
-The mobile backend (Rust under `rust/`, its UniFFI/Kotlin/Swift bindings, and their build systems) and the UI (React Native screens, theme, styles, colours, copy) are separate concerns: keep each change to one side, and where a task needs both, split them into commits labelled backend or UI so a reviewer can read one without the other. Before finishing, scan your own diff for stray edits from the other half, and when the boundary is muddy (a component reaching into the wallet backend, a backend module formatting human prose), name it and propose the separation as its own change rather than fixing it inline.
+The mobile backend (the Binding Layer that zingolib publishes, the Kotlin and Swift native modules that bind it, and the build configuration that fetches it) and the UI (React Native screens, theme, styles, colours, copy) are separate concerns: keep each change to one side, and where a task needs both, split them into commits labelled backend or UI so a reviewer can read one without the other. Before finishing, scan your own diff for stray edits from the other half, and when the boundary is muddy (a component reaching into the wallet backend, a backend module formatting human prose), name it and propose the separation as its own change rather than fixing it inline.
 
 ## Architecture
 
 Goal: produce prose and code that reads as if written by a specific, competent human, not by a model. The point is naturalness and accuracy, not looking exhaustive or safe. When in doubt, commit to a choice and keep it short.
 
-The mobile backend is the Rust under `rust/` and its native interfaces: the
-UniFFI components, the Kotlin and Swift modules that bind them, and the build
-systems that produce them.
+The mobile backend is the Binding Layer and its native interfaces. zingolib
+publishes the Binding Layer, the Rust libraries and their UniFFI bindings, as
+the Prebuilt Bundles that `binding-layer.json` pins. This repository holds the
+Kotlin and Swift modules that bind it and the build configuration that
+fetches it.
 
 The UI is everything above that boundary: the React Native screens and
 components, the theme, the styles, and the user-facing copy. Core UI modules
@@ -134,17 +136,6 @@ without losing meaning, the "so" was decorative. Delete it.
 Every item doc-comment (Rust `///`, KDoc, Swift doc-comment) is one sentence
 and references no ADR, issue, or other document. Module headers (Rust `//!`,
 file- or class-level blocks) are NOT exempt.
-
-### Rust
-
-- Borrow or restructure before reaching for `.clone()`.
-- Use `?` for propagation. No `.unwrap()` or `.expect()` outside tests.
-- Tail expressions. No explicit `return` on the final line.
-- Do not annotate types the compiler infers.
-- Prefer `if let` and combinators (`map`, `and_then`, `ok_or`,
-  `unwrap_or_else`) over verbose `match` when clearer.
-- Prefer iterator chains over manual `for` + `push`.
-- Take `&str` where a borrow suffices.
 
 ### TypeScript / React
 
