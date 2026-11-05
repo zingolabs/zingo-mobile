@@ -20,6 +20,7 @@ export function mockWalletBackendConfig(
     onMixnetViewChanged: jest.fn(),
     startMixnetTransport: jest.fn(),
     stopMixnetTransport: jest.fn().mockResolvedValue(undefined),
+    takeMixnetProxyDeath: async () => '',
     mixnetSupported: false,
     keepAwake: jest.fn(),
     readOnly: false,

@@ -13,6 +13,8 @@ import {
   getMixnetBootstrapDetail,
   getMixnetStatus,
 } from '@app/walletBackend/utils/mixnetUtils';
+import { failureCause } from '@app/walletBackend/transforms/mixnetDoctorReport';
+import { mixnetJournal, shortExit } from './MixnetJournal';
 
 export type MixnetTransportBinding = {
   socks5Addr: string;
@@ -22,6 +24,9 @@ export type MixnetTransportBinding = {
 export type StartMixnetTransport = () => Promise<MixnetTransportBinding>;
 
 export type StopMixnetTransport = () => Promise<void>;
+
+/** Why the hosted proxy last died, once, or empty when nothing has since asked. */
+export type TakeProxyDeathReason = () => Promise<string>;
 
 export function isCurrentPublication(seq: number, latest: number): boolean {
   return seq === latest;
@@ -140,7 +145,9 @@ export class MixnetCoordinator {
   private readonly startTransport: StartMixnetTransport;
   private readonly onChange: (view: MixnetTransportView) => void;
   private readonly stopTransport: StopMixnetTransport;
+  private readonly takeProxyDeath: TakeProxyDeathReason;
 
+  private notedStatus: string = '';
   private pollTimerID?: ReturnType<typeof setInterval>;
   private pollLock: boolean = false;
   private lastStatus: MixnetStatusReport | null = null;
@@ -159,10 +166,38 @@ export class MixnetCoordinator {
     startTransport: StartMixnetTransport,
     onChange: (view: MixnetTransportView) => void,
     stopTransport: StopMixnetTransport,
+    takeProxyDeath: TakeProxyDeathReason = async () => '',
   ) {
     this.startTransport = startTransport;
     this.onChange = onChange;
     this.stopTransport = stopTransport;
+    this.takeProxyDeath = takeProxyDeath;
+  }
+
+  /**
+   * Only ever a side channel: nothing waits on it and nothing it does can reach
+   * the transport, so the journal cannot change what the coordinator decides.
+   */
+  private noteProxyDeath(): void {
+    Promise.resolve()
+      .then(this.takeProxyDeath)
+      .then(reason => {
+        if (reason !== '') {
+          mixnetJournal.note('proxy-death', reason);
+        }
+      })
+      .catch(ignore);
+  }
+
+  private noteStatus(status: MixnetStatusReport): void {
+    const text =
+      status.kind === 'failure'
+        ? failureCause(status.failure)
+        : status.indicator;
+    if (text !== this.notedStatus) {
+      this.notedStatus = text;
+      mixnetJournal.note('status', text);
+    }
   }
 
   // Starts the transport, attaches the wallet, and polls; a failure publishes the typed failure view.
@@ -185,6 +220,9 @@ export class MixnetCoordinator {
     const epoch = ++this.enableEpoch;
     this.clearTimers();
     this.publishStarting();
+    this.noteProxyDeath();
+    mixnetJournal.note('draw', 'starting the proxy');
+    const drawnAt = Date.now();
     try {
       let binding: MixnetTransportBinding;
       this.startingEpoch = epoch;
@@ -202,6 +240,10 @@ export class MixnetCoordinator {
         }
       }
       const { socks5Addr, exitNode } = binding;
+      mixnetJournal.note(
+        'bound',
+        `listening on ${socks5Addr} after ${Date.now() - drawnAt} ms, exit ${shortExit(exitNode)}`,
+      );
       if (!this.isCurrent(epoch)) {
         if (this.phase === 'offline') {
           await this.stopOrphanedTransport();
@@ -214,6 +256,7 @@ export class MixnetCoordinator {
       }
       this.publish(status);
     } catch (thrown: unknown) {
+      mixnetJournal.note('refused', failureCause(describeRejection(thrown)));
       if (!this.isCurrent(epoch)) {
         return;
       }
@@ -238,6 +281,7 @@ export class MixnetCoordinator {
   // it caused itself.
   async goOffline(): Promise<void> {
     this.enterPhase('offline');
+    mixnetJournal.note('offline', 'the session went offline');
     const epoch = this.supersede();
     this.reconnectActive = false;
     this.redrawsSpent = 0;
@@ -328,6 +372,10 @@ export class MixnetCoordinator {
       return;
     }
     this.redrawsSpent += 1;
+    mixnetJournal.note(
+      'redraw',
+      `the draw did not prove itself in time (${this.redrawsSpent} of ${BOOTSTRAP_REDRAW_LIMIT})`,
+    );
     await this.draw();
   }
 
@@ -353,6 +401,11 @@ export class MixnetCoordinator {
     ) {
       return;
     }
+    mixnetJournal.note(
+      'retry',
+      `transport lost, trying again in ${this.reconnectDelayMillis / 1000} s`,
+    );
+    this.noteProxyDeath();
     this.reconnectTimerID = setTimeout(() => {
       this.reconnectTimerID = undefined;
       this.attemptReconnect();
@@ -424,6 +477,7 @@ export class MixnetCoordinator {
     if (this.phase === 'stopped') {
       return;
     }
+    this.noteStatus(status);
     const wasBootstrapping = this.isBootstrapping();
     if (hasIndicator(status, RPCMixnetIndicatorEnum.ready)) {
       this.reconnectActive = false;

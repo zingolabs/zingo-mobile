@@ -53,6 +53,9 @@ class NymTransportModule: NSObject {
   // One proxy per app process, shared across React context reloads.
   private static let handleLock = NSLock()
   private static var handle: MixnetProxyHandle?
+  /// Why the proxy last died, kept for the app's journal: the system log it also
+  /// goes to rotates within minutes.
+  private static var lastDeathReason: String = ""
 
   /// Frees the stored handle and clears the slot before anything that can
   /// throw, so a failed restart never strands a stopped predecessor.
@@ -68,7 +71,7 @@ class NymTransportModule: NSObject {
   /// The proxy-owner-remediates contract: a death report clears the stored
   /// handle and stops it, which begins the ordered teardown on a proxy whose
   /// dead endpoint the app layer never sees again. Recovery stays with the
-  /// user-driven re-enable.
+  /// app's coordinator.
   ///
   /// Identity-checked (#1227): the observer speaks only for the handle it was
   /// started with, so a dying predecessor's late report cannot wipe a fresh
@@ -81,6 +84,7 @@ class NymTransportModule: NSObject {
       NSLog("[Native] mixnet proxy died: \(reason)")
       NymTransportModule.handleLock.lock()
       defer { NymTransportModule.handleLock.unlock() }
+      NymTransportModule.lastDeathReason = "\(reason)"
       switch verdictOnDeath(stored: NymTransportModule.handle, watched: watched) {
       case .clearStored: NymTransportModule.releaseHandle()
       case .retainStored: break
@@ -118,6 +122,20 @@ class NymTransportModule: NSObject {
         NSLog("[Native] nym start_mixnet_transport rejected. \(error)")
         DispatchQueue.main.async { reject("start_mixnet_transport", "\(error)", error) }
       }
+    }
+  }
+
+  /// Hands over why the proxy last died, once, or an empty string when it has
+  /// not died since the last time anyone asked.
+  @objc(takeProxyDeathReason:reject:)
+  func takeProxyDeathReason(_ resolve: @escaping RCTPromiseResolveBlock,
+                            reject: @escaping RCTPromiseRejectBlock) {
+    DispatchQueue.global(qos: .userInitiated).async {
+      NymTransportModule.handleLock.lock()
+      defer { NymTransportModule.handleLock.unlock() }
+      let taken = NymTransportModule.lastDeathReason
+      NymTransportModule.lastDeathReason = ""
+      DispatchQueue.main.async { resolve(taken) }
     }
   }
 
