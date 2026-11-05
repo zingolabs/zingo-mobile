@@ -669,6 +669,74 @@ describe.each([
   });
 });
 
+describe('SwapPoller on a Maya purchase whose deposit Midgard has not seen', () => {
+  const T0 = 1_700_000_000_000;
+  const IDLE = 90_000;
+
+  const harness = () => {
+    jest.useFakeTimers({ now: T0 });
+    const record = makeRecord({
+      recordId: 'rec-awaiting',
+      provider: SwapKitProviderEnum.MayachainStreaming,
+      direction: SwapDirectionEnum.Inbound,
+      sellAsset: ETH,
+      receiveAsset: ZEC,
+      depositAddress: '0xvault',
+      destinationAddress: 't1wallet',
+      providerData: {
+        kind: SwapKitProviderEnum.MayachainStreaming,
+        memo: '=:z:t1wallet',
+      },
+      broadcast: undefined,
+      status: SwapStatusEnum.AwaitingExternalDeposit,
+      depositDeadlineMs: T0 + 12 * 60 * 60 * 1000,
+      createdAtMs: T0,
+      updatedAtMs: T0,
+    } as Partial<SwapRecordType>);
+    const track = jest.fn(async () => {
+      throw new Error('Deposit channel not found');
+    });
+    const find = jest.fn(async () => null);
+    const poller = new SwapPoller({
+      client: { track } as unknown as SwapKitClient,
+      registry: new ProviderRegistry([new MayaExecutor()]),
+      store: withStoreUpdate({
+        readAll: jest.fn(async () => [record]),
+        upsert: jest.fn(async () => undefined),
+      }) as unknown as typeof SwapStore,
+      midgardClient: {
+        findInboundActionByMemo: find,
+      } as unknown as MidgardClient,
+      config: {
+        tickIntervalMs: 10_000,
+        activePollIntervalMs: IDLE,
+        idlePollIntervalMs: IDLE,
+      },
+    });
+    return { poller, track, find };
+  };
+
+  it('Tests that /track is not asked when there is no hash to ask it by', async () => {
+    const { poller, track, find } = harness();
+
+    await poller.tickOnce();
+
+    expect(find).toHaveBeenCalledTimes(1);
+    expect(track).not.toHaveBeenCalled();
+  });
+
+  it('Tests that Midgard is asked again one interval later when it found nothing', async () => {
+    const { poller, find } = harness();
+
+    for (let probe = 1; probe <= 4; probe++) {
+      await poller.tickOnce();
+      jest.setSystemTime(T0 + probe * IDLE);
+    }
+
+    expect(find).toHaveBeenCalledTimes(4);
+  });
+});
+
 describe('SwapPoller on a Maya purchase paid to a unified address', () => {
   const T0 = 1_700_000_000_000;
   const ua =

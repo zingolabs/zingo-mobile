@@ -425,10 +425,19 @@ export class SwapPoller {
     if (!this.isRunningForGeneration(callerGeneration)) return;
     const effectiveRecord = discoveredRecord ?? record;
 
+    this.lastPolledAtMs.set(effectiveRecord.recordId, Date.now());
+
+    // Maya and THORChain answer `/track` only by the source-chain hash. Asked
+    // before Midgard has it, it fails every time, and those failures backed
+    // the next Midgard probe off to twelve minutes: a purchase already paid
+    // out kept reading as awaiting its deposit.
+    const hasHash = !!(
+      effectiveRecord.broadcast?.txId || effectiveRecord.observedDepositTxHash
+    );
+    if (!hasHash && providerKeysOnTxHash(effectiveRecord.provider)) return;
+
     const executor = this.registry.get(effectiveRecord.provider);
     const trackParams = buildTrackParams(effectiveRecord);
-
-    this.lastPolledAtMs.set(effectiveRecord.recordId, Date.now());
 
     let response: TrackResponseType;
     try {
