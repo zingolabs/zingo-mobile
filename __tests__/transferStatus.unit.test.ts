@@ -10,12 +10,28 @@ const at = (confirmations: number) =>
     { status: RPCValueTransfersStatusEnum.confirmed, confirmations },
     t,
   );
+const pending = (status: RPCValueTransfersStatusEnum) =>
+  transferStatus({ status, confirmations: 0 }, t);
 
 test('Tests that a transaction reads as confirming, n of the minimum, until it reaches it', () => {
-  expect(at(0)).toEqual({ text: 'history.in-mempool', tone: 'warning' });
   expect(at(1)).toEqual({ text: 'Confirming 1 of 3', tone: 'warning' });
   expect(at(2)).toEqual({ text: 'Confirming 2 of 3', tone: 'warning' });
   expect(at(3)).toEqual({ text: 'swap.tx-confirmed', tone: 'accent' });
+});
+
+test('Tests that a transaction reads as the status zingolib reports when it is not mined yet', () => {
+  expect(pending(RPCValueTransfersStatusEnum.calculated)).toEqual({
+    text: 'history.calculated',
+    tone: 'warning',
+  });
+  expect(pending(RPCValueTransfersStatusEnum.transmitted)).toEqual({
+    text: 'history.transmitted',
+    tone: 'warning',
+  });
+  expect(pending(RPCValueTransfersStatusEnum.mempool)).toEqual({
+    text: 'history.in-mempool',
+    tone: 'warning',
+  });
 });
 
 test('Tests that a failed transaction reads as failed whatever its confirmations', () => {

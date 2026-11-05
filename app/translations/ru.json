@@ -1095,7 +1095,7 @@
     "address-https": "Zingo-аутентифицированный адрес",
     "type": "Тип",
     "not-confirmed": "Транзакция пока не подтверждена",
-    "calculated": "Подтверждено",
+    "calculated": "Вычислена",
     "transmitted": "Отправлено",
     "mempool": "B мэмпуле",
     "confirmed": "Подтверждено",
