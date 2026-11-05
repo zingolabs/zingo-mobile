@@ -62,15 +62,16 @@ nobody else spends from. It reads its own wallet, the pool-balance wallet,
 created from a new seed with the history below and funded from the
 GloryGoddess wallet. The section "The wallets as created" records it.
 
-The shared fixture wallet started from this seed on 2026-10-02. The wallet sent
-its whole balance to itself in one transaction, txid
-`256fc8dcb3dd730439157301a027f7b243d69aa30e31fc7a9b619e726321d19f`, which
-confirmed in block 4,431,582, and then shielded its transparent funds in block
-4,431,584. The fixture birthday is 4,431,500, 82 blocks before the
-consolidation. A wallet restored from that birthday holds one entry for the
-consolidation, kind `memo-to-self`, value 3,995,811,890 zatoshis, fee 285,000.
-Before any later spend it held a confirmed Ironwood balance of 3,995,846,890
-zatoshis. `TestnetFixture` in `RustFFITest.kt` holds those values. A later
+The shared fixture wallet started from this seed on 2026-10-02 and was refreshed
+on 2026-11-03. The wallet sent its whole shielded balance to itself in one
+transaction with a memo, txid
+`2b8417caed4e46934b237729eb578a6fcd7388dde640e626df3e54f2feefd063`, which
+confirmed in block 4,579,990. The fixture birthday is 4,579,900, 90 blocks
+before the consolidation. A wallet restored from that birthday holds one entry
+for the consolidation, kind `memo-to-self`, value 3,051,533,557 zatoshis, fee
+95,000. The first refresh on 2026-10-02 was txid `256fc8dc…` in block 4,431,582
+from the birthday 4,431,500. `TestnetFixture` in `RustFFITest.kt` holds the
+current values. A later
 spend from the seed by zingolib's tests adds entries after the consolidation
 and lowers the balance, and the fixture tests tolerate both. While the change
 of such a spend waits for its confirmations, the refusal test syncs every 20
@@ -157,35 +158,40 @@ reports, and those become the test constants.
 
 ## The wallets as created
 
-The pool-balance wallet and the transparent wallet were created on 2026-10-02
-with the history above, funded from the GloryGoddess wallet. Both seeds are
-published here and in the test constants.
+The pool-balance wallet was created on 2026-11-03 and the transparent wallet on
+2026-10-02, each with the history above, funded from the GloryGoddess wallet.
+Both seeds are published here and in the test constants. The first pool-balance
+wallet, seed `away win …`, birthday 4,431,742, passed the budget and was
+replaced.
 
-The pool-balance wallet has the seed `away win exhibit affair resource basic
-film radio bomb bone protect gentle logic pelican wreck air buyer nominee baby
-raw panic witness hair cream`, the birthday 4,431,742 (the block of step 1), the
-unified address `utest1d3awxkkpft8c2arx6g443wp97uhvh7uyuk58ghk35tnlx37fdg8mtwf2l7shtaacrj6gnhhxr647uq2yzwtszwn22z8xlghmwv4dzfyu`,
-the Sapling address `utest16f4ta230yxflwxj2ks63hl3t7zj4rjxq49q0ufe2asjhlv9gguelax6lrnuw520ux38dlgj6vdpa7uv65gk5r2tw498l5edwngmzzmm0`,
-and the transparent address `tmVqqboEGhqUDoVnDRk1vVumKPrieJz6btY`. The steps
-confirmed in this order, which differs from the table because step 3 failed
-twice at the mixnet transport before it went through.
+The pool-balance wallet has the seed `usual defy surge vibrant mad ring year
+magnet fringe mistake flame father equip valid come claw noodle portion comic
+drink erosion save swallow innocent`, the birthday 4,580,005 (the block of step
+1), the unified address
+`utest1hxe8zmty4hrpe6acapdhmfsfya0vvr8g3vtwkf6lqjqku7sranwer68mq9dyphmyda3dl7msjmf0zgnlkrjct4dllxx600u3cyuax8ev`,
+the Sapling address
+`utest18uc96psyqfyl5yzxqdd39lylvge6ex3w6hm9hfa9swkgax4m43peyexmvcwn97vtgezmxejwn9xp0xqnly9d4vut6xznuzgt8ua5n336`,
+and the transparent address `tmYEFu54uduQ5pQbYCEd25w3nuNRUBwV62E`. The steps
+confirmed in the order of the table.
 
 | Step | Txid        | Block     | Kind           | Value     | Fee    |
 | ---- | ----------- | --------- | -------------- | --------- | ------ |
-| 1    | `5875d2ef…` | 4,431,742 | `received`     | 1,000,000 | 10,000 |
-| 2    | `4ba12a82…` | 4,431,749 | `sent`         | 100,000   | 10,000 |
-| 4    | `88ffac1d…` | 4,431,758 | `received`     | 250,000   | 20,000 |
-| 5    | `d227083a…` | 4,431,947 | `received`     | 250,000   | 15,000 |
-| 6    | `89f40dad…` | 4,431,991 | `send-to-self` | 880,000   | 10,000 |
-| 7    | `e547ef7f…` | 4,432,021 | `send-to-self` | 240,000   | 10,000 |
-| 8    | `14245075…` | 4,432,043 | `send-to-self` | 125,000   | 15,000 |
-| 3    | `66a12b24…` | 4,432,056 | `memo-to-self` | 115,000   | 10,000 |
-| 9    | `40c75700…` | 4,432,065 | `shield`       | 330,000   | 20,000 |
+| 1    | `da4ae678…` | 4,580,005 | `received`     | 1,000,000 | 10,000 |
+| 2    | `cd2c53bc…` | 4,580,010 | `sent`         | 100,000   | 10,000 |
+| 3    | `dd44405d…` | 4,580,014 | `memo-to-self` | 870,000   | 20,000 |
+| 4    | `cd3ac42a…` | 4,580,020 | `received`     | 250,000   | 20,000 |
+| 5    | `54498444…` | 4,580,026 | `received`     | 250,000   | 15,000 |
+| 6    | `9d6e09a8…` | 4,580,036 | `send-to-self` | 760,000   | 10,000 |
+| 7    | `00624429…` | 4,580,040 | `send-to-self` | 240,000   | 10,000 |
+| 8    | `320a0939…` | 4,580,045 | `send-to-self` | 125,000   | 15,000 |
+| 9    | `73e3a724…` | 4,580,056 | `shield`       | 235,000   | 15,000 |
 
-The receipt of step 1 landed in the Ironwood pool. The pinned zingolib funded
-steps 7, 8, and 3 from the Sapling note, and the change of each returned to
-Sapling. A restore from the birthday reports an Ironwood balance of 1,210,000
-zatoshis, a Sapling balance of 115,000, and no Orchard or transparent balance.
+The receipt of step 1 landed in the Ironwood pool. The shield of step 9 took
+the 250,000 note of step 5 only, because the 100,000 note of step 8 was below
+`min_confirmations` when the proposal was built, and that note stays
+transparent. A restore from the birthday reports an Ironwood balance of
+995,000 zatoshis, a Sapling balance of 225,000, a transparent balance of
+100,000, and no Orchard balance.
 `PoolBalanceFixture` in `RustFFITest.kt` holds these values. The full txids are
 in the value transfers of that wallet, and the first and last are in the Kotlin
 object.
@@ -357,9 +363,10 @@ with #1497.
 
 ## Refreshing
 
-A test syncs from the birthday to the tip, and that range grows by about 5,300
-blocks each day. Testnet mined 53,390 blocks in the ten days before 2026-10-02,
-one block every 16 seconds. Read the tip from the server with `grpcurl`.
+A test syncs from the birthday to the tip, and that range grows by about 4,600
+blocks each day. Since NU7, ZIP 218 sets the testnet target block spacing at 25
+seconds, and testnet mined 148,300 blocks in the 32 days after 2026-10-02, one
+block every 19 seconds. Read the tip from the server with `grpcurl`.
 
 ```bash
 # Ask the testnet indexer for its chain tip.
@@ -368,9 +375,9 @@ grpcurl -max-time 20 \
   cash.z.wallet.sdk.rpc.CompactTxStreamer/GetLightdInfo
 ```
 
-On 2026-10-02 the server reported a `blockHeight` of `4430915`. The shared
-wallet's birthday 4,431,500 passes a budget of 100,000 blocks at height
-4,531,500, about 19 days later.
+On 2026-11-03 the server reported a `blockHeight` of `4579899`. The shared
+wallet's birthday 4,579,900 passes a budget of 100,000 blocks at height
+4,679,900, about 22 days later.
 
 Refresh the fixture wallets in these cases.
 
