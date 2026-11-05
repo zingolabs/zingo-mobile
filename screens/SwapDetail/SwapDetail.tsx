@@ -397,7 +397,9 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
           <Text variant="bodyStrong">
             {t(sell ? 'swap.deposit-unsent-title' : 'swap.deposit-title')}
           </Text>
-          <DepositSlip record={record} paid={sell} />
+          {!(sell && sharedVault) && (
+            <DepositSlip record={record} paid={sell} />
+          )}
         </View>
       )}
 
