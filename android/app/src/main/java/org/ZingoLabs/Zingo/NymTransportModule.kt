@@ -22,8 +22,9 @@ import uniffi.zingo_nym_proxy_ffi.ProxyDeathReason
  * binding — the `host:port` endpoint and the Exit Node it bound, both of
  * which the wallet's attach seam requires.
  * A proxy that dies on its own is observed by the shim's liveness monitor;
- * the observer clears the stored handle so a later re-enable starts afresh,
- * while the wallet's own probe surfaces the `died` mode the app polls.
+ * the observer clears the stored handle so the next start begins afresh,
+ * while the wallet's own probe surfaces the `died` mode the app polls and
+ * reconnects from.
  *
  * Failures settle out of band in the error channel (zingo-mobile ADRs 0002
  * and 0003): the promise rejects under this module's name, never prose in
@@ -70,6 +71,12 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
         private var handle: MixnetProxyHandle? = null
 
         /**
+         * Why the proxy last died, kept for the app's journal: the system log
+         * it also goes to rotates within minutes.
+         */
+        private var lastDeathReason: String = ""
+
+        /**
          * Frees the stored handle and clears the slot before anything that
          * can throw, so a failed restart never strands a destroyed wrapper.
          */
@@ -86,8 +93,8 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
      * The proxy-owner-remediates contract: a death report clears the stored
      * handle and destroys it, which runs the ordered teardown on a proxy
      * whose dead endpoint the app layer never sees again. Recovery stays
-     * with the user-driven re-enable, and the wallet's own liveness probe
-     * lands the `died` mode the app is already polling.
+     * with the app's coordinator, which reconnects when the wallet's own
+     * liveness probe lands the `died` mode it is already polling.
      *
      * Identity-checked (#1227): the observer speaks only for the handle it
      * was started with, so a dying predecessor's late report cannot wipe a
@@ -101,6 +108,7 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
         override fun onDeath(reason: ProxyDeathReason) {
             android.util.Log.w("NymTransportModule", "mixnet proxy died: $reason")
             synchronized(handleLock) {
+                lastDeathReason = reason.toString()
                 when (verdictOnDeath(handle, watched)) {
                     HandleDeathVerdict.ClearStored -> releaseHandle()
                     HandleDeathVerdict.RetainStored -> Unit
@@ -140,6 +148,20 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
                 }
             }
         }
+    }
+
+    /**
+     * Hands over why the proxy last died, once, or an empty string when it has
+     * not died since the last time anyone asked.
+     */
+    @ReactMethod
+    fun takeProxyDeathReason(promise: Promise) {
+        val reason = synchronized(handleLock) {
+            val taken = lastDeathReason
+            lastDeathReason = ""
+            taken
+        }
+        promise.resolve(reason)
     }
 
     /**

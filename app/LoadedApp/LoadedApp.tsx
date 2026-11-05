@@ -133,6 +133,7 @@ import {
 import {
   startMixnetTransport,
   stopMixnetTransport,
+  takeMixnetProxyDeath,
 } from '@app/walletBackend/utils/nymTransport';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { RootParamList } from '@app/types';
@@ -727,6 +728,7 @@ export class LoadedAppClass extends Component<
       onMixnetViewChanged: this.setMixnetView,
       startMixnetTransport: startMixnetTransport,
       stopMixnetTransport: stopMixnetTransport,
+      takeMixnetProxyDeath: takeMixnetProxyDeath,
       mixnetSupported: true,
       readOnly: props.readOnly,
       server: props.server,

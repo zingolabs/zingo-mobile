@@ -4,12 +4,14 @@ import {
   MixnetTransportBinding,
   StartMixnetTransport,
   StopMixnetTransport,
+  TakeProxyDeathReason,
 } from '@app/walletBackend/modules/MixnetCoordinator';
 
 // Mirror of the native NymTransportModule, which hosts the proxy shim in-process.
 interface NymTransportModuleAPI {
   startMixnetTransport(): Promise<MixnetTransportBinding>;
   stopMixnetTransport(): Promise<void>;
+  takeProxyDeathReason(): Promise<string>;
 }
 
 const NymTransportModule =
@@ -20,3 +22,6 @@ export const startMixnetTransport: StartMixnetTransport = () =>
 
 export const stopMixnetTransport: StopMixnetTransport = () =>
   NymTransportModule.stopMixnetTransport();
+
+export const takeMixnetProxyDeath: TakeProxyDeathReason = () =>
+  NymTransportModule.takeProxyDeathReason();
