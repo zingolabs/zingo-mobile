@@ -1141,6 +1141,8 @@
     "try-again": "Tekrar dene",
     "today-price": "Bugünkü fiyatla {usd}",
     "in-mempool": "Mempool’da",
+    "state-prepared": "Hazırlandı",
+    "state-sending": "Gönderiliyor",
     "confirming": "Onaylanıyor {n}/{of}",
     "filter-all": "Tümü",
     "filter-memo": "Notlu",

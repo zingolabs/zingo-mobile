@@ -1141,6 +1141,8 @@
     "try-again": "Попробовать снова",
     "today-price": "{usd} по сегодняшнему курсу",
     "in-mempool": "В мемпуле",
+    "state-prepared": "Подготовлена",
+    "state-sending": "Отправляется",
     "confirming": "Подтверждение {n} из {of}",
     "filter-all": "Все",
     "filter-memo": "С мемо",

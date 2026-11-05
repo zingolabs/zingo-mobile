@@ -4,8 +4,8 @@ import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTr
 
 /** The word for each status before it is mined, as zingolib reports it. */
 const PENDING: Partial<Record<RPCValueTransfersStatusEnum, string>> = {
-  [RPCValueTransfersStatusEnum.calculated]: 'history.calculated',
-  [RPCValueTransfersStatusEnum.transmitted]: 'history.transmitted',
+  [RPCValueTransfersStatusEnum.calculated]: 'history.state-prepared',
+  [RPCValueTransfersStatusEnum.transmitted]: 'history.state-sending',
   [RPCValueTransfersStatusEnum.mempool]: 'history.in-mempool',
 };
 

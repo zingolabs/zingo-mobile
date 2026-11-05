@@ -21,11 +21,11 @@ test('Tests that a transaction reads as confirming, n of the minimum, until it r
 
 test('Tests that a transaction reads as the status zingolib reports when it is not mined yet', () => {
   expect(pending(RPCValueTransfersStatusEnum.calculated)).toEqual({
-    text: 'history.calculated',
+    text: 'history.state-prepared',
     tone: 'warning',
   });
   expect(pending(RPCValueTransfersStatusEnum.transmitted)).toEqual({
-    text: 'history.transmitted',
+    text: 'history.state-sending',
     tone: 'warning',
   });
   expect(pending(RPCValueTransfersStatusEnum.mempool)).toEqual({
