@@ -1,4 +1,4 @@
-import { canRemoveSwap } from '@app/swap/canRemoveSwap';
+import { UNKNOWN_HASH_MS, canRemoveSwap } from '@app/swap/canRemoveSwap';
 import { BroadcastStatusEnum } from '@app/swap/enums/BroadcastStatusEnum';
 import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
@@ -99,4 +99,36 @@ test('Tests that an awaited deposit, a swap in motion, a refund and a completed 
   ]) {
     expect(canRemoveSwap(inbound({ status }))).toBe(false);
   }
+});
+
+describe('a swap in progress on a hash', () => {
+  const stuckAtMs = 1_700_000_000_000;
+  const dayLater = stuckAtMs + UNKNOWN_HASH_MS;
+  const pending = (overrides: Partial<SwapRecordType> = {}) =>
+    inbound({
+      status: SwapStatusEnum.Pending,
+      observedDepositTxHash: 'ab12',
+      updatedAtMs: stuckAtMs,
+      ...overrides,
+    });
+
+  test('Tests that it can be deleted when /track has not recognised it in a day', () => {
+    expect(canRemoveSwap(pending(), dayLater)).toBe(true);
+  });
+
+  test('Tests that it stays when the day has not passed', () => {
+    expect(canRemoveSwap(pending(), dayLater - 1)).toBe(false);
+  });
+
+  test('Tests that it stays when /track has answered for it', () => {
+    expect(canRemoveSwap(pending({ trackCaptureVersion: 1 }), dayLater)).toBe(
+      false,
+    );
+  });
+
+  test('Tests that it stays when it has no hash', () => {
+    expect(
+      canRemoveSwap(pending({ observedDepositTxHash: undefined }), dayLater),
+    ).toBe(false);
+  });
 });
