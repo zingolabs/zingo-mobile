@@ -1,3 +1,4 @@
+import { UNKNOWN_HASH_MS } from '@app/swap/canRemoveSwap';
 jest.mock('@app/RPCModule', () => ({ __esModule: true, default: {} }));
 
 import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
@@ -11,10 +12,12 @@ import { swapScreenFor } from '@screens/Swap/swapRoute';
 import { Route } from '@app/AppState';
 
 const buy = (status: SwapStatusEnum) => ({
+  updatedAtMs: 0,
   direction: SwapDirectionEnum.Inbound,
   status,
 });
 const sell = (status: SwapStatusEnum) => ({
+  updatedAtMs: 0,
   direction: SwapDirectionEnum.Outbound,
   status,
 });
@@ -67,6 +70,12 @@ test('Tests that a swap opens on its deposit, its tracking or its detail when ta
   expect(swapScreenFor(buy(SwapStatusEnum.Expired))).toBe(Route.SwapDetail);
   expect(
     swapScreenFor({ ...buy(SwapStatusEnum.Pending), lateDepositAtMs: 1 }),
+  ).toBe(Route.SwapDetail);
+  expect(
+    swapScreenFor(
+      { ...buy(SwapStatusEnum.Pending), observedDepositTxHash: 'ab12' },
+      UNKNOWN_HASH_MS,
+    ),
   ).toBe(Route.SwapDetail);
 });
 
