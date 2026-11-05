@@ -22,6 +22,7 @@ import {
   heldDeshield,
   isRefunding,
   isTerminalStatus,
+  isThorchainFamily,
   prefillFromRecord,
   providerShortLabel,
   saleDepositRequest,
@@ -51,7 +52,8 @@ type SwapDepositProps = NativeStackScreenProps<
  * it is sent. Opened again from the tracking, the slip is read-only and the
  * arrow goes back there. No time shows. Selling ZEC, it is the sale whose
  * ZEC did not leave: sent again while its quote holds, a new quote after,
- * or deleted.
+ * or deleted. Maya and THORChain sales show no slip: `/track` follows them by
+ * the hash of the payment, which only this wallet's own send gives the app.
  */
 const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   navigation,
@@ -255,8 +257,12 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
         >
           {(resendable && retryError) || undefined}
         </Banner>
-        <View style={{ height: space12 }} />
-        <DepositSlip record={record} paid />
+        {!isThorchainFamily(record.provider) && (
+          <>
+            <View style={{ height: space12 }} />
+            <DepositSlip record={record} paid />
+          </>
+        )}
         <AuthorizeSheet
           ref={authSheetRef}
           summary={`${translate('swap.auth-line-1') as string} ${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${record.sellAsset.symbol} ${translate('swap.auth-line-2') as string} ${providerShortLabel(record.provider)}.`}

@@ -95,6 +95,38 @@ describe.each([
   });
 });
 
+const unsentSale = (provider: SwapKitProviderEnum) =>
+  ({
+    ...expiredPurchase(provider),
+    direction: SwapDirectionEnum.Outbound,
+    status: SwapStatusEnum.PendingDeposit,
+    providerData: {},
+    sellAsset: {
+      swapKitId: 'ZEC.ZEC',
+      chain: 'ZEC',
+      symbol: 'ZEC',
+      ticker: 'ZEC',
+      chainId: 'zcash',
+      decimals: 8,
+    },
+  }) as unknown as SwapRecordType;
+
+test.each([
+  SwapKitProviderEnum.MayachainStreaming,
+  SwapKitProviderEnum.ThorchainStreaming,
+])('Tests that an unsent %s sale shows no way to pay it by hand', provider => {
+  renderDetail(unsentSale(provider));
+
+  expect(screen.getByText('swap.deposit-unsent-title')).toBeTruthy();
+  expect(screen.queryByTestId('swap.deposit.address')).toBeNull();
+});
+
+test('Tests that an unsent NEAR sale keeps its slip', () => {
+  renderDetail(unsentSale(SwapKitProviderEnum.Near));
+
+  expect(screen.getByTestId('swap.deposit.address')).toBeTruthy();
+});
+
 test('Tests that an expired NEAR purchase keeps its own deposit address and no hash field', () => {
   renderDetail(expiredPurchase(SwapKitProviderEnum.Near));
 
