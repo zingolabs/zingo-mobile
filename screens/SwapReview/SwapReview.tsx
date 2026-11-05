@@ -15,6 +15,7 @@ import {
   depositSpendsSourceAddress,
   describeCommitFailure,
   formatAmountForDisplay,
+  orderNamesEphemeral,
   providerShortLabel,
   renderSwapText,
   zecNetworkFeeReserve,
@@ -159,7 +160,12 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
     const claimedByDeposit =
       isOutbound &&
       depositSpendsSourceAddress(depositRequest(committed.instructions));
-    if (!claimedByDeposit) {
+    const named = orderNamesEphemeral({
+      isOutbound,
+      quotedDestination: quoteInput.destinationAddress,
+      orderedDestination: committed.record.destinationAddress,
+    });
+    if (named && !claimedByDeposit) {
       const reserved = await reserveRefundAddress();
       if (!reserved.ok) {
         console.error(

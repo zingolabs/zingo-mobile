@@ -7,7 +7,9 @@ import React, {
   useState,
 } from 'react';
 
-import { ChainNameEnum, ValueTransferType } from '@app/AppState';
+import { ChainNameEnum, ReceiverEnum, ValueTransferType } from '@app/AppState';
+import { createNewUnifiedAddress } from '@app/walletBackend';
+import type { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddressType';
 import { resetPinnedAddress } from '@app/hooks/usePinnedAddress';
 import { resetIronwoodNoticeHide } from '@app/hooks/useIronwoodNoticeHide';
 import { adoptWalletOnFile } from '@app/services/WalletLocalData';
@@ -32,6 +34,24 @@ import { SWAPKIT_API_KEY } from '@app/swap/swapKitSecrets';
  * entry points: SwapKit routes none of our providers on testnet or regtest.
  */
 const SwapServiceContext = createContext<SwapService | null>(null);
+
+/**
+ * Maya refuses a unified address with only an Orchard receiver: Orchard takes
+ * no new outputs since NU6.3 (ZIP 2006). It pays the Sapling one.
+ */
+async function newShieldedAddress(): Promise<string> {
+  const created = await createNewUnifiedAddress(
+    ReceiverEnum.o + ReceiverEnum.z,
+  );
+  if (!created.ok) {
+    throw new Error(created.error.message);
+  }
+  const parsed: RPCUnifiedAddressType = JSON.parse(created.value);
+  if (!parsed.encoded_address) {
+    throw new Error('the wallet named no address');
+  }
+  return parsed.encoded_address;
+}
 
 export type SwapServiceProviderProps = {
   chainName: ChainNameEnum;
@@ -75,6 +95,7 @@ export function SwapServiceProvider({
         created = createSwapService({
           apiKey: apiKey ?? SWAPKIT_API_KEY,
           chainName,
+          newShieldedAddress,
         });
         setService(created);
         created.startPolling();

@@ -12,6 +12,7 @@ import { SwapStatusEnum, isTerminalStatus } from './enums/SwapStatusEnum';
 import { TrackingStatusEnum } from './enums/TrackingStatusEnum';
 import { SwapRecordType } from './types/SwapRecordType';
 import { TrackResponseType } from './types/TrackResponseType';
+import { saplingReceiverOf } from './saplingReceiver';
 
 /**
  * Polls SwapKit `/track` for in-flight `SwapRecord`s, mutates them via the
@@ -333,7 +334,11 @@ export class SwapPoller {
     let discovery;
     try {
       discovery = await this.midgardClient.findInboundActionByMemo({
-        destinationAddress: record.destinationAddress,
+        // Maya pays a unified address through its Sapling receiver, and
+        // Midgard knows the swap only under that one.
+        destinationAddress:
+          saplingReceiverOf(record.destinationAddress) ??
+          record.destinationAddress,
         memo,
         provider: record.provider,
         chainIdForNormalization: record.sellAsset.chainId,

@@ -186,7 +186,11 @@ export {
   depositSpendsSourceAddress,
   zecNetworkFeeReserve,
 } from './depositRouting';
-export { quoteAddressPair, quoteBindsAddress } from './quoteAddressBinding';
+export {
+  orderNamesEphemeral,
+  quoteAddressPair,
+  quoteBindsAddress,
+} from './quoteAddressBinding';
 export { renderSwapText, swapKey, swapRaw } from './swapText';
 export type { SwapTextType } from './swapText';
 export { unavailableProviders } from './unavailableProviders';

@@ -7,6 +7,8 @@ import type { SwapPoller } from '@app/swap/SwapPoller';
 import type { SwapStore } from '@app/swap/SwapStore';
 import type { TokenCatalog } from '@app/swap/TokenCatalog';
 import type { SwapAssetType } from '@app/swap/types/SwapAssetType';
+import { SwapKitHttpError } from '@app/swap/errors';
+import { SwapOperationEnum } from '@app/swap/enums/SwapErrorCategoryEnum';
 
 const ZEC: SwapAssetType = {
   swapKitId: 'ZEC.ZEC',
@@ -149,5 +151,150 @@ describe('SwapService.commitRoute deposit deadline', () => {
     const { record } = await commit(100);
 
     expect(record.depositDeadlineMs).toBeUndefined();
+  });
+});
+
+/**
+ * Maya pays a purchase to a unified address of this wallet when the source
+ * chain's memo can carry one, so the ZEC lands shielded. The route quoted to
+ * the transparent address takes the new destination at `/v3/swap`.
+ */
+describe('SwapService.commitRoute purchase destination', () => {
+  const UA = 'u1shielded';
+  const ETH: SwapAssetType = {
+    swapKitId: 'ETH.ETH',
+    chain: 'ETH',
+    symbol: 'ETH',
+    ticker: 'ETH',
+    chainId: '1',
+    decimals: 18,
+  };
+  const tooLong = new SwapKitHttpError({
+    operation: SwapOperationEnum.Swap,
+    httpStatus: 400,
+    body: JSON.stringify({
+      message:
+        "Destination address is too long for the source chain's memo limit; this route can't be built",
+    }),
+  });
+
+  const commitPurchase = (args: {
+    sellAsset?: SwapAssetType;
+    provider?: SwapKitProviderEnum;
+    swap?: jest.Mock;
+    newShieldedAddress?: jest.Mock;
+  }) => {
+    const swap =
+      args.swap ??
+      jest.fn(async (params: { destinationAddress: string }) => ({
+        inboundAddress: '0xvault',
+        memo: `=:z:${params.destinationAddress}`,
+      }));
+    const newShieldedAddress =
+      args.newShieldedAddress ?? jest.fn(async () => UA);
+    const service = new SwapService({
+      client: { swap } as unknown as SwapKitClient,
+      registry: createDefaultProviderRegistry(),
+      store: {
+        getByRecordId: async () => null,
+        upsert: jest.fn(async () => undefined),
+      } as unknown as typeof SwapStore,
+      poller: { start: jest.fn() } as unknown as SwapPoller,
+      tokenCatalog: null as unknown as TokenCatalog,
+      newShieldedAddress,
+    });
+    const committed = service.commitRoute({
+      quoteInput: {
+        sellAsset: args.sellAsset ?? ETH,
+        receiveAsset: ZEC,
+        sellAmountHumanDecimal: '0.01',
+        sourceAddress: '0xrefund',
+        destinationAddress: 't1ephemeral',
+      },
+      chosenRoute: {
+        routeId: 'route-1',
+        provider: args.provider ?? SwapKitProviderEnum.MayachainStreaming,
+        expectedReceiveAmount: '0.0174',
+        minReceiveAmount: '0.0169',
+      },
+      direction: SwapDirectionEnum.Inbound,
+      fiatValueBasis: {
+        sellUsdUnitPrice: 2000,
+        receiveUsdUnitPrice: 1200,
+        capturedAt: 0,
+      },
+    });
+    return { committed, swap, newShieldedAddress };
+  };
+
+  it('Tests that the order names a new unified address when Maya buys from a chain whose memo fits it', async () => {
+    const { committed, swap } = commitPurchase({});
+    const { record } = await committed;
+
+    expect(swap).toHaveBeenCalledTimes(1);
+    expect(swap).toHaveBeenCalledWith(
+      expect.objectContaining({ routeId: 'route-1', destinationAddress: UA }),
+    );
+    expect(record.destinationAddress).toBe(UA);
+  });
+
+  it('Tests that the order keeps the transparent address when the source chain is Bitcoin', async () => {
+    const { committed, newShieldedAddress } = commitPurchase({
+      sellAsset: BTC,
+    });
+    const { record } = await committed;
+
+    expect(newShieldedAddress).not.toHaveBeenCalled();
+    expect(record.destinationAddress).toBe('t1ephemeral');
+  });
+
+  it('Tests that the order keeps the transparent address when the provider is not Maya', async () => {
+    const { committed, newShieldedAddress } = commitPurchase({
+      provider: SwapKitProviderEnum.Near,
+    });
+    const { record } = await committed;
+
+    expect(newShieldedAddress).not.toHaveBeenCalled();
+    expect(record.destinationAddress).toBe('t1ephemeral');
+  });
+
+  it('Tests that the order falls back to the transparent address when SwapKit says the memo does not fit', async () => {
+    const swap = jest
+      .fn()
+      .mockRejectedValueOnce(tooLong)
+      .mockImplementation(async (params: { destinationAddress: string }) => ({
+        inboundAddress: '0xvault',
+        memo: `=:z:${params.destinationAddress}`,
+      }));
+    const { committed } = commitPurchase({ swap });
+    const { record } = await committed;
+
+    expect(swap).toHaveBeenCalledTimes(2);
+    expect(swap).toHaveBeenLastCalledWith(
+      expect.objectContaining({ destinationAddress: 't1ephemeral' }),
+    );
+    expect(record.destinationAddress).toBe('t1ephemeral');
+  });
+
+  it('Tests that the order falls back to the transparent address when the wallet makes no address', async () => {
+    const { committed, swap } = commitPurchase({
+      newShieldedAddress: jest.fn(async () => {
+        throw new Error('wallet busy');
+      }),
+    });
+    const { record } = await committed;
+
+    expect(swap).toHaveBeenCalledTimes(1);
+    expect(record.destinationAddress).toBe('t1ephemeral');
+  });
+
+  it('Tests that the commit fails when SwapKit refuses the shielded order for another reason', async () => {
+    const swap = jest.fn(async () => {
+      throw new Error('SwapKit swap HTTP 503: unavailable');
+    });
+    const { committed } = commitPurchase({ swap });
+
+    await expect(committed).rejects.toThrow('503');
+    expect(swap).toHaveBeenCalledTimes(1);
   });
 });
