@@ -11,7 +11,6 @@ import { formatUsd } from '@app/utils/formatAmount';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Linking, View } from 'react-native';
 import Pressable from '@ui/primitives/Pressable';
-import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { space12, space8, useTheme, iconSizeMd, iconSizeSm } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
@@ -40,8 +39,6 @@ import Utils from '@app/utils';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
-import TextField from '@ui/primitives/TextField';
-import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 import { TxSwapIcon } from '@ui/primitives/Icons/TxSwapIcon';
 import { TxPendingIcon } from '@ui/primitives/Icons/TxPendingIcon';
 import { swapInFlight } from '@screens/History/historyRowText';
@@ -96,9 +93,6 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
   const records = useSwapRecords();
   const record = useSwapRecord(recordId);
   const [legsOpen, setLegsOpen] = useState<boolean>(false);
-  const [hash, setHash] = useState<string>('');
-  const [attaching, setAttaching] = useState<boolean>(false);
-  const [attachError, setAttachError] = useState<string>('');
   const t = (key: string) => (translate(key) as string).trim();
 
   // A finished swap is no longer polled, so one that finished before the
@@ -119,27 +113,6 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
       navigation.goBack();
     }
   }, [navigation]);
-
-  const attach = useCallback(async () => {
-    const trimmed = hash.trim();
-    if (!trimmed || !swapService || !record) {
-      return;
-    }
-    setAttaching(true);
-    setAttachError('');
-    try {
-      if (record.direction === SwapDirectionEnum.Outbound) {
-        await swapService.markBroadcasted({ recordId, txId: trimmed });
-      } else {
-        await swapService.setObservedDepositTxHash({ recordId, hash: trimmed });
-      }
-      setHash('');
-    } catch (e) {
-      setAttachError(`${e}`);
-    } finally {
-      setAttaching(false);
-    }
-  }, [hash, swapService, record, recordId]);
 
   const removeSwap = useRemoveSwap(close);
 
@@ -430,41 +403,12 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         strike={(expired && !unfoundPurchase) || outcome === 'failed'}
       />
 
-      {(awaitingDeposit || unfoundPurchase) && (
+      {awaitingDeposit && (
         <View style={{ marginVertical: space12, rowGap: space12 }}>
-          {awaitingDeposit && (
-            <>
-              <Text variant="bodyStrong">
-                {t(sell ? 'swap.deposit-unsent-title' : 'swap.deposit-title')}
-              </Text>
-              <DepositSlip record={record} paid={sell} />
-            </>
-          )}
-          <Text variant="bodySmall" tone="muted">
-            {t(sell ? 'swap.deposit-left-anyway' : 'swap.deposit-already-paid')}
+          <Text variant="bodyStrong">
+            {t(sell ? 'swap.deposit-unsent-title' : 'swap.deposit-title')}
           </Text>
-          <TextField
-            testID="swap.detail.hash"
-            label={t('swap.deposit-hash')}
-            value={hash}
-            onChangeText={setHash}
-            placeholder={t('swap.deposit-hash-placeholder')}
-            mono
-            error={attachError || undefined}
-            trailingIcon={ClipboardPasteIcon}
-            trailingLabel={t('paste')}
-            onTrailingPress={async () =>
-              setHash((await Clipboard.getString()).trim())
-            }
-          />
-          <Button
-            inline
-            variant="text"
-            title={t('swap.deposit-follow')}
-            disabled={attaching || hash.trim().length === 0}
-            busy={attaching}
-            onPress={attach}
-          />
+          <DepositSlip record={record} paid={sell} />
         </View>
       )}
 

@@ -162,7 +162,6 @@ export type {
   CommitRouteResult,
   MarkBroadcastedArgs,
   MarkDepositSentArgs,
-  SetObservedDepositTxHashArgs,
 } from './SwapService';
 
 export {
