@@ -56,9 +56,9 @@ function polymod(values: number[]): number {
   for (const value of values) {
     const top = check >>> 25;
     check = ((check & 0x1ffffff) << 5) ^ value;
-    GENERATOR.forEach((g, i) => {
-      if ((top >>> i) & 1) check ^= g;
-    });
+    for (let i = 0; i < GENERATOR.length; i++) {
+      if ((top >>> i) & 1) check ^= GENERATOR[i];
+    }
   }
   return check >>> 0;
 }
