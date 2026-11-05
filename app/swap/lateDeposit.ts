@@ -39,8 +39,8 @@ export function acceptsLateUpdate(updated: SwapRecordType): boolean {
 
 /**
  * A purchase paid after its quote expired, on its way back to the refund
- * address. Not on Maya or THORChain: their vault has no such deadline and swaps
- * what it takes, as THORChain did for `f46af7c2…`, so only `/track` says refunded.
+ * address. Not assumed on Maya or THORChain, where THORChain swapped a payment
+ * the app had given up on (`f46af7c2…`): there only `/track` says refunded.
  */
 export function isRefunding(
   record: Pick<SwapRecordType, 'provider' | 'status' | 'lateDepositAtMs'>,
