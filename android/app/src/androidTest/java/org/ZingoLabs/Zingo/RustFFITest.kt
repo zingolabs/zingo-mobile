@@ -67,17 +67,17 @@ object MainnetServers {
 /** The shared testnet fixture wallet, which is zingolib's GloryGoddess example wallet. */
 object TestnetFixture {
     const val SEED = "glory goddess cargo action guilt ball coral employ phone baby oxygen flavor solid climb situate frequent blade pet enough milk access try swift benefit"
-    const val BIRTHDAY = 4_431_500L
+    const val BIRTHDAY = 4_579_900L
     val SERVERS = listOf("https://testnet.zec.rocks:443", "https://zaino.testnet.unsafe.zec.rocks:443")
     const val CHAIN_HINT = "test"
     const val UNIFIED_ADDRESS = "utest1dmu08vg5wt5m9w0ejwgeqdndzzkfka7c94heuz5llxv5vx4lhcethmm6p5ean3wcj8l0m6tf8k8cau9r636gq7sxq3wa6zey2sysfteh"
     const val TRANSPARENT_ADDRESS = "tmF7QpuKsLF7nsMvThu4wQBpiKVGJXGCSJF"
 
-    const val CONSOLIDATION_TXID = "256fc8dcb3dd730439157301a027f7b243d69aa30e31fc7a9b619e726321d19f"
-    const val CONSOLIDATION_HEIGHT = 4_431_582L
+    const val CONSOLIDATION_TXID = "2b8417caed4e46934b237729eb578a6fcd7388dde640e626df3e54f2feefd063"
+    const val CONSOLIDATION_HEIGHT = 4_579_990L
     const val CONSOLIDATION_KIND = "memo-to-self"
-    const val CONSOLIDATION_VALUE = 3_995_811_890L
-    const val CONSOLIDATION_FEE = 285_000L
+    const val CONSOLIDATION_VALUE = 3_051_533_557L
+    const val CONSOLIDATION_FEE = 95_000L
 
     const val DEADLINE_SECONDS = 10 * 60
     const val TIP_SKEW_BLOCKS = 10L
@@ -85,19 +85,19 @@ object TestnetFixture {
 
 /** The testnet fixture wallet that nobody spends from, whose pool balances the pool-balance test checks exactly. */
 object PoolBalanceFixture {
-    const val SEED = "away win exhibit affair resource basic film radio bomb bone protect gentle logic pelican wreck air buyer nominee baby raw panic witness hair cream"
-    const val BIRTHDAY = 4_431_742L
-    const val UNIFIED_ADDRESS = "utest1d3awxkkpft8c2arx6g443wp97uhvh7uyuk58ghk35tnlx37fdg8mtwf2l7shtaacrj6gnhhxr647uq2yzwtszwn22z8xlghmwv4dzfyu"
-    const val TRANSPARENT_ADDRESS = "tmVqqboEGhqUDoVnDRk1vVumKPrieJz6btY"
+    const val SEED = "usual defy surge vibrant mad ring year magnet fringe mistake flame father equip valid come claw noodle portion comic drink erosion save swallow innocent"
+    const val BIRTHDAY = 4_580_005L
+    const val UNIFIED_ADDRESS = "utest1hxe8zmty4hrpe6acapdhmfsfya0vvr8g3vtwkf6lqjqku7sranwer68mq9dyphmyda3dl7msjmf0zgnlkrjct4dllxx600u3cyuax8ev"
+    const val TRANSPARENT_ADDRESS = "tmYEFu54uduQ5pQbYCEd25w3nuNRUBwV62E"
 
-    const val IRONWOOD_BALANCE = 1_210_000L
+    const val IRONWOOD_BALANCE = 995_000L
     const val ORCHARD_BALANCE = 0L
-    const val SAPLING_BALANCE = 115_000L
-    const val TRANSPARENT_BALANCE = 0L
+    const val SAPLING_BALANCE = 225_000L
+    const val TRANSPARENT_BALANCE = 100_000L
 
-    const val RECEIPT_TXID = "5875d2ef17dcd8010e09e63942c901478fdfa93e5e5883f4c01b96cfda9bf669"
-    const val SHIELD_TXID = "40c75700d939ed5b0ee7e2b65bbb55dbd632689cb070171fa0d8be88b037c7cc"
-    const val SHIELD_HEIGHT = 4_432_065L
+    const val RECEIPT_TXID = "da4ae67858d7ba5355fc0529be81f651b1d86a3a867f77d39af1e0b27fc022a3"
+    const val SHIELD_TXID = "73e3a72477cebc5cf82573a95e260257068f98d011f71bdb06c4c5968a258522"
+    const val SHIELD_HEIGHT = 4_580_056L
     const val VALUE_TRANSFER_COUNT = 9
 }
 
