@@ -2,6 +2,7 @@ import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
 import { SwapStatusEnum, isTerminalStatus } from './enums/SwapStatusEnum';
 import { depositDeadlineMs } from './depositDeadline';
 import { hasDepositEvidence } from './depositEvidence';
+import { isThorchainFamily } from './thorchainFamily';
 import { SwapRecordType } from './types/SwapRecordType';
 
 /** How long an expired purchase is still asked about, for a payment that came late. */
@@ -36,11 +37,17 @@ export function acceptsLateUpdate(updated: SwapRecordType): boolean {
   );
 }
 
-/** A purchase paid after its quote expired, on its way back to the refund address. */
+/**
+ * A purchase paid after its quote expired, on its way back to the refund
+ * address. Not on Maya or THORChain: their vault has no such deadline and swaps
+ * what it takes, as THORChain did for `f46af7c2…`, so only `/track` says refunded.
+ */
 export function isRefunding(
-  record: Pick<SwapRecordType, 'status' | 'lateDepositAtMs'>,
+  record: Pick<SwapRecordType, 'provider' | 'status' | 'lateDepositAtMs'>,
 ): boolean {
   return (
-    record.lateDepositAtMs !== undefined && !isTerminalStatus(record.status)
+    record.lateDepositAtMs !== undefined &&
+    !isTerminalStatus(record.status) &&
+    !isThorchainFamily(record.provider)
   );
 }

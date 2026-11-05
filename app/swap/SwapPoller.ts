@@ -354,13 +354,6 @@ export class SwapPoller {
     if (!discovery) return null;
     if (!wantsHash && !discovery.delivery) return null;
 
-    // A payment found on an expired purchase came late: it reads as
-    // refunding from now on, so the record stays polled whatever this tick's
-    // /track answers. One that delivered is not coming back.
-    const late =
-      wantsHash &&
-      record.status === SwapStatusEnum.Expired &&
-      !discovery.delivery;
     const updated: SwapRecordType = {
       ...record,
       ...(discovery.delivery && {
@@ -374,16 +367,15 @@ export class SwapPoller {
       // The provider has now observed our deposit on-chain — transition out
       // of the pre-evidence "awaiting external" state into the same Pending
       // state we use right after our own outbound broadcast. Subsequent
-      // /track responses promote it further (Processing → Completed).
+      // /track responses promote it further (Processing → Completed). An
+      // expired purchase reopens the same way: it stays polled whatever this
+      // tick's /track answers.
       status:
         wantsHash &&
         (record.status === SwapStatusEnum.AwaitingExternalDeposit ||
           record.status === SwapStatusEnum.Expired)
           ? SwapStatusEnum.Pending
           : record.status,
-      lateDepositAtMs: late
-        ? (record.lateDepositAtMs ?? Date.now())
-        : record.lateDepositAtMs,
       updatedAtMs: Date.now(),
     };
     try {

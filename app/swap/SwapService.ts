@@ -467,7 +467,7 @@ export class SwapService {
    * every time it is shown, since that is how a payment `/track` cannot find
    * turns up. What Midgard finds is stored, and earns the `/track` question
    * whatever the record's stamp says. A found payment on an expired purchase
-   * reopens it, and the poller takes over.
+   * reopens it as in progress, and the poller takes over.
    *
    * A finished swap stays finished. `/track` has been seen to answer an old
    * swap in a way that maps to no terminal state, and the history must not

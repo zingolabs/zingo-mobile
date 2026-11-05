@@ -704,7 +704,7 @@ describe('SwapPoller on an expired Maya purchase Midgard finds a payment for', (
     return { poller, upsert };
   };
 
-  it('Tests that it does not read as refunding when Midgard also shows the delivery', async () => {
+  it('Tests that it keeps the delivery when Midgard also shows it', async () => {
     const { poller, upsert } = harness(
       jest.fn(async () => {
         throw new Error('offline');
@@ -718,7 +718,7 @@ describe('SwapPoller on an expired Maya purchase Midgard finds a payment for', (
     expect(stored.lateDepositAtMs).toBeUndefined();
   });
 
-  it('reads as refunding even when that tick cannot ask /track', async () => {
+  it('Tests that it reopens as in progress when that tick cannot ask /track', async () => {
     const { poller, upsert } = harness(
       jest.fn(async () => {
         throw new Error('offline');
@@ -729,8 +729,8 @@ describe('SwapPoller on an expired Maya purchase Midgard finds a payment for', (
       expect.objectContaining({
         status: SwapStatusEnum.Pending,
         observedDepositTxHash: 'cd'.repeat(32),
-        lateDepositAtMs: now,
       }),
     );
+    expect(upsert.mock.calls[0][0].lateDepositAtMs).toBeUndefined();
   });
 });
