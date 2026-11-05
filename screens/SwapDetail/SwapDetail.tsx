@@ -11,7 +11,6 @@ import { formatUsd } from '@app/utils/formatAmount';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Linking, View } from 'react-native';
 import Pressable from '@ui/primitives/Pressable';
-import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { space12, space8, useTheme, iconSizeMd, iconSizeSm } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
@@ -31,6 +30,7 @@ import {
   isRealLegHash,
   isRefunding,
   isTerminalStatus,
+  isThorchainFamily,
   prefillFromRecord,
   providerLongLabel,
 } from '@app/swap';
@@ -38,8 +38,6 @@ import Utils from '@app/utils';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
-import TextField from '@ui/primitives/TextField';
-import { ClipboardPasteIcon } from '@ui/primitives/Icons/ClipboardPasteIcon';
 import { TxSwapIcon } from '@ui/primitives/Icons/TxSwapIcon';
 import { TxPendingIcon } from '@ui/primitives/Icons/TxPendingIcon';
 import { swapInFlight } from '@screens/History/historyRowText';
@@ -94,9 +92,6 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
   const records = useSwapRecords();
   const record = useSwapRecord(recordId);
   const [legsOpen, setLegsOpen] = useState<boolean>(false);
-  const [hash, setHash] = useState<string>('');
-  const [attaching, setAttaching] = useState<boolean>(false);
-  const [attachError, setAttachError] = useState<string>('');
   const t = (key: string) => (translate(key) as string).trim();
 
   // A finished swap is no longer polled, so one that finished before the
@@ -118,27 +113,6 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
     }
   }, [navigation]);
 
-  const attach = useCallback(async () => {
-    const trimmed = hash.trim();
-    if (!trimmed || !swapService || !record) {
-      return;
-    }
-    setAttaching(true);
-    setAttachError('');
-    try {
-      if (record.direction === SwapDirectionEnum.Outbound) {
-        await swapService.markBroadcasted({ recordId, txId: trimmed });
-      } else {
-        await swapService.setObservedDepositTxHash({ recordId, hash: trimmed });
-      }
-      setHash('');
-    } catch (e) {
-      setAttachError(`${e}`);
-    } finally {
-      setAttaching(false);
-    }
-  }, [hash, swapService, record, recordId]);
-
   const removeSwap = useRemoveSwap(close);
 
   if (!record) {
@@ -150,6 +124,10 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
   const done = outcome === 'completed';
   const expired = outcome === 'expired';
   const refunding = isRefunding(record);
+  /** Paid to a vault every user shares, so its address says nothing of this swap. */
+  const sharedVault = isThorchainFamily(record.provider);
+  /** A purchase whose deposit we did not find, which is not to say it wasn't sent. */
+  const unfoundPurchase = expired && sharedVault && !sell;
   const sellSym = record.sellAsset.ticker ?? record.sellAsset.symbol;
   const getSym = record.receiveAsset.ticker ?? record.receiveAsset.symbol;
   const other = sell ? record.receiveAsset : record.sellAsset;
@@ -182,10 +160,12 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
             amount: `+${formatAmountForDisplay(got)}`,
             unit: getSym,
             tone: 'muted' as const,
-            line: t('history.swap-not-sent').replace(
-              '{amount}',
-              `${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}`,
-            ),
+            line: unfoundPurchase
+              ? `${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}`
+              : t('history.swap-not-sent').replace(
+                  '{amount}',
+                  `${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}`,
+                ),
           }
         : {
             amount: `${done ? '+' : '≈ +'}${formatAmountForDisplay(got)}`,
@@ -251,15 +231,30 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
       ? [
           {
             label: t('swap.result-reason'),
-            value: t('swap.expired-why'),
+            value: t(
+              unfoundPurchase ? 'swap.expired-why-vault' : 'swap.expired-why',
+            ),
             wrap: true,
           },
-          {
-            label: t('swap.deposit-address'),
-            value: Utils.trimToSmall(record.depositAddress, 6),
-            mono: true,
-            strike: true,
-          },
+          ...(unfoundPurchase
+            ? [
+                {
+                  label: t('swap.your-address'),
+                  value: Utils.trimToSmall(record.sourceAddress, 6),
+                  mono: true,
+                  copy: record.sourceAddress,
+                },
+              ]
+            : sharedVault
+              ? []
+              : [
+                  {
+                    label: t('swap.deposit-address'),
+                    value: Utils.trimToSmall(record.depositAddress, 6),
+                    mono: true,
+                    strike: true,
+                  },
+                ]),
         ]
       : []),
     ...(feesUsd && !expired
@@ -394,7 +389,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         line={view.hero.line}
         pill={view.pill.text}
         pillTone={view.pill.tone}
-        strike={expired || outcome === 'failed'}
+        strike={(expired && !unfoundPurchase) || outcome === 'failed'}
       />
 
       {awaitingDeposit && (
@@ -402,32 +397,9 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
           <Text variant="bodyStrong">
             {t(sell ? 'swap.deposit-unsent-title' : 'swap.deposit-title')}
           </Text>
-          <DepositSlip record={record} paid={sell} />
-          <Text variant="bodySmall" tone="muted">
-            {t(sell ? 'swap.deposit-left-anyway' : 'swap.deposit-already-paid')}
-          </Text>
-          <TextField
-            testID="swap.detail.hash"
-            label={t('swap.deposit-hash')}
-            value={hash}
-            onChangeText={setHash}
-            placeholder={t('swap.deposit-hash-placeholder')}
-            mono
-            error={attachError || undefined}
-            trailingIcon={ClipboardPasteIcon}
-            trailingLabel={t('paste')}
-            onTrailingPress={async () =>
-              setHash((await Clipboard.getString()).trim())
-            }
-          />
-          <Button
-            inline
-            variant="text"
-            title={t('swap.deposit-follow')}
-            disabled={attaching || hash.trim().length === 0}
-            busy={attaching}
-            onPress={attach}
-          />
+          {!(sell && sharedVault) && (
+            <DepositSlip record={record} paid={sell} />
+          )}
         </View>
       )}
 
@@ -442,7 +414,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         </Text>
       )}
 
-      {expired && (
+      {expired && !sharedVault && (
         <View style={{ marginTop: space12, rowGap: space12 }}>
           <Banner
             testID="swap.detail.dont-send"

@@ -339,7 +339,7 @@ export class SwapPoller {
     if (!discovery) return null;
 
     // A payment found on an expired purchase came late: it reads as
-    // refunding from now on, as a hash the user pastes does, so the record
+    // refunding from now on, so the record
     // stays polled whatever this tick's /track answers.
     const late = record.status === SwapStatusEnum.Expired;
     const updated: SwapRecordType = {

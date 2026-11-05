@@ -197,8 +197,8 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
             console.log(`SwapReview: markDeshielded failed ${err}`),
           );
       }
-      // The swap is reserved and payable by hand, so the deposit screen takes
-      // over with the address and the way to try again.
+      // The swap is reserved, so the deposit screen takes over with the way to
+      // try again.
       navigation.replace(Route.SwapDeposit, {
         recordId,
         broadcastError:

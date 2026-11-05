@@ -1,7 +1,9 @@
 import { BlockExplorerEnum, ChainNameEnum } from '@app/AppState';
 import Utils from '@app/utils';
+import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
 import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
 import { isRealLegHash } from './providers/trackUpdateBase';
+import { isThorchainFamily } from './thorchainFamily';
 import { providerShortLabel } from './providerLabels';
 import { legChain } from './legChains';
 import type { SwapRecordType } from './types/SwapRecordType';
@@ -203,7 +205,9 @@ export type TrackerWhatType =
   /** The deposit coming back. */
   | { kind: 'refund'; chain: string }
   /** The deposit address, when no deposit was ever seen. */
-  | { kind: 'depositAddress'; chain: string };
+  | { kind: 'depositAddress'; chain: string }
+  /** The address the user gave, when no deposit was seen on a shared vault. */
+  | { kind: 'sourceAddress'; chain: string };
 
 export type TrackerEntryType = {
   key: string;
@@ -233,7 +237,9 @@ const tickerOf = (asset: SwapRecordType['sellAsset']): string =>
  * then the block explorers of each leg and of the refund, the Zcash ones
  * last. An entry that cannot be built, for a missing hash or an unknown
  * chain, is left out, so every row rendered from this opens something. A
- * swap no deposit was ever seen for gets its deposit address instead.
+ * swap no deposit was ever seen for gets its deposit address instead, unless
+ * that is a Maya or THORChain vault: every user of the provider pays it, so a
+ * purchase gets the address the user gave, where the payment normally starts.
  */
 export function buildTrackerEntries(args: {
   record: SwapRecordType;
@@ -325,6 +331,21 @@ export function buildTrackerEntries(args: {
       coin: tickerOf(record.sellAsset),
       chain: sellChain,
     });
+  } else if (isThorchainFamily(record.provider)) {
+    const url =
+      record.direction === SwapDirectionEnum.Inbound
+        ? buildChainAddressUrl(sellChain, record.sourceAddress)
+        : null;
+    if (url) {
+      entries.push({
+        key: 'source-address',
+        name: chainExplorerName(sellChain, zecBlockExplorer),
+        what: { kind: 'sourceAddress', chain: sellChain },
+        url,
+        id: record.sourceAddress,
+        onZcash: isZcash(sellChain),
+      });
+    }
   } else if (record.depositAddress) {
     const url = buildChainAddressUrl(sellChain, record.depositAddress);
     if (url) {

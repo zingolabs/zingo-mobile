@@ -18,7 +18,7 @@ export {
   isPrePaymentStatus,
 } from './enums/SwapStatusEnum';
 export { TrackingStatusEnum } from './enums/TrackingStatusEnum';
-export { canRemoveSwap } from './canRemoveSwap';
+export { canRemoveSwap, hasUnknownHash } from './canRemoveSwap';
 export { hasDepositEvidence } from './depositEvidence';
 export { newlyExpired, newlyRefunding } from './swapTransitions';
 export { prefillFromContact, prefillFromRecord } from './swapPrefill';
@@ -161,7 +161,6 @@ export type {
   CommitRouteResult,
   MarkBroadcastedArgs,
   MarkDepositSentArgs,
-  SetObservedDepositTxHashArgs,
 } from './SwapService';
 
 export {

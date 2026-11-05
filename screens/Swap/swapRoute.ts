@@ -1,6 +1,7 @@
 import { Route } from '@app/AppState';
 import {
   SwapStatusEnum,
+  hasUnknownHash,
   isRefunding,
   isTerminalStatus,
   unsentSale,
@@ -16,13 +17,24 @@ import type { SwapRecordType } from '@app/swap';
 export function swapScreenFor(
   record: Pick<
     SwapRecordType,
-    'direction' | 'status' | 'lateDepositAtMs' | 'depositSentAtMs'
+    | 'direction'
+    | 'status'
+    | 'lateDepositAtMs'
+    | 'depositSentAtMs'
+    | 'observedDepositTxHash'
+    | 'trackCaptureVersion'
+    | 'updatedAtMs'
   >,
+  nowMs: number = Date.now(),
 ):
   | typeof Route.SwapDeposit
   | typeof Route.SwapTracking
   | typeof Route.SwapDetail {
-  if (isTerminalStatus(record.status) || isRefunding(record)) {
+  if (
+    isTerminalStatus(record.status) ||
+    isRefunding(record) ||
+    hasUnknownHash(record, nowMs)
+  ) {
     return Route.SwapDetail;
   }
   const toPay =
