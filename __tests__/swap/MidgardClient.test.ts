@@ -30,6 +30,8 @@ describe('MidgardClient', () => {
       memo: MEMO,
       provider: SwapKitProviderEnum.ThorchainStreaming,
       chainIdForNormalization: 'bitcoin',
+      receiveAssetId: 'ZEC.ZEC',
+      receiveChainId: 'zcash',
     });
 
     expect((swapHttpRequest as jest.Mock).mock.calls[0][0].url).toBe(

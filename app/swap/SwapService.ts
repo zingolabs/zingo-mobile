@@ -364,21 +364,19 @@ export class SwapService {
     recordId: string;
     deshieldTxId: string;
   }): Promise<SwapRecordType> {
-    const record = await this.store.getByRecordId(args.recordId);
-    if (!record) {
-      throw new Error(
-        `SwapService.markDeshielded: no record for ${args.recordId}`,
-      );
-    }
-    const updated: SwapRecordType = {
-      ...record,
+    const updated = await this.store.update(args.recordId, current => ({
+      ...current,
       broadcast: {
         status: BroadcastStatusEnum.PendingBroadcast,
         allTxIds: [args.deshieldTxId],
       },
       updatedAtMs: Date.now(),
-    };
-    await this.store.upsert(updated);
+    }));
+    if (!updated) {
+      throw new Error(
+        `SwapService.markDeshielded: no record for ${args.recordId}`,
+      );
+    }
     return updated;
   }
 
@@ -394,8 +392,8 @@ export class SwapService {
       );
     }
     const now = Date.now();
-    const updated: SwapRecordType = {
-      ...record,
+    const updated = await this.store.update(recordId, current => ({
+      ...current,
       status: SwapStatusEnum.Pending,
       broadcast: {
         status: BroadcastStatusEnum.Broadcasted,
@@ -407,8 +405,10 @@ export class SwapService {
         broadcastedAtMs: now,
       },
       updatedAtMs: now,
-    };
-    await this.store.upsert(updated);
+    }));
+    if (!updated) {
+      throw new Error(`SwapService.markBroadcasted: no record for ${recordId}`);
+    }
     // Status transitioned from PendingDeposit to Pending; the poller now has
     // something concrete to track. Idempotent.
     this.poller.start();
@@ -435,12 +435,14 @@ export class SwapService {
       return record;
     }
     const now = Date.now();
-    const updated: SwapRecordType = {
-      ...record,
+    const updated = await this.store.update(recordId, current => ({
+      ...current,
       depositSentAtMs: now,
       updatedAtMs: now,
-    };
-    await this.store.upsert(updated);
+    }));
+    if (!updated) {
+      throw new Error(`SwapService.markDepositSent: no record for ${recordId}`);
+    }
     const wasRunning = this.poller.isRunning();
     this.poller.start();
     if (wasRunning) {
@@ -504,18 +506,18 @@ export class SwapService {
       return found ?? undefined;
     }
 
-    const tracked = this.registry
-      .get(record.provider)
-      .applyTrackUpdate(record, response);
-    const updated: SwapRecordType = isTerminalStatus(tracked.status)
-      ? tracked
-      : {
-          ...tracked,
-          status: record.status,
-          trackingStatus: record.trackingStatus,
-          terminalAtMs: record.terminalAtMs,
-        };
-    await this.store.upsert(updated);
+    const executor = this.registry.get(record.provider);
+    const updated = await this.store.update(recordId, current => {
+      const tracked = executor.applyTrackUpdate(current, response);
+      return isTerminalStatus(tracked.status)
+        ? tracked
+        : {
+            ...tracked,
+            status: current.status,
+            trackingStatus: current.trackingStatus,
+            terminalAtMs: current.terminalAtMs,
+          };
+    });
     this.followIfReopened(updated);
     return updated;
   }
@@ -525,7 +527,7 @@ export class SwapService {
    * again for a reopened swap. `start()` ticks when it was stopped; the extra
    * tick is for when it was running all along.
    */
-  private followIfReopened(record: SwapRecordType | null): void {
+  private followIfReopened(record: SwapRecordType | null | undefined): void {
     if (!record || isTerminalStatus(record.status)) return;
     const wasRunning = this.poller.isRunning();
     this.poller.start();

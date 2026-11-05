@@ -1,3 +1,4 @@
+import { withStoreUpdate } from '../../__mocks__/dataMocks/swap/withStoreUpdate';
 import { SwapService } from '@app/swap/SwapService';
 import {
   DEPOSIT_WAIT_MS,
@@ -130,10 +131,10 @@ describe('SwapService.markDepositSent', () => {
     const service = new SwapService({
       client: null as never,
       registry: null as never,
-      store: {
+      store: withStoreUpdate({
         getByRecordId: async () => record,
         upsert,
-      } as unknown as typeof SwapStore,
+      }) as unknown as typeof SwapStore,
       poller: poller as unknown as SwapPoller,
       tokenCatalog: null as never,
     });

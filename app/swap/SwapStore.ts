@@ -206,6 +206,30 @@ export class SwapStore {
     });
   }
 
+  /**
+   * Rewrites one record from what is stored at this moment, inside the queue.
+   * A write worked out from a copy read earlier undoes whatever reached the
+   * record since: a broadcast marked while `/track` was answering, or a delete
+   * brought back. Resolves to the record now stored, or undefined when it is
+   * gone. Handing back the same object writes nothing.
+   */
+  static async update(
+    recordId: string,
+    change: (current: SwapRecordType) => SwapRecordType,
+  ): Promise<SwapRecordType | undefined> {
+    return this.enqueue(async () => {
+      const all = await this._readRaw();
+      const idx = all.findIndex(r => r.recordId === recordId);
+      if (idx < 0) return undefined;
+      const next = change(all[idx]);
+      if (next === all[idx]) return next;
+      all[idx] = next;
+      await this._writeRaw(all);
+      SwapStore.notify(all);
+      return next;
+    });
+  }
+
   /** Look up a single record by its locally-minted primary key. */
   static async getByRecordId(
     recordId: string,

@@ -1,3 +1,4 @@
+import { withStoreUpdate } from '../../__mocks__/dataMocks/swap/withStoreUpdate';
 import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
 import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
@@ -40,8 +41,12 @@ const harness = (
   }),
 ) => {
   const upsert = jest.fn(async (_record: SwapRecordType) => undefined);
+  let current = stored;
   const poller = {
-    discoverViaMidgard: jest.fn(async () => found),
+    discoverViaMidgard: jest.fn(async () => {
+      if (found) current = found;
+      return found;
+    }),
     isRunning: jest.fn(() => true),
     start: jest.fn(),
     tickOnce: jest.fn(async () => undefined),
@@ -49,10 +54,10 @@ const harness = (
   const service = new SwapService({
     client: { track } as unknown as SwapKitClient,
     registry: createDefaultProviderRegistry(),
-    store: {
-      getByRecordId: async () => stored,
+    store: withStoreUpdate({
+      getByRecordId: async () => current,
       upsert,
-    } as unknown as typeof SwapStore,
+    }) as unknown as typeof SwapStore,
     poller: poller as unknown as SwapPoller,
     tokenCatalog: null as unknown as TokenCatalog,
   });
