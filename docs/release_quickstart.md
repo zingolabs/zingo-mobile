@@ -89,9 +89,9 @@ Anything other than a bare `zm_<tag>` on the About screen means the shipped
 app was not built on the tag: `_<hash5>` names the commit it was built at,
 and `_dirty` means it was built from an uncommitted working tree.
 
-This only affects the manual store builds. The tag-triggered APKs below are
-built by CI from source on the tagged commit, so their descriptor is always
-clean.
+This only affects the manual store builds. CI builds the tag-triggered APKs
+below from a fresh checkout of the tagged commit, and their descriptor is
+always clean.
 
 ## Tag-triggered Android APKs
 
@@ -106,11 +106,12 @@ internal QA distribution, and reproducible per-commit archives.
 
 The `.github/workflows/android-release.yaml` workflow:
 
-1. Builds the rust native libs (4 ABIs in parallel) and the uniffi kotlin
-   bindings from source on the tagged commit. **No `actions/cache` is read
-   or written for these outputs** — all cross-job hand-off is via
-   `upload-artifact`, which is run-scoped. The maven dependency cache is
-   used in read-only mode (artifacts are content-addressed and signed).
+1. Checks out the tagged commit in its one job. The Gradle build fetches the
+   Binding Layer AAR that the commit's Bundle Pin names, by digest. The AAR
+   carries the Rust native libs for the 4 ABIs and their UniFFI Kotlin
+   bindings. **No `actions/cache` is read or written for build outputs.**
+   The Maven dependency cache is used in read-only mode (artifacts are
+   content-addressed and signed).
 2. Assembles `assembleProdRelease` or `assembleBetaRelease` with
    `-PsplitApk=true -PincludeUniversalApk=true`.
 3. Publishes 5 APKs to the release:

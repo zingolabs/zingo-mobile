@@ -34,10 +34,12 @@ was built from.
 
 ```bash
 # Check zingolib out at the pinned commit, beside this repository.
+# mkdir stops the chain when ../zingolib exists.
 commit="$(node --print 'require("./binding-layer.json").commit')"
-git init --quiet ../zingolib
-git -C ../zingolib fetch --depth 1 https://github.com/zingolabs/zingolib.git "$commit"
-git -C ../zingolib checkout --detach FETCH_HEAD
+mkdir ../zingolib &&
+  git -C ../zingolib init --quiet &&
+  git -C ../zingolib fetch --depth 1 https://github.com/zingolabs/zingolib.git "$commit" &&
+  git -C ../zingolib checkout --detach FETCH_HEAD
 ```
 
 ## Starting from zingolib's testnet wallet
