@@ -34,9 +34,12 @@ was built from.
 
 ```bash
 # Check zingolib out at the pinned commit, beside this repository.
+# mkdir stops the chain when ../zingolib exists.
 commit="$(node --print 'require("./binding-layer.json").commit')"
-git clone https://github.com/zingolabs/zingolib.git ../zingolib
-git -C ../zingolib checkout --detach "$commit"
+mkdir ../zingolib &&
+  git -C ../zingolib init --quiet &&
+  git -C ../zingolib fetch --depth 1 https://github.com/zingolabs/zingolib.git "$commit" &&
+  git -C ../zingolib checkout --detach FETCH_HEAD
 ```
 
 ## Starting from zingolib's testnet wallet
@@ -113,10 +116,10 @@ fixture wallet takes a new seed and the history below.
 
 ## The history
 
-The history reproduces the two regtest scenarios that the tests replace,
+The history reproduces the two regtest scenarios that the tests replaced,
 `funded_orchard_with_3_txs_mobileclient` and
-`funded_orchard_sapling_transparent_shielded_mobileclient` in
-`zingolib_testutils/src/scenarios.rs`. Both scenarios ran with a value
+`funded_orchard_sapling_transparent_shielded_mobileclient`. zingolib
+deleted both before the pinned commit. Both scenarios ran with a value
 of 1,000,000 zatoshis. The amounts below keep that value, and the Kotlin
 expectations change as little as possible.
 
@@ -333,8 +336,8 @@ birthday has finished.
   command of a new wallet prints its creation height, which is lower.
 - The testnet servers. The fixture tests read the first one that answers,
   `https://testnet.zec.rocks:443` and then
-  `https://zaino.testnet.unsafe.zec.rocks:443`, which zingolib lists in
-  `zingo-netutils/src/indexers.rs`.
+  `https://zaino.testnet.unsafe.zec.rocks:443`, which `RustFFITest.kt` and
+  `ZingoTest.swift` list.
 - The txid of each step.
 - The value transfers as the Binding Layer reports them.
 - The total and confirmed balances of the Ironwood, Orchard, Sapling, and

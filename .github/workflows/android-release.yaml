@@ -59,21 +59,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Free up disk space
-        run: |
-          set -eux
-          df -h
-          sudo rm -rf /usr/local/graalvm/ \
-                      /usr/local/share/powershell \
-                      /usr/local/share/chromium \
-                      /usr/local/.ghcup \
-                      /opt/hostedtoolcache/CodeQL \
-                      /usr/local/lib/android/sdk/ndk \
-                      /usr/share/dotnet \
-                      /opt/ghc \
-                      /usr/local/share/boost
-          df -h
-
       - name: Setup Java
         uses: actions/setup-java@v6
         with:
