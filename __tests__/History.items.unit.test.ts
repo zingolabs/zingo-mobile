@@ -431,6 +431,10 @@ test('Tests that a send says where it stands before the time when it is not conf
     transferRowText({
       vt: vt('a', 1, ValueTransferKindEnum.Sent, {
         confirmations,
+        status:
+          confirmations === 0
+            ? RPCValueTransfersStatusEnum.mempool
+            : RPCValueTransfersStatusEnum.confirmed,
         address: 'u1qx8fabcdefghijk3kd9a2',
       }),
       when: 'Just now',

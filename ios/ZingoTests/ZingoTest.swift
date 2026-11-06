@@ -30,17 +30,17 @@ enum PublicChain {
 /// The shared testnet fixture wallet, which is zingolib's GloryGoddess example wallet.
 enum TestnetFixture {
     static let SEED = "glory goddess cargo action guilt ball coral employ phone baby oxygen flavor solid climb situate frequent blade pet enough milk access try swift benefit"
-    static let BIRTHDAY: UInt64 = 4_431_500
+    static let BIRTHDAY: UInt64 = 4_579_900
     static let SERVERS = ["https://testnet.zec.rocks:443", "https://zaino.testnet.unsafe.zec.rocks:443"]
     static let CHAIN_HINT = "test"
     static let UNIFIED_ADDRESS = "utest1dmu08vg5wt5m9w0ejwgeqdndzzkfka7c94heuz5llxv5vx4lhcethmm6p5ean3wcj8l0m6tf8k8cau9r636gq7sxq3wa6zey2sysfteh"
     static let TRANSPARENT_ADDRESS = "tmF7QpuKsLF7nsMvThu4wQBpiKVGJXGCSJF"
 
-    static let CONSOLIDATION_TXID = "256fc8dcb3dd730439157301a027f7b243d69aa30e31fc7a9b619e726321d19f"
-    static let CONSOLIDATION_HEIGHT: Int64 = 4_431_582
+    static let CONSOLIDATION_TXID = "2b8417caed4e46934b237729eb578a6fcd7388dde640e626df3e54f2feefd063"
+    static let CONSOLIDATION_HEIGHT: Int64 = 4_579_990
     static let CONSOLIDATION_KIND = "memo-to-self"
-    static let CONSOLIDATION_VALUE: Int64 = 3_995_811_890
-    static let CONSOLIDATION_FEE: Int64 = 285_000
+    static let CONSOLIDATION_VALUE: Int64 = 3_051_533_557
+    static let CONSOLIDATION_FEE: Int64 = 95_000
 
     static let TIP_SKEW_BLOCKS: UInt64 = 10
 }
