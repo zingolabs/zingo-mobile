@@ -26,6 +26,7 @@ import {
   prefillFromRecord,
   providerShortLabel,
   saleDepositRequest,
+  sentPaymentsFrom,
   unsentSale,
 } from '@app/swap';
 import { leaveFlow } from '@app/navigation/navigate';
@@ -60,8 +61,13 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   route,
 }) => {
   const { recordId, broadcastError } = route.params;
-  const { translate, biometrics, sendSwapDeposit, resumeSwapDeposit } =
-    useContext(ContextAppLoaded);
+  const {
+    translate,
+    biometrics,
+    sendSwapDeposit,
+    resumeSwapDeposit,
+    valueTransfers,
+  } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const swapService = useSwapService();
   const record = useSwapRecord(recordId);
@@ -126,6 +132,15 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
     }
     setRetrying(true);
     setRetryError('');
+    /** A deposit the wallet already shows leaving is this sale's: never pay twice. */
+    const found = await swapService
+      .claimSaleDeposits(sentPaymentsFrom(valueTransfers ?? []))
+      .catch(() => [] as string[]);
+    if (found.includes(recordId)) {
+      setRetrying(false);
+      navigation.replace(Route.SwapTracking, { recordId });
+      return;
+    }
     // Once this sale's deshield went out, zingolib holds its vault payment
     // for a resume until the app restarts; after that it is sent anew.
     const deshieldTxId =
@@ -182,6 +197,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
     recordId,
     navigation,
     translate,
+    valueTransfers,
   ]);
   const onRetry = () => {
     if (biometrics) {

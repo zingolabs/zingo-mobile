@@ -67,7 +67,10 @@ export type SwapRecordType = {
   direction: SwapDirectionEnum;
   /** Per-route opaque identifier echoed back into `/v3/swap`. */
   routeId: string;
-  /** SwapKit-internal id when present (e.g. `transient.swapId`, Flashnet sk-id). */
+  /**
+   * SwapKit's `swapId` for the order. Its public API tracks nothing by it
+   * today, its own tracker does, and support asks for it.
+   */
   swapKitInternalId?: string;
 
   // Assets

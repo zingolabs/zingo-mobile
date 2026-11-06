@@ -4,10 +4,13 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 
-import { ChainNameEnum, ValueTransferType } from '@app/AppState';
+import { ChainNameEnum, ReceiverEnum, ValueTransferType } from '@app/AppState';
+import { createNewUnifiedAddress } from '@app/walletBackend';
+import type { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddressType';
 import { resetPinnedAddress } from '@app/hooks/usePinnedAddress';
 import { resetIronwoodNoticeHide } from '@app/hooks/useIronwoodNoticeHide';
 import { adoptWalletOnFile } from '@app/services/WalletLocalData';
@@ -20,6 +23,9 @@ import {
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
 import { SWAPKIT_API_KEY } from '@app/swap/swapKitSecrets';
+import { payoutNotesFrom } from '@app/swap/payoutNotes';
+import { awaitsSaleDeposit, sentPaymentsFrom } from '@app/swap/saleDeposits';
+import { ContextAppLoaded } from './contextAppLoaded';
 
 /**
  * Provides the `SwapService` of the open wallet and owns the polling
@@ -32,6 +38,24 @@ import { SWAPKIT_API_KEY } from '@app/swap/swapKitSecrets';
  * entry points: SwapKit routes none of our providers on testnet or regtest.
  */
 const SwapServiceContext = createContext<SwapService | null>(null);
+
+/**
+ * Maya refuses a unified address with only an Orchard receiver: Orchard takes
+ * no new outputs since NU6.3 (ZIP 2006). It pays the Sapling one.
+ */
+async function newShieldedAddress(): Promise<string> {
+  const created = await createNewUnifiedAddress(
+    ReceiverEnum.o + ReceiverEnum.z,
+  );
+  if (!created.ok) {
+    throw new Error(created.error.message);
+  }
+  const parsed: RPCUnifiedAddressType = JSON.parse(created.value);
+  if (!parsed.encoded_address) {
+    throw new Error('the wallet named no address');
+  }
+  return parsed.encoded_address;
+}
 
 export type SwapServiceProviderProps = {
   chainName: ChainNameEnum;
@@ -75,6 +99,7 @@ export function SwapServiceProvider({
         created = createSwapService({
           apiKey: apiKey ?? SWAPKIT_API_KEY,
           chainName,
+          newShieldedAddress,
         });
         setService(created);
         created.startPolling();
@@ -103,11 +128,71 @@ export function SwapServiceProvider({
     };
   }, [chainName, apiKey]);
 
+  usePayoutClaims(service);
+  useSaleDepositClaims(service);
+
   return (
     <SwapServiceContext.Provider value={service}>
       {children}
     </SwapServiceContext.Provider>
   );
+}
+
+/**
+ * Hands every payout the wallet received to the service, which ties it to its
+ * purchase. A payout it could not tie yet, because Midgard does not know the
+ * swap, goes again with the next change to the wallet's transfers.
+ */
+function usePayoutClaims(service: SwapService | null): void {
+  const { valueTransfers } = useContext(ContextAppLoaded);
+  const settled = useRef(new Set<string>());
+  const running = useRef(false);
+
+  useEffect(() => {
+    if (!service || !valueTransfers || running.current) {
+      return;
+    }
+    const notes = payoutNotesFrom(valueTransfers).filter(
+      note => !settled.current.has(note.txid),
+    );
+    if (notes.length === 0) {
+      return;
+    }
+    running.current = true;
+    service
+      .claimPayouts(notes)
+      .then(txids => txids.forEach(txid => settled.current.add(txid)))
+      .catch(error =>
+        console.error(`SwapServiceProvider: payout claim failed ${error}`),
+      )
+      .finally(() => {
+        running.current = false;
+      });
+  }, [service, valueTransfers]);
+}
+
+/**
+ * Hands the wallet's sends to the service while a sale has no deposit tied
+ * to it, so a deposit that left without the send reporting it is found
+ * without the user asking to pay again.
+ */
+function useSaleDepositClaims(service: SwapService | null): void {
+  const { valueTransfers } = useContext(ContextAppLoaded);
+  const records = useSwapRecords();
+  const waiting = records.some(awaitsSaleDeposit);
+
+  useEffect(() => {
+    if (!service || !valueTransfers || !waiting) {
+      return;
+    }
+    service
+      .claimSaleDeposits(sentPaymentsFrom(valueTransfers))
+      .catch(error =>
+        console.error(
+          `SwapServiceProvider: sale deposit claim failed ${error}`,
+        ),
+      );
+  }, [service, valueTransfers, waiting]);
 }
 
 /**

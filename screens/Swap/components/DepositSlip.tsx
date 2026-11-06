@@ -4,7 +4,7 @@ import DetailRows from './DetailRows';
 import { View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { radiusMd, space12, space4, useTheme } from '@app/theme';
+import { radiusMd, space12, space16, space4, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   buildDepositQr,
@@ -182,7 +182,13 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
                       <Text variant="caption" tone="muted">
                         {memoHint}
                       </Text>
-                      <View style={{ flexDirection: 'row', columnGap: 16 }}>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'center',
+                          columnGap: space16,
+                        }}
+                      >
                         <Button
                           variant="text"
                           size="small"

@@ -208,6 +208,37 @@ export class MidgardClient {
 }
 
 /**
+ * The memo of the swap a source-chain hash started on a provider. Null when
+ * the provider has no Midgard, or Midgard knows no swap by that hash yet.
+ */
+export async function findSwapByInboundHash(args: {
+  inboundHash: string;
+  provider: SwapKitProviderEnum;
+}): Promise<{ memo: string } | null> {
+  const host = MIDGARD_HOSTS[args.provider];
+  if (!host) return null;
+  const txId = args.inboundHash.replace(/^0x/i, '').toUpperCase();
+  const url = `${host}/v2/actions?txid=${encodeURIComponent(txId)}&type=swap`;
+  const response = await swapHttpRequest({
+    url,
+    method: 'GET',
+    headers: { Accept: 'application/json' },
+    timeoutMs: MIDGARD_TIMEOUT_MS,
+  });
+  if (response.status === 404) return null;
+  if (!response.ok) {
+    throw new Error(
+      `MidgardClient: ${url} returned HTTP ${response.status}: ${response.text.slice(0, 200)}`,
+    );
+  }
+  const data = JSON.parse(response.text) as MidgardActionsResponseType;
+  const action = data.actions?.find(a => !!a.metadata?.swap?.memo);
+  const memo = action?.metadata?.swap?.memo;
+  if (!action || !memo) return null;
+  return { memo };
+}
+
+/**
  * SwapKit `/track` accepts the source-chain hash with the chain's native
  * formatting:
  *
@@ -223,7 +254,10 @@ export class MidgardClient {
  * normalise inbound observations to their own canonical form). So this
  * function bridges the two encodings.
  */
-function normalizeHashForTrack(rawHash: string, chainId: string): string {
+export function normalizeHashForTrack(
+  rawHash: string,
+  chainId: string,
+): string {
   const isEvmChainId = /^\d+$/.test(chainId);
   if (!isEvmChainId) {
     return rawHash.toLowerCase();

@@ -26,6 +26,13 @@ export { canResendSale, unsentSale } from './unsentSale';
 export { saleDepositRequest } from './saleDepositRequest';
 export type { SaleDepositRequestType } from './saleDepositRequest';
 export {
+  awaitsSaleDeposit,
+  claimSaleDeposit,
+  paysSale,
+  sentPaymentsFrom,
+} from './saleDeposits';
+export type { SentPaymentType } from './saleDeposits';
+export {
   DepositAfterDeshieldError,
   heldDeshield,
 } from './depositAfterDeshield';
@@ -186,7 +193,11 @@ export {
   depositSpendsSourceAddress,
   zecNetworkFeeReserve,
 } from './depositRouting';
-export { quoteAddressPair, quoteBindsAddress } from './quoteAddressBinding';
+export {
+  orderNamesEphemeral,
+  quoteAddressPair,
+  quoteBindsAddress,
+} from './quoteAddressBinding';
 export { renderSwapText, swapKey, swapRaw } from './swapText';
 export type { SwapTextType } from './swapText';
 export { unavailableProviders } from './unavailableProviders';

@@ -12,6 +12,7 @@ import { SwapStatusEnum, isTerminalStatus } from './enums/SwapStatusEnum';
 import { TrackingStatusEnum } from './enums/TrackingStatusEnum';
 import { SwapRecordType } from './types/SwapRecordType';
 import { TrackResponseType } from './types/TrackResponseType';
+import { saplingReceiverOf } from './saplingReceiver';
 
 /**
  * Polls SwapKit `/track` for in-flight `SwapRecord`s, mutates them via the
@@ -32,7 +33,7 @@ import { TrackResponseType } from './types/TrackResponseType';
  *     restart — persisting them would survive across launches but a fresh
  *     boot is the natural moment to retry transient failures anyway.
  *   - Dedupe: if the executor's update did not change any user-visible field,
- *     we skip the `SwapStore.upsert` write. This avoids hammering
+ *     we skip the `SwapStore` write. This avoids hammering
  *     storage when the provider returns the same `/track` response
  *     for many ticks.
  *
@@ -171,6 +172,9 @@ export class SwapPoller {
       if (!this.isRunningForGeneration(callerGeneration)) return;
       if (depositOverdue(record, now)) {
         await this.expire(record, now);
+        /** It is watched for a late payment from here: stopping now never asked. */
+        if (this.isPollable(expiredAt(record, now), now))
+          hasPollableRecord = true;
         continue;
       }
       // An awaited deposit keeps the tick alive until its deadline, so it
@@ -192,18 +196,14 @@ export class SwapPoller {
 
   /** Ends an awaited deposit whose deadline passed with nothing seen. */
   private async expire(record: SwapRecordType, nowMs: number): Promise<void> {
-    const expired: SwapRecordType = {
-      ...record,
-      status: SwapStatusEnum.Expired,
-      terminalAtMs: nowMs,
-      updatedAtMs: nowMs,
-    };
     try {
-      await this.store.upsert(expired);
+      await this.store.update(record.recordId, current =>
+        depositOverdue(current, nowMs) ? expiredAt(current, nowMs) : current,
+      );
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : String(err);
       console.log(
-        `SwapPoller: store.upsert (expiry) failed for ${record.depositAddress}:`,
+        `SwapPoller: store.update (expiry) failed for ${record.depositAddress}:`,
         errMsg,
       );
     }
@@ -330,7 +330,11 @@ export class SwapPoller {
     let discovery;
     try {
       discovery = await this.midgardClient.findInboundActionByMemo({
-        destinationAddress: record.destinationAddress,
+        // Maya pays a unified address through its Sapling receiver, and
+        // Midgard knows the swap only under that one.
+        destinationAddress:
+          saplingReceiverOf(record.destinationAddress) ??
+          record.destinationAddress,
         memo,
         provider: record.provider,
         chainIdForNormalization: record.sellAsset.chainId,
@@ -354,43 +358,46 @@ export class SwapPoller {
     if (!discovery) return null;
     if (!wantsHash && !discovery.delivery) return null;
 
-    const updated: SwapRecordType = {
-      ...record,
-      ...(discovery.delivery && {
-        destinationTxHash: discovery.delivery.txHash,
-        actualReceiveAmount:
-          record.actualReceiveAmount ?? discovery.delivery.amount,
-      }),
-      observedDepositTxHash: wantsHash
-        ? discovery.sourceTxHash
-        : record.observedDepositTxHash,
-      // The provider has now observed our deposit on-chain — transition out
-      // of the pre-evidence "awaiting external" state into the same Pending
-      // state we use right after our own outbound broadcast. Subsequent
-      // /track responses promote it further (Processing → Completed). An
-      // expired purchase reopens the same way: it stays polled whatever this
-      // tick's /track answers.
-      status:
-        wantsHash &&
-        (record.status === SwapStatusEnum.AwaitingExternalDeposit ||
-          record.status === SwapStatusEnum.Expired)
-          ? SwapStatusEnum.Pending
-          : record.status,
-      updatedAtMs: Date.now(),
+    const { sourceTxHash, delivery } = discovery;
+    const found = (current: SwapRecordType): SwapRecordType => {
+      const hashWanted = canDiscoverHashViaMidgard(current);
+      return {
+        ...current,
+        ...(delivery && {
+          destinationTxHash: delivery.txHash,
+          actualReceiveAmount: current.actualReceiveAmount ?? delivery.amount,
+        }),
+        observedDepositTxHash: hashWanted
+          ? sourceTxHash
+          : current.observedDepositTxHash,
+        // The provider has now observed our deposit on-chain — transition out
+        // of the pre-evidence "awaiting external" state into the same Pending
+        // state we use right after our own outbound broadcast. Subsequent
+        // /track responses promote it further (Processing → Completed). An
+        // expired purchase reopens the same way: it stays polled whatever this
+        // tick's /track answers.
+        status:
+          hashWanted &&
+          (current.status === SwapStatusEnum.AwaitingExternalDeposit ||
+            current.status === SwapStatusEnum.Expired)
+            ? SwapStatusEnum.Pending
+            : current.status,
+        updatedAtMs: Date.now(),
+      };
     };
     try {
-      await this.store.upsert(updated);
+      return (await this.store.update(record.recordId, found)) ?? null;
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : String(err);
       console.log(
-        `SwapPoller: store.upsert (Midgard discovery) failed for ${record.depositAddress}:`,
+        `SwapPoller: store.update (Midgard discovery) failed for ${record.depositAddress}:`,
         errMsg,
       );
       // Even if we could not persist, return the in-memory updated record so
       // this tick can still feed the hash to /track. The next tick will try
       // the persistence again via the same discovery path.
+      return found(record);
     }
-    return updated;
   }
 
   private async pollRecord(
@@ -414,10 +421,19 @@ export class SwapPoller {
     if (!this.isRunningForGeneration(callerGeneration)) return;
     const effectiveRecord = discoveredRecord ?? record;
 
+    this.lastPolledAtMs.set(effectiveRecord.recordId, Date.now());
+
+    // Maya and THORChain answer `/track` only by the source-chain hash. Asked
+    // before Midgard has it, it fails every time, and those failures backed
+    // the next Midgard probe off to twelve minutes: a purchase already paid
+    // out kept reading as awaiting its deposit.
+    const hasHash = !!(
+      effectiveRecord.broadcast?.txId || effectiveRecord.observedDepositTxHash
+    );
+    if (!hasHash && providerKeysOnTxHash(effectiveRecord.provider)) return;
+
     const executor = this.registry.get(effectiveRecord.provider);
     const trackParams = buildTrackParams(effectiveRecord);
-
-    this.lastPolledAtMs.set(effectiveRecord.recordId, Date.now());
 
     let response: TrackResponseType;
     try {
@@ -437,36 +453,45 @@ export class SwapPoller {
 
     if (!this.isRunningForGeneration(callerGeneration)) return;
 
-    let updated = executor.applyTrackUpdate(effectiveRecord, response);
-    if (!this.isRunningForGeneration(callerGeneration)) return;
-
-    // An expired purchase moves only on a payment the provider saw; that
-    // payment came late, and the swap reads as refunding until the verdict.
-    if (effectiveRecord.status === SwapStatusEnum.Expired) {
-      if (!acceptsLateUpdate(updated)) return;
-      if (!isTerminalStatus(updated.status)) {
-        updated = {
-          ...updated,
-          lateDepositAtMs: updated.lateDepositAtMs ?? Date.now(),
-        };
-      }
-    }
-
-    if (!hasMeaningfulChange(effectiveRecord, updated)) {
-      return;
-    }
-
+    // Worked out on the record as it stands now: the screens write to it while
+    // /track answers, and a copy from before that would undo them.
     try {
-      await this.store.upsert(updated);
+      await this.store.update(effectiveRecord.recordId, current => {
+        let updated = executor.applyTrackUpdate(current, response);
+
+        // An expired purchase moves only on a payment the provider saw; that
+        // payment came late, and the swap reads as refunding until the verdict.
+        if (current.status === SwapStatusEnum.Expired) {
+          if (!acceptsLateUpdate(updated)) return current;
+          if (!isTerminalStatus(updated.status)) {
+            updated = {
+              ...updated,
+              lateDepositAtMs: updated.lateDepositAtMs ?? Date.now(),
+            };
+          }
+        }
+
+        return hasMeaningfulChange(current, updated) ? updated : current;
+      });
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : String(err);
       console.log(
-        `SwapPoller: store.upsert failed for ${effectiveRecord.depositAddress}:`,
+        `SwapPoller: store.update failed for ${effectiveRecord.depositAddress}:`,
         errMsg,
         err,
       );
     }
   }
+}
+
+/** An awaited deposit whose deadline passed with nothing seen. */
+function expiredAt(record: SwapRecordType, nowMs: number): SwapRecordType {
+  return {
+    ...record,
+    status: SwapStatusEnum.Expired,
+    terminalAtMs: nowMs,
+    updatedAtMs: nowMs,
+  };
 }
 
 /**
