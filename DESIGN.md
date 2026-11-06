@@ -611,8 +611,10 @@ stays above the list.
 **History's icons.** A row leads with its kind's icon (`screens/History/transferIcon.ts`):
 received, sent, sent to yourself (a memo to yourself too), shielded, migration,
 swap. Until a transaction has the wallet's minimum confirmations it shows the
-clock instead, and its state word from `transferStatus` ("In mempool",
-"Confirming 1 of 3") before the time, as its detail's pill says it. A failed
+clock instead, and its state word from `transferStatus` ("Prepared",
+"Sending" or "In mempool" for zingolib's calculated, transmitted and mempool,
+then "Confirming 1 of 3") before
+the time, as its detail's pill says it. A failed
 or rejected one keeps its kind's icon, in red on the red tint. A send to a
 saved contact shows the contact's Avatar with the ZEC badge, pending or not.
 A swap shows its icon, or the clock while it moves, with the other coin's

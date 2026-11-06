@@ -1141,6 +1141,8 @@
     "try-again": "Tentar de novo",
     "today-price": "{usd} ao preço de hoje",
     "in-mempool": "No mempool",
+    "state-prepared": "Preparada",
+    "state-sending": "Enviando",
     "confirming": "Confirmando {n} de {of}",
     "filter-all": "Tudo",
     "filter-memo": "Com memo",
