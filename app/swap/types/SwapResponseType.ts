@@ -35,6 +35,8 @@ export type SwapTransientType = {
 export type SwapResponseType = {
   /** Echo of the quote id we requested. */
   quoteId?: string;
+  /** SwapKit's id for the order, the one its own tracker finds it by. */
+  swapId?: string;
   /** Inbound vault address (also present on `tx.to`). */
   inboundAddress?: string;
   /** Transaction-construction payload. */

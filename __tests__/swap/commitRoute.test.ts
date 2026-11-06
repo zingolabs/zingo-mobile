@@ -298,3 +298,57 @@ describe('SwapService.commitRoute purchase destination', () => {
     expect(swap).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('SwapService.commitRoute swapId', () => {
+  const commitWith = (response: object) => {
+    const service = new SwapService({
+      client: {
+        swap: jest.fn(async () => ({
+          tx: { to: 't1deposit' },
+          inboundAddress: 't1deposit',
+          ...response,
+        })),
+      } as unknown as SwapKitClient,
+      registry: createDefaultProviderRegistry(),
+      store: {
+        getByRecordId: async () => null,
+        upsert: jest.fn(async () => undefined),
+      } as unknown as typeof SwapStore,
+      poller: { start: jest.fn() } as unknown as SwapPoller,
+      tokenCatalog: null as unknown as TokenCatalog,
+    });
+    return service.commitRoute({
+      quoteInput: {
+        sellAsset: ZEC,
+        receiveAsset: BTC,
+        sellAmountHumanDecimal: '0.05',
+        sourceAddress: 't1ephemeral',
+        destinationAddress: 'bc1qdestination',
+      },
+      chosenRoute: {
+        routeId: 'route-1',
+        provider: SwapKitProviderEnum.Near,
+        expectedReceiveAmount: '0.0005',
+        minReceiveAmount: '0.00049',
+      },
+      direction: SwapDirectionEnum.Outbound,
+      fiatValueBasis: {
+        sellUsdUnitPrice: 1000,
+        receiveUsdUnitPrice: 100000,
+        capturedAt: 0,
+      },
+    });
+  };
+
+  it('Tests that the record keeps the order id when SwapKit names it', async () => {
+    const { record } = await commitWith({ swapId: 'swap-uuid' });
+
+    expect(record.swapKitInternalId).toBe('swap-uuid');
+  });
+
+  it('Tests that the record keeps the transient id when only that one is named', async () => {
+    const { record } = await commitWith({ transient: { swapId: 'old-uuid' } });
+
+    expect(record.swapKitInternalId).toBe('old-uuid');
+  });
+});
