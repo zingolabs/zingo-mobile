@@ -404,6 +404,22 @@ describe('SwapPoller on an awaited deposit with a deadline', () => {
     );
   });
 
+  /**
+   * A NEAR purchase paid two minutes late on 2026-11-06 was refunded within
+   * two minutes, and the app never noticed: the tick that expired the only
+   * swap left stopped the poller before the late watch could ask.
+   */
+  it('Tests that the poller keeps running for the late watch when it expires the only swap', async () => {
+    const { poller, upsert } = harnessAt(T0 + 600_000, [awaited()]);
+    poller.start();
+    await poller.tickOnce();
+    expect(upsert).toHaveBeenCalledWith(
+      expect.objectContaining({ status: SwapStatusEnum.Expired }),
+    );
+    expect(poller.isRunning()).toBe(true);
+    poller.stop();
+  });
+
   it('keeps asking /track while the deadline is ahead', async () => {
     const { poller, track, upsert } = harnessAt(T0 + 599_000, [awaited()]);
     await poller.tickOnce();

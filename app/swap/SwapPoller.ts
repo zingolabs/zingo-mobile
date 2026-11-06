@@ -172,6 +172,9 @@ export class SwapPoller {
       if (!this.isRunningForGeneration(callerGeneration)) return;
       if (depositOverdue(record, now)) {
         await this.expire(record, now);
+        /** It is watched for a late payment from here: stopping now never asked. */
+        if (this.isPollable(expiredAt(record, now), now))
+          hasPollableRecord = true;
         continue;
       }
       // An awaited deposit keeps the tick alive until its deadline, so it
@@ -195,14 +198,7 @@ export class SwapPoller {
   private async expire(record: SwapRecordType, nowMs: number): Promise<void> {
     try {
       await this.store.update(record.recordId, current =>
-        depositOverdue(current, nowMs)
-          ? {
-              ...current,
-              status: SwapStatusEnum.Expired,
-              terminalAtMs: nowMs,
-              updatedAtMs: nowMs,
-            }
-          : current,
+        depositOverdue(current, nowMs) ? expiredAt(current, nowMs) : current,
       );
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : String(err);
@@ -486,6 +482,16 @@ export class SwapPoller {
       );
     }
   }
+}
+
+/** An awaited deposit whose deadline passed with nothing seen. */
+function expiredAt(record: SwapRecordType, nowMs: number): SwapRecordType {
+  return {
+    ...record,
+    status: SwapStatusEnum.Expired,
+    terminalAtMs: nowMs,
+    updatedAtMs: nowMs,
+  };
 }
 
 /**
