@@ -126,6 +126,9 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
           },
         ]
       : []),
+    ...(leg.poolType
+      ? [{ label: t('history.pool'), value: leg.poolType }]
+      : []),
     ...(leg.fee && leg.fee > 0
       ? [
           {
