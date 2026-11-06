@@ -24,6 +24,7 @@ import {
 import type { SwapRecordType } from '@app/swap';
 import { SWAPKIT_API_KEY } from '@app/swap/swapKitSecrets';
 import { payoutNotesFrom } from '@app/swap/payoutNotes';
+import { awaitsSaleDeposit, sentPaymentsFrom } from '@app/swap/saleDeposits';
 import { ContextAppLoaded } from './contextAppLoaded';
 
 /**
@@ -128,6 +129,7 @@ export function SwapServiceProvider({
   }, [chainName, apiKey]);
 
   usePayoutClaims(service);
+  useSaleDepositClaims(service);
 
   return (
     <SwapServiceContext.Provider value={service}>
@@ -167,6 +169,30 @@ function usePayoutClaims(service: SwapService | null): void {
         running.current = false;
       });
   }, [service, valueTransfers]);
+}
+
+/**
+ * Hands the wallet's sends to the service while a sale has no deposit tied
+ * to it, so a deposit that left without the send reporting it is found
+ * without the user asking to pay again.
+ */
+function useSaleDepositClaims(service: SwapService | null): void {
+  const { valueTransfers } = useContext(ContextAppLoaded);
+  const records = useSwapRecords();
+  const waiting = records.some(awaitsSaleDeposit);
+
+  useEffect(() => {
+    if (!service || !valueTransfers || !waiting) {
+      return;
+    }
+    service
+      .claimSaleDeposits(sentPaymentsFrom(valueTransfers))
+      .catch(error =>
+        console.error(
+          `SwapServiceProvider: sale deposit claim failed ${error}`,
+        ),
+      );
+  }, [service, valueTransfers, waiting]);
 }
 
 /**
