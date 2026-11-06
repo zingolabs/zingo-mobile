@@ -145,6 +145,10 @@ describe('isRealLegHash', () => {
     expect(isRealLegHash(`0x${ZERO_HASH}`)).toBe(false);
   });
 
+  it('Tests that a bare 0x is no hash when SwapKit sends it for a leg not landed', () => {
+    expect(isRealLegHash('0x')).toBe(false);
+  });
+
   it('rejects nothing at all', () => {
     expect(isRealLegHash('')).toBe(false);
     expect(isRealLegHash(undefined)).toBe(false);

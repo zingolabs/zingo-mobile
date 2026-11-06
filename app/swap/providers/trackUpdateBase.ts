@@ -385,7 +385,7 @@ export function pickLegHash(
 export function isRealLegHash(hash: string | undefined): hash is string {
   if (!hash || hash.length === 0) return false;
   // SwapKit's placeholder for "leg not yet landed" is the zero-byte hash
-  // serialised as either bare zeros or `0x`-prefixed zeros. Reject both.
+  // serialised as bare zeros, `0x`-prefixed zeros or a bare `0x`. Reject all.
   const stripped = hash.startsWith('0x') ? hash.slice(2) : hash;
-  return !/^0+$/.test(stripped);
+  return !/^0*$/.test(stripped);
 }
