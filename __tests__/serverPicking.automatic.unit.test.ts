@@ -20,7 +20,7 @@ jest.mock('@app/uris', () => ({
 }));
 
 const translate = (k: string) => k;
-const ZAINO = 'https://mainnet.zainod.zingolabs.dev:443';
+const ZAINO = 'https://zec.global:443';
 const REGISTRY = 'https://registry.example:443';
 const STATIC = 'https://eu.zec.rocks:443';
 
