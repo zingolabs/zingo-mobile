@@ -59,7 +59,12 @@ export function toFfiError(rejection: unknown): FfiError {
       code !== undefined && KNOWN_CODES.has(code)
         ? (code as FfiErrorCode)
         : 'Unknown',
-    message: rejection instanceof Error ? rejection.message : String(rejection),
+    message:
+      typeof rejection === 'object' &&
+      rejection !== null &&
+      'message' in rejection
+        ? String((rejection as { message: unknown }).message)
+        : String(rejection),
   };
 }
 
