@@ -67,13 +67,22 @@ function OnboardingSection() {
   );
 }
 
+/**
+ * React Navigation calls a screen layout as a function inside the
+ * navigator's render, so ScreenSafeArea's hook goes in as an element: called
+ * bare, it changed the navigator's hook order whenever its routes changed.
+ */
+const loadingScreenLayout = ({ children }: { children: React.ReactNode }) => (
+  <ScreenSafeArea>{children}</ScreenSafeArea>
+);
+
 // The loading section: one of the boot, the lock and the onboarding stage,
 // chosen by the session. LoadingApp provides their context around it.
 export function LoadingNavigator() {
   const { session } = useSession();
   return (
     <LoadingStack.Navigator
-      screenLayout={ScreenSafeArea}
+      screenLayout={loadingScreenLayout}
       screenOptions={{ headerShown: false, animation: 'none' }}
     >
       {session.kind === 'locked' ? (
