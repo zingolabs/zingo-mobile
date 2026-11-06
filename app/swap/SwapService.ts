@@ -20,6 +20,8 @@ import { hasDepositEvidence } from './depositEvidence';
 import { SwapKitError } from './errors';
 import { awaitsPayout, claimPayout } from './payoutNotes';
 import type { PayoutNoteType } from './payoutNotes';
+import { awaitsSaleDeposit, claimSaleDeposit, paysSale } from './saleDeposits';
+import type { SentPaymentType } from './saleDeposits';
 import { isMemoTooLong, paysPurchaseShielded } from './shieldedPurchase';
 import type { SwapResponseType } from './types/SwapResponseType';
 import {
@@ -562,6 +564,45 @@ export class SwapService {
       }
     }
     return settled;
+  }
+
+  /**
+   * Ties each sale whose send reported no deposit to the one the wallet shows
+   * leaving: a send that errored after broadcasting, or an app closed before
+   * the send returned. Without it the sale offers to pay again. A
+   * transaction already tied to a swap is never tied to a second. Resolves to
+   * the sales tied.
+   */
+  async claimSaleDeposits(
+    payments: readonly SentPaymentType[],
+  ): Promise<string[]> {
+    const records = await this.store.readAll();
+    const used = new Set(
+      records.flatMap(r => [
+        ...(r.broadcast?.allTxIds ?? []),
+        ...(r.broadcast?.txId ? [r.broadcast.txId] : []),
+      ]),
+    );
+    const waiting = records
+      .filter(awaitsSaleDeposit)
+      .sort((a, b) => a.createdAtMs - b.createdAtMs);
+    const ordered = [...payments].sort((a, b) => a.timeMs - b.timeMs);
+    const claimed: string[] = [];
+    for (const record of waiting) {
+      const payment = ordered.find(
+        p => !used.has(p.txid) && paysSale(record, p),
+      );
+      if (!payment) continue;
+      used.add(payment.txid);
+      const updated = await this.store.update(record.recordId, current =>
+        claimSaleDeposit(current, payment, Date.now()),
+      );
+      if (updated?.broadcast?.txId === payment.txid) {
+        claimed.push(record.recordId);
+      }
+    }
+    if (claimed.length > 0) this.poller.start();
+    return claimed;
   }
 
   async listRecords(): Promise<SwapRecordType[]> {

@@ -26,6 +26,13 @@ export { canResendSale, unsentSale } from './unsentSale';
 export { saleDepositRequest } from './saleDepositRequest';
 export type { SaleDepositRequestType } from './saleDepositRequest';
 export {
+  awaitsSaleDeposit,
+  claimSaleDeposit,
+  paysSale,
+  sentPaymentsFrom,
+} from './saleDeposits';
+export type { SentPaymentType } from './saleDeposits';
+export {
   DepositAfterDeshieldError,
   heldDeshield,
 } from './depositAfterDeshield';
