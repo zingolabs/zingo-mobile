@@ -10,7 +10,7 @@ import {
 
 /** A long host, the case that used to run off both sides of the screen. */
 const zainod = remoteServer(
-  'https://mainnet.zainod.zingolabs.dev:443',
+  'https://mainnet.indexer.long-hostname.example:443',
   ChainNameEnum.mainChainName,
 );
 const mobileData = {

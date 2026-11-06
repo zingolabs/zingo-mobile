@@ -7,7 +7,7 @@ const serverUris = (
     // default server, and a recommended Zaino server. It stays first: the
     // apps take entry 0 as the server before any setting is read.
     {
-      uri: 'https://mainnet.zainod.zingolabs.dev:443',
+      uri: 'https://zec.global:443',
       region: translate('settings.na') as string,
       chainName: ChainNameEnum.mainChainName,
       default: true,
