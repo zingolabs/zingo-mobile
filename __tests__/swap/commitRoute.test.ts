@@ -7,6 +7,8 @@ import type { SwapPoller } from '@app/swap/SwapPoller';
 import type { SwapStore } from '@app/swap/SwapStore';
 import type { TokenCatalog } from '@app/swap/TokenCatalog';
 import type { SwapAssetType } from '@app/swap/types/SwapAssetType';
+import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
+import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
 import { SwapKitHttpError } from '@app/swap/errors';
 import { SwapOperationEnum } from '@app/swap/enums/SwapErrorCategoryEnum';
 
@@ -350,5 +352,103 @@ describe('SwapService.commitRoute swapId', () => {
     const { record } = await commitWith({ transient: { swapId: 'old-uuid' } });
 
     expect(record.swapKitInternalId).toBe('old-uuid');
+  });
+});
+
+/**
+ * A Maya payout to this wallet names the deposit it settles. The purchase
+ * whose memo is that swap's takes it, and completes with the ZEC received.
+ */
+describe('SwapService.claimPayouts', () => {
+  const HASH =
+    '274A79A7383131BCB28D5D71415E9245D7FA83F1ABC1DE20BE4F40C459EE2578';
+  const note = { txid: '8d93434e', amount: 0.01692458, inboundHash: HASH };
+  const purchase = (recordId: string, memo: string, over: object = {}) =>
+    ({
+      recordId,
+      provider: SwapKitProviderEnum.MayachainStreaming,
+      direction: SwapDirectionEnum.Inbound,
+      sellAsset: { chain: 'ETH', chainId: '1' },
+      receiveAsset: ZEC,
+      providerData: { kind: SwapKitProviderEnum.MayachainStreaming, memo },
+      status: SwapStatusEnum.AwaitingExternalDeposit,
+      createdAtMs: 1,
+      updatedAtMs: 1,
+      ...over,
+    }) as unknown as SwapRecordType;
+
+  const harness = (
+    records: SwapRecordType[],
+    found: { memo: string } | null,
+  ) => {
+    const stored = new Map(records.map(r => [r.recordId, r]));
+    const find = jest.fn(async () => found);
+    const service = new SwapService({
+      client: {} as unknown as SwapKitClient,
+      registry: createDefaultProviderRegistry(),
+      store: {
+        readAll: async () => [...stored.values()],
+        update: async (
+          id: string,
+          change: (current: SwapRecordType) => SwapRecordType,
+        ) => {
+          const current = stored.get(id);
+          if (!current) return undefined;
+          stored.set(id, change(current));
+          return stored.get(id);
+        },
+      } as unknown as typeof SwapStore,
+      poller: { start: jest.fn() } as unknown as SwapPoller,
+      tokenCatalog: null as unknown as TokenCatalog,
+      findSwapByInboundHash: find,
+    });
+    return { service, stored, find };
+  };
+
+  it('Tests that the purchase whose memo is the swap’s completes with the payout', async () => {
+    const { service, stored } = harness(
+      [purchase('mine', '=:z:u1mine'), purchase('other', '=:z:u1other')],
+      { memo: '=:z:u1mine' },
+    );
+
+    const settled = await service.claimPayouts([note]);
+
+    expect(settled).toEqual(['8d93434e']);
+    expect(stored.get('mine')).toEqual(
+      expect.objectContaining({
+        status: SwapStatusEnum.Completed,
+        destinationTxHash: '8d93434e',
+        actualReceiveAmount: '0.01692458',
+      }),
+    );
+    expect(stored.get('other')?.status).toBe(
+      SwapStatusEnum.AwaitingExternalDeposit,
+    );
+  });
+
+  it('Tests that the payout waits for a later call when Midgard does not know the swap yet', async () => {
+    const { service, stored } = harness([purchase('mine', '=:z:u1mine')], null);
+
+    expect(await service.claimPayouts([note])).toEqual([]);
+    expect(stored.get('mine')?.destinationTxHash).toBeUndefined();
+  });
+
+  it('Tests that a payout of a swap no purchase here is settles without touching any', async () => {
+    const { service, stored } = harness([purchase('mine', '=:z:u1mine')], {
+      memo: '=:z:u1somebodyelse',
+    });
+
+    expect(await service.claimPayouts([note])).toEqual(['8d93434e']);
+    expect(stored.get('mine')?.destinationTxHash).toBeUndefined();
+  });
+
+  it('Tests that Midgard is not asked when no purchase awaits a payout', async () => {
+    const { service, find } = harness(
+      [purchase('done', '=:z:u1mine', { destinationTxHash: 'zz' })],
+      { memo: '=:z:u1mine' },
+    );
+
+    expect(await service.claimPayouts([note])).toEqual([]);
+    expect(find).not.toHaveBeenCalled();
   });
 });

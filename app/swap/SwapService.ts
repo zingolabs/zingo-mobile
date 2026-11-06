@@ -1,5 +1,5 @@
 import { ChainNameEnum } from './enums/ChainNameEnum';
-import { MidgardClient } from './MidgardClient';
+import { MidgardClient, findSwapByInboundHash } from './MidgardClient';
 import { SwapKitClient } from './SwapKitClient';
 import { SwapPoller, buildTrackParams } from './SwapPoller';
 import type { TrackResponseType } from './types/TrackResponseType';
@@ -18,6 +18,8 @@ import { SwapStatusEnum, isTerminalStatus } from './enums/SwapStatusEnum';
 import { DEPOSIT_WAIT_MS } from './depositDeadline';
 import { hasDepositEvidence } from './depositEvidence';
 import { SwapKitError } from './errors';
+import { awaitsPayout, claimPayout } from './payoutNotes';
+import type { PayoutNoteType } from './payoutNotes';
 import { isMemoTooLong, paysPurchaseShielded } from './shieldedPurchase';
 import type { SwapResponseType } from './types/SwapResponseType';
 import {
@@ -70,6 +72,8 @@ export type SwapServiceArgs = {
    * so a shared one would tie every purchase together.
    */
   newShieldedAddress?: () => Promise<string>;
+  /** Midgard's swap for a source-chain hash; the real lookup unless a test swaps it. */
+  findSwapByInboundHash?: typeof findSwapByInboundHash;
   /** Flashnet's explorer, for the backfill; see `SwapPollerArgs`. */
 };
 
@@ -138,6 +142,7 @@ export class SwapService {
   private readonly poller: SwapPoller;
   private readonly tokenCatalog: TokenCatalog;
   private readonly newShieldedAddress?: () => Promise<string>;
+  private readonly findSwapByInboundHash: typeof findSwapByInboundHash;
 
   /** Finished swaps already asked about this session. */
   private readonly backfillAttempted = new Set<string>();
@@ -149,6 +154,8 @@ export class SwapService {
     this.poller = args.poller;
     this.tokenCatalog = args.tokenCatalog;
     this.newShieldedAddress = args.newShieldedAddress;
+    this.findSwapByInboundHash =
+      args.findSwapByInboundHash ?? findSwapByInboundHash;
   }
 
   /**
@@ -503,6 +510,58 @@ export class SwapService {
       this.poller.tickOnce().catch(() => {});
     }
     return updated;
+  }
+
+  /**
+   * Ties each payout the wallet received to the purchase it settles. The
+   * memo names the deposit's hash, Midgard names the swap that hash started,
+   * and the purchase whose memo is that swap's is the one. It is complete
+   * with the ZEC that arrived, without waiting on Midgard to index the payout
+   * under the destination or on `/track` to report it. Resolves to the
+   * payouts settled, tied to a purchase or known to be no purchase's; the
+   * rest may be tied on a later call.
+   */
+  async claimPayouts(notes: readonly PayoutNoteType[]): Promise<string[]> {
+    const settled: string[] = [];
+    for (const note of notes) {
+      const records = await this.store.readAll();
+      if (records.some(r => r.destinationTxHash === note.txid)) {
+        settled.push(note.txid);
+        continue;
+      }
+      const waiting = records.filter(awaitsPayout);
+      const providers = [...new Set(waiting.map(r => r.provider))];
+      for (const provider of providers) {
+        const swap = await this.findSwapByInboundHash({
+          inboundHash: note.inboundHash,
+          provider,
+        });
+        const record =
+          swap &&
+          waiting.find(
+            r =>
+              r.provider === provider &&
+              (r.providerData as { memo?: string }).memo === swap.memo,
+          );
+        if (!record) {
+          // Midgard knows the swap and no purchase here is it: a payout of a
+          // swap this wallet no longer keeps, never one to ask about again.
+          if (swap) {
+            settled.push(note.txid);
+            break;
+          }
+          continue;
+        }
+        await this.store.update(record.recordId, current =>
+          awaitsPayout(current)
+            ? claimPayout(current, note, Date.now())
+            : current,
+        );
+        settled.push(note.txid);
+        break;
+      }
+    }
+    return settled;
   }
 
   async listRecords(): Promise<SwapRecordType[]> {

@@ -4,6 +4,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 
@@ -22,6 +23,8 @@ import {
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
 import { SWAPKIT_API_KEY } from '@app/swap/swapKitSecrets';
+import { payoutNotesFrom } from '@app/swap/payoutNotes';
+import { ContextAppLoaded } from './contextAppLoaded';
 
 /**
  * Provides the `SwapService` of the open wallet and owns the polling
@@ -124,11 +127,46 @@ export function SwapServiceProvider({
     };
   }, [chainName, apiKey]);
 
+  usePayoutClaims(service);
+
   return (
     <SwapServiceContext.Provider value={service}>
       {children}
     </SwapServiceContext.Provider>
   );
+}
+
+/**
+ * Hands every payout the wallet received to the service, which ties it to its
+ * purchase. A payout it could not tie yet, because Midgard does not know the
+ * swap, goes again with the next change to the wallet's transfers.
+ */
+function usePayoutClaims(service: SwapService | null): void {
+  const { valueTransfers } = useContext(ContextAppLoaded);
+  const settled = useRef(new Set<string>());
+  const running = useRef(false);
+
+  useEffect(() => {
+    if (!service || !valueTransfers || running.current) {
+      return;
+    }
+    const notes = payoutNotesFrom(valueTransfers).filter(
+      note => !settled.current.has(note.txid),
+    );
+    if (notes.length === 0) {
+      return;
+    }
+    running.current = true;
+    service
+      .claimPayouts(notes)
+      .then(txids => txids.forEach(txid => settled.current.add(txid)))
+      .catch(error =>
+        console.error(`SwapServiceProvider: payout claim failed ${error}`),
+      )
+      .finally(() => {
+        running.current = false;
+      });
+  }, [service, valueTransfers]);
 }
 
 /**
