@@ -1035,7 +1035,9 @@
     "result-in-sapling": "It arrived shielded, in Sapling.",
     "detail-swap-id": "Swap ID",
     "view-swap": "View swap",
-    "detail-status": "Status"
+    "detail-status": "Status",
+    "removed-note": "This swap failed and was removed.",
+    "no-swap-id": "This swap’s ID was not saved."
   },
   "history": {
     "shield-all": "Shield All funds",

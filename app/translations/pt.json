@@ -1035,7 +1035,9 @@
     "result-in-sapling": "Chegou blindado, em Sapling.",
     "detail-swap-id": "ID do swap",
     "view-swap": "Ver swap",
-    "detail-status": "Status"
+    "detail-status": "Status",
+    "removed-note": "Este swap falhou e foi removido.",
+    "no-swap-id": "O ID deste swap não foi salvo."
   },
   "history": {
     "shield-all": "Blindar Todos os Fundos",

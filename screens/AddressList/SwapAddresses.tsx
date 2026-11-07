@@ -186,6 +186,21 @@ const SwapAddresses: React.FunctionComponent<SwapAddressesProps> = ({
             >
               {whenOf(entry.record)}
             </Text>
+            {(entry.record.removedAtMs !== undefined ||
+              !entry.record.swapKitInternalId) && (
+              <Text
+                testID="addresslist.swap.note"
+                variant="bodySmall"
+                tone="warning"
+                style={{ textAlign: 'center', marginBottom: space12 }}
+              >
+                {t(
+                  entry.record.removedAtMs !== undefined
+                    ? 'swap.removed-note'
+                    : 'swap.no-swap-id',
+                )}
+              </Text>
+            )}
             <DetailRows
               rows={[
                 {
@@ -231,19 +246,20 @@ const SwapAddresses: React.FunctionComponent<SwapAddressesProps> = ({
                 },
               ]}
             />
-            {swapStatePill(entry.record.status, t).tone === 'accent' && (
-              <View style={{ marginTop: space16 }}>
-                <Button
-                  testID="addresslist.swap.view"
-                  variant="primary"
-                  title={t('swap.view-swap')}
-                  onPress={() => {
-                    close();
-                    onViewSwap(entry.record.recordId);
-                  }}
-                />
-              </View>
-            )}
+            {entry.record.removedAtMs === undefined &&
+              swapStatePill(entry.record.status, t).tone === 'accent' && (
+                <View style={{ marginTop: space16 }}>
+                  <Button
+                    testID="addresslist.swap.view"
+                    variant="primary"
+                    title={t('swap.view-swap')}
+                    onPress={() => {
+                      close();
+                      onViewSwap(entry.record.recordId);
+                    }}
+                  />
+                </View>
+              )}
           </View>
         )}
       </AppSheetModal>

@@ -1035,7 +1035,9 @@
     "result-in-sapling": "Поступило скрыто, в Sapling.",
     "detail-swap-id": "ID обмена",
     "view-swap": "Открыть обмен",
-    "detail-status": "Статус"
+    "detail-status": "Статус",
+    "removed-note": "Этот обмен не удался и был удалён.",
+    "no-swap-id": "ID этого обмена не сохранён."
   },
   "history": {
     "shield-all": "Экранирование всех средств",

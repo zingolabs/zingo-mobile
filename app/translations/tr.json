@@ -1035,7 +1035,9 @@
     "result-in-sapling": "Korumalı olarak, Sapling’e geldi.",
     "detail-swap-id": "Swap kimliği",
     "view-swap": "Swap’ı gör",
-    "detail-status": "Durum"
+    "detail-status": "Durum",
+    "removed-note": "Bu swap başarısız oldu ve kaldırıldı.",
+    "no-swap-id": "Bu swap’ın kimliği kaydedilmedi."
   },
   "history": {
     "shield-all": "Tüm Fonları Koru",

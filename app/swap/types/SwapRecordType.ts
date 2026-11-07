@@ -257,6 +257,11 @@ export type SwapRecordType = {
   // Fiat-value snapshot at quote time
   fiatValueBasis: FiatValueBasisType;
 
+  /** Set when the user removed a swap that had made an address of the wallet:
+   *  the record stays as a marker, without its swap ID, so the address still
+   *  reads as a swap's. readAll and every lookup leave it out. */
+  removedAtMs?: number;
+
   // Timestamps (all Unix-ms)
   createdAtMs: number;
   updatedAtMs: number;
