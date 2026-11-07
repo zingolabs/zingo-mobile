@@ -50,7 +50,16 @@ jest.mock('react-native-reanimated', () => {
     FadeInUp: builder,
     ReduceMotion: { System: 'system' },
     Extrapolation: { CLAMP: 'clamp' },
-    useSharedValue: (v: unknown) => ({ value: v }),
+    useSharedValue: (v: unknown) => {
+      const box = {
+        value: v,
+        get: () => box.value,
+        set: (next: unknown) => {
+          box.value = next;
+        },
+      };
+      return box;
+    },
     useDerivedValue: (fn: () => unknown) => ({ value: fn() }),
     useAnimatedStyle: () => ({}),
     withSpring: (v: unknown) => v,

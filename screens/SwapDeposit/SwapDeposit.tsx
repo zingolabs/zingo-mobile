@@ -30,6 +30,7 @@ import {
   unsentSale,
 } from '@app/swap';
 import { leaveFlow } from '@app/navigation/navigate';
+import { settled } from '@app/utils/settled';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
@@ -148,47 +149,57 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
         ? record.broadcast?.allTxIds?.[0]
         : undefined;
     const resume = heldDeshield(deshieldTxId);
-    try {
-      let txIds: string[];
-      try {
-        txIds = resume
-          ? await resumeSwapDeposit()
-          : await sendSwapDeposit(saleDepositRequest(record));
-      } catch (e) {
-        if (
-          e instanceof DepositAfterDeshieldError &&
-          e.kind === 'failed' &&
-          e.deshieldTxId &&
-          !resume
-        ) {
-          await swapService.markDeshielded({
-            recordId,
-            deshieldTxId: e.deshieldTxId,
-          });
-        }
-        throw e;
-      }
-      await swapService.markBroadcasted({
-        recordId,
-        txId: txIds[txIds.length - 1],
-        allTxIds:
-          resume && record.broadcast?.allTxIds
-            ? [...record.broadcast.allTxIds, ...txIds]
-            : txIds,
-      });
-      navigation.replace(Route.SwapTracking, { recordId });
-    } catch (e) {
-      // Another sale's held deposit refuses this one before anything leaves.
-      setRetryError(
-        e instanceof DepositAfterDeshieldError &&
-          e.kind === 'pending' &&
-          e.deshieldTxId !== deshieldTxId
-          ? (translate('swap.deposit-other-held') as string)
-          : `${e}`,
+    const sent = await settled(() =>
+      resume
+        ? resumeSwapDeposit()
+        : sendSwapDeposit(saleDepositRequest(record)),
+    );
+    let failure: unknown;
+    if (sent.ok) {
+      const txIds = sent.value;
+      const marked = await settled(() =>
+        swapService.markBroadcasted({
+          recordId,
+          txId: txIds[txIds.length - 1],
+          allTxIds:
+            resume && record.broadcast?.allTxIds
+              ? [...record.broadcast.allTxIds, ...txIds]
+              : txIds,
+        }),
       );
-    } finally {
-      setRetrying(false);
+      if (marked.ok) {
+        navigation.replace(Route.SwapTracking, { recordId });
+        setRetrying(false);
+        return;
+      }
+      failure = marked.error;
+    } else {
+      failure = sent.error;
+      const refused = sent.error;
+      if (
+        refused instanceof DepositAfterDeshieldError &&
+        refused.kind === 'failed' &&
+        refused.deshieldTxId &&
+        !resume
+      ) {
+        const deshielded = refused.deshieldTxId;
+        const marked = await settled(() =>
+          swapService.markDeshielded({ recordId, deshieldTxId: deshielded }),
+        );
+        if (!marked.ok) {
+          failure = marked.error;
+        }
+      }
     }
+    // Another sale's held deposit refuses this one before anything leaves.
+    setRetryError(
+      failure instanceof DepositAfterDeshieldError &&
+        failure.kind === 'pending' &&
+        failure.deshieldTxId !== deshieldTxId
+        ? (translate('swap.deposit-other-held') as string)
+        : `${failure}`,
+    );
+    setRetrying(false);
   }, [
     record,
     swapService,

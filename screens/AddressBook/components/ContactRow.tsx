@@ -1,6 +1,7 @@
 /* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
+import { useLatest } from '@app/hooks/useLatest';
 import { Animated as RNAnimated, StyleSheet, View } from 'react-native';
 import Animated, {
   ReduceMotion,
@@ -137,8 +138,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
   const [copied, setCopied] = useState(false);
   const busy = useRef(false);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const left = useRef(onLeft);
-  left.current = onLeft;
+  const left = useLatest(onLeft);
 
   const unfold = useSharedValue(open ? 1 : 0);
   const shown = useSharedValue(open ? 1 : 0);
@@ -203,7 +203,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
         }
       },
     );
-  }, [leaving, gone]);
+  }, [leaving, gone, left]);
 
   const rowStyle = useAnimatedStyle(() => ({
     opacity: 1 - gone.value,
@@ -291,13 +291,15 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
     });
     switch (button) {
       case 'send':
-        fly.value = withTiming(1, {
-          ...motion(duration.action),
-          easing: ease.out,
-        });
+        fly.set(
+          withTiming(1, {
+            ...motion(duration.action),
+            easing: ease.out,
+          }),
+        );
         onSend();
         later(ACTION_RESET_MS, () => {
-          fly.value = 0;
+          fly.set(0);
           busy.current = false;
         });
         return;
@@ -309,10 +311,12 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
         return;
       case 'copy':
         onCopy();
-        copyScale.value = withSequence(
-          withTiming(0.82, motion(duration.fast)),
-          withTiming(1.12, { ...motion(duration.fast), easing: ease.spring }),
-          withTiming(1, { ...motion(duration.fast), easing: ease.spring }),
+        copyScale.set(
+          withSequence(
+            withTiming(0.82, motion(duration.fast)),
+            withTiming(1.12, { ...motion(duration.fast), easing: ease.spring }),
+            withTiming(1, { ...motion(duration.fast), easing: ease.spring }),
+          ),
         );
         later(duration.fast, () => setCopied(true));
         later(duration.fast + duration.hold, () => {
@@ -321,10 +325,10 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
         });
         return;
       case 'edit':
-        pen.value = withTiming(1, motion(duration.action));
+        pen.set(withTiming(1, motion(duration.action)));
         onEdit();
         later(ACTION_RESET_MS, () => {
-          pen.value = 0;
+          pen.set(0);
           busy.current = false;
         });
         return;

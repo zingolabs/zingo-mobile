@@ -140,7 +140,7 @@ export function ServerScreen({
       onProbe={probeServers}
       onUnreachable={serverUnreachable}
       onBack={closeServer}
-      backGuard={serverBackGuard}
+      backGuardRef={serverBackGuard}
     />
   );
 }

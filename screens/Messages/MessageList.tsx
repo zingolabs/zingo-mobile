@@ -7,6 +7,7 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
+import { useLatest } from '@app/hooks/useLatest';
 import Pressable from '@ui/primitives/Pressable';
 import {
   View,
@@ -101,16 +102,13 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
   // when its month differs from the previous (older) item, or it's the
   // first item.
   const monthLabels = useMemo(() => {
-    let last = '';
-    return messagesData.map(vt => {
-      const myMonth = vt.time
+    const monthOf = (vt: ValueTransferType) =>
+      vt.time
         ? Utils.formatDate(vt.time * 1000, 'MMM yyyy', language)
         : '--- ----';
-      if (myMonth !== last) {
-        last = myMonth;
-        return myMonth;
-      }
-      return '';
+    return messagesData.map((vt, i) => {
+      const month = monthOf(vt);
+      return i === 0 || month !== monthOf(messagesData[i - 1]) ? month : '';
     });
   }, [messagesData, language]);
 
@@ -121,8 +119,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
   // older messages); the panel still rising changes the viewport.
   const didInitialScrollRef = useRef<boolean>(false);
   const isAtBottomRef = useRef<boolean>(true);
-  const loadingRef = useRef<boolean>(true);
-  loadingRef.current = loading;
+  const loadingRef = useLatest(loading);
   const onContentSizeChange = useCallback(() => {
     if (loadingRef.current) {
       return;
@@ -135,7 +132,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
     if (isAtBottomRef.current) {
       scrollViewRef.current?.scrollToEnd({ animated: true });
     }
-  }, []);
+  }, [loadingRef]);
 
   const handleScrollToBottom = useCallback(() => {
     scrollViewRef.current?.scrollToEnd({ animated: true });

@@ -72,10 +72,10 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
   const mounted = useRef(true);
   const known = useRef(new Set<string>());
   // The first page shows without a transition; the stack push moves it.
-  const moved = useRef(false);
-  useEffect(() => {
-    moved.current = true;
-  }, [other]);
+  const [moved, setMoved] = useState(false);
+  if (other !== null && !moved) {
+    setMoved(true);
+  }
 
   useEffect(
     () => () => {
@@ -261,7 +261,7 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
         {other === null ? (
           <Animated.View
             key="server"
-            entering={moved.current ? axisEnter(-AXIS_PT) : undefined}
+            entering={moved ? axisEnter(-AXIS_PT) : undefined}
             exiting={axisExit(-AXIS_PT)}
             style={{ flex: 1 }}
           >
@@ -296,7 +296,7 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
               onProbe={probeChain}
               onUnreachable={unreachable}
               onBack={close}
-              backGuard={backGuard}
+              backGuardRef={backGuard}
               onGuard={setGuarded}
             />
           </Animated.View>

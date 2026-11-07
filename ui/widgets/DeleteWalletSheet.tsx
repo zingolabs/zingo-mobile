@@ -59,9 +59,11 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
         return;
       }
       done.current = true;
-      pulse.value = withSequence(
-        withTiming(0.97, { duration: PULSE_MS / 2, easing: ease.spring }),
-        withTiming(1, { duration: PULSE_MS / 2, easing: ease.spring }),
+      pulse.set(
+        withSequence(
+          withTiming(0.97, { duration: PULSE_MS / 2, easing: ease.spring }),
+          withTiming(1, { duration: PULSE_MS / 2, easing: ease.spring }),
+        ),
       );
       setTimeout(() => {
         dismiss();
@@ -74,15 +76,17 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
         return;
       }
       cancelAnimation(progress);
-      const remaining = duration.hold * (1 - progress.value);
-      progress.value = withTiming(
-        1,
-        { duration: remaining, easing: Easing.linear },
-        finished => {
-          if (finished) {
-            runOnJS(complete)();
-          }
-        },
+      const remaining = duration.hold * (1 - progress.get());
+      progress.set(
+        withTiming(
+          1,
+          { duration: remaining, easing: Easing.linear },
+          finished => {
+            if (finished) {
+              runOnJS(complete)();
+            }
+          },
+        ),
       );
     }, [complete, progress]);
 
@@ -91,21 +95,23 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
         return;
       }
       cancelAnimation(progress);
-      if (progress.value < RELEASE_FLOOR) {
-        progress.value = 0;
+      if (progress.get() < RELEASE_FLOOR) {
+        progress.set(0);
         return;
       }
-      progress.value = withTiming(0, {
-        duration: DRAIN_MS,
-        easing: ease.standard,
-      });
+      progress.set(
+        withTiming(0, {
+          duration: DRAIN_MS,
+          easing: ease.standard,
+        }),
+      );
       onReleasedEarly();
     }, [onReleasedEarly, progress]);
 
     const reset = useCallback(() => {
       cancelAnimation(progress);
-      progress.value = 0;
-      pulse.value = 1;
+      progress.set(0);
+      pulse.set(1);
       done.current = false;
     }, [progress, pulse]);
 

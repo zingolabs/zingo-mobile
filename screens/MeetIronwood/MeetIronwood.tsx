@@ -387,8 +387,8 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
     (i: number) => {
       const target = Math.max(0, Math.min(STEP_COUNT - 1, i));
       setIndex(target);
-      activeIndex.value = target;
-      offset.value = withSpring(-target * width, springConfig());
+      activeIndex.set(target);
+      offset.set(withSpring(-target * width, springConfig()));
     },
     [activeIndex, offset, width],
   );
@@ -457,40 +457,40 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
       // grab a moving strip mid-flight: stop the spring and continue from
       // the presentation value.
       cancelAnimation(offset);
-      grabX.value = offset.value;
-      panEnded.value = false;
+      grabX.set(offset.get());
+      panEnded.set(false);
     })
     .onUpdate(e => {
-      const raw = grabX.value + e.translationX;
+      const raw = grabX.get() + e.translationX;
       const min = -(STEP_COUNT - 1) * width;
       if (raw > 0) {
-        offset.value = rubberband(raw, width);
+        offset.set(rubberband(raw, width));
       } else if (raw < min) {
-        offset.value = min + rubberband(raw - min, width);
+        offset.set(min + rubberband(raw - min, width));
       } else {
-        offset.value = raw;
+        offset.set(raw);
       }
     })
     .onEnd(e => {
       // snap to the page the momentum is heading for, one page at a time.
-      const projected = offset.value + project(e.velocityX);
+      const projected = offset.get() + project(e.velocityX);
       let target = Math.round(-projected / width);
       target = Math.max(
-        activeIndex.value - 1,
-        Math.min(activeIndex.value + 1, target),
+        activeIndex.get() - 1,
+        Math.min(activeIndex.get() + 1, target),
       );
       target = Math.max(0, Math.min(STEP_COUNT - 1, target));
-      activeIndex.value = target;
-      panEnded.value = true;
+      activeIndex.set(target);
+      panEnded.set(true);
       runOnJS(setIndex)(target);
-      offset.value = withSpring(-target * width, springConfig(e.velocityX));
+      offset.set(withSpring(-target * width, springConfig(e.velocityX)));
     })
     .onFinalize(() => {
       // a touch that never activated the pan (a tap on a settling strip)
       // still cancelled the spring in onBegin — resume it.
-      if (!panEnded.value) {
-        panEnded.value = true;
-        offset.value = withSpring(-activeIndex.value * width, springConfig());
+      if (!panEnded.get()) {
+        panEnded.set(true);
+        offset.set(withSpring(-activeIndex.get() * width, springConfig()));
       }
     });
 

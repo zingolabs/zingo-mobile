@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
+import { useLatest } from '@app/hooks/useLatest';
 import { TextStyle, View, useWindowDimensions } from 'react-native';
 import Animated, {
   Keyframe,
@@ -137,7 +138,7 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
   const open = openProp ?? openOwn;
   const onToggle = onToggleProp ?? setOpenOwn;
   const iconRef = useRef<View>(null);
-  const owner = useRef({}).current;
+  const [owner] = useState(() => ({}));
   const [icon, setIcon] = useState<Box | null>(null);
   const [bubbleH, setBubbleH] = useState(0);
   const spin = useSharedValue(0);
@@ -253,17 +254,33 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
   );
 
   /** In a host, the bubble is drawn there, and redrawn as it is measured. */
+  const bubbleNow = useLatest(bubble);
+  const toggleNow = useLatest(onToggle);
   useEffect(() => {
     if (!host) {
       return;
     }
     if (open) {
-      host.show({ owner, node: bubble, onClose: () => onToggle(false) });
+      host.show({
+        owner,
+        node: bubbleNow.current,
+        onClose: () => toggleNow.current(false),
+      });
     } else {
       host.hide(owner);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [host, open, icon, bubbleH, under, title, text]);
+  }, [
+    host,
+    open,
+    owner,
+    icon,
+    bubbleH,
+    under,
+    title,
+    text,
+    bubbleNow,
+    toggleNow,
+  ]);
   useEffect(() => () => host?.hide(owner), [host, owner]);
 
   return (

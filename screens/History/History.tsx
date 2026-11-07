@@ -105,7 +105,10 @@ const ViewTypes = {
 
 type HistoryProps = HomeTabScreenProps<'History'>;
 
+// The list's layout provider reads the rows through a ref the render
+// writes, so the compiler leaves this component alone.
 const History: React.FunctionComponent<HistoryProps> = () => {
+  'use no memo';
   const { edges, fades, scrolledTo } = useScrollEdges({
     sides: 'top',
     surface: 'surface',

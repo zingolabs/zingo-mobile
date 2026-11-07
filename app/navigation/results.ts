@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
+import { useLatest } from '@app/hooks/useLatest';
 
 // What a screen can ask another screen for. The asker names the request in
 // the route params; the answering screen delivers under the same name.
@@ -31,8 +32,7 @@ export const useResult = (
   request: Request,
   onValue: (value: string) => void,
 ): void => {
-  const latest = useRef(onValue);
-  latest.current = onValue;
+  const latest = useLatest(onValue);
   useEffect(() => {
     const listener: Listener = value => latest.current(value);
     let subscribed = listeners.get(request);
@@ -44,5 +44,5 @@ export const useResult = (
     return () => {
       subscribed.delete(listener);
     };
-  }, [request]);
+  }, [request, latest]);
 };

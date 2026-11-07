@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
+import { useLatest } from '@app/hooks/useLatest';
 import { Pressable as RNPressable, View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import { useEdgeSwipeBack } from '@app/hooks/useEdgeSwipeBack';
@@ -182,8 +183,7 @@ export default function FullPanel({
    * next step of a flow) goes at once: the next panel takes its place.
    */
   const closing = useRef(false);
-  const heightRef = useRef(height);
-  heightRef.current = height;
+  const heightRef = useLatest(height);
   useEffect(() => {
     if (!rises || !navigation?.addListener) {
       return;
@@ -202,7 +202,7 @@ export default function FullPanel({
       drop.value = withTiming(heightRef.current, PANEL_OUT);
       setTimeout(() => navigation.dispatch(e.data.action), PANEL_OUT.duration);
     });
-  }, [navigation, rises, drop]);
+  }, [navigation, rises, drop, heightRef]);
 
   return (
     <GestureDetector gesture={swipeBack}>

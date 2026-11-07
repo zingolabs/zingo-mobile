@@ -5,9 +5,9 @@ import React, {
   useEffect,
   useImperativeHandle,
   useLayoutEffect,
-  useReducer,
   useRef,
   useState,
+  useSyncExternalStore,
 } from 'react';
 import {
   FlatListProps,
@@ -49,10 +49,22 @@ const SheetBodyHeight = createContext<number>(0);
 const FixedSheet = createContext<boolean>(false);
 
 /** What a sheet's `SheetFooter` holds, and the outlet that draws it. */
-type FooterStore = { node: React.ReactNode; redraw?: () => void };
-const SheetFooterStore = createContext<React.RefObject<FooterStore> | null>(
-  null,
-);
+class FooterStore {
+  node: React.ReactNode = null;
+  private readonly listeners = new Set<() => void>();
+  set(node: React.ReactNode) {
+    this.node = node;
+    this.listeners.forEach(listener => listener());
+  }
+  subscribe = (listener: () => void) => {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
+  };
+  read = () => this.node;
+}
+const SheetFooterStore = createContext<FooterStore | null>(null);
 
 /**
  * A sheet's actions, pinned at the one bottom distance: the body scrolls
@@ -69,35 +81,16 @@ export function SheetFooter({
   const store = useContext(SheetFooterStore);
   const node = <View style={[styles.footer, style]}>{children}</View>;
   useLayoutEffect(() => {
-    if (store?.current) {
-      store.current.node = node;
-      store.current.redraw?.();
-    }
+    store?.set(node);
   });
-  useLayoutEffect(
-    () => () => {
-      if (store?.current) {
-        store.current.node = null;
-        store.current.redraw?.();
-      }
-    },
-    [store],
-  );
+  useLayoutEffect(() => () => store?.set(null), [store]);
   return store ? null : <>{children}</>;
 }
 
 /** Draws the footer a `SheetFooter` in the body hands over. */
-function FooterOutlet({ store }: { store: React.RefObject<FooterStore> }) {
-  const [, redraw] = useReducer((n: number) => n + 1, 0);
-  useLayoutEffect(() => {
-    const held = store.current;
-    held.redraw = redraw;
-    redraw();
-    return () => {
-      held.redraw = undefined;
-    };
-  }, [store]);
-  return <>{store.current.node}</>;
+function FooterOutlet({ store }: { store: FooterStore }) {
+  const node = useSyncExternalStore(store.subscribe, store.read);
+  return <>{node}</>;
 }
 
 type AppSheetModalProps = {
@@ -197,7 +190,7 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
       [],
     );
     const fixed = snapPoints !== undefined;
-    const footerStore = useRef<FooterStore>({ node: null });
+    const [footerStore] = useState(() => new FooterStore());
     const insets = useSafeAreaInsets();
     const { height: windowHeight } = useWindowDimensions();
     const [bodyHeight, setBodyHeight] = useState<number>(0);

@@ -1,4 +1,6 @@
 import React, { Component, useState, useMemo, useEffect } from 'react';
+import { setLocale } from '@app/utils/setLocale';
+import { useLatest } from '@app/hooks/useLatest';
 import {
   I18nManager,
   AppState,
@@ -201,7 +203,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const translate: (key: string) => TranslateType = (key: string) =>
     substituteZingoName(i18n.t(key) as TranslateType);
 
-  useEffect(() => {
+  const load = useLatest(() => {
     (async () => {
       // fallback if no available language fits
       const fallback = { languageTag: LanguageEnum.en, isRTL: false };
@@ -237,7 +239,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         settings.language === LanguageEnum.tr
       ) {
         setLanguage(settings.language);
-        i18n.locale = settings.language;
+        setLocale(i18n, settings.language);
       } else {
         const lang =
           languageTag === LanguageEnum.en ||
@@ -248,7 +250,7 @@ export default function LoadingApp(props: LoadingAppProps) {
             ? (languageTag as LanguageEnum)
             : (fallback.languageTag as LanguageEnum);
         setLanguage(lang);
-        i18n.locale = lang;
+        setLocale(i18n, lang);
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
       }
       if (settings.server) {
@@ -318,8 +320,10 @@ export default function LoadingApp(props: LoadingAppProps) {
 
       setLoading(false);
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
+  useEffect(() => {
+    load.current();
+  }, [load]);
 
   if (loading) {
     return (

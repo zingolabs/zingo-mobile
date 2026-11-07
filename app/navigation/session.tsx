@@ -3,9 +3,9 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
+import { useLatest } from '@app/hooks/useLatest';
 import { Linking } from 'react-native';
 import { BiometricGateOutcome, EventListenerEnum } from '@app/AppState';
 import { LoadedAppNavigationState } from '@app/types';
@@ -54,8 +54,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
 }) => {
   const [session, setSession] = useState<AppSession>(initial);
   const [pendingLink, setPendingLink] = useState<string>();
-  const current = useRef(session);
-  current.current = session;
+  const current = useLatest(session);
 
   // A link is kept through boot and lock, and dropped during onboarding:
   // there is no wallet to pay from.
@@ -70,7 +69,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
       take(url),
     );
     return () => sub.remove();
-  }, []);
+  }, [current]);
 
   const clearLink = useCallback(() => setPendingLink(undefined), []);
   const value = useMemo(

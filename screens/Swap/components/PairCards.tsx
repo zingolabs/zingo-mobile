@@ -132,7 +132,7 @@ export default function PairCards({
   );
 
   const [sendH, setSendH] = useState<number>(0);
-  const progress = useRef(new Animated.Value(1)).current;
+  const [progress] = useState(() => new Animated.Value(1));
   const flipped = useRef(isOutbound);
   useEffect(() => {
     if (flipped.current === isOutbound) {
@@ -171,7 +171,7 @@ export default function PairCards({
     outputRange: ['-180deg', '0deg'],
   });
 
-  const flash = useRef(new Animated.Value(0)).current;
+  const [flash] = useState(() => new Animated.Value(0));
   const lastQuote = useRef(ring?.resetKey);
   useEffect(() => {
     const key = ring?.resetKey;

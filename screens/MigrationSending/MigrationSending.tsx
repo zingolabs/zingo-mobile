@@ -2,6 +2,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import { leaveFlow } from '@app/navigation/navigate';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { parseJson } from '@app/utils/parseJson';
+import { useLatest } from '@app/hooks/useLatest';
 import { BackHandler, ScrollView, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
@@ -64,6 +66,27 @@ const deriveStatus = (
   return 'calculated';
 };
 
+const readDrainStatus = async (): Promise<RPCDrainStatusType | null> => {
+  const status = await drainStatus().catch(() => null);
+  if (!status?.ok) {
+    return null;
+  }
+  return parseJson<RPCDrainStatusType | null>(status.value) ?? null;
+};
+
+const runDrain = async (): Promise<string | null> => {
+  try {
+    const drain = await drainOrchard();
+    if (!drain.ok) {
+      return drain.error.message;
+    }
+    const parsed: RPCDrainType = JSON.parse(drain.value);
+    return parsed.error || null;
+  } catch (e) {
+    return `${e}`;
+  }
+};
+
 const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
   navigation,
   route,
@@ -115,44 +138,25 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
   // single long drain call is in flight. Both run concurrently on separate
   // native queues; drainStatus reads a side channel, not the lightclient lock
   // the drain holds, so the poll stays live throughout.
-  useEffect(() => {
+  const drain = useLatest(() => {
     let cancelled = false;
     let polling = false;
+    // A transient read or parse failure between ticks yields null; the next
+    // tick recovers.
     const poll = setInterval(async () => {
       if (polling) {
         return;
       }
       polling = true;
-      try {
-        const status = await drainStatus();
-        if (status.ok) {
-          const parsed = JSON.parse(status.value) as RPCDrainStatusType | null;
-          if (parsed && !cancelled) {
-            setProgress(parsed);
-          }
-        }
-      } catch {
-        // Transient read/parse between ticks; the next tick recovers.
-      } finally {
-        polling = false;
+      const parsed = await readDrainStatus();
+      polling = false;
+      if (parsed && !cancelled) {
+        setProgress(parsed);
       }
     }, 300);
 
     (async () => {
-      let failure: string | null = null;
-      try {
-        const drain = await drainOrchard();
-        if (!drain.ok) {
-          failure = drain.error.message;
-        } else {
-          const parsed: RPCDrainType = JSON.parse(drain.value);
-          if (parsed.error) {
-            failure = parsed.error;
-          }
-        }
-      } catch (e) {
-        failure = `${e}`;
-      }
+      const failure = await runDrain();
       clearInterval(poll);
       if (cancelled) {
         return;
@@ -181,8 +185,8 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
       cancelled = true;
       clearInterval(poll);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
+  useEffect(() => drain.current(), [drain]);
 
   // Recompute the ceiling as real progress lands: one step of headroom beyond
   // confirmed work. Building (proving, the slow part) owns the first 90% of the

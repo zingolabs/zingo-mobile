@@ -122,14 +122,12 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   const [started, setStarted] = useState<string | null>(null);
   const wasOffline = useRef<boolean>(!netInfo.isConnected);
   // Past the launch sequence, what appears no longer waits for it.
-  const launched = useRef(false);
+  const [launched, setLaunched] = useState(false);
   useEffect(() => {
-    const t = setTimeout(() => {
-      launched.current = true;
-    }, LAUNCH_MS);
+    const t = setTimeout(() => setLaunched(true), LAUNCH_MS);
     return () => clearTimeout(t);
   }, []);
-  const lateEnter = () => (launched.current ? offlineEnter() : tagEnter());
+  const lateEnter = () => (launched ? offlineEnter() : tagEnter());
 
   useEffect(() => {
     if (netInfo.isConnected && wasOffline.current) {

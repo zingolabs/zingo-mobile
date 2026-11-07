@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Easing } from 'react-native';
 
 import useReduceMotion from './useReduceMotion';
@@ -25,7 +25,7 @@ export type TrickleProgress = {
 // completion pushes it to 1 via finish. Extracted from MigrationSending so
 // the splitting screen renders the same feel from coarser events.
 const useTrickleProgress = (initialCeiling: number = 0.08): TrickleProgress => {
-  const progressAnim = useRef(new Animated.Value(0)).current;
+  const [progressAnim] = useState(() => new Animated.Value(0));
   // Where the bar is headed. Each step runs to completion, so the target it
   // was handed is where it ends up. Reading the value back through a listener
   // instead would put a JS callback on every frame of a native animation,

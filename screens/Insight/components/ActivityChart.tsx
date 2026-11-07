@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLatest } from '@app/hooks/useLatest';
 import { Pressable, View } from 'react-native';
 import Animated, {
   ReduceMotion,
@@ -70,8 +71,7 @@ const Bar: React.FunctionComponent<BarProps> = ({
   index,
   grow,
 }) => {
-  const stagger = useRef(index * GROW_STAGGER);
-  stagger.current = index * GROW_STAGGER;
+  const stagger = useLatest(index * GROW_STAGGER);
   const scale = useSharedValue(0);
   useEffect(() => {
     if (Date.now() - grow > GROW_WINDOW) {
@@ -87,7 +87,7 @@ const Bar: React.FunctionComponent<BarProps> = ({
         reduceMotion: ReduceMotion.System,
       }),
     );
-  }, [grow, scale]);
+  }, [grow, scale, stagger]);
   const style = useAnimatedStyle(() => ({
     transform: [{ scaleY: scale.value }],
   }));

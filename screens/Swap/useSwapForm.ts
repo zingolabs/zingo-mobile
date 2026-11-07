@@ -6,6 +6,8 @@ import {
   useRef,
   useState,
 } from 'react';
+import { useLatest } from '@app/hooks/useLatest';
+import { settled } from '@app/utils/settled';
 import { AppState } from 'react-native';
 
 import { ChainNameEnum } from '@app/AppState';
@@ -217,17 +219,18 @@ export function useSwapForm({
     const token = { cancelled: false };
     loadCatalogRef.current = token;
     setCatalogRetrying(true);
-    try {
-      // Receiving wrapped ZEC for native ZEC is a swap nobody means to make;
-      // selling it is ZEC on another chain coming home.
-      const catalog = (
-        await swapService.listRoutableTokens(
-          isOutbound ? 'outbound' : 'inbound',
-        )
-      ).filter(t => isQuotableToken(t) && !(isOutbound && isZecWrapper(t)));
-      if (token.cancelled) {
-        return;
-      }
+    // Receiving wrapped ZEC for native ZEC is a swap nobody means to make;
+    // selling it is ZEC on another chain coming home.
+    const listed = await settled(() =>
+      swapService.listRoutableTokens(isOutbound ? 'outbound' : 'inbound'),
+    );
+    if (token.cancelled) {
+      return;
+    }
+    if (listed.ok) {
+      const catalog = listed.value.filter(
+        t => isQuotableToken(t) && !(isOutbound && isZecWrapper(t)),
+      );
       setTokens(catalog);
       setTokensDirection(
         isOutbound ? SwapDirectionEnum.Outbound : SwapDirectionEnum.Inbound,
@@ -240,10 +243,8 @@ export function useSwapForm({
           catalog[0] ??
           null,
       );
-    } catch (error) {
-      if (token.cancelled) {
-        return;
-      }
+    } else {
+      const { error } = listed;
       setTokens([]);
       const edgeBlocked =
         error instanceof SwapKitHttpError && error.isEdgeBlocked;
@@ -253,11 +254,8 @@ export function useSwapForm({
       setCatalogError(
         edgeBlocked || unreachable ? '' : say(describeQuoteFailure(error)),
       );
-    } finally {
-      if (!token.cancelled) {
-        setCatalogRetrying(false);
-      }
     }
+    setCatalogRetrying(false);
   }, [swapService, isOutbound, say]);
 
   useEffect(() => {
@@ -533,7 +531,7 @@ export function useSwapForm({
         droppedProvider,
       };
     };
-    try {
+    const quoted = await settled(async () => {
       const ephemeral = await deriveEphemeral();
       const other = tokenToSwapAsset(selectedToken);
       const quoteInput: QuoteInput = {
@@ -620,7 +618,9 @@ export function useSwapForm({
           capturedAt: Date.now(),
         }),
       });
-    } catch (error) {
+    });
+    if (!quoted.ok) {
+      const { error } = quoted;
       if (isRateLimited(error)) {
         const now = Date.now();
         setRateLimitedUntilMs(now + rateLimitWaitMs(error));
@@ -633,17 +633,16 @@ export function useSwapForm({
         setRefreshedAtMs(
           Date.now() - QUOTE_REFRESH_MS + FAILED_REFRESH_RETRY_MS,
         );
-        return;
+      } else {
+        setQuoteNotice(null);
+        setQuoteError(say(describeQuoteFailure(error)));
+        setRoutes(null);
+        setUnavailable([]);
+        setQuoteContext(null);
+        setQuoteAttemptFailed(true);
       }
-      setQuoteNotice(null);
-      setQuoteError(say(describeQuoteFailure(error)));
-      setRoutes(null);
-      setUnavailable([]);
-      setQuoteContext(null);
-      setQuoteAttemptFailed(true);
-    } finally {
-      setQuoting(false);
     }
+    setQuoting(false);
   }, [
     swapService,
     selectedToken,
@@ -655,10 +654,9 @@ export function useSwapForm({
     say,
   ]);
 
-  // Quote as soon as there is something to quote. `requestQuote` is left out
-  // of the dependencies on purpose: it is rebuilt on every amount change,
-  // which would restart the debounce on every keystroke.
-  useEffect(() => {
+  // Quote as soon as there is something to quote. The debounce restarts on
+  // the inputs below. A quote that finishes leaves the timer alone.
+  const quoteDebounced = useLatest(() => {
     if (
       !canQuote ||
       reviewing ||
@@ -670,18 +668,22 @@ export function useSwapForm({
     }
     const timer = setTimeout(() => requestQuote(), QUOTE_DEBOUNCE_MS);
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    canQuote,
-    reviewing,
-    amount,
-    slippageBps,
-    selectedToken,
-    direction,
-    boundAddress,
-    quoteAttemptFailed,
-    rateLimitedUntilMs,
-  ]);
+  });
+  useEffect(
+    () => quoteDebounced.current(),
+    [
+      canQuote,
+      reviewing,
+      amount,
+      slippageBps,
+      selectedToken,
+      direction,
+      boundAddress,
+      quoteAttemptFailed,
+      rateLimitedUntilMs,
+      quoteDebounced,
+    ],
+  );
 
   useEffect(() => {
     setQuoteAttemptFailed(false);

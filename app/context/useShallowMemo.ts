@@ -1,21 +1,24 @@
-import { useRef } from 'react';
+import { useState } from 'react';
+
+const shallowEqual = (
+  prev: Record<string, unknown>,
+  next: Record<string, unknown>,
+) =>
+  [...new Set([...Object.keys(prev), ...Object.keys(next)])].every(k =>
+    Object.is(prev[k], next[k]),
+  );
 
 export function useShallowMemo<T extends object>(value: T): T {
-  const ref = useRef<T>(value);
-  const prev = ref.current;
-  if (prev !== value) {
-    const prevRecord = prev as Record<string, unknown>;
-    const nextRecord = value as Record<string, unknown>;
-    const allKeys = new Set([
-      ...Object.keys(prevRecord),
-      ...Object.keys(nextRecord),
-    ]);
-    const changed = [...allKeys].some(
-      k => !Object.is(prevRecord[k], nextRecord[k]),
-    );
-    if (changed) {
-      ref.current = value;
-    }
+  const [held, setHeld] = useState(value);
+  if (
+    held === value ||
+    shallowEqual(
+      held as Record<string, unknown>,
+      value as Record<string, unknown>,
+    )
+  ) {
+    return held;
   }
-  return ref.current;
+  setHeld(value);
+  return value;
 }

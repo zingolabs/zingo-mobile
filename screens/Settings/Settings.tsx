@@ -6,6 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useLatest } from '@app/hooks/useLatest';
 import Pressable from '@ui/primitives/Pressable';
 import {
   View,
@@ -304,7 +305,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   // didn't refresh the closure, so only the change that flipped
   // disabledButton actually persisted on save. Reading through a ref makes
   // the footer's onPress always invoke the current closure.
-  const saveSettingsRef = useRef<() => Promise<void>>(async () => {});
 
   // Each local value against the one the context holds. A saved change
   // drops out, and the guard below lets the screen go.
@@ -417,7 +417,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
       setLeaving(exitAction());
     }
   };
-  saveSettingsRef.current = saveSettings;
+  const saveSettingsRef = useLatest(saveSettings);
 
   // The back arrow and Android's back end in the save sheet while an edit
   // is unsaved. A second back with the sheet up closes it.
@@ -460,8 +460,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
     } else {
       navigation.navigate(Route.Home);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [navigation]);
 
   const optionsRadio = (
     DATA: Options[],

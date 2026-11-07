@@ -107,7 +107,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
   const [open, setOpen] = useState(true);
   const [torch, setTorch] = useState(false);
   const [stage, setStage] = useState<Stage>('looking');
-  const found = useRef('');
+  const [found, setFound] = useState('');
   // A code being checked; the camera keeps reporting it meanwhile.
   const checking = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -155,13 +155,15 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
         timer.current = setTimeout(() => setStage('looking'), MISS_HOLD_MS);
         return;
       }
-      found.current = value;
+      setFound(value);
       setStage('found');
-      closing.value = withTiming(1, {
-        duration: 280,
-        easing: ease.spring,
-        reduceMotion: ReduceMotion.System,
-      });
+      closing.set(
+        withTiming(1, {
+          duration: 280,
+          easing: ease.spring,
+          reduceMotion: ReduceMotion.System,
+        }),
+      );
       if (Platform.OS === 'android') {
         Vibration.vibrate(12);
       }
@@ -182,26 +184,33 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
   });
 
   const closed = useCallback(() => {
-    if (found.current) {
-      onRead(found.current);
+    if (found) {
+      onRead(found);
     }
     onClosed();
-  }, [onRead, onClosed]);
+  }, [found, onRead, onClosed]);
 
   const frameLeft = (size.width - FRAME) / 2;
   const frameTop = (size.height - FRAME) / 2;
   const bracketColor = stage === 'found' ? colors.fgAccent : colors.fgDefault;
-  const corner = (v: 'top' | 'bottom', h: 'left' | 'right') => ({
-    position: 'absolute' as const,
-    [v]: 0,
-    [h]: 0,
-    width: BRACKET,
-    height: BRACKET,
-    borderColor: bracketColor,
-    [`border${v === 'top' ? 'Top' : 'Bottom'}Width`]: BRACKET_W,
-    [`border${h === 'left' ? 'Left' : 'Right'}Width`]: BRACKET_W,
-    [`border${v === 'top' ? 'Top' : 'Bottom'}${h === 'left' ? 'Left' : 'Right'}Radius`]: 8,
-  });
+  const corner = (v: 'top' | 'bottom', h: 'left' | 'right') => {
+    const edgeV = v === 'top' ? 'Top' : 'Bottom';
+    const edgeH = h === 'left' ? 'Left' : 'Right';
+    const widthV = `border${edgeV}Width` as const;
+    const widthH = `border${edgeH}Width` as const;
+    const radius = `border${edgeV}${edgeH}Radius` as const;
+    return {
+      position: 'absolute' as const,
+      [v]: 0,
+      [h]: 0,
+      width: BRACKET,
+      height: BRACKET,
+      borderColor: bracketColor,
+      [widthV]: BRACKET_W,
+      [widthH]: BRACKET_W,
+      [radius]: 8,
+    };
+  };
 
   return (
     <View
@@ -351,7 +360,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
                   style={{ fontWeight: '700' }}
                 >
                   {typeof texts.found === 'function'
-                    ? texts.found(found.current)
+                    ? texts.found(found)
                     : texts.found}
                 </Text>
               </Animated.View>

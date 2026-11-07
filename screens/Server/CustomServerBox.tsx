@@ -117,8 +117,7 @@ const CustomServerBox: React.FC<CustomServerBoxProps> = ({
     }
     const timer = setTimeout(() => hostInput.current?.focus(), 260);
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoFocus]);
+  }, [autoFocus, host]);
 
   const fieldStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: fieldX.value }],

@@ -78,6 +78,7 @@ export function SwapServiceProvider({
   useEffect(() => {
     let cancelled = false;
     let created: SwapService | null = null;
+    const key = apiKey ?? SWAPKIT_API_KEY;
 
     (async () => {
       try {
@@ -93,11 +94,14 @@ export function SwapServiceProvider({
         }
         await adoptWalletOnFile(fingerprint);
         await SwapStore.bindToWallet(fingerprint);
-        if (cancelled || chainName !== ChainNameEnum.mainChainName) {
+        if (cancelled) {
+          return;
+        }
+        if (chainName !== ChainNameEnum.mainChainName) {
           return;
         }
         created = createSwapService({
-          apiKey: apiKey ?? SWAPKIT_API_KEY,
+          apiKey: key,
           chainName,
           newShieldedAddress,
         });

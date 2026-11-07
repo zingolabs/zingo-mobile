@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {
+  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -130,7 +131,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
   // The native text as the last change reported it.
   const nativeRef = useRef('');
   // Words from this index on arrived in one paste and appear without the pop.
-  const pastedFromRef = useRef(Number.MAX_SAFE_INTEGER);
+  const [pastedFrom, setPastedFrom] = useState(Number.MAX_SAFE_INTEGER);
 
   const ufvk = isViewingKey(value) ? value : '';
   const status = useMemo(() => seedStatus(value), [value]);
@@ -178,24 +179,28 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
     transform: [{ scale: counterScale.value }],
   }));
 
-  const pulseCounter = () => {
-    counterScale.value = withSequence(
-      withTiming(1.15, { duration: 120, easing: ease.out }),
-      withTiming(1, { duration: 140, easing: ease.settle }),
+  const pulseCounter = useCallback(() => {
+    counterScale.set(
+      withSequence(
+        withTiming(1.15, { duration: 120, easing: ease.out }),
+        withTiming(1, { duration: 140, easing: ease.settle }),
+      ),
     );
-  };
+  }, [counterScale]);
 
-  const shakeField = () => {
+  const shakeField = useCallback(() => {
     const step = SHAKE_MS / 6;
-    shake.value = withSequence(
-      withTiming(-SHAKE_PX, { duration: step / 2 }),
-      withTiming(SHAKE_PX, { duration: step }),
-      withTiming(-SHAKE_PX, { duration: step }),
-      withTiming(SHAKE_PX, { duration: step }),
-      withTiming(-SHAKE_PX, { duration: step }),
-      withTiming(0, { duration: step / 2 }),
+    shake.set(
+      withSequence(
+        withTiming(-SHAKE_PX, { duration: step / 2 }),
+        withTiming(SHAKE_PX, { duration: step }),
+        withTiming(-SHAKE_PX, { duration: step }),
+        withTiming(SHAKE_PX, { duration: step }),
+        withTiming(-SHAKE_PX, { duration: step }),
+        withTiming(0, { duration: step / 2 }),
+      ),
     );
-  };
+  }, [shake]);
 
   const rejectDraft = () => {
     setInvalidDraft(true);
@@ -219,8 +224,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
 
   const commit = (next: string[]) => {
     const before = currentWords().length;
-    pastedFromRef.current =
-      next.length - before > 1 ? before : Number.MAX_SAFE_INTEGER;
+    setPastedFrom(next.length - before > 1 ? before : Number.MAX_SAFE_INTEGER);
     pendingWordsRef.current = next;
     onChangeValue(joinWords(next));
     pulseCounter();
@@ -360,15 +364,13 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
     if (badChecksum || badWords) {
       shakeField();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [badChecksum, badWords]);
+  }, [badChecksum, badWords, shakeField]);
 
   useEffect(() => {
     if (keyValid) {
       pulseCounter();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [keyValid]);
+  }, [keyValid, pulseCounter]);
 
   const flash = useSharedValue(0);
   useEffect(() => {
@@ -474,9 +476,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
               return (
                 <Animated.View
                   key={`${i}-${word}`}
-                  entering={
-                    i >= pastedFromRef.current ? undefined : chipEnter()
-                  }
+                  entering={i >= pastedFrom ? undefined : chipEnter()}
                   exiting={chipExit()}
                   layout={chipLayout()}
                 >

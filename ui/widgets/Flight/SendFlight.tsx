@@ -227,14 +227,16 @@ const useLoop = (
     if (!on) {
       return;
     }
-    value.value = 0;
-    value.value = withRepeat(
-      withTiming(1, {
-        duration: ms,
-        easing,
-        reduceMotion: ReduceMotion.System,
-      }),
-      -1,
+    value.set(0);
+    value.set(
+      withRepeat(
+        withTiming(1, {
+          duration: ms,
+          easing,
+          reduceMotion: ReduceMotion.System,
+        }),
+        -1,
+      ),
     );
     return () => cancelAnimation(value);
   }, [value, ms, on, easing]);

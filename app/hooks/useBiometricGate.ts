@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLatest } from './useLatest';
 
 import { askGate, enactGateAnswer } from '@app/services/gateController';
 import { SnackbarDurationEnum, TranslateType } from '@app/AppState';
@@ -44,7 +45,7 @@ export const useBiometricGate = ({
   // navigation, and a settings toggle can flip the requirement while the
   // screen stays mounted. The cleanup cancels the pending run, so an
   // unmounted or re-gated screen never acts on a stale answer.
-  useEffect(() => {
+  const gate = useLatest(() => {
     if (!needsAuth) {
       setScreenGate({ kind: 'passed' });
       return;
@@ -77,8 +78,8 @@ export const useBiometricGate = ({
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [needsAuth]);
+  });
+  useEffect(() => gate.current(), [needsAuth, gate]);
 
   return screenGate;
 };

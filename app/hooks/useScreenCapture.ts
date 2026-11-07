@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useLatest } from './useLatest';
 import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
 
 type PrivacyGuardEvents = {
@@ -17,8 +18,7 @@ export const useScreenCapture = (
   onScreenshot: () => void,
 ): boolean => {
   const [captured, setCaptured] = useState(false);
-  const shot = useRef(onScreenshot);
-  shot.current = onScreenshot;
+  const shot = useLatest(onScreenshot);
 
   useEffect(() => {
     const guard = NativeModules.PrivacyGuard as PrivacyGuardEvents | undefined;
@@ -41,7 +41,7 @@ export const useScreenCapture = (
       live = false;
       subs.forEach(s => s.remove());
     };
-  }, [enabled]);
+  }, [enabled, shot]);
 
   return captured;
 };

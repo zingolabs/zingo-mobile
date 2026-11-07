@@ -29,7 +29,7 @@ export function useSyncStatus({
   syncingStatus,
   noSyncingStatus,
 }: UseSyncStatusInput): UseSyncStatusResult {
-  const opacityValue = useRef(new Animated.Value(1)).current;
+  const [opacityValue] = useState(() => new Animated.Value(1));
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
   const [percentageOutputsScanned, setPercentageOutputsScanned] =
     useState<number>(0);
@@ -117,8 +117,7 @@ export function useSyncStatus({
       animationRef.current?.stop();
       opacityValue.setValue(1);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [syncInProgress, noSyncingStatus]);
+  }, [syncInProgress, noSyncingStatus, opacityValue]);
 
   return {
     percentageOutputsScanned,

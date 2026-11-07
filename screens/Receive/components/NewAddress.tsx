@@ -85,25 +85,29 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
 
   const createAddress = async () => {
     const receivers = KINDS.find(k => k.kind === kind)?.receivers ?? '';
+    const create = () =>
+      receivers
+        ? createNewUnifiedAddress(receivers)
+        : createNewTransparentAddress();
+    const tag = label.trim();
+    const chainName = context.walletChainName || context.server.chainName;
     setCreating(true);
     try {
-      const result = receivers
-        ? await createNewUnifiedAddress(receivers)
-        : await createNewTransparentAddress();
+      const result = await create();
       if (!result.ok) {
         addLastSnackbar(
           t('receive.transparent.new-error'),
           SnackbarDurationEnum.short,
         );
-      } else if (label.trim()) {
+      } else if (tag) {
         const parsed: RPCUnifiedAddressType | RPCTransparentAddressType =
           JSON.parse(result.value);
         const ab = await AddressBookFileImpl.writeAddressBookItem(
-          label.trim(),
+          tag,
           parsed.encoded_address,
           Utils.generateColorList(1)[0],
           true,
-          context.walletChainName || context.server.chainName,
+          chainName,
         );
         setAddressBook(ab);
       }

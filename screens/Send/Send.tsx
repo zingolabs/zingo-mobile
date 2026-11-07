@@ -7,6 +7,8 @@ import React, {
   useRef,
   useMemo,
 } from 'react';
+import { parseJson } from '@app/utils/parseJson';
+import { useLatest } from '@app/hooks/useLatest';
 import TitleBar from '@ui/widgets/TitleBar';
 import {
   View,
@@ -108,6 +110,8 @@ const ADDRESS_LIKE =
   /^(u1|utest1|uregtest1|zs1|ztestsapling|zregtestsapling|t1|t3|tm|tex|zcash:)/i;
 /** A name the protocol allows, typed without its suffix. */
 const BARE_NAME = /^[a-z0-9]{1,62}$/;
+
+const errorText = (e: unknown) => (e instanceof Error ? e.message : String(e));
 
 const Send: React.FunctionComponent<SendProps> = () => {
   const { edges, fades } = useScrollEdges({
@@ -290,135 +294,103 @@ const Send: React.FunctionComponent<SendProps> = () => {
     [maxAmount],
   );
 
-  const calculateFeeWithPropose = useCallback(
-    async (
-      amountPar: string,
-      addressPar: string,
-      memoPar: string,
-      includeUAMemoPar: boolean,
-    ): Promise<void> => {
-      const generation = feeCalculationGenRef.current;
+  const calculateFeeWithPropose = async (
+    amountPar: string,
+    addressPar: string,
+    memoPar: string,
+    includeUAMemoPar: boolean,
+  ): Promise<void> => {
+    const generation = feeCalculationGenRef.current;
 
-      // if no address -> make no sense to run the propose
-      if (!addressPar || validAddress !== 1) {
-        defaultValueFee();
-        return;
-      }
-      if (amountPar === '' || validAmount !== 1) {
-        defaultValueFee();
-        return;
-      }
-      if (
-        Utils.parseStringLocaleToNumberFloat(amountPar) === 0 &&
-        !memoEnabled
-      ) {
-        defaultValueFee();
-        return;
-      }
-      if (validMemo === -1) {
-        defaultValueFee();
-        return;
-      }
+    // if no address -> make no sense to run the propose
+    if (!addressPar || validAddress !== 1) {
+      defaultValueFee();
+      return;
+    }
+    if (amountPar === '' || validAmount !== 1) {
+      defaultValueFee();
+      return;
+    }
+    if (Utils.parseStringLocaleToNumberFloat(amountPar) === 0 && !memoEnabled) {
+      defaultValueFee();
+      return;
+    }
+    if (validMemo === -1) {
+      defaultValueFee();
+      return;
+    }
 
-      let sendJson;
+    let sendJson;
 
-      const sendPageStateCalculateFee = new SendPageStateClass(
-        new ToAddrClass(0),
-      );
-      sendPageStateCalculateFee.toaddr.to = addressPar;
-      sendPageStateCalculateFee.toaddr.memo = memoPar;
-      sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemoPar;
-      sendPageStateCalculateFee.toaddr.amount = amountPar;
+    const sendPageStateCalculateFee = new SendPageStateClass(
+      new ToAddrClass(0),
+    );
+    sendPageStateCalculateFee.toaddr.to = addressPar;
+    sendPageStateCalculateFee.toaddr.memo = memoPar;
+    sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemoPar;
+    sendPageStateCalculateFee.toaddr.amount = amountPar;
 
-      sendJson = await Utils.getSendManyJSON(
-        sendPageStateCalculateFee,
-        defaultUnifiedAddress,
-      );
-      // fee
-      let proposeFee = 0;
-      let proposePools: ProposalPoolsType = { source: [], destination: [] };
-      // A MAX send is proposed as a send-all: the figure the spendable
-      // balance reports is sized by zingolib's send-max proposal, which an
-      // ordinary send request for the same amount can be refused for.
-      const runPropose = isSendAllAmount(amountPar)
-        ? await sendAllPreview(
-            addressPar,
-            memoEnabled
-              ? Utils.buildMemo(
-                  memoPar,
-                  includeUAMemoPar,
-                  defaultUnifiedAddress,
-                )
-              : '',
-          )
-        : await sendPreview(JSON.stringify(sendJson));
+    sendJson = await Utils.getSendManyJSON(
+      sendPageStateCalculateFee,
+      defaultUnifiedAddress,
+    );
+    // fee
+    let proposeFee = 0;
+    let proposePools: ProposalPoolsType = { source: [], destination: [] };
+    // A MAX send is proposed as a send-all: the figure the spendable
+    // balance reports is sized by zingolib's send-max proposal, which an
+    // ordinary send request for the same amount can be refused for.
+    const runPropose = isSendAllAmount(amountPar)
+      ? await sendAllPreview(
+          addressPar,
+          memoEnabled
+            ? Utils.buildMemo(memoPar, includeUAMemoPar, defaultUnifiedAddress)
+            : '',
+        )
+      : await sendPreview(JSON.stringify(sendJson));
 
-      // discard result if a newer calculation (or a clear) has superseded this one
-      if (feeCalculationGenRef.current !== generation) {
-        return;
-      }
+    // discard result if a newer calculation (or a clear) has superseded this one
+    if (feeCalculationGenRef.current !== generation) {
+      return;
+    }
 
-      if (!runPropose.ok) {
+    if (!runPropose.ok) {
+      // snack with error
+      setProposeSendLastError(runPropose.error.message);
+    } else {
+      const runProposeJson = parseJson<RPCSendProposeType>(runPropose.value);
+      if (runProposeJson === undefined) {
         // snack with error
-        setProposeSendLastError(runPropose.error.message);
+        setProposeSendLastError(runPropose.value);
+      } else if (runProposeJson.error) {
+        // snack with error — the error message already reaches the UI via
+        // setProposeSendLastError; do not mirror to console (Audit Issue K).
+        setProposeSendLastError(runProposeJson.error);
       } else {
-        try {
-          let runProposeJson: RPCSendProposeType;
-          runProposeJson = await JSON.parse(runPropose.value);
-          if (runProposeJson.error) {
-            // snack with error — the error message already reaches the UI via
-            // setProposeSendLastError; do not mirror to console (Audit Issue K).
-            setProposeSendLastError(runProposeJson.error);
-          } else {
-            if (runProposeJson.fee !== undefined) {
-              proposeFee = runProposeJson.fee / 10 ** 8;
-              setProposeSendLastError('');
-            }
-            proposePools = {
-              source: runProposeJson.source_pools ?? [],
-              destination: runProposeJson.destination_pools ?? [],
-            };
-            if (runProposeJson.amount !== undefined) {
-              const newAmount = runProposeJson.amount / 10 ** 8;
-              updateToField(
-                null,
-                toAmountInput(newAmount) || '0',
-                null,
-                null,
-                null,
-              );
-              setProposeSendLastError('');
-            }
-          }
-        } catch {
-          // snack with error
-          setProposeSendLastError(runPropose.value);
+        if (runProposeJson.fee !== undefined) {
+          proposeFee = runProposeJson.fee / 10 ** 8;
+          setProposeSendLastError('');
+        }
+        proposePools = {
+          source: runProposeJson.source_pools ?? [],
+          destination: runProposeJson.destination_pools ?? [],
+        };
+        if (runProposeJson.amount !== undefined) {
+          const newAmount = runProposeJson.amount / 10 ** 8;
+          updateToField(
+            null,
+            toAmountInput(newAmount) || '0',
+            null,
+            null,
+            null,
+          );
+          setProposeSendLastError('');
         }
       }
-      setFee(proposeFee);
-      setProposalPools(proposePools);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      server,
-      defaultUnifiedAddress,
-      validAddress,
-      validAmount,
-      validMemo,
-      memoEnabled,
-      /* added */ spendable,
-      maxAmount,
-      somePending,
-      stillConfirming,
-      info.latestBlock,
-    ],
-    // The App have to re-calculate de fee if some of these data changed:
-    // - spendable
-    // - maxAmount
-    // - somePending
-    // - stillConfirming
-    // - info.latestBlock
-  );
+    }
+    setFee(proposeFee);
+    setProposalPools(proposePools);
+  };
 
   const calculateSpendableBalance = useCallback(
     async (addressPar: string): Promise<void> => {
@@ -455,9 +427,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
         } catch (e) {
           // snack with error
           setSpendableBalanceLastError(
-            runSpendableBalance.value +
-              ' ' +
-              (e instanceof Error ? e.message : String(e)),
+            runSpendableBalance.value + ' ' + errorText(e),
           );
         }
       }
@@ -552,22 +522,36 @@ const Send: React.FunctionComponent<SendProps> = () => {
     setStillConfirming(stillConf);
   }, [shieldingAmount, somePending, totalBalance]);
 
-  useEffect(() => {
+  // The fee is proposed again when the send changes, and when the wallet's
+  // state under it does (spendable, maxAmount, somePending, stillConfirming,
+  // info.latestBlock). The memo changes nothing in it.
+  const proposeFee = useLatest(() => {
     calculateFeeWithPropose(
       amountText,
       addressText,
       memoText,
       includeUAMemoBoolean,
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  });
+  useEffect(() => {
+    proposeFee.current();
   }, [
-    calculateFeeWithPropose,
+    proposeFee,
     amountText,
     amountCurrencyText,
     includeUAMemoBoolean,
-    // don't have to recalculate the fee if the memo change.
-    // memoText,
     addressText,
+    server,
+    defaultUnifiedAddress,
+    validAddress,
+    validAmount,
+    validMemo,
+    memoEnabled,
+    spendable,
+    maxAmount,
+    somePending,
+    stillConfirming,
+    info.latestBlock,
   ]);
 
   useEffect(() => {
@@ -580,11 +564,13 @@ const Send: React.FunctionComponent<SendProps> = () => {
   // "maria.zec") is looked up after a pause and shown in the results box
   // under the field; it goes into the field only when the user picks it, so
   // nothing replaces what they are still typing.
+  const addressNow = useLatest(addressText);
   useEffect(() => {
     if (!nameQuery) {
+      const typed = addressNow.current;
       setNameLookup({ kind: 'none' });
       setZns(previous =>
-        previous && previous.address !== addressText ? null : previous,
+        previous && previous.address !== typed ? null : previous,
       );
       return;
     }
@@ -606,9 +592,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
       cancelled = true;
       clearTimeout(timerId);
     };
-    // addressText only matters through nameQuery, which it derives.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nameQuery, server.chainName]);
+  }, [nameQuery, server.chainName, addressNow]);
 
   useEffect(() => {
     const getMemoEnabled = async (

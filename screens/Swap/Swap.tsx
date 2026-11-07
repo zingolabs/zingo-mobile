@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useLatest } from '@app/hooks/useLatest';
 import { maxBy } from 'lodash';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import TitleBar from '@ui/widgets/TitleBar';
@@ -227,12 +228,14 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
     }
   };
   /** USD typed before the price was known becomes the coin amount once it is. */
-  useEffect(() => {
+  const fillFromUsd = useLatest(() => {
     if (usdMode && price > 0 && usdText && !form.amount) {
       form.setAmount(toZecText(usdText, price));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [price]);
+  });
+  useEffect(() => {
+    fillFromUsd.current();
+  }, [price, fillFromUsd]);
   const toggleUnit = () => {
     if (usdMode) {
       setUnit('coin');

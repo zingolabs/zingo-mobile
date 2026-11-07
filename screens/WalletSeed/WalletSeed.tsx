@@ -116,12 +116,12 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
   };
   /** The pending action was confirmed or cancelled already. */
   const settled = useRef(false);
-  const onCancel = async () => {
+  const onCancel = useCallback(async () => {
     settled.current = true;
     if (action === 'server') {
       await cancelPendingServer();
     }
-  };
+  }, [action, cancelPendingServer]);
   /**
    * Any other way out (iOS's swipe, Android's back) cancels a pending server
    * change, as the back arrow does.
@@ -133,9 +133,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
           onCancel();
         }
       }),
-    // onCancel reads only the route's action, fixed for this screen.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [navigation],
+    [navigation, onCancel],
   );
   const { colors } = useTheme();
   const { edges, fades } = useScrollEdges();
@@ -157,7 +155,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
   const [tip, setTip] = useState<Tip>('none');
   const [backingUp, setBackingUp] = useState(false);
   const [shot, setShot] = useState<'none' | 'on' | 'leaving'>('none');
-  const shotGone = useCallback(() => setShot('none'), []);
+  const shotGone = () => setShot('none');
 
   useEffect(() => {
     if (!passed) {

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useLatest } from '@app/hooks/useLatest';
 import { StyleProp, View, ViewStyle } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import Animated, {
@@ -60,12 +61,12 @@ export default function QuoteRefreshRing({
   style,
   testID,
 }: QuoteRefreshRingProps) {
-  // A ref, so a re-render's fresher phase never restarts the countdown:
-  // only resetKey (and a changed duration) may.
-  const startProgressRef = useRef(0);
-  startProgressRef.current = Math.min(Math.max(startProgress ?? 0, 0), 1);
-  const [progress, setProgress] = useState(startProgressRef.current);
-  const progressRef = useRef(startProgressRef.current);
+  // Only resetKey (and a changed duration) restart the countdown, from the
+  // latest phase.
+  const startAt = Math.min(Math.max(startProgress ?? 0, 0), 1);
+  const startProgressRef = useLatest(startAt);
+  const [progress, setProgress] = useState(startAt);
+  const progressRef = useRef(startAt);
   const keyRef = useRef(resetKey);
   const strokeWidth = 2;
   const center = size / 2;
@@ -92,7 +93,7 @@ export default function QuoteRefreshRing({
       if (now >= 1) clearInterval(tick);
     }, RING_TICK_MS);
     return () => clearInterval(tick);
-  }, [resetKey, durationMs, paused]);
+  }, [resetKey, durationMs, paused, startProgressRef]);
 
   const turn = useSharedValue(0);
   useEffect(() => {

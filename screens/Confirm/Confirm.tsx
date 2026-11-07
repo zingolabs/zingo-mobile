@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View } from 'react-native';
 
 import Text from '@ui/primitives/Text';
@@ -101,10 +101,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   const amount = Utils.parseStringLocaleToNumberFloat(to.amount);
   const total = amount + calculatedFee;
 
-  const contact = useMemo(
-    () => addressBook.find(entry => entry.address === to.to),
-    [addressBook, to.to],
-  );
+  const contact = addressBook.find(entry => entry.address === to.to);
   const transparent = /^t/i.test(to.to);
   const who = contact?.label ?? (to.znsAlias || '');
 

@@ -1,4 +1,6 @@
 import React, { Component, useState, useMemo, useEffect } from 'react';
+import { setLocale } from '@app/utils/setLocale';
+import { useLatest } from '@app/hooks/useLatest';
 import {
   I18nManager,
   AppState,
@@ -230,14 +232,10 @@ export default function LoadedApp(props: LoadedAppProps) {
   // translated strings (panel labels, screen titles set at mount, etc.)
   // stay in the old language until the next remount.
 
-  // `language` is intentionally in the deps even though the body doesn't
-  // reference it: i18n-js mutates `i18n.locale` in place, so `i18n`'s
-  // identity is stable across language switches. The state bump on
-  // `language` is what forces this memo to rebuild and gives `translate` a
-  // fresh identity that downstream useMemo/useCallback deps can observe.
   const translate: (key: string) => TranslateType = useMemo(
-    () => (key: string) => substituteZingoName(i18n.t(key) as TranslateType),
-    [i18n, language], // eslint-disable-line react-hooks/exhaustive-deps
+    () => (key: string) =>
+      substituteZingoName(i18n.t(key, { locale: language }) as TranslateType),
+    [i18n, language],
   );
   const {
     readOnly,
@@ -251,7 +249,7 @@ export default function LoadedApp(props: LoadedAppProps) {
     walletChainName,
   } = props.wallet;
 
-  useEffect(() => {
+  const load = useLatest(() => {
     (async () => {
       // fallback if no available language fits
       const fallback = { languageTag: LanguageEnum.en, isRTL: false };
@@ -289,7 +287,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         settings.language === LanguageEnum.tr
       ) {
         setLanguage(settings.language);
-        i18n.locale = settings.language;
+        setLocale(i18n, settings.language);
       } else {
         const lang =
           languageTag === LanguageEnum.en ||
@@ -300,7 +298,7 @@ export default function LoadedApp(props: LoadedAppProps) {
             ? (languageTag as LanguageEnum)
             : (fallback.languageTag as LanguageEnum);
         setLanguage(lang);
-        i18n.locale = lang;
+        setLocale(i18n, lang);
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
       }
       if (settings.server) {
@@ -480,8 +478,10 @@ export default function LoadedApp(props: LoadedAppProps) {
             const parseResult = await parseAddress(a.address);
             if (parseResult.ok) {
               const parsed = JSON.parse(parseResult.value);
-              if (parsed && parsed.chain_name) {
-                chain = parsed.chain_name as ChainNameEnum;
+              if (parsed) {
+                if (parsed.chain_name) {
+                  chain = parsed.chain_name as ChainNameEnum;
+                }
               }
             }
           } catch {
@@ -513,8 +513,10 @@ export default function LoadedApp(props: LoadedAppProps) {
       await AddressBookFileImpl.writeAddressBook(abSorted);
       setLoading(false);
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
+  useEffect(() => {
+    load.current();
+  }, [load]);
 
   if (loading) {
     return (
@@ -538,7 +540,7 @@ export default function LoadedApp(props: LoadedAppProps) {
           // outer state so `translate` (memoized on language) is rebuilt
           // — this is what makes the in-place language switch propagate
           // without a `navigateToLoadingApp` reset.
-          i18n.locale = locale;
+          setLocale(i18n, locale);
           setLanguage(locale as LanguageEnum);
         }}
         language={language}

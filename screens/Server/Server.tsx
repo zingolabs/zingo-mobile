@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { View } from 'react-native';
 import Animated, {
   FadeIn,
@@ -77,7 +77,7 @@ export type ServerProps = {
   onBack: () => void;
   // Set to a guard the host calls on a system back; true when the screen
   // handled it (an unsaved custom server asks first).
-  backGuard?: React.MutableRefObject<(() => boolean) | null>;
+  backGuardRef?: React.MutableRefObject<(() => boolean) | null>;
   // Told whether a back must be held now (a test running, the question up,
   // an unsaved custom server), so the host can block the iOS swipe too.
   onGuard?: (guarded: boolean) => void;
@@ -220,7 +220,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
   onProbe,
   onUnreachable,
   onBack,
-  backGuard,
+  backGuardRef,
   onGuard,
   placement = 'screen',
 }) => {
@@ -354,15 +354,17 @@ const Server: React.FunctionComponent<ServerProps> = ({
   };
   const guarded = working || asking || dirty;
   useEffect(() => onGuard?.(guarded), [guarded, onGuard]);
-  if (backGuard) {
-    backGuard.current = () => {
-      if (working || asking || dirty) {
-        leave();
-        return true;
-      }
-      return false;
-    };
-  }
+  useLayoutEffect(() => {
+    if (backGuardRef) {
+      backGuardRef.current = () => {
+        if (working || asking || dirty) {
+          leave();
+          return true;
+        }
+        return false;
+      };
+    }
+  });
 
   const changeTab = (chain: ChainNameEnum) => {
     if (working || chain === tab) {
@@ -401,11 +403,11 @@ const Server: React.FunctionComponent<ServerProps> = ({
    * their new place at once. They glide only when the Custom box opens or
    * closes on the same network.
    */
-  const shownTab = React.useRef(tab);
+  const [shownTab, setShownTab] = useState(tab);
   useEffect(() => {
-    shownTab.current = tab;
+    setShownTab(tab);
   }, [tab]);
-  const glide = shownTab.current === tab ? layout() : undefined;
+  const glide = shownTab === tab ? layout() : undefined;
 
   const customBlock = (
     <CustomServerBox

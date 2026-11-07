@@ -97,7 +97,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
     color ?? (health === 'live' ? colors.fgDefault : colors.fgMuted);
 
   useEffect(() => {
-    var currencyStr;
+    let currencyStr;
 
     if (
       typeof price === 'undefined' ||

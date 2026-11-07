@@ -6,6 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useLatest } from '@app/hooks/useLatest';
 import {
   BackHandler,
   ScrollView,
@@ -203,7 +204,7 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
     dir: 1,
   });
   const [shown, setShown] = useState<Move>(move);
-  const previous = useRef<Step | null>(null);
+  const [previous, setPrevious] = useState<Step | null>(null);
   const [keychainNote, setKeychainNote] = useState(false);
   const [words, setWords] = useState<string[]>([]);
   const [birthday, setBirthday] = useState(0);
@@ -236,7 +237,7 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
 
   useEffect(() => {
     if (shown.step !== move.step) {
-      previous.current = shown.step;
+      setPrevious(shown.step);
       setShown(move);
     }
   }, [move, shown]);
@@ -255,23 +256,27 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
       slideOut();
       return;
     }
-    content.value = withTiming(0, motion(CONTENT_OUT_MS, ease.standard));
-    grow.value = withDelay(
-      CLOSE_AT,
-      withTiming(0, motion(CLOSE_MS), finished => {
+    content.set(withTiming(0, motion(CONTENT_OUT_MS, ease.standard)));
+    grow.set(
+      withDelay(
+        CLOSE_AT,
+        withTiming(0, motion(CLOSE_MS), finished => {
+          if (finished) {
+            runOnJS(navigation.goBack)();
+          }
+        }),
+      ),
+    );
+  };
+
+  const slideOut = () => {
+    slide.set(
+      withTiming(window.width, motion(PUSH_OUT_MS), finished => {
         if (finished) {
           runOnJS(navigation.goBack)();
         }
       }),
     );
-  };
-
-  const slideOut = () => {
-    slide.value = withTiming(window.width, motion(PUSH_OUT_MS), finished => {
-      if (finished) {
-        runOnJS(navigation.goBack)();
-      }
-    });
   };
 
   const finish = () => {
@@ -353,13 +358,15 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
     }
   };
 
-  useEffect(() => {
+  // Runs once: the verify entry reads the phrase as the screen opens.
+  const verifyOnOpen = useLatest(() => {
     if (entry.kind === 'verify') {
       unlock().then(phrase => phrase.length === 0 && close());
     }
-    // Runs once: the verify entry reads the phrase as the screen opens.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
+  useEffect(() => {
+    verifyOnOpen.current();
+  }, [verifyOnOpen]);
 
   const saved = () => {
     setAttempt(a => a + 1);
@@ -528,7 +535,7 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
           <View style={{ flex: 1 }}>
             <Animated.View
               key={step}
-              entering={enterFor(previous.current, shown, pushed)}
+              entering={enterFor(previous, shown, pushed)}
               exiting={exitFor(move)}
               style={{ flex: 1, paddingTop: 16 }}
             >

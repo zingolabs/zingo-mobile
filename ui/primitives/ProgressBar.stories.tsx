@@ -10,7 +10,7 @@ import ProgressBar from './ProgressBar';
 const HeldProgressBar = (
   args: Omit<React.ComponentProps<typeof ProgressBar>, 'progress'>,
 ) => {
-  const value = React.useRef(new Animated.Value(0.6)).current;
+  const [value] = React.useState(() => new Animated.Value(0.6));
   return (
     <View style={{ width: 260 }}>
       <ProgressBar {...args} progress={value} />

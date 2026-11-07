@@ -21,12 +21,10 @@ jest.mock('@app/walletBackend', () => ({
   planOrchardDrain: jest.fn(),
 }));
 
-// The global mock stubs useFocusEffect to a no-op; the read lives there.
+// The read runs while the screen is focused.
 jest.mock('@react-navigation/native', () => ({
   ...jest.requireActual('../__mocks__/@react-navigation/native.js'),
-  useFocusEffect: (cb: () => void | (() => void)) => {
-    require('react').useEffect(cb, [cb]);
-  },
+  useIsFocused: () => true,
 }));
 
 function renderBanner(onHide: jest.Mock) {

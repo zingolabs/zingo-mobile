@@ -137,6 +137,9 @@ const OnboardingStage: React.FunctionComponent<OnboardingStageProps> = ({
   state,
   descriptors,
 }) => {
+  // The leaving view is kept in a ref the render reads, so the compiler
+  // leaves this component alone.
+  'use no memo';
   const { colors } = useTheme();
   const [size, setSize] = useState({ w: 0, h: 0 });
   const focused = state.routes[state.index];

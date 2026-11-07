@@ -218,8 +218,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
         }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [seedufvkText]);
+  }, [seedufvkText, birthday]);
 
   const okButton = async () => {
     // Offline mode is a deliberate no-server flow: exactly like creating a
