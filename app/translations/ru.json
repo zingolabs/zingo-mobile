@@ -727,7 +727,9 @@
     "group-transparent": "Прозрачные",
     "group-count": "Адресов: {n}",
     "public-note": "Публичные",
-    "group-count-one": "1 адрес"
+    "group-count-one": "1 адрес",
+    "group-swaps": "Адреса обменов",
+    "swaps-lead": "По одному на обмен, чтобы обмены нельзя было связать."
   },
   "swap": {
     "title": "Обмен",
@@ -1023,7 +1025,21 @@
     "result-missing": "Не хватает",
     "tx-privacy": "Приватность",
     "tx-private": "Приватно · NYM Enhanced",
-    "no-route-now": "Сейчас для этого обмена нет доступного маршрута."
+    "no-route-now": "Сейчас для этого обмена нет доступного маршрута.",
+    "routes-shielded": "Скрытый",
+    "routes-shielded-note": "Maya может отправить ваши ZEC на новый скрытый адрес.",
+    "routes-shielded-refund-note": "Maya может вернуть средства на новый скрытый адрес.",
+    "routes-no-shielded": "С {coin} все маршруты используют прозрачный адрес.",
+    "review-shielded": "Получить скрыто",
+    "review-shielded-sub": "Новый адрес. Поступит в Sapling.",
+    "review-shielded-refund": "Скрытый возврат",
+    "review-shielded-refund-sub": "Новый адрес. Возвраты идут в Sapling.",
+    "review-refund-new-shielded": "На новый скрытый адрес",
+    "shielded-created": "Скрытый адрес создан",
+    "result-in-sapling": "Поступило скрыто, в Sapling.",
+    "detail-swap-id": "ID обмена",
+    "view-swap": "Открыть обмен",
+    "detail-status": "Статус"
   },
   "history": {
     "shield-all": "Экранирование всех средств",

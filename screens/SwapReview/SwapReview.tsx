@@ -2,9 +2,10 @@
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { space8, useTheme, iconSizeSm } from '@app/theme';
+import { space8, space16, useTheme, iconSizeSm } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
-import { Route } from '@app/AppState';
+import { GlobalConst, Route, SnackbarDurationEnum } from '@app/AppState';
+import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import { ContextAppLoaded, useSwapService } from '@app/context';
 import {
   DepositAfterDeshieldError,
@@ -19,6 +20,7 @@ import {
   providerShortLabel,
   renderSwapText,
   zecNetworkFeeReserve,
+  swapAddressOf,
 } from '@app/swap';
 import type { DepositInstructionsType } from '@app/swap';
 import { reserveRefundAddress } from '@app/walletBackend';
@@ -35,6 +37,8 @@ import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import PairHero from '@screens/Swap/components/PairHero';
 import NymNote from '@screens/Swap/components/NymNote';
 import DetailRows from '@screens/Swap/components/DetailRows';
+import { useShieldedRoutes } from '@screens/Swap/useShieldedRoutes';
+import Card from '@ui/widgets/Card';
 import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import { formatSlippagePercent } from '@screens/Swap/components/SwapSettingsSheet';
 import {
@@ -80,6 +84,10 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
     info,
     sendSwapDeposit,
     addressBook,
+    addLastSnackbar,
+    setAddressBook,
+    server,
+    language,
   } = context;
   const { colors } = useTheme();
   const swapService = useSwapService();
@@ -102,6 +110,11 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
   const [error, setError] = useState<string>('');
 
   const { route: chosen, quoteInput, fiatValueBasis } = review;
+  const shielded = useShieldedRoutes({
+    direction,
+    sellChain: quoteInput.sellAsset.chain,
+    providers: [chosen.provider],
+  }).isShielded(chosen.provider);
   const sellSymbol = quoteInput.sellAsset.ticker ?? quoteInput.sellAsset.symbol;
   const receiveSymbol =
     quoteInput.receiveAsset.ticker ?? quoteInput.receiveAsset.symbol;
@@ -175,6 +188,28 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
     }
     leave('done');
     const recordId = committed.record.recordId;
+    /** The new shielded address is tagged with its swap, as any tag. */
+    const madeAddress = swapAddressOf(committed.record);
+    if (madeAddress) {
+      const { sellAsset, receiveAsset, createdAtMs } = committed.record;
+      const tag = `${sellAsset.ticker ?? sellAsset.symbol} → ${
+        receiveAsset.ticker ?? receiveAsset.symbol
+      } · ${Utils.formatDate(createdAtMs, 'MMM d, h:mm aaa', language)}`;
+      AddressBookFileImpl.writeAddressBookItem(
+        tag,
+        madeAddress,
+        Utils.generateColorList(1)[0],
+        true,
+        server.chainName,
+        GlobalConst.zecSwapChain,
+      )
+        .then(setAddressBook)
+        .catch(err => console.log(`SwapReview: could not tag ${err}`));
+      addLastSnackbar(
+        translate('swap.shielded-created') as string,
+        SnackbarDurationEnum.short,
+      );
+    }
     if (!isOutbound) {
       navigation.replace(Route.SwapDeposit, { recordId });
       return;
@@ -224,6 +259,10 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
     navigation,
     leave,
     translate,
+    addLastSnackbar,
+    setAddressBook,
+    server.chainName,
+    language,
   ]);
 
   const onConfirm = () => {
@@ -412,7 +451,9 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
                   {
                     label: translate('swap.review-if-refunded') as string,
                     value: translate(
-                      'swap.review-refund-new-address',
+                      shielded
+                        ? 'swap.review-refund-new-shielded'
+                        : 'swap.review-refund-new-address',
                     ) as string,
                   },
                 ]
@@ -420,6 +461,39 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
           ]}
         />
       </View>
+      {shielded && (
+        <View testID="swap.review.shielded" style={{ marginTop: space16 }}>
+          <Card flush>
+            <View
+              style={{
+                minHeight: 56,
+                justifyContent: 'center',
+                paddingVertical: space8,
+                paddingHorizontal: space16,
+              }}
+            >
+              <Text variant="bodyStrong">
+                {
+                  translate(
+                    isOutbound
+                      ? 'swap.review-shielded-refund'
+                      : 'swap.review-shielded',
+                  ) as string
+                }
+              </Text>
+              <Text variant="bodySmall" tone="muted" style={{ marginTop: 4 }}>
+                {
+                  translate(
+                    isOutbound
+                      ? 'swap.review-shielded-refund-sub'
+                      : 'swap.review-shielded-sub',
+                  ) as string
+                }
+              </Text>
+            </View>
+          </Card>
+        </View>
+      )}
       <View
         style={{
           flexDirection: 'row',

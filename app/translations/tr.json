@@ -727,7 +727,9 @@
     "group-transparent": "Şeffaf",
     "group-count": "{n} adres",
     "public-note": "Herkese açık",
-    "group-count-one": "1 adres"
+    "group-count-one": "1 adres",
+    "group-swaps": "Swap adresleri",
+    "swaps-lead": "Her swap için bir tane, böylece swap’lar ilişkilendirilemez."
   },
   "swap": {
     "title": "Takas",
@@ -1023,7 +1025,21 @@
     "result-missing": "Eksik",
     "tx-privacy": "Gizlilik",
     "tx-private": "Gizli · NYM Enhanced",
-    "no-route-now": "Şu anda bu takas için kullanılabilir bir rota yok."
+    "no-route-now": "Şu anda bu takas için kullanılabilir bir rota yok.",
+    "routes-shielded": "Korumalı",
+    "routes-shielded-note": "Maya, ZEC’inizi yeni bir korumalı adrese gönderebilir.",
+    "routes-shielded-refund-note": "Maya, yeni bir korumalı adrese iade edebilir.",
+    "routes-no-shielded": "{coin} ile tüm rotalar şeffaf bir adres kullanır.",
+    "review-shielded": "Korumalı al",
+    "review-shielded-sub": "Yeni adres. Sapling’e gelir.",
+    "review-shielded-refund": "Korumalı iade",
+    "review-shielded-refund-sub": "Yeni adres. İadeler Sapling’e gider.",
+    "review-refund-new-shielded": "Yeni bir korumalı adrese",
+    "shielded-created": "Korumalı adres oluşturuldu",
+    "result-in-sapling": "Korumalı olarak, Sapling’e geldi.",
+    "detail-swap-id": "Swap kimliği",
+    "view-swap": "Swap’ı gör",
+    "detail-status": "Durum"
   },
   "history": {
     "shield-all": "Tüm Fonları Koru",

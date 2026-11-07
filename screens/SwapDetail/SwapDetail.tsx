@@ -34,6 +34,7 @@ import {
   lacksDelivery,
   prefillFromRecord,
   providerLongLabel,
+  swapAddressOf,
 } from '@app/swap';
 import Utils from '@app/utils';
 import Text from '@ui/primitives/Text';
@@ -56,7 +57,7 @@ import SaveContactSheet from '@screens/Swap/components/SaveContactSheet';
 import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import SaveContactButton from '@ui/widgets/SaveContactButton';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
-import { swapOutcome } from '@screens/Swap/swapProgress';
+import { swapOutcome, swapStatePill } from '@screens/Swap/swapProgress';
 import { useRemoveSwap } from '@screens/Swap/useRemoveSwap';
 import { legName, legSlot, legsOf } from '@screens/Swap/swapLegs';
 
@@ -178,19 +179,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
                 : ('default' as const),
             line: `−${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}${usd(got, record.fiatValueBasis.receiveUsdUnitPrice) ? ` · ${usd(got, record.fiatValueBasis.receiveUsdUnitPrice)}` : ''}`,
           };
-  const pill =
-    outcome === 'completed'
-      ? { text: t('swap.history-done'), tone: 'accent' as const }
-      : outcome === 'refunded'
-        ? { text: t('swap.history-refunded'), tone: 'warning' as const }
-        : outcome === 'failed'
-          ? { text: t('swap.history-failed'), tone: 'danger' as const }
-          : expired
-            ? { text: t('history.state-expired'), tone: 'neutral' as const }
-            : {
-                text: t('swap.history-in-progress'),
-                tone: 'neutral' as const,
-              };
+  const pill = swapStatePill(record.status, t);
 
   const feesUsd =
     record.totalFeesInReceiveAsset &&
@@ -218,6 +207,8 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
           c.address === outsideAddress,
       )
     : undefined;
+  /** The new unified address a Maya swap used: where a purchase landed, or a sale's refund. */
+  const shieldedAddress = swapAddressOf(record);
   const rows: DetailRow[] = [
     {
       label: t('swap.detail-date'),
@@ -288,6 +279,26 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
               />
             ) : undefined,
           },
+        ]
+      : []),
+    ...(shieldedAddress
+      ? [
+          {
+            label: t(sell ? 'swap.refund-address' : 'swap.detail-received-at'),
+            value: Utils.trimToSmall(shieldedAddress, 6),
+            mono: true,
+            copy: shieldedAddress,
+          },
+          ...(record.swapKitInternalId
+            ? [
+                {
+                  label: t('swap.detail-swap-id'),
+                  value: Utils.trimToSmall(record.swapKitInternalId, 6),
+                  mono: true,
+                  copy: record.swapKitInternalId,
+                },
+              ]
+            : []),
         ]
       : []),
     ...(!done && !expired && reason

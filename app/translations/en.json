@@ -727,7 +727,9 @@
     "group-transparent": "Transparent",
     "group-count": "{n} addresses",
     "public-note": "Public",
-    "group-count-one": "1 address"
+    "group-count-one": "1 address",
+    "group-swaps": "Swap addresses",
+    "swaps-lead": "One per swap, so swaps can’t be linked."
   },
   "swap": {
     "title": "Swap",
@@ -1023,7 +1025,21 @@
     "result-missing": "Missing",
     "tx-privacy": "Privacy",
     "tx-private": "Private · NYM Enhanced",
-    "no-route-now": "No route is available for this swap right now."
+    "no-route-now": "No route is available for this swap right now.",
+    "routes-shielded": "Shielded",
+    "routes-shielded-note": "Maya can send your ZEC to a new shielded address.",
+    "routes-shielded-refund-note": "Maya can refund to a new shielded address.",
+    "routes-no-shielded": "With {coin}, every route uses a transparent address.",
+    "review-shielded": "Receive shielded",
+    "review-shielded-sub": "New address. Arrives in Sapling.",
+    "review-shielded-refund": "Shielded refund",
+    "review-shielded-refund-sub": "New address. Refunds go to Sapling.",
+    "review-refund-new-shielded": "To a new shielded address",
+    "shielded-created": "Shielded address created",
+    "result-in-sapling": "It arrived shielded, in Sapling.",
+    "detail-swap-id": "Swap ID",
+    "view-swap": "View swap",
+    "detail-status": "Status"
   },
   "history": {
     "shield-all": "Shield All funds",

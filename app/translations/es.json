@@ -727,7 +727,9 @@
     "group-transparent": "Transparentes",
     "group-count": "{n} direcciones",
     "public-note": "Públicas",
-    "group-count-one": "1 dirección"
+    "group-count-one": "1 dirección",
+    "group-swaps": "Direcciones de swaps",
+    "swaps-lead": "Una por swap, para que los swaps no se puedan relacionar."
   },
   "swap": {
     "title": "Swap",
@@ -1023,7 +1025,21 @@
     "result-missing": "Falta",
     "tx-privacy": "Privacidad",
     "tx-private": "Privado · NYM Enhanced",
-    "no-route-now": "Ahora mismo no hay ninguna ruta disponible para este swap."
+    "no-route-now": "Ahora mismo no hay ninguna ruta disponible para este swap.",
+    "routes-shielded": "Blindado",
+    "routes-shielded-note": "Maya puede enviar tu ZEC a una nueva dirección blindada.",
+    "routes-shielded-refund-note": "Maya puede reembolsar a una nueva dirección blindada.",
+    "routes-no-shielded": "Con {coin}, todas las rutas usan una dirección transparente.",
+    "review-shielded": "Recibir blindado",
+    "review-shielded-sub": "Dirección nueva. Llega a Sapling.",
+    "review-shielded-refund": "Reembolso blindado",
+    "review-shielded-refund-sub": "Dirección nueva. Los reembolsos van a Sapling.",
+    "review-refund-new-shielded": "A una nueva dirección blindada",
+    "shielded-created": "Dirección blindada creada",
+    "result-in-sapling": "Llegó blindado, en Sapling.",
+    "detail-swap-id": "ID del swap",
+    "view-swap": "Ver swap",
+    "detail-status": "Estado"
   },
   "history": {
     "shield-all": "Blindar Todos\nlos fondos",
