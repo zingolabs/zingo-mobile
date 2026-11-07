@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useContext, useRef, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import { View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { space8, space16, useTheme, iconSizeSm } from '@app/theme';
@@ -26,8 +26,7 @@ import type { DepositInstructionsType } from '@app/swap';
 import { reserveRefundAddress } from '@app/walletBackend';
 import { sendGateOpen } from '@app/walletBackend/transforms/mixnetView';
 import { deliver } from '@app/navigation/results';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import AuthorizeSheet from './AuthorizeSheet';
+import { useAuthorizeDeposit } from './useAuthorizeDeposit';
 import Utils from '@app/utils';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
@@ -79,7 +78,6 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
   const context = useContext(ContextAppLoaded);
   const {
     translate,
-    biometrics,
     mixnetView,
     info,
     sendSwapDeposit,
@@ -104,7 +102,7 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
 
   // Spending from this wallet asks for the device lock when Confirm is
   // pressed. A deposit paid from the other wallet takes nothing here.
-  const authSheetRef = useRef<BottomSheetModal>(null);
+  const authorizeDeposit = useAuthorizeDeposit();
 
   const [committing, setCommitting] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
@@ -265,9 +263,8 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
     language,
   ]);
 
-  const onConfirm = () => {
-    if (isOutbound && biometrics) {
-      authSheetRef.current?.present();
+  const onConfirm = async () => {
+    if (isOutbound && !(await authorizeDeposit())) {
       return;
     }
     commit();
@@ -517,11 +514,6 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
           </Text>
         )}
       </View>
-      <AuthorizeSheet
-        ref={authSheetRef}
-        summary={`${translate('swap.auth-line-1') as string} ${formatAmountForDisplay(quoteInput.sellAmountHumanDecimal)} ${sellSymbol} ${translate('swap.auth-line-2') as string} ${providerShortLabel(chosen.provider)}.`}
-        onAuthorized={commit}
-      />
     </SwapFlowScreen>
   );
 };
