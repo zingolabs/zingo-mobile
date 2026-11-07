@@ -29,13 +29,14 @@ appId: org.ZingoLabs.Zingo
     timeout: 10000
 
 # The ZIP 320 example from the zcash_address 0.13.0 test vectors, a
-# mainnet TEX address.
+# mainnet TEX address. A TEX address takes transparent funds only, so the
+# field warns that the payment will be public.
 - runFlow:
     file: common/clear_send_address.yaml
 - inputText: "tex1s2rt77ggv6q989lr49rkgzmh5slsksa9khdgte"
 - extendedWaitUntil:
     visible:
-      id: "send.address.check"
+      id: "send.address.transparent"
     timeout: 10000
 
 # The zingolib Zennies-for-Zingo donation address, a mainnet unified

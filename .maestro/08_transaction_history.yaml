@@ -3,15 +3,17 @@ appId: org.ZingoLabs.Zingo
 - runFlow:
     file: common/restore_wallet.yaml
 
-# The first row can take sixteen minutes to appear.
+# The first row can take sixteen minutes to appear. Month headers take
+# list indexes too, so the row ids start past them.
 - extendedWaitUntil:
     visible:
-      id: "vt-1"
+      id: "vt-[0-9]+"
     timeout: 960000
 
 # The first row is on screen once the wait above has seen it.
 - tapOn:
-    id: "vt-1"
+    id: "vt-[0-9]+"
+    index: 0
 
 - extendedWaitUntil:
     visible:

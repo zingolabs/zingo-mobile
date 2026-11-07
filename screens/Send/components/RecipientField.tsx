@@ -144,7 +144,11 @@ export default function RecipientField({
       : transparent
         ? line(
             <TriangleAlert size={iconSizeSm} color={colors.fgTransparent} />,
-            <Text variant="bodySmall" color={colors.fgTransparent}>
+            <Text
+              testID="send.address.transparent"
+              variant="bodySmall"
+              color={colors.fgTransparent}
+            >
               {t('send.to-transparent')}
             </Text>,
           )

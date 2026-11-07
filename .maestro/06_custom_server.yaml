@@ -52,15 +52,16 @@ appId: org.ZingoLabs.Zingo
       - assertVisible:
           id: "server.custom.port"
           text: "443"
-- hideKeyboard
 
 # Save tests the server first, then reconnects the wallet to it. The
-# message box ends in a green line once Zingo uses it.
+# message box ends in a green line once Zingo uses it, below the fold
+# once the box has grown. The button shows above the keyboard.
 - tapOn:
     id: "server.custom.save"
-- extendedWaitUntil:
-    visible:
+- scrollUntilVisible:
+    element:
       id: "server.custom.log.final.ok"
+    centerElement: true
     timeout: 120000
 
 # Back leads to the options panel the Server screen opened from. On
@@ -103,7 +104,8 @@ appId: org.ZingoLabs.Zingo
           text: "na\\.zec\\.rocks, .*"
 # The custom box opens on the saved address, and its message box says
 # Zingo uses it once the card has checked the server.
-- extendedWaitUntil:
-    visible:
+- scrollUntilVisible:
+    element:
       id: "server.custom.log.final.ok"
+    centerElement: true
     timeout: 30000
