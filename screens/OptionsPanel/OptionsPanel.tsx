@@ -110,6 +110,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
     () => (
       <Pressable
         kind="icon"
+        testID="optionspanel.close"
         onPress={onClose}
         hitSlop={12}
         style={{ padding: 4 }}
