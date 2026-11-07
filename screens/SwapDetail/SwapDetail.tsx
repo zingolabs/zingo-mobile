@@ -48,7 +48,9 @@ import Banner from '@ui/widgets/Banner';
 import FoldSection from './components/FoldSection';
 import TrackSwap from './components/TrackSwap';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
-import DepositSlip from '@screens/Swap/components/DepositSlip';
+import DepositSlip, {
+  depositMemoOf,
+} from '@screens/Swap/components/DepositSlip';
 import DetailHero from '@screens/Swap/components/DetailHero';
 import DetailRows from '@screens/Swap/components/DetailRows';
 import type { DetailRow } from '@screens/Swap/components/DetailRows';
@@ -209,6 +211,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
     : undefined;
   /** The new unified address a Maya swap used: where a purchase landed, or a sale's refund. */
   const shieldedAddress = swapAddressOf(record);
+  const depositMemo = depositMemoOf(record);
   const rows: DetailRow[] = [
     {
       label: t('swap.detail-date'),
@@ -247,16 +250,24 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
                   copy: record.sourceAddress,
                 },
               ]
-            : sharedVault
-              ? []
-              : [
-                  {
-                    label: t('swap.deposit-address'),
-                    value: Utils.trimToSmall(record.depositAddress, 6),
-                    mono: true,
-                    strike: true,
-                  },
-                ]),
+            : []),
+          {
+            label: t('swap.deposit-address'),
+            value: Utils.trimToSmall(record.depositAddress, 6),
+            mono: true,
+            copy: record.depositAddress,
+          },
+          ...(depositMemo
+            ? [
+                {
+                  label: t('swap.memo'),
+                  value: depositMemo,
+                  mono: true,
+                  wrap: true,
+                  copy: depositMemo,
+                },
+              ]
+            : []),
         ]
       : []),
     ...(feesUsd && !expired
@@ -436,12 +447,14 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         </Text>
       )}
 
-      {expired && !sharedVault && (
+      {expired && (
         <View style={{ marginTop: space12, rowGap: space12 }}>
           <Banner
-            testID="swap.detail.dont-send"
+            testID="swap.detail.late-deposit"
             tone="warning"
-            title={t('swap.expired-dont-send')}
+            title={t(
+              sharedVault ? 'swap.late-deposit-vault' : 'swap.late-deposit',
+            )}
           />
         </View>
       )}

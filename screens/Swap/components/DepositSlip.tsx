@@ -27,7 +27,7 @@ import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 
 /** The memo a provider's order carries, when its data names one. */
 export function depositMemoOf(record: SwapRecordType): string | undefined {
-  const memo = (record.providerData as { memo?: string }).memo;
+  const memo = (record.providerData as { memo?: string } | undefined)?.memo;
   return memo && memo.length > 0 ? memo : undefined;
 }
 
