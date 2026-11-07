@@ -18,13 +18,11 @@ import {
   SwapStatusEnum,
   canResendSale,
   depositDeadlineMs,
-  formatAmountForDisplay,
   heldDeshield,
   isRefunding,
   isTerminalStatus,
   isThorchainFamily,
   prefillFromRecord,
-  providerShortLabel,
   saleDepositRequest,
   sentPaymentsFrom,
   unsentSale,
@@ -40,7 +38,7 @@ import DepositSentSheet from '@screens/Swap/components/DepositSentSheet';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
 import { useRemoveSwap } from '@screens/Swap/useRemoveSwap';
-import AuthorizeSheet from '@screens/SwapReview/AuthorizeSheet';
+import { useAuthorizeDeposit } from '@screens/SwapReview/useAuthorizeDeposit';
 
 type SwapDepositProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -61,13 +59,8 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   route,
 }) => {
   const { recordId, broadcastError } = route.params;
-  const {
-    translate,
-    biometrics,
-    sendSwapDeposit,
-    resumeSwapDeposit,
-    valueTransfers,
-  } = useContext(ContextAppLoaded);
+  const { translate, sendSwapDeposit, resumeSwapDeposit, valueTransfers } =
+    useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const swapService = useSwapService();
   const record = useSwapRecord(recordId);
@@ -76,7 +69,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   const [retryError, setRetryError] = useState<string>(broadcastError ?? '');
   const [retrying, setRetrying] = useState<boolean>(false);
   const sentSheetRef = useRef<BottomSheetModal>(null);
-  const authSheetRef = useRef<BottomSheetModal>(null);
+  const authorizeDeposit = useAuthorizeDeposit();
 
   useEffect(() => {
     const timer = setInterval(() => setNowMs(Date.now()), 30_000);
@@ -199,9 +192,8 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
     translate,
     valueTransfers,
   ]);
-  const onRetry = () => {
-    if (biometrics) {
-      authSheetRef.current?.present();
+  const onRetry = async () => {
+    if (!(await authorizeDeposit())) {
       return;
     }
     retry();
@@ -279,11 +271,6 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
             <DepositSlip record={record} paid />
           </>
         )}
-        <AuthorizeSheet
-          ref={authSheetRef}
-          summary={`${translate('swap.auth-line-1') as string} ${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${record.sellAsset.symbol} ${translate('swap.auth-line-2') as string} ${providerShortLabel(record.provider)}.`}
-          onAuthorized={retry}
-        />
       </SwapFlowScreen>
     );
   }

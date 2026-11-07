@@ -248,3 +248,10 @@ export {
   rateLimitedNotice,
   RATE_LIMITED_MESSAGE,
 } from './rateLimited';
+export {
+  chainCarriesShieldedPurchase,
+  paysPurchaseShielded,
+  routeIsShielded,
+  swapAddressOf,
+} from './shieldedPurchase';
+export { fetchMayaShieldedMemoTarget } from './mayaShieldedMemo';

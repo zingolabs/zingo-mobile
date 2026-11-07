@@ -94,6 +94,9 @@ export type SwapRecordType = {
    *  external chain address from which the user pays — the provider also uses
    *  it as the refund target for AML/expiry. */
   sourceAddress: string;
+  /** Where a refund goes when it is not `sourceAddress`: a Maya sale paid
+   *  with a shielded memo names a new unified address of the wallet. */
+  refundAddress?: string;
 
   // Lifecycle
   status: SwapStatusEnum;
