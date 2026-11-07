@@ -11,6 +11,7 @@ import {
   SwapDirectionEnum,
   canonicalChainAddress,
   formatAmountForDisplay,
+  swapAddressOf,
 } from '@app/swap';
 import Utils from '@app/utils';
 import { leaveFlow } from '@app/navigation/navigate';
@@ -73,6 +74,9 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
     record.receiveAsset.ticker ?? record.receiveAsset.symbol;
   const received = record.actualReceiveAmount ?? record.expectedReceiveAmount;
   const transparentFunds = (totalBalance?.totalTransparentBalance ?? 0) > 0;
+  /** Maya paid the purchase to a new unified address: nothing to shield. */
+  const arrivedShielded = !isOutbound && !!swapAddressOf(record);
+  const shieldAfter = !isOutbound && transparentFunds && !arrivedShielded;
   const refund = record.refundInfo;
 
   const head = (
@@ -164,7 +168,7 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
         center
         footer={
           <ButtonStack>
-            {!isOutbound && transparentFunds ? (
+            {shieldAfter ? (
               <Button
                 variant="quiet"
                 title={translate('swap.result-later') as string}
@@ -179,7 +183,7 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
                 }
               />
             )}
-            {!isOutbound && transparentFunds ? (
+            {shieldAfter ? (
               <Button
                 testID="swap.result.shield"
                 variant="primary"
@@ -209,12 +213,13 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
                 '{who}',
                 who,
               )
-            : transparentFunds
-              ? ''
-              : (translate('swap.result-in-your-wallet') as string),
+            : arrivedShielded
+              ? (translate('swap.result-in-sapling') as string)
+              : transparentFunds
+                ? ''
+                : (translate('swap.result-in-your-wallet') as string),
         )}
-        {!isOutbound &&
-          transparentFunds &&
+        {shieldAfter &&
           shieldNote(translate('swap.result-shield-note-received') as string)}
       </SwapFlowScreen>
     );

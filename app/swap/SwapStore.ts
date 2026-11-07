@@ -1,6 +1,11 @@
 import swapStorage from './swapStorage';
 
 import { SwapRecordType } from './types/SwapRecordType';
+import { swapAddressOf } from './shieldedPurchase';
+
+/** Every record but the markers a removal leaves. */
+const live = (records: SwapRecordType[]): SwapRecordType[] =>
+  records.filter(r => r.removedAtMs === undefined);
 
 /**
  * Clear a key by overwriting it with a valid but empty payload and then
@@ -145,9 +150,10 @@ export class SwapStore {
   }
 
   private static notify(records: SwapRecordType[]): void {
+    const shown = live(records);
     for (const listener of SwapStore.listeners) {
       try {
-        listener(records);
+        listener(shown);
       } catch (err) {
         console.log('SwapStore: listener threw, swallowing:', err);
       }
@@ -172,14 +178,32 @@ export class SwapStore {
 
   /** Read all records. Returns an empty array on first install or storage error. */
   static async readAll(): Promise<SwapRecordType[]> {
-    return this.enqueue(() => this._readRaw());
+    return this.enqueue(async () => live(await this._readRaw()));
+  }
+
+  /**
+   * The swaps the user removed that had made an address of the wallet, kept
+   * as markers without their swap ID so the address still reads as a swap's.
+   * Nothing else sees them: readAll and every lookup leave them out.
+   */
+  static async readRemoved(): Promise<SwapRecordType[]> {
+    return this.enqueue(async () =>
+      (await this._readRaw()).filter(r => r.removedAtMs !== undefined),
+    );
   }
 
   /** Replace the entire record list. Callers should rarely use this directly. */
   static async writeAll(records: SwapRecordType[]): Promise<void> {
     return this.enqueue(async () => {
-      await this._writeRaw(records);
-      SwapStore.notify(records);
+      const markers = (await this._readRaw()).filter(
+        r => r.removedAtMs !== undefined,
+      );
+      const all = [
+        ...records,
+        ...markers.filter(m => !records.some(r => r.recordId === m.recordId)),
+      ];
+      await this._writeRaw(all);
+      SwapStore.notify(all);
     });
   }
 
@@ -236,7 +260,7 @@ export class SwapStore {
   ): Promise<SwapRecordType | undefined> {
     return this.enqueue(async () => {
       const all = await this._readRaw();
-      return all.find(r => r.recordId === recordId);
+      return live(all).find(r => r.recordId === recordId);
     });
   }
 
@@ -253,7 +277,7 @@ export class SwapStore {
   ): Promise<SwapRecordType[]> {
     return this.enqueue(async () => {
       const all = await this._readRaw();
-      return all.filter(r => r.depositAddress === depositAddress);
+      return live(all).filter(r => r.depositAddress === depositAddress);
     });
   }
 
@@ -261,8 +285,17 @@ export class SwapStore {
   static async deleteByRecordId(recordId: string): Promise<void> {
     return this.enqueue(async () => {
       const all = await this._readRaw();
-      const next = all.filter(r => r.recordId !== recordId);
-      if (next.length === all.length) return;
+      const removed = all.find(
+        r => r.recordId === recordId && r.removedAtMs === undefined,
+      );
+      if (!removed) return;
+      const next = swapAddressOf(removed)
+        ? all.map(r =>
+            r.recordId === recordId
+              ? { ...r, swapKitInternalId: undefined, removedAtMs: Date.now() }
+              : r,
+          )
+        : all.filter(r => r.recordId !== recordId);
       await this._writeRaw(next);
       SwapStore.notify(next);
     });
