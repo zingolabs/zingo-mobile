@@ -114,6 +114,28 @@ module.exports = [
   },
   ...compat.extends('@react-native'),
   {
+    // The React compiler skips a component that breaks a rule of React. The
+    // compiler-backed rules report each one, and a suppression of them,
+    // which also makes the compiler skip. `set-state-in-effect` and `purity`
+    // go further than the compiler and wait for the react-doctor change.
+    files: ['app/**', 'screens/**', 'ui/**'],
+    ignores: ['**/__tests__/**', '**/__mocks__/**', '**/*.test.*'],
+    rules: {
+      ...require('eslint-plugin-react-hooks').configs.recommended.rules,
+      'react-hooks/rule-suppression': 'error',
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/purity': 'off',
+    },
+  },
+  {
+    // The two components that say 'use no memo': each keeps a ref its render
+    // reads, and the compiler leaves them alone.
+    files: ['screens/History/History.tsx', 'ui/widgets/OnboardingStage.tsx'],
+    rules: {
+      'react-hooks/refs': 'off',
+    },
+  },
+  {
     // Imports that leave the current folder go through the @app, @screens
     // and @ui aliases. assets/ and .storybook/ have no alias and stay
     // relative. Icons are own components, never FontAwesome.

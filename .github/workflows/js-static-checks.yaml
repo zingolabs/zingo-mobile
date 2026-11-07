@@ -32,6 +32,9 @@ jobs:
       - name: Lint
         run: yarn lint:check
 
+      - name: React compiler compiles every component
+        run: yarn lint:compiler
+
       - name: Check formatting
         run: yarn prettier:check
 
