@@ -17,13 +17,15 @@ appId: org.ZingoLabs.Zingo
 - waitForAnimationToEnd:
     timeout: 5000
 
-# The parser rejects a string that is no Zcash address.
+# The parser rejects a string that is no Zcash address. Letters and
+# digits alone would be looked up as a Zcash Name instead, so the string
+# holds a character no name can.
 - tapOn:
     id: "send.addressplaceholder"
-- inputText: "thisisaninvalidaddress"
+- inputText: "not-an-address"
 - extendedWaitUntil:
     visible:
-      id: "send.address.error"
+      id: "send.addressplaceholder.error"
     timeout: 10000
 
 # The ZIP 320 example from the zcash_address 0.13.0 test vectors, a

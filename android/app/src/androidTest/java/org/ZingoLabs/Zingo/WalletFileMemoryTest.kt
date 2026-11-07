@@ -29,12 +29,15 @@ class WalletFileMemoryTest {
     private val swapName = Constants.WalletTempSwapFileName.value
 
     private val megabyte = 1024 * 1024
-    private val walletSize = 8 * megabyte
+    // The references below copy the wallet on purpose, and an emulator's
+    // heap grows to 16 MiB at most with the app already in it: 8 MiB ran
+    // those copies out of memory.
+    private val walletSize = 2 * megabyte
 
     // A streamed path holds its I/O buffer and nothing else. The ceiling
     // leaves room for device noise while staying far below the smallest
     // copy a regression could reintroduce.
-    private val streamedBudget = megabyte.toLong()
+    private val streamedBudget = megabyte / 2L
 
     private fun wallet(size: Int, fill: Byte): ByteArray =
         ByteArray(size).also {
@@ -123,9 +126,7 @@ class WalletFileMemoryTest {
         }
 
         reference("swap.decision.base64", walletSize.toLong()) {
-            val temp = Base64.encodeToString(File(dir, swapName).readBytes(), Base64.NO_WRAP)
-            assertThat(temp == Base64.encodeToString(File(dir, mainName).readBytes(), Base64.NO_WRAP)).isFalse()
-            assertThat(temp == Base64.encodeToString(File(dir, backupName).readBytes(), Base64.NO_WRAP)).isFalse()
+            Base64.encode(File(dir, swapName).readBytes(), Base64.NO_WRAP)
         }
     }
 }

@@ -50,7 +50,8 @@ import CustomServerBox from './CustomServerBox';
 import SaveSheet from '@ui/widgets/SaveSheet';
 import { LogLine } from './ServerLog';
 import { hostOf, useCustomServer } from './useCustomServer';
-import { useScrollEdges } from '@ui/widgets/ScrollEdges';
+import { EDGE_FADE, useScrollEdges } from '@ui/widgets/ScrollEdges';
+import { BUTTON_HEIGHT } from '@ui/primitives/Button';
 
 export type ServerProps = {
   translate: (key: string) => TranslateType;
@@ -607,9 +608,10 @@ const Server: React.FunctionComponent<ServerProps> = ({
           bottom: BODY_BOTTOM,
         }}
       >
+        {/** Done rides the keyboard, so the focused field stops above it. */}
         <KeyboardAwareScrollView
           {...edges}
-          bottomOffset={16}
+          bottomOffset={BUTTON_HEIGHT + space12 + space16 + EDGE_FADE}
           style={{ flex: 1 }}
           contentContainerStyle={{ paddingBottom: 16 }}
           keyboardShouldPersistTaps="handled"

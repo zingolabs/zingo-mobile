@@ -63,10 +63,13 @@ appId: org.ZingoLabs.Zingo
       id: "server.custom.log.final.ok"
     timeout: 120000
 
-# Back on History, the check icon renders once the sync on the saved
-# server is not in progress.
+# Back leads to the options panel the Server screen opened from. On
+# History, the check icon renders once the sync on the saved server is not
+# in progress.
 - tapOn:
     id: "server.back"
+- tapOn:
+    id: "optionspanel.close"
 - extendedWaitUntil:
     visible:
       id: "header.checkicon"
