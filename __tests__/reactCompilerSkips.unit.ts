@@ -2,6 +2,7 @@ import {
   failure,
   fnNameAt,
   gateFails,
+  parseArgs,
   regressions,
   uncompiledFrom,
   tally,
@@ -172,5 +173,41 @@ describe('transform failure', () => {
       message: 'Unexpected token',
     });
     expect(failure('boom')).toEqual({ kind: 'error', message: 'boom' });
+  });
+});
+
+describe('command line', () => {
+  // Tests that the options parse when each flag carries its value, and that the last --base wins when the script default and the CLI both give one.
+  test('values parse and the last --base wins', () => {
+    expect(
+      parseArgs([
+        '--base=origin/dev',
+        '--json=out.json',
+        '--strict',
+        '--base=abc123',
+      ]),
+    ).toEqual({
+      kind: 'options',
+      base: 'abc123',
+      json: 'out.json',
+      strict: true,
+    });
+    expect(parseArgs([])).toEqual({ kind: 'options', strict: false });
+  });
+
+  // Tests that a --base with no value is rejected when it would otherwise turn the gate into an ungated full sweep. An empty value counts as missing.
+  test('a bare or empty --base is rejected', () => {
+    expect(parseArgs(['--base'])).toEqual({
+      kind: 'error',
+      message: '--base needs a value, as --base=<ref>',
+    });
+    expect(parseArgs(['--base='])).toEqual({
+      kind: 'error',
+      message: '--base needs a value, as --base=<ref>',
+    });
+    expect(parseArgs(['--json'])).toEqual({
+      kind: 'error',
+      message: '--json needs a value, as --json=<path>',
+    });
   });
 });

@@ -104,3 +104,27 @@ export function fnNameAt(code: string, line: number): string | undefined {
   }
   return undefined;
 }
+
+export type Options =
+  | { kind: 'options'; base?: string; json?: string; strict: boolean }
+  | { kind: 'error'; message: string };
+
+const VALUED = { '--base': '<ref>', '--json': '<path>' } as const;
+
+export function parseArgs(args: readonly string[]): Options {
+  const values: { base?: string; json?: string } = {};
+  for (const arg of args) {
+    for (const [flag, placeholder] of Object.entries(VALUED)) {
+      if (arg !== flag && !arg.startsWith(`${flag}=`)) continue;
+      const given = arg.slice(flag.length + 1);
+      if (given === '') {
+        return {
+          kind: 'error',
+          message: `${flag} needs a value, as ${flag}=${placeholder}`,
+        };
+      }
+      values[flag === '--base' ? 'base' : 'json'] = given;
+    }
+  }
+  return { kind: 'options', ...values, strict: args.includes('--strict') };
+}

@@ -24,6 +24,7 @@ import {
   failure,
   fnNameAt,
   gateFails,
+  parseArgs,
   regressions,
   tally,
   uncompiledFrom,
@@ -59,21 +60,12 @@ type FileReport = {
   transform: Transform;
 };
 
-const args = process.argv.slice(2);
-// The last occurrence wins, so a CLI --base overrides a script default.
-const argValue = (name: string): string | undefined => {
-  for (let i = args.length - 1; i >= 0; i--) {
-    const arg = args[i];
-    if (arg === name || arg.startsWith(`${name}=`)) {
-      const eq = arg.indexOf('=');
-      return eq === -1 ? '' : arg.slice(eq + 1);
-    }
-  }
-  return undefined;
-};
-const baseRef = argValue('--base') || undefined;
-const jsonPath = argValue('--json') || undefined;
-const strict = args.includes('--strict');
+const options = parseArgs(process.argv.slice(2));
+if (options.kind === 'error') {
+  console.error(options.message);
+  process.exit(2);
+}
+const { base: baseRef, json: jsonPath, strict } = options;
 
 const babel: Babel = require_('@babel/core');
 const babelConfig: BabelConfig = require_(path.join(ROOT, 'babel.config.js'));
