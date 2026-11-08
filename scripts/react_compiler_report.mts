@@ -10,11 +10,11 @@
 //
 // Usage:
 //   tsx scripts/react_compiler_report.mts                     full report
-//   tsx scripts/react_compiler_report.mts --base=origin/dev   changed files
+//   tsx scripts/react_compiler_report.mts --base=dev          changed files
 //   tsx scripts/react_compiler_report.mts --strict            fail on any bailout
 //   tsx scripts/react_compiler_report.mts --json=out.json     also write JSON
 
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -26,6 +26,7 @@ import {
   gateFails,
   parseArgs,
   regressions,
+  resolveBase,
   tally,
   uncompiledFrom,
   type CompilerEvent,
@@ -65,7 +66,7 @@ if (options.kind === 'error') {
   console.error(options.message);
   process.exit(2);
 }
-const { base: baseRef, json: jsonPath, strict } = options;
+const { json: jsonPath, strict } = options;
 
 const babel: Babel = require_('@babel/core');
 const babelConfig: BabelConfig = require_(path.join(ROOT, 'babel.config.js'));
@@ -206,19 +207,36 @@ async function transformAll(files: string[], codeOf = diskCode): Promise<void> {
   process.stderr.write('\r'.padEnd(40) + '\r');
 }
 
+const probe = (rev: string): string | undefined => {
+  const run = spawnSync(
+    'git',
+    ['rev-parse', '--verify', '--quiet', `${rev}^{commit}`],
+    { cwd: ROOT },
+  );
+  return run.status === 0 ? run.stdout.toString().trim() : undefined;
+};
+const base =
+  options.base === undefined
+    ? undefined
+    : resolveBase(options.base, probe, gitLines('remote'));
+if (base?.kind === 'error') {
+  console.error(base.message);
+  process.exit(2);
+}
+
 const scopeDirs = ['app', 'screens', 'ui'];
-const files = baseRef
-  ? changedFiles(baseRef)
+const files = base
+  ? changedFiles(base.sha)
   : scopeDirs.flatMap(dir => walk(path.join(ROOT, dir)));
 if (files.length === 0) {
   console.log(
-    `no in-scope files ${baseRef ? `changed against ${baseRef}` : 'found'}`,
+    `no in-scope files ${base ? `changed against ${base.ref}` : 'found'}`,
   );
   process.exit(0);
 }
-if (baseRef !== undefined) {
+if (base !== undefined) {
   active = baseReports;
-  await transformAll(filesInBase(baseRef, files), baseCode(baseRef));
+  await transformAll(filesInBase(base.sha, files), baseCode(base.sha));
   active = headReports;
 }
 await transformAll(files);
@@ -238,7 +256,7 @@ const uncompiled = list
   )
   .sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line);
 const regressed =
-  baseRef !== undefined
+  base !== undefined
     ? regressions(bailoutsByFile(baseReports.values()), bailoutsByFile(list))
     : [];
 const newBailouts = regressed.reduce((n, r) => n + r.head - r.base, 0);
@@ -251,7 +269,7 @@ const totals = {
 };
 
 console.log(
-  `React Compiler healthcheck${baseRef ? ` (changed vs ${baseRef})` : ''}`,
+  `React Compiler healthcheck${base ? ` (changed vs ${base.ref})` : ''}`,
 );
 console.log(
   `files: ${totals.files}  optimized functions: ${totals.optimized}  bailouts: ${totals.bailouts}  skips: ${totals.skips}  diagnostics: ${totals.diagnostics}  transform errors: ${totals.errors}`,
@@ -269,8 +287,8 @@ for (const r of list) {
     );
   }
 }
-for (const { file, base, head } of regressed) {
-  console.log(`  ${file}  bailouts on ${baseRef}: ${base}, on HEAD: ${head}`);
+for (const r of regressed) {
+  console.log(`  ${r.file}  bailouts on base: ${r.base}, on HEAD: ${r.head}`);
 }
 
 if (jsonPath !== undefined) {
@@ -283,15 +301,15 @@ if (jsonPath !== undefined) {
 
 if (
   gateFails({
-    gated: baseRef !== undefined || strict,
-    bailouts: baseRef !== undefined ? newBailouts : totals.bailouts,
+    gated: base !== undefined || strict,
+    bailouts: base !== undefined ? newBailouts : totals.bailouts,
     errors: totals.errors,
   })
 ) {
   const what =
     totals.errors > 0
       ? `${totals.errors} transform error(s)`
-      : baseRef !== undefined
+      : base !== undefined
         ? `${newBailouts} new bailout(s) among changed files`
         : `${totals.bailouts} bailout(s)`;
   console.error(`FAIL: ${what}`);

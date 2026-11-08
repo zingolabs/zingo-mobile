@@ -4,6 +4,7 @@ import {
   gateFails,
   parseArgs,
   regressions,
+  resolveBase,
   uncompiledFrom,
   tally,
   type Uncompiled,
@@ -208,6 +209,38 @@ describe('command line', () => {
     expect(parseArgs(['--json'])).toEqual({
       kind: 'error',
       message: '--json needs a value, as --json=<path>',
+    });
+  });
+});
+
+describe('base ref resolution', () => {
+  const shas: Record<string, string> = {
+    'dev@{upstream}': 'aaa111',
+    dev: 'bbb222',
+    'origin/dev': 'ccc333',
+  };
+  const probe = (rev: string): string | undefined => shas[rev];
+
+  // Tests that a branch resolves to its upstream when one is configured, whatever the remote is named, and to itself otherwise.
+  test('a branch prefers its upstream and falls back to itself', () => {
+    expect(resolveBase('dev', probe, ['zingolabs'])).toEqual({
+      kind: 'base',
+      ref: 'dev@{upstream}',
+      sha: 'aaa111',
+    });
+    expect(resolveBase('origin/dev', probe, ['origin'])).toEqual({
+      kind: 'base',
+      ref: 'origin/dev',
+      sha: 'ccc333',
+    });
+  });
+
+  // Tests that an unknown ref is an error naming the ref and the remotes when no candidate resolves.
+  test('an unknown ref names itself and the remotes', () => {
+    expect(resolveBase('origin/dev', () => undefined, ['zingolabs'])).toEqual({
+      kind: 'error',
+      message:
+        'unknown base ref origin/dev. The remotes here are: zingolabs. Pass --base=<ref> for one of them.',
     });
   });
 });

@@ -128,3 +128,22 @@ export function parseArgs(args: readonly string[]): Options {
   }
   return { kind: 'options', ...values, strict: args.includes('--strict') };
 }
+
+export type Base =
+  | { kind: 'base'; ref: string; sha: string }
+  | { kind: 'error'; message: string };
+
+export function resolveBase(
+  ref: string,
+  probe: (rev: string) => string | undefined,
+  remotes: readonly string[],
+): Base {
+  for (const candidate of [`${ref}@{upstream}`, ref]) {
+    const sha = probe(candidate);
+    if (sha !== undefined) return { kind: 'base', ref: candidate, sha };
+  }
+  return {
+    kind: 'error',
+    message: `unknown base ref ${ref}. The remotes here are: ${remotes.join(', ')}. Pass --base=<ref> for one of them.`,
+  };
+}

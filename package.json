@@ -46,7 +46,7 @@
     "check:fetch-lazy": "node scripts/binding_layer_fetch_lazy.mjs",
     "check:repositories": "node scripts/repositories_audit.mjs",
     "check:compiler": "tsx scripts/react_compiler_report.mts",
-    "check:compiler:changed": "tsx scripts/react_compiler_report.mts --base=origin/dev",
+    "check:compiler:changed": "tsx scripts/react_compiler_report.mts --base=dev",
     "release:prod:prep": "node scripts/release/release-prep.mjs prod",
     "release:beta:prep": "node scripts/release/release-prep.mjs beta",
     "pods": "cd ios && pod install && cd .."
