@@ -3,6 +3,7 @@ const path = require('node:path');
 // The one React Compiler entry. Metro reads it through babel.config.js, the
 // Storybook web build through .storybook-web/main.ts and the CI report
 // through scripts/react_compiler_report.mts, so all three compile alike.
+/** @type {[string, { target: string, sources(filename: string): boolean }]} */
 module.exports = [
   'babel-plugin-react-compiler',
   {
