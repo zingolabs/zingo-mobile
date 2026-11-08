@@ -61,11 +61,16 @@ type FileReport = {
 };
 
 const args = process.argv.slice(2);
+// The last occurrence wins, so a CLI --base overrides a script default.
 const argValue = (name: string): string | undefined => {
-  const entry = args.find(a => a === name || a.startsWith(`${name}=`));
-  if (entry === undefined) return undefined;
-  const eq = entry.indexOf('=');
-  return eq === -1 ? '' : entry.slice(eq + 1);
+  for (let i = args.length - 1; i >= 0; i--) {
+    const arg = args[i];
+    if (arg === name || arg.startsWith(`${name}=`)) {
+      const eq = arg.indexOf('=');
+      return eq === -1 ? '' : arg.slice(eq + 1);
+    }
+  }
+  return undefined;
 };
 const baseRef = argValue('--base') || undefined;
 const jsonPath = argValue('--json') || undefined;

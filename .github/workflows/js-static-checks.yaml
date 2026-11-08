@@ -45,7 +45,7 @@ jobs:
           BASE: ${{ github.event.pull_request.base.sha }}
         run: |
           git fetch --no-tags origin "$BASE"
-          tsx scripts/react_compiler_report.mts --base="$BASE"
+          yarn check:compiler:changed --base="$BASE"
 
       # DESIGN.md mirrors app/theme ("Changing the system" in it): a PR that
       # changes a theme value changes DESIGN.md too. The label
