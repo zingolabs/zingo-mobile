@@ -21,11 +21,14 @@ import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import {
+  failure,
+  fnNameAt,
   gateFails,
   regressions,
   tally,
   uncompiledFrom,
   type CompilerEvent,
+  type Transform,
   type Uncompiled,
 } from './react_compiler_skips';
 
@@ -33,7 +36,7 @@ const require_ = createRequire(import.meta.url);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 type CompilerOptions = {
-  sources: (filename: string | null | undefined) => boolean;
+  sources: (filename: unknown) => boolean;
 };
 
 type BabelConfig = { presets: unknown[]; plugins: unknown[] };
@@ -45,16 +48,15 @@ type Babel = {
   ): Promise<unknown>;
 };
 
-type Named = Uncompiled & { name: string | null };
+type Named = Uncompiled & { name?: string };
 
 type FileReport = {
   file: string;
   code: string;
-  lines: string[] | null;
   optimized: number;
   uncompiled: Named[];
   diagnostics: number;
-  error: string | null;
+  transform: Transform;
 };
 
 const args = process.argv.slice(2);
@@ -98,11 +100,10 @@ function fileReport(file: string, codeOf = diskCode): FileReport {
     report = {
       file,
       code: codeOf(file),
-      lines: null,
       optimized: 0,
       uncompiled: [],
       diagnostics: 0,
-      error: null,
+      transform: { kind: 'compiled' },
     };
     active.set(file, report);
   }
@@ -116,21 +117,8 @@ const gitLines = (...cmd: string[]): string[] =>
     .split('\n')
     .filter(Boolean);
 
-function fnNameAt(lines: string[], line: number): string | null {
-  const text = lines[line - 1] ?? '';
-  for (const pattern of [
-    /\bfunction\s+([A-Za-z_$][\w$]*)/,
-    /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=/,
-    /\b([A-Z][\w$]*)\s*[=(]/,
-  ]) {
-    const match = text.match(pattern);
-    if (match) return match[1] ?? null;
-  }
-  return null;
-}
-
 const logger = {
-  logEvent(filename: string | null, event: CompilerEvent): void {
+  logEvent(filename: unknown, event: CompilerEvent): void {
     if (typeof filename !== 'string' || !sources(filename)) return;
     const report = fileReport(filename);
     if (event.kind === 'CompileSuccess') {
@@ -145,10 +133,7 @@ const logger = {
     if (uncompiled === undefined) return;
     report.uncompiled.push({
       ...uncompiled,
-      name: fnNameAt(
-        (report.lines ??= report.code.split('\n')),
-        uncompiled.line,
-      ),
+      name: fnNameAt(report.code, uncompiled.line),
     });
   },
 };
@@ -217,8 +202,8 @@ async function transformAll(files: string[], codeOf = diskCode): Promise<void> {
             ...babelOptions,
             filename: file,
           });
-        } catch (error) {
-          report.error = (error as Error).message.split('\n')[0];
+        } catch (thrown) {
+          report.transform = failure(thrown);
         }
         if (++done % 25 === 0)
           process.stderr.write(`\r  checked ${done}/${files.length}`);
@@ -270,7 +255,7 @@ const totals = {
   optimized: list.reduce((n, r) => n + r.optimized, 0),
   ...tally(uncompiled),
   diagnostics: list.reduce((n, r) => n + r.diagnostics, 0),
-  errors: list.filter(r => r.error !== null).length,
+  errors: list.filter(r => r.transform.kind === 'error').length,
 };
 
 console.log(
@@ -286,9 +271,9 @@ for (const { file, line, name, cause, reason } of uncompiled) {
   );
 }
 for (const r of list) {
-  if (r.error !== null) {
+  if (r.transform.kind === 'error') {
     console.log(
-      `  ${path.relative(ROOT, r.file)}  [TransformError] ${r.error}`,
+      `  ${path.relative(ROOT, r.file)}  [TransformError] ${r.transform.message}`,
     );
   }
 }
@@ -299,7 +284,7 @@ for (const { file, base, head } of regressed) {
 if (jsonPath !== undefined) {
   writeFileSync(
     jsonPath,
-    `${JSON.stringify({ totals, uncompiled, regressed }, null, 2)}\n`,
+    `${JSON.stringify({ totals, uncompiled, regressed }, undefined, 2)}\n`,
   );
   console.log(`json: ${jsonPath}`);
 }

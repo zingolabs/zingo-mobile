@@ -83,3 +83,24 @@ export function regressions(
     .map(([file, count]) => ({ file, base: base[file] ?? 0, head: count }))
     .filter(r => r.head > r.base);
 }
+
+export type Transform =
+  { kind: 'compiled' } | { kind: 'error'; message: string };
+
+export function failure(thrown: unknown): Transform {
+  const message = thrown instanceof Error ? thrown.message : String(thrown);
+  return { kind: 'error', message: message.split('\n')[0] };
+}
+
+export function fnNameAt(code: string, line: number): string | undefined {
+  const text = code.split('\n')[line - 1] ?? '';
+  for (const pattern of [
+    /\bfunction\s+([A-Za-z_$][\w$]*)/,
+    /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=/,
+    /\b([A-Z][\w$]*)\s*[=(]/,
+  ]) {
+    const match = text.match(pattern);
+    if (match) return match[1];
+  }
+  return undefined;
+}

@@ -1,4 +1,6 @@
 import {
+  failure,
+  fnNameAt,
   gateFails,
   regressions,
   uncompiledFrom,
@@ -141,5 +143,34 @@ describe('ratchet against the base', () => {
       { file: 'ui/widgets/New.tsx', base: 0, head: 1 },
     ]);
     expect(regressions({}, { 'ui/widgets/Clean.tsx': 0 })).toEqual([]);
+  });
+});
+
+describe('function name at a line', () => {
+  const code = [
+    'function History() {}',
+    'const useShallowMemo = () => {};',
+    '  PairCards(props) {',
+    'return <Text />;',
+  ].join('\n');
+
+  // Tests that the lookup names the declaration, the binding or the capitalized call on the reported line, and yields no name when the line has none.
+  test('a declaration, a binding and a capitalized call are named', () => {
+    expect(fnNameAt(code, 1)).toBe('History');
+    expect(fnNameAt(code, 2)).toBe('useShallowMemo');
+    expect(fnNameAt(code, 3)).toBe('PairCards');
+    expect(fnNameAt(code, 4)).toBeUndefined();
+    expect(fnNameAt(code, 0)).toBeUndefined();
+  });
+});
+
+describe('transform failure', () => {
+  // Tests that a thrown Error is reported by the first line of its message, and a thrown non-Error by its string form.
+  test('an Error gives its first message line and a non-Error its string', () => {
+    expect(failure(new Error('Unexpected token\n  at parse'))).toEqual({
+      kind: 'error',
+      message: 'Unexpected token',
+    });
+    expect(failure('boom')).toEqual({ kind: 'error', message: 'boom' });
   });
 });
