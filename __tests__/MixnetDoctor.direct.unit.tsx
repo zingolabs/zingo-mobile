@@ -101,9 +101,7 @@ describe('the Mixnet Doctor direct probe', () => {
     );
     rerender(screen(mixnetReady));
 
-    expect(
-      await findByText('mixnetdoctor.connected', {}, { timeout: 3000 }),
-    ).not.toBeNull();
+    expect(await findByText('mixnetdoctor.connected')).not.toBeNull();
     expect(queryByText('mixnetdoctor.server-silent')).toBeNull();
   });
 
