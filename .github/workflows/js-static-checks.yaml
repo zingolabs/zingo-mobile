@@ -12,7 +12,7 @@ on:
 
 jobs:
   js-static-checks:
-    name: tsc, eslint, prettier
+    name: tsc, eslint, prettier, react compiler
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
@@ -34,6 +34,18 @@ jobs:
 
       - name: Check formatting
         run: yarn prettier:check
+
+      # The React Compiler ratchet: only files changed against the PR base
+      # run, so existing skips stay green while every PR keeps its own code
+      # compilable. The full strict sweep (yarn check:compiler --strict)
+      # waits until the skip backlog is gone.
+      - name: React Compiler changed-file gate
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git fetch --no-tags origin "$BASE"
+          tsx scripts/react_compiler_report.mts --base="$BASE"
 
       # DESIGN.md mirrors app/theme ("Changing the system" in it): a PR that
       # changes a theme value changes DESIGN.md too. The label
