@@ -1,31 +1,27 @@
-/**
- * `lockdown()` freezes the language intrinsics but leaves `globalThis`
- * writable, and the networking and timer globals are React Native's, not the
- * language's. Pinning their bindings keeps a dependency from swapping
- * `fetch` or `setTimeout` for its own. The list is the set React Native
- * installs in setUpXHR and setUpTimers; the worklet runtimes own copies of
- * these and are not touched.
- */
-const PINNED = [
-  'fetch',
+export const PINNED = [
   'XMLHttpRequest',
-  'WebSocket',
+  'FormData',
+  'fetch',
   'Headers',
   'Request',
   'Response',
-  'FormData',
+  'WebSocket',
   'Blob',
+  'File',
+  'FileReader',
   'URL',
   'URLSearchParams',
   'AbortController',
   'AbortSignal',
+  'queueMicrotask',
+  'setImmediate',
+  'clearImmediate',
+  'requestIdleCallback',
+  'cancelIdleCallback',
   'setTimeout',
   'clearTimeout',
   'setInterval',
   'clearInterval',
-  'setImmediate',
-  'clearImmediate',
-  'queueMicrotask',
   'requestAnimationFrame',
   'cancelAnimationFrame',
 ] as const;
@@ -33,22 +29,26 @@ const PINNED = [
 type Target = Record<string, unknown>;
 
 /**
- * React Native installs each global as a lazy getter that replaces itself
- * with the real value on first read, so reading it is what makes the binding
- * pinnable. Redefining an already pinned binding with the same value is a
- * no-op, so a second run (Fast Refresh) is harmless.
+ * - Reads every pinned name on `target`, which resolves React Native's lazy
+ *   getters and loads the modules behind them.
+ * - Redefines each as a non-configurable accessor whose setter throws.
  */
 export const pinGlobals = (target: Target = globalThis as Target): void => {
   for (const name of PINNED) {
-    if (!(name in target)) {
+    const installed = Object.getOwnPropertyDescriptor(target, name);
+    if (installed === undefined || !installed.configurable) {
       continue;
     }
     const value = target[name];
     Object.defineProperty(target, name, {
-      value,
-      writable: false,
+      get: () => value,
+      set: () => {
+        throw new TypeError(
+          `${name} is a Pinned Global and rejects writes after the entry file`,
+        );
+      },
       configurable: false,
-      enumerable: Object.getOwnPropertyDescriptor(target, name)?.enumerable,
+      enumerable: installed.enumerable,
     });
   }
 };
