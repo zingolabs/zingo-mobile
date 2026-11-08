@@ -175,7 +175,8 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
 
   /**
    * It keeps following the transport while open, whatever state that is in, so
-   * nothing on screen outlives what it describes.
+   * nothing on screen outlives what it describes. A change of phase reads at
+   * once.
    */
   useEffect(() => {
     if (restingOff) {
@@ -185,7 +186,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
     readState();
     const tick = setInterval(readState, REFRESH_MS);
     return () => clearInterval(tick);
-  }, [restingOff, readState]);
+  }, [restingOff, readState, phase]);
 
   const restart = useCallback(async () => {
     setDirect(NOT_RUN);

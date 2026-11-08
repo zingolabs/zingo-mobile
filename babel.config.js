@@ -1,6 +1,7 @@
 module.exports = {
   presets: ['module:@react-native/babel-preset'],
   plugins: [
+    require('./babel.react-compiler'),
     'dynamic-import-node',
     // Inline ONLY STORYBOOK_ENABLED so the index.js entry toggle resolves
     // at build time. Scoped on purpose: unscoped would bake every build

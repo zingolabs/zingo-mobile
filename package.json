@@ -45,6 +45,8 @@
     "pin": "node --permission --allow-fs-read=node_modules/zingolib-bundle-pin --allow-fs-read=binding-layer.json --allow-fs-read=binding-layer.json.partial --allow-fs-write=binding-layer.json --allow-fs-write=binding-layer.json.partial node_modules/zingolib-bundle-pin/bin/pin_binding_layer.mjs",
     "check:fetch-lazy": "node scripts/binding_layer_fetch_lazy.mjs",
     "check:repositories": "node scripts/repositories_audit.mjs",
+    "check:compiler": "tsx scripts/react_compiler_report.mts",
+    "check:compiler:changed": "tsx scripts/react_compiler_report.mts --base=dev",
     "release:prod:prep": "node scripts/release/release-prep.mjs prod",
     "release:beta:prep": "node scripts/release/release-prep.mjs beta",
     "pods": "cd ios && pod install && cd .."
@@ -119,6 +121,7 @@
     "babel-jest": "^30.5.2",
     "babel-plugin-dynamic-import-node": "^2.3.3",
     "babel-plugin-module-resolver": "^5.0.3",
+    "babel-plugin-react-compiler": "1.0.0",
     "babel-plugin-transform-inline-environment-variables": "^0.4.4",
     "depcheck": "^1.4.7",
     "eslint": "^9.17.0",
