@@ -1,15 +1,16 @@
 #!/usr/bin/env tsx
 // React Compiler healthcheck over app/ui/screens. Reports which components
-// and hooks the compiler optimizes and which it skips. With --base=<ref>,
-// checks only files changed against that ref and exits non-zero when any of
-// them is skipped.
+// and hooks the compiler optimizes, which it skips on an opt-out directive
+// (CompileSkip), and which it bails out of (CompileError, PipelineError).
+// With --base=<ref>, checks only files changed against that ref and exits
+// non-zero when any of them carries a bailout. A skip never fails the check.
 //
 // The compiler options are read from babel.config.js.
 //
 // Usage:
 //   tsx scripts/react_compiler_report.mts                     full report
 //   tsx scripts/react_compiler_report.mts --base=origin/dev   changed files
-//   tsx scripts/react_compiler_report.mts --strict            fail on any skip
+//   tsx scripts/react_compiler_report.mts --strict            fail on any bailout
 //   tsx scripts/react_compiler_report.mts --json=out.json     also write JSON
 
 import { execFileSync } from 'node:child_process';
@@ -18,22 +19,16 @@ import os from 'node:os';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import {
+  gateFails,
+  tally,
+  uncompiledFrom,
+  type CompilerEvent,
+  type Uncompiled,
+} from './react_compiler_skips';
 
 const require_ = createRequire(import.meta.url);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-
-type SourceLocation = { start?: { line?: number } } | null;
-
-type CompilerEvent =
-  | { kind: 'CompileSuccess' }
-  | { kind: 'CompileSkip'; loc: SourceLocation; reason: string }
-  | {
-      kind: 'CompileError';
-      fnLoc: SourceLocation;
-      detail?: { reason?: string };
-    }
-  | { kind: 'PipelineError'; fnLoc: SourceLocation; data: string }
-  | { kind: 'CompileDiagnostic' };
 
 type CompilerOptions = {
   sources: (filename: string | null | undefined) => boolean;
@@ -48,14 +43,14 @@ type Babel = {
   ): Promise<unknown>;
 };
 
-type Skip = { line: number; name: string | null; kind: string; reason: string };
+type Named = Uncompiled & { name: string | null };
 
 type FileReport = {
   file: string;
   code: string;
   lines: string[] | null;
   optimized: number;
-  skipped: Skip[];
+  uncompiled: Named[];
   diagnostics: number;
   error: string | null;
 };
@@ -99,7 +94,7 @@ function fileReport(file: string): FileReport {
       code: readFileSync(file, 'utf8'),
       lines: null,
       optimized: 0,
-      skipped: [],
+      uncompiled: [],
       diagnostics: 0,
       error: null,
     };
@@ -127,28 +122,21 @@ const logger = {
     const report = fileReport(filename);
     if (event.kind === 'CompileSuccess') {
       report.optimized += 1;
-    } else if (
-      event.kind === 'CompileError' ||
-      event.kind === 'CompileSkip' ||
-      event.kind === 'PipelineError'
-    ) {
-      const loc = event.kind === 'CompileSkip' ? event.loc : event.fnLoc;
-      const line = loc?.start?.line ?? 0;
-      const reason =
-        event.kind === 'CompileSkip'
-          ? event.reason
-          : event.kind === 'PipelineError'
-            ? event.data
-            : (event.detail?.reason ?? JSON.stringify(event.detail));
-      report.skipped.push({
-        line,
-        name: fnNameAt((report.lines ??= report.code.split('\n')), line),
-        kind: event.kind,
-        reason,
-      });
-    } else if (event.kind === 'CompileDiagnostic') {
-      report.diagnostics += 1;
+      return;
     }
+    if (event.kind === 'CompileDiagnostic') {
+      report.diagnostics += 1;
+      return;
+    }
+    const uncompiled = uncompiledFrom(event);
+    if (uncompiled === undefined) return;
+    report.uncompiled.push({
+      ...uncompiled,
+      name: fnNameAt(
+        (report.lines ??= report.code.split('\n')),
+        uncompiled.line,
+      ),
+    });
   },
 };
 
@@ -241,10 +229,15 @@ if (files.length === 0) {
 await transformAll(files);
 
 const list = [...reports.values()];
+const uncompiled = list
+  .flatMap(r =>
+    r.uncompiled.map(u => ({ file: path.relative(ROOT, r.file), ...u })),
+  )
+  .sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line);
 const totals = {
   files: list.length,
   optimized: list.reduce((n, r) => n + r.optimized, 0),
-  skipped: list.reduce((n, r) => n + r.skipped.length, 0),
+  ...tally(uncompiled),
   diagnostics: list.reduce((n, r) => n + r.diagnostics, 0),
   errors: list.filter(r => r.error !== null).length,
 };
@@ -253,17 +246,12 @@ console.log(
   `React Compiler healthcheck${baseRef ? ` (changed vs ${baseRef})` : ''}`,
 );
 console.log(
-  `files: ${totals.files}  optimized functions: ${totals.optimized}  skipped: ${totals.skipped}  diagnostics: ${totals.diagnostics}  transform errors: ${totals.errors}`,
+  `files: ${totals.files}  optimized functions: ${totals.optimized}  bailouts: ${totals.bailouts}  skips: ${totals.skips}  diagnostics: ${totals.diagnostics}  transform errors: ${totals.errors}`,
 );
 
-const skipped = list
-  .flatMap(r =>
-    r.skipped.map(s => ({ file: path.relative(ROOT, r.file), ...s })),
-  )
-  .sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line);
-for (const { file, line, name, kind, reason } of skipped) {
+for (const { file, line, name, cause, reason } of uncompiled) {
   console.log(
-    `  ${file}:${line}${name ? `  ${name}` : ''}  [${kind}] ${reason}`,
+    `  ${file}:${line}${name ? `  ${name}` : ''}  [${cause}] ${reason}`,
   );
 }
 for (const r of list) {
@@ -275,18 +263,24 @@ for (const r of list) {
 }
 
 if (jsonPath !== undefined) {
-  writeFileSync(jsonPath, `${JSON.stringify({ totals, skipped }, null, 2)}\n`);
+  writeFileSync(
+    jsonPath,
+    `${JSON.stringify({ totals, uncompiled }, null, 2)}\n`,
+  );
   console.log(`json: ${jsonPath}`);
 }
 
-const failing =
-  totals.errors > 0 ||
-  ((baseRef !== undefined || strict) && totals.skipped > 0);
-if (failing) {
+if (
+  gateFails({
+    gated: baseRef !== undefined || strict,
+    bailouts: totals.bailouts,
+    errors: totals.errors,
+  })
+) {
   const what =
     totals.errors > 0
       ? `${totals.errors} transform error(s)`
-      : `${totals.skipped} skipped component(s)/hook(s)`;
+      : `${totals.bailouts} bailout(s)`;
   console.error(
     `FAIL: ${what}${baseRef !== undefined ? ' among changed files' : ''}`,
   );
