@@ -1,88 +1,121 @@
 import {
+  CompilerErrorDetail,
+  ErrorCategory,
+  type LoggerEvent,
+} from 'babel-plugin-react-compiler';
+import {
   failure,
   fnNameAt,
   gateFails,
+  outcomeOf,
   parseArgs,
   regressions,
   resolveBase,
-  uncompiledFrom,
   tally,
+  type Commit,
   type Uncompiled,
 } from '../scripts/react_compiler_skips';
 
-describe('skip classification', () => {
+type Loc = NonNullable<Extract<LoggerEvent, { kind: 'CompileSkip' }>['loc']>;
+
+const at = (line: number): Loc => ({
+  start: { line, column: 0, index: 0 },
+  end: { line, column: 0, index: 0 },
+  filename: 'app/Probe.tsx',
+  identifierName: '',
+});
+
+describe('compiler event outcome', () => {
   // Tests that a CompileSkip becomes a skip when the compiler honors an opt-out directive.
   test('a CompileSkip is a skip carrying the opt-out directive', () => {
     expect(
-      uncompiledFrom({
+      outcomeOf({
         kind: 'CompileSkip',
-        loc: { start: { line: 12 } },
-        reason: 'Skipped due to "use no memo" directive.',
+        fnLoc: at(10),
+        loc: at(12),
+        reason: "Skipped due to 'use no memo' directive.",
       }),
     ).toEqual({
-      cause: 'skip',
-      event: 'CompileSkip',
-      line: 12,
-      reason: 'Skipped due to "use no memo" directive.',
+      kind: 'uncompiled',
+      uncompiled: {
+        cause: 'skip',
+        event: 'CompileSkip',
+        line: 12,
+        reason: "Skipped due to 'use no memo' directive.",
+      },
     });
   });
 
   // Tests that a CompileError becomes a bailout when the compiler rejects a function, carrying the detail reason.
   test('a CompileError is a bailout carrying the detail reason', () => {
     expect(
-      uncompiledFrom({
+      outcomeOf({
         kind: 'CompileError',
-        fnLoc: { start: { line: 40 } },
-        detail: {
-          reason:
-            'Ref values (the `current` property) may not be accessed during render',
-        },
+        fnLoc: at(40),
+        detail: new CompilerErrorDetail({
+          category: ErrorCategory.Refs,
+          reason: 'Cannot access refs during render',
+          loc: at(41),
+        }),
       }),
     ).toEqual({
-      cause: 'bailout',
-      event: 'CompileError',
-      line: 40,
-      reason:
-        'Ref values (the `current` property) may not be accessed during render',
-    });
-  });
-
-  // Tests that a bailout without a detail reason carries the serialized detail when the compiler omits the reason.
-  test('a CompileError without a reason carries the serialized detail', () => {
-    expect(
-      uncompiledFrom({
-        kind: 'CompileError',
-        fnLoc: null,
-        detail: { severity: 'Todo' },
-      }),
-    ).toEqual({
-      cause: 'bailout',
-      event: 'CompileError',
-      line: 0,
-      reason: '{"severity":"Todo"}',
+      kind: 'uncompiled',
+      uncompiled: {
+        cause: 'bailout',
+        event: 'CompileError',
+        line: 40,
+        reason: 'Cannot access refs during render',
+      },
     });
   });
 
   // Tests that a PipelineError becomes a bailout when the compiler fails internally, carrying its data.
   test('a PipelineError is a bailout carrying its data', () => {
     expect(
-      uncompiledFrom({
+      outcomeOf({
         kind: 'PipelineError',
-        fnLoc: { start: { line: 7 } },
+        fnLoc: at(7),
         data: 'Unexpected terminal kind',
       }),
     ).toEqual({
-      cause: 'bailout',
-      event: 'PipelineError',
-      line: 7,
-      reason: 'Unexpected terminal kind',
+      kind: 'uncompiled',
+      uncompiled: {
+        cause: 'bailout',
+        event: 'PipelineError',
+        line: 7,
+        reason: 'Unexpected terminal kind',
+      },
     });
   });
 
-  // Tests that neither class arises when the compiler reports a success or a diagnostic.
-  test('a success and a diagnostic yield neither', () => {
-    expect(uncompiledFrom({ kind: 'CompileSuccess' })).toBeUndefined();
-    expect(uncompiledFrom({ kind: 'CompileDiagnostic' })).toBeUndefined();
+  // Tests that a success, a diagnostic and an auto-deps event each take their own outcome when the compiler reports them.
+  test('a success, a diagnostic and an auto-deps event have their own outcomes', () => {
+    expect(
+      outcomeOf({
+        kind: 'CompileSuccess',
+        fnLoc: at(1),
+        fnName: 'History',
+        memoSlots: 3,
+        memoBlocks: 1,
+        memoValues: 2,
+        prunedMemoBlocks: 0,
+        prunedMemoValues: 0,
+      }),
+    ).toEqual({ kind: 'optimized' });
+    expect(
+      outcomeOf({
+        kind: 'CompileDiagnostic',
+        fnLoc: at(1),
+        detail: {
+          category: ErrorCategory.Hooks,
+          reason: 'Hooks must be called at the top level',
+          loc: at(2),
+        },
+      }),
+    ).toEqual({ kind: 'diagnostic' });
+    expect(
+      outcomeOf({ kind: 'AutoDepsEligible', fnLoc: at(1), depArrayLoc: at(2) }),
+    ).toEqual({ kind: 'ignored' });
   });
 });
 
@@ -91,7 +124,7 @@ describe('tally and gate', () => {
     cause: 'skip',
     event: 'CompileSkip',
     line: 1,
-    reason: 'Skipped due to "worklet" directive.',
+    reason: "Skipped due to 'worklet' directive.",
   };
   const bailout: Uncompiled = {
     cause: 'bailout',
@@ -156,13 +189,13 @@ describe('function name at a line', () => {
     'return <Text />;',
   ].join('\n');
 
-  // Tests that the lookup names the declaration, the binding or the capitalized call on the reported line, and yields no name when the line has none.
+  // Tests that the lookup names the declaration, the binding or the capitalized call on the reported line, and yields the empty name when the line has none.
   test('a declaration, a binding and a capitalized call are named', () => {
     expect(fnNameAt(code, 1)).toBe('History');
     expect(fnNameAt(code, 2)).toBe('useShallowMemo');
     expect(fnNameAt(code, 3)).toBe('PairCards');
-    expect(fnNameAt(code, 4)).toBeUndefined();
-    expect(fnNameAt(code, 0)).toBeUndefined();
+    expect(fnNameAt(code, 4)).toBe('');
+    expect(fnNameAt(code, 0)).toBe('');
   });
 });
 
@@ -189,11 +222,16 @@ describe('command line', () => {
       ]),
     ).toEqual({
       kind: 'options',
-      base: 'abc123',
-      json: 'out.json',
+      scope: { kind: 'changed', base: 'abc123' },
+      json: { kind: 'file', path: 'out.json' },
       strict: true,
     });
-    expect(parseArgs([])).toEqual({ kind: 'options', strict: false });
+    expect(parseArgs([])).toEqual({
+      kind: 'options',
+      scope: { kind: 'all' },
+      json: { kind: 'stdout' },
+      strict: false,
+    });
   });
 
   // Tests that a --base with no value is rejected when it would otherwise turn the gate into an ungated full sweep. An empty value counts as missing.
@@ -219,7 +257,9 @@ describe('base ref resolution', () => {
     dev: 'bbb222',
     'origin/dev': 'ccc333',
   };
-  const probe = (rev: string): string | undefined => shas[rev];
+  const probe = (rev: string): Commit =>
+    rev in shas ? { kind: 'commit', sha: shas[rev] } : { kind: 'missing' };
+  const nothing = (): Commit => ({ kind: 'missing' });
 
   // Tests that a branch resolves to its upstream when one is configured, whatever the remote is named, and to itself otherwise.
   test('a branch prefers its upstream and falls back to itself', () => {
@@ -237,7 +277,7 @@ describe('base ref resolution', () => {
 
   // Tests that an unknown ref is an error naming the ref and the remotes when no candidate resolves.
   test('an unknown ref names itself and the remotes', () => {
-    expect(resolveBase('origin/dev', () => undefined, ['zingolabs'])).toEqual({
+    expect(resolveBase('origin/dev', nothing, ['zingolabs'])).toEqual({
       kind: 'error',
       message:
         'unknown base ref origin/dev. The remotes here are: zingolabs. Pass --base=<ref> for one of them.',

@@ -1,13 +1,6 @@
-export type CompilerEvent =
-  | { kind: 'CompileSuccess' }
-  | { kind: 'CompileSkip'; loc: unknown; reason: string }
-  | {
-      kind: 'CompileError';
-      fnLoc: unknown;
-      detail?: { reason?: string; [extra: string]: unknown };
-    }
-  | { kind: 'PipelineError'; fnLoc: unknown; data: string }
-  | { kind: 'CompileDiagnostic' };
+import type { LoggerEvent } from 'babel-plugin-react-compiler';
+
+type Loc = Extract<LoggerEvent, { kind: 'CompileSkip' }>['loc'];
 
 export type Uncompiled = {
   cause: 'skip' | 'bailout';
@@ -16,41 +9,54 @@ export type Uncompiled = {
   reason: string;
 };
 
+export type Outcome =
+  | { kind: 'optimized' }
+  | { kind: 'diagnostic' }
+  | { kind: 'uncompiled'; uncompiled: Uncompiled }
+  | { kind: 'ignored' };
+
 export type Tally = { skips: number; bailouts: number };
 
-function lineOf(loc: unknown): number {
-  if (typeof loc !== 'object' || loc === null || !('start' in loc)) return 0;
-  const { start } = loc;
-  if (typeof start !== 'object' || start === null || !('line' in start))
-    return 0;
-  return typeof start.line === 'number' ? start.line : 0;
-}
+const lineOf = (loc: Loc): number => loc?.start.line ?? 0;
 
-export function uncompiledFrom(event: CompilerEvent): Uncompiled | undefined {
+export function outcomeOf(event: LoggerEvent): Outcome {
   switch (event.kind) {
+    case 'CompileSuccess':
+      return { kind: 'optimized' };
+    case 'CompileDiagnostic':
+      return { kind: 'diagnostic' };
     case 'CompileSkip':
       return {
-        cause: 'skip',
-        event: event.kind,
-        line: lineOf(event.loc),
-        reason: event.reason,
+        kind: 'uncompiled',
+        uncompiled: {
+          cause: 'skip',
+          event: event.kind,
+          line: lineOf(event.loc),
+          reason: event.reason,
+        },
       };
     case 'CompileError':
       return {
-        cause: 'bailout',
-        event: event.kind,
-        line: lineOf(event.fnLoc),
-        reason: event.detail?.reason ?? JSON.stringify(event.detail),
+        kind: 'uncompiled',
+        uncompiled: {
+          cause: 'bailout',
+          event: event.kind,
+          line: lineOf(event.fnLoc),
+          reason: event.detail.reason,
+        },
       };
     case 'PipelineError':
       return {
-        cause: 'bailout',
-        event: event.kind,
-        line: lineOf(event.fnLoc),
-        reason: event.data,
+        kind: 'uncompiled',
+        uncompiled: {
+          cause: 'bailout',
+          event: event.kind,
+          line: lineOf(event.fnLoc),
+          reason: event.data,
+        },
       };
     default:
-      return undefined;
+      return { kind: 'ignored' };
   }
 }
 
@@ -92,7 +98,7 @@ export function failure(thrown: unknown): Transform {
   return { kind: 'error', message: message.split('\n')[0] };
 }
 
-export function fnNameAt(code: string, line: number): string | undefined {
+export function fnNameAt(code: string, line: number): string {
   const text = code.split('\n')[line - 1] ?? '';
   for (const pattern of [
     /\bfunction\s+([A-Za-z_$][\w$]*)/,
@@ -102,17 +108,21 @@ export function fnNameAt(code: string, line: number): string | undefined {
     const match = text.match(pattern);
     if (match) return match[1];
   }
-  return undefined;
+  return '';
 }
 
+export type Scope = { kind: 'changed'; base: string } | { kind: 'all' };
+export type Sink = { kind: 'file'; path: string } | { kind: 'stdout' };
+
 export type Options =
-  | { kind: 'options'; base?: string; json?: string; strict: boolean }
+  | { kind: 'options'; scope: Scope; json: Sink; strict: boolean }
   | { kind: 'error'; message: string };
 
 const VALUED = { '--base': '<ref>', '--json': '<path>' } as const;
 
 export function parseArgs(args: readonly string[]): Options {
-  const values: { base?: string; json?: string } = {};
+  let scope: Scope = { kind: 'all' };
+  let json: Sink = { kind: 'stdout' };
   for (const arg of args) {
     for (const [flag, placeholder] of Object.entries(VALUED)) {
       if (arg !== flag && !arg.startsWith(`${flag}=`)) continue;
@@ -123,11 +133,14 @@ export function parseArgs(args: readonly string[]): Options {
           message: `${flag} needs a value, as ${flag}=${placeholder}`,
         };
       }
-      values[flag === '--base' ? 'base' : 'json'] = given;
+      if (flag === '--base') scope = { kind: 'changed', base: given };
+      else json = { kind: 'file', path: given };
     }
   }
-  return { kind: 'options', ...values, strict: args.includes('--strict') };
+  return { kind: 'options', scope, json, strict: args.includes('--strict') };
 }
+
+export type Commit = { kind: 'commit'; sha: string } | { kind: 'missing' };
 
 export type Base =
   | { kind: 'base'; ref: string; sha: string }
@@ -135,12 +148,14 @@ export type Base =
 
 export function resolveBase(
   ref: string,
-  probe: (rev: string) => string | undefined,
+  probe: (rev: string) => Commit,
   remotes: readonly string[],
 ): Base {
   for (const candidate of [`${ref}@{upstream}`, ref]) {
-    const sha = probe(candidate);
-    if (sha !== undefined) return { kind: 'base', ref: candidate, sha };
+    const commit = probe(candidate);
+    if (commit.kind === 'commit') {
+      return { kind: 'base', ref: candidate, sha: commit.sha };
+    }
   }
   return {
     kind: 'error',

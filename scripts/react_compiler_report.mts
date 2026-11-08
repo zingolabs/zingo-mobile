@@ -20,16 +20,19 @@ import os from 'node:os';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import type { PluginItem, TransformOptions } from '@babel/core';
+import type { Logger } from 'babel-plugin-react-compiler';
 import {
   failure,
   fnNameAt,
   gateFails,
+  outcomeOf,
   parseArgs,
   regressions,
   resolveBase,
   tally,
-  uncompiledFrom,
-  type CompilerEvent,
+  type Base,
+  type Commit,
   type Transform,
   type Uncompiled,
 } from './react_compiler_skips';
@@ -38,19 +41,12 @@ const require_ = createRequire(import.meta.url);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 type CompilerOptions = {
-  sources: (filename: unknown) => boolean;
+  sources: (filename: string) => boolean;
 };
 
-type BabelConfig = { presets: unknown[]; plugins: unknown[] };
+type BabelConfig = { presets: PluginItem[]; plugins: PluginItem[] };
 
-type Babel = {
-  transformAsync(
-    code: string,
-    options: Record<string, unknown>,
-  ): Promise<unknown>;
-};
-
-type Named = Uncompiled & { name?: string };
+type Named = Uncompiled & { name: string };
 
 type FileReport = {
   file: string;
@@ -66,20 +62,20 @@ if (options.kind === 'error') {
   console.error(options.message);
   process.exit(2);
 }
-const { json: jsonPath, strict } = options;
+const { scope, json, strict } = options;
 
-const babel: Babel = require_('@babel/core');
+const babel: typeof import('@babel/core') = require_('@babel/core');
 const babelConfig: BabelConfig = require_(path.join(ROOT, 'babel.config.js'));
 
-const compilerEntry = babelConfig.plugins.find(
+const compilerEntries = babelConfig.plugins.filter(
   (plugin): plugin is [string, CompilerOptions] =>
     Array.isArray(plugin) && plugin[0] === 'babel-plugin-react-compiler',
 );
-if (compilerEntry === undefined) {
+if (compilerEntries.length === 0) {
   console.error('babel.config.js has no babel-plugin-react-compiler entry');
   process.exit(2);
 }
-const { sources } = compilerEntry[1];
+const { sources } = compilerEntries[0][1];
 
 const headReports = new Map<string, FileReport>();
 const baseReports = new Map<string, FileReport>();
@@ -87,20 +83,21 @@ let active = headReports;
 
 const diskCode = (file: string): string => readFileSync(file, 'utf8');
 
-function fileReport(file: string, codeOf = diskCode): FileReport {
-  let report = active.get(file);
-  if (report === undefined) {
-    report = {
-      file,
-      code: codeOf(file),
-      optimized: 0,
-      uncompiled: [],
-      diagnostics: 0,
-      transform: { kind: 'compiled' },
-    };
-    active.set(file, report);
-  }
+function register(file: string, codeOf: (file: string) => string): FileReport {
+  const report: FileReport = {
+    file,
+    code: codeOf(file),
+    optimized: 0,
+    uncompiled: [],
+    diagnostics: 0,
+    transform: { kind: 'compiled' },
+  };
+  active.set(file, report);
   return report;
+}
+
+function fileReport(file: string, codeOf = diskCode): FileReport {
+  return active.get(file) ?? register(file, codeOf);
 }
 
 const git = (...cmd: string[]): string =>
@@ -110,40 +107,48 @@ const gitLines = (...cmd: string[]): string[] =>
     .split('\n')
     .filter(Boolean);
 
-const logger = {
-  logEvent(filename: unknown, event: CompilerEvent): void {
+const logger: Logger = {
+  logEvent(filename, event): void {
     if (typeof filename !== 'string' || !sources(filename)) return;
     const report = fileReport(filename);
-    if (event.kind === 'CompileSuccess') {
-      report.optimized += 1;
-      return;
+    const outcome = outcomeOf(event);
+    switch (outcome.kind) {
+      case 'optimized':
+        report.optimized += 1;
+        break;
+      case 'diagnostic':
+        report.diagnostics += 1;
+        break;
+      case 'uncompiled':
+        report.uncompiled.push({
+          ...outcome.uncompiled,
+          name: fnNameAt(report.code, outcome.uncompiled.line),
+        });
+        break;
+      case 'ignored':
+        break;
     }
-    if (event.kind === 'CompileDiagnostic') {
-      report.diagnostics += 1;
-      return;
-    }
-    const uncompiled = uncompiledFrom(event);
-    if (uncompiled === undefined) return;
-    report.uncompiled.push({
-      ...uncompiled,
-      name: fnNameAt(report.code, uncompiled.line),
-    });
   },
 };
 
-const plugins = babelConfig.plugins.map(plugin =>
+const plugins: PluginItem[] = babelConfig.plugins.map(plugin =>
   Array.isArray(plugin) && plugin[0] === 'babel-plugin-react-compiler'
     ? ['babel-plugin-react-compiler', { ...plugin[1], logger }]
     : plugin,
 );
 
-const babelOptions: Record<string, unknown> = {
+const metroCaller: NonNullable<TransformOptions['caller']> & {
+  isDev: boolean;
+  platform: string;
+} = { name: 'metro', isDev: false, platform: 'android' };
+
+const babelOptions: TransformOptions = {
   presets: babelConfig.presets,
   plugins,
   babelrc: false,
   configFile: false,
   cwd: ROOT,
-  caller: { name: 'metro', isDev: false, platform: 'android' },
+  caller: metroCaller,
 };
 
 const EXTENSIONS = /\.(ts|tsx|js|jsx)$/;
@@ -207,36 +212,39 @@ async function transformAll(files: string[], codeOf = diskCode): Promise<void> {
   process.stderr.write('\r'.padEnd(40) + '\r');
 }
 
-const probe = (rev: string): string | undefined => {
+const probe = (rev: string): Commit => {
   const run = spawnSync(
     'git',
     ['rev-parse', '--verify', '--quiet', `${rev}^{commit}`],
     { cwd: ROOT },
   );
-  return run.status === 0 ? run.stdout.toString().trim() : undefined;
+  return run.status === 0
+    ? { kind: 'commit', sha: run.stdout.toString().trim() }
+    : { kind: 'missing' };
 };
-const base =
-  options.base === undefined
-    ? undefined
-    : resolveBase(options.base, probe, gitLines('remote'));
-if (base?.kind === 'error') {
-  console.error(base.message);
+const target: Base | { kind: 'all' } =
+  scope.kind === 'changed'
+    ? resolveBase(scope.base, probe, gitLines('remote'))
+    : { kind: 'all' };
+if (target.kind === 'error') {
+  console.error(target.message);
   process.exit(2);
 }
 
 const scopeDirs = ['app', 'screens', 'ui'];
-const files = base
-  ? changedFiles(base.sha)
-  : scopeDirs.flatMap(dir => walk(path.join(ROOT, dir)));
+const files =
+  target.kind === 'base'
+    ? changedFiles(target.sha)
+    : scopeDirs.flatMap(dir => walk(path.join(ROOT, dir)));
 if (files.length === 0) {
   console.log(
-    `no in-scope files ${base ? `changed against ${base.ref}` : 'found'}`,
+    `no in-scope files ${target.kind === 'base' ? `changed against ${target.ref}` : 'found'}`,
   );
   process.exit(0);
 }
-if (base !== undefined) {
+if (target.kind === 'base') {
   active = baseReports;
-  await transformAll(filesInBase(base.sha, files), baseCode(base.sha));
+  await transformAll(filesInBase(target.sha, files), baseCode(target.sha));
   active = headReports;
 }
 await transformAll(files);
@@ -256,7 +264,7 @@ const uncompiled = list
   )
   .sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line);
 const regressed =
-  base !== undefined
+  target.kind === 'base'
     ? regressions(bailoutsByFile(baseReports.values()), bailoutsByFile(list))
     : [];
 const newBailouts = regressed.reduce((n, r) => n + r.head - r.base, 0);
@@ -269,7 +277,7 @@ const totals = {
 };
 
 console.log(
-  `React Compiler healthcheck${base ? ` (changed vs ${base.ref})` : ''}`,
+  `React Compiler healthcheck${target.kind === 'base' ? ` (changed vs ${target.ref})` : ''}`,
 );
 console.log(
   `files: ${totals.files}  optimized functions: ${totals.optimized}  bailouts: ${totals.bailouts}  skips: ${totals.skips}  diagnostics: ${totals.diagnostics}  transform errors: ${totals.errors}`,
@@ -291,25 +299,26 @@ for (const r of regressed) {
   console.log(`  ${r.file}  bailouts on base: ${r.base}, on HEAD: ${r.head}`);
 }
 
-if (jsonPath !== undefined) {
+const keep = <T,>(_key: string, field: T): T => field;
+if (json.kind === 'file') {
   writeFileSync(
-    jsonPath,
-    `${JSON.stringify({ totals, uncompiled, regressed }, undefined, 2)}\n`,
+    json.path,
+    `${JSON.stringify({ totals, uncompiled, regressed }, keep, 2)}\n`,
   );
-  console.log(`json: ${jsonPath}`);
+  console.log(`json: ${json.path}`);
 }
 
 if (
   gateFails({
-    gated: base !== undefined || strict,
-    bailouts: base !== undefined ? newBailouts : totals.bailouts,
+    gated: target.kind === 'base' || strict,
+    bailouts: target.kind === 'base' ? newBailouts : totals.bailouts,
     errors: totals.errors,
   })
 ) {
   const what =
     totals.errors > 0
       ? `${totals.errors} transform error(s)`
-      : base !== undefined
+      : target.kind === 'base'
         ? `${newBailouts} new bailout(s) among changed files`
         : `${totals.bailouts} bailout(s)`;
   console.error(`FAIL: ${what}`);
