@@ -180,16 +180,8 @@ function walk(dir: string, out: string[] = []): string[] {
 }
 
 function changedFiles(base: string): string[] {
-  let mergeBase: string | undefined;
-  try {
-    mergeBase = gitLines('merge-base', base, 'HEAD')[0];
-  } catch {
-    // Shallow CI checkouts may lack the common history merge-base walks.
-  }
   const names = new Set([
-    ...(mergeBase !== undefined
-      ? gitLines('diff', '--name-only', mergeBase)
-      : gitLines('diff', '--name-only', base, 'HEAD')),
+    ...gitLines('diff', '--name-only', base, 'HEAD'),
     ...gitLines('diff', '--name-only', 'HEAD'),
     ...gitLines('ls-files', '--others', '--exclude-standard'),
   ]);
