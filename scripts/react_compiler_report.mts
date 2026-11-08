@@ -16,7 +16,6 @@
 
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
@@ -31,6 +30,7 @@ import {
   regressions,
   resolveBase,
   tally,
+  transformEach,
   type Base,
   type Commit,
   type Transform,
@@ -187,29 +187,17 @@ const baseCode =
     git('show', `${base}:${path.relative(ROOT, file)}`);
 
 async function transformAll(files: string[], codeOf = diskCode): Promise<void> {
-  let cursor = 0;
-  let done = 0;
-  const workers = Array.from(
-    { length: Math.max(1, Math.min(8, os.cpus().length - 2)) },
-    async () => {
-      while (cursor < files.length) {
-        const file = files[cursor++];
-        const report = fileReport(file, codeOf);
-        try {
-          await babel.transformAsync(report.code, {
-            ...babelOptions,
-            filename: file,
-          });
-        } catch (thrown) {
-          report.transform = failure(thrown);
-        }
-        if (++done % 25 === 0)
-          process.stderr.write(`\r  checked ${done}/${files.length}`);
-      }
-    },
-  );
-  await Promise.all(workers);
-  process.stderr.write('\r'.padEnd(40) + '\r');
+  await transformEach(files, async file => {
+    const report = fileReport(file, codeOf);
+    try {
+      await babel.transformAsync(report.code, {
+        ...babelOptions,
+        filename: file,
+      });
+    } catch (thrown) {
+      report.transform = failure(thrown);
+    }
+  });
 }
 
 const probe = (rev: string): Commit => {

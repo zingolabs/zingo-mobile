@@ -12,6 +12,7 @@ import {
   regressions,
   resolveBase,
   tally,
+  transformEach,
   type Commit,
   type Uncompiled,
 } from '../scripts/react_compiler_skips';
@@ -282,5 +283,25 @@ describe('base ref resolution', () => {
       message:
         'unknown base ref origin/dev. The remotes here are: zingolabs. Pass --base=<ref> for one of them.',
     });
+  });
+});
+
+describe('one transform at a time', () => {
+  // Tests that each file's transform completes before the next one starts when babel runs on the one JS thread. An interleaved start would show a pool.
+  test('files transform strictly in sequence', async () => {
+    const trace: string[] = [];
+    await transformEach(['a', 'b', 'c'], async file => {
+      trace.push(`start ${file}`);
+      await Promise.resolve();
+      trace.push(`end ${file}`);
+    });
+    expect(trace).toEqual([
+      'start a',
+      'end a',
+      'start b',
+      'end b',
+      'start c',
+      'end c',
+    ]);
   });
 });

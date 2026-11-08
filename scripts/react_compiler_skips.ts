@@ -162,3 +162,12 @@ export function resolveBase(
     message: `unknown base ref ${ref}. The remotes here are: ${remotes.join(', ')}. Pass --base=<ref> for one of them.`,
   };
 }
+
+export async function transformEach<T>(
+  items: readonly T[],
+  transform: (item: T) => Promise<void>,
+): Promise<void> {
+  for (const item of items) {
+    await transform(item);
+  }
+}
