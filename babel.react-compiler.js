@@ -7,16 +7,10 @@ module.exports = [
   'babel-plugin-react-compiler',
   {
     target: '19',
-    // Setting this replaces the default opt-out set, so the stock
-    // directives stay listed alongside the worklet directives that
-    // Reanimated uses; the worklets plugin must see un-memoized
-    // functions.
-    customOptOutDirectives: [
-      'use no forget',
-      'use no memo',
-      'worklet',
-      'worklets',
-    ],
+    // The stock opt-out directives ('use no memo', 'use no forget') apply.
+    // The compiler reads them on the body of the component or hook it
+    // compiles. A 'worklet' directive on an inner arrow is out of its view,
+    // and the worklets plugin, last in the chain, transforms that arrow.
     sources(filename) {
       if (typeof filename !== 'string') return false;
       const rel = path.relative(__dirname, filename).split(path.sep).join('/');
