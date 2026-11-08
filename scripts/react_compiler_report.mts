@@ -2,8 +2,9 @@
 // React Compiler healthcheck over app/ui/screens. Reports which components
 // and hooks the compiler optimizes, which it skips on an opt-out directive
 // (CompileSkip), and which it bails out of (CompileError, PipelineError).
-// With --base=<ref>, checks only files changed against that ref and exits
-// non-zero when any of them carries a bailout. A skip never fails the check.
+// With --base=<ref>, checks only files changed against that ref, compiles each
+// one's version on that ref too, and exits non-zero when a file carries more
+// bailouts than its base version. A skip never fails the check.
 //
 // The compiler options are read from babel.config.js.
 //
@@ -21,6 +22,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import {
   gateFails,
+  regressions,
   tally,
   uncompiledFrom,
   type CompilerEvent,
@@ -84,24 +86,35 @@ if (compilerEntry === undefined) {
 }
 const { sources } = compilerEntry[1];
 
-const reports = new Map<string, FileReport>();
+const headReports = new Map<string, FileReport>();
+const baseReports = new Map<string, FileReport>();
+let active = headReports;
 
-function fileReport(file: string): FileReport {
-  let report = reports.get(file);
+const diskCode = (file: string): string => readFileSync(file, 'utf8');
+
+function fileReport(file: string, codeOf = diskCode): FileReport {
+  let report = active.get(file);
   if (report === undefined) {
     report = {
       file,
-      code: readFileSync(file, 'utf8'),
+      code: codeOf(file),
       lines: null,
       optimized: 0,
       uncompiled: [],
       diagnostics: 0,
       error: null,
     };
-    reports.set(file, report);
+    active.set(file, report);
   }
   return report;
 }
+
+const git = (...cmd: string[]): string =>
+  execFileSync('git', cmd, { cwd: ROOT }).toString();
+const gitLines = (...cmd: string[]): string[] =>
+  git(...cmd)
+    .split('\n')
+    .filter(Boolean);
 
 function fnNameAt(lines: string[], line: number): string | null {
   const text = lines[line - 1] ?? '';
@@ -167,30 +180,38 @@ function walk(dir: string, out: string[] = []): string[] {
 }
 
 function changedFiles(base: string): string[] {
-  const git = (...cmd: string[]): string[] =>
-    execFileSync('git', cmd, { cwd: ROOT })
-      .toString()
-      .split('\n')
-      .filter(Boolean);
   let mergeBase: string | undefined;
   try {
-    mergeBase = git('merge-base', base, 'HEAD')[0];
+    mergeBase = gitLines('merge-base', base, 'HEAD')[0];
   } catch {
     // Shallow CI checkouts may lack the common history merge-base walks.
   }
   const names = new Set([
     ...(mergeBase !== undefined
-      ? git('diff', '--name-only', mergeBase)
-      : git('diff', '--name-only', base, 'HEAD')),
-    ...git('diff', '--name-only', 'HEAD'),
-    ...git('ls-files', '--others', '--exclude-standard'),
+      ? gitLines('diff', '--name-only', mergeBase)
+      : gitLines('diff', '--name-only', base, 'HEAD')),
+    ...gitLines('diff', '--name-only', 'HEAD'),
+    ...gitLines('ls-files', '--others', '--exclude-standard'),
   ]);
   return [...names]
     .map(rel => path.join(ROOT, rel))
     .filter(file => existsSync(file) && EXTENSIONS.test(file) && sources(file));
 }
 
-async function transformAll(files: string[]): Promise<void> {
+function filesInBase(base: string, files: string[]): string[] {
+  const rels = files.map(file => path.relative(ROOT, file));
+  const present = new Set(
+    gitLines('ls-tree', '-r', '--name-only', base, '--', ...rels),
+  );
+  return files.filter(file => present.has(path.relative(ROOT, file)));
+}
+
+const baseCode =
+  (base: string) =>
+  (file: string): string =>
+    git('show', `${base}:${path.relative(ROOT, file)}`);
+
+async function transformAll(files: string[], codeOf = diskCode): Promise<void> {
   let cursor = 0;
   let done = 0;
   const workers = Array.from(
@@ -198,7 +219,7 @@ async function transformAll(files: string[]): Promise<void> {
     async () => {
       while (cursor < files.length) {
         const file = files[cursor++];
-        const report = fileReport(file);
+        const report = fileReport(file, codeOf);
         try {
           await babel.transformAsync(report.code, {
             ...babelOptions,
@@ -226,14 +247,32 @@ if (files.length === 0) {
   );
   process.exit(0);
 }
+if (baseRef !== undefined) {
+  active = baseReports;
+  await transformAll(filesInBase(baseRef, files), baseCode(baseRef));
+  active = headReports;
+}
 await transformAll(files);
 
-const list = [...reports.values()];
+const bailoutsByFile = (list: Iterable<FileReport>): Record<string, number> =>
+  Object.fromEntries(
+    [...list].map(r => [
+      path.relative(ROOT, r.file),
+      r.uncompiled.filter(u => u.cause === 'bailout').length,
+    ]),
+  );
+
+const list = [...headReports.values()];
 const uncompiled = list
   .flatMap(r =>
     r.uncompiled.map(u => ({ file: path.relative(ROOT, r.file), ...u })),
   )
   .sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line);
+const regressed =
+  baseRef !== undefined
+    ? regressions(bailoutsByFile(baseReports.values()), bailoutsByFile(list))
+    : [];
+const newBailouts = regressed.reduce((n, r) => n + r.head - r.base, 0);
 const totals = {
   files: list.length,
   optimized: list.reduce((n, r) => n + r.optimized, 0),
@@ -261,11 +300,14 @@ for (const r of list) {
     );
   }
 }
+for (const { file, base, head } of regressed) {
+  console.log(`  ${file}  bailouts on ${baseRef}: ${base}, on HEAD: ${head}`);
+}
 
 if (jsonPath !== undefined) {
   writeFileSync(
     jsonPath,
-    `${JSON.stringify({ totals, uncompiled }, null, 2)}\n`,
+    `${JSON.stringify({ totals, uncompiled, regressed }, null, 2)}\n`,
   );
   console.log(`json: ${jsonPath}`);
 }
@@ -273,17 +315,17 @@ if (jsonPath !== undefined) {
 if (
   gateFails({
     gated: baseRef !== undefined || strict,
-    bailouts: totals.bailouts,
+    bailouts: baseRef !== undefined ? newBailouts : totals.bailouts,
     errors: totals.errors,
   })
 ) {
   const what =
     totals.errors > 0
       ? `${totals.errors} transform error(s)`
-      : `${totals.bailouts} bailout(s)`;
-  console.error(
-    `FAIL: ${what}${baseRef !== undefined ? ' among changed files' : ''}`,
-  );
+      : baseRef !== undefined
+        ? `${newBailouts} new bailout(s) among changed files`
+        : `${totals.bailouts} bailout(s)`;
+  console.error(`FAIL: ${what}`);
   process.exit(1);
 }
 console.log('OK');

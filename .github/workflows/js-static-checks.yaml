@@ -36,9 +36,9 @@ jobs:
         run: yarn prettier:check
 
       # The React Compiler ratchet: only files changed against the PR base
-      # run, so existing skips stay green while every PR keeps its own code
-      # compilable. The full strict sweep (yarn check:compiler --strict)
-      # waits until the skip backlog is gone.
+      # run, each compared with its base version, so existing bailouts stay
+      # green while no PR adds one. The full strict sweep (yarn check:compiler
+      # --strict) waits until the bailout backlog is gone.
       - name: React Compiler changed-file gate
         if: ${{ github.event_name == 'pull_request' }}
         env:

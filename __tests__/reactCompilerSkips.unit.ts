@@ -1,5 +1,6 @@
 import {
   gateFails,
+  regressions,
   uncompiledFrom,
   tally,
   type Uncompiled,
@@ -110,5 +111,35 @@ describe('tally and gate', () => {
     expect(gateFails({ gated: true, bailouts: 0, errors: 0 })).toBe(false);
     expect(gateFails({ gated: false, bailouts: 3, errors: 0 })).toBe(false);
     expect(gateFails({ gated: false, bailouts: 0, errors: 1 })).toBe(true);
+  });
+});
+
+describe('ratchet against the base', () => {
+  // Tests that a changed file regresses when its bailout count on HEAD exceeds its count on the base.
+  test('a file whose bailouts grow is a regression', () => {
+    expect(
+      regressions(
+        { 'screens/Send/Send.tsx': 3 },
+        { 'screens/Send/Send.tsx': 4 },
+      ),
+    ).toEqual([{ file: 'screens/Send/Send.tsx', base: 3, head: 4 }]);
+  });
+
+  // Tests that a changed file passes when its bailout count is unchanged or falls. A one-line copy fix in a file with three existing bailouts stays green.
+  test('a file whose bailouts hold or fall is no regression', () => {
+    expect(
+      regressions(
+        { 'screens/Send/Send.tsx': 3, 'screens/History/History.tsx': 2 },
+        { 'screens/Send/Send.tsx': 3, 'screens/History/History.tsx': 1 },
+      ),
+    ).toEqual([]);
+  });
+
+  // Tests that a file new on the branch counts from zero when the base lacks it.
+  test('a new file counts from zero', () => {
+    expect(regressions({}, { 'ui/widgets/New.tsx': 1 })).toEqual([
+      { file: 'ui/widgets/New.tsx', base: 0, head: 1 },
+    ]);
+    expect(regressions({}, { 'ui/widgets/Clean.tsx': 0 })).toEqual([]);
   });
 });

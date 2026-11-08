@@ -72,3 +72,14 @@ export function gateFails({
 }): boolean {
   return errors > 0 || (gated && bailouts > 0);
 }
+
+export type Regression = { file: string; base: number; head: number };
+
+export function regressions(
+  base: Readonly<Record<string, number>>,
+  head: Readonly<Record<string, number>>,
+): Regression[] {
+  return Object.entries(head)
+    .map(([file, count]) => ({ file, base: base[file] ?? 0, head: count }))
+    .filter(r => r.head > r.base);
+}
