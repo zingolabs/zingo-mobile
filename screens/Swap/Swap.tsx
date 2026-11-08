@@ -85,6 +85,8 @@ import {
 import PairCards from './components/PairCards';
 import AssetPickerSheet from './components/AssetPickerSheet';
 import RoutesSheet from './components/RoutesSheet';
+import { useShieldedRoutes } from './useShieldedRoutes';
+import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
 import SwapSettingsSheet from './components/SwapSettingsSheet';
 import SwapHistorySheet, { swapPairLabel } from './components/SwapHistorySheet';
 import { tokenToSwapAsset } from './swapAssets';
@@ -257,6 +259,11 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
 
   const counterpartyTicker =
     form.selectedToken?.ticker || form.selectedToken?.symbol || '';
+  const shielded = useShieldedRoutes({
+    direction: form.direction,
+    sellChain: form.isOutbound ? 'ZEC' : form.counterpartyChain,
+    providers: (form.routes ?? []).map(r => r.provider),
+  });
   const receiveAsset = form.quoteContext?.quoteInput.receiveAsset;
   const receiveSymbol =
     receiveAsset?.ticker ??
@@ -743,6 +750,14 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                             {providerShortLabel(form.chosenRoute.provider)}
                           </Text>
                         </Pressable>
+                        {shielded.isShielded(form.chosenRoute.provider) && (
+                          <View testID="swap.provider.shielded">
+                            <ShieldIcon
+                              size={iconSizeSm}
+                              color={colors.fgAccent}
+                            />
+                          </View>
+                        )}
                         {!!form.chosenRoute.estimatedTimeText && (
                           <Text variant="caption" tone="muted">
                             {form.chosenRoute.estimatedTimeText}
@@ -1069,6 +1084,9 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
           receiveSymbol={receiveSymbol}
           receiveUsdUnitPrice={receiveUsdUnitPrice}
           onSelect={form.pickRoute}
+          isShielded={shielded.isShielded}
+          shieldedNote={shielded.note}
+          payCoin={counterpartyTicker}
         />
         <SaveContactSheet
           ref={saveContactSheetRef}

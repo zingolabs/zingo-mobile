@@ -60,6 +60,7 @@ const swapResponse = (provider: SwapKitProviderEnum, outbound: boolean) => {
 const commit = (
   provider: SwapKitProviderEnum,
   direction: SwapDirectionEnum,
+  newShieldedAddress?: () => Promise<string>,
 ) => {
   const outbound = direction === SwapDirectionEnum.Outbound;
   const service = new SwapService({
@@ -73,6 +74,7 @@ const commit = (
     } as unknown as typeof SwapStore,
     poller: { start: jest.fn() } as unknown as SwapPoller,
     tokenCatalog: null as unknown as TokenCatalog,
+    newShieldedAddress,
   });
   return service.commitRoute({
     quoteInput: {
@@ -151,5 +153,53 @@ describe('shielded memo deposit across providers and directions', () => {
 
     expect(target).not.toHaveBeenCalled();
     expect(instructions.shieldedMemoAddress).toBeUndefined();
+  });
+});
+
+/**
+ * A shielded memo has room for a unified address, so a Maya sale's refund
+ * goes to a new one of the wallet's and comes back shielded.
+ */
+describe('Maya sale refund address', () => {
+  const REFUND_UA = 'u1newrefundaddress';
+
+  it('Tests that the memo names a new unified address for the refund when the deposit carries a shielded memo', async () => {
+    const make = jest.fn(async () => REFUND_UA);
+    const { instructions, record } = await commit(
+      SwapKitProviderEnum.MayachainStreaming,
+      SwapDirectionEnum.Outbound,
+      make,
+    );
+
+    expect(make).toHaveBeenCalledTimes(1);
+    expect(instructions.memoText).toBe(`=:b:${BTC_ADDRESS}/${REFUND_UA}:0/1/0`);
+    expect(record.refundAddress).toBe(REFUND_UA);
+    expect(record.sourceAddress).toBe(EPHEMERAL);
+  });
+
+  it('Tests that the refund keeps the transparent address when no unified address can be made', async () => {
+    const { instructions, record } = await commit(
+      SwapKitProviderEnum.MayachainStreaming,
+      SwapDirectionEnum.Outbound,
+      jest.fn(async () => {
+        throw new Error('no address');
+      }),
+    );
+
+    expect(instructions.memoText).toBe(`=:b:${BTC_ADDRESS}/${EPHEMERAL}:0/1/0`);
+    expect(record.refundAddress).toBeUndefined();
+  });
+
+  it('Tests that no address is made when Maya takes no shielded memo', async () => {
+    target.mockResolvedValue(null);
+    const make = jest.fn(async () => REFUND_UA);
+    const { record } = await commit(
+      SwapKitProviderEnum.MayachainStreaming,
+      SwapDirectionEnum.Outbound,
+      make,
+    );
+
+    expect(make).not.toHaveBeenCalled();
+    expect(record.refundAddress).toBeUndefined();
   });
 });
