@@ -6,7 +6,7 @@
 // one's version on that ref too, and exits non-zero when a file carries more
 // bailouts than its base version. A skip never fails the check.
 //
-// The compiler options are read from babel.config.js.
+// The compiler entry is read from babel.react-compiler.js.
 //
 // Usage:
 //   tsx scripts/react_compiler_report.mts                     full report
@@ -67,15 +67,10 @@ const { scope, json, strict } = options;
 const babel: typeof import('@babel/core') = require_('@babel/core');
 const babelConfig: BabelConfig = require_(path.join(ROOT, 'babel.config.js'));
 
-const compilerEntries = babelConfig.plugins.filter(
-  (plugin): plugin is [string, CompilerOptions] =>
-    Array.isArray(plugin) && plugin[0] === 'babel-plugin-react-compiler',
+const reactCompiler: [string, CompilerOptions] = require_(
+  path.join(ROOT, 'babel.react-compiler.js'),
 );
-if (compilerEntries.length === 0) {
-  console.error('babel.config.js has no babel-plugin-react-compiler entry');
-  process.exit(2);
-}
-const { sources } = compilerEntries[0][1];
+const { sources } = reactCompiler[1];
 
 const headReports = new Map<string, FileReport>();
 const baseReports = new Map<string, FileReport>();
@@ -132,8 +127,8 @@ const logger: Logger = {
 };
 
 const plugins: PluginItem[] = babelConfig.plugins.map(plugin =>
-  Array.isArray(plugin) && plugin[0] === 'babel-plugin-react-compiler'
-    ? ['babel-plugin-react-compiler', { ...plugin[1], logger }]
+  plugin === reactCompiler
+    ? [reactCompiler[0], { ...reactCompiler[1], logger }]
     : plugin,
 );
 

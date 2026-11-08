@@ -2,6 +2,7 @@ import path from 'path';
 import { access, readFile } from 'fs/promises';
 import type { Plugin } from 'vite';
 import type { StorybookConfig } from '@storybook/react-native-web-vite';
+import reactCompiler from '../babel.react-compiler';
 
 const WORKLET_DEP = /react-native-(reanimated|worklets)[/\\].*\.[cm]?js$/;
 
@@ -86,10 +87,11 @@ const main: StorybookConfig = {
   framework: {
     name: '@storybook/react-native-web-vite',
     options: {
-      // The Worklets Babel plugin
+      // The React Compiler, then the Worklets Babel plugin
       pluginReactOptions: {
         babel: {
           plugins: [
+            reactCompiler,
             ['react-native-worklets/plugin', { disableSourceMaps: true }],
           ],
         },
