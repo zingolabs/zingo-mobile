@@ -15,6 +15,8 @@ import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 
 const handlers = () => ({
   onRetry: jest.fn(),
+  onBack: jest.fn(),
+  onReport: jest.fn(),
   onImport: jest.fn(),
   onCreate: jest.fn(),
   onServer: jest.fn(),
@@ -30,7 +32,8 @@ const mount = (
       value={{ ...defaultAppContextLoading, translate: mockTranslate }}
     >
       <WalletError
-        kind="open"
+        cause="unknown"
+        load="open"
         details="failed to read wallet file"
         busy={false}
         shake={0}
@@ -88,7 +91,8 @@ const mountChain = (h = handlers()) => {
       }}
     >
       <WalletError
-        kind="chain"
+        cause="chain"
+        load="open"
         walletChain={ChainNameEnum.mainChainName}
         details="Wallet chain: main"
         busy={false}
@@ -126,4 +130,41 @@ test('Tests that More options holds Import and Create behind a warning that they
   expect(h.onImport).toHaveBeenCalledTimes(1);
   expect(h.onCreate).toHaveBeenCalledTimes(1);
   registerConfirmListener(null);
+});
+
+test('Tests that create and restore offer Back when they fail', () => {
+  for (const load of ['create', 'restore'] as const) {
+    const h = handlers();
+    const { unmount } = mount({ load }, h);
+    fireEvent.press(screen.getByTestId('walleterror.open'));
+    fireEvent.press(screen.getByTestId('walleterror.back'));
+    expect(h.onRetry).toHaveBeenCalledTimes(1);
+    expect(h.onBack).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId('walleterror.import')).toBeNull();
+    expect(screen.queryByTestId('walleterror.create')).toBeNull();
+    unmount();
+  }
+});
+
+test('Tests that a server failure opens the server screen when its button is pressed', () => {
+  const h = handlers();
+  mount({ cause: 'server', load: 'create' }, h);
+  fireEvent.press(screen.getByTestId('walleterror.change-server'));
+  expect(h.onServer).toHaveBeenCalledTimes(1);
+});
+
+test('Tests that a key failure only offers Back when the key was refused', () => {
+  const h = handlers();
+  mount({ cause: 'key', load: 'restore' }, h);
+  fireEvent.press(screen.getByTestId('walleterror.back'));
+  expect(h.onBack).toHaveBeenCalledTimes(1);
+  expect(screen.queryByTestId('walleterror.open')).toBeNull();
+});
+
+test('Tests that the report carries the title when it is sent from the details', () => {
+  const h = handlers();
+  mount({ load: 'create' }, h);
+  fireEvent.press(screen.getByTestId('walleterror.details'));
+  fireEvent.press(screen.getAllByTestId('walleterror.report')[1]);
+  expect(h.onReport).toHaveBeenCalledWith('text translated');
 });

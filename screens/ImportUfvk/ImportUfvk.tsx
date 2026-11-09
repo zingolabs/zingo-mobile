@@ -64,7 +64,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   onClickOK,
 }) => {
   const context = useContext(ContextAppLoading);
-  const { translate, netInfo, server, addLastSnackbar } = context;
+  const { translate, netInfo, server } = context;
   const { colors } = useTheme();
   const { gap } = useCompact();
   const bottomPad = useBottomActionPad();
@@ -222,14 +222,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   }, [seedufvkText]);
 
   const okButton = async () => {
-    // Offline mode is a deliberate no-server flow: exactly like creating a
-    // wallet, a seed/UFVK can be restored locally and will simply sync once a
-    // server is chosen. So only block when the device is genuinely offline AND
-    // the user is NOT in explicit Offline mode — mirroring createNewWallet.
-    if (!netInfo.isConnected && server.kind !== 'offline') {
-      addLastSnackbar(translate('loadedapp.connection-error') as string);
-      return;
-    }
     onClickOK(seedufvkText.trimEnd().trimStart(), Number(birthday));
     Keyboard.dismiss();
   };
@@ -353,16 +345,12 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
               value={birthday}
               onChangeText={(text: string) => {
                 const height = Number(text.replace(/\D/g, ''));
-                if (
-                  height <= 0 ||
-                  (height > latestBlock && server.kind !== 'offline')
-                ) {
+                if (height <= 0 || (latestBlock > 0 && height > latestBlock)) {
                   setBirthday('');
                 } else {
                   setBirthday(String(height));
                 }
               }}
-              disabled={!latestBlock && server.kind !== 'offline'}
               clearable
               clearLabel={translate('clear') as string}
               keyboardType="number-pad"

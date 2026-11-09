@@ -131,7 +131,7 @@ test.each([
       const restore = jest.mocked(RPCModule.restoreWalletFromSeed);
       restore.mockRejectedValue(new Error('stop here'));
 
-      await app.doRestore('abandon ability able', birthday);
+      await app.doRestore(`${'abandon '.repeat(23)}art`, birthday);
 
       expect(restore.mock.calls[0][1]).toBe(String(birthday));
     } finally {

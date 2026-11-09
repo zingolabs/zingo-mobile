@@ -97,7 +97,7 @@ describe('an online session whose wallet opened with no indexer', () => {
     new Error(
       'Error: sync: Offline: no indexer configured. Call set_indexer_uri() to connect.',
     ),
-    { code: 'Sync' },
+    { code: 'Offline' },
   );
 
   it('attaches its server again instead of recording an error', async () => {
