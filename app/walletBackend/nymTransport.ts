@@ -5,7 +5,7 @@ import {
   StartMixnetTransport,
   StopMixnetTransport,
   TakeProxyDeathReason,
-} from '@app/walletBackend/modules/MixnetCoordinator';
+} from '@app/walletBackend/MixnetCoordinator';
 
 // Mirror of the native NymTransportModule, which hosts the proxy shim in-process.
 interface NymTransportModuleAPI {

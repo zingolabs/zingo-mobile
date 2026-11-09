@@ -11,9 +11,9 @@ import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
 import UnifiedAddressClass from '@app/AppState/classes/UnifiedAddressClass';
 import TransparentAddressClass from '@app/AppState/classes/TransparentAddressClass';
 import AddressBookFileClass from '@app/AppState/classes/AddressBookFileClass';
-import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
-import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
-import { deriveMixnetView } from '@app/walletBackend/transforms/mixnetView';
+import { RPCAddressScopeEnum } from '@app/walletBackend/RPCAddressScopeEnum';
+import { RPCMixnetIndicatorEnum } from '@app/walletBackend/RPCMixnetIndicatorEnum';
+import { deriveMixnetView } from '@app/walletBackend/mixnetView';
 
 export const mockZecPrice: ZecPriceType = {
   zecPrice: 33.75,

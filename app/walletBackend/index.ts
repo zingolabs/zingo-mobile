@@ -8,8 +8,8 @@
 import WalletBackend from './WalletBackend';
 
 export type { FfiError, FfiErrorCode, FfiResult } from './ffi';
-export type { SwapDepositArgs } from './modules/TransactionService';
-export { scanInProgress } from './utils/syncProgress';
+export type { SwapDepositArgs } from './TransactionService';
+export { scanInProgress } from './syncProgress';
 export {
   cancelIronwoodMigration,
   cancelOldPrivateMigration,
@@ -56,13 +56,13 @@ export {
   walletBackupExists,
   walletExists,
   readWalletChain,
-} from './utils/walletUtils';
+} from './walletUtils';
 export type {
   ProbeTarget,
   ServerProbe,
   UfvkCheck,
   ZecPriceOutcome,
-} from './utils/walletUtils';
+} from './walletUtils';
 export {
   hasRepairableWalletFile,
   repairDoubleWrappedWallet,
@@ -70,12 +70,12 @@ export {
   walletFileDiagnosis,
   walletSeedSalvage,
   WALLET_FILE_NAME,
-} from './utils/walletFileRepair';
+} from './walletFileRepair';
 export type {
   WalletFileDiagnosis,
   WalletFileDiagnosisReport,
   WalletFileRepairOutcome,
   WalletFileState,
   WalletSeedSalvage,
-} from './utils/walletFileRepair';
+} from './walletFileRepair';
 export default WalletBackend;

@@ -13,11 +13,8 @@ import {
   ContextAppLoadedProvider,
 } from '@app/context';
 import { Route } from '@app/AppState';
-import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
-import {
-  MixnetView,
-  deriveMixnetView,
-} from '@app/walletBackend/transforms/mixnetView';
+import { RPCMixnetIndicatorEnum } from '@app/walletBackend/RPCMixnetIndicatorEnum';
+import { MixnetView, deriveMixnetView } from '@app/walletBackend/mixnetView';
 import {
   mixnetConnecting,
   mixnetLost,

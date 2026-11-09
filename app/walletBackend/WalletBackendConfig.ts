@@ -6,14 +6,14 @@ import {
   TransparentAddressClass,
   ServerType,
 } from '@app/AppState';
-import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { RPCSyncStatusType } from '@app/walletBackend/RPCSyncStatusType';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/RPCPerformanceLevelEnum';
 import {
   StartMixnetTransport,
   StopMixnetTransport,
   TakeProxyDeathReason,
-} from '@app/walletBackend/modules/MixnetCoordinator';
-import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
+} from '@app/walletBackend/MixnetCoordinator';
+import { MixnetTransportView } from '@app/walletBackend/mixnetView';
 
 // Every sub-service shares one reference to this config.
 export type WalletBackendConfig = {

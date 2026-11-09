@@ -15,12 +15,12 @@ import { Route } from '@app/AppState';
 import { useTheme, radiusMd } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import { probeServer } from '@app/walletBackend';
-import { mixnetJournal } from '@app/walletBackend/modules/MixnetJournal';
+import { mixnetJournal } from '@app/walletBackend/MixnetJournal';
 import {
   getMixnetBootstrapDetail,
   getMixnetStatus,
-} from '@app/walletBackend/utils/mixnetUtils';
-import { viewPhase } from '@app/walletBackend/transforms/mixnetView';
+} from '@app/walletBackend/mixnetUtils';
+import { viewPhase } from '@app/walletBackend/mixnetView';
 import {
   MixnetDirectProbe,
   MixnetDoctorRow,
@@ -28,13 +28,13 @@ import {
   mixnetDoctorReport,
   mixnetDoctorRows,
   mixnetJournalLine,
-} from '@app/walletBackend/transforms/mixnetDoctorReport';
+} from '@app/walletBackend/mixnetDoctorReport';
 import {
   MixnetDoctorStepState,
   MixnetDoctorTone,
   mixnetDoctorSteps,
   mixnetDoctorVerdict,
-} from '@app/walletBackend/transforms/mixnetDoctorVerdict';
+} from '@app/walletBackend/mixnetDoctorVerdict';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 type MixnetDoctorProps = NativeStackScreenProps<

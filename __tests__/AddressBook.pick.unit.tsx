@@ -16,7 +16,7 @@ import {
   ChainNameEnum,
 } from '@app/AppState';
 import { deliver } from '@app/navigation/results';
-import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
+import { RPCAddressScopeEnum } from '@app/walletBackend/RPCAddressScopeEnum';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 
 jest.mock('@app/navigation/results', () => ({

@@ -15,10 +15,10 @@ jest.mock('@app/RPCModule', () =>
 );
 
 import RPCModule from '@app/RPCModule';
-import * as walletUtils from '@app/walletBackend/utils/walletUtils';
-import { SyncCoordinator } from '@app/walletBackend/modules/SyncCoordinator';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
-import type { DataService } from '@app/walletBackend/modules/DataService';
+import * as walletUtils from '@app/walletBackend/walletUtils';
+import { SyncCoordinator } from '@app/walletBackend/SyncCoordinator';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/RPCPerformanceLevelEnum';
+import type { DataService } from '@app/walletBackend/DataService';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { mockWalletBackendConfig } from '../__mocks__/dataMocks/mockWalletBackendConfig';
 

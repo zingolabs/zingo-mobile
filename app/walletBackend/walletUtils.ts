@@ -21,10 +21,10 @@ import { isNumber } from 'lodash';
 import RPCModule from '@app/RPCModule';
 import { callFfi, FfiResult } from '@app/walletBackend/ffi';
 import { withSyncStopped } from './syncBracket';
-import { RPCZecPriceType } from '@app/walletBackend/types/RPCZecPriceType';
-import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
-import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
-import { RPCMigrationStatusType } from '@app/walletBackend/types/RPCMigrationStatusType';
+import { RPCZecPriceType } from '@app/walletBackend/RPCZecPriceType';
+import { RPCSeedType } from '@app/walletBackend/RPCSeedType';
+import { RPCUfvkType } from '@app/walletBackend/RPCUfvkType';
+import { RPCMigrationStatusType } from '@app/walletBackend/RPCMigrationStatusType';
 
 export type ZecPriceErrorKey =
   'info.error-price-fetch' | 'info.error-price-payload';

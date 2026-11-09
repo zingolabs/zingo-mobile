@@ -3,7 +3,7 @@ jest.mock('@app/RPCModule', () =>
 );
 
 import RPCModule from '@app/RPCModule';
-import { TransactionService } from '@app/walletBackend/modules/TransactionService';
+import { TransactionService } from '@app/walletBackend/TransactionService';
 import {
   DepositAfterDeshieldError,
   heldDeshield,

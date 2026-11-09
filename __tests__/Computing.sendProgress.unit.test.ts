@@ -1,6 +1,6 @@
 import { ValueTransferType } from '@app/AppState';
 import { ValueTransferKindEnum } from '@app/AppState/enums/ValueTransferKindEnum';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
 import {
   failedSince,
   followTxids,

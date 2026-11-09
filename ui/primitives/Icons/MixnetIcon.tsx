@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
 import Svg, { Rect } from 'react-native-svg';
-import { MixnetPhase } from '@app/walletBackend/transforms/mixnetView';
+import { MixnetPhase } from '@app/walletBackend/mixnetView';
 import NymOff from '../../../assets/img/nym-off.svg';
 import NymOn from '../../../assets/img/nym-on.svg';
 import { useTheme } from '@app/theme';

@@ -15,7 +15,7 @@ import { InfoType } from '@app/AppState';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { planOrchardDrain } from '@app/walletBackend';
-import { RPCDrainPlanType } from '@app/walletBackend/types/RPCDrainPlanType';
+import { RPCDrainPlanType } from '@app/walletBackend/RPCDrainPlanType';
 
 jest.mock('@app/walletBackend', () => ({
   planOrchardDrain: jest.fn(),

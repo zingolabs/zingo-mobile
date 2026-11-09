@@ -21,7 +21,7 @@ import {
   mockZecRefusal,
 } from '../__mocks__/dataMocks/mockZecPriceOutcome';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
+import { MixnetTransportView } from '@app/walletBackend/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 

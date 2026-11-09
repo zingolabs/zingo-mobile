@@ -2,8 +2,8 @@ import {
   MIXNET_STATUS_KEYS,
   INITIAL_MIXNET_VIEW,
   deriveMixnetView,
-} from '@app/walletBackend/transforms/mixnetView';
-import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
+} from '@app/walletBackend/mixnetView';
+import { RPCMixnetIndicatorEnum } from '@app/walletBackend/RPCMixnetIndicatorEnum';
 
 test('R10: the closed status-key set derives from the indicator enum', () => {
   const derivedKeys = new Set([

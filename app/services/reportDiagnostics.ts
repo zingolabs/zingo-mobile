@@ -10,9 +10,9 @@ import {
   TranslateType,
 } from '@app/AppState';
 import { serverUris } from '@app/uris';
-import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
-import { RPCSyncScanRangePriorityStatusEnum } from '@app/walletBackend/enums/RPCSyncScanRangePriorityStatusEnum';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import { RPCSyncStatusType } from '@app/walletBackend/RPCSyncStatusType';
+import { RPCSyncScanRangePriorityStatusEnum } from '@app/walletBackend/RPCSyncScanRangePriorityStatusEnum';
+import { MixnetView } from '@app/walletBackend/mixnetView';
 import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
 
 export type Served =

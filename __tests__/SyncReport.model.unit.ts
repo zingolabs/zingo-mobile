@@ -1,6 +1,6 @@
 import { BackgroundType } from '@app/AppState';
-import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
-import { RPCSyncScanRangePriorityStatusEnum as Priority } from '@app/walletBackend/enums/RPCSyncScanRangePriorityStatusEnum';
+import { RPCSyncStatusType } from '@app/walletBackend/RPCSyncStatusType';
+import { RPCSyncScanRangePriorityStatusEnum as Priority } from '@app/walletBackend/RPCSyncScanRangePriorityStatusEnum';
 import {
   backgroundOutcome,
   chainTip,

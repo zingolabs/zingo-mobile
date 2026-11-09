@@ -2,7 +2,7 @@ import { useCallback, useContext, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { ContextAppLoaded } from '@app/context';
 import { planOrchardDrain } from '@app/walletBackend';
-import { RPCDrainPlanType } from '@app/walletBackend/types/RPCDrainPlanType';
+import { RPCDrainPlanType } from '@app/walletBackend/RPCDrainPlanType';
 
 /**
  * Whether Orchard holds only a residual: value that costs more in fees to

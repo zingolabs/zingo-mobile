@@ -1,4 +1,4 @@
-import { RPCSyncScanRangePriorityStatusEnum } from '@app/walletBackend/enums/RPCSyncScanRangePriorityStatusEnum';
+import { RPCSyncScanRangePriorityStatusEnum } from '@app/walletBackend/RPCSyncScanRangePriorityStatusEnum';
 
 export type RPCSyncScanRangeStatusType = {
   priority: RPCSyncScanRangePriorityStatusEnum;

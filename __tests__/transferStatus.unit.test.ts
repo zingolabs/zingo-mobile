@@ -1,7 +1,7 @@
 jest.mock('@app/RPCModule', () => ({ __esModule: true, default: {} }));
 
 import { transferStatus } from '@app/utils/transferStatus';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
 
 const t = (key: string) =>
   key === 'history.confirming' ? 'Confirming {n} of {of}' : key;

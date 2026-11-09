@@ -17,17 +17,14 @@ import { ChainNameEnum } from './enums/ChainNameEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import { SnackbarActionType } from './types/SnackbarActionType';
 import ValueTransferType from './types/ValueTransferType';
-import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
-import { RescanState } from '@app/walletBackend/utils/syncProgress';
+import { RPCSyncStatusType } from '@app/walletBackend/RPCSyncStatusType';
+import { RescanState } from '@app/walletBackend/syncProgress';
 import TransparentAddressClass from './classes/TransparentAddressClass';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
-import type { SwapDepositArgs } from '@app/walletBackend/modules/TransactionService';
-import type {
-  SendOutcome,
-  SendPermit,
-} from '@app/walletBackend/transforms/sendPermit';
+import { MixnetView } from '@app/walletBackend/mixnetView';
+import type { SwapDepositArgs } from '@app/walletBackend/TransactionService';
+import type { SendOutcome, SendPermit } from '@app/walletBackend/sendPermit';
 import { SetServerResult } from './types/SetServerResult';
 
 export default interface AppContextLoaded {

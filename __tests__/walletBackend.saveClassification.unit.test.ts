@@ -14,10 +14,7 @@ jest.mock('@app/RPCModule', () =>
 );
 
 import RPCModule from '@app/RPCModule';
-import {
-  doSave,
-  nativeSaveSucceeded,
-} from '@app/walletBackend/utils/walletUtils';
+import { doSave, nativeSaveSucceeded } from '@app/walletBackend/walletUtils';
 
 const mockedDoSave = RPCModule.doSave as jest.Mock;
 

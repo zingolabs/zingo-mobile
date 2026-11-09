@@ -1,4 +1,4 @@
-import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
+import { RPCMixnetIndicatorEnum } from '@app/walletBackend/RPCMixnetIndicatorEnum';
 import {
   afterSettled,
   BOOTSTRAP_DEADLINE_MILLIS,
@@ -11,14 +11,14 @@ import {
   STEADY_POLL_MILLIS,
   StartMixnetTransport,
   StopMixnetTransport,
-} from '@app/walletBackend/modules/MixnetCoordinator';
-import { mixnetJournal } from '@app/walletBackend/modules/MixnetJournal';
+} from '@app/walletBackend/MixnetCoordinator';
+import { mixnetJournal } from '@app/walletBackend/MixnetJournal';
 import {
   ABSENT_MIXNET_VIEW,
   MixnetTransportView,
   deriveMixnetView,
   sendGateOpen,
-} from '@app/walletBackend/transforms/mixnetView';
+} from '@app/walletBackend/mixnetView';
 import { mixnetStatusPayload as statusPayload } from '../__mocks__/dataMocks/mockMixnetStatus';
 
 jest.mock('@app/RPCModule', () =>

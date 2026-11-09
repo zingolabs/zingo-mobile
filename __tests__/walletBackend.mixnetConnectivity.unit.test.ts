@@ -16,7 +16,7 @@ import {
 } from '../__mocks__/dataMocks/mockServer';
 import { mockWalletBackendConfig } from '../__mocks__/dataMocks/mockWalletBackendConfig';
 import { mixnetStatusPayload } from '../__mocks__/dataMocks/mockMixnetStatus';
-import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
+import { MixnetTransportView } from '@app/walletBackend/mixnetView';
 import WalletBackend from '@app/walletBackend/WalletBackend';
 
 jest.mock('@app/RPCModule', () =>
@@ -25,7 +25,7 @@ jest.mock('@app/RPCModule', () =>
 
 // The sync side is out of scope here: this suite judges the connectivity
 // decision alone, so the coordinator that would dial an indexer is inert.
-jest.mock('@app/walletBackend/modules/SyncCoordinator', () => ({
+jest.mock('@app/walletBackend/SyncCoordinator', () => ({
   SyncCoordinator: class {
     async configure(): Promise<void> {}
     async clearTimers(): Promise<void> {}

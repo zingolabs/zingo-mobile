@@ -22,29 +22,26 @@ import {
   TransparentAddressClass,
   foldBlockSpacing,
 } from '@app/AppState';
-import {
-  noteHeights,
-  resetFreshness,
-} from '@app/walletBackend/utils/syncFreshness';
+import { noteHeights, resetFreshness } from '@app/walletBackend/syncFreshness';
 import RPCModule from '@app/RPCModule';
-import { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddressType';
-import { RPCBalancesType } from '@app/walletBackend/types/RPCBalancesType';
-import { RPCInfoType } from '@app/walletBackend/types/RPCInfoType';
-import { RPCWalletHeight } from '@app/walletBackend/types/RPCWalletHeightType';
-import { RPCValueTransfersType } from '@app/walletBackend/types/RPCValueTransfersType';
-import { RPCValueTransferType } from '@app/walletBackend/types/RPCValueTransferType';
-import { RPCTransparentAddressType } from '@app/walletBackend/types/RPCTransparentAddressType';
-import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
-import { RPCWalletSaveRequiredType } from '@app/walletBackend/types/RPCWalletSaveRequiredType';
-import { RPCConfigWalletPerformanceType } from '@app/walletBackend/types/RPCConfigWalletPerformanceType';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
-import { RPCWalletVersionType } from '@app/walletBackend/types/RPCWalletVersionType';
+import { RPCUnifiedAddressType } from '@app/walletBackend/RPCUnifiedAddressType';
+import { RPCBalancesType } from '@app/walletBackend/RPCBalancesType';
+import { RPCInfoType } from '@app/walletBackend/RPCInfoType';
+import { RPCWalletHeight } from '@app/walletBackend/RPCWalletHeightType';
+import { RPCValueTransfersType } from '@app/walletBackend/RPCValueTransfersType';
+import { RPCValueTransferType } from '@app/walletBackend/RPCValueTransferType';
+import { RPCTransparentAddressType } from '@app/walletBackend/RPCTransparentAddressType';
+import { RPCSpendablebalanceType } from '@app/walletBackend/RPCSpendablebalanceType';
+import { RPCWalletSaveRequiredType } from '@app/walletBackend/RPCWalletSaveRequiredType';
+import { RPCConfigWalletPerformanceType } from '@app/walletBackend/RPCConfigWalletPerformanceType';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/RPCPerformanceLevelEnum';
+import { RPCWalletVersionType } from '@app/walletBackend/RPCWalletVersionType';
 import {
   WalletBackendConfig,
   isOffline,
-} from '@app/walletBackend/config/WalletBackendConfig';
-import { transformValueTransfer } from '@app/walletBackend/transforms/valueTransferTransform';
-import { fetchWallet } from '@app/walletBackend/utils/walletUtils';
+} from '@app/walletBackend/WalletBackendConfig';
+import { transformValueTransfer } from '@app/walletBackend/valueTransferTransform';
+import { fetchWallet } from '@app/walletBackend/walletUtils';
 
 // The info a session publishes when no server answered.
 function emptyInfo(): InfoType {

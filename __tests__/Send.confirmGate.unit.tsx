@@ -80,11 +80,8 @@ import { HomeTabScreenProps } from '@app/types';
 import { fetchServerList } from '@app/uris';
 import Utils from '@app/utils';
 import RPCModule from '@app/RPCModule';
-import {
-  SendPermitInputs,
-  sendPermit,
-} from '@app/walletBackend/transforms/sendPermit';
-import { ABSENT_MIXNET_VIEW } from '@app/walletBackend/transforms/mixnetView';
+import { SendPermitInputs, sendPermit } from '@app/walletBackend/sendPermit';
+import { ABSENT_MIXNET_VIEW } from '@app/walletBackend/mixnetView';
 import { mixnetLost } from '../.storybook/storyMocks';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';

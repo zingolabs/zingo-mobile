@@ -29,8 +29,8 @@ import {
   BOOTSTRAP_DEADLINE_MILLIS,
   MixnetCoordinator,
   MixnetTransportBinding,
-} from '@app/walletBackend/modules/MixnetCoordinator';
-import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
+} from '@app/walletBackend/MixnetCoordinator';
+import { MixnetTransportView } from '@app/walletBackend/mixnetView';
 import { mixnetStatusPayload as statusPayload } from '../__mocks__/dataMocks/mockMixnetStatus';
 
 jest.mock('@app/RPCModule', () =>

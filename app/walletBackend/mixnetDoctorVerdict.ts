@@ -1,4 +1,4 @@
-import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
+import { RPCMixnetIndicatorEnum } from '@app/walletBackend/RPCMixnetIndicatorEnum';
 import { MixnetDirectProbe, directAnswered } from './mixnetDoctorReport';
 import { MixnetStatusReport } from './mixnetTransform';
 

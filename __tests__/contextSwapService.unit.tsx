@@ -26,7 +26,7 @@ import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
 import type { SwapAssetType } from '@app/swap/SwapAssetType';
 import type { SwapRecordType } from '@app/swap/SwapRecordType';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
 
 const ZEC: SwapAssetType = {
   swapKitId: 'ZEC.ZEC',

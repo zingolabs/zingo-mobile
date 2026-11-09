@@ -95,10 +95,10 @@ import { createAlert } from '@app/services/createAlert';
 import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
 import Utils from '@app/utils';
 import { formatInteger } from '@app/utils/formatAmount';
-import { RPCWalletKindType } from '@app/walletBackend/types/RPCWalletKindType';
+import { RPCWalletKindType } from '@app/walletBackend/RPCWalletKindType';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '@ui/widgets/toastConfig';
-import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
+import { RPCSeedType } from '@app/walletBackend/RPCSeedType';
 import Launching from '@screens/Launching';
 import {
   GateAnswer,
@@ -131,9 +131,9 @@ import { sanitizePaths } from '@app/utils/sanitizePaths';
 import { duration as motionDuration } from '@app/theme/motion';
 
 import { sendEmail } from '@app/services/sendEmail';
-import { RPCWalletKindEnum } from '@app/walletBackend/enums/RPCWalletKindEnum';
-import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { RPCWalletKindEnum } from '@app/walletBackend/RPCWalletKindEnum';
+import { RPCUfvkType } from '@app/walletBackend/RPCUfvkType';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/RPCPerformanceLevelEnum';
 import {
   RootParamList,
   LoadedAppNavigationState,

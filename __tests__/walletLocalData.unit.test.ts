@@ -9,7 +9,7 @@ import {
   forgetWalletOnFile,
   releaseWalletOnFile,
 } from '@app/services/WalletLocalData';
-import { WalletLifecycleService } from '@app/walletBackend/modules/WalletLifecycleService';
+import { WalletLifecycleService } from '@app/walletBackend/WalletLifecycleService';
 
 const bridge = RPCModule as unknown as Record<string, jest.Mock>;
 const storage = AsyncStorage as unknown as Record<string, jest.Mock>;

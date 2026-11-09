@@ -1,5 +1,5 @@
-import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { WalletBackendConfig } from '@app/walletBackend/WalletBackendConfig';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/RPCPerformanceLevelEnum';
 import { mockServer } from './mockServer';
 
 export function mockWalletBackendConfig(

@@ -8,7 +8,7 @@ import {
   foldBlockSpacing,
   windowTargetHeight,
 } from '@app/AppState';
-import { RPCBroadcastWindowType } from '@app/walletBackend/types/RPCMigrationStatusType';
+import { RPCBroadcastWindowType } from '@app/walletBackend/RPCMigrationStatusType';
 
 describe('foldBlockSpacing', () => {
   test('first accepted sample becomes the estimate', () => {

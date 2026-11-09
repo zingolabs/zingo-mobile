@@ -7,7 +7,7 @@ import type {
 import { ValueTransferKindEnum } from '@app/AppState/enums/ValueTransferKindEnum';
 import Utils from '@app/utils';
 import { formatAmount } from '@app/utils/formatAmount';
-import type { ComputingSubject } from '@app/walletBackend/transforms/sendSettlement';
+import type { ComputingSubject } from '@app/walletBackend/sendSettlement';
 
 /** A TEX address only takes transparent funds, so a send to it goes in two transactions. */
 const TEX = /^tex(test)?1/i;

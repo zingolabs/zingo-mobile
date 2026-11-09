@@ -2,7 +2,7 @@ import { useSyncExternalStore } from 'react';
 import { AppState, NativeEventSubscription } from 'react-native';
 import { errorKeyed } from '@app/AppState';
 import { getZecPrice, ZecPriceOutcome } from '@app/walletBackend';
-import { MixnetStatusKey } from '@app/walletBackend/transforms/mixnetView';
+import { MixnetStatusKey } from '@app/walletBackend/mixnetView';
 
 export const PRICE_REFRESH_MIN_MS = 45_000;
 export const PRICE_REFRESH_MAX_MS = 75_000;

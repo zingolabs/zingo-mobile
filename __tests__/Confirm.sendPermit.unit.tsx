@@ -30,7 +30,7 @@ import {
 import { Route } from '@app/AppState';
 import type { TranslateType } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
-import { SendPermitInputs } from '@app/walletBackend/transforms/sendPermit';
+import { SendPermitInputs } from '@app/walletBackend/sendPermit';
 import { mixnetLost } from '../.storybook/storyMocks';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';

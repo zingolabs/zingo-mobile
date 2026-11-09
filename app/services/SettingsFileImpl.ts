@@ -15,7 +15,7 @@ import {
 } from '@app/AppState';
 import { serverUris } from '@app/uris';
 import { isEqual } from 'lodash';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/RPCPerformanceLevelEnum';
 
 type ServerWire = { uri: string; chainName: ChainNameEnum };
 type SelectServerWire = SelectServerEnum | 'offline';

@@ -27,9 +27,9 @@ import {
   loadExistingWallet,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,
-} from '@app/walletBackend/utils/walletUtils';
-import { SyncCoordinator } from '@app/walletBackend/modules/SyncCoordinator';
-import { DataService } from '@app/walletBackend/modules/DataService';
+} from '@app/walletBackend/walletUtils';
+import { SyncCoordinator } from '@app/walletBackend/SyncCoordinator';
+import { DataService } from '@app/walletBackend/DataService';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { mockWalletBackendConfig } from '../__mocks__/dataMocks/mockWalletBackendConfig';
 

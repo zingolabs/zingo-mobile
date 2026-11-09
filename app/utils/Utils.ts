@@ -30,10 +30,10 @@ import {
 import randomColor from 'randomcolor';
 import { parseAddress } from '@app/walletBackend';
 import { Buffer } from 'buffer';
-import { RPCParseAddressType } from '@app/walletBackend/types/RPCParseAddressType';
-import { RPCParseAddressStatusEnum } from '@app/walletBackend/enums/RPCParseAddressStatusEnum';
-import { RPCAddressKindEnum } from '@app/walletBackend/enums/RPCAddressKindEnum';
-import { RPCReceiversEnum } from '@app/walletBackend/enums/RPCReceiversEnum';
+import { RPCParseAddressType } from '@app/walletBackend/RPCParseAddressType';
+import { RPCParseAddressStatusEnum } from '@app/walletBackend/RPCParseAddressStatusEnum';
+import { RPCAddressKindEnum } from '@app/walletBackend/RPCAddressKindEnum';
+import { RPCReceiversEnum } from '@app/walletBackend/RPCReceiversEnum';
 import { themeTokens } from '@app/theme';
 
 export default class Utils {

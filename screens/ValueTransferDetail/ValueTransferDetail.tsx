@@ -29,7 +29,7 @@ import {
 import Utils from '@app/utils';
 import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
 import { transferStatus } from '@app/utils/transferStatus';
 import { removeTransaction } from '@app/walletBackend';
 import { createAlert } from '@app/services/createAlert';

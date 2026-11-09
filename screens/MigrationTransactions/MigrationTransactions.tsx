@@ -15,7 +15,7 @@ import { ContextAppLoaded } from '@app/context';
 import { formatAmount } from '@app/utils/formatAmount';
 import { Route } from '@app/AppState';
 import { planOrchardDrain } from '@app/walletBackend';
-import { RPCDrainPlanType } from '@app/walletBackend/types/RPCDrainPlanType';
+import { RPCDrainPlanType } from '@app/walletBackend/RPCDrainPlanType';
 import { themeTokens } from '@app/theme';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';

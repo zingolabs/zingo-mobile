@@ -4,7 +4,7 @@ import {
   sendStage,
   settleSend,
   shieldEnd,
-} from '@app/walletBackend/transforms/sendSettlement';
+} from '@app/walletBackend/sendSettlement';
 
 const sent = { kind: 'sent', receipt: 'txid' };
 const refusal = errorKeyed('send.nym-blocked');

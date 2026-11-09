@@ -15,7 +15,7 @@ jest.mock('@app/RPCModule', () =>
 );
 
 import RPCModule from '@app/RPCModule';
-import { DataService } from '@app/walletBackend/modules/DataService';
+import { DataService } from '@app/walletBackend/DataService';
 import type { ServerType } from '@app/AppState';
 import {
   mockOfflineServer as OFFLINE,

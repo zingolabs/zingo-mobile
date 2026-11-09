@@ -10,7 +10,7 @@ import {
   ChainNameEnum,
   ValueTransferKindEnum,
 } from '@app/AppState';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
 import { REVEAL_MS } from '@app/utils/reveal';
 import Insight from '@screens/Insight';
 import { advance } from '../__mocks__/advanceTimers';

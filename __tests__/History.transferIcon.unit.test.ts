@@ -1,5 +1,5 @@
 import { ValueTransferKindEnum } from '@app/AppState';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
 import { transferIcon } from '@screens/History/transferIcon';
 import { ShieldCheckIcon } from '@ui/primitives/Icons/ShieldCheckIcon';
 import { TxMigrationIcon } from '@ui/primitives/Icons/TxMigrationIcon';

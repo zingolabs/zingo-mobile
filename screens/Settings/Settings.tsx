@@ -58,7 +58,7 @@ import {
   hasRecoveryWalletInfo,
   saveRecoveryWalletInfo,
 } from '@app/services/recoveryWalletInfo';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/RPCPerformanceLevelEnum';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
   CommonActions,

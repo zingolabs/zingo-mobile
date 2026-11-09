@@ -22,7 +22,7 @@ import {
   WalletFileDiagnosis,
   WalletFileState,
   WALLET_FILE_NAME,
-} from '@app/walletBackend/utils/walletFileRepair';
+} from '@app/walletBackend/walletFileRepair';
 
 const bridge = RPCModule as unknown as Record<string, jest.Mock>;
 

@@ -29,11 +29,11 @@ import {
 import { Route, ValueTransferType } from '@app/AppState';
 import type { TranslateType } from '@app/AppState';
 import { ValueTransferKindEnum } from '@app/AppState/enums/ValueTransferKindEnum';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
 import type {
   ComputingParams,
   ComputingSubject,
-} from '@app/walletBackend/transforms/sendSettlement';
+} from '@app/walletBackend/sendSettlement';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 const translate = (key: string): TranslateType => key;

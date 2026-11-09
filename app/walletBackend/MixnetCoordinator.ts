@@ -1,19 +1,19 @@
-import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
+import { RPCMixnetIndicatorEnum } from '@app/walletBackend/RPCMixnetIndicatorEnum';
 import {
   MixnetStatusReport,
   describeRejection,
-} from '@app/walletBackend/transforms/mixnetTransform';
+} from '@app/walletBackend/mixnetTransform';
 import {
   MixnetTransportView,
   deriveMixnetView,
-} from '@app/walletBackend/transforms/mixnetView';
+} from '@app/walletBackend/mixnetView';
 import {
   attachMixnet,
   disableMixnet,
   getMixnetBootstrapDetail,
   getMixnetStatus,
-} from '@app/walletBackend/utils/mixnetUtils';
-import { failureCause } from '@app/walletBackend/transforms/mixnetDoctorReport';
+} from '@app/walletBackend/mixnetUtils';
+import { failureCause } from '@app/walletBackend/mixnetDoctorReport';
 import { mixnetJournal, shortExit } from './MixnetJournal';
 
 export type MixnetTransportBinding = {

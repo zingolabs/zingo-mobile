@@ -92,7 +92,7 @@ import { sendEmail } from '@app/services/sendEmail';
 import Toast from 'react-native-toast-message';
 import { ACTION_SNACKBAR_MS, toastConfig } from '@ui/widgets/toastConfig';
 import { MASK } from '@ui/widgets/PrivateAmount';
-import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
+import { RPCSeedType } from '@app/walletBackend/RPCSeedType';
 import Launching from '@screens/Launching';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import {
@@ -117,28 +117,25 @@ import {
   OptionsPanelProvider,
 } from '@app/context/optionsPanel';
 import type { SwapDepositArgs } from '@app/walletBackend';
-import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
-import { rescanStep } from '@app/walletBackend/utils/syncProgress';
-import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
-import {
-  INITIAL_MIXNET_VIEW,
-  MixnetView,
-} from '@app/walletBackend/transforms/mixnetView';
+import { RPCSyncStatusType } from '@app/walletBackend/RPCSyncStatusType';
+import { rescanStep } from '@app/walletBackend/syncProgress';
+import { RPCUfvkType } from '@app/walletBackend/RPCUfvkType';
+import { INITIAL_MIXNET_VIEW, MixnetView } from '@app/walletBackend/mixnetView';
 import {
   SendOutcome,
   SendPermit,
   sendPermit,
   sendWhenPermitted,
-} from '@app/walletBackend/transforms/sendPermit';
+} from '@app/walletBackend/sendPermit';
 import {
   startMixnetTransport,
   stopMixnetTransport,
   takeMixnetProxyDeath,
-} from '@app/walletBackend/utils/nymTransport';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+} from '@app/walletBackend/nymTransport';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/RPCPerformanceLevelEnum';
 import { RootParamList } from '@app/types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
 import { publishReport } from '@app/services/reportDiagnostics';
 
 const en = require('@app/translations/en.json');

@@ -1,8 +1,8 @@
-import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
+import { RPCMixnetIndicatorEnum } from '@app/walletBackend/RPCMixnetIndicatorEnum';
 import {
   RPCMixnetDetailType,
   RPCMixnetStatusType,
-} from '@app/walletBackend/types/RPCMixnetType';
+} from '@app/walletBackend/RPCMixnetType';
 
 export type MixnetFailure =
   | { readonly reason: 'nativeRejection'; readonly message: string }

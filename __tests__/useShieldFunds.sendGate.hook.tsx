@@ -19,10 +19,7 @@ import type { TranslateType } from '@app/AppState';
 import { useShieldFunds } from '@app/hooks/useShieldFunds';
 import { showConfirm } from '@app/services/showConfirm';
 import { shieldConfirm, shieldPropose } from '@app/walletBackend';
-import {
-  SendPermitInputs,
-  sendPermit,
-} from '@app/walletBackend/transforms/sendPermit';
+import { SendPermitInputs, sendPermit } from '@app/walletBackend/sendPermit';
 import { mixnetLost, mixnetOff } from '../.storybook/storyMocks';
 import { mockOnline } from '../__mocks__/dataMocks/mockOnline';
 

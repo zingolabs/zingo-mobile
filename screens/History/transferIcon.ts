@@ -1,6 +1,6 @@
 import { GlobalConst, ValueTransferKindEnum } from '@app/AppState';
 import type { ValueTransferType } from '@app/AppState';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
 import { ShieldCheckIcon } from '@ui/primitives/Icons/ShieldCheckIcon';
 import { TxMigrationIcon } from '@ui/primitives/Icons/TxMigrationIcon';
 import { TxPendingIcon } from '@ui/primitives/Icons/TxPendingIcon';
