@@ -40,7 +40,7 @@ export type DepositQrType = {
  *
  *   1. **Memo present (Maya / THORChain) on an EVM source chain** — EIP-681
  *      with the memo as `data` calldata. The only shape that carries address,
- *      amount and memo together.
+ *      amount and memo together. Native gas assets only.
  *   2. **No memo (NEAR Intents / Flashnet)** — a memo-less payment URI that
  *      still pre-fills the exact amount, which is what those providers are
  *      strict about. Native gas assets only; a token would make the wallet
@@ -49,9 +49,10 @@ export type DepositQrType = {
  *      so the user can at least scan it and type the amount from the row below.
  *
  * Returns `null` when a memo exists but no URI can carry it: a UTXO BIP-21 URI
- * silently drops the OP_RETURN, and a QR that looks complete while omitting
- * the one field the provider routes on is worse than no QR at all. The caller
- * falls back to the manual rows, which spell the memo out.
+ * silently drops the OP_RETURN, an EIP-681 `value` moves the gas asset whatever
+ * the token (100 DAI would ask for 100 ETH), and a QR that looks complete while
+ * omitting the one field the provider routes on is worse than no QR at all. The
+ * caller falls back to the manual rows, which spell the memo out.
  */
 export function buildDepositQr(args: {
   sellAsset: SwapAssetType;
@@ -61,8 +62,12 @@ export function buildDepositQr(args: {
 }): DepositQrType | null {
   const { sellAsset, depositAddress, amountHumanDecimal, memoText } = args;
   if (!depositAddress) return null;
+  // A native gas asset is a SwapKit identifier with no `-<contract>` suffix
+  // (`SOL.SOL`, `BASE.ETH`). Tokens must not get a native-transfer URI.
+  const isNative = !sellAsset.swapKitId.includes('-');
 
   if (memoText) {
+    if (!isNative) return null;
     const memoUri = buildEip681Uri({
       chain: sellAsset.chain,
       chainId: sellAsset.chainId,
@@ -84,9 +89,7 @@ export function buildDepositQr(args: {
     decimals: sellAsset.decimals,
     address: depositAddress,
     amountHumanDecimal,
-    // A native gas asset is a SwapKit identifier with no `-<contract>` suffix
-    // (`SOL.SOL`, `BASE.ETH`). Tokens must not get a native-transfer URI.
-    isNative: !sellAsset.swapKitId.includes('-'),
+    isNative,
   });
   if (memolessUri) {
     return {
