@@ -1,5 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { useNavigation, usePreventRemove } from '@react-navigation/native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
@@ -180,8 +186,11 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
     return () => clearTimeout(timer);
   }, [params?.phase, creating]);
 
-  const toHistory = () =>
-    navigation.navigate(Route.Home, { screen: Route.History }, { pop: true });
+  const toHistory = useCallback(
+    () =>
+      navigation.navigate(Route.Home, { screen: Route.History }, { pop: true }),
+    [navigation],
+  );
   /**
    * Whatever takes this screen away (the back gesture, Android's back,
    * Done) lands on History: under it is the screen a send or shield started
@@ -193,8 +202,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
     if (leaving) {
       toHistory();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [leaving]);
+  }, [leaving, toHistory]);
 
   const openDetail = (vt: ValueTransferType) =>
     navigation.navigate(Route.ValueTransferDetail, {

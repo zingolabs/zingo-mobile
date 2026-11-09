@@ -940,10 +940,9 @@ const useLoop = (
     if (!on) {
       return;
     }
-    value.value = 0;
-    value.value = withDelay(
-      lag,
-      withRepeat(withTiming(1, { duration: ms, easing }), -1),
+    value.set(0);
+    value.set(
+      withDelay(lag, withRepeat(withTiming(1, { duration: ms, easing }), -1)),
     );
     return () => cancelAnimation(value);
   }, [value, ms, on, easing, lag]);
@@ -962,18 +961,18 @@ const useFall = (
 ) =>
   useEffect(() => {
     if (!failure) {
-      reach.value = 0;
-      fall.value = 0;
+      reach.set(0);
+      fall.set(0);
       return;
     }
     const { along, lead } = BRANCHES[failure];
     if (still) {
-      reach.value = along;
-      fall.value = 1;
+      reach.set(along);
+      fall.set(1);
       return;
     }
-    const from = along === 0 ? 0 : along === 1 ? 1 : trip.value;
-    reach.value = from;
+    const from = along === 0 ? 0 : along === 1 ? 1 : trip.get();
+    reach.set(from);
     if (from !== along) {
       const easing = TRIP_EASE;
       /** Past the point already, it finishes the lap and flies there again. */
@@ -985,20 +984,20 @@ const useFall = (
               withTiming(along, { duration: REACH_MS - 200, easing }),
             )
           : withTiming(along, { duration: REACH_MS, easing });
-      reach.value = withDelay(index * PAIR_LAG_MS, flight);
+      reach.set(withDelay(index * PAIR_LAG_MS, flight));
     }
-    fall.value = withDelay(
-      lead + index * (failure === 'build' ? 120 : 160),
-      withTiming(
-        1,
-        failure === 'build'
-          ? { duration: 500, easing: Easing.in(Easing.ease) }
-          : { duration: 760, easing: Easing.bezier(0.5, 0, 0.75, 0) },
+    fall.set(
+      withDelay(
+        lead + index * (failure === 'build' ? 120 : 160),
+        withTiming(
+          1,
+          failure === 'build'
+            ? { duration: 500, easing: Easing.in(Easing.ease) }
+            : { duration: 760, easing: Easing.bezier(0.5, 0, 0.75, 0) },
+        ),
       ),
     );
-    // A failure plays once, when it happens. A shared value's identity never changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [failure, still]);
+  }, [failure, still, index, trip, reach, fall]);
 
 /**
  * A send told on one drawing. Creating, the coin works on the proof while the
@@ -1163,9 +1162,34 @@ export default function SendFlight({
       rightHappy.value = 1;
       land.value = 0;
     }
-    // Each scene starts once, when the step becomes it. A shared value's identity never changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step, failure]);
+  }, [
+    step,
+    failure,
+    still,
+    building,
+    wilting,
+    waiting,
+    arrived,
+    badged,
+    done,
+    stem,
+    leftLeaf,
+    rightLeaf,
+    unfold,
+    bobbing,
+    ring,
+    wilt,
+    landed,
+    pool,
+    badge,
+    number,
+    disc,
+    check,
+    burst,
+    leftHappy,
+    rightHappy,
+    land,
+  ]);
 
   const trail = useAnimatedProps(() => {
     const shown = failure
