@@ -12,7 +12,7 @@ import ButtonStack from '@ui/primitives/ButtonStack';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import { formatAmount } from '@app/utils/formatAmount';
+import { formatAmount } from '@app/wallet/formatAmount';
 import { Route } from '@app/AppState';
 import { planOrchardDrain } from '@app/walletBackend';
 import { RPCDrainPlanType } from '@app/walletBackend/RPCDrainPlanType';

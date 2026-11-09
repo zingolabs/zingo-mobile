@@ -16,7 +16,7 @@ import {
   requiresExactAmountWarning,
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
-import { formatExactAmount } from '@app/utils/formatAmount';
+import { formatExactAmount } from '@app/wallet/formatAmount';
 import Text from '@ui/primitives/Text';
 import { useInsetFill } from '@ui/primitives/Surface';
 import Button from '@ui/primitives/Button';

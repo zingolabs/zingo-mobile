@@ -1,5 +1,5 @@
 import 'react-native';
-import { formatZecAmount } from '@app/utils/formatZecAmount';
+import { formatZecAmount } from '@app/wallet/formatZecAmount';
 import { transferRowText } from '@screens/History/historyRowText';
 import { ValueTransferKindEnum, ValueTransferType } from '@app/AppState';
 

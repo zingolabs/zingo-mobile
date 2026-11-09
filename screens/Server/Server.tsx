@@ -35,7 +35,7 @@ import {
 } from '@app/AppState';
 import Text from '@ui/primitives/Text';
 import { ServerStatus } from '@app/server/ServerStatus';
-import { formatInteger } from '@app/utils/formatAmount';
+import { formatInteger } from '@app/wallet/formatAmount';
 import ServerRow, {
   Placement,
   useLift,

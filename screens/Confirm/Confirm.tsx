@@ -21,7 +21,7 @@ import Utils from '@app/utils';
 import { deliver } from '@app/navigation/results';
 import { sendSubject } from '@screens/Send/sendSubject';
 import { fiatQuote } from '@app/price/fiatQuote';
-import { formatAmount, formatUsd } from '@app/utils/formatAmount';
+import { formatAmount, formatUsd } from '@app/wallet/formatAmount';
 import { sendPermit } from '@app/walletBackend/sendPermit';
 import { Route, SendPageStateClass, ProposalPoolsType } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';

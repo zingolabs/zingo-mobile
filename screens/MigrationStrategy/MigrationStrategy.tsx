@@ -21,7 +21,7 @@ import { deriveNymGateState } from './components/nymGateState';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import { formatAmount } from '@app/utils/formatAmount';
+import { formatAmount } from '@app/wallet/formatAmount';
 import { Route } from '@app/AppState';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';

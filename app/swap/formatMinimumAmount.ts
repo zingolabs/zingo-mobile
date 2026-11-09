@@ -1,4 +1,4 @@
-import { formatExactAmount } from '@app/utils/formatAmount';
+import { formatExactAmount } from '@app/wallet/formatAmount';
 
 /**
  * A provider's minimum in the amount format, but to the zatoshi at any size

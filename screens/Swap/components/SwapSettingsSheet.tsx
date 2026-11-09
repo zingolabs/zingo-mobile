@@ -17,7 +17,7 @@ import {
   formatPercent,
   parseAmountInput,
   toAmountInput,
-} from '@app/utils/formatAmount';
+} from '@app/wallet/formatAmount';
 
 type SwapSettingsSheetProps = {
   slippageBps: number;

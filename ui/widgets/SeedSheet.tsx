@@ -6,7 +6,7 @@ import { ease } from '@app/theme/motion';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 import { TranslateType, WalletType } from '@app/AppState';
-import { formatInteger } from '@app/utils/formatAmount';
+import { formatInteger } from '@app/wallet/formatAmount';
 import Text from '@ui/primitives/Text';
 import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
 import Button from '@ui/primitives/Button';

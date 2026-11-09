@@ -16,7 +16,7 @@ import {
 import { ContextAppLoaded } from '@app/context';
 import { fiatQuote } from '@app/price/fiatQuote';
 import Utils from '@app/utils';
-import { formatUsd } from '@app/utils/formatAmount';
+import { formatUsd } from '@app/wallet/formatAmount';
 import { FileTextIcon } from '@ui/primitives/Icons/FileTextIcon';
 import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
 import { shortWhen, transferRowText } from '@screens/History/historyRowText';

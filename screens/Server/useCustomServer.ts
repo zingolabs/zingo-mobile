@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 
 import { ChainNameEnum, TranslateType } from '@app/AppState';
 import { parseServerURI } from '@app/uris';
-import { formatInteger } from '@app/utils/formatAmount';
+import { formatInteger } from '@app/wallet/formatAmount';
 import { probeServer } from '@app/walletBackend';
 import { LogLine } from './ServerLog';
 

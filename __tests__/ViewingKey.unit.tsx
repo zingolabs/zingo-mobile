@@ -13,7 +13,7 @@ import {
 
 import ViewingKey from '@screens/ViewingKey';
 import ViewOnlyNotice from '@screens/History/components/ViewOnlyNotice';
-import { copySensitive } from '@app/utils/sensitiveClipboard';
+import { copySensitive } from '@app/security/sensitiveClipboard';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 const UFVK =
@@ -25,7 +25,7 @@ jest.mock('@app/wallet/recoveryWalletInfo', () => ({
   })),
 }));
 jest.mock('@app/walletBackend', () => ({ fetchWallet: jest.fn() }));
-jest.mock('@app/utils/sensitiveClipboard', () => ({
+jest.mock('@app/security/sensitiveClipboard', () => ({
   copySensitive: jest.fn(),
 }));
 

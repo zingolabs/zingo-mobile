@@ -1,4 +1,4 @@
-import { formatAmount } from '@app/utils/formatAmount';
+import { formatAmount } from '@app/wallet/formatAmount';
 
 /**
  * A swap amount string from SwapKit or a provider (sometimes 18+ decimals)

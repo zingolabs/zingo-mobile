@@ -1,4 +1,4 @@
-import { formatAmount, formatExactAmount } from '@app/utils/formatAmount';
+import { formatAmount, formatExactAmount } from '@app/wallet/formatAmount';
 
 import type { FiatValueBasisType } from './FiatValueBasisType';
 

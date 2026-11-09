@@ -10,7 +10,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { formatUsd } from '@app/utils/formatAmount';
+import { formatUsd } from '@app/wallet/formatAmount';
 import { usePriceHealth } from './priceFetcherStore';
 import { useTimedReveal } from '@app/security/useTimedReveal';
 import { MASK } from '@ui/widgets/PrivateAmount';

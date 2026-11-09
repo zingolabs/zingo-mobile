@@ -5,7 +5,7 @@ import {
   formatInteger,
   formatUsd,
   toAmountInput,
-} from '@app/utils/formatAmount';
+} from '@app/wallet/formatAmount';
 import Tag from '@ui/widgets/Tag';
 import { Linking, View } from 'react-native';
 import { useAmountReveal } from '@ui/widgets/PrivateAmount';
@@ -30,7 +30,7 @@ import Utils from '@app/utils';
 import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
-import { transferStatus } from '@app/utils/transferStatus';
+import { transferStatus } from '@app/wallet/transferStatus';
 import { removeTransaction } from '@app/walletBackend';
 import { createAlert } from '@app/alert/createAlert';
 import { showConfirm } from '@app/alert/showConfirm';

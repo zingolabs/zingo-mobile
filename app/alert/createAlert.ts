@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
 import { GlobalConst, TranslateType } from '@app/AppState';
 import { SnackbarDurationEnum } from '@app/alert/SnackbarDurationEnum';
-import { sanitizePaths } from '@app/utils/sanitizePaths';
+import { sanitizePaths } from '@app/reporting/sanitizePaths';
 import { showConfirm } from './showConfirm';
 
 export const createAlert = async (

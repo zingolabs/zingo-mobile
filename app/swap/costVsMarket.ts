@@ -19,7 +19,7 @@
  * the fee is already inside it.
  */
 
-import { formatPercent } from '@app/utils/formatAmount';
+import { formatPercent } from '@app/wallet/formatAmount';
 
 import { swapKey } from './swapText';
 import type { SwapTextType } from './swapText';

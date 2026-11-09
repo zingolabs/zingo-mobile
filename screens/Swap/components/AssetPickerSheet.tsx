@@ -30,7 +30,7 @@ import RadioRow, { RadioList, RadioListSlice } from '@ui/widgets/RadioRow';
 import { ChevronRight } from '@ui/primitives/Icons/Chevron';
 import { ChainLogo } from '@ui/widgets/ChainSelect';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
-import { formatInteger } from '@app/utils/formatAmount';
+import { formatInteger } from '@app/wallet/formatAmount';
 import { repeatedCoins, shortContract } from '@screens/Swap/swapAssets';
 import TokenLogo from './TokenLogo';
 import SheetTitle from './SheetTitle';

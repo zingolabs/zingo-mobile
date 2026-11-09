@@ -18,7 +18,7 @@ import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
 import { RefreshIcon } from '@ui/primitives/Icons/RefreshIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
-import { formatInteger } from '@app/utils/formatAmount';
+import { formatInteger } from '@app/wallet/formatAmount';
 import { pendingSwapLabel } from '@screens/Swap/pendingSwapLabel';
 import SheetTitle from './SheetTitle';
 

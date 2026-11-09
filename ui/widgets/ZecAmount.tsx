@@ -4,7 +4,7 @@ import { Text, View, TextStyle, useWindowDimensions } from 'react-native';
 import { useTheme, fontScaleBody } from '@app/theme';
 import Pressable from '@ui/primitives/Pressable';
 
-import { formatAmount } from '@app/utils/formatAmount';
+import { formatAmount } from '@app/wallet/formatAmount';
 import { SvgXml } from 'react-native-svg';
 import { CurrencyNameEnum } from '@app/AppState';
 import { useTimedReveal } from '@app/security/useTimedReveal';

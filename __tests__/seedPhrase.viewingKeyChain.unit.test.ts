@@ -1,5 +1,5 @@
 import { ChainNameEnum } from '@app/AppState';
-import { viewingKeyChain } from '@app/utils/seedPhrase';
+import { viewingKeyChain } from '@app/wallet/seedPhrase';
 
 test.each([
   ['uview1qqqq', ChainNameEnum.mainChainName],

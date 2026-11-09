@@ -1,4 +1,4 @@
-import { scannedSeedPhrase } from '@app/utils/seedPhrase';
+import { scannedSeedPhrase } from '@app/wallet/seedPhrase';
 
 const WORDS = [...Array(23).fill('abandon'), 'art'];
 const PHRASE = WORDS.join(' ');

@@ -6,7 +6,7 @@ import {
   formatUsd,
   parseAmountInput,
   toAmountInput,
-} from '@app/utils/formatAmount';
+} from '@app/wallet/formatAmount';
 
 let mockSeparators = { decimalSeparator: ',', groupingSeparator: '.' };
 jest.mock('react-native-localize', () => ({

@@ -2,7 +2,7 @@
  * The pure rules of the privacy mask and of the text helpers that every
  * reveal shares.
  */
-import { Reveal, chunks, mask, trim, visible } from '@app/utils/reveal';
+import { Reveal, chunks, mask, trim, visible } from '@app/security/reveal';
 
 const LONE_SURROGATE =
   /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/;

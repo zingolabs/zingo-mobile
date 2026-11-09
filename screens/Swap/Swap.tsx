@@ -53,7 +53,7 @@ import {
   formatUsd,
   parseAmountInput,
   toAmountInput,
-} from '@app/utils/formatAmount';
+} from '@app/wallet/formatAmount';
 import Header from '@ui/widgets/Header';
 import AppSheet from '@ui/primitives/AppSheet';
 import Text from '@ui/primitives/Text';

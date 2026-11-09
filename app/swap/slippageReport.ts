@@ -8,7 +8,7 @@
  * had been asked for.
  */
 
-import { formatPercent } from '@app/utils/formatAmount';
+import { formatPercent } from '@app/wallet/formatAmount';
 
 import { swapKey, swapRaw } from './swapText';
 import type { SwapTextType } from './swapText';

@@ -13,7 +13,7 @@ import Button from '@ui/primitives/Button';
 import ProgressBar from '@ui/primitives/ProgressBar';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import { formatAmount } from '@app/utils/formatAmount';
+import { formatAmount } from '@app/wallet/formatAmount';
 import useTrickleProgress from '@app/wallet/useTrickleProgress';
 import { drainOrchard, drainStatus } from '@app/walletBackend';
 import { RPCDrainType } from '@app/walletBackend/RPCDrainType';

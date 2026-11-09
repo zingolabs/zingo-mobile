@@ -1,6 +1,6 @@
 import 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { copySensitive } from '@app/utils/sensitiveClipboard';
+import { copySensitive } from '@app/security/sensitiveClipboard';
 
 const { NativeModules } = jest.requireActual('react-native');
 

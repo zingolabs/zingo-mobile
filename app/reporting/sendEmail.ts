@@ -1,7 +1,7 @@
 import { Linking } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import { GlobalConst, TranslateType } from '@app/AppState';
-import { redactReport } from '@app/utils/redactReport';
+import { redactReport } from '@app/reporting/redactReport';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
 import { showConfirm } from '@app/alert/showConfirm';
 import {

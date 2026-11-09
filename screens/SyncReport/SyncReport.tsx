@@ -43,7 +43,7 @@ import {
 } from '@app/security/gateController';
 import { showConfirm } from '@app/alert/showConfirm';
 import Utils from '@app/utils';
-import { formatInteger } from '@app/utils/formatAmount';
+import { formatInteger } from '@app/wallet/formatAmount';
 import CircularProgress from '@ui/primitives/CircularProgress';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
 import Header from '@ui/widgets/Header';

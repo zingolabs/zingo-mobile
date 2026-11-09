@@ -23,7 +23,7 @@ import {
   shieldEnd,
 } from '@app/walletBackend/sendSettlement';
 import { isOnTop } from '@app/navigation/navigate';
-import { formatAmount } from '@app/utils/formatAmount';
+import { formatAmount } from '@app/wallet/formatAmount';
 import { withSyncStopped } from '@app/walletBackend/syncBracket';
 import { SendPermit } from '@app/walletBackend/sendPermit';
 

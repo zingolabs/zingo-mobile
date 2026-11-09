@@ -37,7 +37,7 @@ import {
 import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
 import { showConfirm } from '@app/alert/showConfirm';
-import { viewingKeyChain } from '@app/utils/seedPhrase';
+import { viewingKeyChain } from '@app/wallet/seedPhrase';
 
 import {
   createNewWallet,
@@ -94,7 +94,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '@app/alert/createAlert';
 import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
 import Utils from '@app/utils';
-import { formatInteger } from '@app/utils/formatAmount';
+import { formatInteger } from '@app/wallet/formatAmount';
 import { RPCWalletKindType } from '@app/walletBackend/RPCWalletKindType';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '@ui/widgets/toastConfig';
@@ -127,7 +127,7 @@ import SeedSheet from '@ui/widgets/SeedSheet';
 import DeleteWalletSheet from '@ui/widgets/DeleteWalletSheet';
 import { DeleteWalletContext } from '@app/wallet/DeleteWalletContext';
 import { walletErrorKind } from './walletErrorKind';
-import { sanitizePaths } from '@app/utils/sanitizePaths';
+import { sanitizePaths } from '@app/reporting/sanitizePaths';
 import { duration as motionDuration } from '@app/theme/motion';
 
 import { sendEmail } from '@app/reporting/sendEmail';

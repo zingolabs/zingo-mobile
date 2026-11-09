@@ -6,7 +6,7 @@ import type {
 } from '@app/AppState';
 import { ValueTransferKindEnum } from '@app/wallet/ValueTransferKindEnum';
 import Utils from '@app/utils';
-import { formatAmount } from '@app/utils/formatAmount';
+import { formatAmount } from '@app/wallet/formatAmount';
 import type { ComputingSubject } from '@app/walletBackend/sendSettlement';
 
 /** A TEX address only takes transparent funds, so a send to it goes in two transactions. */

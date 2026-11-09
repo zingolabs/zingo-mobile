@@ -74,7 +74,7 @@ import {
   formatAmount,
   formatInteger,
   toAmountInput,
-} from '@app/utils/formatAmount';
+} from '@app/wallet/formatAmount';
 import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
 import { AppTheme } from '@app/theme';
 import SettingsFileImpl from '@app/settings/SettingsFileImpl';

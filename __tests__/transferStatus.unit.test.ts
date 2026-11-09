@@ -1,6 +1,6 @@
 jest.mock('@app/RPCModule', () => ({ __esModule: true, default: {} }));
 
-import { transferStatus } from '@app/utils/transferStatus';
+import { transferStatus } from '@app/wallet/transferStatus';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
 
 const t = (key: string) =>

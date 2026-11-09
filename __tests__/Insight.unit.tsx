@@ -11,7 +11,7 @@ import {
   ValueTransferKindEnum,
 } from '@app/AppState';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
-import { REVEAL_MS } from '@app/utils/reveal';
+import { REVEAL_MS } from '@app/security/reveal';
 import Insight from '@screens/Insight';
 import { advance } from '../__mocks__/advanceTimers';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';

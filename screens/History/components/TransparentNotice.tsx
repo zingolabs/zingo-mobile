@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { ContextAppLoaded } from '@app/context';
-import { formatAmount } from '@app/utils/formatAmount';
+import { formatAmount } from '@app/wallet/formatAmount';
 import Button from '@ui/primitives/Button';
 import Banner from '@ui/widgets/Banner';
 import PrivateAmount from '@ui/widgets/PrivateAmount';

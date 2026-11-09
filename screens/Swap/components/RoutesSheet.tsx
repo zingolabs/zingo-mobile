@@ -10,7 +10,7 @@ import {
   renderSwapText,
 } from '@app/swap';
 import type { SwapTextType } from '@app/swap';
-import { formatUsd } from '@app/utils/formatAmount';
+import { formatUsd } from '@app/wallet/formatAmount';
 import type {
   RouteOptionType,
   SwapKitProviderEnum,

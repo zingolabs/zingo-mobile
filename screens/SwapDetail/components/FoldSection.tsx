@@ -4,7 +4,7 @@ import Animated from 'react-native-reanimated';
 import { View } from 'react-native';
 import { radiusMd, radiusSm, iconSizeSm, useTheme } from '@app/theme';
 import { useUnfold } from '@app/hooks/useUnfold';
-import { formatInteger } from '@app/utils/formatAmount';
+import { formatInteger } from '@app/wallet/formatAmount';
 import Pressable from '@ui/primitives/Pressable';
 import Text from '@ui/primitives/Text';
 import { ChevronDown, ChevronUp } from '@ui/primitives/Icons/Chevron';

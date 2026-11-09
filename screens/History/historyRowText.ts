@@ -9,8 +9,8 @@ import {
   providerShortLabel,
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
-import { formatAmount } from '@app/utils/formatAmount';
-import { transferStatus } from '@app/utils/transferStatus';
+import { formatAmount } from '@app/wallet/formatAmount';
+import { transferStatus } from '@app/wallet/transferStatus';
 
 type Translate = (key: string) => string;
 

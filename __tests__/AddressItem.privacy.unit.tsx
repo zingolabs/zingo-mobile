@@ -13,7 +13,7 @@ import {
 
 import AddressItem from '@ui/widgets/AddressItem';
 import { AddressBookFileClass } from '@app/AppState';
-import { REVEAL_MS } from '@app/utils/reveal';
+import { REVEAL_MS } from '@app/security/reveal';
 import { advance } from '../__mocks__/advanceTimers';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';

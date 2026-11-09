@@ -5,7 +5,7 @@ import { View } from 'react-native';
 import { space12, space16 } from '@app/theme';
 import Checkbox from '@ui/primitives/Checkbox';
 import { ContextAppLoaded } from '@app/context';
-import { formatInteger } from '@app/utils/formatAmount';
+import { formatInteger } from '@app/wallet/formatAmount';
 import { SIDE, StepTitle } from './StepParts';
 import { CopyShowButtons, InfoRow, WordGrid } from './SeedParts';
 

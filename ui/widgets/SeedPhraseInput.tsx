@@ -49,7 +49,7 @@ import {
   startsLikeViewingKey,
   suggestWords,
   tokenize,
-} from '@app/utils/seedPhrase';
+} from '@app/wallet/seedPhrase';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
 
 type SeedPhraseInputProps = {

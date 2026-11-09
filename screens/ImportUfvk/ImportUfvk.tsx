@@ -34,7 +34,7 @@ import {
   scannedSeedPhrase,
   seedStatus,
   viewingKeyProblem,
-} from '@app/utils/seedPhrase';
+} from '@app/wallet/seedPhrase';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';

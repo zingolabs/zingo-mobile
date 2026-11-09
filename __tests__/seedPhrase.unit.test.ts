@@ -5,7 +5,7 @@ import {
   seedStatus,
   suggestWords,
   tokenize,
-} from '../app/utils/seedPhrase';
+} from '@app/wallet/seedPhrase';
 
 describe('suggestWords', () => {
   it('Tests that at most three list words starting with the prefix come back, in list order, when the prefix has matches. An exact word is the first entry.', () => {

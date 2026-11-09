@@ -13,8 +13,8 @@ import {
   tr as trLocale,
 } from 'date-fns/locale';
 
-import { ZecAmountSplitType } from './types/ZecAmountSplitType';
-import { TRIM_KEEP_DEFAULT, chunks, trim } from './reveal';
+import { ZecAmountSplitType } from '@app/wallet/ZecAmountSplitType';
+import { TRIM_KEEP_DEFAULT, chunks, trim } from '@app/security/reveal';
 import {
   ChainNameEnum,
   ErrorKeyed,

@@ -1,11 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext } from 'react';
-import { formatZecAmount } from '@app/utils/formatZecAmount';
+import { formatZecAmount } from '@app/wallet/formatZecAmount';
 import {
   formatAmount,
   formatInteger,
   formatUsd,
-} from '@app/utils/formatAmount';
+} from '@app/wallet/formatAmount';
 import { Linking, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -26,7 +26,7 @@ import {
 import { ContextAppLoaded, useSwapRecords } from '@app/context';
 import { fiatQuote } from '@app/price/fiatQuote';
 import Utils from '@app/utils';
-import { transferStatus } from '@app/utils/transferStatus';
+import { transferStatus } from '@app/wallet/transferStatus';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import Pressable from '@ui/primitives/Pressable';

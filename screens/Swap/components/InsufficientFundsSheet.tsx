@@ -15,7 +15,7 @@ import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import { WalletIcon } from '@ui/primitives/Icons/WalletIcon';
-import { toAmountInput } from '@app/utils/formatAmount';
+import { toAmountInput } from '@app/wallet/formatAmount';
 import SheetTitle from './SheetTitle';
 
 type InsufficientFundsSheetProps = {

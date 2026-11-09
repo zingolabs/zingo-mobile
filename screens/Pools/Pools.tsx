@@ -29,7 +29,7 @@ import {
 } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import { formatZecAmount } from '@app/utils/formatZecAmount';
+import { formatZecAmount } from '@app/wallet/formatZecAmount';
 import { useShieldFunds } from '@app/wallet/useShieldFunds';
 import { useOrchardResidualOnly } from '@app/wallet/useOrchardResidualOnly';
 import Header from '@ui/widgets/Header';

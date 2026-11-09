@@ -1,4 +1,4 @@
-import { redactReport } from '@app/utils/redactReport';
+import { redactReport } from '@app/reporting/redactReport';
 
 const UA =
   'u1qxy0r7fsl8q2r2gk8c3v4w6d5p9j7h3k2m4n6p8q0s2t4v6w8x0y2z4a6c8e0g2h4j6k8m0n2p4q6';

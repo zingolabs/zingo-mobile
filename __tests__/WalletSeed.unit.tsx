@@ -8,7 +8,7 @@ import {
 import { Route } from '@app/AppState';
 import { WalletSeedAction } from '@app/types';
 import { showConfirm } from '@app/alert/showConfirm';
-import { copySensitive } from '@app/utils/sensitiveClipboard';
+import { copySensitive } from '@app/security/sensitiveClipboard';
 
 import WalletSeed from '@screens/WalletSeed';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
@@ -23,7 +23,7 @@ jest.mock('@app/wallet/recoveryWalletInfo', () => ({
 }));
 
 jest.mock('@app/alert/showConfirm', () => ({ showConfirm: jest.fn() }));
-jest.mock('@app/utils/sensitiveClipboard', () => ({
+jest.mock('@app/security/sensitiveClipboard', () => ({
   copySensitive: jest.fn(),
 }));
 

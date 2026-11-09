@@ -19,7 +19,7 @@ import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
 import { sendEmail } from '@app/reporting/sendEmail';
 import { TranslateType } from './AppState';
-import { sanitizePaths } from './utils/sanitizePaths';
+import { sanitizePaths } from '@app/reporting/sanitizePaths';
 import { getZingoName, getZingoVersion } from './utils/ZingoAppData';
 
 /**

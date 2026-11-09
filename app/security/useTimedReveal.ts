@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { REVEAL_MS, Reveal, visible } from '@app/utils/reveal';
+import { REVEAL_MS, Reveal, visible } from '@app/security/reveal';
 
 const HIDDEN: Reveal = { kind: 'hidden' };
 

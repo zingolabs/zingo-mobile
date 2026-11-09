@@ -5,7 +5,7 @@ import {
   buildBaseOptions,
   buildGetOptions,
   buildSetOptions,
-} from '@app/utils/keychainOptions';
+} from '@app/security/keychainOptions';
 
 const service = GlobalConst.serviceKeyChain;
 

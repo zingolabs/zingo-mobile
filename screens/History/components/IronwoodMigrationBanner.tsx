@@ -6,7 +6,7 @@ import Banner from '@ui/widgets/Banner';
 import PrivateAmount from '@ui/widgets/PrivateAmount';
 import { ContextAppLoaded } from '@app/context';
 import { useOrchardResidualOnly } from '@app/wallet/useOrchardResidualOnly';
-import { formatAmount } from '@app/utils/formatAmount';
+import { formatAmount } from '@app/wallet/formatAmount';
 import { duration } from '@app/theme/motion';
 
 // Colour and opacity are what reduced motion keeps, so the fade runs either

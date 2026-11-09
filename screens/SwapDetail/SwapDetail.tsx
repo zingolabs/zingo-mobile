@@ -6,8 +6,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { formatZecAmount } from '@app/utils/formatZecAmount';
-import { formatUsd } from '@app/utils/formatAmount';
+import { formatZecAmount } from '@app/wallet/formatZecAmount';
+import { formatUsd } from '@app/wallet/formatAmount';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Linking, View } from 'react-native';
 import Pressable from '@ui/primitives/Pressable';

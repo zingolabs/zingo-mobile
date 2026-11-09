@@ -32,7 +32,7 @@ import {
   validateAddressForChain,
   zecNetworkFeeReserve,
 } from '@app/swap';
-import { decimalSeparator, parseAmountInput } from '@app/utils/formatAmount';
+import { decimalSeparator, parseAmountInput } from '@app/wallet/formatAmount';
 import { selectionAcrossRefresh } from '@app/swap/selectionAcrossRefresh';
 import type {
   SwapPrefillType,

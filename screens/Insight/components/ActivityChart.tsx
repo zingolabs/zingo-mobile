@@ -31,7 +31,7 @@ import {
 } from '@app/theme';
 import Text from '@ui/primitives/Text';
 import { duration } from '@app/theme/motion';
-import { formatPercent } from '@app/utils/formatAmount';
+import { formatPercent } from '@app/wallet/formatAmount';
 import { MASK } from '@ui/widgets/PrivateAmount';
 
 const H = 168;

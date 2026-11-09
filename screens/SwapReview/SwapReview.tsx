@@ -44,7 +44,7 @@ import {
   formatAmount,
   formatPercent,
   formatUsd,
-} from '@app/utils/formatAmount';
+} from '@app/wallet/formatAmount';
 
 type SwapReviewProps = NativeStackScreenProps<
   AppDrawerParamList,

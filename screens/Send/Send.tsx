@@ -62,7 +62,7 @@ import {
   formatAmount,
   formatUsd,
   toAmountInput,
-} from '@app/utils/formatAmount';
+} from '@app/wallet/formatAmount';
 /** After utils: the uris barrel and utils import each other, and this order resolves it. */
 import { parseZcashURI } from '@app/uris';
 import { useResult } from '@app/navigation/results';

@@ -24,7 +24,7 @@ import InfoType from '@app/server/InfoType';
 import { fiatQuote } from '@app/price/fiatQuote';
 import ZecPriceType from '@app/price/ZecPriceType';
 import Utils from '@app/utils';
-import { formatUsd } from '@app/utils/formatAmount';
+import { formatUsd } from '@app/wallet/formatAmount';
 import CurrencyAmount, { PriceTint } from '@ui/widgets/CurrencyAmount';
 import { MASK } from '@ui/widgets/PrivateAmount';
 import { useTimedReveal } from '@app/security/useTimedReveal';

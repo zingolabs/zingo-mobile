@@ -29,7 +29,7 @@ import { ease } from '@app/theme/motion';
 import Pressable from '@ui/primitives/Pressable';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import { formatAmount, formatInteger } from '@app/utils/formatAmount';
+import { formatAmount, formatInteger } from '@app/wallet/formatAmount';
 import { MASK, useAmountReveal } from '@ui/widgets/PrivateAmount';
 import Utils from '@app/utils';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
@@ -41,7 +41,7 @@ import Header from '@ui/widgets/Header';
 import ActivityChart from '@screens/Insight/components/ActivityChart';
 import Donut from '@screens/Insight/components/Donut';
 import { useTimedReveal } from '@app/security/useTimedReveal';
-import { mask } from '@app/utils/reveal';
+import { mask } from '@app/security/reveal';
 import {
   buildInsight,
   Group,

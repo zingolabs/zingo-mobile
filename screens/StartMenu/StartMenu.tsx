@@ -23,7 +23,7 @@ import {
 import { ContextAppLoading } from '@app/context';
 import { WalletType } from '@app/AppState';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
-import { formatInteger } from '@app/utils/formatAmount';
+import { formatInteger } from '@app/wallet/formatAmount';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import Card from '@ui/widgets/Card';

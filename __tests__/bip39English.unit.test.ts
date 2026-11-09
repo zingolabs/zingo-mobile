@@ -1,4 +1,4 @@
-import { BIP39_ENGLISH } from '../app/utils/bip39English';
+import { BIP39_ENGLISH } from '@app/wallet/bip39English';
 
 describe('BIP39_ENGLISH', () => {
   it('Tests that the list holds the 2048 canonical words in order when loaded. The first four letters of every word are unique, as the standard requires.', () => {

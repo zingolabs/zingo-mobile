@@ -3,7 +3,7 @@
  */
 import { act, renderHook } from '@testing-library/react-native';
 import { useTimedReveal } from '@app/security/useTimedReveal';
-import { REVEAL_MS } from '@app/utils/reveal';
+import { REVEAL_MS } from '@app/security/reveal';
 import { advance } from '../__mocks__/advanceTimers';
 
 const SECOND_TAP_MS = 4500;

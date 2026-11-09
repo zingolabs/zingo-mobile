@@ -6,7 +6,7 @@ import { space4, space8, space12, space20, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import type { SwapRecordType } from '@app/swap';
 import Utils from '@app/utils';
-import { formatExactAmount } from '@app/utils/formatAmount';
+import { formatExactAmount } from '@app/wallet/formatAmount';
 import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';

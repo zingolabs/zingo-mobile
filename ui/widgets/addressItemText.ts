@@ -1,4 +1,4 @@
-import { chunks, mask, trim } from '@app/utils/reveal';
+import { chunks, mask, trim } from '@app/security/reveal';
 
 const TRIM_KEEP = 7;
 const ADDRESS_SHORT = 50;

@@ -46,7 +46,7 @@ import {
   hasRecoveryWalletInfo,
 } from '@app/wallet/recoveryWalletInfo';
 import { fetchWallet } from '@app/walletBackend';
-import { copySensitive } from '@app/utils/sensitiveClipboard';
+import { copySensitive } from '@app/security/sensitiveClipboard';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { axisEnter, axisExit } from '@ui/widgets/OnboardingStage';
 import InfoStep from './components/InfoStep';
