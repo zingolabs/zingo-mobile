@@ -150,6 +150,12 @@ const POOL_DOTS = [
 const POOL_CENTER = { x: 246, y: 40 };
 
 const BADGE = { x: 283, y: 14, r: 11 };
+/**
+ * The badge's ring and sparks reach past the 300 x 220 drawing, and Android
+ * clips an Svg to its own box whatever its overflow says.
+ */
+const BADGE_BLEED = 12;
+const BADGE_BOX = `${-BADGE_BLEED} ${-BADGE_BLEED} ${WIDTH + 2 * BADGE_BLEED} ${HEIGHT + 2 * BADGE_BLEED}`;
 const ARCS = [
   'M286.18 -1.68 A16 16 0 0 1 298.17 19.09',
   'M294.99 24.59 A16 16 0 0 1 271.01 24.59',
@@ -1530,7 +1536,16 @@ export default function SendFlight({
           testID={`computing.flight.filled.${done ? ARCS.length : step === 'conf' ? confirmations : 0}`}
           style={[scene, badgeStyle]}
         >
-          <Svg width={WIDTH} height={HEIGHT} style={svgStyle}>
+          <Svg
+            width={WIDTH + 2 * BADGE_BLEED}
+            height={HEIGHT + 2 * BADGE_BLEED}
+            viewBox={BADGE_BOX}
+            style={{
+              position: 'absolute',
+              left: -BADGE_BLEED,
+              top: -BADGE_BLEED,
+            }}
+          >
             {ARCS.map((d, i) => (
               <BlockArc
                 key={d}
