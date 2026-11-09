@@ -77,39 +77,39 @@ import {
 } from '@app/utils/formatAmount';
 import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
 import { AppTheme } from '@app/theme';
-import SettingsFileImpl from '@app/services/SettingsFileImpl';
+import SettingsFileImpl from '@app/settings/SettingsFileImpl';
 import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import SwapExpiryNotice from '@screens/Swap/components/SwapExpiryNotice';
 import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
 import { ContextAppLoadedProvider, SwapServiceProvider } from '@app/context';
 import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
 import { otherServers, staticAlternatives } from '@app/uris/serverChoice';
-import selectingServer from '@app/services/selectingServer';
-import BackgroundFileImpl from '@app/services/BackgroundFileImpl';
+import selectingServer from '@app/server/selectingServer';
+import BackgroundFileImpl from '@app/lifecycle/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createAlert } from '@app/services/createAlert';
-import { sendEmail } from '@app/services/sendEmail';
+import { createAlert } from '@app/alert/createAlert';
+import { sendEmail } from '@app/reporting/sendEmail';
 import Toast from 'react-native-toast-message';
 import { ACTION_SNACKBAR_MS, toastConfig } from '@ui/widgets/toastConfig';
 import { MASK } from '@ui/widgets/PrivateAmount';
 import { RPCSeedType } from '@app/walletBackend/RPCSeedType';
 import Launching from '@screens/Launching';
-import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
+import AddressBookFileImpl from '@app/addressBook/AddressBookFileImpl';
 import {
   GateAnswer,
   enactGateAnswer,
   resolveTriggerGate,
-} from '@app/services/gateController';
-import ShowAddressAlertAsync from '@app/services/showAddressAlertAsync';
+} from '@app/security/gateController';
+import ShowAddressAlertAsync from '@app/addressBook/showAddressAlertAsync';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import AddTagModalHost from './components/AddTagModalHost';
-import { showAddTag } from '@app/services/showAddTag';
+import { showAddTag } from '@app/addressBook/showAddTag';
 import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
 import FadeInOnMount from '@ui/widgets/FadeInOnMount';
-import { showConfirm } from '@app/services/showConfirm';
+import { showConfirm } from '@app/alert/showConfirm';
 import { WalletNavigator } from '@app/navigation/WalletNavigator';
 import TooltipHost from '@ui/widgets/TooltipHost';
 import {
@@ -136,7 +136,7 @@ import { RPCPerformanceLevelEnum } from '@app/walletBackend/RPCPerformanceLevelE
 import { RootParamList } from '@app/types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
-import { publishReport } from '@app/services/reportDiagnostics';
+import { publishReport } from '@app/reporting/reportDiagnostics';
 
 const en = require('@app/translations/en.json');
 const es = require('@app/translations/es.json');

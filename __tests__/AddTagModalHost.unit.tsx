@@ -11,7 +11,7 @@ import {
 } from '@app/context';
 
 import AddTagModalHost from '@app/LoadedApp/components/AddTagModalHost';
-import { showAddTag } from '@app/services/showAddTag';
+import { showAddTag } from '@app/addressBook/showAddTag';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 
 const host = (own: boolean) => {

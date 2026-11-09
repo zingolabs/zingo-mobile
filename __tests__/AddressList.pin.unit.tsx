@@ -1,4 +1,4 @@
-jest.mock('@app/services/ReceivePinImpl', () => ({
+jest.mock('@app/security/ReceivePinImpl', () => ({
   readPinnedAddress: jest.fn(() =>
     Promise.resolve('UA-sapling-12345678901234567890'),
   ),
@@ -19,7 +19,7 @@ import {
 import { Route } from '@app/AppState';
 import { AddressList } from '@screens/AddressList';
 import { deliver } from '@app/navigation/results';
-import { writePinnedAddress } from '@app/services/ReceivePinImpl';
+import { writePinnedAddress } from '@app/security/ReceivePinImpl';
 import { resetPinnedAddress } from '@app/hooks/usePinnedAddress';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';

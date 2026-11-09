@@ -7,7 +7,7 @@ import {
 } from '@app/context';
 import { Route } from '@app/AppState';
 import { WalletSeedAction } from '@app/types';
-import { showConfirm } from '@app/services/showConfirm';
+import { showConfirm } from '@app/alert/showConfirm';
 import { copySensitive } from '@app/utils/sensitiveClipboard';
 
 import WalletSeed from '@screens/WalletSeed';
@@ -15,14 +15,14 @@ import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 const UFVK = 'uview1k8q4m2xw7d0yq5cv3t9ln6r2hfj8sa4e0ux7d2p';
 
-jest.mock('@app/services/recoveryWalletInfo', () => ({
+jest.mock('@app/wallet/recoveryWalletInfo', () => ({
   getRecoveryWalletInfo: jest.fn(async () => ({
     seed: Array.from({ length: 24 }, (_, i) => `w${i}`).join(' '),
     birthday: 3512840,
   })),
 }));
 
-jest.mock('@app/services/showConfirm', () => ({ showConfirm: jest.fn() }));
+jest.mock('@app/alert/showConfirm', () => ({ showConfirm: jest.fn() }));
 jest.mock('@app/utils/sensitiveClipboard', () => ({
   copySensitive: jest.fn(),
 }));

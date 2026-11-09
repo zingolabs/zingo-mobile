@@ -20,7 +20,7 @@ jest.mock('@app/uris', () => ({
   ],
 }));
 
-import SettingsFileImpl from '@app/services/SettingsFileImpl';
+import SettingsFileImpl from '@app/settings/SettingsFileImpl';
 import {
   ChainNameEnum,
   SelectServerEnum,

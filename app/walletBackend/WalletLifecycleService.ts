@@ -11,7 +11,7 @@ import RPCModule from '@app/RPCModule';
 import {
   forgetWalletOnFile,
   releaseWalletOnFile,
-} from '@app/services/WalletLocalData';
+} from '@app/wallet/WalletLocalData';
 import { SyncCoordinator } from './SyncCoordinator';
 
 export type WalletLifecycleErrorKey =

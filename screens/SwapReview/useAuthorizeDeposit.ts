@@ -1,6 +1,6 @@
 import { useCallback, useContext } from 'react';
 import { ContextAppLoaded } from '@app/context';
-import { askGate, enactGateAnswer } from '@app/services/gateController';
+import { askGate, enactGateAnswer } from '@app/security/gateController';
 
 /**
  * The device lock before a deposit leaves the wallet, asked straight from the

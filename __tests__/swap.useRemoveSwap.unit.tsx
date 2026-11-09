@@ -1,4 +1,4 @@
-jest.mock('@app/services/showConfirm', () => ({ showConfirm: jest.fn() }));
+jest.mock('@app/alert/showConfirm', () => ({ showConfirm: jest.fn() }));
 
 import React from 'react';
 import { renderHook } from '@testing-library/react-native';
@@ -6,7 +6,7 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { showConfirm } from '@app/services/showConfirm';
+import { showConfirm } from '@app/alert/showConfirm';
 import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
 import type { SwapRecordType } from '@app/swap/SwapRecordType';
 import { useRemoveSwap } from '@screens/Swap/useRemoveSwap';

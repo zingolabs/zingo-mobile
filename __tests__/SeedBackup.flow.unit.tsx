@@ -17,7 +17,7 @@ const WORDS = Array.from({ length: 24 }, (_, i) =>
   'abcdefghijklmnopqrstuvwx'[i].repeat(3 + (i % 6)),
 );
 
-jest.mock('@app/services/recoveryWalletInfo', () => ({
+jest.mock('@app/wallet/recoveryWalletInfo', () => ({
   getRecoveryWalletInfo: jest.fn(async () => ({
     seed: Array.from({ length: 24 }, (_, i) =>
       'abcdefghijklmnopqrstuvwx'[i].repeat(3 + (i % 6)),

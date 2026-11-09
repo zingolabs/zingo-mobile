@@ -13,22 +13,22 @@ import {
   SelectServerEnum,
 } from '@app/AppState';
 import { remoteServer } from '@app/server/ServerType';
-import { askGate, resolveTriggerGate } from '@app/services/gateController';
+import { askGate, resolveTriggerGate } from '@app/security/gateController';
 import RPCModule from '@app/RPCModule';
-import { hasRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
+import { hasRecoveryWalletInfo } from '@app/wallet/recoveryWalletInfo';
 
 jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
 );
 
-jest.mock('@app/services/gateController', () => ({
-  ...jest.requireActual('@app/services/gateController'),
+jest.mock('@app/security/gateController', () => ({
+  ...jest.requireActual('@app/security/gateController'),
   resolveTriggerGate: jest.fn(async () => ({ kind: 'passed' })),
   askGate: jest.fn(async () => ({ kind: 'passed' })),
 }));
 
-jest.mock('@app/services/recoveryWalletInfo', () => ({
-  ...jest.requireActual('@app/services/recoveryWalletInfo'),
+jest.mock('@app/wallet/recoveryWalletInfo', () => ({
+  ...jest.requireActual('@app/wallet/recoveryWalletInfo'),
   hasRecoveryWalletInfo: jest.fn(async () => false),
   getRecoveryWalletInfo: jest.fn(async () => null),
 }));

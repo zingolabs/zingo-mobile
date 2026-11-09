@@ -1,7 +1,7 @@
 import 'react-native';
 import * as Keychain from 'react-native-keychain';
 import { GlobalConst } from '@app/AppState';
-import { getRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
+import { getRecoveryWalletInfo } from '@app/wallet/recoveryWalletInfo';
 
 const keychain = Keychain as jest.Mocked<typeof Keychain>;
 

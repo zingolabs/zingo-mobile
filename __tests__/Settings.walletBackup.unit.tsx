@@ -18,7 +18,7 @@ import {
 import {
   ConfirmOptions,
   registerConfirmListener,
-} from '@app/services/showConfirm';
+} from '@app/alert/showConfirm';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';

@@ -5,7 +5,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { space8, space16, useTheme, iconSizeSm } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import { GlobalConst, Route, SnackbarDurationEnum } from '@app/AppState';
-import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
+import AddressBookFileImpl from '@app/addressBook/AddressBookFileImpl';
 import { ContextAppLoaded, useSwapService } from '@app/context';
 import {
   DepositAfterDeshieldError,

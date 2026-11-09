@@ -20,7 +20,7 @@ import { probeServer } from '@app/walletBackend';
 
 jest.mock('@app/walletBackend', () => ({ probeServer: jest.fn() }));
 
-const en = require('../app/translations/en.json');
+const en = require('@app/translations/en.json');
 const translate = (key: string): TranslateType =>
   key.split('.').reduce((o, k) => o?.[k], en) ?? key;
 const probe = probeServer as jest.Mock;

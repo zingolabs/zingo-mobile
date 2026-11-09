@@ -3,7 +3,7 @@ import React from 'react';
 import { act, render, screen } from '@testing-library/react-native';
 
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
-import { showConfirm } from '@app/services/showConfirm';
+import { showConfirm } from '@app/alert/showConfirm';
 
 const messageColor = () =>
   screen.getByTestId('confirm.message').props.style.color;

@@ -1,4 +1,4 @@
-import { listenerStack } from './listenerStack';
+import { listenerStack } from '@app/alert/listenerStack';
 
 /** What the add-to-address-book sheet opens on. */
 export type AddTagTarget = {

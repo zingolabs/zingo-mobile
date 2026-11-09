@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { askGate, enactGateAnswer } from '@app/services/gateController';
+import { askGate, enactGateAnswer } from '@app/security/gateController';
 import { SnackbarDurationEnum, TranslateType } from '@app/AppState';
 
 type UseBiometricGateArgs = {

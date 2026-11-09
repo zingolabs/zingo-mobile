@@ -3,7 +3,7 @@ import {
   IronwoodNoticeHide,
   readIronwoodNoticeHide,
   writeIronwoodNoticeHide,
-} from '@app/services/IronwoodNoticeImpl';
+} from '@app/wallet/IronwoodNoticeImpl';
 
 type HideState = { loaded: boolean; hide: IronwoodNoticeHide };
 

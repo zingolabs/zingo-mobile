@@ -8,7 +8,7 @@ import {
   adoptWalletOnFile,
   forgetWalletOnFile,
   releaseWalletOnFile,
-} from '@app/services/WalletLocalData';
+} from '@app/wallet/WalletLocalData';
 import { WalletLifecycleService } from '@app/walletBackend/WalletLifecycleService';
 
 const bridge = RPCModule as unknown as Record<string, jest.Mock>;

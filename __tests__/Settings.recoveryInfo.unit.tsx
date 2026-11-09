@@ -16,7 +16,7 @@ import {
   ContextAppLoadedProvider,
 } from '@app/context';
 import { Route, SelectServerEnum } from '@app/AppState';
-import { saveRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
+import { saveRecoveryWalletInfo } from '@app/wallet/recoveryWalletInfo';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';

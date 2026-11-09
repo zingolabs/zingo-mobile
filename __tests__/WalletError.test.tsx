@@ -10,7 +10,7 @@ import { ChainNameEnum, remoteServer } from '@app/AppState';
 import {
   ConfirmOptions,
   registerConfirmListener,
-} from '@app/services/showConfirm';
+} from '@app/alert/showConfirm';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 
 const handlers = () => ({
@@ -73,7 +73,7 @@ test('Tests that the button shows a spinner and ignores presses while a retry is
 });
 
 const mountChain = (h = handlers()) => {
-  const en = require('../app/translations/en.json');
+  const en = require('@app/translations/en.json');
   const translate = (key: string) =>
     key.split('.').reduce((o: any, k) => o?.[k], en) ?? key;
   render(

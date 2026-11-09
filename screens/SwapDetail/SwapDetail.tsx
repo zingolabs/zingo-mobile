@@ -19,7 +19,7 @@ import {
   SnackbarDurationEnum,
   ValueTransferKindEnum,
 } from '@app/AppState';
-import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
+import AddressBookFileImpl from '@app/addressBook/AddressBookFileImpl';
 import { ContextAppLoaded, useSwapRecords, useSwapService } from '@app/context';
 import {
   SwapDirectionEnum,

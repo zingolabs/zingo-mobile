@@ -5,7 +5,7 @@ import { Keyboard, View } from 'react-native';
 import { space12, space4, space16, space20 } from '@app/theme';
 import { AddressBookFileClass, GlobalConst } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
-import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
+import AddressBookFileImpl from '@app/addressBook/AddressBookFileImpl';
 import Utils from '@app/utils';
 import Button from '@ui/primitives/Button';
 import Card from '@ui/widgets/Card';

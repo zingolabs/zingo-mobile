@@ -19,7 +19,7 @@ import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 // The screen owns the persisted "already onboarded" flag now, so the file
 // layer is stubbed rather than reaching for RNFS.
 const mockWriteSettings = jest.fn();
-jest.mock('@app/services/SettingsFileImpl', () => ({
+jest.mock('@app/settings/SettingsFileImpl', () => ({
   __esModule: true,
   default: {
     readSettings: jest.fn(),

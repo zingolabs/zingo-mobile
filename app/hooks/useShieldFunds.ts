@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { showConfirm } from '@app/services/showConfirm';
+import { showConfirm } from '@app/alert/showConfirm';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
 import {

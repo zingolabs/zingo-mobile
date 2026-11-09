@@ -4,7 +4,7 @@ import RNRestart from 'react-native-restart';
 import * as RNLocalize from 'react-native-localize';
 
 import RPCModule from './RPCModule';
-import SettingsFileImpl from './services/SettingsFileImpl';
+import SettingsFileImpl from '@app/settings/SettingsFileImpl';
 import {
   fieldMinHeight,
   radiusSm,
@@ -17,7 +17,7 @@ import {
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
-import { sendEmail } from './services/sendEmail';
+import { sendEmail } from '@app/reporting/sendEmail';
 import { TranslateType } from './AppState';
 import { sanitizePaths } from './utils/sanitizePaths';
 import { getZingoName, getZingoVersion } from './utils/ZingoAppData';

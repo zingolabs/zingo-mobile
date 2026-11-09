@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   readPinnedAddress,
   writePinnedAddress,
-} from '@app/services/ReceivePinImpl';
+} from '@app/security/ReceivePinImpl';
 
 type PinState = { loaded: boolean; pin: string };
 

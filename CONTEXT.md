@@ -138,7 +138,8 @@ _Avoid_: shell
 
 **Service**:
 A module that renders nothing and is called by the runtime or screens: file
-IO, alerts, email, biometrics. Home: `app/services`.
+IO, alerts, email, biometrics. Home: the module's domain (`app/alert`,
+`app/security`, `app/server`, ...).
 
 ## Wallet birthday
 

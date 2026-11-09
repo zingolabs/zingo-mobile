@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 
-import { BIOMETRIC_BLANKING_EVENT } from '@app/services/gateController';
+import { BIOMETRIC_BLANKING_EVENT } from '@app/security/gateController';
 import { themeTokens } from '@app/theme';
 
 const styles = StyleSheet.create({

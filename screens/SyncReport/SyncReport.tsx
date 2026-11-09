@@ -35,13 +35,13 @@ import { SnackbarDurationEnum } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { useSyncStatus } from '@app/hooks/useSyncStatus';
-import { createAlert } from '@app/services/createAlert';
-import { sendEmail } from '@app/services/sendEmail';
+import { createAlert } from '@app/alert/createAlert';
+import { sendEmail } from '@app/reporting/sendEmail';
 import {
   enactGateAnswer,
   resolveTriggerGate,
-} from '@app/services/gateController';
-import { showConfirm } from '@app/services/showConfirm';
+} from '@app/security/gateController';
+import { showConfirm } from '@app/alert/showConfirm';
 import Utils from '@app/utils';
 import { formatInteger } from '@app/utils/formatAmount';
 import CircularProgress from '@ui/primitives/CircularProgress';

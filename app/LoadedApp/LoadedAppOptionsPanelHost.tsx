@@ -8,11 +8,11 @@ import type {
 } from '@screens/OptionsPanel';
 import { closeOptionsPanel, useOptionsPanel } from '@app/context/optionsPanel';
 import { navigateWallet } from '@app/navigation/navigate';
-import { probeUri } from '@app/services/serverPicking';
+import { probeUri } from '@app/server/serverPicking';
 import { ContextAppLoaded } from '@app/context';
 import { MenuItemEnum, Route } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
-import { sendEmail } from '@app/services/sendEmail';
+import { sendEmail } from '@app/reporting/sendEmail';
 import ServerIcon from '@ui/widgets/ServerIcon';
 
 import AddressBookIcon from '../../assets/img/options/address-book.svg';

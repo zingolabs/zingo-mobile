@@ -36,9 +36,9 @@ import { AppDrawerParamList } from '@app/types';
 import {
   enactGateAnswer,
   resolveTriggerGate,
-} from '@app/services/gateController';
-import { getRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
-import { showConfirm } from '@app/services/showConfirm';
+} from '@app/security/gateController';
+import { getRecoveryWalletInfo } from '@app/wallet/recoveryWalletInfo';
+import { showConfirm } from '@app/alert/showConfirm';
 import { fetchWallet } from '@app/walletBackend';
 import { copySensitive } from '@app/utils/sensitiveClipboard';
 import { EyeIcon } from '@ui/primitives/Icons/EyeIcon';

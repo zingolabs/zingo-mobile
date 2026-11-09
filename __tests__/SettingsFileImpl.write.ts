@@ -28,7 +28,7 @@ jest.mock('@app/uris', () => ({
   ],
 }));
 
-import SettingsFileImpl from '@app/services/SettingsFileImpl';
+import SettingsFileImpl from '@app/settings/SettingsFileImpl';
 import { LanguageEnum, SettingsNameEnum } from '@app/AppState';
 
 describe('SettingsFileImpl.writeSettings', () => {

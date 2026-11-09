@@ -33,7 +33,7 @@ jest.mock('@app/uris', () => ({
   fetchServerList: jest.fn(),
 }));
 
-jest.mock('@app/services/selectingServer', () => ({
+jest.mock('@app/server/selectingServer', () => ({
   __esModule: true,
   default: jest.fn(),
 }));

@@ -1,5 +1,5 @@
 import { ChainNameEnum } from '@app/AppState';
-import { pickAutomatic } from '@app/services/serverPicking';
+import { pickAutomatic } from '@app/server/serverPicking';
 import { serverUris } from '@app/uris';
 
 const mockAnswering = new Set<string>();

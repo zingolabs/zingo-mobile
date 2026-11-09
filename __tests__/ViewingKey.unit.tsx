@@ -9,7 +9,7 @@ import { ChainNameEnum, Route } from '@app/AppState';
 import {
   ConfirmOptions,
   registerConfirmListener,
-} from '@app/services/showConfirm';
+} from '@app/alert/showConfirm';
 
 import ViewingKey from '@screens/ViewingKey';
 import ViewOnlyNotice from '@screens/History/components/ViewOnlyNotice';
@@ -19,7 +19,7 @@ import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 const UFVK =
   'uview1qg8x2m5k7d9w3e6r4t0yhu2jn8ls5c7v3b6nq9pz4xw2k8e5r7t1ym3gd6hf0jn2ks8al4xq7wv9cz5eb3rt6yu1io0pl8mk2nj4hb7gv5fc3dx9sz6aq';
 
-jest.mock('@app/services/recoveryWalletInfo', () => ({
+jest.mock('@app/wallet/recoveryWalletInfo', () => ({
   getRecoveryWalletInfo: jest.fn(async () => ({
     ufvk: 'uview1qg8x2m5k7d9w3e6r4t0yhu2jn8ls5c7v3b6nq9pz4xw2k8e5r7t1ym3gd6hf0jn2ks8al4xq7wv9cz5eb3rt6yu1io0pl8mk2nj4hb7gv5fc3dx9sz6aq',
   })),

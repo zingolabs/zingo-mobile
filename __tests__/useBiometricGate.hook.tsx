@@ -2,15 +2,15 @@
  * The shared screen-level gate, asking the single gate controller of ADR
  * 0007 and acting on its three-way answer.
  */
-jest.mock('@app/services/gateController', () => ({
+jest.mock('@app/security/gateController', () => ({
   __esModule: true,
-  ...jest.requireActual('@app/services/gateController'),
+  ...jest.requireActual('@app/security/gateController'),
   askGate: jest.fn(),
 }));
 
 import { renderHook, waitFor } from '@testing-library/react-native';
-import { askGate } from '@app/services/gateController';
-import type { GateAnswer } from '@app/services/gateController';
+import { askGate } from '@app/security/gateController';
+import type { GateAnswer } from '@app/security/gateController';
 import { useBiometricGate } from '@app/hooks/useBiometricGate';
 import type { TranslateType } from '@app/AppState';
 

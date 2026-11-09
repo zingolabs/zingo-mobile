@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { act, render } from '@testing-library/react-native';
-import { IronwoodNoticeHide } from '@app/services/IronwoodNoticeImpl';
+import { IronwoodNoticeHide } from '@app/wallet/IronwoodNoticeImpl';
 import { resetIronwoodNoticeHide } from '@app/hooks/useIronwoodNoticeHide';
 import History from '@screens/History';
 import {
@@ -23,7 +23,7 @@ import { HomeTabScreenProps } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 let mockStoredHide: IronwoodNoticeHide = { kind: 'shown' };
-jest.mock('@app/services/IronwoodNoticeImpl', () => ({
+jest.mock('@app/wallet/IronwoodNoticeImpl', () => ({
   readIronwoodNoticeHide: jest.fn(async () => mockStoredHide),
   writeIronwoodNoticeHide: jest.fn(async () => {}),
 }));

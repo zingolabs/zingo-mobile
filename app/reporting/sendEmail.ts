@@ -3,7 +3,7 @@ import DeviceInfo from 'react-native-device-info';
 import { GlobalConst, TranslateType } from '@app/AppState';
 import { redactReport } from '@app/utils/redactReport';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
-import { showConfirm } from './showConfirm';
+import { showConfirm } from '@app/alert/showConfirm';
 import {
   privateHosts,
   reportDiagnostics,

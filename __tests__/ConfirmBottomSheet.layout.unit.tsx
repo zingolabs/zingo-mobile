@@ -3,7 +3,7 @@ import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
-import { showConfirm } from '@app/services/showConfirm';
+import { showConfirm } from '@app/alert/showConfirm';
 import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 
 /** The style may be an array: the shared Pressable adds its pressed style. */

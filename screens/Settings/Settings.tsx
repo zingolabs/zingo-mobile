@@ -47,7 +47,7 @@ import { fetchWallet, walletBackupExists } from '@app/walletBackend';
 import {
   DeviceSecurityProbe,
   probeDeviceSecurity,
-} from '@app/services/gateController';
+} from '@app/security/gateController';
 import { useBiometricGate } from '@app/hooks/useBiometricGate';
 import SelectBottomSheet from '@ui/widgets/SelectBottomSheet';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
@@ -57,7 +57,7 @@ import {
   RecoveryInfoSaveResult,
   hasRecoveryWalletInfo,
   saveRecoveryWalletInfo,
-} from '@app/services/recoveryWalletInfo';
+} from '@app/wallet/recoveryWalletInfo';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/RPCPerformanceLevelEnum';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
@@ -65,9 +65,9 @@ import {
   NavigationAction,
   usePreventRemove,
 } from '@react-navigation/native';
-import { createAlert } from '@app/services/createAlert';
-import { showConfirm } from '@app/services/showConfirm';
-import { sendEmail } from '@app/services/sendEmail';
+import { createAlert } from '@app/alert/createAlert';
+import { showConfirm } from '@app/alert/showConfirm';
+import { sendEmail } from '@app/reporting/sendEmail';
 import SaveSheet from '@ui/widgets/SaveSheet';
 import Switch from '@ui/primitives/Switch';
 import { ChevronRight } from '@ui/primitives/Icons/Chevron';

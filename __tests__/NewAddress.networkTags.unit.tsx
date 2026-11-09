@@ -24,7 +24,7 @@ import {
 } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
 import { RPCAddressScopeEnum } from '@app/walletBackend/RPCAddressScopeEnum';
-import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
+import AddressBookFileImpl from '@app/addressBook/AddressBookFileImpl';
 import NewAddress from '@screens/Receive/components/NewAddress';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';

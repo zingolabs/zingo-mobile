@@ -36,7 +36,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
-import { showConfirm } from '@app/services/showConfirm';
+import { showConfirm } from '@app/alert/showConfirm';
 import { viewingKeyChain } from '@app/utils/seedPhrase';
 
 import {
@@ -85,13 +85,13 @@ import {
 } from '@app/AppState';
 import { serverUris } from '@app/uris';
 import { staticAlternatives, staticServers } from '@app/uris/serverChoice';
-import SettingsFileImpl from '@app/services/SettingsFileImpl';
+import SettingsFileImpl from '@app/settings/SettingsFileImpl';
 import { fetchWallet } from '@app/walletBackend';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoadingProvider } from '@app/context';
-import BackgroundFileImpl from '@app/services/BackgroundFileImpl';
+import BackgroundFileImpl from '@app/lifecycle/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createAlert } from '@app/services/createAlert';
+import { createAlert } from '@app/alert/createAlert';
 import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
 import Utils from '@app/utils';
 import { formatInteger } from '@app/utils/formatAmount';
@@ -107,20 +107,20 @@ import {
   enactGateAnswer,
   resolveTriggerGate,
   retireSentinelEntries,
-} from '@app/services/gateController';
-import selectingServer from '@app/services/selectingServer';
+} from '@app/security/gateController';
+import selectingServer from '@app/server/selectingServer';
 import {
   otherServersFor,
   pickAutomatic,
   probeUri,
   recommendedServers,
-} from '@app/services/serverPicking';
+} from '@app/server/serverPicking';
 import { defaultTo, isEqual } from 'lodash';
 import {
   createUpdateRecoveryWalletInfo,
   getRecoveryWalletInfo,
   hasRecoveryWalletInfo,
-} from '@app/services/recoveryWalletInfo';
+} from '@app/wallet/recoveryWalletInfo';
 
 // no lazy load because slowing down screens.
 import SeedSheet from '@ui/widgets/SeedSheet';
@@ -130,7 +130,7 @@ import { walletErrorKind } from './walletErrorKind';
 import { sanitizePaths } from '@app/utils/sanitizePaths';
 import { duration as motionDuration } from '@app/theme/motion';
 
-import { sendEmail } from '@app/services/sendEmail';
+import { sendEmail } from '@app/reporting/sendEmail';
 import { RPCWalletKindEnum } from '@app/walletBackend/RPCWalletKindEnum';
 import { RPCUfvkType } from '@app/walletBackend/RPCUfvkType';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/RPCPerformanceLevelEnum';
@@ -139,8 +139,8 @@ import {
   LoadedAppNavigationState,
   OnboardingRoute,
 } from '@app/types';
-import { publishReport, reportState } from '@app/services/reportDiagnostics';
-import { forgetWalletOnFile } from '@app/services/WalletLocalData';
+import { publishReport, reportState } from '@app/reporting/reportDiagnostics';
+import { forgetWalletOnFile } from '@app/wallet/WalletLocalData';
 
 const en = require('@app/translations/en.json');
 const es = require('@app/translations/es.json');

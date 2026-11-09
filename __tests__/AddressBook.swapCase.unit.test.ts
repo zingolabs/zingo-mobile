@@ -3,7 +3,7 @@ jest.mock('@app/RPCModule', () =>
 );
 
 import { ChainNameEnum } from '@app/AppState';
-import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
+import AddressBookFileImpl from '@app/addressBook/AddressBookFileImpl';
 
 test('Tests that the address book stores a Bitcoin address in lowercase when it was typed in uppercase', async () => {
   jest.spyOn(AddressBookFileImpl, 'readAddressBook').mockResolvedValue([]);

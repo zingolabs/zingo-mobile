@@ -32,7 +32,7 @@ import {
   pickAutomatic,
   probeUri,
   recommendedServers,
-} from '@app/services/serverPicking';
+} from '@app/server/serverPicking';
 import { AXIS_PT, axisEnter, axisExit } from '@ui/widgets/OnboardingStage';
 import ServerList from '@screens/ServerList';
 import Server from './Server';

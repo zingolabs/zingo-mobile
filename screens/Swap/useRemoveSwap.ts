@@ -3,7 +3,7 @@ import { SnackbarDurationEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { SwapStore } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
-import { showConfirm } from '@app/services/showConfirm';
+import { showConfirm } from '@app/alert/showConfirm';
 import { swapOutcome } from './swapProgress';
 
 /**

@@ -9,8 +9,11 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 import { SnackbarDurationEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
-import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
-import { AddTagTarget, registerAddTagListener } from '@app/services/showAddTag';
+import AddressBookFileImpl from '@app/addressBook/AddressBookFileImpl';
+import {
+  AddTagTarget,
+  registerAddTagListener,
+} from '@app/addressBook/showAddTag';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import ContactSheet from '@ui/widgets/ContactSheet';
 import NewAddressTag, {

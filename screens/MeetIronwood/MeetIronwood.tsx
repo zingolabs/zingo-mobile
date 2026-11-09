@@ -36,7 +36,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
-import SettingsFileImpl from '@app/services/SettingsFileImpl';
+import SettingsFileImpl from '@app/settings/SettingsFileImpl';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { Route, SettingsNameEnum } from '@app/AppState';

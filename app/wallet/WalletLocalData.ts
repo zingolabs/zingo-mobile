@@ -7,8 +7,8 @@ import {
   readCurrentWalletFingerprint,
 } from '@app/swap';
 import { callFfi } from '@app/walletBackend/ffi';
-import { RECEIVE_PIN_KEY_PREFIX } from './ReceivePinImpl';
-import { IRONWOOD_HIDDEN_KEY_PREFIX } from './IronwoodNoticeImpl';
+import { RECEIVE_PIN_KEY_PREFIX } from '@app/security/ReceivePinImpl';
+import { IRONWOOD_HIDDEN_KEY_PREFIX } from '@app/wallet/IronwoodNoticeImpl';
 
 /**
  * What the app keeps beside the wallet file, keyed by the wallet's

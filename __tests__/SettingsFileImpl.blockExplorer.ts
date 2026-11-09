@@ -22,7 +22,7 @@ jest.mock('@app/uris', () => ({
   ],
 }));
 
-import SettingsFileImpl from '@app/services/SettingsFileImpl';
+import SettingsFileImpl from '@app/settings/SettingsFileImpl';
 import { BlockExplorerEnum } from '@app/AppState';
 
 describe('SettingsFileImpl.readSettings blockExplorer', () => {

@@ -19,7 +19,7 @@ import {
 import { RPCUnifiedAddressType } from '@app/walletBackend/RPCUnifiedAddressType';
 import { RPCTransparentAddressType } from '@app/walletBackend/RPCTransparentAddressType';
 import Utils from '@app/utils';
-import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
+import AddressBookFileImpl from '@app/addressBook/AddressBookFileImpl';
 import TextField from '@ui/primitives/TextField';
 import { SheetFooter } from '@ui/primitives/AppSheetModal';
 

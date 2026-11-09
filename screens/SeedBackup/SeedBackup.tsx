@@ -40,11 +40,11 @@ import { useScreenCapture } from '@app/hooks/useScreenCapture';
 import {
   enactGateAnswer,
   resolveTriggerGate,
-} from '@app/services/gateController';
+} from '@app/security/gateController';
 import {
   getRecoveryWalletInfo,
   hasRecoveryWalletInfo,
-} from '@app/services/recoveryWalletInfo';
+} from '@app/wallet/recoveryWalletInfo';
 import { fetchWallet } from '@app/walletBackend';
 import { copySensitive } from '@app/utils/sensitiveClipboard';
 import { XIcon } from '@ui/primitives/Icons/XIcon';

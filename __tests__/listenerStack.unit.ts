@@ -1,4 +1,4 @@
-import { listenerStack } from '@app/services/listenerStack';
+import { listenerStack } from '@app/alert/listenerStack';
 
 describe('listenerStack', () => {
   test('Tests that the last listener registered answers, and the one before it when that one leaves', () => {

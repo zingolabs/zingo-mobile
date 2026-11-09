@@ -19,7 +19,7 @@ import {
   radiusPill,
 } from '@app/theme';
 import { GlobalConst, Route, SnackbarDurationEnum } from '@app/AppState';
-import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
+import AddressBookFileImpl from '@app/addressBook/AddressBookFileImpl';
 import { HomeTabScreenProps } from '@app/types';
 import { ContextAppLoaded, useSwapRecords, useSwapService } from '@app/context';
 import {
@@ -37,7 +37,7 @@ import type { SwapRecordType } from '@app/swap';
 import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 import { sendGateOpen, shownStatusKey } from '@app/walletBackend/mixnetView';
 import { fiatQuote, toFiatText, toZecText } from '@app/price/fiatQuote';
-import { showConfirm } from '@app/services/showConfirm';
+import { showConfirm } from '@app/alert/showConfirm';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import { useNavigation } from '@react-navigation/native';
 import { useResult } from '@app/navigation/results';

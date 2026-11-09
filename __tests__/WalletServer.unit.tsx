@@ -14,17 +14,17 @@ import {
 } from '@app/AppState';
 import { remoteServer } from '@app/server/ServerType';
 import WalletServer from '@screens/Server/WalletServer';
-import { pickAutomatic } from '@app/services/serverPicking';
+import { pickAutomatic } from '@app/server/serverPicking';
 
 jest.mock('@app/walletBackend', () => ({ probeServer: jest.fn() }));
-jest.mock('@app/services/serverPicking', () => ({
+jest.mock('@app/server/serverPicking', () => ({
   otherServersFor: jest.fn().mockResolvedValue([]),
   pickAutomatic: jest.fn(),
   probeUri: jest.fn().mockResolvedValue({ latency: 40, height: '3473752' }),
   recommendedServers: jest.fn().mockReturnValue([]),
 }));
 
-const en = require('../app/translations/en.json');
+const en = require('@app/translations/en.json');
 const translate = (key: string): TranslateType =>
   key.split('.').reduce((o, k) => o?.[k], en) ?? key;
 

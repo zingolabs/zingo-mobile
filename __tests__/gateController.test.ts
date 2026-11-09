@@ -3,7 +3,7 @@
  * freshness window instead of purposes and holds, and a uniform fail-open
  * answer for every way the gate cannot run.
  */
-jest.mock('@app/services/DeviceAuthModule', () => ({
+jest.mock('@app/security/DeviceAuthModule', () => ({
   __esModule: true,
   default: {
     canAuthenticate: jest.fn(),
@@ -30,9 +30,9 @@ type NativeMock = { canAuthenticate: jest.Mock; authenticate: jest.Mock };
 const load = () => {
   jest.resetModules();
   const controller =
-    require('@app/services/gateController') as typeof import('@app/services/gateController');
+    require('@app/security/gateController') as typeof import('@app/security/gateController');
   const native = (
-    require('@app/services/DeviceAuthModule') as { default: NativeMock }
+    require('@app/security/DeviceAuthModule') as { default: NativeMock }
   ).default;
   return { controller, native };
 };
@@ -458,7 +458,7 @@ test('every gate failure key exists in every catalog', () => {
   ];
   const languages = ['en', 'es', 'pt', 'ru', 'tr'];
   for (const language of languages) {
-    const catalog = require(`../app/translations/${language}.json`) as Record<
+    const catalog = require(`@app/translations/${language}.json`) as Record<
       string,
       unknown
     >;

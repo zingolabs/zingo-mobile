@@ -11,7 +11,7 @@ import {
   ConfirmButton,
   ConfirmOptions,
   registerConfirmListener,
-} from '@app/services/showConfirm';
+} from '@app/alert/showConfirm';
 
 // The confirmation sheet behind showConfirm: title, message, the actions as
 // full-width pills (red when destructive) and Cancel as a link under them.

@@ -31,7 +31,7 @@ import {
   publishReport,
   reportDiagnostics,
   syncLine,
-} from '@app/services/reportDiagnostics';
+} from '@app/reporting/reportDiagnostics';
 import { RPCSyncScanRangePriorityStatusEnum } from '@app/walletBackend/RPCSyncScanRangePriorityStatusEnum';
 import {
   ABSENT_MIXNET_VIEW,

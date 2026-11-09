@@ -1,5 +1,5 @@
 import { TranslateType } from '@app/AppState';
-import { showConfirm } from './showConfirm';
+import { showConfirm } from '@app/alert/showConfirm';
 
 const ShowAddressAlertAsync = (
   translate: (key: string) => TranslateType,

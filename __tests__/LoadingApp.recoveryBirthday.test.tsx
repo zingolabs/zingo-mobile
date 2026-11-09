@@ -17,17 +17,17 @@ import RPCModule from '@app/RPCModule';
 import {
   ConfirmOptions,
   registerConfirmListener,
-} from '@app/services/showConfirm';
+} from '@app/alert/showConfirm';
 
 jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
 );
-jest.mock('@app/services/gateController', () => ({
-  ...jest.requireActual('@app/services/gateController'),
+jest.mock('@app/security/gateController', () => ({
+  ...jest.requireActual('@app/security/gateController'),
   askGate: jest.fn(async () => ({ kind: 'passed' })),
 }));
-jest.mock('@app/services/serverPicking', () => ({
-  ...jest.requireActual('@app/services/serverPicking'),
+jest.mock('@app/server/serverPicking', () => ({
+  ...jest.requireActual('@app/server/serverPicking'),
   probeUri: jest.fn(async () => ({ latency: 40, height: '3000000' })),
 }));
 
