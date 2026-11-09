@@ -1,15 +1,35 @@
-import UnifiedAddressClass from './classes/UnifiedAddressClass';
-import TransparentAddressClass from './classes/TransparentAddressClass';
 import AddressBookFileClass from './classes/AddressBookFileClass';
-import SendPageStateClass from './classes/SendPageStateClass';
 import SettingsFileClass from './classes/SettingsFileClass';
-import ToAddrClass from './classes/ToAddrClass';
-import TotalBalanceClass from './classes/TotalBalanceClass';
 import AddressBookFileClassObsolete from './classes/AddressBookFileClassObsolete';
+import {
+  SendPageStateClass,
+  ToAddrClass,
+  TotalBalanceClass,
+  TransparentAddressClass,
+  UnifiedAddressClass,
+} from '@app/wallet/classes';
+import type {
+  SendJsonToTypeType,
+  WalletType,
+  ValueTransferType,
+  ProposalPoolsType,
+  TransactionType,
+  TxDetailType,
+} from '@app/wallet/types';
+import {
+  TransactionTypeEnum,
+  PoolEnum,
+  RestoreFromTypeEnum,
+  PoolToShieldEnum,
+  AddressKindEnum,
+  ReceiverEnum,
+  ValueTransferKindEnum,
+  FilterEnum,
+  TransactionActionEnum,
+  AddressUnifiedTypeEnum,
+} from '@app/wallet/enums';
 
 import type InfoType from './types/InfoType';
-import type SendJsonToTypeType from './types/SendJsonToTypeType';
-import type WalletType from './types/WalletType';
 import type { TranslateType } from './types/TranslateType';
 import type NetInfoType from './types/NetInfoType';
 import type BackgroundType from './types/BackgroundType';
@@ -22,10 +42,6 @@ import type { ErrorKeyed, Done } from './types/Result';
 import type { GateFailure, GateFailureKey } from './types/GateFailure';
 import { DONE, errorKeyed } from './types/Result';
 import { nativeUri, offlineServer, remoteServer } from './types/ServerType';
-import type ValueTransferType from './types/ValueTransferType';
-import type ProposalPoolsType from './types/ProposalPoolsType';
-import type TransactionType from './types/TransactionType';
-import type TxDetailType from './types/TxDetailType';
 
 import { AddressBookActionEnum } from './enums/AddressBookActionEnum';
 import { MenuItemEnum } from './enums/MenuItemEnum';
@@ -34,21 +50,11 @@ import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import type { SnackbarActionType } from './types/SnackbarActionType';
-import { TransactionTypeEnum } from './enums/TransactionTypeEnum';
-import { PoolEnum } from './enums/PoolEnum';
-import { RestoreFromTypeEnum } from './enums/RestoreFromTypeEnum';
-import { PoolToShieldEnum } from './enums/PoolToShieldEnum';
 import { SettingsNameEnum } from './enums/SettingsNameEnum';
 import { Route } from './enums/Route';
 import { AppStateStatusEnum } from './enums/AppStateStatusEnum';
 import { CurrencyNameEnum } from './enums/CurrencyNameEnum';
-import { AddressKindEnum } from './enums/AddressKindEnum';
-import { ReceiverEnum } from './enums/ReceiverEnum';
 import { EventListenerEnum } from './enums/EventListenerEnum';
-import { ValueTransferKindEnum } from './enums/ValueTransferKindEnum';
-import { FilterEnum } from './enums/FilterEnum';
-import { TransactionActionEnum } from './enums/TransactionActionEnum';
-import { AddressUnifiedTypeEnum } from './enums/AddressUnifiedTypeEnum';
 import { ZcashUriFieldEnum } from './enums/ZcashUriFieldEnum';
 import { LaunchingModeEnum } from './enums/LaunchingModeEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';

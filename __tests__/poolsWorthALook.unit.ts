@@ -1,4 +1,4 @@
-import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
+import { TotalBalanceClass } from '@app/wallet/classes';
 import { poolsWorthALook } from '@ui/widgets/Header/components/poolsWorthALook';
 
 const balance = (b: Partial<TotalBalanceClass>): TotalBalanceClass => ({
