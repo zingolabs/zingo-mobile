@@ -168,18 +168,34 @@ function changedFiles(base: string): string[] {
     .filter(file => existsSync(file) && EXTENSIONS.test(file) && sources(file));
 }
 
+// HEAD path -> the path the same file had on base, for files the diff pairs
+// as renames. A pure move keeps its base bailout count this way; pairing by
+// HEAD path alone would read every moved file as new and its bailouts as
+// regressions.
+const renames = new Map<string, string>();
+
 function filesInBase(base: string, files: string[]): string[] {
-  const rels = files.map(file => path.relative(ROOT, file));
+  const relOf = (file: string): string => path.relative(ROOT, file);
   const present = new Set(
-    gitLines('ls-tree', '-r', '--name-only', base, '--', ...rels),
+    gitLines(
+      'ls-tree',
+      '-r',
+      '--name-only',
+      base,
+      '--',
+      ...files.map(file => renames.get(relOf(file)) ?? relOf(file)),
+    ),
   );
-  return files.filter(file => present.has(path.relative(ROOT, file)));
+  return files.filter(file => present.has(renames.get(relOf(file)) ?? relOf(file)));
 }
 
 const baseCode =
   (base: string) =>
   (file: string): string =>
-    git('show', `${base}:${path.relative(ROOT, file)}`);
+    git(
+      'show',
+      `${base}:${renames.get(path.relative(ROOT, file)) ?? path.relative(ROOT, file)}`,
+    );
 
 async function transformAll(files: string[], codeOf = diskCode): Promise<void> {
   await transformEach(files, async file => {
@@ -226,6 +242,10 @@ if (files.length === 0) {
   process.exit(0);
 }
 if (target.kind === 'base') {
+  for (const line of gitLines('diff', '--name-status', '-M', target.sha, 'HEAD')) {
+    const [status, from, to] = line.split('\t');
+    if (status.startsWith('R') && from && to) renames.set(to, from);
+  }
   active = baseReports;
   await transformAll(filesInBase(target.sha, files), baseCode(target.sha));
   active = headReports;
