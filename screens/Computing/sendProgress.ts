@@ -2,6 +2,7 @@ import { GlobalConst, ValueTransferType } from '@app/AppState';
 import { ValueTransferKindEnum } from '@app/AppState/enums/ValueTransferKindEnum';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import type { SendStage } from '@app/walletBackend/transforms/sendSettlement';
+import type { FlightFailure } from '@ui/widgets/Flight/SendFlight';
 
 /** The five steps a send is told in, with its dots. */
 export const STEPS = ['build', 'nym', 'pool', 'conf', 'done'] as const;
@@ -48,6 +49,19 @@ export const followsHere = (vt: ValueTransferType): boolean =>
   OWN.includes(vt.kind) &&
   !isFailed(vt) &&
   vt.confirmations < GlobalConst.minConfirmations;
+
+/** How a failed send is drawn: what it failed at and, expired, the last step it had reached. */
+export const failureOf = (
+  stage: FailStage,
+  reached: SendStep,
+): FlightFailure =>
+  stage === 'create'
+    ? 'build'
+    : stage !== 'expired'
+      ? 'nym'
+      : STEPS.indexOf(reached) >= STEPS.indexOf('pool')
+        ? 'poolexp'
+        : 'nymexp';
 
 /**
  * A send that went out, followed by its txids: through NYM until every one
@@ -102,7 +116,8 @@ export function followTxids(
  * A send that failed at `stage`: created and failed, its transactions are
  * this wallet's failed rows since its attempt began (a TEX hop that went out
  * stays among them, and makes it partial). Failed while creating, there are
- * none.
+ * none. Failing to send does not prove the network never got it: once all of
+ * them turn up in the mempool or a block, the send goes on from there.
  */
 export function failedSince(
   stage: SendStage,
@@ -118,6 +133,19 @@ export function failedSince(
             (a, b) =>
               a.time - b.time || Number(isPayment(a)) - Number(isPayment(b)),
           );
+  if (
+    rows.length > 0 &&
+    rows.every(
+      vt =>
+        vt.status === RPCValueTransfersStatusEnum.mempool ||
+        vt.status === RPCValueTransfersStatusEnum.confirmed,
+    )
+  ) {
+    return followTxids(
+      rows.map(vt => vt.txid),
+      valueTransfers,
+    );
+  }
   const lost = rows.filter(isFailed);
   return {
     kind: 'failed',
