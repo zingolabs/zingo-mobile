@@ -1,4 +1,4 @@
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from '@app/AppState/enums/BlockExplorerEnum';
 import { LanguageEnum } from '@app/AppState/enums/LanguageEnum';
 import { SelectServerEnum } from '@app/AppState/enums/SelectServerEnum';

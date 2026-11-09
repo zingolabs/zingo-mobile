@@ -5,7 +5,7 @@ import {
   describeRejection,
   transformMixnetDetail,
   transformMixnetStatus,
-} from '@app/walletBackend/transforms/mixnetTransform';
+} from '@app/walletBackend/mixnetTransform';
 
 // A rejection becomes the typed failure arm here, at the native edge.
 async function statusCall(

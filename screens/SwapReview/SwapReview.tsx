@@ -24,7 +24,7 @@ import {
 } from '@app/swap';
 import type { DepositInstructionsType } from '@app/swap';
 import { reserveRefundAddress } from '@app/walletBackend';
-import { sendGateOpen } from '@app/walletBackend/transforms/mixnetView';
+import { sendGateOpen } from '@app/walletBackend/mixnetView';
 import { deliver } from '@app/navigation/results';
 import { useAuthorizeDeposit } from './useAuthorizeDeposit';
 import Utils from '@app/utils';

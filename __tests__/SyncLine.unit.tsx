@@ -11,7 +11,7 @@ import { offlineServer } from '@app/AppState/types/ServerType';
 import {
   noteHeights,
   resetFreshness,
-} from '@app/walletBackend/utils/syncFreshness';
+} from '@app/walletBackend/syncFreshness';
 import SyncLine from '@ui/widgets/Header/components/SyncLine';
 
 jest.mock('@react-navigation/native', () => ({

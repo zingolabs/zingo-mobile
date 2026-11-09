@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { useShallowMemo } from './useShallowMemo';
-import { PERMITTED } from '@app/walletBackend/transforms/sendPermit';
-import { ABSENT_MIXNET_VIEW } from '@app/walletBackend/transforms/mixnetView';
+import { PERMITTED } from '@app/walletBackend/sendPermit';
+import { ABSENT_MIXNET_VIEW } from '@app/walletBackend/mixnetView';
 
 import {
   InfoType,
@@ -19,8 +19,8 @@ import {
   BlockExplorerEnum,
 } from '@app/AppState';
 
-import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { RPCSyncStatusType } from '@app/walletBackend/RPCSyncStatusType';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/RPCPerformanceLevelEnum';
 
 export const defaultAppContextLoaded: AppContextLoaded = {
   netInfo: {} as NetInfoType,

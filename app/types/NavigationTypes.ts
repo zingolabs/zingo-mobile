@@ -20,8 +20,8 @@ import {
   ValueTransferType,
   ProposalPoolsType,
 } from '@app/AppState';
-import type { ComputingParams } from '@app/walletBackend/transforms/sendSettlement';
-import { RPCDrainTxType } from '@app/walletBackend/types/RPCDrainPlanType';
+import type { ComputingParams } from '@app/walletBackend/sendSettlement';
+import { RPCDrainTxType } from '@app/walletBackend/RPCDrainPlanType';
 import type { SwapReview } from '@screens/Swap/useSwapForm';
 import type { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
 

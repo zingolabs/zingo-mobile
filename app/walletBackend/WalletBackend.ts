@@ -1,14 +1,14 @@
 import { SendJsonToTypeType, ServerType } from '@app/AppState';
-import { WalletBackendConfig, isOffline } from './config/WalletBackendConfig';
-import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
-import { DataService } from './modules/DataService';
-import { MixnetCoordinator } from './modules/MixnetCoordinator';
-import { SyncCoordinator } from './modules/SyncCoordinator';
+import { WalletBackendConfig, isOffline } from './WalletBackendConfig';
+import { RPCPerformanceLevelEnum } from './RPCPerformanceLevelEnum';
+import { DataService } from './DataService';
+import { MixnetCoordinator } from './MixnetCoordinator';
+import { SyncCoordinator } from './SyncCoordinator';
 import {
   SwapDepositArgs,
   TransactionService,
-} from './modules/TransactionService';
-import { WalletLifecycleService } from './modules/WalletLifecycleService';
+} from './TransactionService';
+import { WalletLifecycleService } from './WalletLifecycleService';
 
 // Wires the sub-services together and exposes one API to LoadedApp.
 export default class WalletBackend {

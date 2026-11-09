@@ -84,7 +84,7 @@ import {
 import { ScrollEvent } from 'recyclerlistview/dist/reactnative/core/scrollcomponent/BaseScrollView';
 import { RecyclerListViewState } from 'recyclerlistview/dist/reactnative/core/RecyclerListView';
 import { Swipeable } from 'react-native-gesture-handler';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import Filters, { HISTORY_FILTERS, filterOf } from './components/Filters';
 import Text from '@ui/primitives/Text';

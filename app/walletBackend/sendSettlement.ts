@@ -1,5 +1,5 @@
 import type { FfiResult } from '@app/walletBackend/ffi';
-import { RPCShieldType } from '@app/walletBackend/types/RPCShieldType';
+import { RPCShieldType } from '@app/walletBackend/RPCShieldType';
 import {
   SendFailureClass,
   SendFailureText,

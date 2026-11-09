@@ -13,8 +13,8 @@ jest.mock('@app/RPCModule', () =>
 );
 
 import RPCModule from '@app/RPCModule';
-import { SyncCoordinator } from '@app/walletBackend/modules/SyncCoordinator';
-import type { DataService } from '@app/walletBackend/modules/DataService';
+import { SyncCoordinator } from '@app/walletBackend/SyncCoordinator';
+import type { DataService } from '@app/walletBackend/DataService';
 import type { ServerType } from '@app/AppState';
 import {
   mockOfflineServer as OFFLINE,

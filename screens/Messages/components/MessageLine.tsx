@@ -30,7 +30,7 @@ import {
 import { ContextAppLoaded } from '@app/context';
 import AddressItem from '@ui/widgets/AddressItem';
 import Utils from '@app/utils';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import { VerifyXIcon } from '@ui/primitives/Icons/VerifyXIcon';
 import { CheckCircleLineIcon } from '@ui/primitives/Icons/CheckCircleLineIcon';

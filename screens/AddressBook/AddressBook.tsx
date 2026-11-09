@@ -41,7 +41,7 @@ import ContactSwapSheet, {
   loadSwapCoins,
 } from './components/ContactSwapSheet';
 import SegmentedSwitch from '@ui/widgets/SegmentedSwitch';
-import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
+import { RPCAddressScopeEnum } from '@app/walletBackend/RPCAddressScopeEnum';
 import ContactSheet, {
   ContactEdit,
   contactSheetTitleKey,

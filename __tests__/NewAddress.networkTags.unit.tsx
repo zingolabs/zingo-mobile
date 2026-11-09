@@ -23,7 +23,7 @@ import {
   remoteServer,
 } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
-import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
+import { RPCAddressScopeEnum } from '@app/walletBackend/RPCAddressScopeEnum';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import NewAddress from '@screens/Receive/components/NewAddress';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';

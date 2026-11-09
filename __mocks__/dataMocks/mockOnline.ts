@@ -1,7 +1,7 @@
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 
 import { ChainNameEnum, remoteServer } from '@app/AppState';
-import { SendPermitInputs } from '@app/walletBackend/transforms/sendPermit';
+import { SendPermitInputs } from '@app/walletBackend/sendPermit';
 import { mixnetReady, mockInfo } from '../../.storybook/storyMocks';
 
 /** The app state of a connected device on a remote server with a ready mixnet. */

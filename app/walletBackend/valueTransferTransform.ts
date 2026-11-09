@@ -1,7 +1,7 @@
 import { ValueTransferType, ValueTransferKindEnum } from '@app/AppState';
-import { RPCValueTransferType } from '@app/walletBackend/types/RPCValueTransferType';
-import { RPCValueTransfersKindEnum } from '@app/walletBackend/enums/RPCValueTransfersKindEnum';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransferType } from '@app/walletBackend/RPCValueTransferType';
+import { RPCValueTransfersKindEnum } from '@app/walletBackend/RPCValueTransfersKindEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
 
 /**
  * Maps a raw zingolib value transfer to the app's ValueTransferType.

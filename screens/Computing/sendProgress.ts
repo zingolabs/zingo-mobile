@@ -1,7 +1,7 @@
 import { GlobalConst, ValueTransferType } from '@app/AppState';
 import { ValueTransferKindEnum } from '@app/AppState/enums/ValueTransferKindEnum';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
-import type { SendStage } from '@app/walletBackend/transforms/sendSettlement';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
+import type { SendStage } from '@app/walletBackend/sendSettlement';
 
 /** The five steps a send is told in, with its dots. */
 export const STEPS = ['build', 'nym', 'pool', 'conf', 'done'] as const;

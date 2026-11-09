@@ -38,7 +38,7 @@ import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 import {
   sendGateOpen,
   shownStatusKey,
-} from '@app/walletBackend/transforms/mixnetView';
+} from '@app/walletBackend/mixnetView';
 import { fiatQuote, toFiatText, toZecText } from '@app/price/fiatQuote';
 import { showConfirm } from '@app/services/showConfirm';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';

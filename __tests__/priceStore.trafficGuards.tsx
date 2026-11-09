@@ -23,7 +23,7 @@ import {
   mockZecQuote,
   mockZecRefusal,
 } from '../__mocks__/dataMocks/mockZecPriceOutcome';
-import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
+import { MixnetTransportView } from '@app/walletBackend/mixnetView';
 
 const READY_VIEW: MixnetTransportView = {
   kind: 'transport',

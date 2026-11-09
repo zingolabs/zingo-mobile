@@ -3,7 +3,7 @@ jest.mock('@app/RPCModule', () => ({ __esModule: true, default: {} }));
 import { ValueTransferKindEnum } from '@app/AppState';
 import { PoolEnum } from '@app/AppState';
 import type { ValueTransferType } from '@app/AppState';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
 import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
 import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';

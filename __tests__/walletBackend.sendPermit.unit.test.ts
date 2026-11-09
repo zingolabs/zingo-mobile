@@ -5,8 +5,8 @@ import {
   SendPermit,
   sendPermit,
   sendWhenPermitted,
-} from '@app/walletBackend/transforms/sendPermit';
-import { ABSENT_MIXNET_VIEW } from '@app/walletBackend/transforms/mixnetView';
+} from '@app/walletBackend/sendPermit';
+import { ABSENT_MIXNET_VIEW } from '@app/walletBackend/mixnetView';
 import { mixnetLost } from '../.storybook/storyMocks';
 import { mockOnline } from '../__mocks__/dataMocks/mockOnline';
 

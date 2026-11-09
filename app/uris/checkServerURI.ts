@@ -4,7 +4,7 @@ import {
   getBalanceInfo,
   getServerInfo,
 } from '@app/walletBackend';
-import { RPCInfoType } from '@app/walletBackend/types/RPCInfoType';
+import { RPCInfoType } from '@app/walletBackend/RPCInfoType';
 
 type checkServerURIReturn = {
   result: boolean;

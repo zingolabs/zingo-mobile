@@ -7,7 +7,7 @@ import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
 import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
 import { ValueTransferKindEnum } from '@app/AppState';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
 import type { SwapAssetType } from '@app/swap/SwapAssetType';
 import type { SwapRecordType } from '@app/swap/SwapRecordType';
 

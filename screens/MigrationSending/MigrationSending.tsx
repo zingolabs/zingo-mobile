@@ -16,8 +16,8 @@ import { ContextAppLoaded } from '@app/context';
 import { formatAmount } from '@app/utils/formatAmount';
 import useTrickleProgress from '@app/hooks/useTrickleProgress';
 import { drainOrchard, drainStatus } from '@app/walletBackend';
-import { RPCDrainType } from '@app/walletBackend/types/RPCDrainType';
-import { RPCDrainStatusType } from '@app/walletBackend/types/RPCDrainStatusType';
+import { RPCDrainType } from '@app/walletBackend/RPCDrainType';
+import { RPCDrainStatusType } from '@app/walletBackend/RPCDrainStatusType';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 

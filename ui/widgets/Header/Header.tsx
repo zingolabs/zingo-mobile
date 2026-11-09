@@ -47,7 +47,7 @@ import { useSyncStatus } from '@app/hooks/useSyncStatus';
 import TitleBar from '@ui/widgets/TitleBar';
 import SyncLine from './components/SyncLine';
 import MixnetIcon from '@ui/primitives/Icons/MixnetIcon';
-import { viewPhase } from '@app/walletBackend/transforms/mixnetView';
+import { viewPhase } from '@app/walletBackend/mixnetView';
 import BalanceRow from './components/BalanceRow';
 import PriceRow from './components/PriceRow';
 import { MessagesIcon } from '@ui/primitives/Icons/MessagesIcon';

@@ -10,7 +10,7 @@ import React, {
 
 import { ChainNameEnum, ReceiverEnum, ValueTransferType } from '@app/AppState';
 import { createNewUnifiedAddress } from '@app/walletBackend';
-import type { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddressType';
+import type { RPCUnifiedAddressType } from '@app/walletBackend/RPCUnifiedAddressType';
 import { resetPinnedAddress } from '@app/hooks/usePinnedAddress';
 import { resetIronwoodNoticeHide } from '@app/hooks/useIronwoodNoticeHide';
 import { adoptWalletOnFile } from '@app/services/WalletLocalData';

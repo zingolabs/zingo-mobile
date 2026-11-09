@@ -16,20 +16,20 @@
  */
 import { TotalBalanceClass, GlobalConst } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
-import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
-import { RPCSyncPollType } from '@app/walletBackend/types/RPCSyncPollType';
-import { scanInProgress } from '@app/walletBackend/utils/syncProgress';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { RPCSyncStatusType } from '@app/walletBackend/RPCSyncStatusType';
+import { RPCSyncPollType } from '@app/walletBackend/RPCSyncPollType';
+import { scanInProgress } from '@app/walletBackend/syncProgress';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/RPCPerformanceLevelEnum';
 import {
   WalletBackendConfig,
   isOffline,
-} from '@app/walletBackend/config/WalletBackendConfig';
+} from '@app/walletBackend/WalletBackendConfig';
 import { DataService } from './DataService';
-import { changeServer, doSave } from '@app/walletBackend/utils/walletUtils';
+import { changeServer, doSave } from '@app/walletBackend/walletUtils';
 import {
   spendInFlight,
   stopSyncAndWait,
-} from '@app/walletBackend/utils/syncBracket';
+} from '@app/walletBackend/syncBracket';
 
 // zingolib's refusal to sync a client that has no indexer configured.
 const INDEXERLESS = /no indexer configured/i;

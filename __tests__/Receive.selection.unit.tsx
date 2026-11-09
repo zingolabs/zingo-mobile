@@ -4,7 +4,7 @@ import {
   TransparentAddressClass,
   UnifiedAddressClass,
 } from '@app/AppState';
-import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
+import { RPCAddressScopeEnum } from '@app/walletBackend/RPCAddressScopeEnum';
 import { useReceiveSelection } from '@screens/Receive/useReceiveSelection';
 
 const ua = (index: number, address: string) =>

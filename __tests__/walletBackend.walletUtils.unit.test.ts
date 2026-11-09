@@ -25,7 +25,7 @@ import {
   resolvedTrue,
   walletBackupExists,
   walletExists,
-} from '@app/walletBackend/utils/walletUtils';
+} from '@app/walletBackend/walletUtils';
 
 const bridge = RPCModule as unknown as Record<string, jest.Mock>;
 

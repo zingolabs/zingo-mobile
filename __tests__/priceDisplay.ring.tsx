@@ -26,7 +26,7 @@ import {
 } from '@app/context';
 import { SelectServerEnum } from '@app/AppState';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
+import { MixnetTransportView } from '@app/walletBackend/mixnetView';
 
 beforeEach(() => {
   priceFetcherStore.resetForTests();

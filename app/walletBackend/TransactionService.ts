@@ -9,9 +9,9 @@
  */
 import { SendJsonToTypeType } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
-import { RPCSendProposeType } from '@app/walletBackend/types/RPCSendProposeType';
-import { RPCSendType } from '@app/walletBackend/types/RPCSendType';
-import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
+import { RPCSendProposeType } from '@app/walletBackend/RPCSendProposeType';
+import { RPCSendType } from '@app/walletBackend/RPCSendType';
+import { WalletBackendConfig } from '@app/walletBackend/WalletBackendConfig';
 import { depositSpendsSourceAddress } from '@app/swap/depositRouting';
 import {
   depositAfterDeshieldError,
@@ -19,7 +19,7 @@ import {
 } from '@app/swap/depositAfterDeshield';
 import { toFfiError } from '@app/walletBackend/ffi';
 import { SyncCoordinator } from './SyncCoordinator';
-import { withSyncStopped } from '@app/walletBackend/utils/syncBracket';
+import { withSyncStopped } from '@app/walletBackend/syncBracket';
 import { Buffer } from 'buffer';
 
 // What a swap deposit needs: where, how much, and the memo or source address

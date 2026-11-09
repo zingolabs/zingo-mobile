@@ -32,11 +32,11 @@ import {
   reportDiagnostics,
   syncLine,
 } from '@app/services/reportDiagnostics';
-import { RPCSyncScanRangePriorityStatusEnum } from '@app/walletBackend/enums/RPCSyncScanRangePriorityStatusEnum';
+import { RPCSyncScanRangePriorityStatusEnum } from '@app/walletBackend/RPCSyncScanRangePriorityStatusEnum';
 import {
   ABSENT_MIXNET_VIEW,
   INITIAL_MIXNET_VIEW,
-} from '@app/walletBackend/transforms/mixnetView';
+} from '@app/walletBackend/mixnetView';
 
 const translate = (k: string) => k;
 

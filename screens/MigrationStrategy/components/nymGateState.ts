@@ -5,7 +5,7 @@
 import {
   MixnetStatusKey,
   MixnetView,
-} from '@app/walletBackend/transforms/mixnetView';
+} from '@app/walletBackend/mixnetView';
 
 export type NymGateFailureKey = Extract<
   MixnetStatusKey,

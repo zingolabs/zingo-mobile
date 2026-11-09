@@ -16,8 +16,8 @@ import {
   createNewTransparentAddress,
   createNewUnifiedAddress,
 } from '@app/walletBackend';
-import { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddressType';
-import { RPCTransparentAddressType } from '@app/walletBackend/types/RPCTransparentAddressType';
+import { RPCUnifiedAddressType } from '@app/walletBackend/RPCUnifiedAddressType';
+import { RPCTransparentAddressType } from '@app/walletBackend/RPCTransparentAddressType';
 import Utils from '@app/utils';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import TextField from '@ui/primitives/TextField';

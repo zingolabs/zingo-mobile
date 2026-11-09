@@ -4,7 +4,7 @@ import {
   isFallingBehind,
   noteHeights,
   resetFreshness,
-} from '@app/walletBackend/utils/syncFreshness';
+} from '@app/walletBackend/syncFreshness';
 
 const NOW = 1_000_000_000;
 

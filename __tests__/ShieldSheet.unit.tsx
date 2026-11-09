@@ -12,7 +12,7 @@ import {
 import {
   ABSENT_MIXNET_VIEW,
   MixnetView,
-} from '@app/walletBackend/transforms/mixnetView';
+} from '@app/walletBackend/mixnetView';
 import ShieldSheet from '@screens/History/components/ShieldSheet';
 import {
   mixnetConnecting,

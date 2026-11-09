@@ -16,16 +16,16 @@ import {
   shieldPropose,
 } from '@app/walletBackend';
 import type { FfiResult } from '@app/walletBackend';
-import { RPCShieldProposeType } from '@app/walletBackend/types/RPCShieldProposeType';
+import { RPCShieldProposeType } from '@app/walletBackend/RPCShieldProposeType';
 import {
   ComputingSubject,
   nowSeconds,
   shieldEnd,
-} from '@app/walletBackend/transforms/sendSettlement';
+} from '@app/walletBackend/sendSettlement';
 import { isOnTop } from '@app/navigation/navigate';
 import { formatAmount } from '@app/utils/formatAmount';
-import { withSyncStopped } from '@app/walletBackend/utils/syncBracket';
-import { SendPermit } from '@app/walletBackend/transforms/sendPermit';
+import { withSyncStopped } from '@app/walletBackend/syncBracket';
+import { SendPermit } from '@app/walletBackend/sendPermit';
 
 type UseShieldFundsInput = {
   readOnly: boolean;

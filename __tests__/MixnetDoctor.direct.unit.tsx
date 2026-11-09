@@ -16,7 +16,7 @@ import {
   ContextAppLoadedProvider,
 } from '@app/context';
 import { ChainNameEnum, Route, remoteServer } from '@app/AppState';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import { MixnetView } from '@app/walletBackend/mixnetView';
 import { mixnetLost, mixnetReady, mockInfo } from '../.storybook/storyMocks';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 

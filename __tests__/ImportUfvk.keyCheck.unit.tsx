@@ -16,8 +16,8 @@ import { ChainNameEnum, remoteServer } from '@app/AppState';
 
 const mockedCheckUfvk = jest.fn();
 
-jest.mock('@app/walletBackend/utils/walletUtils', () => ({
-  ...jest.requireActual('@app/walletBackend/utils/walletUtils'),
+jest.mock('@app/walletBackend/walletUtils', () => ({
+  ...jest.requireActual('@app/walletBackend/walletUtils'),
   checkUfvk: (...args: unknown[]) => mockedCheckUfvk(...args),
   getLatestBlockServerInfo: jest
     .fn()

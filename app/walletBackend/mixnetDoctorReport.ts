@@ -1,6 +1,6 @@
-import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
-import type { ServerProbe } from '@app/walletBackend/utils/walletUtils';
-import type { MixnetJournalEntry } from '@app/walletBackend/modules/MixnetJournal';
+import { RPCMixnetIndicatorEnum } from '@app/walletBackend/RPCMixnetIndicatorEnum';
+import type { ServerProbe } from '@app/walletBackend/walletUtils';
+import type { MixnetJournalEntry } from '@app/walletBackend/MixnetJournal';
 import {
   MixnetDetailReport,
   MixnetFailure,

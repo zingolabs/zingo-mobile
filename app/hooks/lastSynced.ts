@@ -3,7 +3,7 @@ import {
   SyncFreshness,
   getFreshness,
   subscribeFreshness,
-} from '@app/walletBackend/utils/syncFreshness';
+} from '@app/walletBackend/syncFreshness';
 
 /** The wallet's heights and the last moment it was seen at the tip. */
 export function useSyncFreshness(): SyncFreshness {

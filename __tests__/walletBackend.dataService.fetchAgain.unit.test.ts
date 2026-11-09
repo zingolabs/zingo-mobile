@@ -3,7 +3,7 @@ jest.mock('@app/RPCModule', () =>
 );
 
 import RPCModule from '@app/RPCModule';
-import { DataService } from '@app/walletBackend/modules/DataService';
+import { DataService } from '@app/walletBackend/DataService';
 import { mockOfflineServer } from '../__mocks__/dataMocks/mockServer';
 import { mockWalletBackendConfig } from '../__mocks__/dataMocks/mockWalletBackendConfig';
 

@@ -1,7 +1,7 @@
 import { BackgroundType } from '@app/AppState';
-import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
-import { RPCSyncScanRangeStatusType } from '@app/walletBackend/types/RPCSyncScanRangeStatusType';
-import { RPCSyncScanRangePriorityStatusEnum as Priority } from '@app/walletBackend/enums/RPCSyncScanRangePriorityStatusEnum';
+import { RPCSyncStatusType } from '@app/walletBackend/RPCSyncStatusType';
+import { RPCSyncScanRangeStatusType } from '@app/walletBackend/RPCSyncScanRangeStatusType';
+import { RPCSyncScanRangePriorityStatusEnum as Priority } from '@app/walletBackend/RPCSyncScanRangePriorityStatusEnum';
 
 export const MAP_ROWS = 6;
 export const MAP_COLS = 30;

@@ -19,7 +19,7 @@ import { parseZcashURI } from '@app/uris';
 import Utils from '@app/utils';
 import TextInputAddress from '@ui/widgets/TextInputAddress';
 import Text from '@ui/primitives/Text';
-import { RPCCheckAddressType } from '@app/walletBackend/types/RPCCheckAddressType';
+import { RPCCheckAddressType } from '@app/walletBackend/RPCCheckAddressType';
 import { VerifyCheckIcon } from '@ui/primitives/Icons/VerifyCheckIcon';
 import { VerifyXIcon } from '@ui/primitives/Icons/VerifyXIcon';
 import { SheetFooter } from '@ui/primitives/AppSheetModal';

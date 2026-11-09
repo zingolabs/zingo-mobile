@@ -1,8 +1,8 @@
 import {
   rescanStep,
   scanInProgress,
-} from '@app/walletBackend/utils/syncProgress';
-import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
+} from '@app/walletBackend/syncProgress';
+import { RPCSyncStatusType } from '@app/walletBackend/RPCSyncStatusType';
 
 const status = (s: Partial<RPCSyncStatusType>) => s as RPCSyncStatusType;
 

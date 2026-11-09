@@ -3,7 +3,7 @@ import {
   ValueTransferType,
   ValueTransferKindEnum,
 } from '@app/AppState';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
 
 // Fixed instant rather than Date.now(): these rows reach the History snapshot
 // verbatim, and a wall-clock reading makes it fail on the next run. The

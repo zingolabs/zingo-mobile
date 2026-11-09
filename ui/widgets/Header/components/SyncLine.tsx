@@ -25,7 +25,7 @@ import Pressable from '@ui/primitives/Pressable';
 import { Route, ServerType, TranslateType } from '@app/AppState';
 import NetInfoType from '@app/AppState/types/NetInfoType';
 import { useSyncFreshness } from '@app/hooks/lastSynced';
-import { isFallingBehind } from '@app/walletBackend/utils/syncFreshness';
+import { isFallingBehind } from '@app/walletBackend/syncFreshness';
 import Text from '@ui/primitives/Text';
 import { CARD_MARGIN_TOP } from './PriceRow';
 import { CloudDownloadIcon } from '@ui/primitives/Icons/CloudDownloadIcon';

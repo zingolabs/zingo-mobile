@@ -27,7 +27,7 @@ import {
   MIXNET_STATUS_KEYS,
   MixnetStatusKey,
   MixnetTransportView,
-} from '@app/walletBackend/transforms/mixnetView';
+} from '@app/walletBackend/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 

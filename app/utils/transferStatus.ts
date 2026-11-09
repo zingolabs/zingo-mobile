@@ -1,6 +1,6 @@
 import { GlobalConst } from '@app/AppState';
 import type { ValueTransferType } from '@app/AppState';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
 
 /** The word for each status before it is mined, as zingolib reports it. */
 const PENDING: Partial<Record<RPCValueTransfersStatusEnum, string>> = {

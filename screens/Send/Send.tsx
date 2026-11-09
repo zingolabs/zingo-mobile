@@ -33,7 +33,7 @@ import { getNumberFormatSettings } from 'react-native-localize';
 import {
   sendGateOpen,
   shownStatusKey,
-} from '@app/walletBackend/transforms/mixnetView';
+} from '@app/walletBackend/mixnetView';
 import Button from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import {
@@ -58,7 +58,7 @@ import {
   computingEnd,
   nowSeconds,
   settleSend,
-} from '@app/walletBackend/transforms/sendSettlement';
+} from '@app/walletBackend/sendSettlement';
 import { isOnTop } from '@app/navigation/navigate';
 import Utils from '@app/utils';
 import {
@@ -82,7 +82,7 @@ import Header from '@ui/widgets/Header';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
-import { RPCSendProposeType } from '@app/walletBackend/types/RPCSendProposeType';
+import { RPCSendProposeType } from '@app/walletBackend/RPCSendProposeType';
 import ShowAddressAlertAsync from '@app/services/showAddressAlertAsync';
 import RecipientField from './components/RecipientField';
 import type { NameLookup } from './components/RecipientField';
@@ -92,7 +92,7 @@ import { PlusIcon } from '@ui/primitives/Icons/PlusIcon';
 import SendErrorSheet from './components/SendErrorSheet';
 import { sendEmail } from '@app/services/sendEmail';
 import { retryServer } from '@app/services/retryServer';
-import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
+import { RPCSpendablebalanceType } from '@app/walletBackend/RPCSpendablebalanceType';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import { PANEL_TOP } from '@ui/widgets/Header/Header';

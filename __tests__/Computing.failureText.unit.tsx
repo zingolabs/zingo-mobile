@@ -13,7 +13,7 @@ import { Route } from '@app/AppState';
 import type { TranslateType } from '@app/AppState';
 import { errorKeyed } from '@app/AppState/types/Result';
 import { AppDrawerParamList } from '@app/types';
-import { SendFailureText } from '@app/walletBackend/transforms/sendFailureTransform';
+import { SendFailureText } from '@app/walletBackend/sendFailureTransform';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 const translate = (key: string): TranslateType => `translated ${key}`;

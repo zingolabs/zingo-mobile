@@ -5,7 +5,7 @@ import {
   TransparentAddressClass,
   UnifiedAddressClass,
 } from '@app/AppState';
-import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
+import { RPCAddressScopeEnum } from '@app/walletBackend/RPCAddressScopeEnum';
 
 export type OwnAddress = UnifiedAddressClass | TransparentAddressClass;
 

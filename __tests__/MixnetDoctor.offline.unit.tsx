@@ -23,7 +23,7 @@ import {
   offlineServer,
   remoteServer,
 } from '@app/AppState';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import { MixnetView } from '@app/walletBackend/mixnetView';
 import { mixnetOff, mixnetReady, mockInfo } from '../.storybook/storyMocks';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 

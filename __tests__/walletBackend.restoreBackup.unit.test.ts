@@ -3,7 +3,7 @@ jest.mock('@app/RPCModule', () =>
 );
 
 import RPCModule from '@app/RPCModule';
-import { WalletLifecycleService } from '@app/walletBackend/modules/WalletLifecycleService';
+import { WalletLifecycleService } from '@app/walletBackend/WalletLifecycleService';
 
 const bridge = RPCModule as unknown as Record<string, jest.Mock>;
 

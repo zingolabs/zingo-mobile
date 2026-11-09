@@ -1,7 +1,7 @@
 // Backend payloads for the migration screen stories. Values in zatoshis,
 // mirroring what zingolib returns through the bridge.
-import { RPCDrainPlanType } from '@app/walletBackend/types/RPCDrainPlanType';
-import { RPCDrainStatusType } from '@app/walletBackend/types/RPCDrainStatusType';
+import { RPCDrainPlanType } from '@app/walletBackend/RPCDrainPlanType';
+import { RPCDrainStatusType } from '@app/walletBackend/RPCDrainStatusType';
 
 const ZEC = 100_000_000;
 

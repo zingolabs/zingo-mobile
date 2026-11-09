@@ -1,17 +1,17 @@
-import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
-import { MixnetJournal } from '@app/walletBackend/modules/MixnetJournal';
+import { RPCMixnetIndicatorEnum } from '@app/walletBackend/RPCMixnetIndicatorEnum';
+import { MixnetJournal } from '@app/walletBackend/MixnetJournal';
 import {
   MixnetDirectProbe,
   MixnetDoctorRun,
   mixnetDoctorReport,
   mixnetDoctorRows,
-} from '@app/walletBackend/transforms/mixnetDoctorReport';
+} from '@app/walletBackend/mixnetDoctorReport';
 import {
   MixnetDoctorInput,
   mixnetDoctorSteps,
   mixnetDoctorVerdict,
-} from '@app/walletBackend/transforms/mixnetDoctorVerdict';
-import { MixnetStatusReport } from '@app/walletBackend/transforms/mixnetTransform';
+} from '@app/walletBackend/mixnetDoctorVerdict';
+import { MixnetStatusReport } from '@app/walletBackend/mixnetTransform';
 
 const status = (indicator: RPCMixnetIndicatorEnum): MixnetStatusReport => ({
   kind: 'status',
