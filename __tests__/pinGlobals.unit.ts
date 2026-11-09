@@ -101,3 +101,11 @@ test('Tests that the pinned set equals the host globals React Native installs wh
   );
   expect(new Set(PINNED)).toEqual(new Set(installed));
 });
+
+test('Tests that a write to a pinned global throws when the writer discards the [[Set]] result, as a sloppy-mode module does. A data pin answers false there and the write completes as a silent no-op.', () => {
+  const realFetch = () => 'real';
+  const target: Target = { fetch: realFetch };
+  pinGlobals(target);
+  expect(() => Reflect.set(target, 'fetch', () => 'evil')).toThrow(TypeError);
+  expect(target.fetch).toBe(realFetch);
+});
