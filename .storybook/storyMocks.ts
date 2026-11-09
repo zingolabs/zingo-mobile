@@ -7,9 +7,9 @@ import {
   InfoType,
   ZecPriceType,
 } from '@app/AppState';
-import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
-import UnifiedAddressClass from '@app/AppState/classes/UnifiedAddressClass';
-import TransparentAddressClass from '@app/AppState/classes/TransparentAddressClass';
+import { TotalBalanceClass } from '@app/wallet/classes';
+import { UnifiedAddressClass } from '@app/wallet/classes';
+import { TransparentAddressClass } from '@app/wallet/classes';
 import AddressBookFileClass from '@app/AppState/classes/AddressBookFileClass';
 import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
 import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';

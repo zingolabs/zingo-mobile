@@ -1,5 +1,5 @@
 import { AddressBookFileClass, ValueTransferKindEnum } from '@app/AppState';
-import ValueTransferType from '@app/AppState/types/ValueTransferType';
+import { ValueTransferType } from '@app/wallet/types';
 import { themeTokens } from '@app/theme';
 
 export const TOP = 5;
