@@ -17,7 +17,7 @@ import { AddressKindEnum, Route, SnackbarDurationEnum } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { deliver } from '@app/navigation/results';
-import { usePinnedAddress } from '@app/hooks/usePinnedAddress';
+import { usePinnedAddress } from '@app/wallet/usePinnedAddress';
 import Utils from '@app/utils';
 import Text from '@ui/primitives/Text';
 import AppSheetModal from '@ui/primitives/AppSheetModal';

@@ -7,7 +7,7 @@ import React from 'react';
 
 import { act, render } from '@testing-library/react-native';
 import { IronwoodNoticeHide } from '@app/wallet/IronwoodNoticeImpl';
-import { resetIronwoodNoticeHide } from '@app/hooks/useIronwoodNoticeHide';
+import { resetIronwoodNoticeHide } from '@app/wallet/useIronwoodNoticeHide';
 import History from '@screens/History';
 import {
   defaultAppContextLoaded,

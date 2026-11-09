@@ -1,6 +1,6 @@
 import 'react-native';
 import { act, renderHook } from '@testing-library/react-native';
-import { useScreenCapture } from '@app/hooks/useScreenCapture';
+import { useScreenCapture } from '@app/security/useScreenCapture';
 
 const { DeviceEventEmitter, NativeModules } =
   jest.requireActual('react-native');

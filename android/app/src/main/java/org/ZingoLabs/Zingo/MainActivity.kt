@@ -43,7 +43,7 @@ class MainActivity : ReactActivity() {
         // the window for the whole app lifetime, which also killed captures on
         // History and Home. It is now toggled per-screen from JS, for the
         // screens that render recovery material only — see ScreenSecurityModule
-        // and app/hooks/useSecureScreen.ts.
+        // and app/security/useSecureScreen.ts.
         super.onCreate(null)
         // Audit Issue I: tapjacking protection — drop touches if another
         // window (e.g. SYSTEM_ALERT_WINDOW overlay) is on top of ours.

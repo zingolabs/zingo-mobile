@@ -31,7 +31,7 @@ import NewAddressTag, {
 import { useResult } from '@app/navigation/results';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
-import { usePinnedAddress } from '@app/hooks/usePinnedAddress';
+import { usePinnedAddress } from '@app/wallet/usePinnedAddress';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { ListIcon } from '@ui/primitives/Icons/ListIcon';
 import { PlusIcon } from '@ui/primitives/Icons/PlusIcon';

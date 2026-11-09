@@ -15,7 +15,7 @@ import {
 } from '@app/swap';
 import Utils from '@app/utils';
 import { leaveFlow } from '@app/navigation/navigate';
-import { useShieldFunds } from '@app/hooks/useShieldFunds';
+import { useShieldFunds } from '@app/wallet/useShieldFunds';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';

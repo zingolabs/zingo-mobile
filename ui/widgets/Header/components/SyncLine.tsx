@@ -24,7 +24,7 @@ import {
 import Pressable from '@ui/primitives/Pressable';
 import { Route, ServerType, TranslateType } from '@app/AppState';
 import NetInfoType from '@app/lifecycle/NetInfoType';
-import { useSyncFreshness } from '@app/hooks/lastSynced';
+import { useSyncFreshness } from '@app/wallet/lastSynced';
 import { isFallingBehind } from '@app/walletBackend/syncFreshness';
 import Text from '@ui/primitives/Text';
 import { CARD_MARGIN_TOP } from './PriceRow';

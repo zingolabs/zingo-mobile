@@ -40,7 +40,7 @@ import ZecAmount from '@ui/widgets/ZecAmount';
 import Header from '@ui/widgets/Header';
 import ActivityChart from '@screens/Insight/components/ActivityChart';
 import Donut from '@screens/Insight/components/Donut';
-import { useTimedReveal } from '@app/hooks/useTimedReveal';
+import { useTimedReveal } from '@app/security/useTimedReveal';
 import { mask } from '@app/utils/reveal';
 import {
   buildInsight,

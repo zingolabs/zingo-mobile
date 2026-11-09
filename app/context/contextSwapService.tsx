@@ -11,8 +11,8 @@ import React, {
 import { ChainNameEnum, ReceiverEnum, ValueTransferType } from '@app/AppState';
 import { createNewUnifiedAddress } from '@app/walletBackend';
 import type { RPCUnifiedAddressType } from '@app/walletBackend/RPCUnifiedAddressType';
-import { resetPinnedAddress } from '@app/hooks/usePinnedAddress';
-import { resetIronwoodNoticeHide } from '@app/hooks/useIronwoodNoticeHide';
+import { resetPinnedAddress } from '@app/wallet/usePinnedAddress';
+import { resetIronwoodNoticeHide } from '@app/wallet/useIronwoodNoticeHide';
 import { adoptWalletOnFile } from '@app/wallet/WalletLocalData';
 import {
   SwapService,

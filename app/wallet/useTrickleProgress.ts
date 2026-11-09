@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Animated, Easing } from 'react-native';
 
-import useReduceMotion from './useReduceMotion';
+import useReduceMotion from '@app/hooks/useReduceMotion';
 
 export type TrickleProgress = {
   // The bar's value, 0..1. Interpolate to a transform, not a width: the bar

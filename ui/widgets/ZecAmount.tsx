@@ -7,7 +7,7 @@ import Pressable from '@ui/primitives/Pressable';
 import { formatAmount } from '@app/utils/formatAmount';
 import { SvgXml } from 'react-native-svg';
 import { CurrencyNameEnum } from '@app/AppState';
-import { useTimedReveal } from '@app/hooks/useTimedReveal';
+import { useTimedReveal } from '@app/security/useTimedReveal';
 import { MASK } from '@ui/widgets/PrivateAmount';
 
 /** The Ž of the ZEC logo, in its own units: bars of 20.12 above and

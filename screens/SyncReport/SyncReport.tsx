@@ -34,7 +34,7 @@ import Pressable from '@ui/primitives/Pressable';
 import { SnackbarDurationEnum } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import { useSyncStatus } from '@app/hooks/useSyncStatus';
+import { useSyncStatus } from '@app/wallet/useSyncStatus';
 import { createAlert } from '@app/alert/createAlert';
 import { sendEmail } from '@app/reporting/sendEmail';
 import {

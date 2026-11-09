@@ -43,7 +43,7 @@ import {
 } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { getZingoLogo } from '@app/utils/ZingoAppData';
-import { useSyncStatus } from '@app/hooks/useSyncStatus';
+import { useSyncStatus } from '@app/wallet/useSyncStatus';
 import TitleBar from '@ui/widgets/TitleBar';
 import SyncLine from './components/SyncLine';
 import MixnetIcon from '@ui/primitives/Icons/MixnetIcon';

@@ -34,9 +34,9 @@ import { ContextAppLoaded } from '@app/context';
 import { SnackbarDurationEnum } from '@app/AppState';
 import Header from '@ui/widgets/Header';
 import { AppDrawerParamList, CardRect } from '@app/types';
-import { useSecureScreen } from '@app/hooks/useSecureScreen';
+import { useSecureScreen } from '@app/security/useSecureScreen';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
-import { useScreenCapture } from '@app/hooks/useScreenCapture';
+import { useScreenCapture } from '@app/security/useScreenCapture';
 import {
   enactGateAnswer,
   resolveTriggerGate,

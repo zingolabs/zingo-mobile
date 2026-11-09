@@ -12,7 +12,7 @@ import {
   textView,
   viewLines,
 } from './addressItemText';
-import { useTimedReveal } from '@app/hooks/useTimedReveal';
+import { useTimedReveal } from '@app/security/useTimedReveal';
 import {
   AddressBookFileClass,
   SendPageStateClass,

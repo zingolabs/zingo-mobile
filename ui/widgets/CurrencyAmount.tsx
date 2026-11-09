@@ -12,7 +12,7 @@ import Animated, {
 
 import { formatUsd } from '@app/utils/formatAmount';
 import { usePriceHealth } from './priceFetcherStore';
-import { useTimedReveal } from '@app/hooks/useTimedReveal';
+import { useTimedReveal } from '@app/security/useTimedReveal';
 import { MASK } from '@ui/widgets/PrivateAmount';
 
 /** The fiat beside a ZEC amount, at ZecAmount's default size. */

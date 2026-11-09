@@ -2,7 +2,7 @@
  * The one timer of a timed reveal.
  */
 import { act, renderHook } from '@testing-library/react-native';
-import { useTimedReveal } from '@app/hooks/useTimedReveal';
+import { useTimedReveal } from '@app/security/useTimedReveal';
 import { REVEAL_MS } from '@app/utils/reveal';
 import { advance } from '../__mocks__/advanceTimers';
 

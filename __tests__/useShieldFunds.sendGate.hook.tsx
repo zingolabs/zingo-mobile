@@ -16,7 +16,7 @@ import { act, renderHook } from '@testing-library/react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import type { TranslateType } from '@app/AppState';
-import { useShieldFunds } from '@app/hooks/useShieldFunds';
+import { useShieldFunds } from '@app/wallet/useShieldFunds';
 import { showConfirm } from '@app/alert/showConfirm';
 import { shieldConfirm, shieldPropose } from '@app/walletBackend';
 import { SendPermitInputs, sendPermit } from '@app/walletBackend/sendPermit';

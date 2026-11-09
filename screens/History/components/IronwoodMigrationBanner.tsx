@@ -5,7 +5,7 @@ import Button from '@ui/primitives/Button';
 import Banner from '@ui/widgets/Banner';
 import PrivateAmount from '@ui/widgets/PrivateAmount';
 import { ContextAppLoaded } from '@app/context';
-import { useOrchardResidualOnly } from '@app/hooks/useOrchardResidualOnly';
+import { useOrchardResidualOnly } from '@app/wallet/useOrchardResidualOnly';
 import { formatAmount } from '@app/utils/formatAmount';
 import { duration } from '@app/theme/motion';
 

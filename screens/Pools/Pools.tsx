@@ -30,8 +30,8 @@ import {
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { formatZecAmount } from '@app/utils/formatZecAmount';
-import { useShieldFunds } from '@app/hooks/useShieldFunds';
-import { useOrchardResidualOnly } from '@app/hooks/useOrchardResidualOnly';
+import { useShieldFunds } from '@app/wallet/useShieldFunds';
+import { useOrchardResidualOnly } from '@app/wallet/useOrchardResidualOnly';
 import Header from '@ui/widgets/Header';
 import { useAmountReveal } from '@ui/widgets/PrivateAmount';
 import Card from '@ui/widgets/Card';

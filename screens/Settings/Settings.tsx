@@ -48,7 +48,7 @@ import {
   DeviceSecurityProbe,
   probeDeviceSecurity,
 } from '@app/security/gateController';
-import { useBiometricGate } from '@app/hooks/useBiometricGate';
+import { useBiometricGate } from '@app/security/useBiometricGate';
 import SelectBottomSheet from '@ui/widgets/SelectBottomSheet';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';

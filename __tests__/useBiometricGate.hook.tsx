@@ -11,7 +11,7 @@ jest.mock('@app/security/gateController', () => ({
 import { renderHook, waitFor } from '@testing-library/react-native';
 import { askGate } from '@app/security/gateController';
 import type { GateAnswer } from '@app/security/gateController';
-import { useBiometricGate } from '@app/hooks/useBiometricGate';
+import { useBiometricGate } from '@app/security/useBiometricGate';
 import type { TranslateType } from '@app/AppState';
 
 const gate = askGate as jest.MockedFunction<typeof askGate>;

@@ -10,7 +10,7 @@ import Banner from '@ui/widgets/Banner';
 import { ArrowUpIcon } from '@ui/primitives/Icons/ArrowUpIcon';
 import { space16, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import { useBiometricGate } from '@app/hooks/useBiometricGate';
+import { useBiometricGate } from '@app/security/useBiometricGate';
 import DetailRows, { DetailRow } from '@screens/Swap/components/DetailRows';
 import NymNote from '@screens/Swap/components/NymNote';
 import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';

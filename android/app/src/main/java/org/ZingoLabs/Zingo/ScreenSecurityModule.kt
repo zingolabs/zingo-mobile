@@ -15,7 +15,7 @@ import com.facebook.react.bridge.ReactMethod
  * The flag belongs to the Activity window, not to a view, so it cannot be
  * expressed as a React component. JS owns the lifetime: every setSecure(true)
  * needs a matching setSecure(false) once the sensitive screen unmounts. See
- * app/hooks/useSecureScreen.ts, which ref-counts the callers.
+ * app/security/useSecureScreen.ts, which ref-counts the callers.
  */
 class ScreenSecurityModule(private val reactContext: ReactApplicationContext) :
         ReactContextBaseJavaModule(reactContext), LifecycleEventListener {

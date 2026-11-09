@@ -20,7 +20,7 @@ import { Route } from '@app/AppState';
 import { AddressList } from '@screens/AddressList';
 import { deliver } from '@app/navigation/results';
 import { writePinnedAddress } from '@app/security/ReceivePinImpl';
-import { resetPinnedAddress } from '@app/hooks/usePinnedAddress';
+import { resetPinnedAddress } from '@app/wallet/usePinnedAddress';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { ContextAppLoaded } from '@app/context';
-import { useShieldFunds } from '@app/hooks/useShieldFunds';
+import { useShieldFunds } from '@app/wallet/useShieldFunds';
 import Banner from '@ui/widgets/Banner';
 import Button from '@ui/primitives/Button';
 

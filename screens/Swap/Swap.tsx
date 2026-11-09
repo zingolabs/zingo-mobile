@@ -44,7 +44,7 @@ import { useResult } from '@app/navigation/results';
 import { WalletNavigation } from '@app/types';
 import { swapScreenFor } from './swapRoute';
 import { pendingSwapLabel } from './pendingSwapLabel';
-import { useNearSmallWarningHide } from '@app/hooks/useNearSmallWarningHide';
+import { useNearSmallWarningHide } from '@app/swap/useNearSmallWarningHide';
 import DontShowAgain from './components/DontShowAgain';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 import Utils from '@app/utils';

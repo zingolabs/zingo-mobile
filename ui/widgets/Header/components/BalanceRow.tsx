@@ -27,7 +27,7 @@ import Utils from '@app/utils';
 import { formatUsd } from '@app/utils/formatAmount';
 import CurrencyAmount, { PriceTint } from '@ui/widgets/CurrencyAmount';
 import { MASK } from '@ui/widgets/PrivateAmount';
-import { useTimedReveal } from '@app/hooks/useTimedReveal';
+import { useTimedReveal } from '@app/security/useTimedReveal';
 import PriceFetcher, { usePriceRing } from '@ui/widgets/PriceFetcher';
 import RegText from '@ui/primitives/RegText';
 import Text from '@ui/primitives/Text';

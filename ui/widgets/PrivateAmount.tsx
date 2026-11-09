@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import Pressable from '@ui/primitives/Pressable';
 
 import { ContextAppLoaded } from '@app/context';
-import { useTimedReveal } from '@app/hooks/useTimedReveal';
+import { useTimedReveal } from '@app/security/useTimedReveal';
 import Text from '@ui/primitives/Text';
 
 /** What stands for an amount while privacy is on. */
