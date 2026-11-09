@@ -14,7 +14,7 @@ import {
 } from '@app/context/optionsPanel';
 import { AddressBook } from '@screens/AddressBook';
 import { AddressBookFileClass, ChainNameEnum, Route } from '@app/AppState';
-import { remoteServer } from '@app/AppState/types/ServerType';
+import { remoteServer } from '@app/server/ServerType';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 

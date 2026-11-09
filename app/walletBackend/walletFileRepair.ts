@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import RPCModule from '@app/RPCModule';
 import { callFfi } from '@app/walletBackend/ffi';
-import { ErrorKeyed } from '@app/AppState/types/Result';
+import { ErrorKeyed } from '@app/types/Result';
 
 // Support tooling for damaged wallet files: both platforms classify their
 // wallet files for the recovery dialog, and Android additionally repairs

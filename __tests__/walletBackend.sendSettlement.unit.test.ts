@@ -1,4 +1,4 @@
-import { errorKeyed } from '@app/AppState/types/Result';
+import { errorKeyed } from '@app/types/Result';
 import {
   computingEnd,
   sendStage,

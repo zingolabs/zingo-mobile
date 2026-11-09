@@ -34,7 +34,7 @@ import {
   TranslateType,
 } from '@app/AppState';
 import Text from '@ui/primitives/Text';
-import { ServerStatus } from '@app/AppState/types/ServerStatus';
+import { ServerStatus } from '@app/server/ServerStatus';
 import { formatInteger } from '@app/utils/formatAmount';
 import ServerRow, {
   Placement,

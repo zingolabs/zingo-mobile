@@ -26,7 +26,7 @@ The UI is everything above that boundary: the React Native screens and
 components, the theme, the styles, and the user-facing copy. Core UI modules
 (`app/uris/`, `app/walletBackend/`) hold logic and know nothing about display.
 Shared outcome types (`ErrorKeyed<K>`, `Done`) live in
-`app/AppState/types/Result.ts`. Translation happens only at the display edge.
+`app/types/Result.ts`. Translation happens only at the display edge.
 ESLint enforces the zone.
 
 - Use the active voice. Prefer "the parser rejects malformed input" over "malformed input is rejected by the parser". Passive voice only when the actor is unknown or irrelevant.

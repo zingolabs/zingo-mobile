@@ -1,11 +1,11 @@
 import { AppStateStatus } from 'react-native';
-import { LaunchingModeEnum } from './enums/LaunchingModeEnum';
-import WalletType from './types/WalletType';
-import { GateFailure } from './types/GateFailure';
-import { WalletErrorInfo } from './types/WalletErrorInfo';
-import { DeleteWalletContext } from './types/DeleteWalletContext';
-import { ServerStatus } from './types/ServerStatus';
-import ServerUrisType from './types/ServerUrisType';
+import { LaunchingModeEnum } from '@app/lifecycle/LaunchingModeEnum';
+import WalletType from '@app/wallet/WalletType';
+import { GateFailure } from '@app/security/GateFailure';
+import { WalletErrorInfo } from '@app/wallet/WalletErrorInfo';
+import { DeleteWalletContext } from '@app/wallet/DeleteWalletContext';
+import { ServerStatus } from '@app/server/ServerStatus';
+import ServerUrisType from '@app/server/ServerUrisType';
 
 /** The launch gate's outcome, carried whole so the locked screen renders the reason it was locked for. */
 export type BiometricGateOutcome =

@@ -11,7 +11,7 @@ import {
 import { OptionsPanelProvider } from '@app/context/optionsPanel';
 import { AddressBook } from '@screens/AddressBook';
 import { AddressBookFileClass, ChainNameEnum, Route } from '@app/AppState';
-import { remoteServer } from '@app/AppState/types/ServerType';
+import { remoteServer } from '@app/server/ServerType';
 import { SwapDirectionEnum } from '@app/swap';
 import type { TokenEntryType } from '@app/swap';
 import { chainCoin } from '@screens/Swap/swapAssets';

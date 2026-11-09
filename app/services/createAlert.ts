@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
 import { GlobalConst, TranslateType } from '@app/AppState';
-import { SnackbarDurationEnum } from '@app/AppState/enums/SnackbarDurationEnum';
+import { SnackbarDurationEnum } from '@app/alert/SnackbarDurationEnum';
 import { sanitizePaths } from '@app/utils/sanitizePaths';
 import { showConfirm } from './showConfirm';
 

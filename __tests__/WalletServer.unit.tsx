@@ -12,7 +12,7 @@ import {
   SelectServerEnum,
   TranslateType,
 } from '@app/AppState';
-import { remoteServer } from '@app/AppState/types/ServerType';
+import { remoteServer } from '@app/server/ServerType';
 import WalletServer from '@screens/Server/WalletServer';
 import { pickAutomatic } from '@app/services/serverPicking';
 

@@ -1,4 +1,4 @@
-import { WalletErrorKind } from '@app/AppState/types/WalletErrorInfo';
+import { WalletErrorKind } from '@app/wallet/WalletErrorInfo';
 
 const SERVER_HINTS =
   /\b(connect|connection|transport|timed? ?out|unreachable|dns|grpc|network)\b/i;

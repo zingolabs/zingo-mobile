@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { NetInfoStateType } from '@react-native-community/netinfo';
 import { ChainNameEnum, remoteServer } from '@app/AppState';
-import { offlineServer } from '@app/AppState/types/ServerType';
+import { offlineServer } from '@app/server/ServerType';
 import SyncLine from './SyncLine';
 import {
   mockTranslate,

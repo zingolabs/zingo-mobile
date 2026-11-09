@@ -1,8 +1,8 @@
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/RPCPerformanceLevelEnum';
-import { BlockExplorerEnum } from '@app/AppState/enums/BlockExplorerEnum';
-import { LanguageEnum } from '@app/AppState/enums/LanguageEnum';
-import { SelectServerEnum } from '@app/AppState/enums/SelectServerEnum';
-import ServerType from '@app/AppState/types/ServerType';
+import { BlockExplorerEnum } from '@app/settings/BlockExplorerEnum';
+import { LanguageEnum } from '@app/settings/LanguageEnum';
+import { SelectServerEnum } from '@app/server/SelectServerEnum';
+import ServerType from '@app/server/ServerType';
 
 export default class SettingsFileClass {
   server: ServerType;

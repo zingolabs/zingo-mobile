@@ -5,8 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import DeviceAuth from './DeviceAuthModule';
 import { GlobalConst, TranslateType } from '@app/AppState';
-import { errorKeyed } from '@app/AppState/types/Result';
-import { GateFailure, GateFailureKey } from '@app/AppState/types/GateFailure';
+import { errorKeyed } from '@app/types/Result';
+import { GateFailure, GateFailureKey } from '@app/security/GateFailure';
 import Utils from '@app/utils';
 
 // The single gate controller of ADR 0007. The gate is a privacy shutter,

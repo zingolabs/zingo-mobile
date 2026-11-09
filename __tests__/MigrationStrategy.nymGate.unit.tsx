@@ -14,10 +14,7 @@ import {
 } from '@app/context';
 import { Route } from '@app/AppState';
 import { RPCMixnetIndicatorEnum } from '@app/walletBackend/RPCMixnetIndicatorEnum';
-import {
-  MixnetView,
-  deriveMixnetView,
-} from '@app/walletBackend/mixnetView';
+import { MixnetView, deriveMixnetView } from '@app/walletBackend/mixnetView';
 import {
   mixnetConnecting,
   mixnetLost,

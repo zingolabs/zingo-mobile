@@ -1,5 +1,5 @@
-import { ValueTransferKindEnum } from '@app/AppState/enums/ValueTransferKindEnum';
-import { PoolEnum } from '@app/AppState/enums/PoolEnum';
+import { ValueTransferKindEnum } from '@app/wallet/ValueTransferKindEnum';
+import { PoolEnum } from '@app/wallet/PoolEnum';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
 
 export default interface ValueTransferType {

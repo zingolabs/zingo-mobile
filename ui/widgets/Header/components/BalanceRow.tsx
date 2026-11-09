@@ -19,10 +19,10 @@ import {
   textVariants,
 } from '@app/theme';
 import { Route, ServerType, TranslateType } from '@app/AppState';
-import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
-import InfoType from '@app/AppState/types/InfoType';
+import TotalBalanceClass from '@app/wallet/TotalBalanceClass';
+import InfoType from '@app/server/InfoType';
 import { fiatQuote } from '@app/price/fiatQuote';
-import ZecPriceType from '@app/AppState/types/ZecPriceType';
+import ZecPriceType from '@app/price/ZecPriceType';
 import Utils from '@app/utils';
 import { formatUsd } from '@app/utils/formatAmount';
 import CurrencyAmount, { PriceTint } from '@ui/widgets/CurrencyAmount';

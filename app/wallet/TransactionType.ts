@@ -1,4 +1,4 @@
-import { TransactionTypeEnum } from '@app/AppState/enums/TransactionTypeEnum';
+import { TransactionTypeEnum } from '@app/wallet/TransactionTypeEnum';
 import TxDetailType from './TxDetailType';
 
 export default interface TransactionType {

@@ -1,34 +1,31 @@
-import TotalBalanceClass from './classes/TotalBalanceClass';
-import UnifiedAddressClass from './classes/UnifiedAddressClass';
-import SendPageStateClass from './classes/SendPageStateClass';
-import AddressBookFileClass from './classes/AddressBookFileClass';
+import TotalBalanceClass from '@app/wallet/TotalBalanceClass';
+import UnifiedAddressClass from '@app/wallet/UnifiedAddressClass';
+import SendPageStateClass from '@app/wallet/SendPageStateClass';
+import AddressBookFileClass from '@app/addressBook/AddressBookFileClass';
 
-import InfoType from './types/InfoType';
-import ZecPriceType from './types/ZecPriceType';
-import BackgroundType from './types/BackgroundType';
-import { TranslateType } from './types/TranslateType';
-import NetInfoType from './types/NetInfoType';
-import BackgroundErrorType from './types/BackgroundErrorType';
-import ServerType from './types/ServerType';
+import InfoType from '@app/server/InfoType';
+import ZecPriceType from '@app/price/ZecPriceType';
+import BackgroundType from '@app/lifecycle/BackgroundType';
+import { TranslateType } from '@app/translations/TranslateType';
+import NetInfoType from '@app/lifecycle/NetInfoType';
+import BackgroundErrorType from '@app/lifecycle/BackgroundErrorType';
+import ServerType from '@app/server/ServerType';
 
-import { LanguageEnum } from './enums/LanguageEnum';
-import { SelectServerEnum } from './enums/SelectServerEnum';
-import { ChainNameEnum } from './enums/ChainNameEnum';
-import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
-import { SnackbarActionType } from './types/SnackbarActionType';
-import ValueTransferType from './types/ValueTransferType';
+import { LanguageEnum } from '@app/settings/LanguageEnum';
+import { SelectServerEnum } from '@app/server/SelectServerEnum';
+import { ChainNameEnum } from '@app/server/ChainNameEnum';
+import { SnackbarDurationEnum } from '@app/alert/SnackbarDurationEnum';
+import { SnackbarActionType } from '@app/alert/SnackbarActionType';
+import ValueTransferType from '@app/wallet/ValueTransferType';
 import { RPCSyncStatusType } from '@app/walletBackend/RPCSyncStatusType';
 import { RescanState } from '@app/walletBackend/syncProgress';
-import TransparentAddressClass from './classes/TransparentAddressClass';
+import TransparentAddressClass from '@app/wallet/TransparentAddressClass';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/RPCPerformanceLevelEnum';
-import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
+import { BlockExplorerEnum } from '@app/settings/BlockExplorerEnum';
 import { MixnetView } from '@app/walletBackend/mixnetView';
 import type { SwapDepositArgs } from '@app/walletBackend/TransactionService';
-import type {
-  SendOutcome,
-  SendPermit,
-} from '@app/walletBackend/sendPermit';
-import { SetServerResult } from './types/SetServerResult';
+import type { SendOutcome, SendPermit } from '@app/walletBackend/sendPermit';
+import { SetServerResult } from '@app/server/SetServerResult';
 
 export default interface AppContextLoaded {
   netInfo: NetInfoType;

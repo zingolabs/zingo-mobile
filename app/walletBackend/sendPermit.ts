@@ -1,5 +1,5 @@
 import type AppContextLoaded from '@app/AppState/AppContextLoaded';
-import { ErrorKeyed, errorKeyed } from '@app/AppState/types/Result';
+import { ErrorKeyed, errorKeyed } from '@app/types/Result';
 import { sendGateOpen } from './mixnetView';
 
 export type SendRefusalKey = 'loadedapp.connection-error' | 'send.nym-blocked';

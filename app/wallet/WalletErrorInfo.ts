@@ -1,4 +1,4 @@
-import { ChainNameEnum } from '@app/AppState/enums/ChainNameEnum';
+import { ChainNameEnum } from '@app/server/ChainNameEnum';
 
 // 'chain': the wallet is on another network than the server it would open on.
 export type WalletErrorKind = 'open' | 'server' | 'chain';

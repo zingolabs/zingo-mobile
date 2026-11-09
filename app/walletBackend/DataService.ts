@@ -22,10 +22,7 @@ import {
   TransparentAddressClass,
   foldBlockSpacing,
 } from '@app/AppState';
-import {
-  noteHeights,
-  resetFreshness,
-} from '@app/walletBackend/syncFreshness';
+import { noteHeights, resetFreshness } from '@app/walletBackend/syncFreshness';
 import RPCModule from '@app/RPCModule';
 import { RPCUnifiedAddressType } from '@app/walletBackend/RPCUnifiedAddressType';
 import { RPCBalancesType } from '@app/walletBackend/RPCBalancesType';

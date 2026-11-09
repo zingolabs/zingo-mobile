@@ -1,4 +1,4 @@
-import { ChainNameEnum } from '@app/AppState/enums/ChainNameEnum';
+import { ChainNameEnum } from '@app/server/ChainNameEnum';
 
 type OfflineServer = { kind: 'offline'; chainName: ChainNameEnum };
 type RemoteServer = { kind: 'remote'; uri: string; chainName: ChainNameEnum };

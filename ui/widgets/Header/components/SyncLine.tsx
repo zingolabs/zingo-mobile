@@ -23,7 +23,7 @@ import {
 } from '@app/theme';
 import Pressable from '@ui/primitives/Pressable';
 import { Route, ServerType, TranslateType } from '@app/AppState';
-import NetInfoType from '@app/AppState/types/NetInfoType';
+import NetInfoType from '@app/lifecycle/NetInfoType';
 import { useSyncFreshness } from '@app/hooks/lastSynced';
 import { isFallingBehind } from '@app/walletBackend/syncFreshness';
 import Text from '@ui/primitives/Text';

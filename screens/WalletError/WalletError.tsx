@@ -32,7 +32,7 @@ import { ContextAppLoading } from '@app/context';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import Tag from '@ui/widgets/Tag';
-import { WalletErrorKind } from '@app/AppState/types/WalletErrorInfo';
+import { WalletErrorKind } from '@app/wallet/WalletErrorInfo';
 import { ChainNameEnum } from '@app/AppState';
 import { showConfirm } from '@app/services/showConfirm';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';

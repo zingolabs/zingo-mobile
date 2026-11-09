@@ -16,7 +16,7 @@ import {
   ContextAppLoadedProvider,
 } from '@app/context';
 import { ChainNameEnum, Route, SelectServerEnum } from '@app/AppState';
-import { remoteServer } from '@app/AppState/types/ServerType';
+import { remoteServer } from '@app/server/ServerType';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';

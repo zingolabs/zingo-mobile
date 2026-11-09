@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { Route, ValueTransferType } from '@app/AppState';
-import { ValueTransferKindEnum } from '@app/AppState/enums/ValueTransferKindEnum';
+import { ValueTransferKindEnum } from '@app/wallet/ValueTransferKindEnum';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
 import ComputingTxContent from './ComputingTxContent';
 import {

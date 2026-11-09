@@ -2,10 +2,7 @@
 // held Enable tap. Pure and total: every `mixnet.status.*` key the transform
 // emits maps to exactly one state, and a reconnecting bootstrap reads as
 // connecting, never as a failure.
-import {
-  MixnetStatusKey,
-  MixnetView,
-} from '@app/walletBackend/mixnetView';
+import { MixnetStatusKey, MixnetView } from '@app/walletBackend/mixnetView';
 
 export type NymGateFailureKey = Extract<
   MixnetStatusKey,

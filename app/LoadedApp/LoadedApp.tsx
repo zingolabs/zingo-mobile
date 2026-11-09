@@ -120,10 +120,7 @@ import type { SwapDepositArgs } from '@app/walletBackend';
 import { RPCSyncStatusType } from '@app/walletBackend/RPCSyncStatusType';
 import { rescanStep } from '@app/walletBackend/syncProgress';
 import { RPCUfvkType } from '@app/walletBackend/RPCUfvkType';
-import {
-  INITIAL_MIXNET_VIEW,
-  MixnetView,
-} from '@app/walletBackend/mixnetView';
+import { INITIAL_MIXNET_VIEW, MixnetView } from '@app/walletBackend/mixnetView';
 import {
   SendOutcome,
   SendPermit,

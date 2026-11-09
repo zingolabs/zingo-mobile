@@ -1,4 +1,4 @@
-import { ErrorKeyed, errorKeyed } from '@app/AppState/types/Result';
+import { ErrorKeyed, errorKeyed } from '@app/types/Result';
 import type { SendRefusalKey } from './sendPermit';
 
 /**

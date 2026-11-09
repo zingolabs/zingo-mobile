@@ -10,10 +10,7 @@ jest.mock('@app/RPCModule', () =>
 import RPCModule from '@app/RPCModule';
 import { SyncCoordinator } from '@app/walletBackend/SyncCoordinator';
 import type { DataService } from '@app/walletBackend/DataService';
-import {
-  spendInFlight,
-  withSyncStopped,
-} from '@app/walletBackend/syncBracket';
+import { spendInFlight, withSyncStopped } from '@app/walletBackend/syncBracket';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { mockWalletBackendConfig } from '../__mocks__/dataMocks/mockWalletBackendConfig';
 

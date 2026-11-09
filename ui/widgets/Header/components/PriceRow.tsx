@@ -6,8 +6,8 @@ import { radiusMd, useTheme } from '@app/theme';
 
 import { ServerType, TranslateType } from '@app/AppState';
 import { fiatQuote } from '@app/price/fiatQuote';
-import InfoType from '@app/AppState/types/InfoType';
-import ZecPriceType from '@app/AppState/types/ZecPriceType';
+import InfoType from '@app/server/InfoType';
+import ZecPriceType from '@app/price/ZecPriceType';
 import BoldText from '@ui/primitives/BoldText';
 import CurrencyAmount from '@ui/widgets/CurrencyAmount';
 import FadeText from '@ui/primitives/FadeText';

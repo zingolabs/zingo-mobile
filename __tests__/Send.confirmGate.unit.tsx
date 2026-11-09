@@ -75,15 +75,12 @@ import {
   remoteServer,
 } from '@app/AppState';
 import type { TranslateType } from '@app/AppState';
-import { errorKeyed } from '@app/AppState/types/Result';
+import { errorKeyed } from '@app/types/Result';
 import { HomeTabScreenProps } from '@app/types';
 import { fetchServerList } from '@app/uris';
 import Utils from '@app/utils';
 import RPCModule from '@app/RPCModule';
-import {
-  SendPermitInputs,
-  sendPermit,
-} from '@app/walletBackend/sendPermit';
+import { SendPermitInputs, sendPermit } from '@app/walletBackend/sendPermit';
 import { ABSENT_MIXNET_VIEW } from '@app/walletBackend/mixnetView';
 import { mixnetLost } from '../.storybook/storyMocks';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';

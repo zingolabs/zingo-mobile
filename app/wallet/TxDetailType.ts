@@ -1,5 +1,5 @@
-import { PoolEnum } from '@app/AppState/enums/PoolEnum';
-import { TransactionTypeEnum } from '@app/AppState/enums/TransactionTypeEnum';
+import { PoolEnum } from '@app/wallet/PoolEnum';
+import { TransactionTypeEnum } from '@app/wallet/TransactionTypeEnum';
 
 export default interface TxDetailType {
   // those field excepcionally can be different between

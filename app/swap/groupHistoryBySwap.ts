@@ -1,4 +1,4 @@
-import type ValueTransferType from '@app/AppState/types/ValueTransferType';
+import type ValueTransferType from '@app/wallet/ValueTransferType';
 import { ValueTransferKindEnum } from '@app/AppState';
 import { isRealLegHash } from './trackUpdateBase';
 import type { SwapRecordType } from './SwapRecordType';

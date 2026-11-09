@@ -4,7 +4,7 @@ import type {
   TranslateType,
   ValueTransferType,
 } from '@app/AppState';
-import { ValueTransferKindEnum } from '@app/AppState/enums/ValueTransferKindEnum';
+import { ValueTransferKindEnum } from '@app/wallet/ValueTransferKindEnum';
 import Utils from '@app/utils';
 import { formatAmount } from '@app/utils/formatAmount';
 import type { ComputingSubject } from '@app/walletBackend/sendSettlement';

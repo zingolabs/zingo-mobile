@@ -7,11 +7,8 @@ import React from 'react';
 import { act, render } from '@testing-library/react-native';
 import { NetInfoStateType } from '@react-native-community/netinfo';
 import { ChainNameEnum, remoteServer } from '@app/AppState';
-import { offlineServer } from '@app/AppState/types/ServerType';
-import {
-  noteHeights,
-  resetFreshness,
-} from '@app/walletBackend/syncFreshness';
+import { offlineServer } from '@app/server/ServerType';
+import { noteHeights, resetFreshness } from '@app/walletBackend/syncFreshness';
 import SyncLine from '@ui/widgets/Header/components/SyncLine';
 
 jest.mock('@react-navigation/native', () => ({

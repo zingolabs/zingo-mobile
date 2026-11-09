@@ -1,7 +1,7 @@
-import ServerType from './types/ServerType';
+import ServerType from '@app/server/ServerType';
 
 import { AppStateStatus } from 'react-native';
-import { SelectServerEnum } from './enums/SelectServerEnum';
+import { SelectServerEnum } from '@app/server/SelectServerEnum';
 
 export default interface AppStateLoaded {
   appStateStatus: AppStateStatus;

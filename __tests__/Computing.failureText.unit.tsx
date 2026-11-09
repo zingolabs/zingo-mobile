@@ -11,7 +11,7 @@ import {
 } from '@app/context';
 import { Route } from '@app/AppState';
 import type { TranslateType } from '@app/AppState';
-import { errorKeyed } from '@app/AppState/types/Result';
+import { errorKeyed } from '@app/types/Result';
 import { AppDrawerParamList } from '@app/types';
 import { SendFailureText } from '@app/walletBackend/sendFailureTransform';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';

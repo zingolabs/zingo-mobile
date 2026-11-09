@@ -11,7 +11,7 @@ import {
   LaunchingModeEnum,
   SelectServerEnum,
 } from '@app/AppState';
-import { remoteServer } from '@app/AppState/types/ServerType';
+import { remoteServer } from '@app/server/ServerType';
 import RPCModule from '@app/RPCModule';
 
 jest.mock('@app/RPCModule', () =>

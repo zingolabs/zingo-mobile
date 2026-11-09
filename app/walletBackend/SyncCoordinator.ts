@@ -26,10 +26,7 @@ import {
 } from '@app/walletBackend/WalletBackendConfig';
 import { DataService } from './DataService';
 import { changeServer, doSave } from '@app/walletBackend/walletUtils';
-import {
-  spendInFlight,
-  stopSyncAndWait,
-} from '@app/walletBackend/syncBracket';
+import { spendInFlight, stopSyncAndWait } from '@app/walletBackend/syncBracket';
 
 // zingolib's refusal to sync a client that has no indexer configured.
 const INDEXERLESS = /no indexer configured/i;

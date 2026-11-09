@@ -12,7 +12,7 @@ import {
   Route,
   SelectServerEnum,
 } from '@app/AppState';
-import { remoteServer } from '@app/AppState/types/ServerType';
+import { remoteServer } from '@app/server/ServerType';
 import { askGate, resolveTriggerGate } from '@app/services/gateController';
 import RPCModule from '@app/RPCModule';
 import { hasRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';

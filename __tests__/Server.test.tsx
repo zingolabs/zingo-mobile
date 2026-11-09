@@ -13,7 +13,7 @@ import {
   ServerUrisType,
   TranslateType,
 } from '@app/AppState';
-import { offlineServer, remoteServer } from '@app/AppState/types/ServerType';
+import { offlineServer, remoteServer } from '@app/server/ServerType';
 import Server from '@screens/Server';
 import ServerList from '@screens/ServerList';
 import { probeServer } from '@app/walletBackend';

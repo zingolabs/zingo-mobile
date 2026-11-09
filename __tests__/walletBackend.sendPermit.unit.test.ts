@@ -1,5 +1,5 @@
 import { ChainNameEnum, offlineServer } from '@app/AppState';
-import { errorKeyed } from '@app/AppState/types/Result';
+import { errorKeyed } from '@app/types/Result';
 import {
   PERMITTED,
   SendPermit,

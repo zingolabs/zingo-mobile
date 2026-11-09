@@ -1,20 +1,20 @@
-import ZecPriceType from './types/ZecPriceType';
-import BackgroundType from './types/BackgroundType';
-import { TranslateType } from './types/TranslateType';
-import NetInfoType from './types/NetInfoType';
-import BackgroundErrorType from './types/BackgroundErrorType';
-import ServerType from './types/ServerType';
+import ZecPriceType from '@app/price/ZecPriceType';
+import BackgroundType from '@app/lifecycle/BackgroundType';
+import { TranslateType } from '@app/translations/TranslateType';
+import NetInfoType from '@app/lifecycle/NetInfoType';
+import BackgroundErrorType from '@app/lifecycle/BackgroundErrorType';
+import ServerType from '@app/server/ServerType';
 
-import { LanguageEnum } from './enums/LanguageEnum';
-import { SelectServerEnum } from './enums/SelectServerEnum';
-import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
+import { LanguageEnum } from '@app/settings/LanguageEnum';
+import { SelectServerEnum } from '@app/server/SelectServerEnum';
+import { SnackbarDurationEnum } from '@app/alert/SnackbarDurationEnum';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/RPCPerformanceLevelEnum';
-import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
-import { ChainNameEnum } from './enums/ChainNameEnum';
-import WalletType from './types/WalletType';
-import { WalletErrorInfo } from './types/WalletErrorInfo';
-import { ServerStatus } from './types/ServerStatus';
-import ServerUrisType from './types/ServerUrisType';
+import { BlockExplorerEnum } from '@app/settings/BlockExplorerEnum';
+import { ChainNameEnum } from '@app/server/ChainNameEnum';
+import WalletType from '@app/wallet/WalletType';
+import { WalletErrorInfo } from '@app/wallet/WalletErrorInfo';
+import { ServerStatus } from '@app/server/ServerStatus';
+import ServerUrisType from '@app/server/ServerUrisType';
 import type { BiometricGateOutcome } from './AppStateLoading';
 
 // Asks the Server screen whether leaving it needs a confirmation first.

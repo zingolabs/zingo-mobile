@@ -1,5 +1,5 @@
-import { ChainNameEnum } from '@app/AppState/enums/ChainNameEnum';
-import { CurrencyNameEnum } from '@app/AppState/enums/CurrencyNameEnum';
+import { ChainNameEnum } from '@app/server/ChainNameEnum';
+import { CurrencyNameEnum } from '@app/price/CurrencyNameEnum';
 
 export default interface InfoType {
   chainName: ChainNameEnum;

@@ -30,10 +30,7 @@ import {
 import TextField, { FieldAction } from '@ui/primitives/TextField';
 import { getNumberFormatSettings } from 'react-native-localize';
 
-import {
-  sendGateOpen,
-  shownStatusKey,
-} from '@app/walletBackend/mixnetView';
+import { sendGateOpen, shownStatusKey } from '@app/walletBackend/mixnetView';
 import Button from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import {
@@ -44,7 +41,7 @@ import {
   Route,
   ProposalPoolsType,
 } from '@app/AppState';
-import { hasUnconfirmedFunds } from '@app/AppState/classes/TotalBalanceClass';
+import { hasUnconfirmedFunds } from '@app/wallet/TotalBalanceClass';
 // Imported straight from the module rather than through the `uris` barrel, so
 // the ZNS SDK stays out of the module graph of everything else that barrel
 // serves (the wallet backend among them).

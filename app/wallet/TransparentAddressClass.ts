@@ -1,5 +1,5 @@
 import { RPCAddressScopeEnum } from '@app/walletBackend/RPCAddressScopeEnum';
-import { AddressKindEnum } from '@app/AppState/enums/AddressKindEnum';
+import { AddressKindEnum } from '@app/wallet/AddressKindEnum';
 
 export default class TransparentAddressClass {
   index: number;

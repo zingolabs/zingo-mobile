@@ -23,8 +23,8 @@ import {
   ServerUrisType,
   SnackbarDurationEnum,
 } from '@app/AppState';
-import { offlineServer, remoteServer } from '@app/AppState/types/ServerType';
-import { ServerStatus } from '@app/AppState/types/ServerStatus';
+import { offlineServer, remoteServer } from '@app/server/ServerType';
+import { ServerStatus } from '@app/server/ServerStatus';
 import { AppDrawerParamList } from '@app/types';
 import { serverUris } from '@app/uris';
 import {

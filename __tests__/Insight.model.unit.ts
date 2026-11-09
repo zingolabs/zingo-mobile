@@ -3,7 +3,7 @@ import {
   ChainNameEnum,
   ValueTransferKindEnum,
 } from '@app/AppState';
-import ValueTransferType from '@app/AppState/types/ValueTransferType';
+import ValueTransferType from '@app/wallet/ValueTransferType';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/RPCValueTransfersStatusEnum';
 import {
   buildInsight,

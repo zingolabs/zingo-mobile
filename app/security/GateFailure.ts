@@ -1,4 +1,4 @@
-import { ErrorKeyed } from './Result';
+import { ErrorKeyed } from '@app/types/Result';
 
 // The gate's error channel carries a catalog key, never prose. `param` is
 // the untranslated platform diagnostic (an LAError raw value, a prompt

@@ -1,4 +1,4 @@
-import { AddressKindEnum } from '@app/AppState/enums/AddressKindEnum';
+import { AddressKindEnum } from '@app/wallet/AddressKindEnum';
 
 export default class UnifiedAddressClass {
   index: number;

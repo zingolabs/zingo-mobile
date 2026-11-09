@@ -4,10 +4,7 @@ import { RPCPerformanceLevelEnum } from './RPCPerformanceLevelEnum';
 import { DataService } from './DataService';
 import { MixnetCoordinator } from './MixnetCoordinator';
 import { SyncCoordinator } from './SyncCoordinator';
-import {
-  SwapDepositArgs,
-  TransactionService,
-} from './TransactionService';
+import { SwapDepositArgs, TransactionService } from './TransactionService';
 import { WalletLifecycleService } from './WalletLifecycleService';
 
 // Wires the sub-services together and exposes one API to LoadedApp.
