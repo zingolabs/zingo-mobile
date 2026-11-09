@@ -1,9 +1,9 @@
-import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
-import { SwapStatusEnum, isTerminalStatus } from './enums/SwapStatusEnum';
+import { SwapDirectionEnum } from './SwapDirectionEnum';
+import { SwapStatusEnum, isTerminalStatus } from './SwapStatusEnum';
 import { depositDeadlineMs } from './depositDeadline';
 import { hasDepositEvidence } from './depositEvidence';
 import { isThorchainFamily } from './thorchainFamily';
-import { SwapRecordType } from './types/SwapRecordType';
+import { SwapRecordType } from './SwapRecordType';
 
 /** How long an expired purchase is still asked about, for a payment that came late. */
 export const LATE_WATCH_MS = 24 * 60 * 60 * 1000;

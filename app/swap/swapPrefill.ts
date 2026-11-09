@@ -1,7 +1,7 @@
-import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
-import { SwapAssetType } from './types/SwapAssetType';
-import { SwapRecordType } from './types/SwapRecordType';
-import { SwapPrefillType } from './types/SwapPrefillType';
+import { SwapDirectionEnum } from './SwapDirectionEnum';
+import { SwapAssetType } from './SwapAssetType';
+import { SwapRecordType } from './SwapRecordType';
+import { SwapPrefillType } from './SwapPrefillType';
 
 /** The same swap again, at today's price. */
 export function prefillFromRecord(

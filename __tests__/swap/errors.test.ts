@@ -6,7 +6,7 @@ import {
 import {
   SwapErrorCategoryEnum,
   SwapOperationEnum,
-} from '@app/swap/enums/SwapErrorCategoryEnum';
+} from '@app/swap/SwapErrorCategoryEnum';
 
 /**
  * The classifier decides what the user is told when a swap call fails, and the

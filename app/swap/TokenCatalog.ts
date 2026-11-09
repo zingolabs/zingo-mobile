@@ -1,6 +1,6 @@
 import { SwapKitClient } from './SwapKitClient';
-import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
-import { TokenEntryType } from './types/TokensResponseType';
+import { SwapKitProviderEnum } from './SwapKitProviderEnum';
+import { TokenEntryType } from './TokensResponseType';
 
 /**
  * In-memory cache for the SwapKit token catalog.

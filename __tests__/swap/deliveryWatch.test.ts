@@ -3,10 +3,10 @@ import {
   lacksDelivery,
   watchesDelivery,
 } from '@app/swap/deliveryWatch';
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
-import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
+import type { SwapRecordType } from '@app/swap/SwapRecordType';
 
 const T0 = 1_700_000_000_000;
 const record = (overrides: Partial<SwapRecordType> = {}) =>

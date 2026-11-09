@@ -1,10 +1,10 @@
 import { TokenCatalog } from '@app/swap/TokenCatalog';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 import type { SwapKitClient } from '@app/swap/SwapKitClient';
 import type {
   TokenEntryType,
   TokensResponseType,
-} from '@app/swap/types/TokensResponseType';
+} from '@app/swap/TokensResponseType';
 
 /**
  * The catalog decides what the asset picker offers. Its failures are quiet:

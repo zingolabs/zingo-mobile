@@ -1,15 +1,15 @@
-import { FlashnetExecutor } from '@app/swap/providers/FlashnetExecutor';
-import { MayaExecutor } from '@app/swap/providers/MayaExecutor';
-import { ThorchainExecutor } from '@app/swap/providers/ThorchainExecutor';
-import { NearIntentsExecutor } from '@app/swap/providers/NearIntentsExecutor';
+import { FlashnetExecutor } from '@app/swap/FlashnetExecutor';
+import { MayaExecutor } from '@app/swap/MayaExecutor';
+import { ThorchainExecutor } from '@app/swap/ThorchainExecutor';
+import { NearIntentsExecutor } from '@app/swap/NearIntentsExecutor';
 import {
   ProviderRegistry,
   createDefaultProviderRegistry,
-} from '@app/swap/providers/ProviderRegistry';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import type { ExtractDepositInstructionsContext } from '@app/swap/providers/ProviderExecutor';
-import type { SwapAssetType } from '@app/swap/types/SwapAssetType';
-import type { SwapResponseType } from '@app/swap/types/SwapResponseType';
+} from '@app/swap/ProviderRegistry';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import type { ExtractDepositInstructionsContext } from '@app/swap/ProviderExecutor';
+import type { SwapAssetType } from '@app/swap/SwapAssetType';
+import type { SwapResponseType } from '@app/swap/SwapResponseType';
 
 /**
  * Executors decide where a deposit goes and what rides with it. Everything

@@ -4,10 +4,10 @@ import { ValueTransferKindEnum } from '@app/AppState';
 import { PoolEnum } from '@app/AppState';
 import type { ValueTransferType } from '@app/AppState';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
-import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
+import type { SwapRecordType } from '@app/swap/SwapRecordType';
 import { buildHistoryItems } from '@screens/History/historyItems';
 import {
   shortWhen,

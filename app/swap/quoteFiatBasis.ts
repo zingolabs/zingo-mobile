@@ -1,5 +1,5 @@
-import type { FiatValueBasisType } from './types/FiatValueBasisType';
-import type { QuoteResponseType } from './types/QuoteResponseType';
+import type { FiatValueBasisType } from './FiatValueBasisType';
+import type { QuoteResponseType } from './QuoteResponseType';
 
 /**
  * The USD unit prices for a quote's two assets, snapshotted at quote time.

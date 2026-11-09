@@ -1,15 +1,15 @@
 import { BlockExplorerEnum, ChainNameEnum } from '@app/AppState';
 
 jest.mock('@app/RPCModule', () => ({ __esModule: true, default: {} }));
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
 import {
   buildChainExplorerUrl,
   buildTrackerEntries,
 } from '@app/swap/explorerUrls';
 import { hashRowsForRecord } from '@app/swap/hashRowsForRecord';
-import { applyDefaultTrackUpdate } from '@app/swap/providers/trackUpdateBase';
+import { applyDefaultTrackUpdate } from '@app/swap/trackUpdateBase';
 import {
   DEPOSIT_HASH,
   NEAR_EXECUTION_HASH,
@@ -21,8 +21,8 @@ import {
   REFUNDED_DEPOSIT_HASH,
   flashnetRefundedTrack,
 } from '../../__mocks__/dataMocks/swap/flashnetRefundedTrack';
-import type { SwapAssetType } from '@app/swap/types/SwapAssetType';
-import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
+import type { SwapAssetType } from '@app/swap/SwapAssetType';
+import type { SwapRecordType } from '@app/swap/SwapRecordType';
 
 const explorer = {
   zecChainName: ChainNameEnum.mainChainName,

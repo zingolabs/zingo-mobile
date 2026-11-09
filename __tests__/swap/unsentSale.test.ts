@@ -1,8 +1,8 @@
 import { canResendSale, unsentSale } from '@app/swap/unsentSale';
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
-import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
+import type { SwapRecordType } from '@app/swap/SwapRecordType';
 
 const NOW = 1_700_000_000_000;
 

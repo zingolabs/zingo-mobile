@@ -1,5 +1,5 @@
 import { selectionAcrossRefresh } from '@app/swap/selectionAcrossRefresh';
-import { RouteOptionType } from '@app/swap/types/RouteOptionType';
+import { RouteOptionType } from '@app/swap/RouteOptionType';
 
 const route = (routeId: string, provider: string, tags?: string[]) =>
   ({ routeId, provider, tags }) as RouteOptionType;

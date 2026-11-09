@@ -1,9 +1,9 @@
 import type ValueTransferType from '@app/AppState/types/ValueTransferType';
 import { ValueTransferKindEnum } from '@app/AppState';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
 import {
   groupHistoryBySwap,
   sliceKeepingGroups,
@@ -11,8 +11,8 @@ import {
   swapTxidIndex,
 } from '@app/swap/groupHistoryBySwap';
 import { swapRecordToValueTransfer } from '@app/swap/swapRecordToValueTransfer';
-import type { SwapAssetType } from '@app/swap/types/SwapAssetType';
-import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
+import type { SwapAssetType } from '@app/swap/SwapAssetType';
+import type { SwapRecordType } from '@app/swap/SwapRecordType';
 
 const ZEC: SwapAssetType = {
   swapKitId: 'ZEC.ZEC',

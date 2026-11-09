@@ -1,4 +1,4 @@
-import { ChainNameEnum } from '@app/swap/enums/ChainNameEnum';
+import { ChainNameEnum } from '@app/swap/ChainNameEnum';
 import { SwapKitClient } from '@app/swap/SwapKitClient';
 import { swapHttpRequest } from '@app/swap/swapHttp';
 

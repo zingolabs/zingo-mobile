@@ -1,8 +1,8 @@
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import { DepositInstructionsType } from '@app/swap/types/DepositInstructionsType';
-import { FlashnetProviderData } from '@app/swap/types/ProviderDataType';
-import { SwapRecordType } from '@app/swap/types/SwapRecordType';
-import { TrackResponseType } from '@app/swap/types/TrackResponseType';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import { DepositInstructionsType } from '@app/swap/DepositInstructionsType';
+import { FlashnetProviderData } from '@app/swap/ProviderDataType';
+import { SwapRecordType } from '@app/swap/SwapRecordType';
+import { TrackResponseType } from '@app/swap/TrackResponseType';
 import {
   ExtractDepositInstructionsContext,
   ProviderExecutor,

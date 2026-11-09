@@ -1,4 +1,4 @@
-import { SwapStatusEnum } from './enums/SwapStatusEnum';
+import { SwapStatusEnum } from './SwapStatusEnum';
 
 /**
  * The history row's label for a swap.

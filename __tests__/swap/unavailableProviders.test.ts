@@ -1,4 +1,4 @@
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 import { unavailableProviders as unavailableProvidersText } from '@app/swap/unavailableProviders';
 import { english } from '../../__mocks__/dataMocks/swap/englishText';
 
@@ -11,8 +11,8 @@ const unavailableProviders = (
     reason: english(row.reason),
   }));
 
-import type { QuoteResponseType } from '@app/swap/types/QuoteResponseType';
-import type { RouteOptionType } from '@app/swap/types/RouteOptionType';
+import type { QuoteResponseType } from '@app/swap/QuoteResponseType';
+import type { RouteOptionType } from '@app/swap/RouteOptionType';
 
 const SUPPORTED = [
   SwapKitProviderEnum.MayachainStreaming,

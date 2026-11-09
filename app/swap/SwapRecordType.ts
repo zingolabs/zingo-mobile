@@ -1,8 +1,8 @@
-import { BroadcastStatusEnum } from '@app/swap/enums/BroadcastStatusEnum';
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
-import { TrackingStatusEnum } from '@app/swap/enums/TrackingStatusEnum';
+import { BroadcastStatusEnum } from '@app/swap/BroadcastStatusEnum';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
+import { TrackingStatusEnum } from '@app/swap/TrackingStatusEnum';
 import { FiatValueBasisType } from './FiatValueBasisType';
 import { ProviderDataType } from './ProviderDataType';
 import { RefundInfoType } from './RefundInfoType';

@@ -1,15 +1,15 @@
-import { ChainNameEnum } from './enums/ChainNameEnum';
+import { ChainNameEnum } from './ChainNameEnum';
 import {
   SwapErrorCategoryEnum,
   SwapOperationEnum,
-} from './enums/SwapErrorCategoryEnum';
+} from './SwapErrorCategoryEnum';
 import { SwapKitError, SwapKitHttpError, SwapKitNetworkError } from './errors';
 import { swapHttpRequest } from './swapHttp';
 import type { SwapHttpResponse } from './swapHttp';
-import { QuoteResponseType } from './types/QuoteResponseType';
-import { SwapResponseType } from './types/SwapResponseType';
-import { TokensResponseType } from './types/TokensResponseType';
-import { TrackResponseType } from './types/TrackResponseType';
+import { QuoteResponseType } from './QuoteResponseType';
+import { SwapResponseType } from './SwapResponseType';
+import { TokensResponseType } from './TokensResponseType';
+import { TrackResponseType } from './TrackResponseType';
 
 /**
  * Thin typed wrapper over SwapKit's REST v3 API.

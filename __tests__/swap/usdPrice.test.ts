@@ -1,5 +1,5 @@
 import { SwapService } from '@app/swap/SwapService';
-import { createDefaultProviderRegistry } from '@app/swap/providers/ProviderRegistry';
+import { createDefaultProviderRegistry } from '@app/swap/ProviderRegistry';
 import type { SwapKitClient } from '@app/swap/SwapKitClient';
 import type { SwapPoller } from '@app/swap/SwapPoller';
 import type { SwapStore } from '@app/swap/SwapStore';

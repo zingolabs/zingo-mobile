@@ -1,5 +1,5 @@
-import { SwapOperationEnum } from '@app/swap/enums/SwapErrorCategoryEnum';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
+import { SwapOperationEnum } from '@app/swap/SwapErrorCategoryEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 import { SwapKitHttpError } from '@app/swap/errors';
 import {
   describeCommitFailure as describeCommitFailureText,

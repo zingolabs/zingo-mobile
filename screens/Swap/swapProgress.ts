@@ -1,5 +1,5 @@
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
 
 type Progress = {
   direction: SwapDirectionEnum;

@@ -7,8 +7,8 @@ import {
   defaultAppContextLoaded,
 } from '@app/context';
 import { showConfirm } from '@app/services/showConfirm';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
-import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
+import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
+import type { SwapRecordType } from '@app/swap/SwapRecordType';
 import { useRemoveSwap } from '@screens/Swap/useRemoveSwap';
 
 const messageFor = (status: SwapStatusEnum): string => {

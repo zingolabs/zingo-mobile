@@ -1,9 +1,9 @@
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 import { UNKNOWN_HASH_MS } from '@app/swap/canRemoveSwap';
 jest.mock('@app/RPCModule', () => ({ __esModule: true, default: {} }));
 
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
 import {
   swapOutcome,
   swapStepIndex,

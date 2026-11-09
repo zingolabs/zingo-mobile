@@ -1,7 +1,7 @@
 import {
   SwapErrorCategoryEnum,
   SwapOperationEnum,
-} from './enums/SwapErrorCategoryEnum';
+} from './SwapErrorCategoryEnum';
 
 /**
  * Strongly-typed errors thrown by `SwapKitClient` and provider executors.

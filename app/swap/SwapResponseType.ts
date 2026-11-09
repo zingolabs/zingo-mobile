@@ -7,7 +7,7 @@
  * (NEAR-style channel ids, SwapKit-internal swap id), and `inboundAddress`.
  *
  * Empirical shapes per provider were captured during 2026-06-21/22 mainnet
- * testing. See `app/swap/providers/<Provider>Executor.ts` for the per-provider
+ * testing. See `app/swap/<Provider>Executor.ts` for the per-provider
  * parsing.
  */
 export type SwapTxType = {

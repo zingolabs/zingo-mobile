@@ -3,7 +3,7 @@ import {
   depositSpendsSourceAddress,
   zecNetworkFeeReserve,
 } from '@app/swap/depositRouting';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 
 describe('depositCarriesMemo', () => {
   // Maya and THORChain read which swap a deposit belongs to from its memo,

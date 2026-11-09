@@ -1,8 +1,8 @@
-import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
-import { SwapStatusEnum } from './enums/SwapStatusEnum';
-import { isRealLegHash } from './providers/trackUpdateBase';
+import { SwapDirectionEnum } from './SwapDirectionEnum';
+import { SwapStatusEnum } from './SwapStatusEnum';
+import { isRealLegHash } from './trackUpdateBase';
 import { isThorchainFamily } from './thorchainFamily';
-import { SwapRecordType } from './types/SwapRecordType';
+import { SwapRecordType } from './SwapRecordType';
 
 /** How long a finished purchase is still asked about, for its delivery. */
 export const DELIVERY_WATCH_MS = 24 * 60 * 60 * 1000;

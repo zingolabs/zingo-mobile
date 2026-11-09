@@ -1,4 +1,4 @@
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 import { FlashnetExecutor } from './FlashnetExecutor';
 import { MayaExecutor } from './MayaExecutor';
 import { NearIntentsExecutor } from './NearIntentsExecutor';

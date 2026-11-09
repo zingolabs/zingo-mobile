@@ -1,6 +1,6 @@
-import { SwapStatusEnum } from './enums/SwapStatusEnum';
+import { SwapStatusEnum } from './SwapStatusEnum';
 import { isRefunding } from './lateDeposit';
-import { SwapRecordType } from './types/SwapRecordType';
+import { SwapRecordType } from './SwapRecordType';
 
 /**
  * The swaps that just ran out of time: expired now, awaiting their deposit

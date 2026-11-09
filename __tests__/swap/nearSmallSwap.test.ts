@@ -2,8 +2,8 @@ import {
   NEAR_NO_REFUND_USD,
   nearRefusesSmallRefunds,
 } from '@app/swap/nearSmallSwap';
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 
 const buy = (provider: SwapKitProviderEnum | undefined, sellUsd: number) =>
   nearRefusesSmallRefunds({

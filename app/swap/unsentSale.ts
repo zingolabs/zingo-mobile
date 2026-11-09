@@ -1,7 +1,7 @@
-import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
-import { SwapStatusEnum } from './enums/SwapStatusEnum';
+import { SwapDirectionEnum } from './SwapDirectionEnum';
+import { SwapStatusEnum } from './SwapStatusEnum';
 import { MIN_REMAINING_VALIDITY_MS } from './keepLastQuote';
-import { SwapRecordType } from './types/SwapRecordType';
+import { SwapRecordType } from './SwapRecordType';
 
 /** A sale the provider reserved whose ZEC never left the wallet. */
 export function unsentSale(

@@ -1,16 +1,16 @@
 import { SwapService } from '@app/swap/SwapService';
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import { createDefaultProviderRegistry } from '@app/swap/providers/ProviderRegistry';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import { createDefaultProviderRegistry } from '@app/swap/ProviderRegistry';
 import type { SwapKitClient } from '@app/swap/SwapKitClient';
 import type { SwapPoller } from '@app/swap/SwapPoller';
 import type { SwapStore } from '@app/swap/SwapStore';
 import type { TokenCatalog } from '@app/swap/TokenCatalog';
-import type { SwapAssetType } from '@app/swap/types/SwapAssetType';
-import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
+import type { SwapAssetType } from '@app/swap/SwapAssetType';
+import type { SwapRecordType } from '@app/swap/SwapRecordType';
+import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
 import { SwapKitHttpError } from '@app/swap/errors';
-import { SwapOperationEnum } from '@app/swap/enums/SwapErrorCategoryEnum';
+import { SwapOperationEnum } from '@app/swap/SwapErrorCategoryEnum';
 
 const ZEC: SwapAssetType = {
   swapKitId: 'ZEC.ZEC',

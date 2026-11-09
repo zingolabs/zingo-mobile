@@ -1,11 +1,11 @@
 import { SwapService } from '@app/swap/SwapService';
-import { BroadcastStatusEnum } from '@app/swap/enums/BroadcastStatusEnum';
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
+import { BroadcastStatusEnum } from '@app/swap/BroadcastStatusEnum';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
 import type { SwapStore } from '@app/swap/SwapStore';
-import type { SwapAssetType } from '@app/swap/types/SwapAssetType';
-import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
+import type { SwapAssetType } from '@app/swap/SwapAssetType';
+import type { SwapRecordType } from '@app/swap/SwapRecordType';
 
 // SwapService reaches the network clients, which read `window.electronAPI` at
 // module load. Nothing on this path calls them, but the import has to resolve.

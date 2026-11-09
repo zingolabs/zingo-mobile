@@ -1,7 +1,7 @@
 import { SwapKitHttpError } from './errors';
 import { RATE_LIMITED_MESSAGE, isRateLimited } from './rateLimited';
 import { providerShortLabel } from './providerLabels';
-import type { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
+import type { SwapKitProviderEnum } from './SwapKitProviderEnum';
 import { swapKey, swapRaw } from './swapText';
 import type { SwapTextType } from './swapText';
 

@@ -1,6 +1,6 @@
 import { formatAmount, formatExactAmount } from '@app/utils/formatAmount';
 
-import type { FiatValueBasisType } from './types/FiatValueBasisType';
+import type { FiatValueBasisType } from './FiatValueBasisType';
 
 /**
  * How a fee quoted in one asset was expressed in another.

@@ -1,4 +1,4 @@
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 import {
   MIN_REMAINING_VALIDITY_MS,
   STALE_QUOTE_GRACE_MS,
@@ -6,7 +6,7 @@ import {
   quoteQuestionKey,
 } from '@app/swap/keepLastQuote';
 import type { QuoteInput } from '@app/swap/SwapService';
-import type { RouteOptionType } from '@app/swap/types/RouteOptionType';
+import type { RouteOptionType } from '@app/swap/RouteOptionType';
 
 const asset = (swapKitId: string) => ({ swapKitId }) as QuoteInput['sellAsset'];
 const input = (overrides: Partial<QuoteInput> = {}): QuoteInput => ({

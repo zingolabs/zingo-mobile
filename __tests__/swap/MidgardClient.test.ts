@@ -1,5 +1,5 @@
 import { MidgardClient } from '@app/swap/MidgardClient';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 import { swapHttpRequest } from '@app/swap/swapHttp';
 
 jest.mock('@app/swap/swapHttp', () => ({ swapHttpRequest: jest.fn() }));

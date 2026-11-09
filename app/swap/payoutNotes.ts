@@ -1,11 +1,11 @@
 import type { ValueTransferType } from '@app/AppState';
 import { ValueTransferKindEnum } from '@app/AppState/enums/ValueTransferKindEnum';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
-import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
-import { SwapStatusEnum } from './enums/SwapStatusEnum';
+import { SwapDirectionEnum } from './SwapDirectionEnum';
+import { SwapStatusEnum } from './SwapStatusEnum';
 import { normalizeHashForTrack } from './MidgardClient';
 import { isThorchainFamily } from './thorchainFamily';
-import type { SwapRecordType } from './types/SwapRecordType';
+import type { SwapRecordType } from './SwapRecordType';
 
 /** A payout this wallet received, with the source-chain hash its memo names. */
 export type PayoutNoteType = {

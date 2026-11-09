@@ -1,4 +1,4 @@
-import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
+import { SwapKitProviderEnum } from './SwapKitProviderEnum';
 import { isThorchainFamily } from './thorchainFamily';
 
 /**

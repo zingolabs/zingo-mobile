@@ -1,7 +1,7 @@
-import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
-import { SwapStatusEnum } from './enums/SwapStatusEnum';
+import { SwapDirectionEnum } from './SwapDirectionEnum';
+import { SwapStatusEnum } from './SwapStatusEnum';
 import { hasDepositEvidence } from './depositEvidence';
-import { SwapRecordType } from './types/SwapRecordType';
+import { SwapRecordType } from './SwapRecordType';
 
 /**
  * How long Zingo waits for an inbound deposit, from the moment the payment

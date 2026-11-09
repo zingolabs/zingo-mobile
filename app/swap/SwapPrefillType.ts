@@ -1,5 +1,5 @@
 import { SwapAssetType } from './SwapAssetType';
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
 
 /**
  * What a new quote starts from: the direction, the other coin, the amount

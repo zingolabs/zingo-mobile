@@ -5,19 +5,19 @@
 // resolves the whole module graph as TypeScript; webpack sees Babel's output,
 // where a type has no runtime export and the build fails on the missing name.
 
-export { BroadcastStatusEnum } from './enums/BroadcastStatusEnum';
-export { SwapDirectionEnum } from './enums/SwapDirectionEnum';
+export { BroadcastStatusEnum } from './BroadcastStatusEnum';
+export { SwapDirectionEnum } from './SwapDirectionEnum';
 export {
   SwapErrorCategoryEnum,
   SwapOperationEnum,
-} from './enums/SwapErrorCategoryEnum';
-export { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
+} from './SwapErrorCategoryEnum';
+export { SwapKitProviderEnum } from './SwapKitProviderEnum';
 export {
   SwapStatusEnum,
   isTerminalStatus,
   isPrePaymentStatus,
-} from './enums/SwapStatusEnum';
-export { TrackingStatusEnum } from './enums/TrackingStatusEnum';
+} from './SwapStatusEnum';
+export { TrackingStatusEnum } from './TrackingStatusEnum';
 export { canRemoveSwap, hasUnknownHash } from './canRemoveSwap';
 export { hasDepositEvidence } from './depositEvidence';
 export { newlyExpired, newlyRefunding } from './swapTransitions';
@@ -37,7 +37,7 @@ export {
   heldDeshield,
 } from './depositAfterDeshield';
 export { NEAR_NO_REFUND_USD, nearRefusesSmallRefunds } from './nearSmallSwap';
-export type { SwapPrefillType } from './types/SwapPrefillType';
+export type { SwapPrefillType } from './SwapPrefillType';
 export {
   LATE_WATCH_MS,
   acceptsLateUpdate,
@@ -59,8 +59,8 @@ export {
 } from './depositDeadline';
 export type { DepositPhase } from './depositDeadline';
 
-export type { DepositInstructionsType } from './types/DepositInstructionsType';
-export type { FiatValueBasisType } from './types/FiatValueBasisType';
+export type { DepositInstructionsType } from './DepositInstructionsType';
+export type { FiatValueBasisType } from './FiatValueBasisType';
 export type {
   ChainflipProviderData,
   FlashnetProviderData,
@@ -69,31 +69,28 @@ export type {
   NearProviderData,
   ProviderDataType,
   ThorchainStreamingProviderData,
-} from './types/ProviderDataType';
+} from './ProviderDataType';
 export type {
   QuoteResponseType,
   QuoteRouteAssetType,
   QuoteRouteFeeType,
   QuoteRouteType,
-} from './types/QuoteResponseType';
-export type { RefundInfoType } from './types/RefundInfoType';
-export type { RouteOptionType } from './types/RouteOptionType';
-export type { SwapAssetType } from './types/SwapAssetType';
-export type { SwapRecordType } from './types/SwapRecordType';
+} from './QuoteResponseType';
+export type { RefundInfoType } from './RefundInfoType';
+export type { RouteOptionType } from './RouteOptionType';
+export type { SwapAssetType } from './SwapAssetType';
+export type { SwapRecordType } from './SwapRecordType';
 export type {
   SwapResponseType,
   SwapTransientType,
   SwapTxType,
-} from './types/SwapResponseType';
+} from './SwapResponseType';
 export type {
   TokenEntryType,
   TokensProviderBucketType,
   TokensResponseType,
-} from './types/TokensResponseType';
-export type {
-  TrackLegType,
-  TrackResponseType,
-} from './types/TrackResponseType';
+} from './TokensResponseType';
+export type { TrackLegType, TrackResponseType } from './TrackResponseType';
 
 export { SwapKitClient } from './SwapKitClient';
 export type {
@@ -228,20 +225,20 @@ export {
 export type {
   ExtractDepositInstructionsContext,
   ProviderExecutor,
-} from './providers/ProviderExecutor';
-export { FlashnetExecutor } from './providers/FlashnetExecutor';
-export { MayaExecutor } from './providers/MayaExecutor';
-export { NearIntentsExecutor } from './providers/NearIntentsExecutor';
+} from './ProviderExecutor';
+export { FlashnetExecutor } from './FlashnetExecutor';
+export { MayaExecutor } from './MayaExecutor';
+export { NearIntentsExecutor } from './NearIntentsExecutor';
 export {
   ProviderRegistry,
   createDefaultProviderRegistry,
-} from './providers/ProviderRegistry';
-export { mapSwapStatus, mapTrackingStatus } from './providers/statusMapping';
+} from './ProviderRegistry';
+export { mapSwapStatus, mapTrackingStatus } from './statusMapping';
 export {
   applyDefaultTrackUpdate,
   pickLegHash,
   isRealLegHash,
-} from './providers/trackUpdateBase';
+} from './trackUpdateBase';
 export {
   isRateLimited,
   rateLimitWaitMs,

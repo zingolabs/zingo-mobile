@@ -1,7 +1,7 @@
 import type ValueTransferType from '@app/AppState/types/ValueTransferType';
 import { ValueTransferKindEnum } from '@app/AppState';
-import { isRealLegHash } from './providers/trackUpdateBase';
-import type { SwapRecordType } from './types/SwapRecordType';
+import { isRealLegHash } from './trackUpdateBase';
+import type { SwapRecordType } from './SwapRecordType';
 
 /**
  * History grouped by swap: each swap row followed by the Zcash transactions it

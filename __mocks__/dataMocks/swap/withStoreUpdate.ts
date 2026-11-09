@@ -1,4 +1,4 @@
-import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
+import type { SwapRecordType } from '@app/swap/SwapRecordType';
 
 type StoreMock = {
   readAll?: () => Promise<SwapRecordType[]>;

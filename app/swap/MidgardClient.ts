@@ -1,5 +1,5 @@
 import { swapHttpRequest } from './swapHttp';
-import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
+import { SwapKitProviderEnum } from './SwapKitProviderEnum';
 
 /**
  * Midgard is the THORChain/Mayachain L2 indexer. SwapKit's own `/track`

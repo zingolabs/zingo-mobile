@@ -1,15 +1,15 @@
 import type { ValueTransferType } from '@app/AppState';
 import { ValueTransferKindEnum } from '@app/AppState/enums/ValueTransferKindEnum';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
 import {
   awaitsPayout,
   claimPayout,
   payoutNotesFrom,
 } from '@app/swap/payoutNotes';
-import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
+import type { SwapRecordType } from '@app/swap/SwapRecordType';
 
 const HASH = 'E717E197095A637090BF5F94609B8BC84D56ACD6DAD4E423D695307CF6259BAA';
 

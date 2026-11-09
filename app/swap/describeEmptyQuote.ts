@@ -1,4 +1,4 @@
-import type { QuoteResponseType } from './types/QuoteResponseType';
+import type { QuoteResponseType } from './QuoteResponseType';
 import { formatMinimumAmount } from './formatMinimumAmount';
 import type { UnavailableProviderType } from './unavailableProviders';
 import { providerShortLabel } from './providerLabels';

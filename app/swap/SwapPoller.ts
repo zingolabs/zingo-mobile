@@ -1,17 +1,17 @@
 import { MidgardClient } from './MidgardClient';
 import { SwapKitClient } from './SwapKitClient';
 import { SwapStore } from './SwapStore';
-import { ProviderRegistry } from './providers/ProviderRegistry';
-import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
+import { ProviderRegistry } from './ProviderRegistry';
+import { SwapDirectionEnum } from './SwapDirectionEnum';
+import { SwapKitProviderEnum } from './SwapKitProviderEnum';
 import { awaitsDeposit, depositOverdue } from './depositDeadline';
 import { acceptsLateUpdate, watchesLateDeposit } from './lateDeposit';
 import { lacksDelivery, watchesDelivery } from './deliveryWatch';
 import { isThorchainFamily } from './thorchainFamily';
-import { SwapStatusEnum, isTerminalStatus } from './enums/SwapStatusEnum';
-import { TrackingStatusEnum } from './enums/TrackingStatusEnum';
-import { SwapRecordType } from './types/SwapRecordType';
-import { TrackResponseType } from './types/TrackResponseType';
+import { SwapStatusEnum, isTerminalStatus } from './SwapStatusEnum';
+import { TrackingStatusEnum } from './TrackingStatusEnum';
+import { SwapRecordType } from './SwapRecordType';
+import { TrackResponseType } from './TrackResponseType';
 import { saplingReceiverOf } from './saplingReceiver';
 
 /**

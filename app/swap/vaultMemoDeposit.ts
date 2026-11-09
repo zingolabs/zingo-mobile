@@ -1,4 +1,4 @@
-import { SwapResponseType } from '@app/swap/types/SwapResponseType';
+import { SwapResponseType } from '@app/swap/SwapResponseType';
 
 /**
  * The deposit shape shared by the THORChain-family providers: pay a rotating

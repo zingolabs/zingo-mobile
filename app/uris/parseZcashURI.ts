@@ -1,6 +1,6 @@
 import { Base64 } from 'js-base64';
 import Url from 'url-parse';
-import ZcashURITargetClass from './classes/ZcashURITargetClass';
+import ZcashURITargetClass from './ZcashURITargetClass';
 import {
   ServerType,
   ErrorKeyed,

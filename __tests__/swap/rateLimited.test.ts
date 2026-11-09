@@ -1,4 +1,4 @@
-import { SwapOperationEnum } from '@app/swap/enums/SwapErrorCategoryEnum';
+import { SwapOperationEnum } from '@app/swap/SwapErrorCategoryEnum';
 import { SwapKitHttpError, parseRetryAfter } from '@app/swap/errors';
 import {
   RATE_LIMIT_DEFAULT_WAIT_MS,

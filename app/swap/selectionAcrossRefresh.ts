@@ -1,4 +1,4 @@
-import { RouteOptionType } from './types/RouteOptionType';
+import { RouteOptionType } from './RouteOptionType';
 import { optimalRouteId } from './optimalRoute';
 
 /**

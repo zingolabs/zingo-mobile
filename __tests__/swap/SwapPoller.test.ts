@@ -1,21 +1,21 @@
 import { withStoreUpdate } from '../../__mocks__/dataMocks/swap/withStoreUpdate';
 import { SwapPoller } from '@app/swap/SwapPoller';
-import { BroadcastStatusEnum } from '@app/swap/enums/BroadcastStatusEnum';
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
-import { ProviderRegistry } from '@app/swap/providers/ProviderRegistry';
+import { BroadcastStatusEnum } from '@app/swap/BroadcastStatusEnum';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
+import { ProviderRegistry } from '@app/swap/ProviderRegistry';
 import type { MidgardClient } from '@app/swap/MidgardClient';
-import { FlashnetExecutor } from '@app/swap/providers/FlashnetExecutor';
-import { MayaExecutor } from '@app/swap/providers/MayaExecutor';
-import { ThorchainExecutor } from '@app/swap/providers/ThorchainExecutor';
-import { NearIntentsExecutor } from '@app/swap/providers/NearIntentsExecutor';
+import { FlashnetExecutor } from '@app/swap/FlashnetExecutor';
+import { MayaExecutor } from '@app/swap/MayaExecutor';
+import { ThorchainExecutor } from '@app/swap/ThorchainExecutor';
+import { NearIntentsExecutor } from '@app/swap/NearIntentsExecutor';
 import type { SwapKitClient } from '@app/swap/SwapKitClient';
 import type { SwapStore } from '@app/swap/SwapStore';
-import type { ProviderExecutor } from '@app/swap/providers/ProviderExecutor';
-import type { SwapAssetType } from '@app/swap/types/SwapAssetType';
-import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
-import type { TrackResponseType } from '@app/swap/types/TrackResponseType';
+import type { ProviderExecutor } from '@app/swap/ProviderExecutor';
+import type { SwapAssetType } from '@app/swap/SwapAssetType';
+import type { SwapRecordType } from '@app/swap/SwapRecordType';
+import type { TrackResponseType } from '@app/swap/TrackResponseType';
 
 // The poller's clients read `window.electronAPI` at module load; the fakes
 // below stand in for every call this suite makes.

@@ -2,14 +2,14 @@ import {
   swapRecordToValueTransfer,
   isOutboundSwap,
 } from '@app/swap/swapRecordToValueTransfer';
-import { BroadcastStatusEnum } from '@app/swap/enums/BroadcastStatusEnum';
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
+import { BroadcastStatusEnum } from '@app/swap/BroadcastStatusEnum';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
 import { ValueTransferKindEnum } from '@app/AppState';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
-import type { SwapAssetType } from '@app/swap/types/SwapAssetType';
-import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
+import type { SwapAssetType } from '@app/swap/SwapAssetType';
+import type { SwapRecordType } from '@app/swap/SwapRecordType';
 
 /**
  * The projection that lets a swap sit in the History list beside zingolib's

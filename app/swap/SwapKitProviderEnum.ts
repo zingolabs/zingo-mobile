@@ -7,7 +7,7 @@
  *
  * Adding a new provider:
  *   1. Add the literal here (must match what SwapKit returns).
- *   2. Add a `ProviderExecutor` implementation under `app/swap/providers/`.
+ *   2. Add a `ProviderExecutor` implementation under `app/swap/`.
  *   3. Register it in `ProviderRegistry`.
  *   No other code paths should hard-code provider identifiers.
  */

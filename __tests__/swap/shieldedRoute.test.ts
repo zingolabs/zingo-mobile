@@ -1,5 +1,5 @@
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 import { routeIsShielded, swapAddressOf } from '@app/swap/shieldedPurchase';
 
 const maya = SwapKitProviderEnum.MayachainStreaming;

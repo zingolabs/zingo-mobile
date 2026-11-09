@@ -1,4 +1,4 @@
-import type { TrackResponseType } from '@app/swap/types/TrackResponseType';
+import type { TrackResponseType } from '@app/swap/TrackResponseType';
 
 /**
  * A completed NEAR Intents swap of ZEC into USDC on Solana, as `/track`

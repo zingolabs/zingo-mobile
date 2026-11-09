@@ -1,5 +1,5 @@
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
-import { TrackingStatusEnum } from '@app/swap/enums/TrackingStatusEnum';
+import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
+import { TrackingStatusEnum } from '@app/swap/TrackingStatusEnum';
 
 /**
  * Shared helpers that map raw `/track` status strings to our enums.

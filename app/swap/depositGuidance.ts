@@ -1,5 +1,5 @@
-import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
+import { SwapDirectionEnum } from './SwapDirectionEnum';
+import { SwapKitProviderEnum } from './SwapKitProviderEnum';
 import { isThorchainFamily } from './thorchainFamily';
 import {
   buildEip681Uri,
@@ -8,7 +8,7 @@ import {
   isUtxoSourceChain,
   memoToHexCalldata,
 } from './chainMemoEncoding';
-import { SwapAssetType } from './types/SwapAssetType';
+import { SwapAssetType } from './SwapAssetType';
 
 /**
  * The rules behind the deposit slip: what to scan, what to warn about, and

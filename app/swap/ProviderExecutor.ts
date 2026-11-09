@@ -1,12 +1,12 @@
 import type { ShieldedMemoTarget } from '@app/swap/mayaShieldedMemo';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 import { SwapKitError } from '@app/swap/errors';
-import { SwapErrorCategoryEnum } from '@app/swap/enums/SwapErrorCategoryEnum';
-import { DepositInstructionsType } from '@app/swap/types/DepositInstructionsType';
-import { SwapAssetType } from '@app/swap/types/SwapAssetType';
-import { SwapRecordType } from '@app/swap/types/SwapRecordType';
-import { SwapResponseType } from '@app/swap/types/SwapResponseType';
-import { TrackResponseType } from '@app/swap/types/TrackResponseType';
+import { SwapErrorCategoryEnum } from '@app/swap/SwapErrorCategoryEnum';
+import { DepositInstructionsType } from '@app/swap/DepositInstructionsType';
+import { SwapAssetType } from '@app/swap/SwapAssetType';
+import { SwapRecordType } from '@app/swap/SwapRecordType';
+import { SwapResponseType } from '@app/swap/SwapResponseType';
+import { TrackResponseType } from '@app/swap/TrackResponseType';
 
 /**
  * Context handed to `extractDepositInstructions` together with the raw

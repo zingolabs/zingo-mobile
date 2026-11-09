@@ -5,9 +5,9 @@ import {
   providerRequiresMemo,
   requiresExactAmountWarning,
 } from '@app/swap/depositGuidance';
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import type { SwapAssetType } from '@app/swap/types/SwapAssetType';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import type { SwapAssetType } from '@app/swap/SwapAssetType';
 
 const ETH: SwapAssetType = {
   swapKitId: 'ETH.ETH',

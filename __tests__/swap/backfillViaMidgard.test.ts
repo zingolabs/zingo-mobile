@@ -1,15 +1,15 @@
 import { withStoreUpdate } from '../../__mocks__/dataMocks/swap/withStoreUpdate';
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
-import { createDefaultProviderRegistry } from '@app/swap/providers/ProviderRegistry';
-import { TRACK_CAPTURE_VERSION } from '@app/swap/providers/trackUpdateBase';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
+import { createDefaultProviderRegistry } from '@app/swap/ProviderRegistry';
+import { TRACK_CAPTURE_VERSION } from '@app/swap/trackUpdateBase';
 import { SwapService } from '@app/swap/SwapService';
 import type { SwapKitClient } from '@app/swap/SwapKitClient';
 import type { SwapPoller } from '@app/swap/SwapPoller';
 import type { SwapStore } from '@app/swap/SwapStore';
 import type { TokenCatalog } from '@app/swap/TokenCatalog';
-import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
+import type { SwapRecordType } from '@app/swap/SwapRecordType';
 
 const DEPOSIT_HASH = 'cd'.repeat(32);
 const DELIVERY_HASH = 'ef'.repeat(32);

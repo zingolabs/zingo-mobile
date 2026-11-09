@@ -1,14 +1,14 @@
 import { SwapService } from '@app/swap/SwapService';
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 import { depositSpendsSourceAddress } from '@app/swap/depositRouting';
 import { fetchMayaShieldedMemoTarget } from '@app/swap/mayaShieldedMemo';
-import { createDefaultProviderRegistry } from '@app/swap/providers/ProviderRegistry';
+import { createDefaultProviderRegistry } from '@app/swap/ProviderRegistry';
 import type { SwapKitClient } from '@app/swap/SwapKitClient';
 import type { SwapPoller } from '@app/swap/SwapPoller';
 import type { SwapStore } from '@app/swap/SwapStore';
 import type { TokenCatalog } from '@app/swap/TokenCatalog';
-import type { SwapAssetType } from '@app/swap/types/SwapAssetType';
+import type { SwapAssetType } from '@app/swap/SwapAssetType';
 
 jest.mock('@app/swap/mayaShieldedMemo', () => ({
   ...jest.requireActual('@app/swap/mayaShieldedMemo'),

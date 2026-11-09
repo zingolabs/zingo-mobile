@@ -2,18 +2,15 @@ import {
   applyDefaultTrackUpdate,
   isRealLegHash,
   pickLegHash,
-} from '@app/swap/providers/trackUpdateBase';
-import {
-  mapSwapStatus,
-  mapTrackingStatus,
-} from '@app/swap/providers/statusMapping';
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
-import { TrackingStatusEnum } from '@app/swap/enums/TrackingStatusEnum';
-import type { SwapAssetType } from '@app/swap/types/SwapAssetType';
-import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
-import type { TrackResponseType } from '@app/swap/types/TrackResponseType';
+} from '@app/swap/trackUpdateBase';
+import { mapSwapStatus, mapTrackingStatus } from '@app/swap/statusMapping';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
+import { TrackingStatusEnum } from '@app/swap/TrackingStatusEnum';
+import type { SwapAssetType } from '@app/swap/SwapAssetType';
+import type { SwapRecordType } from '@app/swap/SwapRecordType';
+import type { TrackResponseType } from '@app/swap/TrackResponseType';
 
 /**
  * This is the poller's whole reason for existing: what a `/track` response

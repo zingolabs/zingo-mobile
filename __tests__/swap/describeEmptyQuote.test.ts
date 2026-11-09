@@ -7,8 +7,8 @@ const describeEmptyQuote = (
   ...args: Parameters<typeof describeEmptyQuoteText>
 ) => english(describeEmptyQuoteText(...args));
 
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import type { QuoteResponseType } from '@app/swap/types/QuoteResponseType';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import type { QuoteResponseType } from '@app/swap/QuoteResponseType';
 
 const GENERIC = 'No route is available for this swap right now.';
 

@@ -1,10 +1,10 @@
-import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
+import { SwapKitProviderEnum } from './SwapKitProviderEnum';
 import { formatMinimumAmount } from './formatMinimumAmount';
 import type {
   QuoteProviderErrorType,
   QuoteResponseType,
-} from './types/QuoteResponseType';
-import type { RouteOptionType } from './types/RouteOptionType';
+} from './QuoteResponseType';
+import type { RouteOptionType } from './RouteOptionType';
 import { swapKey, swapRaw } from './swapText';
 import type { SwapTextType } from './swapText';
 

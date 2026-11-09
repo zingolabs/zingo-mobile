@@ -1,5 +1,5 @@
 import { hashRowsForRecord } from '@app/swap/hashRowsForRecord';
-import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
+import type { SwapRecordType } from '@app/swap/SwapRecordType';
 
 const HASH_A =
   'd6c77daacfac04428ab98bd01ec2480e2bb1880ded80d3f370937fedbfd4ddaa';

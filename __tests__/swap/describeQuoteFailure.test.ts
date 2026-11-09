@@ -1,4 +1,4 @@
-import { SwapOperationEnum } from '@app/swap/enums/SwapErrorCategoryEnum';
+import { SwapOperationEnum } from '@app/swap/SwapErrorCategoryEnum';
 import { SwapKitHttpError } from '@app/swap/errors';
 import { describeQuoteFailure as describeQuoteFailureText } from '@app/swap/describeQuoteFailure';
 import { english } from '../../__mocks__/dataMocks/swap/englishText';

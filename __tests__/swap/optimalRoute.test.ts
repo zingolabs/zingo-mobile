@@ -1,5 +1,5 @@
 import { optimalRouteId } from '@app/swap/optimalRoute';
-import { RouteOptionType } from '@app/swap/types/RouteOptionType';
+import { RouteOptionType } from '@app/swap/RouteOptionType';
 
 const route = (routeId: string, tags?: string[]) =>
   ({ routeId, tags }) as RouteOptionType;

@@ -1,5 +1,5 @@
 import type { QuoteInput } from './SwapService';
-import type { RouteOptionType } from './types/RouteOptionType';
+import type { RouteOptionType } from './RouteOptionType';
 
 /**
  * The routes on screen that a refresh did not bring back, but that still

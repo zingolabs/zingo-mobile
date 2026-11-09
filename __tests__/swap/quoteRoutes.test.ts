@@ -1,8 +1,8 @@
 import { SwapService } from '@app/swap/SwapService';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import { SwapOperationEnum } from '@app/swap/enums/SwapErrorCategoryEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import { SwapOperationEnum } from '@app/swap/SwapErrorCategoryEnum';
 import { SwapKitHttpError, SwapKitNetworkError } from '@app/swap/errors';
-import { createDefaultProviderRegistry } from '@app/swap/providers/ProviderRegistry';
+import { createDefaultProviderRegistry } from '@app/swap/ProviderRegistry';
 import type { SwapKitClient } from '@app/swap/SwapKitClient';
 import { english } from '../../__mocks__/dataMocks/swap/englishText';
 import type { SwapPoller } from '@app/swap/SwapPoller';
@@ -11,8 +11,8 @@ import type { TokenCatalog } from '@app/swap/TokenCatalog';
 import type {
   QuoteResponseType,
   QuoteRouteType,
-} from '@app/swap/types/QuoteResponseType';
-import type { SwapAssetType } from '@app/swap/types/SwapAssetType';
+} from '@app/swap/QuoteResponseType';
+import type { SwapAssetType } from '@app/swap/SwapAssetType';
 
 /**
  * `quote()` projects SwapKit's routes into what the screen reads. Two of those

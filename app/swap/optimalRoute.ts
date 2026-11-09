@@ -1,4 +1,4 @@
-import { RouteOptionType } from './types/RouteOptionType';
+import { RouteOptionType } from './RouteOptionType';
 
 /**
  * The route to select when nobody has chosen one.

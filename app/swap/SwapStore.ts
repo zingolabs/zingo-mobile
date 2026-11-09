@@ -1,6 +1,6 @@
 import swapStorage from './swapStorage';
 
-import { SwapRecordType } from './types/SwapRecordType';
+import { SwapRecordType } from './SwapRecordType';
 import { swapAddressOf } from './shieldedPurchase';
 
 /** Every record but the markers a removal leaves. */

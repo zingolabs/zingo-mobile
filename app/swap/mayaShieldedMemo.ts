@@ -1,5 +1,5 @@
 import { swapHttpRequest } from './swapHttp';
-import { SwapResponseType } from './types/SwapResponseType';
+import { SwapResponseType } from './SwapResponseType';
 
 /**
  * Maya's shielded memo deposit for ZEC.

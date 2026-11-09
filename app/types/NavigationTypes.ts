@@ -3,7 +3,7 @@ import type {
   CompositeScreenProps,
   NavigatorScreenParams,
 } from '@react-navigation/native';
-import type { SwapPrefillType } from '@app/swap/types/SwapPrefillType';
+import type { SwapPrefillType } from '@app/swap/SwapPrefillType';
 import type {
   NativeStackNavigationProp,
   NativeStackScreenProps,
@@ -23,7 +23,7 @@ import {
 import type { ComputingParams } from '@app/walletBackend/transforms/sendSettlement';
 import { RPCDrainTxType } from '@app/walletBackend/types/RPCDrainPlanType';
 import type { SwapReview } from '@screens/Swap/useSwapForm';
-import type { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
+import type { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
 
 // The root stack: one section, chosen by the session, plus the scanner,
 // which sits above every section and its bottom-sheet portal.

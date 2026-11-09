@@ -1,11 +1,11 @@
 import type { ValueTransferType } from '@app/AppState';
 import { ValueTransferKindEnum } from '@app/AppState/enums/ValueTransferKindEnum';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
-import { BroadcastStatusEnum } from '@app/swap/enums/BroadcastStatusEnum';
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
-import { createDefaultProviderRegistry } from '@app/swap/providers/ProviderRegistry';
+import { BroadcastStatusEnum } from '@app/swap/BroadcastStatusEnum';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
+import { createDefaultProviderRegistry } from '@app/swap/ProviderRegistry';
 import {
   awaitsSaleDeposit,
   claimSaleDeposit,
@@ -18,7 +18,7 @@ import type { SwapKitClient } from '@app/swap/SwapKitClient';
 import type { SwapPoller } from '@app/swap/SwapPoller';
 import type { SwapStore } from '@app/swap/SwapStore';
 import type { TokenCatalog } from '@app/swap/TokenCatalog';
-import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
+import type { SwapRecordType } from '@app/swap/SwapRecordType';
 
 const CREATED_MS = 1_800_000_000_000;
 

@@ -1,5 +1,5 @@
-import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
+import { SwapDirectionEnum } from './SwapDirectionEnum';
+import { SwapKitProviderEnum } from './SwapKitProviderEnum';
 
 /**
  * Chains whose memo holds 80 bytes. Maya's memo to a unified address runs

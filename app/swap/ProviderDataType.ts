@@ -1,4 +1,4 @@
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 
 /**
  * Persisted per-provider data attached to a `SwapRecord`.

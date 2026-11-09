@@ -1,5 +1,5 @@
-import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
+import { SwapDirectionEnum } from './SwapDirectionEnum';
+import { SwapKitProviderEnum } from './SwapKitProviderEnum';
 
 /**
  * Under this value, in dollars, NEAR Intents returns nothing sent by

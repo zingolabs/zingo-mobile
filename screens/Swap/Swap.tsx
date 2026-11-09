@@ -34,7 +34,7 @@ import {
   renderSwapText,
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 import {
   sendGateOpen,
   shownStatusKey,

@@ -1,9 +1,9 @@
 import ValueTransferType from '@app/AppState/types/ValueTransferType';
 import { ValueTransferKindEnum } from '@app/AppState/enums/ValueTransferKindEnum';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
-import { SwapStatusEnum, isTerminalStatus } from './enums/SwapStatusEnum';
-import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
-import { SwapRecordType } from './types/SwapRecordType';
+import { SwapStatusEnum, isTerminalStatus } from './SwapStatusEnum';
+import { SwapDirectionEnum } from './SwapDirectionEnum';
+import { SwapRecordType } from './SwapRecordType';
 
 /**
  * Projects a `SwapRecordType` into a `ValueTransferType` row, so the History

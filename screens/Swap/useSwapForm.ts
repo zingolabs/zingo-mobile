@@ -44,7 +44,7 @@ import type {
   TokenEntryType,
   UnavailableProviderType,
 } from '@app/swap';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 import { deriveRefundAddress } from '@app/walletBackend';
 import {
   tokenEntryOf,

@@ -1,5 +1,5 @@
-import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
-import { SwapRecordType } from './types/SwapRecordType';
+import { SwapKitProviderEnum } from './SwapKitProviderEnum';
+import { SwapRecordType } from './SwapRecordType';
 
 /** What a sale's deposit asks the wallet to send. */
 export type SaleDepositRequestType = {

@@ -1,9 +1,6 @@
-import {
-  SwapStatusEnum,
-  isTerminalStatus,
-} from '@app/swap/enums/SwapStatusEnum';
-import { SwapRecordType } from '@app/swap/types/SwapRecordType';
-import { TrackResponseType } from '@app/swap/types/TrackResponseType';
+import { SwapStatusEnum, isTerminalStatus } from '@app/swap/SwapStatusEnum';
+import { SwapRecordType } from '@app/swap/SwapRecordType';
+import { TrackResponseType } from '@app/swap/TrackResponseType';
 import { mapSwapStatus, mapTrackingStatus } from './statusMapping';
 import { hasDepositEvidence } from '@app/swap/depositEvidence';
 

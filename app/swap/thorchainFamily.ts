@@ -1,4 +1,4 @@
-import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
+import { SwapKitProviderEnum } from './SwapKitProviderEnum';
 
 /**
  * Whether a provider is THORChain or the Mayachain fork of it, in either the

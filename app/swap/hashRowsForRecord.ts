@@ -1,6 +1,6 @@
-import { isRealLegHash } from './providers/trackUpdateBase';
+import { isRealLegHash } from './trackUpdateBase';
 import { legChain } from './legChains';
-import type { SwapRecordType } from './types/SwapRecordType';
+import type { SwapRecordType } from './SwapRecordType';
 
 /** One transaction the detail view offers, under the name that swap gives it. */
 export type HashRowType = {

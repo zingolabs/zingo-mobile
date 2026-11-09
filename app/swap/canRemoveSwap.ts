@@ -1,6 +1,6 @@
-import { SwapStatusEnum } from './enums/SwapStatusEnum';
+import { SwapStatusEnum } from './SwapStatusEnum';
 import { hasDepositEvidence } from './depositEvidence';
-import { SwapRecordType } from './types/SwapRecordType';
+import { SwapRecordType } from './SwapRecordType';
 
 /** How long `/track` gets to recognise a deposit hash. */
 export const UNKNOWN_HASH_MS = 24 * 60 * 60 * 1000;

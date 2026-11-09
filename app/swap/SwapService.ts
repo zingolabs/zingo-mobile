@@ -1,20 +1,20 @@
-import { ChainNameEnum } from './enums/ChainNameEnum';
+import { ChainNameEnum } from './ChainNameEnum';
 import { MidgardClient, findSwapByInboundHash } from './MidgardClient';
 import { SwapKitClient } from './SwapKitClient';
 import { SwapPoller, buildTrackParams } from './SwapPoller';
-import type { TrackResponseType } from './types/TrackResponseType';
+import type { TrackResponseType } from './TrackResponseType';
 import { SwapStore } from './SwapStore';
 import { TokenCatalog } from './TokenCatalog';
-import { BroadcastStatusEnum } from './enums/BroadcastStatusEnum';
-import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
-import { SwapErrorCategoryEnum } from './enums/SwapErrorCategoryEnum';
-import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
+import { BroadcastStatusEnum } from './BroadcastStatusEnum';
+import { SwapDirectionEnum } from './SwapDirectionEnum';
+import { SwapErrorCategoryEnum } from './SwapErrorCategoryEnum';
+import { SwapKitProviderEnum } from './SwapKitProviderEnum';
 import {
   fetchMayaShieldedMemoTarget,
   shieldedMemoAddressFromSwap,
 } from './mayaShieldedMemo';
 import { lacksDelivery } from './deliveryWatch';
-import { SwapStatusEnum, isTerminalStatus } from './enums/SwapStatusEnum';
+import { SwapStatusEnum, isTerminalStatus } from './SwapStatusEnum';
 import { DEPOSIT_WAIT_MS } from './depositDeadline';
 import { hasDepositEvidence } from './depositEvidence';
 import { SwapKitError } from './errors';
@@ -23,19 +23,19 @@ import type { PayoutNoteType } from './payoutNotes';
 import { awaitsSaleDeposit, claimSaleDeposit, paysSale } from './saleDeposits';
 import type { SentPaymentType } from './saleDeposits';
 import { isMemoTooLong, paysPurchaseShielded } from './shieldedPurchase';
-import type { SwapResponseType } from './types/SwapResponseType';
+import type { SwapResponseType } from './SwapResponseType';
 import {
   ProviderRegistry,
   createDefaultProviderRegistry,
-} from './providers/ProviderRegistry';
-import { TRACK_CAPTURE_VERSION } from './providers/trackUpdateBase';
-import { DepositInstructionsType } from './types/DepositInstructionsType';
-import { FiatValueBasisType } from './types/FiatValueBasisType';
-import { QuoteResponseType, QuoteRouteType } from './types/QuoteResponseType';
-import { RouteOptionType } from './types/RouteOptionType';
-import { SwapAssetType } from './types/SwapAssetType';
-import { SwapRecordType } from './types/SwapRecordType';
-import { TokenEntryType } from './types/TokensResponseType';
+} from './ProviderRegistry';
+import { TRACK_CAPTURE_VERSION } from './trackUpdateBase';
+import { DepositInstructionsType } from './DepositInstructionsType';
+import { FiatValueBasisType } from './FiatValueBasisType';
+import { QuoteResponseType, QuoteRouteType } from './QuoteResponseType';
+import { RouteOptionType } from './RouteOptionType';
+import { SwapAssetType } from './SwapAssetType';
+import { SwapRecordType } from './SwapRecordType';
+import { TokenEntryType } from './TokensResponseType';
 import { unavailableProviders } from './unavailableProviders';
 import type { UnavailableProviderType } from './unavailableProviders';
 

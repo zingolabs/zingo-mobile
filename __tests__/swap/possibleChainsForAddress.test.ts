@@ -1,4 +1,4 @@
-import { ChainNameEnum } from '@app/swap/enums/ChainNameEnum';
+import { ChainNameEnum } from '@app/swap/ChainNameEnum';
 import { possibleChainsForAddress } from '@app/swap/possibleChainsForAddress';
 
 // No address here is a Zcash one.

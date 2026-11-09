@@ -1,10 +1,10 @@
 import type { ValueTransferType } from '@app/AppState';
 import { ValueTransferKindEnum } from '@app/AppState/enums/ValueTransferKindEnum';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
-import { BroadcastStatusEnum } from './enums/BroadcastStatusEnum';
-import { SwapStatusEnum } from './enums/SwapStatusEnum';
+import { BroadcastStatusEnum } from './BroadcastStatusEnum';
+import { SwapStatusEnum } from './SwapStatusEnum';
 import { saleDepositRequest } from './saleDepositRequest';
-import type { SwapRecordType } from './types/SwapRecordType';
+import type { SwapRecordType } from './SwapRecordType';
 import { unsentSale } from './unsentSale';
 
 /** A payment this wallet sent, as a sale's deposit would show in it. */

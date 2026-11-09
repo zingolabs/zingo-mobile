@@ -1,10 +1,10 @@
 import { withStoreUpdate } from '../../__mocks__/dataMocks/swap/withStoreUpdate';
 import { SwapService } from '@app/swap/SwapService';
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
-import { createDefaultProviderRegistry } from '@app/swap/providers/ProviderRegistry';
-import { TRACK_CAPTURE_VERSION } from '@app/swap/providers/trackUpdateBase';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import { SwapStatusEnum } from '@app/swap/SwapStatusEnum';
+import { createDefaultProviderRegistry } from '@app/swap/ProviderRegistry';
+import { TRACK_CAPTURE_VERSION } from '@app/swap/trackUpdateBase';
 import {
   REFUND_HASH,
   REFUNDED_DEPOSIT_HASH,
@@ -14,9 +14,9 @@ import type { SwapKitClient } from '@app/swap/SwapKitClient';
 import type { SwapPoller } from '@app/swap/SwapPoller';
 import type { SwapStore } from '@app/swap/SwapStore';
 import type { TokenCatalog } from '@app/swap/TokenCatalog';
-import type { SwapAssetType } from '@app/swap/types/SwapAssetType';
-import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
-import type { TrackResponseType } from '@app/swap/types/TrackResponseType';
+import type { SwapAssetType } from '@app/swap/SwapAssetType';
+import type { SwapRecordType } from '@app/swap/SwapRecordType';
+import type { TrackResponseType } from '@app/swap/TrackResponseType';
 
 const ZEC: SwapAssetType = {
   swapKitId: 'ZEC.ZEC',

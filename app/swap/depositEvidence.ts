@@ -1,6 +1,6 @@
-import { BroadcastStatusEnum } from './enums/BroadcastStatusEnum';
-import { isRealLegHash } from './providers/trackUpdateBase';
-import { SwapRecordType } from './types/SwapRecordType';
+import { BroadcastStatusEnum } from './BroadcastStatusEnum';
+import { isRealLegHash } from './trackUpdateBase';
+import { SwapRecordType } from './SwapRecordType';
 
 /**
  * Whether the provider can already see a deposit for this swap.

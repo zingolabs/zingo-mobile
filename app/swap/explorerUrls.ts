@@ -1,12 +1,12 @@
 import { BlockExplorerEnum, ChainNameEnum } from '@app/AppState';
 import Utils from '@app/utils';
-import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
-import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
-import { isRealLegHash } from './providers/trackUpdateBase';
+import { SwapDirectionEnum } from './SwapDirectionEnum';
+import { SwapKitProviderEnum } from './SwapKitProviderEnum';
+import { isRealLegHash } from './trackUpdateBase';
 import { isThorchainFamily } from './thorchainFamily';
 import { providerShortLabel } from './providerLabels';
 import { legChain } from './legChains';
-import type { SwapRecordType } from './types/SwapRecordType';
+import type { SwapRecordType } from './SwapRecordType';
 
 /**
  * Per-chain block-explorer transaction URLs, keyed by SwapKit's short chain

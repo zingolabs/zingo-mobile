@@ -1,4 +1,4 @@
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
 import { providerCustody } from '@app/swap/providerLabels';
 
 describe('providerCustody', () => {

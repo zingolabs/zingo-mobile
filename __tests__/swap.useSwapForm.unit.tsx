@@ -10,8 +10,8 @@ jest.mock('@app/walletBackend', () => ({
 
 import { act, renderHook, waitFor } from '@testing-library/react-native';
 import { ChainNameEnum } from '@app/AppState';
-import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
-import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
+import { SwapKitProviderEnum } from '@app/swap/SwapKitProviderEnum';
+import { SwapDirectionEnum } from '@app/swap/SwapDirectionEnum';
 import type {
   QuoteInput,
   RouteOptionType,
