@@ -39,6 +39,7 @@ class MainApplication : Application(), ReactApplication {
         super.onCreate()
         context = WeakReference(applicationContext)
         loadReactNative(this)
+        NotifeeResidue.purge(this)
     }
 
     companion object {
