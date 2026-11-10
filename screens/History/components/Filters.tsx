@@ -23,7 +23,10 @@ export const HISTORY_FILTERS: ReadonlyArray<[HistoryFilter, string]> = [
   ['swaps', 'history.filter-swaps'],
 ];
 
-export type FilterKind = 'received' | 'sent' | 'shielded' | 'swaps';
+export type FilterKind = Exclude<HistoryFilter, 'all' | 'failed' | 'memo'>;
+
+export const kindOf = (picked: HistoryFilter): FilterKind | null =>
+  picked === 'all' || picked === 'failed' || picked === 'memo' ? null : picked;
 
 /** The one filter the History state holds, read back from its flags. */
 export function filterOf(
@@ -37,18 +40,7 @@ export function filterOf(
   if (memos) {
     return 'memo';
   }
-  switch (kind) {
-    case 'received':
-      return 'received';
-    case 'sent':
-      return 'sent';
-    case 'shielded':
-      return 'shielded';
-    case 'swaps':
-      return 'swaps';
-    default:
-      return 'all';
-  }
+  return kind ?? 'all';
 }
 
 type FiltersProps = {
@@ -87,17 +79,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
     setFilterWithFunds(false);
     setFilterFailed(picked === 'failed');
     setFilterMemos(picked === 'memo');
-    setFilterKind(
-      picked === 'received'
-        ? 'received'
-        : picked === 'sent'
-          ? 'sent'
-          : picked === 'shielded'
-            ? 'shielded'
-            : picked === 'swaps'
-              ? 'swaps'
-              : null,
-    );
+    setFilterKind(kindOf(picked));
     closeSheet();
   };
 

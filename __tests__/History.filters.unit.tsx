@@ -9,7 +9,7 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import Filters, { filterOf } from '@screens/History/components/Filters';
+import Filters, { filterOf, kindOf } from '@screens/History/components/Filters';
 
 describe('History filters', () => {
   test('Tests that the one filter is read back from the flags when several are stored', () => {
@@ -17,6 +17,14 @@ describe('History filters', () => {
     expect(filterOf('swaps', false, false)).toBe('swaps');
     expect(filterOf('sent', true, false)).toBe('failed');
     expect(filterOf(null, false, true)).toBe('memo');
+  });
+
+  test('Tests that kindOf returns the kind when the picked filter is one, and null when it is all, failed or memo', () => {
+    expect(kindOf('swaps')).toBe('swaps');
+    expect(kindOf('received')).toBe('received');
+    expect(kindOf('all')).toBeNull();
+    expect(kindOf('failed')).toBeNull();
+    expect(kindOf('memo')).toBeNull();
   });
 
   test('Tests that Apply leaves exactly one filter on when a chip is picked', () => {

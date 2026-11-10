@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { FlatCompat } = require('@eslint/eslintrc');
+const { filesUnder } = require('./scripts/source_files');
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
@@ -95,16 +96,8 @@ const geometryLock = [
  * here, so PRs that clean different files never touch the same lines.
  */
 const GAP_MARKER = /^\/\* geometry-gap: /;
-const sourcesUnder = dir =>
-  fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
-    const file = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      return sourcesUnder(file);
-    }
-    return /\.tsx?$/.test(entry.name) ? [file] : [];
-  });
 const geometryGaps = ['app/navigation', 'screens', 'ui']
-  .flatMap(dir => sourcesUnder(path.join(__dirname, dir)))
+  .flatMap(dir => filesUnder(path.join(__dirname, dir), /\.tsx?$/))
   .filter(file => GAP_MARKER.test(fs.readFileSync(file, 'utf8')))
   .map(file => path.relative(__dirname, file).split(path.sep).join('/'));
 

@@ -15,7 +15,7 @@
 //   tsx scripts/react_compiler_report.mts --json=out.json     also write JSON
 
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
@@ -36,6 +36,7 @@ import {
   type Transform,
   type Uncompiled,
 } from './react_compiler_skips';
+import { filesUnder } from './source_files';
 
 const require_ = createRequire(import.meta.url);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -148,15 +149,6 @@ const babelOptions: TransformOptions = {
 
 const EXTENSIONS = /\.(ts|tsx|js|jsx)$/;
 
-function walk(dir: string, out: string[] = []): string[] {
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) walk(full, out);
-    else if (EXTENSIONS.test(entry.name) && sources(full)) out.push(full);
-  }
-  return out;
-}
-
 function changedFiles(base: string): string[] {
   const names = new Set([
     ...gitLines('diff', '--name-only', base, 'HEAD'),
@@ -186,7 +178,9 @@ function filesInBase(base: string, files: string[]): string[] {
       ...files.map(file => renames.get(relOf(file)) ?? relOf(file)),
     ),
   );
-  return files.filter(file => present.has(renames.get(relOf(file)) ?? relOf(file)));
+  return files.filter(file =>
+    present.has(renames.get(relOf(file)) ?? relOf(file)),
+  );
 }
 
 const baseCode =
@@ -234,7 +228,9 @@ const scopeDirs = ['app', 'screens', 'ui'];
 const files =
   target.kind === 'base'
     ? changedFiles(target.sha)
-    : scopeDirs.flatMap(dir => walk(path.join(ROOT, dir)));
+    : scopeDirs.flatMap(dir =>
+        filesUnder(path.join(ROOT, dir), EXTENSIONS).filter(sources),
+      );
 if (files.length === 0) {
   console.log(
     `no in-scope files ${target.kind === 'base' ? `changed against ${target.ref}` : 'found'}`,
@@ -242,7 +238,13 @@ if (files.length === 0) {
   process.exit(0);
 }
 if (target.kind === 'base') {
-  for (const line of gitLines('diff', '--name-status', '-M', target.sha, 'HEAD')) {
+  for (const line of gitLines(
+    'diff',
+    '--name-status',
+    '-M',
+    target.sha,
+    'HEAD',
+  )) {
     const [status, from, to] = line.split('\t');
     if (status.startsWith('R') && from && to) renames.set(to, from);
   }

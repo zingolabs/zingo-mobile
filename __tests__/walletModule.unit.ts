@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import {
@@ -9,17 +9,14 @@ import {
   reexports,
   type Source,
 } from '../scripts/module_rules';
+import { filesUnder } from '../scripts/source_files';
 
 const root = path.join(__dirname, '..');
 
 const under = (dir: string): string[] =>
-  readdirSync(path.join(root, dir), { withFileTypes: true }).flatMap(entry => {
-    const file = `${dir}/${entry.name}`;
-    if (entry.isDirectory()) {
-      return under(file);
-    }
-    return /\.tsx?$/.test(entry.name) ? [file] : [];
-  });
+  filesUnder(path.join(root, dir), /\.tsx?$/).map(file =>
+    path.relative(root, file).split(path.sep).join('/'),
+  );
 
 const read = (file: string): Source => ({
   path: file,
