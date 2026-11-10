@@ -9,6 +9,7 @@ import Svg, {
   Path,
   Stop,
   Text as SvgText,
+  type ColumnMajorTransformMatrix,
 } from 'react-native-svg';
 import Animated, {
   Easing,
@@ -33,7 +34,10 @@ import { samplePath } from './pathPoints';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-const AnimatedG = Animated.createAnimatedComponent(G);
+/** A group whose `matrix`, the native transform, can be animated: see `turnAbout`. */
+const AnimatedG = Animated.createAnimatedComponent(
+  G<{ matrix?: ColumnMajorTransformMatrix }>,
+);
 
 const WIDTH = 300;
 const HEIGHT = 220;
@@ -170,18 +174,32 @@ const SPARKS = [
   { x: -17, y: -9 },
 ];
 
-/** The sprout is drawn large and shown at 56%: this viewBox places it. */
-const PLANT_SCALE = 0.56;
-const PLANT_X = 14;
-const PLANT_Y = 51.5;
-const PLANT_BOX = `${-PLANT_X / PLANT_SCALE} ${-PLANT_Y / PLANT_SCALE} ${WIDTH / PLANT_SCALE} ${HEIGHT / PLANT_SCALE}`;
-const inPlant = (x: number, y: number) =>
-  `${PLANT_X + x * PLANT_SCALE}px ${PLANT_Y + y * PLANT_SCALE}px`;
+/**
+ * The sprout is drawn large and shown at 56%, by a group in the drawing's own
+ * 300 x 220 Svg. Scaled by a viewBox instead, its moving parts vanished on
+ * Android for as long as they moved.
+ */
+const PLANT = 'translate(14 51.5) scale(0.56)';
 const COIN = { x: 75.15, y: 258.14 };
-const COIN_ORIGIN = inPlant(COIN.x, COIN.y);
-const LEFT_LEAF_ORIGIN = inPlant(71.67, 221.47);
-const RIGHT_LEAF_ORIGIN = inPlant(75.15, 203.48);
+const LEFT_LEAF_BASE = { x: 71.67, y: 221.47 };
+const RIGHT_LEAF_BASE = { x: 75.15, y: 203.48 };
 const STEM_LENGTH = 84.526;
+
+/**
+ * The `matrix` of a group scaled by `scale` and turned `deg` about `at`: Reanimated
+ * hands animated props to the native view as they are, and `matrix` is the only
+ * transform the native group reads.
+ */
+const turnAbout = (
+  at: { x: number; y: number },
+  deg: number,
+  scale = 1,
+): ColumnMajorTransformMatrix => {
+  'worklet';
+  const a = scale * Math.cos((deg * Math.PI) / 180);
+  const b = scale * Math.sin((deg * Math.PI) / 180);
+  return [a, b, -b, a, at.x - a * at.x + b * at.y, at.y - b * at.x - a * at.y];
+};
 
 const TRIP_EASE = Easing.bezier(0.45, 0, 0.25, 1);
 const REDUCE = { reduceMotion: ReduceMotion.System };
@@ -359,12 +377,6 @@ const scene = {
   height: HEIGHT,
 } as const;
 const svgStyle = { overflow: 'visible' } as const;
-
-const PlantSvg = ({ children }: { children: React.ReactNode }) => (
-  <Svg width={WIDTH} height={HEIGHT} viewBox={PLANT_BOX} style={svgStyle}>
-    {children}
-  </Svg>
-);
 
 const LeafGradient = ({
   id,
@@ -1215,28 +1227,27 @@ export default function SendFlight({
   const stemWiltProps = useAnimatedProps(() => ({
     strokeDashoffset: STEM_LENGTH * (1 - stem.value),
   }));
-  const leftLeafStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: leftLeaf.value * leftHappy.value },
-      {
-        rotate: `${(flying ? -7 * wave(clock.value) : 0) - 34 * wilt.value}deg`,
-      },
-    ],
+  const leftLeafProps = useAnimatedProps(() => ({
+    matrix: turnAbout(
+      LEFT_LEAF_BASE,
+      (flying ? -7 * wave(clock.value) : 0) - 34 * wilt.value,
+      leftLeaf.value * leftHappy.value,
+    ),
   }));
-  const rightLeafStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: rightLeaf.value * rightHappy.value },
-      {
-        rotate: `${(flying ? -7 * wave((clock.value + 300 / TRIP_MS) % 1) : 0) + 30 * wilt.value}deg`,
-      },
-    ],
+  const rightLeafProps = useAnimatedProps(() => ({
+    matrix: turnAbout(
+      RIGHT_LEAF_BASE,
+      (flying ? -7 * wave((clock.value + 300 / TRIP_MS) % 1) : 0) +
+        30 * wilt.value,
+      rightLeaf.value * rightHappy.value,
+    ),
   }));
-  const coinStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: building ? 1 + 0.07 * wave(beat.value) : 1 }],
+  const coinProps = useAnimatedProps(() => ({
+    matrix: turnAbout(COIN, 0, building ? 1 + 0.07 * wave(beat.value) : 1),
   }));
-  const ringStyle = useAnimatedStyle(() => ({
+  const ringProps = useAnimatedProps(() => ({
     opacity: ring.value,
-    transform: [{ rotate: `${spin.value * 360}deg` }],
+    matrix: turnAbout(COIN, spin.value * 360),
   }));
   const poolStyle = useAnimatedStyle(() => ({ opacity: pool.value }));
   const orbitStyle = useAnimatedStyle(() => ({
@@ -1333,8 +1344,8 @@ export default function SendFlight({
           )}
         </Svg>
 
-        <View style={scene}>
-          <PlantSvg>
+        <Svg width={WIDTH} height={HEIGHT} style={[scene, svgStyle]}>
+          <G transform={PLANT}>
             <Path
               d="M77.93 274.75C120.97 274.75 155.86 269.48 155.86 262.99C155.86 256.49 120.97 251.23 77.93 251.23C34.89 251.23 0 256.49 0 262.99C0 269.48 34.89 274.75 77.93 274.75Z"
               fill={art.ground}
@@ -1371,139 +1382,125 @@ export default function SendFlight({
                 />
               </Wilted>
             )}
-          </PlantSvg>
-        </View>
 
-        <Animated.View
-          style={[scene, { transformOrigin: LEFT_LEAF_ORIGIN }, leftLeafStyle]}
-        >
-          <PlantSvg>
-            <Defs>
-              <LeafGradient id="left" x1={30.6} y1={189} x2={62.3} y2={228.9} />
-            </Defs>
-            <Path
-              d="M71.67 221.47C50.79 219.4 33.4 205.56 30.62 188.95C55.66 188.95 70.28 200.72 71.67 221.47Z"
-              fill="url(#left)"
-            />
-            <Path
-              d="M70.28 219.4C57.29 206.94 45.69 198.64 35.49 194.49"
-              strokeWidth={1.6}
-              stroke={art.vein}
-              fill="none"
-            />
-            {wilting && (
-              <Wilted wilt={wilt}>
-                <Defs>
-                  <LeafGradient
-                    id="leftWilted"
-                    x1={30.6}
-                    y1={189}
-                    x2={62.3}
-                    y2={228.9}
-                    shades={art.wilted}
-                  />
-                </Defs>
-                <Path
-                  d="M71.67 221.47C50.79 219.4 33.4 205.56 30.62 188.95C55.66 188.95 70.28 200.72 71.67 221.47Z"
-                  fill="url(#leftWilted)"
+            <AnimatedG animatedProps={leftLeafProps}>
+              <Defs>
+                <LeafGradient
+                  id="left"
+                  x1={30.6}
+                  y1={189}
+                  x2={62.3}
+                  y2={228.9}
                 />
-                <Path
-                  d="M70.28 219.4C57.29 206.94 45.69 198.64 35.49 194.49"
-                  strokeWidth={1.6}
-                  stroke={art.wilted.vein}
-                  fill="none"
-                />
-              </Wilted>
-            )}
-          </PlantSvg>
-        </Animated.View>
-        <Animated.View
-          style={[
-            scene,
-            { transformOrigin: RIGHT_LEAF_ORIGIN },
-            rightLeafStyle,
-          ]}
-        >
-          <PlantSvg>
-            <Defs>
-              <LeafGradient
-                id="right"
-                x1={75.1}
-                y1={171.5}
-                x2={106.7}
-                y2={208.6}
+              </Defs>
+              <Path
+                d="M71.67 221.47C50.79 219.4 33.4 205.56 30.62 188.95C55.66 188.95 70.28 200.72 71.67 221.47Z"
+                fill="url(#left)"
               />
-            </Defs>
-            <Path
-              d="M75.15 203.48C77.93 182.73 93.93 170.27 112.72 171.65C109.24 191.03 96.72 204.17 75.15 203.48Z"
-              fill="url(#right)"
-            />
-            <Path
-              d="M78.63 201.41C87.9 188.49 97.41 180.42 107.15 177.19"
-              strokeWidth={1.6}
-              stroke={art.vein}
-              fill="none"
-            />
-            {wilting && (
-              <Wilted wilt={wilt}>
-                <Defs>
-                  <LeafGradient
-                    id="rightWilted"
-                    x1={75.1}
-                    y1={171.5}
-                    x2={106.7}
-                    y2={208.6}
-                    shades={art.wilted}
+              <Path
+                d="M70.28 219.4C57.29 206.94 45.69 198.64 35.49 194.49"
+                strokeWidth={1.6}
+                stroke={art.vein}
+                fill="none"
+              />
+              {wilting && (
+                <Wilted wilt={wilt}>
+                  <Defs>
+                    <LeafGradient
+                      id="leftWilted"
+                      x1={30.6}
+                      y1={189}
+                      x2={62.3}
+                      y2={228.9}
+                      shades={art.wilted}
+                    />
+                  </Defs>
+                  <Path
+                    d="M71.67 221.47C50.79 219.4 33.4 205.56 30.62 188.95C55.66 188.95 70.28 200.72 71.67 221.47Z"
+                    fill="url(#leftWilted)"
                   />
-                </Defs>
-                <Path
-                  d="M75.15 203.48C77.93 182.73 93.93 170.27 112.72 171.65C109.24 191.03 96.72 204.17 75.15 203.48Z"
-                  fill="url(#rightWilted)"
+                  <Path
+                    d="M70.28 219.4C57.29 206.94 45.69 198.64 35.49 194.49"
+                    strokeWidth={1.6}
+                    stroke={art.wilted.vein}
+                    fill="none"
+                  />
+                </Wilted>
+              )}
+            </AnimatedG>
+            <AnimatedG animatedProps={rightLeafProps}>
+              <Defs>
+                <LeafGradient
+                  id="right"
+                  x1={75.1}
+                  y1={171.5}
+                  x2={106.7}
+                  y2={208.6}
                 />
-                <Path
-                  d="M78.63 201.41C87.9 188.49 97.41 180.42 107.15 177.19"
-                  strokeWidth={1.6}
-                  stroke={art.wilted.vein}
-                  fill="none"
-                />
-              </Wilted>
-            )}
-          </PlantSvg>
-        </Animated.View>
+              </Defs>
+              <Path
+                d="M75.15 203.48C77.93 182.73 93.93 170.27 112.72 171.65C109.24 191.03 96.72 204.17 75.15 203.48Z"
+                fill="url(#right)"
+              />
+              <Path
+                d="M78.63 201.41C87.9 188.49 97.41 180.42 107.15 177.19"
+                strokeWidth={1.6}
+                stroke={art.vein}
+                fill="none"
+              />
+              {wilting && (
+                <Wilted wilt={wilt}>
+                  <Defs>
+                    <LeafGradient
+                      id="rightWilted"
+                      x1={75.1}
+                      y1={171.5}
+                      x2={106.7}
+                      y2={208.6}
+                      shades={art.wilted}
+                    />
+                  </Defs>
+                  <Path
+                    d="M75.15 203.48C77.93 182.73 93.93 170.27 112.72 171.65C109.24 191.03 96.72 204.17 75.15 203.48Z"
+                    fill="url(#rightWilted)"
+                  />
+                  <Path
+                    d="M78.63 201.41C87.9 188.49 97.41 180.42 107.15 177.19"
+                    strokeWidth={1.6}
+                    stroke={art.wilted.vein}
+                    fill="none"
+                  />
+                </Wilted>
+              )}
+            </AnimatedG>
 
-        <Animated.View
-          style={[scene, { transformOrigin: COIN_ORIGIN }, ringStyle]}
-        >
-          <PlantSvg>
-            <Circle
-              cx={COIN.x}
-              cy={COIN.y}
-              r={19}
-              fill="none"
-              stroke={wilting ? art.failed : art.coinRing}
-              strokeWidth={1.6}
-              strokeDasharray={[3, 4]}
-            />
-          </PlantSvg>
-        </Animated.View>
-        <Animated.View
-          style={[scene, { transformOrigin: COIN_ORIGIN }, coinStyle]}
-        >
-          <PlantSvg>
-            <Circle
-              cx={COIN.x}
-              cy={COIN.y}
-              r={11.76}
-              fill={art.coinFill}
-              strokeWidth={2}
-              stroke={art.coinRing}
-            />
-            <Path
-              d="M74.25 249.6H76.05V252.3H79.9V254.5L73.5 261.8H79.9V264H76.05V266.7H74.25V264H70.4V261.8L76.8 254.5H70.4V252.3H74.25Z"
-              fill={art.coinMark}
-            />
-          </PlantSvg>
-        </Animated.View>
+            <AnimatedG animatedProps={ringProps}>
+              <Circle
+                cx={COIN.x}
+                cy={COIN.y}
+                r={19}
+                fill="none"
+                stroke={wilting ? art.failed : art.coinRing}
+                strokeWidth={1.6}
+                strokeDasharray={[3, 4]}
+              />
+            </AnimatedG>
+            <AnimatedG animatedProps={coinProps}>
+              <Circle
+                cx={COIN.x}
+                cy={COIN.y}
+                r={11.76}
+                fill={art.coinFill}
+                strokeWidth={2}
+                stroke={art.coinRing}
+              />
+              <Path
+                d="M74.25 249.6H76.05V252.3H79.9V254.5L73.5 261.8H79.9V264H76.05V266.7H74.25V264H70.4V261.8L76.8 254.5H70.4V252.3H74.25Z"
+                fill={art.coinMark}
+              />
+            </AnimatedG>
+          </G>
+        </Svg>
 
         <Animated.View style={[scene, poolStyle]}>
           <Animated.View
