@@ -10,6 +10,7 @@ import {
   buildDepositQr,
   formatAmountForDisplay,
   isEvmSourceChain,
+  isTokenAsset,
   isUtxoSourceChain,
   memoToHexCalldata,
   providerShortLabel,
@@ -73,11 +74,23 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
   const utxo = isUtxoSourceChain(asset.chain);
   const bitcoin = asset.chain === 'BTC';
 
-  const memoHint = isEvmSourceChain(asset.chain)
-    ? t('swap.memo-hint-evm')
-    : bitcoin
-      ? t('swap.memo-hint-btc')
-      : t('swap.memo-hint-other');
+  /** A token transfer has no data field of its own: the memo is the wallet's to add. */
+  const token = isTokenAsset(asset);
+  const memoHint = token
+    ? t('swap.memo-hint-token')
+    : isEvmSourceChain(asset.chain)
+      ? t('swap.memo-hint-evm')
+      : bitcoin
+        ? t('swap.memo-hint-btc')
+        : t('swap.memo-hint-other');
+  const provider = providerShortLabel(record.provider);
+  const amount = `${formatExactAmount(record.sellAmountHumanDecimal)} ${ticker}`;
+  /** What the code holds, said under it: a bare address leaves the amount to type. */
+  const qrCaption = memo
+    ? 'swap.qr-carries-memo'
+    : qr?.value === record.depositAddress
+      ? 'swap.qr-carries-address'
+      : 'swap.qr-carries-amount';
 
   const pill = (key: string, label: string, value: string) => {
     const done = copiedKey === key;
@@ -97,6 +110,16 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
 
   return (
     <View style={{ rowGap: space12 }}>
+      {/* Exchanges take their fee out of the withdrawal, which is what refunds these. */}
+      {showExactAmount && !memo && !paid && (
+        <Banner
+          testID="swap.deposit.exchange-fee"
+          tone="warning"
+          title={t('swap.exact-amount-exchange')
+            .replace('{amount}', amount)
+            .replace('{provider}', provider)}
+        />
+      )}
       <View
         style={{
           alignItems: 'center',
@@ -125,11 +148,21 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
               tone="muted"
               style={{ textAlign: 'center', marginTop: 12 }}
             >
-              {t(memo ? 'swap.qr-carries-memo' : 'swap.qr-carries-amount')}
+              {t(qrCaption)}
             </Text>
           </>
         ) : !paid && memo ? (
-          <Banner tone="warning" title={t('swap.qr-no-memo')} />
+          <Banner
+            testID="swap.deposit.no-qr"
+            tone="warning"
+            title={
+              token
+                ? t('swap.qr-token-memo')
+                    .replace('{coin}', ticker)
+                    .replace('{provider}', provider)
+                : t('swap.qr-no-memo')
+            }
+          />
         ) : null}
         <Text
           variant="address"
@@ -164,7 +197,7 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
         rows={[
           {
             label: t(memo ? 'swap.amount' : 'swap.send-exactly'),
-            value: `${formatExactAmount(record.sellAmountHumanDecimal)} ${ticker}`,
+            value: amount,
             tip: memo ? undefined : t('swap.tip-exact'),
             copy: record.sellAmountHumanDecimal,
             mono: false,
@@ -200,7 +233,7 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
                           }
                           onPress={() => copy('memo', memo)}
                         />
-                        {isEvmSourceChain(asset.chain) && (
+                        {isEvmSourceChain(asset.chain) && !token && (
                           <Button
                             variant="text"
                             size="small"
@@ -227,7 +260,7 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
           },
           {
             label: t('swap.provider'),
-            value: providerShortLabel(record.provider),
+            value: provider,
           },
         ]}
       />

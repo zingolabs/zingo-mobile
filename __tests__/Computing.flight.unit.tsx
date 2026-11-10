@@ -1,3 +1,5 @@
+jest.mock('@app/services/sendEmail', () => ({ sendEmail: jest.fn() }));
+
 // The shared mock of the bottom sheet drops the footer. The buttons are in
 // the footer, and this mock renders it below the sheet's children.
 jest.mock('@gorhom/bottom-sheet', () => {
@@ -20,7 +22,9 @@ import 'react-native';
 import React from 'react';
 
 import { act, fireEvent, render } from '@testing-library/react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
+import { sendEmail } from '@app/services/sendEmail';
 import ComputingTxContent from '@screens/Computing/ComputingTxContent';
 import {
   ContextAppLoadedProvider,
@@ -130,16 +134,14 @@ describe('Computing flight', () => {
       row('abc', 'confirmed', 2),
     ]);
     expect(view.getByTestId('computing.flight.conf', hidden)).toBeTruthy();
-    expect(view.getAllByTestId('computing.block-filled', hidden)).toHaveLength(
-      2,
-    );
+    expect(view.getByTestId('computing.flight.filled.2', hidden)).toBeTruthy();
   });
 
   test('Tests that a send says Sent with how much and to whom when it has its confirmations', () => {
     const view = computing({ phase: 'created', txids: ['abc'], subject }, [
       row('abc', 'confirmed', 3),
     ]);
-    expect(view.getByTestId('computing.sent')).toBeTruthy();
+    expect(view.getByTestId('computing.sent', hidden)).toBeTruthy();
     expect(view.getByTestId('computing.title')).toHaveTextContent(
       'send.sent-title',
     );
@@ -196,7 +198,7 @@ describe('Computing failures', () => {
       { phase: 'failed', stage: 'create', since: SINCE, subject },
       [row('old', 'failed')],
     );
-    expect(view.getByTestId('computing.failed')).toBeTruthy();
+    expect(view.getByTestId('computing.failed', hidden)).toBeTruthy();
     expect(view.getByTestId('computing.title')).toHaveTextContent(
       'send.fail-create-title',
     );
@@ -238,9 +240,135 @@ describe('Computing failures', () => {
     const view = computing({ phase: 'created', txids: ['abc'], subject }, [
       row('abc', 'failed'),
     ]);
-    expect(view.getByTestId('computing.failed')).toBeTruthy();
+    expect(view.getByTestId('computing.failed', hidden)).toBeTruthy();
     expect(view.getByTestId('computing.title')).toHaveTextContent(
       'send.fail-expired-title',
+    );
+  });
+
+  test('Tests that a send that could not be created wilts the sprout when the backend refuses it', () => {
+    const view = computing(
+      { phase: 'failed', stage: 'create', since: SINCE, subject },
+      [],
+    );
+    expect(view.getByTestId('computing.flight.build', hidden)).toBeTruthy();
+  });
+
+  test('Tests that a send that failed on its way falls from the route when it was not delivered', () => {
+    const view = computing(
+      { phase: 'failed', stage: 'send', since: SINCE, subject },
+      [row('abc', RPCValueTransfersStatusEnum.failed)],
+    );
+    expect(view.getByTestId('computing.flight.nym', hidden)).toBeTruthy();
+  });
+
+  test('Tests that a send expires through NYM when it was never seen in the mempool', () => {
+    const view = computing({ phase: 'created', txids: ['abc'], subject }, [
+      row('abc', RPCValueTransfersStatusEnum.transmitted),
+    ]);
+    view.rerender(
+      <ContextAppLoadedProvider
+        value={{
+          ...defaultAppContextLoaded,
+          translate,
+          valueTransfers: [row('abc', RPCValueTransfersStatusEnum.failed)],
+        }}
+      >
+        <ComputingTxContent
+          navigation={mockNavigation}
+          route={{
+            key: 'Key-1',
+            name: Route.Computing,
+            params: { phase: 'created', txids: ['abc'], subject },
+          }}
+        />
+      </ContextAppLoadedProvider>,
+    );
+    expect(view.getByTestId('computing.flight.nymexp', hidden)).toBeTruthy();
+    act(() => jest.advanceTimersByTime(1_000));
+    expect(view.getByTestId('computing.sub')).toHaveTextContent(
+      'send.fail-expired-nym-body',
+    );
+  });
+
+  test('Tests that a send expires in the mempool when it had reached it', () => {
+    const view = computing({ phase: 'created', txids: ['abc'], subject }, [
+      row('abc', RPCValueTransfersStatusEnum.mempool),
+    ]);
+    view.rerender(
+      <ContextAppLoadedProvider
+        value={{
+          ...defaultAppContextLoaded,
+          translate,
+          valueTransfers: [row('abc', RPCValueTransfersStatusEnum.failed)],
+        }}
+      >
+        <ComputingTxContent
+          navigation={mockNavigation}
+          route={{
+            key: 'Key-1',
+            name: Route.Computing,
+            params: { phase: 'created', txids: ['abc'], subject },
+          }}
+        />
+      </ContextAppLoadedProvider>,
+    );
+    expect(view.getByTestId('computing.flight.poolexp', hidden)).toBeTruthy();
+    act(() => jest.advanceTimersByTime(1_000));
+    expect(view.getByTestId('computing.sub')).toHaveTextContent(
+      'send.fail-expired-pool-body',
+    );
+  });
+
+  test('Tests that a send that failed to send goes on when its transaction turns up in the mempool', () => {
+    const view = computing(
+      { phase: 'failed', stage: 'send', since: SINCE, subject },
+      [row('abc', RPCValueTransfersStatusEnum.mempool)],
+    );
+    expect(view.queryByTestId('computing.failed', hidden)).toBeNull();
+    expect(view.getByTestId('computing.flight.pool', hidden)).toBeTruthy();
+  });
+
+  test('Tests that a TEX send stays failed when only its hop is in the mempool', () => {
+    const view = computing(
+      { phase: 'failed', stage: 'send', since: SINCE, subject },
+      [
+        row(
+          'hop',
+          RPCValueTransfersStatusEnum.mempool,
+          0,
+          ValueTransferKindEnum.SendToSelf,
+        ),
+        row('pay', RPCValueTransfersStatusEnum.failed),
+      ],
+    );
+    expect(view.getByTestId('computing.failed', hidden)).toBeTruthy();
+  });
+
+  test('Tests that the error can be copied and mailed when the send could not be created', () => {
+    const view = computing(
+      {
+        phase: 'failed',
+        stage: 'create',
+        since: SINCE,
+        subject,
+        failure: { kind: 'verbatim', text: 'checkpoint not found' },
+      },
+      [],
+    );
+    expect(view.queryByTestId('computing.error.text')).toBeNull();
+    fireEvent.press(view.getByTestId('computing.error.toggle'));
+    expect(view.getByTestId('computing.error.text')).toHaveTextContent(
+      'checkpoint not found',
+    );
+    fireEvent.press(view.getByTestId('computing.error.copy'));
+    expect(Clipboard.setString).toHaveBeenCalledWith('checkpoint not found');
+    fireEvent.press(view.getByTestId('computing.error.email'));
+    expect(sendEmail).toHaveBeenCalledWith(
+      translate,
+      '',
+      'send.fail-create-title',
+      'checkpoint not found',
     );
   });
 });

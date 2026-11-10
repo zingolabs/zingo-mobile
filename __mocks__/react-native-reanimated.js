@@ -79,7 +79,16 @@ const Extrapolation = {
 // only exercise the mock's own stand-ins.
 const useAnimatedStyle = jest.fn(() => ({}));
 const useAnimatedProps = jest.fn(() => ({}));
-const useSharedValue = jest.fn(v => ({ value: v }));
+const useSharedValue = jest.fn(v => {
+  const shared = {
+    value: v,
+    get: () => shared.value,
+    set: next => {
+      shared.value = next;
+    },
+  };
+  return shared;
+});
 const makeMutable = jest.fn(v => ({ value: v }));
 const useDerivedValue = jest.fn(fn => ({ value: fn() }));
 const useAnimatedGestureHandler = jest.fn(() => ({}));
