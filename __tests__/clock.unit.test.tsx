@@ -29,7 +29,7 @@ function JournalReader() {
 }
 
 describe('clock', () => {
-  test('Tests that a reader of the clock repaints when the next minute strikes', () => {
+  test('Tests that a reader of the clock repaints when the minute ticks', () => {
     const screen = render(<NowReader />);
     const before = screen.getByTestId('now').props.children;
     act(() => {
