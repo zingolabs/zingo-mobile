@@ -29,6 +29,7 @@ import {
   space8,
   space16,
   space20,
+  space24,
 } from '@app/theme';
 
 import {
@@ -44,6 +45,7 @@ import {
 } from '@app/AppState';
 import { HomeTabNavigation, HomeTabScreenProps } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
+import EmptySprout from '@ui/widgets/EmptySprout';
 import AppSheet from '@ui/primitives/AppSheet';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import RingBorder from '@ui/primitives/RingBorder';
@@ -88,6 +90,7 @@ import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTr
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import Filters, { HISTORY_FILTERS, filterOf } from './components/Filters';
 import Text from '@ui/primitives/Text';
+import Button from '@ui/primitives/Button';
 import FreshGlow from './components/FreshGlow';
 import { useFreshRows } from './useFreshRows';
 import { FiltersIcon } from '@ui/primitives/Icons/FiltersIcon';
@@ -1068,6 +1071,44 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                     </View>
                     {fades}
                   </>
+                ) : mergedValueTransfers.length === 0 ? (
+                  <View
+                    testID="history.empty"
+                    style={{
+                      flex: 1,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      paddingHorizontal: space20,
+                      paddingBottom: 116,
+                    }}
+                  >
+                    <EmptySprout />
+                    <Text
+                      variant="subtitle"
+                      style={{ marginTop: space20, textAlign: 'center' }}
+                    >
+                      {translate('history.empty-title') as string}
+                    </Text>
+                    <Text
+                      variant="bodySmall"
+                      tone="muted"
+                      style={{
+                        marginTop: space8,
+                        maxWidth: 290,
+                        textAlign: 'center',
+                      }}
+                    >
+                      {translate('history.empty-text') as string}
+                    </Text>
+                    <Button
+                      testID="history.empty.receive"
+                      variant="primary"
+                      inline
+                      title={translate('history.empty-receive') as string}
+                      onPress={() => navigation.navigate(Route.Receive)}
+                      style={{ marginTop: space24 }}
+                    />
+                  </View>
                 ) : (
                   <View
                     style={{
