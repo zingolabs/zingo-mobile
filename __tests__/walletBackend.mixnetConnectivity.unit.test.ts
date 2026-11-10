@@ -177,6 +177,37 @@ describe('the mixnet follows the session connectivity', () => {
     backend.stopMixnetPolling();
   });
 
+  // A Beta 346 send retry reopened the wallet on another server and met the
+  // new client with no mixnet: "the Nym mixnet is not enabled".
+  it('arms it again for a reopened wallet', async () => {
+    const { backend, start, published } = harness(ONLINE);
+    await backend.configure();
+    await flushPromises();
+
+    backend.walletReopened();
+    await backend.configure();
+    await flushPromises();
+
+    expect(start).toHaveBeenCalledTimes(2);
+    expect(mockedBridge.attachMixnet).toHaveBeenCalledTimes(2);
+    expect(published[published.length - 1].statusKey).toBe(
+      'mixnet.status.ready',
+    );
+    backend.stopMixnetPolling();
+  });
+
+  it('leaves an Offline session off when its wallet is reopened', async () => {
+    const { backend, start } = harness(OFFLINE);
+    await backend.configure();
+    await flushPromises();
+
+    backend.walletReopened();
+    await flushPromises();
+
+    expect(start).not.toHaveBeenCalled();
+    backend.stopMixnetPolling();
+  });
+
   it('leaves the transport alone where the platform has none', async () => {
     const { backend, start, stop, published } = harness(OFFLINE, false);
 
