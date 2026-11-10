@@ -5,6 +5,7 @@ import {
   AccessibilityInfo,
   Animated,
   Easing,
+  StyleSheet,
   TextInput,
   View,
 } from 'react-native';
@@ -39,6 +40,19 @@ const SEAM = 4;
 const FLIP_SIZE = 40;
 /** A fresh price flashes green, at its strongest 30% of the way. */
 const FLASH_MS = 1100;
+
+/** Where a coin row sits in its card. */
+type RowBox = { x: number; y: number; height: number };
+const NO_ROW: RowBox = { x: 0, y: 0, height: 0 };
+const boxOf = ({ x, y, height }: RowBox): RowBox => ({ x, y, height });
+/** A chip on its way, centred on a row's height as the row centres it. */
+const travellingChip = (row: RowBox) => ({
+  position: 'absolute' as const,
+  top: 0,
+  left: row.x,
+  height: row.height,
+  justifyContent: 'center' as const,
+});
 
 export type PairCardsTexts = {
   youSend: string;
@@ -130,19 +144,26 @@ export default function PairCards({
       testID="swap.pick-asset"
     />
   );
+  /** The picker as it looks, edge and chevron included, for the copy that travels. */
+  const tokenChip = (surface: string) => (
+    <AssetButton token={token} surfaceColor={surface} onPress={onPickAsset} />
+  );
 
   const [sendH, setSendH] = useState<number>(0);
-  const progress = useRef(new Animated.Value(1)).current;
-  const flipped = useRef(isOutbound);
+  const [sendRow, setSendRow] = useState<RowBox>(NO_ROW);
+  const [receiveRow, setReceiveRow] = useState<RowBox>(NO_ROW);
+  const [progress] = useState(() => new Animated.Value(1));
+  /**
+   * Read once: asked on the press, the answer came after the flipped layout
+   * had painted, which showed the end state before the animation.
+   */
+  const [reduceMotion, setReduceMotion] = useState<boolean>(false);
   useEffect(() => {
-    if (flipped.current === isOutbound) {
-      return;
-    }
-    flipped.current = isOutbound;
-    AccessibilityInfo.isReduceMotionEnabled().then(reduce => {
-      if (reduce) {
-        return;
-      }
+    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion);
+  }, []);
+  /** Rewound before the state changes, so the flipped layout first paints at the start. */
+  const flip = () => {
+    if (!reduceMotion) {
       progress.setValue(0);
       Animated.timing(progress, {
         toValue: 1,
@@ -150,20 +171,31 @@ export default function PairCards({
         easing: Easing.bezier(0.2, 0, 0, 1),
         useNativeDriver: true,
       }).start();
-    });
-  }, [isOutbound, progress]);
-  /** Each row starts where the other one was, a card and the seam away. */
-  const travel = sendH + SEAM;
-  const sendRowShift = progress.interpolate({
+    }
+    onFlip();
+  };
+  /** The receive card's coin row, measured from the top of the send card. */
+  const receiveTop = sendH + SEAM + receiveRow.y;
+  const sendChipShift = progress.interpolate({
     inputRange: [0, 1],
-    outputRange: [travel, 0],
+    outputRange: [receiveTop, sendRow.y],
   });
-  const receiveRowShift = progress.interpolate({
+  const receiveChipShift = progress.interpolate({
     inputRange: [0, 1],
-    outputRange: [-travel, 0],
+    outputRange: [sendRow.y, receiveTop],
   });
+  /** The chips in the rows stand in for the travelling ones once they land. */
+  const landed = progress.interpolate({
+    inputRange: [0, 0.999, 1],
+    outputRange: [0, 0, 1],
+  });
+  const travelling = progress.interpolate({
+    inputRange: [0, 0.999, 1],
+    outputRange: [1, 1, 0],
+  });
+  /** The words and the numbers cross in place: out at once, in after a beat. */
   const words = progress.interpolate({
-    inputRange: [0, 0.35, 1],
+    inputRange: [0, 0.3, 1],
     outputRange: [0, 0, 1],
   });
   const spin = progress.interpolate({
@@ -221,7 +253,6 @@ export default function PairCards({
     alignItems: 'center' as const,
     columnGap: space12,
     marginTop: space8,
-    zIndex: 3,
   };
   const underRow = {
     flexDirection: 'row' as const,
@@ -265,11 +296,14 @@ export default function PairCards({
             </Text>
           )}
         </Animated.View>
-        <Animated.View
-          style={[coinRow, { transform: [{ translateY: sendRowShift }] }]}
+        <View
+          style={coinRow}
+          onLayout={e => setSendRow(boxOf(e.nativeEvent.layout))}
         >
-          {isOutbound ? zecChip : pickChip(sendSurface)}
-          <View
+          <Animated.View style={{ opacity: landed }}>
+            {isOutbound ? zecChip : pickChip(sendSurface)}
+          </Animated.View>
+          <Animated.View
             style={{
               flex: 1,
               minWidth: 0,
@@ -277,6 +311,7 @@ export default function PairCards({
               alignItems: 'center',
               justifyContent: 'flex-end',
               columnGap: space8,
+              opacity: words,
             }}
           >
             {unit === 'usd' && (
@@ -303,8 +338,8 @@ export default function PairCards({
                 ...singleLineInput(textVariants.balance.lineHeight),
               }}
             />
-          </View>
-        </Animated.View>
+          </Animated.View>
+        </View>
         <Animated.View style={[underRow, { opacity: words }]}>
           {onToggleUnit ? (
             <Pressable
@@ -340,7 +375,7 @@ export default function PairCards({
           testID="swap.flip"
           accessibilityRole="button"
           accessibilityLabel={texts.flip}
-          onPress={onFlip}
+          onPress={flip}
           hitSlop={(touchTarget - FLIP_SIZE) / 2}
           style={{
             position: 'absolute',
@@ -390,11 +425,14 @@ export default function PairCards({
             )}
           </View>
         </Animated.View>
-        <Animated.View
-          style={[coinRow, { transform: [{ translateY: receiveRowShift }] }]}
+        <View
+          style={coinRow}
+          onLayout={e => setReceiveRow(boxOf(e.nativeEvent.layout))}
         >
-          {isOutbound ? pickChip(receiveSurface) : zecChip}
-          <View
+          <Animated.View style={{ opacity: landed }}>
+            {isOutbound ? pickChip(receiveSurface) : zecChip}
+          </Animated.View>
+          <Animated.View
             style={{
               flex: 1,
               minWidth: 0,
@@ -402,6 +440,7 @@ export default function PairCards({
               alignItems: 'center',
               justifyContent: 'flex-end',
               columnGap: space8,
+              opacity: words,
             }}
           >
             {!!ring && (
@@ -445,14 +484,40 @@ export default function PairCards({
             >
               {receiveText || receivePlaceholder}
             </Animated.Text>
-          </View>
-        </Animated.View>
+          </Animated.View>
+        </View>
         <Animated.View style={[underRow, { opacity: words }]}>
           <Text variant="bodySmall" tone="muted">
             {receiveAltText}
           </Text>
         </Animated.View>
       </View>
+
+      {/* Only the coins travel, over both cards, so neither hides behind
+          the other at the seam. */}
+      <Animated.View
+        pointerEvents="none"
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        style={[StyleSheet.absoluteFill, { opacity: travelling, zIndex: 5 }]}
+      >
+        <Animated.View
+          style={[
+            travellingChip(sendRow),
+            { transform: [{ translateY: sendChipShift }] },
+          ]}
+        >
+          {isOutbound ? zecChip : tokenChip(sendSurface)}
+        </Animated.View>
+        <Animated.View
+          style={[
+            travellingChip(receiveRow),
+            { transform: [{ translateY: receiveChipShift }] },
+          ]}
+        >
+          {isOutbound ? tokenChip(receiveSurface) : zecChip}
+        </Animated.View>
+      </Animated.View>
     </View>
   );
 }
