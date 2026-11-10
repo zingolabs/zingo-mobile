@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { space16, space20, useTheme, radiusPill, space8 } from '@app/theme';
@@ -27,6 +27,7 @@ import SwapFlight from '@ui/widgets/Flight/SwapFlight';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
 import { swapStepIndex, swapStepKeys } from '@screens/Swap/swapProgress';
+import { useNowMs } from '@app/hooks/useNowMs';
 
 type SwapTrackingProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -52,15 +53,8 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
   const record = useSwapRecord(recordId);
   const t = (key: string) => translate(key) as string;
 
-  const [nowMs, setNowMs] = useState<number>(() => Date.now());
+  const nowMs = useNowMs();
   const awaiting = !!record && awaitsDeposit(record);
-  useEffect(() => {
-    if (!awaiting) {
-      return;
-    }
-    const timer = setInterval(() => setNowMs(Date.now()), 30_000);
-    return () => clearInterval(timer);
-  }, [awaiting]);
 
   // An expired swap, or a late payment on its way back, has no result
   // screen: its detail says why.
