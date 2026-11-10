@@ -10,13 +10,12 @@ import {
   defaultAppContextLoaded,
 } from '@app/context';
 
+import type { ValueTransferType } from '@app/wallet/transfer';
 import ValueTransferLine from '@screens/History/components/ValueTransferLine';
-import { ValueTransferKindEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 
 const FIXED_TIME = 1704067200; // 2024-01-01 00:00:00 UTC (seconds)
 const fixedValueTransfers = mockValueTransfers.map(vt => ({
@@ -73,11 +72,11 @@ describe('ValueTransferLine - snapshots', () => {
   });
 
   test('ValueTransferLine pending (0 confirmations)', () => {
-    const vt = {
+    const vt: ValueTransferType = {
       ...fixedValueTransfers[0],
       confirmations: 0,
-      status: RPCValueTransfersStatusEnum.mempool,
-      kind: ValueTransferKindEnum.Sent,
+      status: 'mempool',
+      kind: 'Sent',
     };
     expect(
       render(
@@ -97,10 +96,10 @@ describe('ValueTransferLine - snapshots', () => {
   });
 
   test('ValueTransferLine failed transaction', () => {
-    const vt = {
+    const vt: ValueTransferType = {
       ...fixedValueTransfers[0],
-      status: RPCValueTransfersStatusEnum.failed,
-      kind: ValueTransferKindEnum.Sent,
+      status: 'failed',
+      kind: 'Sent',
     };
     expect(
       render(

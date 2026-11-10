@@ -1,7 +1,7 @@
 import 'react-native';
 import { formatZecAmount } from '@app/utils/formatZecAmount';
 import { transferRowText } from '@screens/History/historyRowText';
-import { ValueTransferKindEnum, ValueTransferType } from '@app/AppState';
+import { ValueTransferType } from '@app/wallet/transfer';
 
 describe('formatZecAmount', () => {
   test('Tests that a round amount keeps one decimal', () => {
@@ -30,7 +30,7 @@ describe('formatZecAmount', () => {
 describe('transferRowText title', () => {
   const t = (key: string) => key;
   const sent = {
-    kind: ValueTransferKindEnum.Sent,
+    kind: 'Sent',
     address: 'u1abcdefghijklmnopqrstuvwxyz0123456789',
     amount: 0.1,
     confirmations: 10,

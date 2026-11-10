@@ -14,11 +14,7 @@ import Pressable from '@ui/primitives/Pressable';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { space12, space8, useTheme, iconSizeMd, iconSizeSm } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
-import {
-  Route,
-  SnackbarDurationEnum,
-  ValueTransferKindEnum,
-} from '@app/AppState';
+import { Route, SnackbarDurationEnum } from '@app/AppState';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import { ContextAppLoaded, useSwapRecords, useSwapService } from '@app/context';
 import {
@@ -350,9 +346,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
   const awaitingDeposit =
     !isTerminalStatus(record.status) && !hasDepositEvidence;
   const legs = legsOf(records, valueTransfers ?? [], recordId);
-  const receivedTransparent = legs.some(
-    l => l.kind === ValueTransferKindEnum.Received,
-  );
+  const receivedTransparent = legs.some(l => l.kind === 'Received');
 
   /** Didn't finish well: the Track section lists every link, SwapKit's first. */
   const troubled =
@@ -477,7 +471,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
             onToggle={() => setLegsOpen(open => !open)}
           >
             {legs.map((leg, index) => {
-              const received = leg.kind === ValueTransferKindEnum.Received;
+              const received = leg.kind === 'Received';
               return (
                 <Pressable
                   kind="row"

@@ -1,5 +1,5 @@
-import { AddressBookFileClass, ValueTransferKindEnum } from '@app/AppState';
-import { ValueTransferType } from '@app/wallet/types';
+import { AddressBookFileClass } from '@app/AppState';
+import { ValueTransferType } from '@app/wallet/transfer';
 import { themeTokens } from '@app/theme';
 
 export const TOP = 5;
@@ -43,9 +43,7 @@ const empty = (): Cell => ({ amount: 0, sends: 0, bytes: 0 });
 
 /** Payments the wallet sent to an address, each recipient line on its own. */
 const sendsOf = (transfers: ValueTransferType[]): ValueTransferType[] =>
-  transfers.filter(
-    vt => vt.kind === ValueTransferKindEnum.Sent && !!vt.address,
-  );
+  transfers.filter(vt => vt.kind === 'Sent' && !!vt.address);
 
 /** Weekly sends per recipient: the five largest by amount, then the rest together. */
 export const buildInsight = (

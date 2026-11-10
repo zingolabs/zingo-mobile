@@ -18,11 +18,7 @@ import {
   iconSizeMd,
 } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
-import {
-  Route,
-  SnackbarDurationEnum,
-  ValueTransferKindEnum,
-} from '@app/AppState';
+import { Route, SnackbarDurationEnum } from '@app/AppState';
 import { ContextAppLoaded, useSwapRecords } from '@app/context';
 import { fiatQuote } from '@app/price/fiatQuote';
 import Utils from '@app/utils';
@@ -86,7 +82,7 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
     return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
   }
 
-  const received = leg.kind === ValueTransferKindEnum.Received;
+  const received = leg.kind === 'Received';
   const quote = fiatQuote(zecPrice, server, server.chainName);
   const price =
     leg.zecPrice && leg.zecPrice > 0

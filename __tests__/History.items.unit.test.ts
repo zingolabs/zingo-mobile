@@ -1,9 +1,10 @@
 jest.mock('@app/RPCModule', () => ({ __esModule: true, default: {} }));
 
-import { ValueTransferKindEnum } from '@app/AppState';
-import { PoolEnum } from '@app/AppState';
-import type { ValueTransferType } from '@app/AppState';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { Pool } from '@app/wallet/pool';
+import type {
+  ValueTransferKind,
+  ValueTransferType,
+} from '@app/wallet/transfer';
 import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
 import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
@@ -21,7 +22,7 @@ const DEPOSIT = 'b'.repeat(64);
 const vt = (
   txid: string,
   time: number,
-  kind = ValueTransferKindEnum.Sent,
+  kind: ValueTransferKind = 'Sent',
   extra: Partial<ValueTransferType> = {},
 ): ValueTransferType => ({
   txid,
@@ -30,7 +31,7 @@ const vt = (
   blockheight: 1,
   time,
   amount: 1.5,
-  status: RPCValueTransfersStatusEnum.confirmed,
+  status: 'confirmed',
   ...extra,
 });
 
@@ -73,7 +74,7 @@ const monthOf = (timeSec: number) =>
   timeSec >= 1_900_000 ? 'Oct 2026' : 'Apr 2026';
 
 const swapRow = (r: SwapRecordType) =>
-  vt(DEPOSIT, r.createdAtMs / 1000, ValueTransferKindEnum.Swap, {
+  vt(DEPOSIT, r.createdAtMs / 1000, 'Swap', {
     swapRecordId: r.recordId,
   });
 
@@ -82,8 +83,8 @@ test('Tests that a swap is one row and its Zcash transactions leave the flat lis
   const rows = [
     swapRow(r),
     vt(DEPOSIT, 2_000_010),
-    vt(HOP, 2_000_005, ValueTransferKindEnum.SendToSelf),
-    vt('c'.repeat(64), 1_000_000, ValueTransferKindEnum.Received),
+    vt(HOP, 2_000_005, 'SendToSelf'),
+    vt('c'.repeat(64), 1_000_000, 'Received'),
   ];
 
   const items = buildHistoryItems({
@@ -109,7 +110,7 @@ test('Tests that an open swap shows its transactions under it, oldest first, whe
   const rows = [
     swapRow(r),
     vt(DEPOSIT, 2_000_010),
-    vt(HOP, 2_000_005, ValueTransferKindEnum.SendToSelf),
+    vt(HOP, 2_000_005, 'SendToSelf'),
   ];
 
   const items = buildHistoryItems({
@@ -131,11 +132,11 @@ test('Tests that a shielded memo deposit shows its vault payment and its memo no
   const r = record();
   const rows = [
     swapRow(r),
-    vt(DEPOSIT, 2_000_010, ValueTransferKindEnum.Sent, {
+    vt(DEPOSIT, 2_000_010, 'Sent', {
       amount: 0,
       address: 'u1mayamemo',
     }),
-    vt(DEPOSIT, 2_000_010, ValueTransferKindEnum.Sent, {
+    vt(DEPOSIT, 2_000_010, 'Sent', {
       amount: 0.01,
       address: 't1vault',
     }),
@@ -200,7 +201,7 @@ test('Tests that a refunded swap shows what it cost and what came back when the 
 
 test('Tests that a sent transfer is titled by its address and signed negative', () => {
   const text = transferRowText({
-    vt: vt('d'.repeat(64), 1, ValueTransferKindEnum.Sent, { address: 'u1abc' }),
+    vt: vt('d'.repeat(64), 1, 'Sent', { address: 'u1abc' }),
     when: 'Oct 16',
     currency: 'ZEC',
     usd: '$924.36',
@@ -216,17 +217,17 @@ test('Tests that a sent transfer is titled by its address and signed negative', 
 test('Tests that a shield names the pool its funds went to when the transfer carries one', () => {
   const shieldT = (key: string) =>
     key === 'history.shield-line' ? 'Transparent → {pool}' : key;
-  const lineOf = (poolType?: PoolEnum) =>
+  const lineOf = (poolType?: Pool) =>
     transferRowText({
-      vt: vt('e'.repeat(64), 1, ValueTransferKindEnum.Shield, { poolType }),
+      vt: vt('e'.repeat(64), 1, 'Shield', { poolType }),
       when: 'Oct 24',
       currency: 'ZEC',
       usd: '',
       t: shieldT,
     }).line;
 
-  expect(lineOf(PoolEnum.IronwoodPool)).toBe('Transparent → Ironwood · Oct 24');
-  expect(lineOf(PoolEnum.OrchardPool)).toBe('Transparent → Orchard · Oct 24');
+  expect(lineOf('Ironwood')).toBe('Transparent → Ironwood · Oct 24');
+  expect(lineOf('Orchard')).toBe('Transparent → Orchard · Oct 24');
   expect(lineOf(undefined)).toBe('Oct 24');
 });
 
@@ -250,7 +251,7 @@ test('Tests that a running swap sits above every month while it runs and goes ba
     createdAtMs: 1_000_000_000,
     broadcast: undefined,
   });
-  const newer = vt('d'.repeat(64), 2_000_000, ValueTransferKindEnum.Received);
+  const newer = vt('d'.repeat(64), 2_000_000, 'Received');
   const rows = [newer, swapRow(older)];
 
   const running = buildHistoryItems({
@@ -375,8 +376,8 @@ test('Tests that a failed swap reads its amount struck through and grey, as a de
 
 test('Tests that a failed send reads its amount struck through and grey, and a sent one does not', () => {
   const failed = transferRowText({
-    vt: vt(DEPOSIT, 2_000_010, ValueTransferKindEnum.Sent, {
-      status: RPCValueTransfersStatusEnum.failed,
+    vt: vt(DEPOSIT, 2_000_010, 'Sent', {
+      status: 'failed',
     }),
     when: 'Oct 17',
     currency: 'ZEC',
@@ -398,8 +399,8 @@ test('Tests that a failed send reads its amount struck through and grey, and a s
 
 test('Tests that a failed shield reads its amount struck through and grey too', () => {
   const text = transferRowText({
-    vt: vt(DEPOSIT, 2_000_010, ValueTransferKindEnum.Shield, {
-      status: RPCValueTransfersStatusEnum.failed,
+    vt: vt(DEPOSIT, 2_000_010, 'Shield', {
+      status: 'failed',
     }),
     when: 'Oct 17',
     currency: 'ZEC',
@@ -429,12 +430,9 @@ test('Tests that a swap not completed is titled with both coins in its order, wh
 test('Tests that a send says where it stands before the time when it is not confirmed yet', () => {
   const row = (confirmations: number) =>
     transferRowText({
-      vt: vt('a', 1, ValueTransferKindEnum.Sent, {
+      vt: vt('a', 1, 'Sent', {
         confirmations,
-        status:
-          confirmations === 0
-            ? RPCValueTransfersStatusEnum.mempool
-            : RPCValueTransfersStatusEnum.confirmed,
+        status: confirmations === 0 ? 'mempool' : 'confirmed',
         address: 'u1qx8fabcdefghijk3kd9a2',
       }),
       when: 'Just now',

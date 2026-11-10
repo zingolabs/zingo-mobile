@@ -1,6 +1,7 @@
 import * as Keychain from 'react-native-keychain';
 import { defaultTo } from 'lodash';
-import { GlobalConst, WalletType } from '@app/AppState';
+import { GlobalConst } from '@app/AppState';
+import { WalletType } from '@app/wallet/keys';
 import {
   buildBaseOptions,
   buildGetOptions,

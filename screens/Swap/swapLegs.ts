@@ -1,5 +1,4 @@
-import { ValueTransferKindEnum } from '@app/AppState';
-import type { ValueTransferType } from '@app/AppState';
+import type { ValueTransferType } from '@app/wallet/transfer';
 import { SwapStatusEnum, providerShortLabel, swapTxidIndex } from '@app/swap';
 import { isThorchainFamily } from '@app/swap/thorchainFamily';
 import type { SwapRecordType } from '@app/swap';
@@ -29,11 +28,7 @@ export function legsOf(
 ): ValueTransferType[] {
   const index = swapTxidIndex(records);
   return transfers
-    .filter(
-      vt =>
-        vt.kind !== ValueTransferKindEnum.Swap &&
-        index.get(vt.txid) === recordId,
-    )
+    .filter(vt => vt.kind !== 'Swap' && index.get(vt.txid) === recordId)
     .sort((a, b) => a.time - b.time);
 }
 
@@ -41,7 +36,7 @@ export function legsOf(
 export function isHop(leg: ValueTransferType, record: SwapRecordType): boolean {
   const hops = record.broadcast?.allTxIds;
   return (
-    leg.kind === ValueTransferKindEnum.SendToSelf ||
+    leg.kind === 'SendToSelf' ||
     (!!hops && hops.length > 1 && hops[0] === leg.txid)
   );
 }
@@ -55,7 +50,7 @@ export function legName(
   if (isHop(leg, record)) {
     return t('swap.leg-to-self');
   }
-  if (leg.kind !== ValueTransferKindEnum.Received) {
+  if (leg.kind !== 'Received') {
     return `${t('swap.leg-payment-to')} ${providerShortLabel(record.provider)}`;
   }
   return t(
@@ -78,7 +73,7 @@ export function legRole(
       warn: false,
     };
   }
-  if (leg.kind !== ValueTransferKindEnum.Received) {
+  if (leg.kind !== 'Received') {
     return { note: `${provider} ${t('swap.leg-payment-note')}`, warn: true };
   }
   if (record.status !== SwapStatusEnum.Completed) {

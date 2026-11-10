@@ -17,8 +17,7 @@ jest.mock('@app/swap/swapStorage', () => {
 });
 
 import { renderHook, waitFor } from '@testing-library/react-native';
-import { ValueTransferKindEnum } from '@app/AppState';
-import type { ValueTransferType } from '@app/AppState';
+import type { ValueTransferType } from '@app/wallet/transfer';
 import { useValueTransfersWithSwaps } from '@app/context';
 import { SwapStore } from '@app/swap';
 import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
@@ -26,7 +25,6 @@ import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
 import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
 import type { SwapAssetType } from '@app/swap/types/SwapAssetType';
 import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 
 const ZEC: SwapAssetType = {
   swapKitId: 'ZEC.ZEC',
@@ -80,12 +78,12 @@ const makeRecord = (
 
 const sent = (txid: string, time: number): ValueTransferType => ({
   txid,
-  kind: ValueTransferKindEnum.Sent,
+  kind: 'Sent',
   confirmations: 3,
   blockheight: 100,
   time,
   amount: 0.5,
-  status: RPCValueTransfersStatusEnum.confirmed,
+  status: 'confirmed',
 });
 
 beforeEach(async () => {
@@ -106,7 +104,7 @@ test('Tests that History lists the swaps of the bound wallet beside its transfer
       'tx-old',
     ]),
   );
-  expect(result.current[1].kind).toBe(ValueTransferKindEnum.Swap);
+  expect(result.current[1].kind).toBe('Swap');
   expect(result.current[1].swapRecordId).toBe('rec-1');
 });
 

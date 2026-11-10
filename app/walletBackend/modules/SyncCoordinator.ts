@@ -14,7 +14,8 @@
  *
  * To add a new periodic task, push it into taskPromises inside runTaskPromises.
  */
-import { TotalBalanceClass, GlobalConst } from '@app/AppState';
+import { GlobalConst } from '@app/AppState';
+import { TotalBalanceClass } from '@app/wallet/balance';
 import RPCModule from '@app/RPCModule';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCSyncPollType } from '@app/walletBackend/types/RPCSyncPollType';

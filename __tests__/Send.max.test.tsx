@@ -6,7 +6,8 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { Route, SendPageStateClass, ToAddrClass } from '@app/AppState';
+import { Route } from '@app/AppState';
+import { SendPageStateClass, ToAddrClass } from '@app/wallet/send';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';

@@ -11,13 +11,12 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme } from '@app/theme';
 import {
   AddressBookFileClass,
-  AddressKindEnum,
   GlobalConst,
   Route,
-  SendPageStateClass,
   SnackbarDurationEnum,
-  ToAddrClass,
 } from '@app/AppState';
+import { AddressKind } from '@app/wallet/address';
+import { SendPageStateClass, ToAddrClass } from '@app/wallet/send';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded, useSwapService } from '@app/context';
 import { useOptionsPanel } from '@app/context/optionsPanel';
@@ -41,7 +40,6 @@ import ContactSwapSheet, {
   loadSwapCoins,
 } from './components/ContactSwapSheet';
 import SegmentedSwitch from '@ui/widgets/SegmentedSwitch';
-import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
 import ContactSheet, {
   ContactEdit,
   contactSheetTitleKey,
@@ -106,7 +104,7 @@ export const listedContacts = (
 export const mineEntries = (
   addresses: {
     address: string;
-    addressKind: AddressKindEnum;
+    addressKind: AddressKind;
     scope?: string;
   }[],
   book: AddressBookFileClass[],
@@ -114,11 +112,9 @@ export const mineEntries = (
   query: string,
 ): MineEntry[] => {
   const q = query.trim().toLowerCase();
-  const unified = addresses.filter(a => a.addressKind === AddressKindEnum.u);
+  const unified = addresses.filter(a => a.addressKind === 'u');
   const transparent = addresses.filter(
-    a =>
-      a.addressKind === AddressKindEnum.t &&
-      a.scope === RPCAddressScopeEnum.external,
+    a => a.addressKind === 't' && a.scope === 'external',
   );
   const named = (
     list: { address: string }[],

@@ -6,8 +6,6 @@ import { BroadcastStatusEnum } from '@app/swap/enums/BroadcastStatusEnum';
 import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
 import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
-import { ValueTransferKindEnum } from '@app/AppState';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import type { SwapAssetType } from '@app/swap/types/SwapAssetType';
 import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
 
@@ -190,22 +188,19 @@ describe('how the row is painted', () => {
   it('marks the kind so History routes the row to the swap detail', () => {
     const vt = swapRecordToValueTransfer(outbound());
 
-    expect(vt.kind).toBe(ValueTransferKindEnum.Swap);
+    expect(vt.kind).toBe('Swap');
     expect(vt.swapRecordId).toBe('rec-1');
     expect(vt.swapStatus).toBe(SwapStatusEnum.Pending);
   });
 
   it.each([
-    [SwapStatusEnum.Completed, RPCValueTransfersStatusEnum.confirmed],
-    [SwapStatusEnum.Failed, RPCValueTransfersStatusEnum.failed],
-    [SwapStatusEnum.Refunded, RPCValueTransfersStatusEnum.failed],
-    [SwapStatusEnum.Expired, RPCValueTransfersStatusEnum.failed],
-    [SwapStatusEnum.PendingDeposit, RPCValueTransfersStatusEnum.calculated],
-    [
-      SwapStatusEnum.AwaitingExternalDeposit,
-      RPCValueTransfersStatusEnum.calculated,
-    ],
-    [SwapStatusEnum.Processing, RPCValueTransfersStatusEnum.mempool],
+    [SwapStatusEnum.Completed, 'confirmed'],
+    [SwapStatusEnum.Failed, 'failed'],
+    [SwapStatusEnum.Refunded, 'failed'],
+    [SwapStatusEnum.Expired, 'failed'],
+    [SwapStatusEnum.PendingDeposit, 'calculated'],
+    [SwapStatusEnum.AwaitingExternalDeposit, 'calculated'],
+    [SwapStatusEnum.Processing, 'mempool'],
   ])('paints %s as %s', (swapStatus, expected) => {
     expect(
       swapRecordToValueTransfer(outbound({ status: swapStatus })).status,
@@ -220,7 +215,7 @@ describe('how the row is painted', () => {
       swapRecordToValueTransfer(
         outbound({ status: SwapStatusEnum.IncompleteDeposit }),
       ).status,
-    ).toBe(RPCValueTransfersStatusEnum.mempool);
+    ).toBe('mempool');
   });
 
   // The list short-circuits on zero confirmations to render progress, so a

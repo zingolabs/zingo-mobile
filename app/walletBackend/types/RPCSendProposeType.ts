@@ -1,4 +1,4 @@
-import { PoolNameType } from '@app/wallet/types';
+import { PoolNameType } from '@app/wallet/pool';
 
 export type RPCSendProposeType = {
   fee?: number;

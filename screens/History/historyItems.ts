@@ -1,5 +1,4 @@
-import { ValueTransferKindEnum } from '@app/AppState';
-import type { ValueTransferType } from '@app/AppState';
+import type { ValueTransferType } from '@app/wallet/transfer';
 import { swapTxidIndex } from '@app/swap/groupHistoryBySwap';
 import { isTerminalStatus } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
@@ -60,7 +59,7 @@ export function buildHistoryItems(args: {
   const recordById = new Map(records.map(r => [r.recordId, r]));
   const legsOf = new Map<string, ValueTransferType[]>();
   for (const vt of all) {
-    if (vt.kind === ValueTransferKindEnum.Swap) {
+    if (vt.kind === 'Swap') {
       continue;
     }
     const recordId = index.get(vt.txid);
@@ -74,11 +73,7 @@ export function buildHistoryItems(args: {
     const record = vt.swapRecordId
       ? recordById.get(vt.swapRecordId)
       : undefined;
-    return (
-      vt.kind === ValueTransferKindEnum.Swap &&
-      !!record &&
-      !isTerminalStatus(record.status)
-    );
+    return vt.kind === 'Swap' && !!record && !isTerminalStatus(record.status);
   };
   const pushSwap = (
     vt: ValueTransferType,
@@ -116,7 +111,7 @@ export function buildHistoryItems(args: {
 
   let month = '';
   for (const vt of rows) {
-    const isSwap = vt.kind === ValueTransferKindEnum.Swap;
+    const isSwap = vt.kind === 'Swap';
     if ((!isSwap && index.has(vt.txid)) || live(vt)) {
       continue;
     }

@@ -1,7 +1,6 @@
-import { ValueTransferType, ValueTransferKindEnum } from '@app/AppState';
+import { ValueTransferType } from '@app/wallet/transfer';
 import { RPCValueTransferType } from '@app/walletBackend/types/RPCValueTransferType';
 import { RPCValueTransfersKindEnum } from '@app/walletBackend/enums/RPCValueTransfersKindEnum';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 
 /**
  * Maps a raw zingolib value transfer to the app's ValueTransferType.
@@ -24,31 +23,31 @@ export function transformValueTransfer(
   result.time = vt.datetime;
   result.kind =
     vt.kind === RPCValueTransfersKindEnum.migration
-      ? ValueTransferKindEnum.Migration
+      ? 'Migration'
       : vt.kind === RPCValueTransfersKindEnum.memoToSelf
-        ? ValueTransferKindEnum.MemoToSelf
+        ? 'MemoToSelf'
         : vt.kind === RPCValueTransfersKindEnum.sendToSelf
-          ? ValueTransferKindEnum.SendToSelf
+          ? 'SendToSelf'
           : vt.kind === RPCValueTransfersKindEnum.received
-            ? ValueTransferKindEnum.Received
+            ? 'Received'
             : vt.kind === RPCValueTransfersKindEnum.sent
-              ? ValueTransferKindEnum.Sent
+              ? 'Sent'
               : vt.kind === RPCValueTransfersKindEnum.shield
-                ? ValueTransferKindEnum.Shield
+                ? 'Shield'
                 : vt.kind === RPCValueTransfersKindEnum.rejection
-                  ? ValueTransferKindEnum.Rejection
+                  ? 'Rejection'
                   : vt.kind;
   result.fee = (!vt.transaction_fee ? 0 : vt.transaction_fee) / 10 ** 8;
   result.zecPrice = !vt.zec_price ? 0 : vt.zec_price;
 
   if (
-    vt.status === RPCValueTransfersStatusEnum.calculated ||
-    vt.status === RPCValueTransfersStatusEnum.transmitted ||
-    vt.status === RPCValueTransfersStatusEnum.mempool ||
-    vt.status === RPCValueTransfersStatusEnum.failed
+    vt.status === 'calculated' ||
+    vt.status === 'transmitted' ||
+    vt.status === 'mempool' ||
+    vt.status === 'failed'
   ) {
     result.confirmations = 0;
-  } else if (vt.status === RPCValueTransfersStatusEnum.confirmed) {
+  } else if (vt.status === 'confirmed') {
     result.confirmations =
       lastServerBlockHeight && lastServerBlockHeight >= lastWalletBlockHeight
         ? lastServerBlockHeight - vt.blockheight + 1
@@ -61,7 +60,7 @@ export function transformValueTransfer(
   result.blockheight = vt.blockheight;
   result.status = vt.status;
 
-  if (vt.status === RPCValueTransfersStatusEnum.failed) {
+  if (vt.status === 'failed') {
     console.log('[RPC] failed value transfer (raw):', vt);
   }
   result.address = !vt.recipient_address ? undefined : vt.recipient_address;
@@ -78,7 +77,7 @@ export function transformValueTransfer(
       ? undefined
       : vt.pools_received[vt.pools_received.length - 1];
 
-  if (result.status === RPCValueTransfersStatusEnum.failed) {
+  if (result.status === 'failed') {
     console.log('[RPC] failed value transfer (transformed):', result);
   }
 

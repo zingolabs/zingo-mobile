@@ -3,13 +3,12 @@ import { showConfirm } from '@app/services/showConfirm';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
 import {
-  PoolToShieldEnum,
   Route,
   ServerType,
   SnackbarDurationEnum,
   TranslateType,
 } from '@app/AppState';
-import { TotalBalanceClass } from '@app/wallet/classes';
+import { TotalBalanceClass } from '@app/wallet/balance';
 import {
   shieldConfirm,
   shieldPreview,
@@ -203,10 +202,7 @@ export function useShieldFunds({
     setShieldingAmount,
   ]);
 
-  const calculatePoolsToShield = useCallback(
-    (): string => PoolToShieldEnum.transparentPoolToShield,
-    [],
-  );
+  const calculatePoolsToShield = useCallback((): string => 'transparent', []);
 
   const calculateDisableButtonToShield = useCallback(
     (): boolean => (somePending ? 0 : shieldingAmount) <= 0,

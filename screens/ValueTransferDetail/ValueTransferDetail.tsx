@@ -19,17 +19,13 @@ import {
   ChainNameEnum,
   GlobalConst,
   Route,
-  SendPageStateClass,
   SnackbarDurationEnum,
-  ToAddrClass,
-  TransactionActionEnum,
-  ValueTransferKindEnum,
-  ValueTransferType,
 } from '@app/AppState';
+import { SendPageStateClass, ToAddrClass } from '@app/wallet/send';
+import { ValueTransferType } from '@app/wallet/transfer';
 import Utils from '@app/utils';
 import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { transferStatus } from '@app/utils/transferStatus';
 import { removeTransaction } from '@app/walletBackend';
 import { createAlert } from '@app/services/createAlert';
@@ -82,9 +78,9 @@ const ValueTransferDetail: React.FunctionComponent<
 
   const vt: ValueTransferType = route.params?.vt ?? ({} as ValueTransferType);
   const { memo, memoUA } = Utils.splitMemo(vt.memos);
-  const failed = vt.status === RPCValueTransfersStatusEnum.failed;
-  const received = vt.kind === ValueTransferKindEnum.Received;
-  const sent = vt.kind === ValueTransferKindEnum.Sent;
+  const failed = vt.status === 'failed';
+  const received = vt.kind === 'Received';
+  const sent = vt.kind === 'Sent';
   const contact = vt.address
     ? addressBook.find(entry => entry.address === vt.address)
     : undefined;
@@ -100,17 +96,17 @@ const ValueTransferDetail: React.FunctionComponent<
   /** What happened, in the prototype's words. */
   const head = (() => {
     switch (vt.kind) {
-      case ValueTransferKindEnum.Received:
+      case 'Received':
         return t('history.received');
-      case ValueTransferKindEnum.Shield:
+      case 'Shield':
         return t('history.shield');
-      case ValueTransferKindEnum.SendToSelf:
+      case 'SendToSelf':
         return t('history.tx-self');
-      case ValueTransferKindEnum.MemoToSelf:
+      case 'MemoToSelf':
         return t('history.memotoself');
-      case ValueTransferKindEnum.Migration:
+      case 'Migration':
         return t('history.migration');
-      case ValueTransferKindEnum.Rejection:
+      case 'Rejection':
         return t('history.rejection');
       default:
         return contact
@@ -233,14 +229,13 @@ const ValueTransferDetail: React.FunctionComponent<
             }
             navigation.navigate(Route.Computing);
             const result = await removeTransaction(vt.txid);
-            const action = TransactionActionEnum.remove;
             createAlert(
               setBackgroundError,
               addLastSnackbar,
-              t(`history.${action}-title`),
+              t('history.remove-title'),
               result.ok
-                ? `${t(`history.${action}-message`)} ${result.value}`
-                : `${t(`history.${action}-error`)} ${result.error.message}`,
+                ? `${t('history.remove-message')} ${result.value}`
+                : `${t('history.remove-error')} ${result.error.message}`,
               result.ok,
               translate,
             );

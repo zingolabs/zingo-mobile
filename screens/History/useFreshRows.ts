@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { ValueTransferType } from '@app/AppState';
+import type { ValueTransferType } from '@app/wallet/transfer';
 import { duration } from '@app/theme/motion';
 
 /**

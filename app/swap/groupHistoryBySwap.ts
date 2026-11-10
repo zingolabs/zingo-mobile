@@ -1,5 +1,4 @@
-import type { ValueTransferType } from '@app/wallet/types';
-import { ValueTransferKindEnum } from '@app/AppState';
+import type { ValueTransferType } from '@app/wallet/transfer';
 import { isRealLegHash } from './providers/trackUpdateBase';
 import type { SwapRecordType } from './types/SwapRecordType';
 
@@ -56,9 +55,7 @@ export function swapGroupOf(
   vt: ValueTransferType,
   index: ReadonlyMap<string, string>,
 ): string | undefined {
-  return vt.kind === ValueTransferKindEnum.Swap
-    ? vt.swapRecordId
-    : index.get(vt.txid);
+  return vt.kind === 'Swap' ? vt.swapRecordId : index.get(vt.txid);
 }
 
 /**
@@ -78,13 +75,12 @@ export function groupHistoryBySwap(
 ): ValueTransferType[] {
   const swapRows = new Set<string>();
   for (const vt of rows) {
-    if (vt.kind === ValueTransferKindEnum.Swap && vt.swapRecordId)
-      swapRows.add(vt.swapRecordId);
+    if (vt.kind === 'Swap' && vt.swapRecordId) swapRows.add(vt.swapRecordId);
   }
 
   const members = new Map<string, ValueTransferType[]>();
   for (const vt of rows) {
-    if (vt.kind === ValueTransferKindEnum.Swap) continue;
+    if (vt.kind === 'Swap') continue;
     const swapId = index.get(vt.txid);
     if (!swapId || !swapRows.has(swapId)) continue;
     const bucket = members.get(swapId);
@@ -94,7 +90,7 @@ export function groupHistoryBySwap(
 
   const grouped: ValueTransferType[] = [];
   for (const vt of rows) {
-    if (vt.kind === ValueTransferKindEnum.Swap) {
+    if (vt.kind === 'Swap') {
       grouped.push(vt);
       // Collected newest first, like the list; the group reads oldest first.
       const bucket = vt.swapRecordId ? members.get(vt.swapRecordId) : undefined;

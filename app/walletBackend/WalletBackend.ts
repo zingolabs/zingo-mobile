@@ -1,4 +1,5 @@
-import { SendJsonToTypeType, ServerType } from '@app/AppState';
+import { ServerType } from '@app/AppState';
+import { SendJsonToTypeType } from '@app/wallet/send';
 import { WalletBackendConfig, isOffline } from './config/WalletBackendConfig';
 import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { DataService } from './modules/DataService';

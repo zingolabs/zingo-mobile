@@ -1,6 +1,4 @@
-import { ValueTransferKindEnum } from '@app/AppState';
-import type { ValueTransferType } from '@app/AppState';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import type { ValueTransferType } from '@app/wallet/transfer';
 import {
   SwapDirectionEnum,
   SwapStatusEnum,
@@ -83,8 +81,7 @@ export function transferRowText(
           },
           line: args.when,
         };
-  return args.vt.status === RPCValueTransfersStatusEnum.failed ||
-    args.vt.kind === ValueTransferKindEnum.Rejection
+  return args.vt.status === 'failed' || args.vt.kind === 'Rejection'
     ? { ...stated, topTone: 'muted', topStrike: true }
     : stated;
 }
@@ -99,11 +96,11 @@ function transferRowTextOf(args: {
   contactName?: string;
 }): RowText {
   const { vt, when, currency, usd, t, contactName } = args;
-  const failed = vt.status === RPCValueTransfersStatusEnum.failed;
+  const failed = vt.status === 'failed';
   const amount = `${formatAmount(vt.amount)} ${currency}`;
   const base = { bottom: usd, titleMono: false };
   switch (vt.kind) {
-    case ValueTransferKindEnum.Sent:
+    case 'Sent':
       return {
         ...base,
         title: contactName
@@ -116,7 +113,7 @@ function transferRowTextOf(args: {
         top: `−${amount}`,
         topTone: failed ? 'muted' : 'default',
       };
-    case ValueTransferKindEnum.Received:
+    case 'Received':
       return {
         ...base,
         title: t('history.received'),
@@ -124,7 +121,7 @@ function transferRowTextOf(args: {
         top: `+${amount}`,
         topTone: failed ? 'muted' : 'positive',
       };
-    case ValueTransferKindEnum.Shield:
+    case 'Shield':
       return {
         ...base,
         title: t('history.shield'),
@@ -139,13 +136,13 @@ function transferRowTextOf(args: {
       return {
         ...base,
         title: t(
-          vt.kind === ValueTransferKindEnum.SendToSelf
+          vt.kind === 'SendToSelf'
             ? 'history.sendtoself'
-            : vt.kind === ValueTransferKindEnum.MemoToSelf
+            : vt.kind === 'MemoToSelf'
               ? 'history.memotoself'
-              : vt.kind === ValueTransferKindEnum.Migration
+              : vt.kind === 'Migration'
                 ? 'history.migration'
-                : vt.kind === ValueTransferKindEnum.Rejection
+                : vt.kind === 'Rejection'
                   ? 'history.rejection'
                   : 'history.swap',
         ).trim(),
@@ -292,7 +289,7 @@ export function legRowText(args: {
   t: Translate;
 }): RowText {
   const { vt, time, currency, usd, t } = args;
-  const received = vt.kind === ValueTransferKindEnum.Received;
+  const received = vt.kind === 'Received';
   const fee =
     vt.fee && vt.fee > 0
       ? ` · ${t('history.fee')} ${formatAmount(vt.fee)} ${currency}`

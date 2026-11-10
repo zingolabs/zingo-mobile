@@ -18,19 +18,19 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import ZecAmount from '@ui/widgets/ZecAmount';
 import Text from '@ui/primitives/Text';
 import {
-  ValueTransferType,
-  ValueTransferKindEnum,
   AddressBookFileClass,
   SnackbarDurationEnum,
   GlobalConst,
+} from '@app/AppState';
+import { ValueTransferType } from '@app/wallet/transfer';
+import {
   UnifiedAddressClass,
   TransparentAddressClass,
-} from '@app/AppState';
+} from '@app/wallet/address';
 
 import { ContextAppLoaded } from '@app/context';
 import AddressItem from '@ui/widgets/AddressItem';
 import Utils from '@app/utils';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import { VerifyXIcon } from '@ui/primitives/Icons/VerifyXIcon';
 import { CheckCircleLineIcon } from '@ui/primitives/Icons/CheckCircleLineIcon';
@@ -73,8 +73,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
   const { memo, memoUA } = Utils.splitMemo(vt.memos);
 
   const getAmountColor = (_vt: ValueTransferType) => {
-    return _vt.kind === ValueTransferKindEnum.Received ||
-      _vt.kind === ValueTransferKindEnum.Shield
+    return _vt.kind === 'Received' || _vt.kind === 'Shield'
       ? colors.fgAccent
       : colors.fgDefault;
   };
@@ -107,13 +106,13 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
 
   //if (index === 0) {
   //  vt.confirmations = 0;
-  //  vt.status = RPCValueTransfersStatusEnum.failed;
-  //  vt.kind = ValueTransferKindEnum.Shield;
+  //  vt.status = 'failed';
+  //  vt.kind = 'Shield';
   //}
   //if (index === 1) {
   //  vt.confirmations = 0;
-  //  vt.status = RPCValueTransfersStatusEnum.failed;
-  //  vt.kind = ValueTransferKindEnum.Sent;
+  //  vt.status = 'failed';
+  //  vt.kind = 'Sent';
   //}
 
   return (
@@ -149,21 +148,15 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
             justifyContent: 'flex-start',
             padding: space12,
             marginBottom: space8,
-            marginLeft:
-              vt.kind === ValueTransferKindEnum.Received ? 0 : BUBBLE_INSET,
-            marginRight:
-              vt.kind === ValueTransferKindEnum.Received ? BUBBLE_INSET : 0,
+            marginLeft: vt.kind === 'Received' ? 0 : BUBBLE_INSET,
+            marginRight: vt.kind === 'Received' ? BUBBLE_INSET : 0,
             borderRadius: radiusMd,
             borderBottomEndRadius:
-              vt.kind === ValueTransferKindEnum.Received
-                ? radiusMd
-                : TAIL_CORNER,
+              vt.kind === 'Received' ? radiusMd : TAIL_CORNER,
             borderBottomStartRadius:
-              vt.kind === ValueTransferKindEnum.Received
-                ? TAIL_CORNER
-                : radiusMd,
+              vt.kind === 'Received' ? TAIL_CORNER : radiusMd,
             backgroundColor:
-              vt.status === RPCValueTransfersStatusEnum.failed
+              vt.status === 'failed'
                 ? colors.bgMutedSubtle
                 : colors.bgAccentSubtle,
           }}
@@ -244,7 +237,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
               alignSelf: 'flex-end',
             }}
           >
-            {vt.status === RPCValueTransfersStatusEnum.failed && (
+            {vt.status === 'failed' && (
               <Text
                 variant="caption"
                 tone="danger"
@@ -288,23 +281,23 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                   alignItems: 'center',
                 }}
               >
-                {vt.status === RPCValueTransfersStatusEnum.failed && (
+                {vt.status === 'failed' && (
                   <VerifyXIcon
                     style={{ marginLeft: 5, marginRight: 1, marginTop: 2 }}
                     size={iconSizeSm}
                     color={colors.fgDanger}
                   />
                 )}
-                {(vt.status === RPCValueTransfersStatusEnum.calculated ||
-                  vt.status === RPCValueTransfersStatusEnum.transmitted ||
-                  vt.status === RPCValueTransfersStatusEnum.mempool) && (
+                {(vt.status === 'calculated' ||
+                  vt.status === 'transmitted' ||
+                  vt.status === 'mempool') && (
                   <CheckCircleLineIcon
                     style={{ marginLeft: 5, marginRight: 1, marginTop: 2 }}
                     size={iconSizeSm}
                     color={colors.fgWarning}
                   />
                 )}
-                {vt.status === RPCValueTransfersStatusEnum.confirmed && (
+                {vt.status === 'confirmed' && (
                   <CheckCircleIcon
                     style={{ marginLeft: 5, marginRight: 1, marginTop: 2 }}
                     size={iconSizeSm}
@@ -312,15 +305,14 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                     checkColor={colors.fgOnAccent}
                   />
                 )}
-                {vt.status !== RPCValueTransfersStatusEnum.confirmed &&
-                  vt.status !== RPCValueTransfersStatusEnum.failed && (
-                    <CheckCircleLineIcon
-                      style={{ marginLeft: 1, marginRight: 0, marginTop: 2 }}
-                      size={iconSizeSm}
-                      color={colors.fgWarning}
-                    />
-                  )}
-                {vt.status === RPCValueTransfersStatusEnum.confirmed && (
+                {vt.status !== 'confirmed' && vt.status !== 'failed' && (
+                  <CheckCircleLineIcon
+                    style={{ marginLeft: 1, marginRight: 0, marginTop: 2 }}
+                    size={iconSizeSm}
+                    color={colors.fgWarning}
+                  />
+                )}
+                {vt.status === 'confirmed' && (
                   <CheckCircleIcon
                     style={{ marginLeft: 1, marginRight: 0, marginTop: 2 }}
                     size={iconSizeSm}
@@ -328,19 +320,16 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                     checkColor={colors.fgOnAccent}
                   />
                 )}
-                {vt.status !== RPCValueTransfersStatusEnum.confirmed &&
-                  vt.status !== RPCValueTransfersStatusEnum.failed && (
-                    <View style={{ marginLeft: 2, marginTop: 2 }}>
-                      <ActivityIndicator
-                        size={
-                          Platform.OS === GlobalConst.platformOSios
-                            ? 'small'
-                            : 12
-                        }
-                        color={colors.fgMuted}
-                      />
-                    </View>
-                  )}
+                {vt.status !== 'confirmed' && vt.status !== 'failed' && (
+                  <View style={{ marginLeft: 2, marginTop: 2 }}>
+                    <ActivityIndicator
+                      size={
+                        Platform.OS === GlobalConst.platformOSios ? 'small' : 12
+                      }
+                      color={colors.fgMuted}
+                    />
+                  </View>
+                )}
               </View>
             </View>
           </View>

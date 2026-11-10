@@ -1,6 +1,4 @@
-import type { ValueTransferType } from '@app/AppState';
-import { ValueTransferKindEnum } from '@app/wallet/enums';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import type { ValueTransferType } from '@app/wallet/transfer';
 import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
 import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
@@ -15,12 +13,12 @@ const HASH = 'E717E197095A637090BF5F94609B8BC84D56ACD6DAD4E423D695307CF6259BAA';
 
 const vt = (over: Partial<ValueTransferType>): ValueTransferType => ({
   txid: 'df3fe39c',
-  kind: ValueTransferKindEnum.Received,
+  kind: 'Received',
   confirmations: 1,
   blockheight: 1,
   time: 1,
   amount: 0.01732169,
-  status: RPCValueTransfersStatusEnum.confirmed,
+  status: 'confirmed',
   memos: [`OUT:${HASH}`],
   ...over,
 });
@@ -54,8 +52,8 @@ describe('payoutNotesFrom', () => {
   it('Tests that nothing is a payout when the transfer was not received, failed, or is a swap row', () => {
     expect(
       payoutNotesFrom([
-        vt({ kind: ValueTransferKindEnum.Sent }),
-        vt({ status: RPCValueTransfersStatusEnum.failed }),
+        vt({ kind: 'Sent' }),
+        vt({ status: 'failed' }),
         vt({ swapRecordId: 'rec-1' }),
       ]),
     ).toEqual([]);

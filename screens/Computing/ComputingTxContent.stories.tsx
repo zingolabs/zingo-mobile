@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { Route, ValueTransferType } from '@app/AppState';
-import { ValueTransferKindEnum } from '@app/wallet/enums';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { Route } from '@app/AppState';
+import { ValueTransferType, ValueTransferStatus } from '@app/wallet/transfer';
 import ComputingTxContent from './ComputingTxContent';
 import {
   screenProps,
@@ -54,9 +53,9 @@ const subject = {
 };
 const tx = (
   txid: string,
-  status: RPCValueTransfersStatusEnum,
+  status: ValueTransferStatus,
   confirmations = 0,
-  kind = ValueTransferKindEnum.Sent,
+  kind = 'Sent',
 ): ValueTransferType =>
   ({
     txid,
@@ -73,7 +72,7 @@ export const InMempool: Story = {
   tags: ['static'],
   decorators: [
     withAppContext({
-      valueTransfers: [tx('abc', RPCValueTransfersStatusEnum.mempool)],
+      valueTransfers: [tx('abc', 'mempool')],
     }),
   ],
   args: screenProps(Route.Computing, {
@@ -87,7 +86,7 @@ export const Confirming: Story = {
   tags: ['static'],
   decorators: [
     withAppContext({
-      valueTransfers: [tx('abc', RPCValueTransfersStatusEnum.confirmed, 2)],
+      valueTransfers: [tx('abc', 'confirmed', 2)],
     }),
   ],
   args: screenProps(Route.Computing, {
@@ -102,13 +101,8 @@ export const TexInMempool: Story = {
   decorators: [
     withAppContext({
       valueTransfers: [
-        tx(
-          'hop',
-          RPCValueTransfersStatusEnum.mempool,
-          0,
-          ValueTransferKindEnum.SendToSelf,
-        ),
-        tx('pay', RPCValueTransfersStatusEnum.mempool),
+        tx('hop', 'mempool', 0, 'SendToSelf'),
+        tx('pay', 'mempool'),
       ],
     }),
   ],
@@ -123,7 +117,7 @@ export const FailedSending: Story = {
   tags: ['static'],
   decorators: [
     withAppContext({
-      valueTransfers: [tx('abc', RPCValueTransfersStatusEnum.failed)],
+      valueTransfers: [tx('abc', 'failed')],
     }),
   ],
   args: screenProps(Route.Computing, {

@@ -1,6 +1,5 @@
-import { GlobalConst, ValueTransferType } from '@app/AppState';
-import { ValueTransferKindEnum } from '@app/wallet/enums';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { GlobalConst } from '@app/AppState';
+import { ValueTransferType, ValueTransferKind } from '@app/wallet/transfer';
 import type { SendStage } from '@app/walletBackend/transforms/sendSettlement';
 
 /** The five steps a send is told in, with its dots. */
@@ -30,18 +29,16 @@ export type SendView =
     };
 
 /** The kinds a send or a shield of this wallet leaves in History. */
-const OWN: readonly ValueTransferKindEnum[] = [
-  ValueTransferKindEnum.Sent,
-  ValueTransferKindEnum.SendToSelf,
-  ValueTransferKindEnum.MemoToSelf,
-  ValueTransferKindEnum.Shield,
+const OWN: readonly ValueTransferKind[] = [
+  'Sent',
+  'SendToSelf',
+  'MemoToSelf',
+  'Shield',
 ];
 
-const isFailed = (vt: ValueTransferType) =>
-  vt.status === RPCValueTransfersStatusEnum.failed;
+const isFailed = (vt: ValueTransferType) => vt.status === 'failed';
 /** In a TEX send the hop to oneself goes first, the payment last. */
-const isPayment = (vt: ValueTransferType) =>
-  vt.kind === ValueTransferKindEnum.Sent;
+const isPayment = (vt: ValueTransferType) => vt.kind === 'Sent';
 
 /** A send or a shield of this wallet that History should reopen here: not failed and still confirming. */
 export const followsHere = (vt: ValueTransferType): boolean =>
@@ -82,11 +79,7 @@ export function followTxids(
   }
   if (
     rows.length < txids.length ||
-    rows.some(
-      vt =>
-        vt.status === RPCValueTransfersStatusEnum.calculated ||
-        vt.status === RPCValueTransfersStatusEnum.transmitted,
-    )
+    rows.some(vt => vt.status === 'calculated' || vt.status === 'transmitted')
   ) {
     return progress('nym');
   }

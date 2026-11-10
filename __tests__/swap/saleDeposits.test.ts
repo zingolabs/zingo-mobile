@@ -1,6 +1,4 @@
-import type { ValueTransferType } from '@app/AppState';
-import { ValueTransferKindEnum } from '@app/wallet/enums';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import type { ValueTransferType } from '@app/wallet/transfer';
 import { BroadcastStatusEnum } from '@app/swap/enums/BroadcastStatusEnum';
 import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
@@ -48,13 +46,13 @@ const payment = (over: Partial<SentPaymentType> = {}): SentPaymentType => ({
 
 const vt = (over: Partial<ValueTransferType>): ValueTransferType => ({
   txid: 'aa11',
-  kind: ValueTransferKindEnum.Sent,
+  kind: 'Sent',
   confirmations: 0,
   blockheight: 0,
   time: (CREATED_MS + 60_000) / 1000,
   amount: 0.25,
   address: 't1deposit',
-  status: RPCValueTransfersStatusEnum.mempool,
+  status: 'mempool',
   ...over,
 });
 
@@ -66,8 +64,8 @@ describe('sentPaymentsFrom', () => {
   it('Tests that nothing is a payment when it was received, failed, a swap row or has no address', () => {
     expect(
       sentPaymentsFrom([
-        vt({ kind: ValueTransferKindEnum.Received }),
-        vt({ status: RPCValueTransfersStatusEnum.failed }),
+        vt({ kind: 'Received' }),
+        vt({ status: 'failed' }),
         vt({ swapRecordId: 'sale-1' }),
         vt({ address: undefined }),
       ]),

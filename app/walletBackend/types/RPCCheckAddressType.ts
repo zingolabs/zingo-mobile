@@ -1,4 +1,4 @@
-import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
+import { AddressScope } from '@app/wallet/address';
 import { RPCCheckAddressTypeEnum } from '@app/walletBackend/enums/RPCCheckAddressTypeEnum';
 
 export type RPCCheckAddressType = {
@@ -11,5 +11,5 @@ export type RPCCheckAddressType = {
   has_sapling?: boolean;
   has_transparent?: boolean;
   diversifier_index?: number;
-  scope?: RPCAddressScopeEnum;
+  scope?: AddressScope;
 };

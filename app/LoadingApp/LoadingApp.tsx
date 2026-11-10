@@ -37,7 +37,7 @@ import {
 import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
 import { showConfirm } from '@app/services/showConfirm';
-import { viewingKeyChain } from '@app/utils/seedPhrase';
+import { isViewingKey, viewingKeyChain } from '@app/utils/seedPhrase';
 
 import {
   createNewWallet,
@@ -59,7 +59,6 @@ import {
 import {
   AppStateLoading,
   BackgroundType,
-  WalletType,
   TranslateType,
   NetInfoType,
   ServerType,
@@ -79,10 +78,11 @@ import {
   AppContextLoading,
   OnboardingContext,
   ZecPriceType,
-  RestoreFromTypeEnum,
   LaunchingModeEnum,
   BlockExplorerEnum,
 } from '@app/AppState';
+import { WalletType } from '@app/wallet/keys';
+import { DeleteWalletContext } from '@app/AppState/types/DeleteWalletContext';
 import { serverUris } from '@app/uris';
 import { staticAlternatives, staticServers } from '@app/uris/serverChoice';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
@@ -125,7 +125,6 @@ import {
 // no lazy load because slowing down screens.
 import SeedSheet from '@ui/widgets/SeedSheet';
 import DeleteWalletSheet from '@ui/widgets/DeleteWalletSheet';
-import { DeleteWalletContext } from '@app/wallet/types';
 import { walletErrorKind } from './walletErrorKind';
 import { sanitizePaths } from '@app/utils/sanitizePaths';
 import { duration as motionDuration } from '@app/theme/motion';
@@ -1353,18 +1352,8 @@ export class LoadingAppClass extends Component<
         }),
       origin === Route.ImportWallet ? motionDuration.emphasized : 0,
     );
-    let type: RestoreFromTypeEnum = RestoreFromTypeEnum.seedRestoreFrom;
-    if (
-      seedUfvk.toLowerCase().startsWith(GlobalConst.uview) ||
-      seedUfvk.toLowerCase().startsWith(GlobalConst.uviewtest) ||
-      seedUfvk.toLowerCase().startsWith(GlobalConst.uviewregtest)
-    ) {
-      // this is a UFVK
-      type = RestoreFromTypeEnum.ufvkRestoreFrom;
-    }
-
     let result: Awaited<ReturnType<typeof restoreWalletFromSeed>>;
-    if (type === RestoreFromTypeEnum.seedRestoreFrom) {
+    if (!isViewingKey(seedUfvk)) {
       result = await restoreWalletFromSeed(
         seedUfvk.toLowerCase(),
         walletBirthday,

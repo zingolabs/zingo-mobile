@@ -7,7 +7,7 @@ import { WalletNavigation } from '@app/types';
 import { useTheme } from '@app/theme';
 import Pressable from '@ui/primitives/Pressable';
 import { Route } from '@app/AppState';
-import type { ValueTransferType } from '@app/AppState';
+import type { ValueTransferType } from '@app/wallet/transfer';
 import { ContextAppLoaded } from '@app/context';
 import { fiatQuote } from '@app/price/fiatQuote';
 import Utils from '@app/utils';

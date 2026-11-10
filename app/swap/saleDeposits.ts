@@ -1,6 +1,4 @@
-import type { ValueTransferType } from '@app/AppState';
-import { ValueTransferKindEnum } from '@app/wallet/enums';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import type { ValueTransferType } from '@app/wallet/transfer';
 import { BroadcastStatusEnum } from './enums/BroadcastStatusEnum';
 import { SwapStatusEnum } from './enums/SwapStatusEnum';
 import { saleDepositRequest } from './saleDepositRequest';
@@ -25,8 +23,8 @@ export function sentPaymentsFrom(
   valueTransfers: readonly ValueTransferType[],
 ): SentPaymentType[] {
   return valueTransfers.flatMap(vt =>
-    vt.kind === ValueTransferKindEnum.Sent &&
-    vt.status !== RPCValueTransfersStatusEnum.failed &&
+    vt.kind === 'Sent' &&
+    vt.status !== 'failed' &&
     !vt.swapRecordId &&
     vt.address
       ? [

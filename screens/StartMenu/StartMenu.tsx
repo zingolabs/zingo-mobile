@@ -21,7 +21,7 @@ import {
 } from '@app/theme';
 
 import { ContextAppLoading } from '@app/context';
-import { WalletType } from '@app/AppState';
+import { WalletType } from '@app/wallet/keys';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
 import { formatInteger } from '@app/utils/formatAmount';
 import Text from '@ui/primitives/Text';

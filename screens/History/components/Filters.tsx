@@ -3,7 +3,6 @@ import React, { useContext, useState } from 'react';
 import { View } from 'react-native';
 import { space8 } from '@app/theme';
 
-import { FilterEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import Button from '@ui/primitives/Button';
 import Chip from '@ui/primitives/Chip';
@@ -24,9 +23,11 @@ export const HISTORY_FILTERS: ReadonlyArray<[HistoryFilter, string]> = [
   ['swaps', 'history.filter-swaps'],
 ];
 
+export type FilterKind = 'received' | 'sent' | 'shielded' | 'swaps';
+
 /** The one filter the History state holds, read back from its flags. */
 export function filterOf(
-  kind: FilterEnum | null,
+  kind: FilterKind | null,
   failed: boolean,
   memos: boolean,
 ): HistoryFilter {
@@ -37,13 +38,13 @@ export function filterOf(
     return 'memo';
   }
   switch (kind) {
-    case FilterEnum.received:
+    case 'received':
       return 'received';
-    case FilterEnum.sent:
+    case 'sent':
       return 'sent';
-    case FilterEnum.shielded:
+    case 'shielded':
       return 'shielded';
-    case FilterEnum.swaps:
+    case 'swaps':
       return 'swaps';
     default:
       return 'all';
@@ -52,8 +53,8 @@ export function filterOf(
 
 type FiltersProps = {
   closeSheet: () => void;
-  filterKind: FilterEnum | null;
-  setFilterKind: (f: FilterEnum | null) => void;
+  filterKind: FilterKind | null;
+  setFilterKind: (f: FilterKind | null) => void;
   filterFailed: boolean;
   setFilterFailed: (f: boolean) => void;
   filterMemos: boolean;
@@ -88,13 +89,13 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
     setFilterMemos(picked === 'memo');
     setFilterKind(
       picked === 'received'
-        ? FilterEnum.received
+        ? 'received'
         : picked === 'sent'
-          ? FilterEnum.sent
+          ? 'sent'
           : picked === 'shielded'
-            ? FilterEnum.shielded
+            ? 'shielded'
             : picked === 'swaps'
-              ? FilterEnum.swaps
+              ? 'swaps'
               : null,
     );
     closeSheet();

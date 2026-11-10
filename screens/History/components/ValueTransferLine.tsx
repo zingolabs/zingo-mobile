@@ -6,13 +6,9 @@ import { WalletNavigation } from '@app/types';
 import { slopFor, useTheme, iconSizeMd, iconSize } from '@app/theme';
 import Pressable from '@ui/primitives/Pressable';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import {
-  ValueTransferType,
-  SendPageStateClass,
-  ToAddrClass,
-  Route,
-  GlobalConst,
-} from '@app/AppState';
+import { Route, GlobalConst } from '@app/AppState';
+import { ValueTransferType } from '@app/wallet/transfer';
+import { SendPageStateClass, ToAddrClass } from '@app/wallet/send';
 import { ContextAppLoaded } from '@app/context';
 import { fiatQuote } from '@app/price/fiatQuote';
 import Utils from '@app/utils';

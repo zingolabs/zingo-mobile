@@ -1,33 +1,6 @@
 import AddressBookFileClass from './classes/AddressBookFileClass';
 import SettingsFileClass from './classes/SettingsFileClass';
 import AddressBookFileClassObsolete from './classes/AddressBookFileClassObsolete';
-import {
-  SendPageStateClass,
-  ToAddrClass,
-  TotalBalanceClass,
-  TransparentAddressClass,
-  UnifiedAddressClass,
-} from '@app/wallet/classes';
-import type {
-  SendJsonToTypeType,
-  WalletType,
-  ValueTransferType,
-  ProposalPoolsType,
-  TransactionType,
-  TxDetailType,
-} from '@app/wallet/types';
-import {
-  TransactionTypeEnum,
-  PoolEnum,
-  RestoreFromTypeEnum,
-  PoolToShieldEnum,
-  AddressKindEnum,
-  ReceiverEnum,
-  ValueTransferKindEnum,
-  FilterEnum,
-  TransactionActionEnum,
-  AddressUnifiedTypeEnum,
-} from '@app/wallet/enums';
 
 import type InfoType from './types/InfoType';
 import type { TranslateType } from './types/TranslateType';
@@ -76,13 +49,8 @@ import type { OnboardingContext } from './AppContextLoading';
 import type AppContextLoaded from './AppContextLoaded';
 
 export {
-  UnifiedAddressClass,
-  TransparentAddressClass,
   AddressBookFileClass,
-  SendPageStateClass,
   SettingsFileClass,
-  ToAddrClass,
-  TotalBalanceClass,
   AddressBookFileClassObsolete,
   DONE,
   errorKeyed,
@@ -95,21 +63,11 @@ export {
   SelectServerEnum,
   ChainNameEnum,
   SnackbarDurationEnum,
-  TransactionTypeEnum,
-  PoolEnum,
-  RestoreFromTypeEnum,
-  PoolToShieldEnum,
   SettingsNameEnum,
   Route,
   AppStateStatusEnum,
   CurrencyNameEnum,
-  AddressKindEnum,
-  ReceiverEnum,
   EventListenerEnum,
-  ValueTransferKindEnum,
-  FilterEnum,
-  TransactionActionEnum,
-  AddressUnifiedTypeEnum,
   ZcashUriFieldEnum,
   LaunchingModeEnum,
   BlockExplorerEnum,
@@ -128,8 +86,6 @@ export type {
   AppContextLoading,
   OnboardingContext,
   AppContextLoaded,
-  WalletType,
-  SendJsonToTypeType,
   InfoType,
   ZecPriceType,
   BackgroundType,
@@ -144,8 +100,4 @@ export type {
   Done,
   GateFailure,
   GateFailureKey,
-  ValueTransferType,
-  ProposalPoolsType,
-  TransactionType,
-  TxDetailType,
 };

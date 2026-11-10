@@ -1,28 +1,14 @@
 import { act, renderHook } from '@testing-library/react-native';
 import {
-  AddressKindEnum,
   TransparentAddressClass,
   UnifiedAddressClass,
-} from '@app/AppState';
-import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
+} from '@app/wallet/address';
 import { useReceiveSelection } from '@screens/Receive/useReceiveSelection';
 
 const ua = (index: number, address: string) =>
-  new UnifiedAddressClass(
-    index,
-    address,
-    AddressKindEnum.u,
-    true,
-    false,
-    false,
-  );
+  new UnifiedAddressClass(index, address, 'u', true, false, false);
 const ta = (index: number, address: string) =>
-  new TransparentAddressClass(
-    index,
-    address,
-    AddressKindEnum.t,
-    RPCAddressScopeEnum.external,
-  );
+  new TransparentAddressClass(index, address, 't', 'external');
 
 const shielded = [ua(0, 'u-old'), ua(1, 'u-new')];
 const transparent = [ta(0, 't-one')];

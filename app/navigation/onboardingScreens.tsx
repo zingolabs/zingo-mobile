@@ -80,18 +80,20 @@ export function OpenErrorScreen() {
   if (!walletError) {
     return null;
   }
+  const walletChain =
+    walletError.kind === 'chain' ? walletError.walletChain : undefined;
   return (
     <WalletError
       kind={walletError.kind}
       details={walletError.details}
-      walletChain={walletError.walletChain}
+      walletChain={walletChain}
       resolved={errorResolved}
       busy={retrying}
       shake={errorShake}
       onRetry={retryOpenWallet}
       onImport={deleteThenImport}
       onCreate={deleteThenCreate}
-      onServer={() => openServer(walletError.walletChain)}
+      onServer={() => openServer(walletChain)}
       onSwitchChain={switchToWalletChain}
     />
   );

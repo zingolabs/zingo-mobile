@@ -11,12 +11,12 @@
  * inspected for an error sentinel.
  */
 import {
-  WalletType,
   GlobalConst,
   ErrorKeyed,
   errorKeyed,
   ChainNameEnum,
 } from '@app/AppState';
+import { WalletType } from '@app/wallet/keys';
 import { isNumber } from 'lodash';
 import RPCModule from '@app/RPCModule';
 import { callFfi, FfiResult } from '@app/walletBackend/ffi';

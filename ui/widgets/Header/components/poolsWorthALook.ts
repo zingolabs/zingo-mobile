@@ -1,4 +1,4 @@
-import { TotalBalanceClass } from '@app/wallet/classes';
+import { TotalBalanceClass } from '@app/wallet/balance';
 
 /**
  * Whether the balance needs its pools explained. Ironwood is the main

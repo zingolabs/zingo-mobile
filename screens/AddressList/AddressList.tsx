@@ -13,7 +13,7 @@ import {
   space20,
   touchTarget,
 } from '@app/theme';
-import { AddressKindEnum, Route, SnackbarDurationEnum } from '@app/AppState';
+import { Route, SnackbarDurationEnum } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { deliver } from '@app/navigation/results';
@@ -111,7 +111,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
   const row = (address: OwnAddress, index: number) => {
     const tag = tagOf(address.address)?.label ?? '';
     const kind = t(addressKindKey(address));
-    const isT = address.addressKind === AddressKindEnum.t;
+    const isT = address.addressKind === 't';
     return (
       <RadioRow
         key={address.address}

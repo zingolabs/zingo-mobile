@@ -2,7 +2,8 @@
 import React, { forwardRef, useContext } from 'react';
 import { View } from 'react-native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { GlobalConst, ValueTransferType } from '@app/AppState';
+import { GlobalConst } from '@app/AppState';
+import { ValueTransferType } from '@app/wallet/transfer';
 import { ContextAppLoaded } from '@app/context';
 import { fiatQuote } from '@app/price/fiatQuote';
 import Utils from '@app/utils';

@@ -1,6 +1,4 @@
-import type { ValueTransferType } from '@app/AppState';
-import { ValueTransferKindEnum } from '@app/wallet/enums';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import type { ValueTransferType } from '@app/wallet/transfer';
 import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
 import { SwapStatusEnum } from './enums/SwapStatusEnum';
 import { normalizeHashForTrack } from './MidgardClient';
@@ -27,11 +25,7 @@ export function payoutNotesFrom(
   valueTransfers: readonly ValueTransferType[],
 ): PayoutNoteType[] {
   return valueTransfers.flatMap(vt => {
-    if (
-      vt.kind !== ValueTransferKindEnum.Received ||
-      vt.status === RPCValueTransfersStatusEnum.failed ||
-      vt.swapRecordId
-    ) {
+    if (vt.kind !== 'Received' || vt.status === 'failed' || vt.swapRecordId) {
       return [];
     }
     const hash = (vt.memos ?? [])
