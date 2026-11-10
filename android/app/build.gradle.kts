@@ -340,6 +340,29 @@ androidComponents {
     }
 }
 
+// BackgroundSyncWorker consumes WorkManager's ListenableFuture from the
+// standalone jar. Guava on the runtime classpath would ship its whole
+// library for that one interface, which this check refuses per variant.
+androidComponents {
+    onVariants { variant ->
+        val runtime = variant.runtimeConfiguration
+        val verifyGuavaAbsent = tasks.register("verify${variant.name.replaceFirstChar(Char::uppercase)}GuavaAbsent") {
+            doLast {
+                val modules = runtime.incoming.resolutionResult.allComponents.map { it.id.displayName }
+                check(modules.none { it.startsWith("com.google.guava:guava:") }) {
+                    "Guava resolves on the ${variant.name} runtime classpath"
+                }
+                check(modules.any { it.startsWith("com.google.guava:listenablefuture:") }) {
+                    "listenablefuture is missing from the ${variant.name} runtime classpath"
+                }
+            }
+        }
+        tasks.matching { it.name == "pre${variant.name.replaceFirstChar(Char::uppercase)}Build" }.configureEach {
+            dependsOn(verifyGuavaAbsent)
+        }
+    }
+}
+
 
 // The React Native plugin registers a snapshot repository first on every
 // project, for its nightly builds, so each uncached lookup asks it before
