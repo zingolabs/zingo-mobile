@@ -1,0 +1,60 @@
+name: Code duplication
+
+on:
+  workflow_call:
+    inputs:
+      # Fail-all (see CONTEXT.md): when true, a failure here cancels the
+      # whole run. PR CI opts in; ci-nightly does not.
+      fail-all:
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  code-duplication:
+    name: jscpd
+    runs-on: ubuntu-24.04
+    steps:
+      # Depth 2 keeps the parent commit, the baseline of a mainline push.
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+
+      - run: yarn
+
+      # A pull request is measured against the tip of its base branch, a
+      # mainline push against its parent. jscpd scans the tree of the
+      # baseline ref, and a depth-one fetch of the base branch holds that tree.
+      - name: Resolve the baseline ref
+        env:
+          BASE_BRANCH: ${{ github.base_ref }}
+        run: |
+          if [ -n "$BASE_BRANCH" ]; then
+            git fetch --depth=1 origin "$BASE_BRANCH"
+            echo "BASELINE_REF=origin/$BASE_BRANCH" >> "$GITHUB_ENV"
+          else
+            echo "BASELINE_REF=HEAD^" >> "$GITHUB_ENV"
+          fi
+
+      # Fails on each clone the baseline lacks, in TypeScript, Kotlin or
+      # Swift. An edit that moves a clone makes it new.
+      - name: Check for new duplicated code
+        run: yarn dupes "$BASELINE_REF"
+
+      - name: Cancel the run on failure (fail-all)
+        if: ${{ failure() && inputs.fail-all }}
+        uses: actions/github-script@v9
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });

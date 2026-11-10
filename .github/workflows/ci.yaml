@@ -82,6 +82,13 @@ jobs:
     with:
       fail-all: true
 
+  # jscpd against the base branch. A PR that adds duplicated TypeScript,
+  # Kotlin or Swift fails here (see AGENTS.md, "No duplicated code").
+  code-duplication:
+    uses: ./.github/workflows/code-duplication.yaml
+    with:
+      fail-all: true
+
   # tsc, eslint and prettier --check. A rename-heavy PR is what this gate
   # catches: a stale import path or an unformatted file that jest never
   # loads.

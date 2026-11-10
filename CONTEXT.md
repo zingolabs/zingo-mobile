@@ -163,7 +163,8 @@ _Avoid_: clamped, floored
 
 **Blocking check** — a PR CI job that runs under fail-all and that
 branch protection requires; its failure withholds the merge verdict.
-Jest, js-depcheck, the JS static checks, andr-dependency-analysis, the
+Jest, js-depcheck, the JS static checks, the code-duplication check (jscpd
+against the base branch), andr-dependency-analysis, the
 two Binding Layer fetches, the Android Kotlin compile, the Android JVM
 unit tests, the Android APK build, the offline device tests, and the iOS
 integration test are blocking checks.
