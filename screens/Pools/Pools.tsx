@@ -30,6 +30,7 @@ import {
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { formatZecAmount } from '@app/utils/formatZecAmount';
+import { PoolNameType } from '@app/wallet/pool';
 import { useShieldFunds } from '@app/hooks/useShieldFunds';
 import { useOrchardResidualOnly } from '@app/hooks/useOrchardResidualOnly';
 import Header from '@ui/widgets/Header';
@@ -59,10 +60,8 @@ const BAR_DIM = 0.35;
 /** A segment is thinner than a finger. */
 const BAR_SLOP = { top: 15, bottom: 15 };
 
-type PoolKey = 'ironwood' | 'orchard' | 'sapling' | 'transparent';
-
 type Pool = {
-  key: PoolKey;
+  key: PoolNameType;
   total: number;
   /** Spendable for the shielded pools, confirmed for transparent. */
   ready: number;
@@ -117,8 +116,8 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
   });
   const orchardResidualOnly = useOrchardResidualOnly();
   /** The pool picked in the bar or by its card, as Sync's bars and boxes. */
-  const [focus, setFocus] = useState<PoolKey | null>(null);
-  const toggle = (key: PoolKey) =>
+  const [focus, setFocus] = useState<PoolNameType | null>(null);
+  const toggle = (key: PoolNameType) =>
     setFocus(prev => (prev === key ? null : key));
 
   const paint = {
@@ -299,7 +298,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                 }))}
                 track={colors.bgMutedSubtle}
                 focus={focus}
-                onPick={key => toggle(key as PoolKey)}
+                onPick={key => toggle(key as PoolNameType)}
               />
               <View
                 style={{
