@@ -1,5 +1,5 @@
 import { GlobalConst, ValueTransferType } from '@app/AppState';
-import { ValueTransferKindEnum } from '@app/AppState/enums/ValueTransferKindEnum';
+import { ValueTransferKindEnum } from '@app/wallet/enums';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import type { SendStage } from '@app/walletBackend/transforms/sendSettlement';
 import type { FlightFailure } from '@ui/widgets/Flight/SendFlight';

@@ -1,6 +1,6 @@
-import TotalBalanceClass from './classes/TotalBalanceClass';
-import UnifiedAddressClass from './classes/UnifiedAddressClass';
-import SendPageStateClass from './classes/SendPageStateClass';
+import { TotalBalanceClass } from '@app/wallet/classes';
+import { UnifiedAddressClass } from '@app/wallet/classes';
+import { SendPageStateClass } from '@app/wallet/classes';
 import AddressBookFileClass from './classes/AddressBookFileClass';
 
 import InfoType from './types/InfoType';
@@ -16,10 +16,10 @@ import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import { SnackbarActionType } from './types/SnackbarActionType';
-import ValueTransferType from './types/ValueTransferType';
+import type { ValueTransferType } from '@app/wallet/types';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RescanState } from '@app/walletBackend/utils/syncProgress';
-import TransparentAddressClass from './classes/TransparentAddressClass';
+import { TransparentAddressClass } from '@app/wallet/classes';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';

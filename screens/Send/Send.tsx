@@ -44,7 +44,7 @@ import {
   Route,
   ProposalPoolsType,
 } from '@app/AppState';
-import { hasUnconfirmedFunds } from '@app/AppState/classes/TotalBalanceClass';
+import { hasUnconfirmedFunds } from '@app/wallet/classes';
 // Imported straight from the module rather than through the `uris` barrel, so
 // the ZNS SDK stays out of the module graph of everything else that barrel
 // serves (the wallet backend among them).

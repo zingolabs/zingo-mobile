@@ -1,9 +1,9 @@
 import { AppStateStatus } from 'react-native';
 import { LaunchingModeEnum } from './enums/LaunchingModeEnum';
-import WalletType from './types/WalletType';
+import type { WalletType } from '@app/wallet/types';
 import { GateFailure } from './types/GateFailure';
-import { WalletErrorInfo } from './types/WalletErrorInfo';
-import { DeleteWalletContext } from './types/DeleteWalletContext';
+import type { WalletErrorInfo } from '@app/wallet/types';
+import type { DeleteWalletContext } from '@app/wallet/types';
 import { ServerStatus } from './types/ServerStatus';
 import ServerUrisType from './types/ServerUrisType';
 

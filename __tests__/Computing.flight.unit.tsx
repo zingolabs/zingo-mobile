@@ -32,7 +32,7 @@ import {
 } from '@app/context';
 import { Route, ValueTransferType } from '@app/AppState';
 import type { TranslateType } from '@app/AppState';
-import { ValueTransferKindEnum } from '@app/AppState/enums/ValueTransferKindEnum';
+import { ValueTransferKindEnum } from '@app/wallet/enums';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import type {
   ComputingParams,

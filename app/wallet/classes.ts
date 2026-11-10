@@ -1,4 +1,39 @@
-export default class TotalBalanceClass {
+import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
+
+import { AddressKindEnum } from './enums';
+
+export class ToAddrClass {
+  id: number;
+  to: string;
+  amount: string;
+  amountCurrency: string;
+  memo: string;
+  includeUAMemo: boolean;
+  // The ZNS alias this recipient was resolved from, empty when the address
+  // was entered directly. Carried so the confirmation screen can name the
+  // recipient the way the user did, and offer it when saving a contact.
+  znsAlias: string;
+
+  constructor(id: number) {
+    this.id = id;
+    this.to = '';
+    this.amount = '';
+    this.amountCurrency = '';
+    this.memo = '';
+    this.includeUAMemo = false;
+    this.znsAlias = '';
+  }
+}
+
+export class SendPageStateClass {
+  toaddr: ToAddrClass;
+
+  constructor(toaddr: ToAddrClass) {
+    this.toaddr = toaddr;
+  }
+}
+
+export class TotalBalanceClass {
   // Total transparent, confirmed and unconfirmed
   totalTransparentBalance: number;
 
@@ -65,3 +100,47 @@ export const hasUnconfirmedFunds = (balance: TotalBalanceClass): boolean =>
 
 export const hasFullyUnconfirmedPool = (balance: TotalBalanceClass): boolean =>
   poolPairs(balance).some(pool => pool.total > 0 && pool.confirmed === 0);
+
+export class TransparentAddressClass {
+  index: number;
+  address: string;
+  addressKind: AddressKindEnum.t;
+  scope: RPCAddressScopeEnum;
+
+  constructor(
+    index: number,
+    address: string,
+    addressKind: AddressKindEnum.t,
+    scope: RPCAddressScopeEnum,
+  ) {
+    this.index = index;
+    this.address = address;
+    this.addressKind = addressKind;
+    this.scope = scope;
+  }
+}
+
+export class UnifiedAddressClass {
+  index: number;
+  address: string;
+  addressKind: AddressKindEnum.u;
+  has_orchard: boolean;
+  has_sapling: boolean;
+  has_transparent: boolean;
+
+  constructor(
+    index: number,
+    address: string,
+    addressKind: AddressKindEnum.u,
+    has_orchard: boolean,
+    has_sapling: boolean,
+    has_transparent: boolean,
+  ) {
+    this.index = index;
+    this.address = address;
+    this.addressKind = addressKind;
+    this.has_orchard = has_orchard;
+    this.has_sapling = has_sapling;
+    this.has_transparent = has_transparent;
+  }
+}

@@ -23,7 +23,7 @@ import {
 } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
 import { TranslateType } from '@app/AppState';
-import { DeleteWalletContext } from '@app/AppState/types/DeleteWalletContext';
+import { DeleteWalletContext } from '@app/wallet/types';
 import Text from '@ui/primitives/Text';
 import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
 import Button, { BUTTON_HEIGHT } from '@ui/primitives/Button';

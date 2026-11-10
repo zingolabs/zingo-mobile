@@ -19,7 +19,7 @@ import {
   textVariants,
 } from '@app/theme';
 import { Route, ServerType, TranslateType } from '@app/AppState';
-import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
+import { TotalBalanceClass } from '@app/wallet/classes';
 import InfoType from '@app/AppState/types/InfoType';
 import { fiatQuote } from '@app/price/fiatQuote';
 import ZecPriceType from '@app/AppState/types/ZecPriceType';

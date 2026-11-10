@@ -9,7 +9,7 @@ import {
   SnackbarDurationEnum,
   TranslateType,
 } from '@app/AppState';
-import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
+import { TotalBalanceClass } from '@app/wallet/classes';
 import {
   shieldConfirm,
   shieldPreview,
