@@ -228,13 +228,17 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
       form.setAmount(text);
     }
   };
-  /** USD typed before the price was known becomes the coin amount once it is. */
-  useEffect(() => {
+  /**
+   * USD typed before the price was known becomes the coin amount once it is.
+   * Only when the price changes: a form emptied after a swap stays empty.
+   */
+  const [pricedAt, setPricedAt] = useState<number>(price);
+  if (pricedAt !== price) {
+    setPricedAt(price);
     if (usdMode && price > 0 && usdText && !form.amount) {
       form.setAmount(toZecText(usdText, price));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [price]);
+  }
   const toggleUnit = () => {
     if (usdMode) {
       setUnit('coin');
@@ -1087,6 +1091,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
           isShielded={shielded.isShielded}
           shieldedNote={shielded.note}
           payCoin={counterpartyTicker}
+          paidFromOutside={!form.isOutbound}
         />
         <SaveContactSheet
           ref={saveContactSheetRef}

@@ -25,6 +25,16 @@ import { SwapAssetType } from './types/SwapAssetType';
  * are quoted rather than paraphrased.
  */
 
+/**
+ * A token rather than its chain's gas asset: a SwapKit identifier with a
+ * `-<contract>` suffix (`ETH.USDT-0x…`, where `ETH.ETH` is native). A token
+ * transfer has no room for a memo, so a provider that routes on one cannot be
+ * paid with it from an exchange or a plain wallet.
+ */
+export function isTokenAsset(asset: { swapKitId: string }): boolean {
+  return asset.swapKitId.includes('-');
+}
+
 /** What to render in the QR block above the manual copy rows. */
 export type DepositQrType = {
   /** QR payload: a full payment URI, or a bare deposit address. */
@@ -62,9 +72,8 @@ export function buildDepositQr(args: {
 }): DepositQrType | null {
   const { sellAsset, depositAddress, amountHumanDecimal, memoText } = args;
   if (!depositAddress) return null;
-  // A native gas asset is a SwapKit identifier with no `-<contract>` suffix
-  // (`SOL.SOL`, `BASE.ETH`). Tokens must not get a native-transfer URI.
-  const isNative = !sellAsset.swapKitId.includes('-');
+  // Tokens must not get a native-transfer URI.
+  const isNative = !isTokenAsset(sellAsset);
 
   if (memoText) {
     if (!isNative) return null;

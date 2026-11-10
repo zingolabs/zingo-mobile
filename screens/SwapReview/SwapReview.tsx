@@ -16,7 +16,9 @@ import {
   depositSpendsSourceAddress,
   describeCommitFailure,
   formatAmountForDisplay,
+  isTokenAsset,
   orderNamesEphemeral,
+  providerRequiresMemo,
   providerShortLabel,
   renderSwapText,
   zecNetworkFeeReserve,
@@ -30,6 +32,7 @@ import { useAuthorizeDeposit } from './useAuthorizeDeposit';
 import Utils from '@app/utils';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
+import Checkbox from '@ui/primitives/Checkbox';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
@@ -106,6 +109,7 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
 
   const [committing, setCommitting] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [memoAcknowledged, setMemoAcknowledged] = useState<boolean>(false);
 
   const { route: chosen, quoteInput, fiatValueBasis } = review;
   const shielded = useShieldedRoutes({
@@ -123,6 +127,14 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
     counterparty.chain !== counterparty.symbol
       ? chainDisplayName(counterparty.chain) || counterparty.chain
       : '';
+  /** Buying ZEC, the other wallet pays: to an address alone, or with a memo it must add. */
+  const paysWithMemo = !isOutbound && providerRequiresMemo(chosen.provider);
+  /**
+   * A token transfer has no room for the memo, so paying one to Maya or
+   * THORChain takes a wallet that can add it some other way: the user says so
+   * before the address is reserved.
+   */
+  const memoAckNeeded = paysWithMemo && isTokenAsset(quoteInput.sellAsset);
   const slippage = quoteInput.slippageBps ?? 0;
   const feeReserve = isOutbound ? zecNetworkFeeReserve(chosen.provider) : 0;
   const feeText = isOutbound
@@ -309,6 +321,18 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
           {error}
         </Text>
       )}
+      {memoAckNeeded && (
+        <Checkbox
+          testID="swap.review.memo-ack"
+          label={(translate('swap.review-memo-ack') as string).replace(
+            '{provider}',
+            providerShortLabel(chosen.provider),
+          )}
+          checked={memoAcknowledged}
+          onChange={setMemoAcknowledged}
+          disabled={committing}
+        />
+      )}
       <Button
         testID="swap.review.confirm"
         variant={isOutbound ? 'nym' : 'primary'}
@@ -320,7 +344,12 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
             : (translate('swap.review-generate') as string)
         }
         busy={committing}
-        disabled={committing || !swapService || (isOutbound && !mixnetReady)}
+        disabled={
+          committing ||
+          !swapService ||
+          (isOutbound && !mixnetReady) ||
+          (memoAckNeeded && !memoAcknowledged)
+        }
         onPress={onConfirm}
       />
       <Button
@@ -421,6 +450,19 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
                 .filter(Boolean)
                 .join(' · '),
             },
+            ...(isOutbound
+              ? []
+              : [
+                  {
+                    label: translate('swap.review-how-you-pay') as string,
+                    value: translate(
+                      paysWithMemo
+                        ? 'swap.pay-address-memo'
+                        : 'swap.pay-address-only',
+                    ) as string,
+                    tone: paysWithMemo ? ('warning' as const) : undefined,
+                  },
+                ]),
             {
               label: translate(
                 isOutbound ? 'swap.review-to' : 'swap.refund-address',
