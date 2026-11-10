@@ -1,29 +1,44 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { useNavigation, usePreventRemove } from '@react-navigation/native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import Animated, {
   ReduceMotion,
+  interpolateColor,
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { space20, useTheme, radiusPill, slopFor, iconSizeSm } from '@app/theme';
-import Pressable from '@ui/primitives/Pressable';
-import { duration } from '@app/theme/motion';
+import { space20, useTheme, radiusPill } from '@app/theme';
+import { sendArt } from '@app/theme/sendArt';
+import { duration, ease } from '@app/theme/motion';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
 import FullPanel from '@ui/widgets/FullPanel';
-import SendFlight from '@ui/widgets/Flight/SendFlight';
-import SentMark from '@ui/widgets/Flight/SentMark';
+import SendFlight, { FAILED_AT } from '@ui/widgets/Flight/SendFlight';
 import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { GlobalConst, Route, ValueTransferType } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { STEPS, SendView, failedSince, followTxids } from './sendProgress';
+import {
+  STEPS,
+  SendStep,
+  SendView,
+  failedSince,
+  failureOf,
+  followTxids,
+} from './sendProgress';
+import ErrorDetails from './ErrorDetails';
 import TransactionsSheet from './TransactionsSheet';
 
 /**
@@ -33,6 +48,8 @@ import TransactionsSheet from './TransactionsSheet';
 const BUILD_MS = 2 * duration.hero;
 /** The fade between one step's words and the next. */
 const STEP_FADE_MS = duration.step;
+/** Error details arrive once the drawing has started to fail. */
+const ERROR_AFTER_MS = 700;
 
 type ComputingTxContentProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -59,26 +76,76 @@ const useFadedText = (text: string) => {
   return [shown, style] as const;
 };
 
+/** One of the step dots: 0 unlit, 1 lit once the send has reached its step, 2 red where it failed. */
+const StepDot = ({ state }: { state: number }) => {
+  const { colors } = useTheme();
+  const on = useSharedValue(state);
+  useEffect(() => {
+    on.value = withTiming(state, {
+      duration: duration.axis,
+      reduceMotion: ReduceMotion.System,
+    });
+  }, [state, on]);
+  const style = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(
+      on.value,
+      [0, 1, 2],
+      [sendArt.nodeStroke, colors.fgAccent, colors.fgDanger],
+    ),
+  }));
+  return (
+    <Animated.View
+      style={[{ width: 6, height: 6, borderRadius: radiusPill }, style]}
+    />
+  );
+};
+
+/** What arrives under a step that has started: it rises in once. */
+const RiseIn = ({
+  children,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+}) => {
+  const shown = useSharedValue(0);
+  useEffect(() => {
+    shown.value = withDelay(
+      delay,
+      withTiming(1, {
+        duration: duration.axis,
+        easing: ease.emphasized,
+        reduceMotion: ReduceMotion.System,
+      }),
+    );
+  }, [shown, delay]);
+  const style = useAnimatedStyle(() => ({
+    opacity: shown.value,
+    transform: [{ translateY: 6 * (1 - shown.value) }],
+  }));
+  return <Animated.View style={style}>{children}</Animated.View>;
+};
+
 /**
  * A send or a shield, followed from the moment it leaves to its last
  * confirmation: Creating, Through NYM, In the mempool, Confirming 1 to 3 of
- * 3, then the check with its sprout. While the backend works, a clock moves
+ * 3, then Sent. While the backend works, a clock moves
  * Creating to Through NYM; once it answers with the txids, the
  * transactions' own state tells the rest, so leaving and coming back from
- * History finds it at the right step. A send that fails says where, with a
- * red cross.
+ * History finds it at the right step. A send that fails says where, and the
+ * drawing ends there; one that failed to send and turns up after all goes on.
  */
 const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
   route,
 }) => {
   const navigation = useNavigation<WalletNavigation>();
   const { translate, valueTransfers } = useContext(ContextAppLoaded);
-  const { colors } = useTheme();
   const { width } = useWindowDimensions();
   const t = (key: string) => translate(key) as string;
 
   const [creating, setCreating] = useState<boolean>(true);
-  const [showErrorDetails, setShowErrorDetails] = useState<boolean>(false);
+  /** The last step the send was seen at, which tells where it expired. */
+  const [reached, setReached] = useState<SendStep>('nym');
   const sheetRef = useRef<BottomSheetModal>(null);
 
   const params = route.params;
@@ -101,6 +168,15 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
     (params?.phase === 'created' && params.txids.length > 1) ||
     view.rows.length > 1;
   const of = String(GlobalConst.minConfirmations);
+  const flightFailure =
+    view.kind === 'failed' ? failureOf(view.stage, reached) : undefined;
+  const progressStep = view.kind === 'progress' ? view.step : undefined;
+
+  useEffect(() => {
+    if (progressStep) {
+      setReached(progressStep);
+    }
+  }, [progressStep]);
 
   useEffect(() => {
     if (params?.phase !== undefined || !creating) {
@@ -110,8 +186,11 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
     return () => clearTimeout(timer);
   }, [params?.phase, creating]);
 
-  const toHistory = () =>
-    navigation.navigate(Route.Home, { screen: Route.History }, { pop: true });
+  const toHistory = useCallback(
+    () =>
+      navigation.navigate(Route.Home, { screen: Route.History }, { pop: true }),
+    [navigation],
+  );
   /**
    * Whatever takes this screen away (the back gesture, Android's back,
    * Done) lands on History: under it is the screen a send or shield started
@@ -123,8 +202,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
     if (leaving) {
       toHistory();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [leaving]);
+  }, [leaving, toHistory]);
 
   const openDetail = (vt: ValueTransferType) =>
     navigation.navigate(Route.ValueTransferDetail, {
@@ -148,12 +226,21 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
   const two = (key: string) => (pair ? `${key}-two` : key);
 
   const sent = view.kind === 'progress' && view.step === 'done';
+  /** Expired, the words depend on where: through NYM, or waiting for a block. */
+  const failedBody =
+    view.kind !== 'failed'
+      ? ''
+      : view.stage === 'expired'
+        ? `send.fail-expired-${flightFailure === 'poolexp' ? 'pool' : 'nym'}-body`
+        : `send.fail-${view.stage}-body`;
   const title =
     view.kind === 'failed'
       ? t(
           view.partial
             ? `send.fail-${view.stage}-title-2`
-            : `send.fail-${view.stage}-title`,
+            : view.stage === 'expired' && pair
+              ? 'send.fail-expired-title-two'
+              : `send.fail-${view.stage}-title`,
         )
       : sent
         ? t(
@@ -164,11 +251,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
         : fill(`send.step-${view.step}`, view.confirmations);
   const sub =
     view.kind === 'failed'
-      ? t(
-          view.partial
-            ? 'send.fail-partial-body'
-            : two(`send.fail-${view.stage}-body`),
-        )
+      ? t(view.partial ? 'send.fail-partial-body' : two(failedBody))
       : sent
         ? fill(two('send.sent-body'))
         : fill(two(`send.step-${view.step}-sub`), view.confirmations);
@@ -177,16 +260,18 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
 
   const viewButton =
     view.rows.length > 0 ? (
-      <Button
-        testID="computing.view"
-        variant="text"
-        title={t(
-          view.rows.length > 1
-            ? 'send.view-transactions'
-            : 'send.view-transaction',
-        )}
-        onPress={viewTransactions}
-      />
+      <RiseIn>
+        <Button
+          testID="computing.view"
+          variant="text"
+          title={t(
+            view.rows.length > 1
+              ? 'send.view-transactions'
+              : 'send.view-transaction',
+          )}
+          onPress={viewTransactions}
+        />
+      </RiseIn>
     ) : undefined;
   const footer = (
     <ButtonStack>
@@ -209,28 +294,31 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
     </ButtonStack>
   );
 
-  const step = view.kind === 'progress' ? STEPS.indexOf(view.step) : -1;
+  const step = STEPS.indexOf(
+    flightFailure ? FAILED_AT[flightFailure] : (progressStep ?? 'build'),
+  );
+  const dotState = (index: number) =>
+    flightFailure && index === step
+      ? 2
+      : flightFailure
+        ? Number(index < step)
+        : Number(index <= step);
 
   return (
     <FullPanel title="" center motion="step" footer={footer} testID="computing">
       <View style={{ alignItems: 'center' }}>
-        {view.kind === 'failed' ? (
-          <SentMark kind="failed" />
-        ) : sent ? (
-          <SentMark />
-        ) : (
-          <SendFlight
-            step={view.step === 'done' ? 'conf' : view.step}
-            confirmations={view.confirmations}
-            pair={pair}
-            width={width - space20 * 2}
-          />
-        )}
+        <SendFlight
+          step={progressStep}
+          failure={flightFailure}
+          confirmations={view.kind === 'progress' ? view.confirmations : 0}
+          width={width - space20 * 2}
+          pair={pair}
+        />
         <Animated.View style={titleStyle}>
           <Text
             testID="computing.title"
             variant="subtitle"
-            style={{ marginTop: 32, textAlign: 'center' }}
+            style={{ marginTop: 26, textAlign: 'center' }}
           >
             {shownTitle}
           </Text>
@@ -260,54 +348,20 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
             {shownSub}
           </Text>
         </Animated.View>
-        {step >= 0 && !sent && (
-          <View style={{ flexDirection: 'row', columnGap: 8, marginTop: 20 }}>
-            {STEPS.map((key, index) => (
-              <View
-                key={key}
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: radiusPill,
-                  backgroundColor:
-                    index < step
-                      ? colors.fgAccent
-                      : index === step
-                        ? colors.fgWarning
-                        : colors.borderMuted,
-                }}
-              />
-            ))}
-          </View>
-        )}
+        <View style={{ flexDirection: 'row', columnGap: 6, marginTop: 20 }}>
+          {STEPS.map((key, index) => (
+            <StepDot key={key} state={dotState(index)} />
+          ))}
+        </View>
         {view.kind === 'failed' && failure !== undefined && (
-          <View style={{ marginTop: 16, alignItems: 'center' }}>
-            <Pressable
-              kind="link"
-              onPress={() => setShowErrorDetails(v => !v)}
-              hitSlop={slopFor(iconSizeSm)}
-            >
-              <Text
-                variant="caption"
-                tone="danger"
-                style={{
-                  fontWeight: '700',
-                  textDecorationLine: 'underline',
-                }}
-              >
-                {t('loadedapp.transactionfailed-details')}
-              </Text>
-            </Pressable>
-            {showErrorDetails && (
-              <Text
-                variant="caption"
-                tone="muted"
-                style={{ marginTop: 12, textAlign: 'center' }}
-              >
-                {failure.kind === 'error' ? t(failure.errorKey) : failure.text}
-              </Text>
-            )}
-          </View>
+          <RiseIn delay={ERROR_AFTER_MS}>
+            <ErrorDetails
+              subject={title}
+              text={
+                failure.kind === 'error' ? t(failure.errorKey) : failure.text
+              }
+            />
+          </RiseIn>
         )}
       </View>
       <TransactionsSheet

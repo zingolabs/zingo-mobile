@@ -16,6 +16,7 @@ import {
 import { lacksDelivery } from './deliveryWatch';
 import { SwapStatusEnum, isTerminalStatus } from './enums/SwapStatusEnum';
 import { DEPOSIT_WAIT_MS } from './depositDeadline';
+import { isTokenAsset } from './depositGuidance';
 import { hasDepositEvidence } from './depositEvidence';
 import { SwapKitError } from './errors';
 import { awaitsPayout, claimPayout } from './payoutNotes';
@@ -915,6 +916,7 @@ function toRouteOption(
         ? route.warnings.join('; ')
         : undefined,
     tags,
+    paidWithToken: isTokenAsset({ swapKitId: sellAssetId }),
   };
 }
 

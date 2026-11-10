@@ -205,6 +205,7 @@ export type { UnavailableProviderType } from './unavailableProviders';
 export {
   buildDepositQr,
   exactAmountWarningText,
+  isTokenAsset,
   memoFieldHintForChain,
   providerRequiresMemo,
   requiresExactAmountWarning,
