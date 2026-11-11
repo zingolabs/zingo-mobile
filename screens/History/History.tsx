@@ -29,6 +29,7 @@ import {
   space8,
   space16,
   space20,
+  space24,
 } from '@app/theme';
 
 import {
@@ -44,6 +45,7 @@ import {
 } from '@app/AppState';
 import { HomeTabNavigation, HomeTabScreenProps } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
+import EmptySprout from '@ui/widgets/EmptySprout';
 import AppSheet from '@ui/primitives/AppSheet';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import RingBorder from '@ui/primitives/RingBorder';
@@ -88,6 +90,7 @@ import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTr
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import Filters, { HISTORY_FILTERS, filterOf } from './components/Filters';
 import Text from '@ui/primitives/Text';
+import Button from '@ui/primitives/Button';
 import FreshGlow from './components/FreshGlow';
 import { useFreshRows } from './useFreshRows';
 import { FiltersIcon } from '@ui/primitives/Icons/FiltersIcon';
@@ -826,34 +829,53 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     }
   };
 
+  /** Nothing to filter: no filter button, and none left on from before. */
+  const noHistory = mergedValueTransfers.length === 0;
+  useEffect(() => {
+    if (noHistory) {
+      setFilterKind(null);
+      setFilterFailed(false);
+      setFilterMemos(false);
+      setFilterWithFunds(false);
+    }
+  }, [noHistory]);
+
   const historyHeader = (
     <TitleBar
       title={translate('history.title') as string}
       onLayout={setHandleH}
-      right={{
-        icon: FiltersIcon,
-        accessibilityLabel: translate('history.filters') as string,
-        onPress: () => {
-          setShowFilters(true);
-          bottomSheetRef.current?.present();
-        },
-        badge:
-          !!filterKind || filterFailed || filterMemos || filterWithFunds ? (
-            <View
-              testID="history.filter.dot"
-              style={{
-                backgroundColor: colors.fgAccent,
-                width: 8,
-                height: 8,
-                borderRadius: radiusPill,
-                marginLeft: -3,
-                marginTop: -8,
-                borderWidth: 2,
-                borderColor: colors.bgSurface,
-              }}
-            />
-          ) : undefined,
-      }}
+      right={
+        noHistory
+          ? undefined
+          : {
+              icon: FiltersIcon,
+              testID: 'history.filters',
+              accessibilityLabel: translate('history.filters') as string,
+              onPress: () => {
+                setShowFilters(true);
+                bottomSheetRef.current?.present();
+              },
+              badge:
+                !!filterKind ||
+                filterFailed ||
+                filterMemos ||
+                filterWithFunds ? (
+                  <View
+                    testID="history.filter.dot"
+                    style={{
+                      backgroundColor: colors.fgAccent,
+                      width: 8,
+                      height: 8,
+                      borderRadius: radiusPill,
+                      marginLeft: -3,
+                      marginTop: -8,
+                      borderWidth: 2,
+                      borderColor: colors.bgSurface,
+                    }}
+                  />
+                ) : undefined,
+            }
+      }
     />
   );
 
@@ -943,7 +965,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
               />
             ) : (
               <View style={{ flex: 1, width: '100%' }}>
-                {activeFilter !== 'all' && (
+                {activeFilter !== 'all' && !noHistory && (
                   <View
                     testID="history.filter.bar"
                     style={{
@@ -1068,6 +1090,49 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                     </View>
                     {fades}
                   </>
+                ) : noHistory ? (
+                  <View
+                    testID="history.empty"
+                    style={{
+                      flex: 1,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      paddingHorizontal: space20,
+                      paddingBottom: 116,
+                    }}
+                  >
+                    <EmptySprout />
+                    <Text
+                      variant="subtitle"
+                      style={{
+                        marginTop: space20,
+                        alignSelf: 'stretch',
+                        textAlign: 'center',
+                      }}
+                    >
+                      {translate('history.empty-title') as string}
+                    </Text>
+                    <Text
+                      variant="bodySmall"
+                      tone="muted"
+                      style={{
+                        marginTop: space8,
+                        width: '100%',
+                        maxWidth: 290,
+                        textAlign: 'center',
+                      }}
+                    >
+                      {translate('history.empty-text') as string}
+                    </Text>
+                    <Button
+                      testID="history.empty.receive"
+                      variant="primary"
+                      inline
+                      title={translate('history.empty-receive') as string}
+                      onPress={() => navigation.navigate(Route.Receive)}
+                      style={{ marginTop: space24 }}
+                    />
+                  </View>
                 ) : (
                   <View
                     style={{

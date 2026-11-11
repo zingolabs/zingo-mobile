@@ -262,3 +262,32 @@ test('Tests that a sale asked about again fills the coin received, the amount an
   expect(result.current.amount).toBe('0.01');
   expect(result.current.activeAddress).toBe(BTC_ADDRESS);
 });
+
+test('Tests that the chosen coin stays when a flip loads the other direction’s catalog', async () => {
+  const USDT: TokenEntryType = {
+    chain: 'ETH',
+    chainId: '1',
+    ticker: 'USDT',
+    identifier: 'ETH.USDT-0xdAC17F958D2ee523a2206206994597C13D831ec7',
+    symbol: 'USDT',
+    name: 'Tether',
+    decimals: 6,
+  };
+  const { swapService } = service();
+  (
+    swapService.listRoutableTokens as jest.MockedFunction<
+      SwapService['listRoutableTokens']
+    >
+  ).mockImplementation(async () => [BTC, USDT]);
+  const { result } = render(swapService);
+  await waitFor(() => expect(result.current.selectedToken).toEqual(BTC));
+  act(() => result.current.setSelectedToken(USDT));
+
+  act(() => result.current.flip());
+
+  await waitFor(() => expect(result.current.isOutbound).toBe(false));
+  await waitFor(() =>
+    expect(swapService.listRoutableTokens).toHaveBeenCalledTimes(2),
+  );
+  expect(result.current.selectedToken).toEqual(USDT);
+});

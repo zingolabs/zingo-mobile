@@ -37,6 +37,11 @@ export function legsOf(
     .sort((a, b) => a.time - b.time);
 }
 
+/** The 0 ZEC note that carries a shielded deposit's memo, sent beside the payment. */
+export function isMemoLeg(leg: ValueTransferType): boolean {
+  return leg.kind !== ValueTransferKindEnum.Received && leg.amount === 0;
+}
+
 /** The deshield to the wallet's own transparent address before a memo deposit. */
 export function isHop(leg: ValueTransferType, record: SwapRecordType): boolean {
   const hops = record.broadcast?.allTxIds;
@@ -56,7 +61,7 @@ export function legName(
     return t('swap.leg-to-self');
   }
   if (leg.kind !== ValueTransferKindEnum.Received) {
-    return `${t('swap.leg-payment-to')} ${providerShortLabel(record.provider)}`;
+    return `${t(isMemoLeg(leg) ? 'swap.leg-memo-to' : 'swap.leg-payment-to')} ${providerShortLabel(record.provider)}`;
   }
   return t(
     record.status === SwapStatusEnum.Completed

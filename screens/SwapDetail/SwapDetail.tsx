@@ -61,7 +61,7 @@ import SaveContactButton from '@ui/widgets/SaveContactButton';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
 import { swapOutcome, swapStatePill } from '@screens/Swap/swapProgress';
 import { useRemoveSwap } from '@screens/Swap/useRemoveSwap';
-import { legName, legSlot, legsOf } from '@screens/Swap/swapLegs';
+import { isMemoLeg, legName, legSlot, legsOf } from '@screens/Swap/swapLegs';
 import { useNowMs } from '@app/hooks/useNowMs';
 
 type SwapDetailProps = NativeStackScreenProps<
@@ -525,14 +525,20 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
                       columnGap: space8,
                     }}
                   >
-                    <Text
-                      variant="bodyStrong"
-                      style={{
-                        color: received ? colors.fgAccent : colors.fgDefault,
-                      }}
-                    >
-                      {`${received ? '+' : '−'}${formatZecAmount(leg.amount)} ${info.currencyName}`}
-                    </Text>
+                    {isMemoLeg(leg) ? (
+                      <Text variant="caption" tone="muted">
+                        {`${t('history.fee')} ${formatZecAmount(leg.fee ?? 0)} ${info.currencyName}`}
+                      </Text>
+                    ) : (
+                      <Text
+                        variant="bodyStrong"
+                        style={{
+                          color: received ? colors.fgAccent : colors.fgDefault,
+                        }}
+                      >
+                        {`${received ? '+' : '−'}${formatZecAmount(leg.amount)} ${info.currencyName}`}
+                      </Text>
+                    )}
                     <ChevronRight size={iconSizeSm} color={colors.fgMuted} />
                   </View>
                 </Pressable>
