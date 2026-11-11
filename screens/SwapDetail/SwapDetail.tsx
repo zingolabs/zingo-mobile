@@ -62,6 +62,7 @@ import { useSwapRecord } from '@screens/Swap/useSwapRecord';
 import { swapOutcome, swapStatePill } from '@screens/Swap/swapProgress';
 import { useRemoveSwap } from '@screens/Swap/useRemoveSwap';
 import { legName, legSlot, legsOf } from '@screens/Swap/swapLegs';
+import { useNowMs } from '@app/hooks/useNowMs';
 
 type SwapDetailProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -95,6 +96,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
   const swapService = useSwapService();
   const records = useSwapRecords();
   const record = useSwapRecord(recordId);
+  const nowMs = useNowMs();
   const [legsOpen, setLegsOpen] = useState<boolean>(false);
   const t = (key: string) => (translate(key) as string).trim();
 
@@ -367,7 +369,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
       footer={
         <ButtonStack>
           {/* The last child shows on top: explorer, new quote, Delete. */}
-          {canRemoveSwap(record) && (
+          {canRemoveSwap(record, nowMs) && (
             <Button
               testID="swap.detail.remove"
               variant="dangerText"

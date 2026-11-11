@@ -14,6 +14,7 @@ import TitleBar from '@ui/widgets/TitleBar';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { shortWhen, transferRowText } from '@screens/History/historyRowText';
 import { transferIcon } from '@screens/History/transferIcon';
+import { useNowMs } from '@app/hooks/useNowMs';
 import HistoryRowBody from '@screens/History/components/HistoryRowBody';
 import HistoryAvatar from '@screens/History/components/HistoryAvatar';
 import { usdText } from '@screens/History/components/ValueTransferLine';
@@ -34,6 +35,7 @@ const TransactionsSheet = forwardRef<
     useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const t = (key: string) => (translate(key) as string).trim();
+  const nowMs = useNowMs();
   const quote = fiatQuote(zecPrice, server, server.chainName);
 
   return (
@@ -90,7 +92,7 @@ const TransactionsSheet = forwardRef<
                 }
                 text={transferRowText({
                   vt,
-                  when: shortWhen(vt.time * 1000, Date.now(), t, ms =>
+                  when: shortWhen(vt.time * 1000, nowMs, t, ms =>
                     Utils.formatDate(ms, 'MMM d', language),
                   ),
                   currency: info.currencyName,
