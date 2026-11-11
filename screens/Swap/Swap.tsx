@@ -23,7 +23,6 @@ import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import { HomeTabScreenProps } from '@app/types';
 import { ContextAppLoaded, useSwapRecords, useSwapService } from '@app/context';
 import {
-  awaitsDeposit,
   canonicalChainAddress,
   formatAmountForDisplay,
   isRefunding,
@@ -33,6 +32,7 @@ import {
   rateLimitedNotice,
   renderSwapText,
 } from '@app/swap';
+import { useNowMs } from '@app/hooks/useNowMs';
 import type { SwapRecordType } from '@app/swap';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
 import {
@@ -307,15 +307,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
     r => r.createdAtMs,
   );
   // The card turns to its warning half an hour after the payment address.
-  const [nowMs, setNowMs] = useState<number>(() => Date.now());
-  const awaiting = !!pending && awaitsDeposit(pending);
-  useEffect(() => {
-    if (!awaiting) {
-      return;
-    }
-    const timer = setInterval(() => setNowMs(Date.now()), 30_000);
-    return () => clearInterval(timer);
-  }, [awaiting]);
+  const nowMs = useNowMs();
   const pendingState = pending
     ? pendingSwapLabel(pending, nowMs, key => translate(key) as string)
     : null;

@@ -21,6 +21,7 @@ import {
   swapInFlight,
   swapRowText,
 } from '@screens/History/historyRowText';
+import { useNowMs } from '@app/hooks/useNowMs';
 import HistoryAvatar from './HistoryAvatar';
 import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import HistoryRowBody from './HistoryRowBody';
@@ -52,6 +53,7 @@ function SwapLine({
   const { translate, language, addressBook } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const t = (key: string) => (translate(key) as string).trim();
+  const nowMs = useNowMs();
   const sale = record.direction === SwapDirectionEnum.Outbound;
   const contact =
     sale && record.status === SwapStatusEnum.Completed
@@ -69,7 +71,7 @@ function SwapLine({
   const text = swapRowText({
     record,
     contactName: contact?.label,
-    when: shortWhen(record.createdAtMs, Date.now(), t, ms =>
+    when: shortWhen(record.createdAtMs, nowMs, t, ms =>
       Utils.formatDate(ms, 'MMM d', language),
     ),
     t,

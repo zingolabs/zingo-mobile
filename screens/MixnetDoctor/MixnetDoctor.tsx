@@ -1,5 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -15,7 +21,12 @@ import { Route } from '@app/AppState';
 import { useTheme, radiusMd } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import { probeServer } from '@app/walletBackend';
-import { mixnetJournal } from '@app/walletBackend/modules/MixnetJournal';
+import {
+  listJournal,
+  recentLossesOf,
+  subscribeJournal,
+} from '@app/walletBackend/modules/MixnetJournal';
+import { useNowMs } from '@app/hooks/useNowMs';
 import {
   getMixnetBootstrapDetail,
   getMixnetStatus,
@@ -126,7 +137,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
   const [direct, setDirect] = useState<MixnetDirectProbe>(NOT_RUN);
   const [directPhase, setDirectPhase] = useState<string>('');
   const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
-  const [nowMillis, setNowMillis] = useState<number>(Date.now());
+  const nowMillis = useNowMs();
 
   const closeScreen = useCallback(() => {
     if (navigation.canGoBack()) {
@@ -151,7 +162,6 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
       detailMillis,
       direct: NOT_RUN,
     });
-    setNowMillis(Date.now());
   }, [server]);
 
   /**
@@ -194,7 +204,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
     await readState();
   }, [reenableMixnet, readState]);
 
-  const journal = mixnetJournal.list();
+  const journal = useSyncExternalStore(subscribeJournal, listJournal);
 
   /**
    * A direct answer speaks for the transport it was taken against: once the
@@ -208,7 +218,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
           status: run.status,
           attachInFlight,
           direct: directPhase === phase ? direct : NOT_RUN,
-          recentLosses: mixnetJournal.recentLosses(nowMillis),
+          recentLosses: recentLossesOf(journal, nowMillis),
         };
   const verdict = input === null ? null : mixnetDoctorVerdict(input);
   const steps =
@@ -219,7 +229,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
 
   const copyReport = useCallback(
     (finished: MixnetDoctorRun) => {
-      Clipboard.setString(mixnetDoctorReport(finished, mixnetJournal.list()));
+      Clipboard.setString(mixnetDoctorReport(finished, listJournal()));
       addLastSnackbar(translate('mixnetdoctor.report-copied') as string);
     },
     [addLastSnackbar, translate],
