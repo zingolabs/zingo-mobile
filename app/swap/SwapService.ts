@@ -21,6 +21,8 @@ import { hasDepositEvidence } from './depositEvidence';
 import { SwapKitError } from './errors';
 import { awaitsPayout, claimPayout } from './payoutNotes';
 import type { PayoutNoteType } from './payoutNotes';
+import { awaitsRefund, claimRefund, paidIn } from './refundNotes';
+import type { RefundNoteType } from './refundNotes';
 import { awaitsSaleDeposit, claimSaleDeposit, paysSale } from './saleDeposits';
 import type { SentPaymentType } from './saleDeposits';
 import { isMemoTooLong, paysPurchaseShielded } from './shieldedPurchase';
@@ -590,6 +592,30 @@ export class SwapService {
         settled.push(note.txid);
         break;
       }
+    }
+    return settled;
+  }
+
+  /**
+   * Ties each refund the wallet received to the sale whose deposit it names.
+   * The memo carries the wallet's own deposit txid, so no provider is asked.
+   * Resolves to the refunds settled, tied to a sale or known to be no sale's.
+   */
+  async claimRefunds(notes: readonly RefundNoteType[]): Promise<string[]> {
+    const settled: string[] = [];
+    for (const note of notes) {
+      const records = await this.store.readAll();
+      const record = records.find(
+        r => awaitsRefund(r) && paidIn(r, note.depositTxid),
+      );
+      if (record) {
+        await this.store.update(record.recordId, current =>
+          awaitsRefund(current)
+            ? claimRefund(current, note, Date.now())
+            : current,
+        );
+      }
+      settled.push(note.txid);
     }
     return settled;
   }
