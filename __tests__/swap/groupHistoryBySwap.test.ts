@@ -1,6 +1,7 @@
-import type { ValueTransferType } from '@app/wallet/types';
-import { ValueTransferKindEnum } from '@app/AppState';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import type {
+  ValueTransferKind,
+  ValueTransferType,
+} from '@app/wallet/transfer';
 import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
 import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
@@ -67,12 +68,12 @@ const swap = (overrides: Partial<SwapRecordType>): SwapRecordType => ({
 const tx = (
   txid: string,
   timeSec: number,
-  type = ValueTransferKindEnum.Sent,
+  type: ValueTransferKind = 'Sent',
 ): ValueTransferType => ({
   kind: type,
   confirmations: 1,
   blockheight: 0,
-  status: RPCValueTransfersStatusEnum.confirmed,
+  status: 'confirmed',
   txid,
   time: timeSec,
   amount: 0.01,
@@ -82,11 +83,7 @@ const tx = (
 const newestFirst = (rows: ValueTransferType[]) =>
   [...rows].sort((a, b) => b.time - a.time);
 const ids = (rows: ValueTransferType[]) =>
-  rows.map(vt =>
-    vt.kind === ValueTransferKindEnum.Swap
-      ? `swap:${vt.swapRecordId}`
-      : vt.txid,
-  );
+  rows.map(vt => (vt.kind === 'Swap' ? `swap:${vt.swapRecordId}` : vt.txid));
 
 // A two-transaction outbound deposit refunded hours later, with an unrelated
 // transaction in between: the case that reads worst in time order.
@@ -142,7 +139,7 @@ describe('groupHistoryBySwap', () => {
       tx(HOP, 1001),
       tx(DEPOSIT, 1100),
       tx(UNRELATED, 5000),
-      tx(REFUND, 9000, ValueTransferKindEnum.Received),
+      tx(REFUND, 9000, 'Received'),
       tx(EARLIER, 500),
     ]);
 
@@ -171,7 +168,7 @@ describe('groupHistoryBySwap', () => {
     const rows = newestFirst([
       swapRecordToValueTransfer(inbound),
       tx(UNRELATED, 2000),
-      tx(DELIVERY, 3000, ValueTransferKindEnum.Received),
+      tx(DELIVERY, 3000, 'Received'),
     ]);
 
     expect(ids(groupHistoryBySwap(rows, swapTxidIndex([inbound])))).toEqual([

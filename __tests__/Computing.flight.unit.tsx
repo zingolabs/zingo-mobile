@@ -30,10 +30,9 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { Route, ValueTransferType } from '@app/AppState';
+import { Route } from '@app/AppState';
 import type { TranslateType } from '@app/AppState';
-import { ValueTransferKindEnum } from '@app/wallet/enums';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { ValueTransferType, ValueTransferStatus } from '@app/wallet/transfer';
 import type {
   ComputingParams,
   ComputingSubject,
@@ -51,9 +50,9 @@ const SINCE = 1_700_000_000;
 
 const row = (
   txid: string,
-  status: RPCValueTransfersStatusEnum,
+  status: ValueTransferStatus,
   confirmations = 0,
-  kind = ValueTransferKindEnum.Sent,
+  kind = 'Sent',
 ): ValueTransferType =>
   ({
     txid,
@@ -112,7 +111,7 @@ describe('Computing flight', () => {
 
   test('Tests that a send stays Through NYM when its transaction is only transmitted', () => {
     const view = computing({ phase: 'created', txids: ['abc'], subject }, [
-      row('abc', RPCValueTransfersStatusEnum.transmitted),
+      row('abc', 'transmitted'),
     ]);
     expect(view.getByTestId('computing.flight.nym', hidden)).toBeTruthy();
     expect(view.getByTestId('computing.view')).toHaveTextContent(
@@ -122,7 +121,7 @@ describe('Computing flight', () => {
 
   test('Tests that a send waits in the mempool when its transaction is there', () => {
     const view = computing({ phase: 'created', txids: ['abc'], subject }, [
-      row('abc', RPCValueTransfersStatusEnum.mempool),
+      row('abc', 'mempool'),
     ]);
     expect(view.getByTestId('computing.flight.pool', hidden)).toBeTruthy();
     expect(view.getByTestId('computing.title')).toHaveTextContent(
@@ -132,7 +131,7 @@ describe('Computing flight', () => {
 
   test('Tests that a send fills a block per confirmation when it is mined', () => {
     const view = computing({ phase: 'created', txids: ['abc'], subject }, [
-      row('abc', RPCValueTransfersStatusEnum.confirmed, 2),
+      row('abc', 'confirmed', 2),
     ]);
     expect(view.getByTestId('computing.flight.conf', hidden)).toBeTruthy();
     expect(view.getByTestId('computing.flight.filled.2', hidden)).toBeTruthy();
@@ -140,7 +139,7 @@ describe('Computing flight', () => {
 
   test('Tests that a send says Sent with how much and to whom when it has its confirmations', () => {
     const view = computing({ phase: 'created', txids: ['abc'], subject }, [
-      row('abc', RPCValueTransfersStatusEnum.confirmed, 3),
+      row('abc', 'confirmed', 3),
     ]);
     expect(view.getByTestId('computing.sent', hidden)).toBeTruthy();
     expect(view.getByTestId('computing.title')).toHaveTextContent(
@@ -157,7 +156,7 @@ describe('Computing flight', () => {
   });
 
   test('Tests that View transaction opens the transaction when History already lists it', () => {
-    const vt = row('abc', RPCValueTransfersStatusEnum.mempool);
+    const vt = row('abc', 'mempool');
     const view = computing({ phase: 'created', txids: ['abc'], subject }, [vt]);
     fireEvent.press(view.getByTestId('computing.view'));
     expect(mockNavigation.navigate).toHaveBeenCalledWith(
@@ -169,10 +168,7 @@ describe('Computing flight', () => {
   test('Tests that a TEX send follows both transactions and offers them together when it went out in two', () => {
     const view = computing(
       { phase: 'created', txids: ['hop', 'pay'], subject },
-      [
-        row('hop', RPCValueTransfersStatusEnum.confirmed, 1),
-        row('pay', RPCValueTransfersStatusEnum.mempool),
-      ],
+      [row('hop', 'confirmed', 1), row('pay', 'mempool')],
     );
     expect(view.getByTestId('computing.flight.pool', hidden)).toBeTruthy();
     expect(view.getByText('send.sending-line-two')).toBeTruthy();
@@ -188,14 +184,7 @@ describe('Computing flight', () => {
         txids: ['abc'],
         subject: { ...subject, kind: 'shield' },
       },
-      [
-        row(
-          'abc',
-          RPCValueTransfersStatusEnum.confirmed,
-          3,
-          ValueTransferKindEnum.Shield,
-        ),
-      ],
+      [row('abc', 'confirmed', 3, 'Shield')],
     );
     expect(view.getByTestId('computing.title')).toHaveTextContent(
       'send.shielded-title',
@@ -207,7 +196,7 @@ describe('Computing failures', () => {
   test('Tests that a send failed while creating shows the cross and nothing to view', () => {
     const view = computing(
       { phase: 'failed', stage: 'create', since: SINCE, subject },
-      [row('old', RPCValueTransfersStatusEnum.failed)],
+      [row('old', 'failed')],
     );
     expect(view.getByTestId('computing.failed', hidden)).toBeTruthy();
     expect(view.getByTestId('computing.title')).toHaveTextContent(
@@ -220,7 +209,7 @@ describe('Computing failures', () => {
   test('Tests that a send failed while sending offers its failed transaction when it was created', () => {
     const view = computing(
       { phase: 'failed', stage: 'send', since: SINCE, subject },
-      [row('abc', RPCValueTransfersStatusEnum.failed)],
+      [row('abc', 'failed')],
     );
     expect(view.getByTestId('computing.title')).toHaveTextContent(
       'send.fail-send-title',
@@ -234,15 +223,7 @@ describe('Computing failures', () => {
   test('Tests that a TEX send says transaction 2 was rejected when its hop went out', () => {
     const view = computing(
       { phase: 'failed', stage: 'rejected', since: SINCE, subject },
-      [
-        row(
-          'hop',
-          RPCValueTransfersStatusEnum.transmitted,
-          0,
-          ValueTransferKindEnum.SendToSelf,
-        ),
-        row('pay', RPCValueTransfersStatusEnum.failed),
-      ],
+      [row('hop', 'transmitted', 0, 'SendToSelf'), row('pay', 'failed')],
     );
     expect(view.getByTestId('computing.title')).toHaveTextContent(
       'send.fail-rejected-title-2',
@@ -257,7 +238,7 @@ describe('Computing failures', () => {
 
   test('Tests that a send that went out says it expired when its transaction turns failed', () => {
     const view = computing({ phase: 'created', txids: ['abc'], subject }, [
-      row('abc', RPCValueTransfersStatusEnum.failed),
+      row('abc', 'failed'),
     ]);
     expect(view.getByTestId('computing.failed', hidden)).toBeTruthy();
     expect(view.getByTestId('computing.title')).toHaveTextContent(

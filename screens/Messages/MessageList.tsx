@@ -28,7 +28,8 @@ import {
   useTheme,
 } from '@app/theme';
 
-import { Route, ValueTransferType } from '@app/AppState';
+import { Route } from '@app/AppState';
+import { ValueTransferType } from '@app/wallet/transfer';
 import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import Text from '@ui/primitives/Text';
 import FullPanel from '@ui/widgets/FullPanel';

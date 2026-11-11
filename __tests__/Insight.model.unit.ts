@@ -1,10 +1,5 @@
-import {
-  AddressBookFileClass,
-  ChainNameEnum,
-  ValueTransferKindEnum,
-} from '@app/AppState';
-import { ValueTransferType } from '@app/wallet/types';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { AddressBookFileClass, ChainNameEnum } from '@app/AppState';
+import { ValueTransferType } from '@app/wallet/transfer';
 import {
   buildInsight,
   groupTotal,
@@ -24,14 +19,14 @@ const sent = (
   memo = '',
 ): ValueTransferType => ({
   txid,
-  kind: ValueTransferKindEnum.Sent,
+  kind: 'Sent',
   confirmations: 10,
   blockheight: 1,
   time: nowSec - daysAgo * DAY,
   address,
   amount,
   memos: memo ? [memo] : [],
-  status: RPCValueTransfersStatusEnum.confirmed,
+  status: 'confirmed',
 });
 
 const ana = new AddressBookFileClass(
@@ -71,9 +66,9 @@ test('Tests that a contact keeps its name and color when the book holds its addr
 });
 
 test('Tests that sends land in their week and receipts stay out when the history mixes both.', () => {
-  const received = {
+  const received: ValueTransferType = {
     ...sent('u1x', 5, 1),
-    kind: ValueTransferKindEnum.Received,
+    kind: 'Received',
   };
   const insight = buildInsight(
     [sent('u1x', 1, 1, 't1', 'hi'), sent('u1x', 2, 20), received],

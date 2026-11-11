@@ -1,12 +1,12 @@
 import { GlobalConst } from '@app/AppState';
-import type { ValueTransferType } from '@app/AppState';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import type { ValueTransferType } from '@app/wallet/transfer';
+import { ValueTransferStatus } from '@app/wallet/transfer';
 
 /** The word for each status before it is mined, as zingolib reports it. */
-const PENDING: Partial<Record<RPCValueTransfersStatusEnum, string>> = {
-  [RPCValueTransfersStatusEnum.calculated]: 'history.state-prepared',
-  [RPCValueTransfersStatusEnum.transmitted]: 'history.state-sending',
-  [RPCValueTransfersStatusEnum.mempool]: 'history.in-mempool',
+const PENDING: Partial<Record<ValueTransferStatus, string>> = {
+  calculated: 'history.state-prepared',
+  transmitted: 'history.state-sending',
+  mempool: 'history.in-mempool',
 };
 
 /**
@@ -19,7 +19,7 @@ export function transferStatus(
   vt: Pick<ValueTransferType, 'status' | 'confirmations'>,
   t: (key: string) => string,
 ): { text: string; tone: 'danger' | 'warning' | 'accent' } {
-  if (vt.status === RPCValueTransfersStatusEnum.failed) {
+  if (vt.status === 'failed') {
     return { text: t('history.state-failed'), tone: 'danger' };
   }
   const pending = PENDING[vt.status];

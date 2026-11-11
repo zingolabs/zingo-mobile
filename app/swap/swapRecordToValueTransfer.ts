@@ -1,6 +1,4 @@
-import { ValueTransferType } from '@app/wallet/types';
-import { ValueTransferKindEnum } from '@app/wallet/enums';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { ValueTransferType, ValueTransferStatus } from '@app/wallet/transfer';
 import { SwapStatusEnum, isTerminalStatus } from './enums/SwapStatusEnum';
 import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
 import { SwapRecordType } from './types/SwapRecordType';
@@ -41,7 +39,7 @@ export function swapRecordToValueTransfer(
 
   return {
     txid,
-    kind: ValueTransferKindEnum.Swap,
+    kind: 'Swap',
     fee: undefined,
     // A multi-step swap has no single confirmation count. Zero reads as in
     // progress in the row; the detail reads the per-transaction figures.
@@ -68,25 +66,23 @@ export function swapRecordToValueTransfer(
  * values to the swap's ten. `IncompleteDeposit` stays in flight: the provider
  * holds the funds and either refunds or accepts a top-up.
  */
-function mapSwapStatusToVTStatus(
-  status: SwapStatusEnum,
-): RPCValueTransfersStatusEnum {
+function mapSwapStatusToVTStatus(status: SwapStatusEnum): ValueTransferStatus {
   switch (status) {
     case SwapStatusEnum.Completed:
-      return RPCValueTransfersStatusEnum.confirmed;
+      return 'confirmed';
     case SwapStatusEnum.Failed:
     case SwapStatusEnum.Refunded:
     case SwapStatusEnum.Expired:
-      return RPCValueTransfersStatusEnum.failed;
+      return 'failed';
     case SwapStatusEnum.PendingDeposit:
     case SwapStatusEnum.AwaitingExternalDeposit:
-      return RPCValueTransfersStatusEnum.calculated;
+      return 'calculated';
     case SwapStatusEnum.IncompleteDeposit:
     case SwapStatusEnum.Pending:
     case SwapStatusEnum.Processing:
     case SwapStatusEnum.ProviderStatusUnknown:
     default:
-      return RPCValueTransfersStatusEnum.mempool;
+      return 'mempool';
   }
 }
 

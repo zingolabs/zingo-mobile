@@ -3,7 +3,6 @@ import React, { useContext, useState } from 'react';
 import { View } from 'react-native';
 import { space8 } from '@app/theme';
 
-import { FilterEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import Button from '@ui/primitives/Button';
 import Chip from '@ui/primitives/Chip';
@@ -24,9 +23,14 @@ export const HISTORY_FILTERS: ReadonlyArray<[HistoryFilter, string]> = [
   ['swaps', 'history.filter-swaps'],
 ];
 
+export type FilterKind = Exclude<HistoryFilter, 'all' | 'failed' | 'memo'>;
+
+export const kindOf = (picked: HistoryFilter): FilterKind | null =>
+  picked === 'all' || picked === 'failed' || picked === 'memo' ? null : picked;
+
 /** The one filter the History state holds, read back from its flags. */
 export function filterOf(
-  kind: FilterEnum | null,
+  kind: FilterKind | null,
   failed: boolean,
   memos: boolean,
 ): HistoryFilter {
@@ -36,24 +40,13 @@ export function filterOf(
   if (memos) {
     return 'memo';
   }
-  switch (kind) {
-    case FilterEnum.received:
-      return 'received';
-    case FilterEnum.sent:
-      return 'sent';
-    case FilterEnum.shielded:
-      return 'shielded';
-    case FilterEnum.swaps:
-      return 'swaps';
-    default:
-      return 'all';
-  }
+  return kind ?? 'all';
 }
 
 type FiltersProps = {
   closeSheet: () => void;
-  filterKind: FilterEnum | null;
-  setFilterKind: (f: FilterEnum | null) => void;
+  filterKind: FilterKind | null;
+  setFilterKind: (f: FilterKind | null) => void;
   filterFailed: boolean;
   setFilterFailed: (f: boolean) => void;
   filterMemos: boolean;
@@ -86,17 +79,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
     setFilterWithFunds(false);
     setFilterFailed(picked === 'failed');
     setFilterMemos(picked === 'memo');
-    setFilterKind(
-      picked === 'received'
-        ? FilterEnum.received
-        : picked === 'sent'
-          ? FilterEnum.sent
-          : picked === 'shielded'
-            ? FilterEnum.shielded
-            : picked === 'swaps'
-              ? FilterEnum.swaps
-              : null,
-    );
+    setFilterKind(kindOf(picked));
     closeSheet();
   };
 

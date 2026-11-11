@@ -11,15 +11,9 @@ import type {
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { RevealOrigin } from '@ui/widgets/CircularReveal';
 import type { Request } from '@app/navigation/results';
-import {
-  ChainNameEnum,
-  ValueTransferKindEnum,
-  LaunchingModeEnum,
-  Route,
-  SendPageStateClass,
-  ValueTransferType,
-  ProposalPoolsType,
-} from '@app/AppState';
+import { ChainNameEnum, LaunchingModeEnum, Route } from '@app/AppState';
+import { ValueTransferKind, ValueTransferType } from '@app/wallet/transfer';
+import { SendPageStateClass, ProposalPoolsType } from '@app/wallet/send';
 import type { ComputingParams } from '@app/walletBackend/transforms/sendSettlement';
 import { RPCDrainTxType } from '@app/walletBackend/types/RPCDrainPlanType';
 import type { SwapReview } from '@screens/Swap/useSwapForm';
@@ -205,7 +199,7 @@ export type SwapReviewNavigationState = {
 export type SwapTransactionNavigationState = {
   recordId: string;
   txid: string;
-  kind: ValueTransferKindEnum;
+  kind: ValueTransferKind;
   /** Which of the transaction's transfers of that kind (`legSlot`). */
   slot: number;
 };

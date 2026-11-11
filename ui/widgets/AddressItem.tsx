@@ -15,11 +15,10 @@ import {
 import { useTimedReveal } from '@app/hooks/useTimedReveal';
 import {
   AddressBookFileClass,
-  SendPageStateClass,
-  ToAddrClass,
   SnackbarDurationEnum,
   Route,
 } from '@app/AppState';
+import { SendPageStateClass, ToAddrClass } from '@app/wallet/send';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
 import { useTheme, slopFor, iconSize, iconSizeMd } from '@app/theme';

@@ -10,13 +10,9 @@ import {
 } from '@app/context';
 import { AddressBook } from '@screens/AddressBook';
 import { mineEntries } from '@screens/AddressBook/AddressBook';
-import {
-  AddressBookFileClass,
-  AddressKindEnum,
-  ChainNameEnum,
-} from '@app/AppState';
+import { AddressBookFileClass, ChainNameEnum } from '@app/AppState';
+import { AddressKind, AddressScope } from '@app/wallet/address';
 import { deliver } from '@app/navigation/results';
-import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 
 jest.mock('@app/navigation/results', () => ({
@@ -26,13 +22,15 @@ jest.mock('@app/navigation/results', () => ({
 
 const NAMES = { unified: 'Unified', transparent: 'Transparent' };
 
-const unified = (address: string) => ({
+type Own = { address: string; addressKind: AddressKind; scope?: AddressScope };
+
+const unified = (address: string): Own => ({
   address,
-  addressKind: AddressKindEnum.u,
+  addressKind: 'u',
 });
-const transparent = (address: string, scope: RPCAddressScopeEnum) => ({
+const transparent = (address: string, scope: AddressScope): Own => ({
   address,
-  addressKind: AddressKindEnum.t,
+  addressKind: 't',
   scope,
 });
 
@@ -50,8 +48,8 @@ describe('mineEntries', () => {
   const addresses = [
     unified('u1first'),
     unified('u1second'),
-    transparent('t1outside', RPCAddressScopeEnum.external),
-    transparent('t1change', RPCAddressScopeEnum.internal),
+    transparent('t1outside', 'external'),
+    transparent('t1change', 'internal'),
   ];
 
   test('Tests that the own list numbers the unified addresses, marks the newest in use and keeps external transparent ones when the wallet has several.', () => {
@@ -111,7 +109,7 @@ describe('AddressBook as a picker', () => {
             {
               index: 0,
               address: 'u1mine',
-              addressKind: AddressKindEnum.u,
+              addressKind: 'u',
               has_orchard: true,
               has_sapling: true,
               has_transparent: false,

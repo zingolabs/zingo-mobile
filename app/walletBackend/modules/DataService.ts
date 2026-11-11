@@ -11,17 +11,18 @@
  * dependency: DataService → SyncCoordinator → DataService.
  */
 import {
-  TotalBalanceClass,
   InfoType,
   ChainNameEnum,
   CurrencyNameEnum,
-  AddressKindEnum,
   GlobalConst,
-  ValueTransferType,
-  UnifiedAddressClass,
-  TransparentAddressClass,
   foldBlockSpacing,
 } from '@app/AppState';
+import { TotalBalanceClass } from '@app/wallet/balance';
+import { ValueTransferType } from '@app/wallet/transfer';
+import {
+  UnifiedAddressClass,
+  TransparentAddressClass,
+} from '@app/wallet/address';
 import {
   noteHeights,
   resetFreshness,
@@ -208,7 +209,7 @@ export class DataService {
             new UnifiedAddressClass(
               u.address_index,
               u.encoded_address,
-              AddressKindEnum.u,
+              'u',
               u.has_orchard,
               u.has_sapling,
               u.has_transparent,
@@ -222,7 +223,7 @@ export class DataService {
             new TransparentAddressClass(
               u.address_index,
               u.encoded_address,
-              AddressKindEnum.t,
+              't',
               u.scope,
             ),
           );

@@ -7,7 +7,7 @@
  * deposits run the same way. The inSend flag is exposed so the UI can gate
  * actions that must not run during a send.
  */
-import { SendJsonToTypeType } from '@app/AppState';
+import { SendJsonToTypeType } from '@app/wallet/send';
 import RPCModule from '@app/RPCModule';
 import { RPCSendProposeType } from '@app/walletBackend/types/RPCSendProposeType';
 import { RPCSendType } from '@app/walletBackend/types/RPCSendType';

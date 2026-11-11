@@ -1,4 +1,4 @@
-import { TotalBalanceClass } from '@app/AppState';
+import { TotalBalanceClass } from '@app/wallet/balance';
 
 export const mockTotalBalance: TotalBalanceClass = {
   totalTransparentBalance: 0.12345678,

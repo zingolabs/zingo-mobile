@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { FilterEnum } from '@app/AppState';
 import Filters from './Filters';
 import { withAppContext } from '../../../.storybook/storyDecorators';
 
@@ -9,7 +8,7 @@ const meta: Meta<typeof Filters> = {
   decorators: [withAppContext()],
   args: {
     closeSheet: () => {},
-    filterKind: FilterEnum.all,
+    filterKind: null,
     setFilterKind: () => {},
     filterFailed: false,
     setFilterFailed: () => {},

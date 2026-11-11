@@ -33,10 +33,7 @@ import {
 } from '@app/walletBackend';
 import {
   AppStateLoaded,
-  TotalBalanceClass,
-  SendPageStateClass,
   InfoType,
-  ToAddrClass,
   ZecPriceType,
   BackgroundType,
   TranslateType,
@@ -57,18 +54,20 @@ import {
   EventListenerEnum,
   AppContextLoaded,
   NetInfoType,
-  ValueTransferType,
-  ValueTransferKindEnum,
   CurrencyNameEnum,
-  UnifiedAddressClass,
-  TransparentAddressClass,
-  AddressKindEnum,
   AddressBookFileClassObsolete,
   LaunchingModeEnum,
   BlockExplorerEnum,
   SnackbarDurationEnum,
   SnackbarActionType,
 } from '@app/AppState';
+import { TotalBalanceClass } from '@app/wallet/balance';
+import { SendPageStateClass, ToAddrClass } from '@app/wallet/send';
+import { ValueTransferType } from '@app/wallet/transfer';
+import {
+  UnifiedAddressClass,
+  TransparentAddressClass,
+} from '@app/wallet/address';
 import Utils from '@app/utils';
 import {
   formatAmount,
@@ -138,7 +137,6 @@ import {
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { RootParamList } from '@app/types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { publishReport } from '@app/services/reportDiagnostics';
 
 const en = require('@app/translations/en.json');
@@ -1170,10 +1168,7 @@ export class LoadedAppClass extends Component<
       const pending: number =
         valueTransfersTotal > 0
           ? valueTransfers
-              .filter(
-                (vt: ValueTransferType) =>
-                  vt.status !== RPCValueTransfersStatusEnum.failed,
-              )
+              .filter((vt: ValueTransferType) => vt.status !== 'failed')
               .filter(
                 (vt: ValueTransferType) =>
                   vt.confirmations >= 0 &&
@@ -1199,10 +1194,7 @@ export class LoadedAppClass extends Component<
                 this.state.privacy ? MASK : formatAmount(zec);
               let message: string = '';
               let title: string = '';
-              if (
-                vtNew[0].kind === ValueTransferKindEnum.Received &&
-                vtNew[0].amount > 0
-              ) {
+              if (vtNew[0].kind === 'Received' && vtNew[0].amount > 0) {
                 message =
                   (this.state.translate('loadedapp.incoming-funds') as string) +
                   (this.state.translate('history.received') as string) +
@@ -1214,7 +1206,7 @@ export class LoadedAppClass extends Component<
                   'loadedapp.receive-menu',
                 ) as string;
               } else if (
-                vtNew[0].kind === ValueTransferKindEnum.MemoToSelf &&
+                vtNew[0].kind === 'MemoToSelf' &&
                 vtNew[0].fee &&
                 vtNew[0].fee > 0
               ) {
@@ -1232,7 +1224,7 @@ export class LoadedAppClass extends Component<
                     : '');
                 title = this.state.translate('loadedapp.send-menu') as string;
               } else if (
-                vtNew[0].kind === ValueTransferKindEnum.SendToSelf &&
+                vtNew[0].kind === 'SendToSelf' &&
                 vtNew[0].fee &&
                 vtNew[0].fee > 0
               ) {
@@ -1249,7 +1241,7 @@ export class LoadedAppClass extends Component<
                       this.state.info.currencyName
                     : '');
                 title = this.state.translate('loadedapp.send-menu') as string;
-              } else if (vtNew[0].kind === ValueTransferKindEnum.Migration) {
+              } else if (vtNew[0].kind === 'Migration') {
                 // Orchard -> Ironwood migration: report the migrated amount
                 // (surfaced via the value-transfer `value`) plus the fee paid.
                 message =
@@ -1271,10 +1263,7 @@ export class LoadedAppClass extends Component<
                       this.state.info.currencyName
                     : '');
                 title = this.state.translate('loadedapp.send-menu') as string;
-              } else if (
-                vtNew[0].kind === ValueTransferKindEnum.Rejection &&
-                vtNew[0].amount > 0
-              ) {
+              } else if (vtNew[0].kind === 'Rejection' && vtNew[0].amount > 0) {
                 // not so sure about this `kind`...
                 // I guess the wallet is receiving some refund from a TEX sent.
                 message =
@@ -1287,10 +1276,7 @@ export class LoadedAppClass extends Component<
                 title = this.state.translate(
                   'loadedapp.receive-menu',
                 ) as string;
-              } else if (
-                vtNew[0].kind === ValueTransferKindEnum.Shield &&
-                vtNew[0].amount > 0
-              ) {
+              } else if (vtNew[0].kind === 'Shield' && vtNew[0].amount > 0) {
                 message =
                   (this.state.translate('loadedapp.incoming-funds') as string) +
                   (this.state.translate('history.shield') as string) +
@@ -1301,10 +1287,7 @@ export class LoadedAppClass extends Component<
                 title = this.state.translate(
                   'loadedapp.receive-menu',
                 ) as string;
-              } else if (
-                vtNew[0].kind === ValueTransferKindEnum.Sent &&
-                vtNew[0].amount > 0
-              ) {
+              } else if (vtNew[0].kind === 'Sent' && vtNew[0].amount > 0) {
                 message =
                   (this.state.translate('loadedapp.payment-made') as string) +
                   (this.state.translate('history.sent') as string) +
@@ -1366,7 +1349,7 @@ export class LoadedAppClass extends Component<
       // the last Unified Address created.
       const defaultUAArray = addresses.filter(
         (a: UnifiedAddressClass | TransparentAddressClass) =>
-          a.addressKind === AddressKindEnum.u,
+          a.addressKind === 'u',
       );
       const defaultUA: string =
         defaultUAArray[defaultUAArray.length - 1].address;

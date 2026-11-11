@@ -8,7 +8,8 @@ import React, {
   useState,
 } from 'react';
 
-import { ChainNameEnum, ReceiverEnum, ValueTransferType } from '@app/AppState';
+import { ChainNameEnum } from '@app/AppState';
+import { ValueTransferType } from '@app/wallet/transfer';
 import { createNewUnifiedAddress } from '@app/walletBackend';
 import type { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddressType';
 import { resetPinnedAddress } from '@app/hooks/usePinnedAddress';
@@ -44,9 +45,7 @@ const SwapServiceContext = createContext<SwapService | null>(null);
  * no new outputs since NU6.3 (ZIP 2006). It pays the Sapling one.
  */
 async function newShieldedAddress(): Promise<string> {
-  const created = await createNewUnifiedAddress(
-    ReceiverEnum.o + ReceiverEnum.z,
-  );
+  const created = await createNewUnifiedAddress('oz');
   if (!created.ok) {
     throw new Error(created.error.message);
   }

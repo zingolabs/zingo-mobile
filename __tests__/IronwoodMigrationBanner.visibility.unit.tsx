@@ -13,7 +13,8 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { InfoType, Route, TotalBalanceClass } from '@app/AppState';
+import { InfoType, Route } from '@app/AppState';
+import { TotalBalanceClass } from '@app/wallet/balance';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';

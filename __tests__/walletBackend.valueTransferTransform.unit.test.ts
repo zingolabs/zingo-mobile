@@ -2,9 +2,8 @@
  * @format
  */
 
-import { PoolEnum, ValueTransferKindEnum } from '@app/AppState';
+import { ValueTransferKind, ValueTransferStatus } from '@app/wallet/transfer';
 import { RPCValueTransfersKindEnum } from '@app/walletBackend/enums/RPCValueTransfersKindEnum';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { transformValueTransfer } from '@app/walletBackend/transforms/valueTransferTransform';
 import { RPCValueTransferType } from '@app/walletBackend/types/RPCValueTransferType';
 
@@ -14,7 +13,7 @@ function makeVt(
   return {
     txid: 'abc123',
     datetime: 1700000000,
-    status: RPCValueTransfersStatusEnum.confirmed,
+    status: 'confirmed',
     blockheight: 1000,
     kind: RPCValueTransfersKindEnum.received,
     value: 100_000_000,
@@ -23,14 +22,14 @@ function makeVt(
 }
 
 describe('transformValueTransfer — kind mapping', () => {
-  const cases: [RPCValueTransfersKindEnum, ValueTransferKindEnum][] = [
-    [RPCValueTransfersKindEnum.sent, ValueTransferKindEnum.Sent],
-    [RPCValueTransfersKindEnum.received, ValueTransferKindEnum.Received],
-    [RPCValueTransfersKindEnum.memoToSelf, ValueTransferKindEnum.MemoToSelf],
-    [RPCValueTransfersKindEnum.sendToSelf, ValueTransferKindEnum.SendToSelf],
-    [RPCValueTransfersKindEnum.migration, ValueTransferKindEnum.Migration],
-    [RPCValueTransfersKindEnum.shield, ValueTransferKindEnum.Shield],
-    [RPCValueTransfersKindEnum.rejection, ValueTransferKindEnum.Rejection],
+  const cases: [RPCValueTransfersKindEnum, ValueTransferKind][] = [
+    [RPCValueTransfersKindEnum.sent, 'Sent'],
+    [RPCValueTransfersKindEnum.received, 'Received'],
+    [RPCValueTransfersKindEnum.memoToSelf, 'MemoToSelf'],
+    [RPCValueTransfersKindEnum.sendToSelf, 'SendToSelf'],
+    [RPCValueTransfersKindEnum.migration, 'Migration'],
+    [RPCValueTransfersKindEnum.shield, 'Shield'],
+    [RPCValueTransfersKindEnum.rejection, 'Rejection'],
   ];
 
   test.each(cases)('maps %s → %s', (rpcKind, appKind) => {
@@ -45,11 +44,11 @@ describe('transformValueTransfer — kind mapping', () => {
 
 describe('transformValueTransfer — confirmations', () => {
   test('pending statuses yield 0 confirmations', () => {
-    const pendingStatuses = [
-      RPCValueTransfersStatusEnum.calculated,
-      RPCValueTransfersStatusEnum.transmitted,
-      RPCValueTransfersStatusEnum.mempool,
-      RPCValueTransfersStatusEnum.failed,
+    const pendingStatuses: ValueTransferStatus[] = [
+      'calculated',
+      'transmitted',
+      'mempool',
+      'failed',
     ];
     for (const status of pendingStatuses) {
       const result = transformValueTransfer(
@@ -129,7 +128,7 @@ describe('transformValueTransfer — optional fields', () => {
     expect(result.txid).toBe('deadbeef');
     expect(result.time).toBe(9999);
     expect(result.blockheight).toBe(42);
-    expect(result.status).toBe(RPCValueTransfersStatusEnum.confirmed);
+    expect(result.status).toBe('confirmed');
   });
 
   test('zecPrice defaults to 0 when absent', () => {
@@ -204,20 +203,20 @@ describe('transformValueTransfer — optional fields', () => {
 
   test('poolType is the single received pool', () => {
     const result = transformValueTransfer(
-      makeVt({ pools_received: [PoolEnum.OrchardPool] }),
+      makeVt({ pools_received: ['Orchard'] }),
       1100,
       1100,
     );
-    expect(result.poolType).toBe(PoolEnum.OrchardPool);
+    expect(result.poolType).toBe('Orchard');
   });
 
   test('poolType is the newest pool when a transfer spans pools', () => {
     // pools_received arrives in protocol order; ironwood is the newest.
     const result = transformValueTransfer(
-      makeVt({ pools_received: [PoolEnum.OrchardPool, PoolEnum.IronwoodPool] }),
+      makeVt({ pools_received: ['Orchard', 'Ironwood'] }),
       1100,
       1100,
     );
-    expect(result.poolType).toBe(PoolEnum.IronwoodPool);
+    expect(result.poolType).toBe('Ironwood');
   });
 });

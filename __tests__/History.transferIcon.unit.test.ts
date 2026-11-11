@@ -1,5 +1,4 @@
-import { ValueTransferKindEnum } from '@app/AppState';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { ValueTransferKind, ValueTransferStatus } from '@app/wallet/transfer';
 import { transferIcon } from '@screens/History/transferIcon';
 import { ShieldCheckIcon } from '@ui/primitives/Icons/ShieldCheckIcon';
 import { TxMigrationIcon } from '@ui/primitives/Icons/TxMigrationIcon';
@@ -9,31 +8,32 @@ import { TxSelfIcon } from '@ui/primitives/Icons/TxSelfIcon';
 import { TxSentIcon } from '@ui/primitives/Icons/TxSentIcon';
 
 const at = (
-  kind: ValueTransferKindEnum,
+  kind: ValueTransferKind,
   confirmations: number,
-  status = RPCValueTransfersStatusEnum.confirmed,
+  status: ValueTransferStatus = 'confirmed',
 ) => transferIcon({ kind, confirmations, status });
 
 test('Tests that a confirmed transaction shows its kind icon when it has the wallet minimum of confirmations', () => {
-  expect(at(ValueTransferKindEnum.Received, 3).icon).toBe(TxReceivedIcon);
-  expect(at(ValueTransferKindEnum.Sent, 3).icon).toBe(TxSentIcon);
-  expect(at(ValueTransferKindEnum.SendToSelf, 3).icon).toBe(TxSelfIcon);
-  expect(at(ValueTransferKindEnum.MemoToSelf, 3).icon).toBe(TxSelfIcon);
-  expect(at(ValueTransferKindEnum.Shield, 3).icon).toBe(ShieldCheckIcon);
-  expect(at(ValueTransferKindEnum.Migration, 3).icon).toBe(TxMigrationIcon);
-  expect(at(ValueTransferKindEnum.Sent, 3).danger).toBe(false);
+  expect(at('Received', 3).icon).toBe(TxReceivedIcon);
+  expect(at('Sent', 3).icon).toBe(TxSentIcon);
+  expect(at('SendToSelf', 3).icon).toBe(TxSelfIcon);
+  expect(at('MemoToSelf', 3).icon).toBe(TxSelfIcon);
+  expect(at('Shield', 3).icon).toBe(ShieldCheckIcon);
+  expect(at('Migration', 3).icon).toBe(TxMigrationIcon);
+  expect(at('Sent', 3).danger).toBe(false);
 });
 
 test('Tests that a transaction shows the clock when it is in the mempool or confirming', () => {
-  expect(at(ValueTransferKindEnum.Received, 0).icon).toBe(TxPendingIcon);
-  expect(at(ValueTransferKindEnum.Shield, 2).icon).toBe(TxPendingIcon);
+  expect(at('Received', 0).icon).toBe(TxPendingIcon);
+  expect(at('Shield', 2).icon).toBe(TxPendingIcon);
 });
 
 test('Tests that a transaction shows its kind icon in red when it failed or was rejected', () => {
-  expect(
-    at(ValueTransferKindEnum.Shield, 0, RPCValueTransfersStatusEnum.failed),
-  ).toEqual({ icon: ShieldCheckIcon, danger: true });
-  expect(at(ValueTransferKindEnum.Rejection, 3)).toEqual({
+  expect(at('Shield', 0, 'failed')).toEqual({
+    icon: ShieldCheckIcon,
+    danger: true,
+  });
+  expect(at('Rejection', 3)).toEqual({
     icon: TxSentIcon,
     danger: true,
   });

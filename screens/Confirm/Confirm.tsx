@@ -23,7 +23,8 @@ import { sendSubject } from '@screens/Send/sendSubject';
 import { fiatQuote } from '@app/price/fiatQuote';
 import { formatAmount, formatUsd } from '@app/utils/formatAmount';
 import { sendPermit } from '@app/walletBackend/transforms/sendPermit';
-import { Route, SendPageStateClass, ProposalPoolsType } from '@app/AppState';
+import { Route } from '@app/AppState';
+import { SendPageStateClass, ProposalPoolsType } from '@app/wallet/send';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type ConfirmProps = NativeStackScreenProps<AppDrawerParamList, 'Confirm'>;

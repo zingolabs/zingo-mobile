@@ -2,11 +2,7 @@
 import React, { useContext, useState } from 'react';
 import { View, Keyboard } from 'react-native';
 import { space8, space16, space20 } from '@app/theme';
-import {
-  AddressBookFileClass,
-  ReceiverEnum,
-  SnackbarDurationEnum,
-} from '@app/AppState';
+import { AddressBookFileClass, SnackbarDurationEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
@@ -37,20 +33,20 @@ const KINDS: {
     kind: 'orchard',
     title: 'receive.shielded-orchard',
     sub: 'receive.new-orchard-sub',
-    receivers: ReceiverEnum.o,
+    receivers: 'o',
     pill: 'best',
   },
   {
     kind: 'orchardSapling',
     title: 'receive.shielded-orchard-sapling',
     sub: 'receive.new-orchard-sapling-sub',
-    receivers: ReceiverEnum.o + ReceiverEnum.z,
+    receivers: 'oz',
   },
   {
     kind: 'sapling',
     title: 'receive.shielded-sapling',
     sub: 'receive.new-sapling-sub',
-    receivers: ReceiverEnum.z,
+    receivers: 'z',
   },
   {
     kind: 'transparent',

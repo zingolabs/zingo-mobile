@@ -21,11 +21,10 @@ import {
   GateFailure,
   GlobalConst,
   LanguageEnum,
-  SendJsonToTypeType,
-  SendPageStateClass,
   TranslateType,
   BlockExplorerEnum,
 } from '@app/AppState';
+import { SendJsonToTypeType, SendPageStateClass } from '@app/wallet/send';
 
 import randomColor from 'randomcolor';
 import { parseAddress } from '@app/walletBackend';

@@ -26,10 +26,9 @@ import {
 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
-  AddressKindEnum,
   TransparentAddressClass,
   UnifiedAddressClass,
-} from '@app/AppState';
+} from '@app/wallet/address';
 import Utils from '@app/utils';
 import { getZingoLogo } from '@app/utils/ZingoAppData';
 import Text from '@ui/primitives/Text';
@@ -128,7 +127,7 @@ export default function AddressCard({
   const { translate } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const t = (key: string) => translate(key) as string;
-  const transparent = address.addressKind === AddressKindEnum.t;
+  const transparent = address.addressKind === 't';
   /** Only the icon carries the pool's colour; its name reads in the text colour. */
   const kindColor = transparent ? colors.fgTransparent : colors.fgAccent;
 

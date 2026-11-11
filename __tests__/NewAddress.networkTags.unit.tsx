@@ -17,13 +17,12 @@ import {
 import {
   AppContextLoaded,
   AddressBookFileClass,
-  AddressKindEnum,
   ChainNameEnum,
   offlineServer,
   remoteServer,
 } from '@app/AppState';
+import { AddressKind } from '@app/wallet/address';
 import RPCModule from '@app/RPCModule';
-import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import NewAddress from '@screens/Receive/components/NewAddress';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
@@ -115,14 +114,12 @@ function walletContext(
 
 async function saveTag(
   network: (typeof networks)[number],
-  kind: AddressKindEnum,
+  kind: AddressKind,
   context = walletContext(network.chain),
 ) {
   const { chain } = network;
-  const generated =
-    kind === AddressKindEnum.u ? network.generated : network.transparent;
-  const existing =
-    kind === AddressKindEnum.u ? network.existing : network.generated;
+  const generated = kind === 'u' ? network.generated : network.transparent;
+  const existing = kind === 'u' ? network.existing : network.generated;
   const previous = [
     {
       label: 'Wallet tag',
@@ -134,7 +131,7 @@ async function saveTag(
     },
   ];
   await AddressBookFileImpl.writeAddressBook(previous);
-  if (kind === AddressKindEnum.u) {
+  if (kind === 'u') {
     jest.mocked(RPCModule.createNewUnifiedAddressProcess).mockResolvedValue(
       JSON.stringify({
         account: 0,
@@ -150,7 +147,7 @@ async function saveTag(
       JSON.stringify({
         account: 0,
         address_index: 1,
-        scope: RPCAddressScopeEnum.external,
+        scope: 'external',
         encoded_address: generated,
       }),
     );
@@ -162,7 +159,7 @@ async function saveTag(
       <NewAddress setAddressBook={setAddressBook} closeSheet={closeSheet} />
     </ContextAppLoadedProvider>,
   );
-  if (kind === AddressKindEnum.t) {
+  if (kind === 't') {
     fireEvent.press(screen.getByTestId('receive.new-kind.transparent'));
   }
   fireEvent.changeText(screen.getByTestId('receive.new-tag'), 'New tag');
@@ -185,8 +182,10 @@ async function saveTag(
   expect(reopened.find(entry => entry.label === 'New tag')?.chain).toBe(chain);
 }
 
+const kinds: AddressKind[] = ['u', 't'];
+
 const generationCases = networks.flatMap(network =>
-  [AddressKindEnum.u, AddressKindEnum.t].map(kind => ({ ...network, kind })),
+  kinds.map(kind => ({ ...network, kind })),
 );
 
 test.each(generationCases)(
@@ -194,7 +193,7 @@ test.each(generationCases)(
   async network => saveTag(network, network.kind),
 );
 
-test.each([AddressKindEnum.u, AddressKindEnum.t])(
+test.each(kinds)(
   'Tests that the generated %s tag remains in the book when the testnet wallet opens offline.',
   async kind => {
     const context = walletContext(ChainNameEnum.testChainName);

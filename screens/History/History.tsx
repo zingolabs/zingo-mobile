@@ -31,17 +31,9 @@ import {
   space20,
 } from '@app/theme';
 
-import {
-  ChainNameEnum,
-  FilterEnum,
-  isIronwoodActive,
-  Route,
-  ValueTransferKindEnum,
-  //SelectServerEnum,
-  //SendPageStateClass,
-  //ServerType,
-  ValueTransferType,
-} from '@app/AppState';
+import { ChainNameEnum, isIronwoodActive, Route } from '@app/AppState';
+import { FilterKind } from '@screens/History/components/Filters';
+import { ValueTransferType } from '@app/wallet/transfer';
 import { HomeTabNavigation, HomeTabScreenProps } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
 import AppSheet from '@ui/primitives/AppSheet';
@@ -84,7 +76,6 @@ import {
 import { ScrollEvent } from 'recyclerlistview/dist/reactnative/core/scrollcomponent/BaseScrollView';
 import { RecyclerListViewState } from 'recyclerlistview/dist/reactnative/core/RecyclerListView';
 import { Swipeable } from 'react-native-gesture-handler';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import Filters, { HISTORY_FILTERS, filterOf } from './components/Filters';
 import Text from '@ui/primitives/Text';
@@ -169,7 +160,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [filterWithFunds, setFilterWithFunds] = useState<boolean>(false);
-  const [filterKind, setFilterKind] = useState<FilterEnum | null>(null);
+  const [filterKind, setFilterKind] = useState<FilterKind | null>(null);
   const [filterFailed, setFilterFailed] = useState<boolean>(false);
   const [filterMemos, setFilterMemos] = useState<boolean>(false);
   const [showFilters, setShowFilters] = useState<boolean>(false);
@@ -501,36 +492,29 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       if (filterKind) {
         selectedKind = false;
         if (
-          filterKind === FilterEnum.sent &&
-          (vt.kind === ValueTransferKindEnum.Sent ||
-            vt.kind === ValueTransferKindEnum.SendToSelf ||
-            vt.kind === ValueTransferKindEnum.MemoToSelf ||
-            vt.kind === ValueTransferKindEnum.Migration ||
-            vt.kind === ValueTransferKindEnum.Rejection ||
-            (vt.kind === ValueTransferKindEnum.Swap && !vt.swapIsInbound))
+          filterKind === 'sent' &&
+          (vt.kind === 'Sent' ||
+            vt.kind === 'SendToSelf' ||
+            vt.kind === 'MemoToSelf' ||
+            vt.kind === 'Migration' ||
+            vt.kind === 'Rejection' ||
+            (vt.kind === 'Swap' && !vt.swapIsInbound))
         ) {
           selectedKind = true;
         } else if (
-          filterKind === FilterEnum.received &&
-          (vt.kind === ValueTransferKindEnum.Received ||
-            (vt.kind === ValueTransferKindEnum.Swap && vt.swapIsInbound))
+          filterKind === 'received' &&
+          (vt.kind === 'Received' || (vt.kind === 'Swap' && vt.swapIsInbound))
         ) {
           selectedKind = true;
-        } else if (
-          filterKind === FilterEnum.shielded &&
-          vt.kind === ValueTransferKindEnum.Shield
-        ) {
+        } else if (filterKind === 'shielded' && vt.kind === 'Shield') {
           selectedKind = true;
-        } else if (
-          filterKind === FilterEnum.swaps &&
-          vt.kind === ValueTransferKindEnum.Swap
-        ) {
+        } else if (filterKind === 'swaps' && vt.kind === 'Swap') {
           selectedKind = true;
         }
       }
       if (filterFailed) {
         selectedFailed = false;
-        if (vt.status === RPCValueTransfersStatusEnum.failed) {
+        if (vt.status === 'failed') {
           selectedFailed = true;
         }
       }

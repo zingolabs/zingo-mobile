@@ -69,12 +69,11 @@ import {
 import {
   ChainNameEnum,
   Route,
-  SendPageStateClass,
-  ToAddrClass,
   offlineServer,
   remoteServer,
 } from '@app/AppState';
 import type { TranslateType } from '@app/AppState';
+import { SendPageStateClass, ToAddrClass } from '@app/wallet/send';
 import { errorKeyed } from '@app/AppState/types/Result';
 import { HomeTabScreenProps } from '@app/types';
 import { fetchServerList } from '@app/uris';

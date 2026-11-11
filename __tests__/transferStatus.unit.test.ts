@@ -1,16 +1,13 @@
 jest.mock('@app/RPCModule', () => ({ __esModule: true, default: {} }));
 
 import { transferStatus } from '@app/utils/transferStatus';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { ValueTransferStatus } from '@app/wallet/transfer';
 
 const t = (key: string) =>
   key === 'history.confirming' ? 'Confirming {n} of {of}' : key;
 const at = (confirmations: number) =>
-  transferStatus(
-    { status: RPCValueTransfersStatusEnum.confirmed, confirmations },
-    t,
-  );
-const pending = (status: RPCValueTransfersStatusEnum) =>
+  transferStatus({ status: 'confirmed', confirmations }, t);
+const pending = (status: ValueTransferStatus) =>
   transferStatus({ status, confirmations: 0 }, t);
 
 test('Tests that a transaction reads as confirming, n of the minimum, until it reaches it', () => {
@@ -20,25 +17,23 @@ test('Tests that a transaction reads as confirming, n of the minimum, until it r
 });
 
 test('Tests that a transaction reads as the status zingolib reports when it is not mined yet', () => {
-  expect(pending(RPCValueTransfersStatusEnum.calculated)).toEqual({
+  expect(pending('calculated')).toEqual({
     text: 'history.state-prepared',
     tone: 'warning',
   });
-  expect(pending(RPCValueTransfersStatusEnum.transmitted)).toEqual({
+  expect(pending('transmitted')).toEqual({
     text: 'history.state-sending',
     tone: 'warning',
   });
-  expect(pending(RPCValueTransfersStatusEnum.mempool)).toEqual({
+  expect(pending('mempool')).toEqual({
     text: 'history.in-mempool',
     tone: 'warning',
   });
 });
 
 test('Tests that a failed transaction reads as failed whatever its confirmations', () => {
-  expect(
-    transferStatus(
-      { status: RPCValueTransfersStatusEnum.failed, confirmations: 0 },
-      t,
-    ),
-  ).toEqual({ text: 'history.state-failed', tone: 'danger' });
+  expect(transferStatus({ status: 'failed', confirmations: 0 }, t)).toEqual({
+    text: 'history.state-failed',
+    tone: 'danger',
+  });
 });

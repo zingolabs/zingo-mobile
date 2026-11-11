@@ -7,8 +7,6 @@ import {
   InfoType,
   ZecPriceType,
   BackgroundType,
-  SendPageStateClass,
-  ToAddrClass,
   NetInfoType,
   remoteServer,
   AddressBookFileClass,
@@ -18,6 +16,7 @@ import {
   AppContextLoaded,
   BlockExplorerEnum,
 } from '@app/AppState';
+import { SendPageStateClass, ToAddrClass } from '@app/wallet/send';
 
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';

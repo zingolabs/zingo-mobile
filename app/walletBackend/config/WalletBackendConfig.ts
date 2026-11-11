@@ -1,11 +1,10 @@
+import { InfoType, ServerType } from '@app/AppState';
+import { TotalBalanceClass } from '@app/wallet/balance';
+import { ValueTransferType } from '@app/wallet/transfer';
 import {
-  TotalBalanceClass,
-  InfoType,
-  ValueTransferType,
   UnifiedAddressClass,
   TransparentAddressClass,
-  ServerType,
-} from '@app/AppState';
+} from '@app/wallet/address';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import {

@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { TransparentAddressClass, UnifiedAddressClass } from '@app/AppState';
+import {
+  TransparentAddressClass,
+  UnifiedAddressClass,
+} from '@app/wallet/address';
 
 const NO_SWAP_ADDRESSES: ReadonlySet<string> = new Set();
 

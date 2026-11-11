@@ -11,7 +11,6 @@ import {
 } from '@app/context';
 
 import Filters from '@screens/History/components/Filters';
-import { FilterEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 
 describe('Filters - snapshots', () => {
@@ -45,7 +44,7 @@ describe('Filters - snapshots', () => {
         <ContextAppLoadedProvider value={state}>
           <Filters
             closeSheet={onFn}
-            filterKind={FilterEnum.sent}
+            filterKind={'sent'}
             setFilterKind={onFn}
             filterFailed={true}
             setFilterFailed={onFn}

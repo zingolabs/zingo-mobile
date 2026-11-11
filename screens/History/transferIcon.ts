@@ -1,6 +1,6 @@
-import { GlobalConst, ValueTransferKindEnum } from '@app/AppState';
-import type { ValueTransferType } from '@app/AppState';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { GlobalConst } from '@app/AppState';
+import { ValueTransferKind } from '@app/wallet/transfer';
+import type { ValueTransferType } from '@app/wallet/transfer';
 import { ShieldCheckIcon } from '@ui/primitives/Icons/ShieldCheckIcon';
 import { TxMigrationIcon } from '@ui/primitives/Icons/TxMigrationIcon';
 import { TxPendingIcon } from '@ui/primitives/Icons/TxPendingIcon';
@@ -11,16 +11,16 @@ import { TxSentIcon } from '@ui/primitives/Icons/TxSentIcon';
 type IconComponent = typeof TxSentIcon;
 
 /** The drawing of a transaction's kind, once it is confirmed. */
-function kindIcon(kind: ValueTransferKindEnum): IconComponent {
+function kindIcon(kind: ValueTransferKind): IconComponent {
   switch (kind) {
-    case ValueTransferKindEnum.Received:
+    case 'Received':
       return TxReceivedIcon;
-    case ValueTransferKindEnum.Shield:
+    case 'Shield':
       return ShieldCheckIcon;
-    case ValueTransferKindEnum.Migration:
+    case 'Migration':
       return TxMigrationIcon;
-    case ValueTransferKindEnum.SendToSelf:
-    case ValueTransferKindEnum.MemoToSelf:
+    case 'SendToSelf':
+    case 'MemoToSelf':
       return TxSelfIcon;
     default:
       return TxSentIcon;
@@ -35,8 +35,8 @@ function kindIcon(kind: ValueTransferKindEnum): IconComponent {
 export function transferIcon(
   vt: Pick<ValueTransferType, 'kind' | 'status' | 'confirmations'>,
 ): { icon: IconComponent; danger: boolean } {
-  const failed = vt.status === RPCValueTransfersStatusEnum.failed;
-  if (failed || vt.kind === ValueTransferKindEnum.Rejection) {
+  const failed = vt.status === 'failed';
+  if (failed || vt.kind === 'Rejection') {
     return { icon: kindIcon(vt.kind), danger: true };
   }
   if (vt.confirmations < GlobalConst.minConfirmations) {

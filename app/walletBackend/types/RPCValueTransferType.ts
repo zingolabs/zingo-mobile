@@ -1,11 +1,11 @@
-import { PoolEnum } from '@app/AppState';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { Pool } from '@app/wallet/pool';
+import { ValueTransferStatus } from '@app/wallet/transfer';
 import { RPCValueTransfersKindEnum } from '@app/walletBackend/enums/RPCValueTransfersKindEnum';
 
 export type RPCValueTransferType = {
   txid: string;
   datetime: number;
-  status: RPCValueTransfersStatusEnum;
+  status: ValueTransferStatus;
   blockheight: number;
   transaction_fee?: number;
   zec_price?: number;
@@ -14,7 +14,7 @@ export type RPCValueTransferType = {
   recipient_address?: string;
   // Pool lists arrive in protocol order: transparent, sapling, orchard,
   // ironwood. A transfer can span pools (e.g. an Orchard + Ironwood receive).
-  pools_sent_from?: PoolEnum[];
-  pools_received?: PoolEnum[];
+  pools_sent_from?: Pool[];
+  pools_received?: Pool[];
   memos?: string[];
 };

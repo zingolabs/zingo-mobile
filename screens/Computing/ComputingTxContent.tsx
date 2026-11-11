@@ -28,7 +28,8 @@ import FullPanel from '@ui/widgets/FullPanel';
 import SendFlight, { FAILED_AT } from '@ui/widgets/Flight/SendFlight';
 import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import { GlobalConst, Route, ValueTransferType } from '@app/AppState';
+import { GlobalConst, Route } from '@app/AppState';
+import { ValueTransferType } from '@app/wallet/transfer';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
   STEPS,

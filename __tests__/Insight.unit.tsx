@@ -5,12 +5,8 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import {
-  AddressBookFileClass,
-  ChainNameEnum,
-  ValueTransferKindEnum,
-} from '@app/AppState';
-import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { AddressBookFileClass, ChainNameEnum } from '@app/AppState';
+import { ValueTransferType } from '@app/wallet/transfer';
 import { REVEAL_MS } from '@app/utils/reveal';
 import Insight from '@screens/Insight';
 import { advance } from '../__mocks__/advanceTimers';
@@ -18,16 +14,20 @@ import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 const nowSec = Date.now() / 1000;
 
-const sent = (address: string, amount: number, txid: string) => ({
+const sent = (
+  address: string,
+  amount: number,
+  txid: string,
+): ValueTransferType => ({
   txid,
-  kind: ValueTransferKindEnum.Sent,
+  kind: 'Sent',
   confirmations: 10,
   blockheight: 1,
   time: nowSec - 3600,
   address,
   amount,
   memos: [],
-  status: RPCValueTransfersStatusEnum.confirmed,
+  status: 'confirmed',
 });
 
 const ana = new AddressBookFileClass(

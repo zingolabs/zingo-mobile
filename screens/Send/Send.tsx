@@ -36,15 +36,13 @@ import {
 } from '@app/walletBackend/transforms/mixnetView';
 import Button from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
+import { GlobalConst, SelectServerEnum, Route } from '@app/AppState';
 import {
   SendPageStateClass,
   ToAddrClass,
-  GlobalConst,
-  SelectServerEnum,
-  Route,
   ProposalPoolsType,
-} from '@app/AppState';
-import { hasUnconfirmedFunds } from '@app/wallet/classes';
+} from '@app/wallet/send';
+import { hasUnconfirmedFunds } from '@app/wallet/balance';
 // Imported straight from the module rather than through the `uris` barrel, so
 // the ZNS SDK stays out of the module graph of everything else that barrel
 // serves (the wallet backend among them).

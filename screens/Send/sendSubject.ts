@@ -1,10 +1,6 @@
-import type {
-  AddressBookFileClass,
-  ToAddrClass,
-  TranslateType,
-  ValueTransferType,
-} from '@app/AppState';
-import { ValueTransferKindEnum } from '@app/wallet/enums';
+import type { AddressBookFileClass, TranslateType } from '@app/AppState';
+import type { ToAddrClass } from '@app/wallet/send';
+import type { ValueTransferType } from '@app/wallet/transfer';
 import Utils from '@app/utils';
 import { formatAmount } from '@app/utils/formatAmount';
 import type { ComputingSubject } from '@app/walletBackend/transforms/sendSettlement';
@@ -34,7 +30,7 @@ export function transferSubject(
   addressBook: AddressBookFileClass[],
   translate: (key: string) => TranslateType,
 ): ComputingSubject {
-  const shield = vt.kind === ValueTransferKindEnum.Shield;
+  const shield = vt.kind === 'Shield';
   return {
     amount: formatAmount(vt.amount),
     who: shield

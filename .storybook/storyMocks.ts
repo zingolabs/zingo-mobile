@@ -3,15 +3,15 @@
 import {
   ChainNameEnum,
   CurrencyNameEnum,
-  AddressKindEnum,
   InfoType,
   ZecPriceType,
 } from '@app/AppState';
-import { TotalBalanceClass } from '@app/wallet/classes';
-import { UnifiedAddressClass } from '@app/wallet/classes';
-import { TransparentAddressClass } from '@app/wallet/classes';
+import { TotalBalanceClass } from '@app/wallet/balance';
+import {
+  UnifiedAddressClass,
+  TransparentAddressClass,
+} from '@app/wallet/address';
 import AddressBookFileClass from '@app/AppState/classes/AddressBookFileClass';
-import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
 import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
 import { deriveMixnetView } from '@app/walletBackend/transforms/mixnetView';
 
@@ -44,7 +44,7 @@ export const tAddress = 't1duiEGg7b39nfQee3XaTY4f5McqfyJKhBi';
 export const sampleUnified = new UnifiedAddressClass(
   0,
   uAddress,
-  AddressKindEnum.u,
+  'u',
   true,
   true,
   true,
@@ -53,8 +53,8 @@ export const sampleUnified = new UnifiedAddressClass(
 export const sampleTransparent = new TransparentAddressClass(
   0,
   tAddress,
-  AddressKindEnum.t,
-  RPCAddressScopeEnum.external,
+  't',
+  'external',
 );
 
 export const sampleContact = new AddressBookFileClass(

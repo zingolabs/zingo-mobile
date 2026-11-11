@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react-native';
-import type { ValueTransferType } from '@app/AppState';
+import type { ValueTransferType } from '@app/wallet/transfer';
 import { useFreshRows } from '@screens/History/useFreshRows';
 import { duration } from '@app/theme/motion';
 

@@ -5,7 +5,8 @@ import { useTheme, radiusSm, space12 } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
-import { TranslateType, WalletType } from '@app/AppState';
+import { TranslateType } from '@app/AppState';
+import { WalletType } from '@app/wallet/keys';
 import { formatInteger } from '@app/utils/formatAmount';
 import Text from '@ui/primitives/Text';
 import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';

@@ -9,15 +9,22 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { FilterEnum } from '@app/AppState';
-import Filters, { filterOf } from '@screens/History/components/Filters';
+import Filters, { filterOf, kindOf } from '@screens/History/components/Filters';
 
 describe('History filters', () => {
   test('Tests that the one filter is read back from the flags when several are stored', () => {
     expect(filterOf(null, false, false)).toBe('all');
-    expect(filterOf(FilterEnum.swaps, false, false)).toBe('swaps');
-    expect(filterOf(FilterEnum.sent, true, false)).toBe('failed');
+    expect(filterOf('swaps', false, false)).toBe('swaps');
+    expect(filterOf('sent', true, false)).toBe('failed');
     expect(filterOf(null, false, true)).toBe('memo');
+  });
+
+  test('Tests that kindOf returns the kind when the picked filter is one, and null when it is all, failed or memo', () => {
+    expect(kindOf('swaps')).toBe('swaps');
+    expect(kindOf('received')).toBe('received');
+    expect(kindOf('all')).toBeNull();
+    expect(kindOf('failed')).toBeNull();
+    expect(kindOf('memo')).toBeNull();
   });
 
   test('Tests that Apply leaves exactly one filter on when a chip is picked', () => {
@@ -30,7 +37,7 @@ describe('History filters', () => {
       <ContextAppLoadedProvider value={defaultAppContextLoaded}>
         <Filters
           closeSheet={close}
-          filterKind={FilterEnum.sent}
+          filterKind={'sent'}
           setFilterKind={setKind}
           filterFailed={false}
           setFilterFailed={setFailed}
@@ -43,7 +50,7 @@ describe('History filters', () => {
     );
     fireEvent.press(screen.getByTestId('history.filter.swaps'));
     fireEvent.press(screen.getByTestId('history.filter.apply'));
-    expect(setKind).toHaveBeenCalledWith(FilterEnum.swaps);
+    expect(setKind).toHaveBeenCalledWith('swaps');
     expect(setFailed).toHaveBeenCalledWith(false);
     expect(setMemos).toHaveBeenCalledWith(false);
     expect(setFunds).toHaveBeenCalledWith(false);

@@ -1,11 +1,9 @@
 import { useContext, useMemo } from 'react';
 import { ContextAppLoaded } from '@app/context';
 import {
-  AddressKindEnum,
   TransparentAddressClass,
   UnifiedAddressClass,
-} from '@app/AppState';
-import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
+} from '@app/wallet/address';
 
 export type OwnAddress = UnifiedAddressClass | TransparentAddressClass;
 
@@ -22,9 +20,9 @@ export function useOwnAddresses(): {
     const shielded: UnifiedAddressClass[] = [];
     const transparent: TransparentAddressClass[] = [];
     (addresses ?? []).forEach(a => {
-      if (a.addressKind === AddressKindEnum.u) {
+      if (a.addressKind === 'u') {
         shielded.push(a);
-      } else if (a.scope === RPCAddressScopeEnum.external) {
+      } else if (a.scope === 'external') {
         transparent.push(a);
       }
     });
