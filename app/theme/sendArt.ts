@@ -1,0 +1,41 @@
+/**
+ * The colors of the send illustration (ui/widgets/Flight/SendFlight), drawn by
+ * design: its gradients and shades are art, and name no role a token could.
+ */
+export const sendArt = {
+  track: '#12344A',
+  trail: '#1D9F47',
+  nodeFill: '#0A2236',
+  nodeStroke: '#1B3C6B',
+  nodeLit: '#24D83A',
+  ground: '#061A24',
+  mound: '#092838',
+  stem: '#1A9E2D',
+  leafLight: '#92ED4E',
+  leafMid: '#2CD82A',
+  leafDeep: '#087D32',
+  vein: '#7CDB59',
+  coinFill: '#082A2D',
+  coinRing: '#24C62A',
+  coinMark: '#8DF35D',
+  planeLight: '#FFFFFF',
+  planeMid: '#D9ECFF',
+  planeDeep: '#7FB9E9',
+  planeBody: '#052036',
+  planeVein: '#91EF66',
+  poolDot: '#3A5070',
+  badgeFill: '#092432',
+  badgeStroke: '#1E6B62',
+  badgeText: '#8DA0B8',
+  confirmed: '#38E45B',
+  failed: '#E5484D',
+  failedFill: '#2A0E14',
+  failedMark: '#F2878A',
+  wilted: {
+    leafLight: '#8A9483',
+    leafMid: '#687A68',
+    leafDeep: '#39453E',
+    stem: '#4B594D',
+    vein: '#7E887A',
+  },
+} as const;

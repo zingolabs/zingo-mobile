@@ -6,6 +6,7 @@ import { space8, space20 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   formatAmountForDisplay,
+  providerRequiresMemo,
   providerShortLabel,
   renderSwapText,
 } from '@app/swap';
@@ -40,6 +41,8 @@ type RoutesSheetProps = {
   shieldedNote: ShieldedNoteType;
   /** The coin a purchase is paid with, for the note that none is shielded. */
   payCoin: string;
+  /** Buying ZEC: the deposit is paid from another wallet, which may not add a memo. */
+  paidFromOutside: boolean;
 };
 
 /**
@@ -59,6 +62,7 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
       isShielded,
       shieldedNote,
       payCoin,
+      paidFromOutside,
     },
     ref,
   ) => {
@@ -112,13 +116,26 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
               {sorted.map((route, index) => {
                 const selected = route.routeId === selectedRouteId;
                 const best = index === 0;
+                const needsMemo =
+                  paidFromOutside && providerRequiresMemo(route.provider);
                 const details = [
                   usd(route.expectedReceiveAmount),
                   route.estimatedTimeText ?? '',
                   providerShortLabel(route.provider),
+                  paidFromOutside && !needsMemo
+                    ? (translate('swap.pay-address-only') as string)
+                    : '',
                 ]
                   .filter(Boolean)
                   .join(' · ');
+                const warning = [
+                  route.warningsText ?? '',
+                  needsMemo
+                    ? (translate('swap.routes-needs-memo') as string)
+                    : '',
+                ]
+                  .filter(Boolean)
+                  .join('\n');
                 return (
                   <RadioRow
                     key={route.routeId}
@@ -139,12 +156,12 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
                           : undefined
                     }
                     sub={
-                      route.warningsText ? (
+                      warning ? (
                         <>
                           {details}
                           {'\n'}
                           <Text variant="bodySmall" tone="warning">
-                            {route.warningsText}
+                            {warning}
                           </Text>
                         </>
                       ) : (

@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import Animated, {
   Easing,
@@ -25,6 +25,7 @@ import Pressable from '@ui/primitives/Pressable';
 import { Route, ServerType, TranslateType } from '@app/AppState';
 import NetInfoType from '@app/AppState/types/NetInfoType';
 import { useSyncFreshness } from '@app/hooks/lastSynced';
+import { useNowMs } from '@app/hooks/useNowMs';
 import { isFallingBehind } from '@app/walletBackend/utils/syncFreshness';
 import Text from '@ui/primitives/Text';
 import { CARD_MARGIN_TOP } from './PriceRow';
@@ -114,7 +115,7 @@ export default function SyncLine({
   const freshness = useSyncFreshness();
   /** Never wider than the screen inside its gutters; the words give way. */
   const maxWidth = useWindowDimensions().width - 2 * space20;
-  const [nowMs, setNowMs] = useState<number>(Date.now());
+  const nowMs = useNowMs();
 
   const state: SyncState = !netInfo.isConnected
     ? 'noInternet'
@@ -135,11 +136,6 @@ export default function SyncLine({
   const showMetered =
     metered &&
     (state === 'synced' || state === 'syncing' || state === 'starting');
-
-  useEffect(() => {
-    const timer = setInterval(() => setNowMs(Date.now()), 30 * 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   /** The last moment the wallet was at the tip, which only stops moving when it falls behind. */
   const lastSynced = freshness.caughtUpAtMs;

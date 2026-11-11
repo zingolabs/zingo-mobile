@@ -133,3 +133,17 @@ export const FailedSending: Story = {
     subject,
   }),
 };
+
+export const Expired: Story = {
+  tags: ['static'],
+  decorators: [
+    withAppContext({
+      valueTransfers: [tx('abc', RPCValueTransfersStatusEnum.failed)],
+    }),
+  ],
+  args: screenProps(Route.Computing, {
+    phase: 'created',
+    txids: ['abc'],
+    subject,
+  }),
+};
