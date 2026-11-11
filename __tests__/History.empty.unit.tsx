@@ -30,7 +30,7 @@ describe('History when the wallet has no activity', () => {
     (useNavigation as jest.Mock).mockReturnValue(mockNavigation);
   });
 
-  test('Tests that the sprout and Receive ZEC show when the wallet has no transfers', async () => {
+  test('Tests that the sprout and Receive ZEC show, with no filters, when the wallet has no transfers', async () => {
     const state = {
       ...defaultAppContextLoaded,
       valueTransfers: [],
@@ -46,6 +46,8 @@ describe('History when the wallet has no activity', () => {
     );
     await act(async () => {});
     expect(screen.getByTestId('history.empty')).toBeTruthy();
+    expect(screen.queryByTestId('history.filters')).toBeNull();
+    expect(screen.queryByTestId('history.filter.bar')).toBeNull();
 
     fireEvent.press(screen.getByTestId('history.empty.receive'));
 

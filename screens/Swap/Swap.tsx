@@ -618,12 +618,10 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                   onToggleUnit={toggleUnit}
                   altText={altText}
                   availableText={
-                    !form.isOutbound
-                      ? undefined
-                      : usdMode
-                        ? toFiatText(String(form.maxSpendableForSwap), price) ||
-                          Utils.parseNumberFloatToStringLocale(0, 2)
-                        : `${formatAmountForDisplay(String(form.maxSpendableForSwap))} ${info.currencyName}`
+                    usdMode
+                      ? toFiatText(String(form.maxSpendableForSwap), price) ||
+                        Utils.parseNumberFloatToStringLocale(0, 2)
+                      : `${formatAmountForDisplay(String(form.maxSpendableForSwap))} ${info.currencyName}`
                   }
                   onUseMax={() =>
                     onChangeAmountText(
@@ -655,9 +653,10 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                   onPickAsset={() => assetSheetRef.current?.present()}
                   texts={{
                     youSend: translate('swap.you-send') as string,
-                    youReceive: form.isOutbound
-                      ? (translate('swap.you-receive') as string)
-                      : (translate('swap.receive-in-zingo') as string),
+                    youReceive: translate('swap.you-receive') as string,
+                    receiveInZingo: translate(
+                      'swap.receive-in-zingo',
+                    ) as string,
                     receiveTip: translate('swap.tip-derived') as string,
                     fromOtherWallet: translate(
                       'swap.from-other-wallet',
@@ -733,7 +732,8 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
 
                 {!!form.selectedToken &&
                   (form.chosenRoute ? (
-                    <>
+                    /** One block, so the scroll's gap does not open between the rows. */
+                    <View>
                       <Pressable
                         kind="row"
                         testID="swap.change-route"
@@ -751,29 +751,40 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                         >
                           {translate('swap.provider') as string}
                         </Text>
-                        <Text variant="bodySmall" style={{ fontWeight: '600' }}>
-                          {providerShortLabel(form.chosenRoute.provider)}
-                        </Text>
-                        {shielded.isShielded(form.chosenRoute.provider) && (
-                          <View testID="swap.provider.shielded">
-                            <ShieldIcon
-                              size={iconSizeSm}
-                              color={colors.fgAccent}
-                            />
-                          </View>
-                        )}
-                        {!!form.chosenRoute.estimatedTimeText && (
-                          <Text variant="caption" tone="muted">
-                            {form.chosenRoute.estimatedTimeText}
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            columnGap: 4,
+                          }}
+                        >
+                          <Text
+                            variant="bodySmall"
+                            style={{ fontWeight: '600' }}
+                          >
+                            {providerShortLabel(form.chosenRoute.provider)}
                           </Text>
-                        )}
-                        <ChevronRight
-                          size={iconSizeSm}
-                          color={colors.fgMuted}
-                        />
+                          {shielded.isShielded(form.chosenRoute.provider) && (
+                            <View testID="swap.provider.shielded">
+                              <ShieldIcon
+                                size={iconSizeSm}
+                                color={colors.fgAccent}
+                              />
+                            </View>
+                          )}
+                          {!!form.chosenRoute.estimatedTimeText && (
+                            <Text variant="caption" tone="muted">
+                              {form.chosenRoute.estimatedTimeText}
+                            </Text>
+                          )}
+                          <ChevronRight
+                            size={iconSizeSm}
+                            color={colors.fgMuted}
+                          />
+                        </View>
                       </Pressable>
                       {!!feeValue && (
-                        <View style={providerRow}>
+                        <View style={[providerRow, { minHeight: 24 }]}>
                           <View
                             style={{
                               flex: 1,
@@ -806,7 +817,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                           </Text>
                         </View>
                       )}
-                    </>
+                    </View>
                   ) : (
                     <View style={providerRow}>
                       <Text

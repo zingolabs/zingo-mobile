@@ -18,7 +18,13 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import { radiusSheet, rowMinHeight, space20, useTheme } from '@app/theme';
+import {
+  radiusSheet,
+  rowMinHeight,
+  space12,
+  space20,
+  useTheme,
+} from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { contentTopPad } from '@app/navigation/safeArea';
@@ -46,7 +52,7 @@ const PANEL_OUT = {
 };
 /** The content fades in as the panel nears its place. */
 const CONTENT_DELAY = 160;
-/** The footer's top pad and button, and the gap above them. */
+/** The footer's top pad and one button, and the gap above them: the least a footer clears. */
 const FOOTER_CLEAR = 108;
 
 type FullPanelProps = {
@@ -332,8 +338,10 @@ export default function FullPanel({
                       justifyContent: center ? 'center' : 'flex-start',
                       paddingHorizontal: space20,
                       paddingTop: 8,
-                      /** Clears the footer (its top pad and button) and the bottom pad. */
-                      paddingBottom: bottomPad + (footer ? FOOTER_CLEAR : 28),
+                      /** Clears the footer and the bottom pad; a taller footer (two buttons, a checkbox) by its measured height. */
+                      paddingBottom: footer
+                        ? Math.max(bottomPad + FOOTER_CLEAR, footerH + space12)
+                        : bottomPad + 28,
                     }}
                   >
                     <Animated.View

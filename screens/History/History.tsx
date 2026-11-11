@@ -829,34 +829,53 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     }
   };
 
+  /** Nothing to filter: no filter button, and none left on from before. */
+  const noHistory = mergedValueTransfers.length === 0;
+  useEffect(() => {
+    if (noHistory) {
+      setFilterKind(null);
+      setFilterFailed(false);
+      setFilterMemos(false);
+      setFilterWithFunds(false);
+    }
+  }, [noHistory]);
+
   const historyHeader = (
     <TitleBar
       title={translate('history.title') as string}
       onLayout={setHandleH}
-      right={{
-        icon: FiltersIcon,
-        accessibilityLabel: translate('history.filters') as string,
-        onPress: () => {
-          setShowFilters(true);
-          bottomSheetRef.current?.present();
-        },
-        badge:
-          !!filterKind || filterFailed || filterMemos || filterWithFunds ? (
-            <View
-              testID="history.filter.dot"
-              style={{
-                backgroundColor: colors.fgAccent,
-                width: 8,
-                height: 8,
-                borderRadius: radiusPill,
-                marginLeft: -3,
-                marginTop: -8,
-                borderWidth: 2,
-                borderColor: colors.bgSurface,
-              }}
-            />
-          ) : undefined,
-      }}
+      right={
+        noHistory
+          ? undefined
+          : {
+              icon: FiltersIcon,
+              testID: 'history.filters',
+              accessibilityLabel: translate('history.filters') as string,
+              onPress: () => {
+                setShowFilters(true);
+                bottomSheetRef.current?.present();
+              },
+              badge:
+                !!filterKind ||
+                filterFailed ||
+                filterMemos ||
+                filterWithFunds ? (
+                  <View
+                    testID="history.filter.dot"
+                    style={{
+                      backgroundColor: colors.fgAccent,
+                      width: 8,
+                      height: 8,
+                      borderRadius: radiusPill,
+                      marginLeft: -3,
+                      marginTop: -8,
+                      borderWidth: 2,
+                      borderColor: colors.bgSurface,
+                    }}
+                  />
+                ) : undefined,
+            }
+      }
     />
   );
 
@@ -946,7 +965,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
               />
             ) : (
               <View style={{ flex: 1, width: '100%' }}>
-                {activeFilter !== 'all' && (
+                {activeFilter !== 'all' && !noHistory && (
                   <View
                     testID="history.filter.bar"
                     style={{
@@ -1071,7 +1090,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                     </View>
                     {fades}
                   </>
-                ) : mergedValueTransfers.length === 0 ? (
+                ) : noHistory ? (
                   <View
                     testID="history.empty"
                     style={{
@@ -1085,7 +1104,11 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                     <EmptySprout />
                     <Text
                       variant="subtitle"
-                      style={{ marginTop: space20, textAlign: 'center' }}
+                      style={{
+                        marginTop: space20,
+                        alignSelf: 'stretch',
+                        textAlign: 'center',
+                      }}
                     >
                       {translate('history.empty-title') as string}
                     </Text>
@@ -1094,6 +1117,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                       tone="muted"
                       style={{
                         marginTop: space8,
+                        width: '100%',
                         maxWidth: 290,
                         textAlign: 'center',
                       }}

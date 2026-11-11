@@ -76,6 +76,8 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
 
   /** A token transfer has no data field of its own: the memo is the wallet's to add. */
   const token = isTokenAsset(asset);
+  /** No code can carry it, so the one banner under the box says both rules. */
+  const tokenMemo = token && !!memo;
   const memoHint = token
     ? t('swap.memo-hint-token')
     : isEvmSourceChain(asset.chain)
@@ -151,17 +153,11 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
               {t(qrCaption)}
             </Text>
           </>
-        ) : !paid && memo ? (
+        ) : !paid && memo && !token ? (
           <Banner
             testID="swap.deposit.no-qr"
             tone="warning"
-            title={
-              token
-                ? t('swap.qr-token-memo')
-                    .replace('{coin}', ticker)
-                    .replace('{provider}', provider)
-                : t('swap.qr-no-memo')
-            }
+            title={t('swap.qr-no-memo')}
           />
         ) : null}
         <Text
@@ -184,10 +180,11 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
         </View>
       </View>
 
-      {isToken && (
+      {(isToken || tokenMemo) && (
         <Banner
+          testID={tokenMemo ? 'swap.deposit.network-memo' : undefined}
           tone="warning"
-          title={t('swap.network-only')
+          title={t(tokenMemo ? 'swap.network-memo-only' : 'swap.network-only')
             .replace('{coin}', ticker)
             .replace('{network}', network)}
         />

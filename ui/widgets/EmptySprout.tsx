@@ -24,10 +24,18 @@ const AnimatedG = Animated.createAnimatedComponent(
   G<{ matrix?: ColumnMajorTransformMatrix }>,
 );
 
-const WIDTH = 175;
-const HEIGHT = 193;
+/**
+ * The art is 206 × 227; the padding leaves room for the leaves that bob and
+ * turn past its edges.
+ */
+const PAD = 12;
+const VIEW_BOX = `${-PAD} ${-PAD} ${206 + 2 * PAD} ${227 + 2 * PAD}`;
+/** Points per viewBox unit. */
+const SCALE = 0.68;
+const WIDTH = Math.round((206 + 2 * PAD) * SCALE);
+const HEIGHT = Math.round((227 + 2 * PAD) * SCALE);
 /** The leaf that got away weighs the art to the right; this centres the sprout. */
-const NUDGE = { marginLeft: 14 };
+const NUDGE = { marginLeft: 11 };
 
 type Vec = [number, number];
 /** The stem: a rising cubic up to the top of the arch, then the drooping head. */
@@ -248,7 +256,7 @@ export default function EmptySprout() {
     <Svg
       width={WIDTH}
       height={HEIGHT}
-      viewBox="0 0 206 227"
+      viewBox={VIEW_BOX}
       fill="none"
       style={NUDGE}
     >
