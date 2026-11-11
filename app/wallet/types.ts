@@ -56,6 +56,8 @@ export interface ValueTransferType {
   address?: string;
   amount: number;
   memos?: string[];
+  /** The text of the transaction's OP_RETURN outputs, where a transparent Maya or THORChain payout signs itself. */
+  opReturnData?: string[];
   poolType?: PoolEnum;
   status: RPCValueTransfersStatusEnum;
   // Set only on rows projected from a swap record. The detail reads
