@@ -39,15 +39,12 @@ import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import PairHero from '@screens/Swap/components/PairHero';
 import NymNote from '@screens/Swap/components/NymNote';
 import DetailRows from '@screens/Swap/components/DetailRows';
+import { routeFeeValue } from '@screens/Swap/routeFeeValue';
 import { useShieldedRoutes } from '@screens/Swap/useShieldedRoutes';
 import Card from '@ui/widgets/Card';
 import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import { formatSlippagePercent } from '@screens/Swap/components/SwapSettingsSheet';
-import {
-  formatAmount,
-  formatPercent,
-  formatUsd,
-} from '@app/utils/formatAmount';
+import { formatAmount, formatUsd } from '@app/utils/formatAmount';
 
 type SwapReviewProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -137,13 +134,6 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
   const memoAckNeeded = paysWithMemo && isTokenAsset(quoteInput.sellAsset);
   const slippage = quoteInput.slippageBps ?? 0;
   const feeReserve = isOutbound ? zecNetworkFeeReserve(chosen.provider) : 0;
-  const feeText = isOutbound
-    ? chosen.totalFeesInSellAsset
-      ? `${formatAmountForDisplay(chosen.totalFeesInSellAsset)} ${sellSymbol}`
-      : '—'
-    : chosen.totalFeesInReceiveAsset
-      ? `${formatAmountForDisplay(chosen.totalFeesInReceiveAsset)} ${receiveSymbol}`
-      : '—';
   // Inbound, the far side is the source: where the sold asset returns.
   const address = isOutbound
     ? quoteInput.destinationAddress
@@ -282,27 +272,13 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
     commit();
   };
 
-  /** The fee as a share of what is sold, with its dollars; the amount when no share can be told. */
-  const sellAmount = parseFloat(quoteInput.sellAmountHumanDecimal);
-  const feesInSell = parseFloat(chosen.totalFeesInSellAsset ?? '');
-  const feesInReceive = parseFloat(chosen.totalFeesInReceiveAsset ?? '');
+  const feeValue = routeFeeValue({
+    route: chosen,
+    quoteInput,
+    fiatValueBasis,
+    isOutbound,
+  });
   const receiveAmount = parseFloat(chosen.expectedReceiveAmount);
-  const feeShare = Number.isFinite(feesInSell)
-    ? feesInSell / sellAmount
-    : Number.isFinite(feesInReceive)
-      ? feesInReceive / (receiveAmount + feesInReceive)
-      : NaN;
-  const feeUsd = Number.isFinite(feesInSell)
-    ? feesInSell * fiatValueBasis.sellUsdUnitPrice
-    : feesInReceive * fiatValueBasis.receiveUsdUnitPrice;
-  const feeValue = Number.isFinite(feeShare)
-    ? [
-        `${formatPercent(feeShare * 100)}%`,
-        Number.isFinite(feeUsd) && feeUsd > 0 ? `≈ ${formatUsd(feeUsd)}` : '',
-      ]
-        .filter(Boolean)
-        .join(' · ')
-    : feeText;
   const receiveUsd = receiveAmount * fiatValueBasis.receiveUsdUnitPrice;
 
   const counterpartyChain = counterparty.chain;

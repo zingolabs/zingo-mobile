@@ -174,8 +174,12 @@ function changedFiles(base: string): string[] {
 // regressions.
 const renames = new Map<string, string>();
 
+/** A path as git names it: relative to the root, with forward slashes on every OS. */
+const gitPath = (file: string): string =>
+  path.relative(ROOT, file).split(path.sep).join(path.posix.sep);
+
 function filesInBase(base: string, files: string[]): string[] {
-  const relOf = (file: string): string => path.relative(ROOT, file);
+  const relOf = gitPath;
   const present = new Set(
     gitLines(
       'ls-tree',
@@ -186,16 +190,15 @@ function filesInBase(base: string, files: string[]): string[] {
       ...files.map(file => renames.get(relOf(file)) ?? relOf(file)),
     ),
   );
-  return files.filter(file => present.has(renames.get(relOf(file)) ?? relOf(file)));
+  return files.filter(file =>
+    present.has(renames.get(relOf(file)) ?? relOf(file)),
+  );
 }
 
 const baseCode =
   (base: string) =>
   (file: string): string =>
-    git(
-      'show',
-      `${base}:${renames.get(path.relative(ROOT, file)) ?? path.relative(ROOT, file)}`,
-    );
+    git('show', `${base}:${renames.get(gitPath(file)) ?? gitPath(file)}`);
 
 async function transformAll(files: string[], codeOf = diskCode): Promise<void> {
   await transformEach(files, async file => {
@@ -242,7 +245,13 @@ if (files.length === 0) {
   process.exit(0);
 }
 if (target.kind === 'base') {
-  for (const line of gitLines('diff', '--name-status', '-M', target.sha, 'HEAD')) {
+  for (const line of gitLines(
+    'diff',
+    '--name-status',
+    '-M',
+    target.sha,
+    'HEAD',
+  )) {
     const [status, from, to] = line.split('\t');
     if (status.startsWith('R') && from && to) renames.set(to, from);
   }

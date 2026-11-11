@@ -91,6 +91,7 @@ import SwapSettingsSheet from './components/SwapSettingsSheet';
 import SwapHistorySheet, { swapPairLabel } from './components/SwapHistorySheet';
 import { tokenToSwapAsset } from './swapAssets';
 import { useCoinPrice } from './useCoinPrice';
+import { routeFeeValue } from './routeFeeValue';
 import { onTabScroll } from '@app/navigation/tabBarScroll';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { PANEL_TOP } from '@ui/widgets/Header/Header';
@@ -282,6 +283,22 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
     form.chosenRoute && receiveUsdUnitPrice > 0
       ? `≈ ${formatUsd(parseFloat(form.chosenRoute.expectedReceiveAmount) * receiveUsdUnitPrice)}`
       : '';
+  const feeValue =
+    form.chosenRoute && form.quoteContext
+      ? routeFeeValue({
+          route: form.chosenRoute,
+          quoteInput: form.quoteContext.quoteInput,
+          fiatValueBasis: form.quoteContext.fiatValueBasis,
+          isOutbound: form.isOutbound,
+        })
+      : '';
+  const providerRow = {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    columnGap: space8,
+    minHeight: 44,
+    paddingHorizontal: 4,
+  };
 
   // The newest swap in progress. A late payment on its way back is not one;
   // it has no card.
@@ -593,12 +610,10 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                   onToggleUnit={toggleUnit}
                   altText={altText}
                   availableText={
-                    !form.isOutbound
-                      ? undefined
-                      : usdMode
-                        ? toFiatText(String(form.maxSpendableForSwap), price) ||
-                          Utils.parseNumberFloatToStringLocale(0, 2)
-                        : `${formatAmountForDisplay(String(form.maxSpendableForSwap))} ${info.currencyName}`
+                    usdMode
+                      ? toFiatText(String(form.maxSpendableForSwap), price) ||
+                        Utils.parseNumberFloatToStringLocale(0, 2)
+                      : `${formatAmountForDisplay(String(form.maxSpendableForSwap))} ${info.currencyName}`
                   }
                   onUseMax={() =>
                     onChangeAmountText(
@@ -615,7 +630,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                   receivePlaceholder="0"
                   receiveAltText={receiveUsd}
                   ring={
-                    form.routes?.length
+                    form.routes?.length || form.quoting
                       ? {
                           resetKey: form.refreshedAtMs,
                           durationMs: QUOTE_REFRESH_MS,
@@ -630,9 +645,10 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                   onPickAsset={() => assetSheetRef.current?.present()}
                   texts={{
                     youSend: translate('swap.you-send') as string,
-                    youReceive: form.isOutbound
-                      ? (translate('swap.you-receive') as string)
-                      : (translate('swap.receive-in-zingo') as string),
+                    youReceive: translate('swap.you-receive') as string,
+                    receiveInZingo: translate(
+                      'swap.receive-in-zingo',
+                    ) as string,
                     receiveTip: translate('swap.tip-derived') as string,
                     fromOtherWallet: translate(
                       'swap.from-other-wallet',
@@ -706,73 +722,116 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                   </View>
                 )}
 
-                {!!form.selectedToken && (
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      columnGap: space8,
-                      minHeight: 44,
-                      paddingHorizontal: 4,
-                    }}
-                  >
-                    <Text
-                      variant="bodySmall"
-                      tone="muted"
-                      style={{ flex: 1, fontWeight: '600' }}
-                    >
-                      {translate('swap.provider') as string}
-                    </Text>
-                    {form.chosenRoute ? (
-                      <>
-                        <Pressable
-                          kind="link"
-                          testID="swap.change-route"
-                          accessibilityRole="button"
-                          accessibilityLabel={
-                            translate('swap.change-route-acc') as string
-                          }
-                          onPress={() => routesSheetRef.current?.present()}
-                          hitSlop={8}
-                          style={{ minHeight: 32, justifyContent: 'center' }}
+                {!!form.selectedToken &&
+                  (form.chosenRoute ? (
+                    /** One block, so the scroll's gap does not open between the rows. */
+                    <View>
+                      <Pressable
+                        kind="row"
+                        testID="swap.change-route"
+                        accessibilityRole="button"
+                        accessibilityLabel={
+                          translate('swap.change-route-acc') as string
+                        }
+                        onPress={() => routesSheetRef.current?.present()}
+                        style={providerRow}
+                      >
+                        <Text
+                          variant="bodySmall"
+                          tone="muted"
+                          style={{ flex: 1, fontWeight: '600' }}
+                        >
+                          {translate('swap.provider') as string}
+                        </Text>
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            columnGap: 4,
+                          }}
                         >
                           <Text
                             variant="bodySmall"
-                            style={{
-                              fontWeight: '600',
-                              textDecorationLine: 'underline',
-                            }}
+                            style={{ fontWeight: '600' }}
                           >
                             {providerShortLabel(form.chosenRoute.provider)}
                           </Text>
-                        </Pressable>
-                        {shielded.isShielded(form.chosenRoute.provider) && (
-                          <View testID="swap.provider.shielded">
-                            <ShieldIcon
-                              size={iconSizeSm}
-                              color={colors.fgAccent}
-                            />
+                          {shielded.isShielded(form.chosenRoute.provider) && (
+                            <View testID="swap.provider.shielded">
+                              <ShieldIcon
+                                size={iconSizeSm}
+                                color={colors.fgAccent}
+                              />
+                            </View>
+                          )}
+                          {!!form.chosenRoute.estimatedTimeText && (
+                            <Text variant="caption" tone="muted">
+                              {form.chosenRoute.estimatedTimeText}
+                            </Text>
+                          )}
+                          <ChevronRight
+                            size={iconSizeSm}
+                            color={colors.fgMuted}
+                          />
+                        </View>
+                      </Pressable>
+                      {!!feeValue && (
+                        <View style={[providerRow, { minHeight: 24 }]}>
+                          <View
+                            style={{
+                              flex: 1,
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              columnGap: 4,
+                            }}
+                          >
+                            <Text
+                              variant="bodySmall"
+                              tone="muted"
+                              style={{ fontWeight: '600' }}
+                            >
+                              {translate('swap.review-fees') as string}
+                            </Text>
+                            <InfoTooltip
+                              testID="swap.fees-info"
+                              label={translate('swap.review-fees') as string}
+                              text={translate('swap.tip-fees') as string}
+                            >
+                              <></>
+                            </InfoTooltip>
                           </View>
-                        )}
-                        {!!form.chosenRoute.estimatedTimeText && (
-                          <Text variant="caption" tone="muted">
-                            {form.chosenRoute.estimatedTimeText}
+                          <Text
+                            variant="bodySmall"
+                            testID="swap.fees"
+                            style={{ fontVariant: ['tabular-nums'] }}
+                          >
+                            {feeValue}
                           </Text>
-                        )}
-                      </>
-                    ) : (
+                        </View>
+                      )}
+                    </View>
+                  ) : (
+                    <View style={providerRow}>
+                      <Text
+                        variant="bodySmall"
+                        tone="muted"
+                        style={{ flex: 1, fontWeight: '600' }}
+                      >
+                        {translate('swap.provider') as string}
+                      </Text>
                       <Text variant="caption" tone="muted">
                         {
                           translate(
-                            form.cta === 'noRoutes'
-                              ? 'swap.provider-none'
-                              : 'swap.provider-pending',
+                            form.quoting
+                              ? 'swap.cta-quoting'
+                              : form.cta === 'noRoutes'
+                                ? 'swap.provider-none'
+                                : 'swap.provider-pending',
                           ) as string
                         }
                       </Text>
-                    )}
-                  </View>
-                )}
+                    </View>
+                  ))}
                 {form.rateLimited && (
                   <Banner
                     tone="warning"

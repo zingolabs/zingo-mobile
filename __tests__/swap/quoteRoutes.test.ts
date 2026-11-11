@@ -529,3 +529,62 @@ describe('providers that returned nothing', () => {
     });
   });
 });
+
+describe('buying ZEC with a token', () => {
+  const USDT: SwapAssetType = {
+    swapKitId: 'ETH.USDT-0XDAC17F958D2EE523A2206206994597C13D831EC7',
+    chain: 'ETH',
+    symbol: 'USDT-0XDAC17F958D2EE523A2206206994597C13D831EC7',
+    ticker: 'USDT',
+    chainId: '1',
+    decimals: 6,
+  };
+  const ETH: SwapAssetType = {
+    swapKitId: 'ETH.ETH',
+    chain: 'ETH',
+    symbol: 'ETH',
+    ticker: 'ETH',
+    chainId: '1',
+    decimals: 18,
+  };
+  const quoteFrom = (sellAsset: SwapAssetType) =>
+    serviceReturning({
+      routes: [
+        route({ routeId: 'maya' }),
+        route({
+          routeId: 'thor',
+          providers: [SwapKitProviderEnum.ThorchainStreaming],
+        }),
+        route({ routeId: 'near', providers: [SwapKitProviderEnum.Near] }),
+      ],
+    }).service.quote({
+      sellAsset,
+      receiveAsset: ZEC,
+      sellAmountHumanDecimal: '65',
+      sourceAddress: '0xsender',
+      destinationAddress: 't1ephemeral',
+    });
+
+  it('Tests that Maya and THORChain are set aside, with why, when the payment is a token', async () => {
+    const result = await quoteFrom(USDT);
+    expect(result.routes.map(r => r.routeId)).toEqual(['near']);
+    expect(
+      result.unavailable
+        .filter(row =>
+          [
+            SwapKitProviderEnum.MayachainStreaming,
+            SwapKitProviderEnum.ThorchainStreaming,
+          ].includes(row.provider),
+        )
+        .map(row => english(row.reason)),
+    ).toEqual([
+      'Can’t be paid with a token from another wallet: it needs a memo the token transfer can’t carry.',
+      'Can’t be paid with a token from another wallet: it needs a memo the token transfer can’t carry.',
+    ]);
+  });
+
+  it('Tests that Maya and THORChain stay when the payment is the chain’s own coin', async () => {
+    const result = await quoteFrom(ETH);
+    expect(result.routes.map(r => r.routeId)).toEqual(['maya', 'thor', 'near']);
+  });
+});
