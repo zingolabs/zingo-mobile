@@ -981,6 +981,7 @@
     "msg-received-less": "Received {percent}% less than expected",
     "msg-received-more": "Received {percent}% more than expected",
     "msg-wallet-cannot": "This wallet cannot swap through this provider yet.",
+    "msg-token-memo": "Can’t be paid with a token from another wallet: it needs a memo the token transfer can’t carry.",
     "msg-refusal-rate-limited": "The provider is refusing requests for the moment. The next quote may reach it.",
     "msg-refusal-estimate": "Could not price this swap right now. It may be back on the next quote.",
     "msg-refusal-liquidity": "Not enough liquidity for this swap right now.",

@@ -12,6 +12,15 @@ If you believe you have discovered a security issue, please contact us at:
 
 zingodisclosure@proton.me
 
+## Swaps
+
+ZEC swaps to and from assets on other chains through SwapKit (NEAR Intents, Maya, THORChain and Flashnet).
+
+- Buying ZEC with a token (USDT, USDC…) from another wallet never goes through Maya or THORChain: their
+  memo travels only through the router contract, which no wallet's Send calls, and a plain token transfer
+  to their vault is neither seen nor refunded. Those routes are listed as unavailable, with the reason;
+  paying with a chain's own coin (BTC, ETH…) keeps them
+
 ## Building The App
 
  Please see the platform specific [iOS](./docs/ios_developer_quickstart.md) and [Android](./docs/android_developer_quickstart.md) "quickstart" documentation.

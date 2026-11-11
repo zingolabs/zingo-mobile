@@ -981,6 +981,7 @@
     "msg-received-less": "Beklenenden %{percent} daha az alındı",
     "msg-received-more": "Beklenenden %{percent} daha fazla alındı",
     "msg-wallet-cannot": "Bu cüzdan henüz bu sağlayıcı üzerinden takas yapamıyor.",
+    "msg-token-memo": "Başka bir cüzdandan token ile ödenemez: token transferinin taşıyamadığı bir not gerekiyor.",
     "msg-refusal-rate-limited": "Sağlayıcı şu an istekleri reddediyor. Bir sonraki teklif ulaşabilir.",
     "msg-refusal-estimate": "Bu takas şu anda fiyatlandırılamadı. Bir sonraki teklifte geri gelebilir.",
     "msg-refusal-liquidity": "Şu anda bu takas için yeterli likidite yok.",
