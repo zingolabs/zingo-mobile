@@ -82,6 +82,7 @@ const ValueTransferDetail: React.FunctionComponent<
 
   const vt: ValueTransferType = route.params?.vt ?? ({} as ValueTransferType);
   const { memo, memoUA } = Utils.splitMemo(vt.memos);
+  const opReturn = (vt.opReturnData ?? []).join('\n');
   const failed = vt.status === RPCValueTransfersStatusEnum.failed;
   const received = vt.kind === ValueTransferKindEnum.Received;
   const sent = vt.kind === ValueTransferKindEnum.Sent;
@@ -423,6 +424,40 @@ const ValueTransferDetail: React.FunctionComponent<
               <Text variant="address">{memoUA}</Text>
             </Pressable>
           )}
+        </View>
+      )}
+
+      {!!opReturn && (
+        <View
+          style={{
+            marginTop: 12,
+            paddingVertical: 12,
+            paddingHorizontal: 16,
+            rowGap: 4,
+            borderRadius: radiusMd,
+            borderWidth: 1,
+            borderColor: colors.bottomSheetBorder,
+            backgroundColor: colors.bgCanvas,
+          }}
+        >
+          <Text variant="caption" tone="muted">
+            {t('history.tx-op-return')}
+          </Text>
+          <Pressable
+            kind="link"
+            testID="valuetransferdetail.op-return"
+            onPress={() => {
+              Clipboard.setString(opReturn);
+              addLastSnackbar(
+                t('history.op-return-copied'),
+                SnackbarDurationEnum.short,
+              );
+            }}
+          >
+            <Text variant="body" selectable>
+              {opReturn}
+            </Text>
+          </Pressable>
         </View>
       )}
     </FullPanel>

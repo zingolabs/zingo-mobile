@@ -1171,6 +1171,8 @@
     "tx-to": "Куда",
     "tx-fee": "Сетевая комиссия",
     "tx-memo": "Мемо",
+    "tx-op-return": "OP_RETURN",
+    "op-return-copied": "OP_RETURN скопирован в буфер обмена",
     "tx-explorer": "Открыть в обозревателе блоков",
     "try-again": "Попробовать снова",
     "today-price": "{usd} по сегодняшнему курсу",

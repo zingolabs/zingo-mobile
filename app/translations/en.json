@@ -1171,6 +1171,8 @@
     "tx-to": "To",
     "tx-fee": "Network fee",
     "tx-memo": "Memo",
+    "tx-op-return": "OP_RETURN",
+    "op-return-copied": "OP_RETURN copied to Clipboard",
     "tx-explorer": "View in block explorer",
     "try-again": "Try again",
     "today-price": "{usd} at today’s price",
