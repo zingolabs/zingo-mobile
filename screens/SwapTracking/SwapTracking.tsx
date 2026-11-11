@@ -108,6 +108,12 @@ const SwapTracking: React.FunctionComponent<SwapTrackingProps> = ({
       footer={
         <View style={{ rowGap: space8 }}>
           <Button
+            testID="swap.tracking.details"
+            variant="text"
+            title={t('swap.detail-title')}
+            onPress={() => navigation.navigate(Route.SwapDetail, { recordId })}
+          />
+          <Button
             testID="swap.tracking.leave"
             variant="primary"
             title={t('swap.back-to-zingo')}
