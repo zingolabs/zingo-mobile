@@ -121,7 +121,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
     clearToAddr,
     setScrollToTop,
     setScrollToBottom,
-    setServerOption,
+    switchServerForRetry,
     setShieldingAmount,
     translate,
     info,
@@ -838,7 +838,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
       async () => {
         const target = await retryServer(server, translate);
         if (target !== server) {
-          await setServerOption(target, selectServer, false, true);
+          await switchServerForRetry(target);
         }
       },
       // A `custom` server is the user's own choice, and the retry keeps it.

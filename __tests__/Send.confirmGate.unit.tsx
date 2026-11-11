@@ -135,7 +135,7 @@ const sendUi = (
   inputs: SendPermitInputs,
   sendTransaction: jest.Mock,
   addLastSnackbar: jest.Mock,
-  setServerOption: jest.Mock = jest.fn(),
+  switchServerForRetry: jest.Mock = jest.fn(),
 ) => {
   appState = inputs;
   const state = { ...defaultAppContextLoaded };
@@ -151,7 +151,7 @@ const sendUi = (
   state.mixnetView = inputs.mixnetView;
   state.sendPermitNow = () => sendPermit(appState);
   state.sendTransaction = sendTransaction;
-  state.setServerOption = setServerOption;
+  state.switchServerForRetry = switchServerForRetry;
   return (
     <ContextAppLoadedProvider value={state}>
       <Send {...makeDrawerProps()} />
@@ -297,23 +297,20 @@ describe('Send confirm send permit', () => {
       .fn()
       .mockRejectedValueOnce('Error: server unreachable')
       .mockResolvedValueOnce(errorKeyed('send.nym-blocked'));
-    const setServerOption = jest.fn();
+    const switchServerForRetry = jest.fn();
     const view = render(
-      sendUi(online, sendTransaction, jest.fn(), setServerOption),
+      sendUi(online, sendTransaction, jest.fn(), switchServerForRetry),
     );
     layoutSend();
     const confirmSend = await openConfirmScreen(view);
 
     await confirmSend();
 
-    expect(setServerOption).toHaveBeenCalledWith(
+    expect(switchServerForRetry).toHaveBeenCalledWith(
       remoteServer(other.uri, other.chainName),
-      defaultAppContextLoaded.selectServer,
-      false,
-      true,
     );
     expect(sendTransaction).toHaveBeenCalledTimes(2);
-    expect(setServerOption.mock.invocationCallOrder[0]).toBeLessThan(
+    expect(switchServerForRetry.mock.invocationCallOrder[0]).toBeLessThan(
       sendTransaction.mock.invocationCallOrder[1],
     );
     expect(navigate).toHaveBeenLastCalledWith(

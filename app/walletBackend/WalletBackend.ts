@@ -132,6 +132,15 @@ export default class WalletBackend {
     }
     return this.mixnetCoordinator.reenable();
   }
+  /**
+   * A reopened wallet is a new client, born without the mixnet, and
+   * `configure` will not arm a session it already counts as armed.
+   */
+  walletReopened() {
+    if (this.config.mixnetSupported && this.mixnetOnline) {
+      this.mixnetCoordinator.reenable();
+    }
+  }
   stopMixnetPolling() {
     this.mixnetCoordinator.stop();
   }
