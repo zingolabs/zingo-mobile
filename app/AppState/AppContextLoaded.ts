@@ -120,6 +120,7 @@ export default interface AppContextLoaded {
     toast: boolean,
     sameServerChainName: boolean,
   ) => Promise<SetServerResult>;
+  switchServerForRetry: (server: ServerType) => Promise<void>;
   clearToAddr: () => void;
   doRescan: () => Promise<void>;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
