@@ -1171,6 +1171,8 @@
     "tx-to": "Para",
     "tx-fee": "Comisión de red",
     "tx-memo": "Memo",
+    "tx-op-return": "OP_RETURN",
+    "op-return-copied": "OP_RETURN copiado al portapapeles",
     "tx-explorer": "Ver en el explorador de bloques",
     "try-again": "Volver a intentarlo",
     "today-price": "{usd} al precio de hoy",

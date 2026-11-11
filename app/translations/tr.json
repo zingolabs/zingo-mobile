@@ -1171,6 +1171,8 @@
     "tx-to": "Alıcı",
     "tx-fee": "Ağ ücreti",
     "tx-memo": "Not",
+    "tx-op-return": "OP_RETURN",
+    "op-return-copied": "OP_RETURN panoya kopyalandı",
     "tx-explorer": "Blok gezgininde görüntüle",
     "try-again": "Tekrar dene",
     "today-price": "Bugünkü fiyatla {usd}",

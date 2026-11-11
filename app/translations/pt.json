@@ -1171,6 +1171,8 @@
     "tx-to": "Para",
     "tx-fee": "Taxa de rede",
     "tx-memo": "Memo",
+    "tx-op-return": "OP_RETURN",
+    "op-return-copied": "OP_RETURN copiado para a Área de Transferência",
     "tx-explorer": "Ver no explorador de blocos",
     "try-again": "Tentar de novo",
     "today-price": "{usd} ao preço de hoje",
