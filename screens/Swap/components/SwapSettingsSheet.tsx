@@ -24,6 +24,14 @@ type SwapSettingsSheetProps = {
   onChange: (bps: number) => void;
 };
 
+type Edited = {
+  kind: 'edited';
+  editing: boolean;
+  custom: string;
+  preset: number;
+};
+type Edits = { kind: 'saved' } | Edited;
+
 /** 0.5%, 1%, 3%. */
 const PRESETS_BPS: ReadonlyArray<number> = [50, 100, 300];
 /** The tolerance can be set between these. */
@@ -45,24 +53,23 @@ export function formatSlippagePercent(bps: number): string {
 const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
   ({ slippageBps, onChange }, ref) => {
     const { translate } = useContext(ContextAppLoaded);
-    const [editing, setEditing] = useState<boolean>(
-      !PRESETS_BPS.includes(slippageBps),
-    );
-    const [custom, setCustom] = useState<string>(
-      PRESETS_BPS.includes(slippageBps) ? '' : toAmountInput(slippageBps / 100),
-    );
-
-    // A preset picked but not yet applied: nothing changes until Done.
-    const [preset, setPreset] = useState<number>(slippageBps);
-    const reset = useCallback(() => {
-      setPreset(slippageBps);
-      setEditing(!PRESETS_BPS.includes(slippageBps));
-      setCustom(
-        PRESETS_BPS.includes(slippageBps)
-          ? ''
-          : toAmountInput(slippageBps / 100),
-      );
-    }, [slippageBps]);
+    /**
+     * Edits wait for Done. gorhom calls the onDismiss of an earlier render,
+     * which is why a dismiss only drops the edits and reads no props.
+     */
+    const [edits, setEdits] = useState<Edits>({ kind: 'saved' });
+    const { editing, custom, preset } =
+      edits.kind === 'edited'
+        ? edits
+        : {
+            editing: !PRESETS_BPS.includes(slippageBps),
+            custom: PRESETS_BPS.includes(slippageBps)
+              ? ''
+              : toAmountInput(slippageBps / 100),
+            preset: slippageBps,
+          };
+    const edit = (change: Partial<Omit<Edited, 'kind'>>) =>
+      setEdits({ kind: 'edited', editing, custom, preset, ...change });
 
     const dismiss = useCallback(() => {
       (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss();
@@ -89,7 +96,7 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
     return (
       <AppSheetModal
         ref={ref}
-        onDismiss={reset}
+        onDismiss={() => setEdits({ kind: 'saved' })}
         header={
           <SheetTitle
             title={translate('swap.settings-title') as string}
@@ -142,10 +149,7 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
                   key={bps}
                   testID={`swap.slippage.${bps}`}
                   selected={!editing && preset === bps}
-                  onPress={() => {
-                    setEditing(false);
-                    setPreset(bps);
-                  }}
+                  onPress={() => edit({ editing: false, preset: bps })}
                 >
                   {`${formatSlippagePercent(bps)}%`}
                 </Chip>
@@ -153,7 +157,7 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
               <Chip
                 testID="swap.slippage.custom"
                 selected={editing}
-                onPress={() => setEditing(true)}
+                onPress={() => edit({ editing: true })}
               >
                 {editing && customValid
                   ? `${formatSlippagePercent(parsedCustom)}%`
@@ -173,7 +177,7 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
                 testID="swap.slippage.input"
                 label={translate('swap.slippage') as string}
                 value={custom}
-                onChangeText={setCustom}
+                onChangeText={text => edit({ custom: text })}
                 keyboardType="decimal-pad"
                 placeholder={formatSlippagePercent(slippageBps)}
                 error={customError}
