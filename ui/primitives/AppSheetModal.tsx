@@ -11,7 +11,6 @@ import React, {
 } from 'react';
 import {
   FlatListProps,
-  Keyboard,
   StyleProp,
   StyleSheet,
   View,
@@ -31,6 +30,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import { radiusSheet, useTheme, radiusPill, space20 } from '@app/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { KeyboardController } from 'react-native-keyboard-controller';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { SurfaceContext } from './Surface';
 import TooltipHost from '@ui/widgets/TooltipHost';
@@ -38,6 +38,9 @@ import { duration, ease } from '@app/theme/motion';
 
 /** Every sheet opens and closes in 420 ms on (.2,0,0,1). */
 const SHEET_MOTION = { duration: duration.sheet, easing: ease.emphasized };
+
+/** The longest a sheet waits for the keyboard to close before it opens anyway. */
+const KEYBOARD_GONE_MS = 400;
 import SheetRim from './SheetRim';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { SheetPresence } from './SheetPresence';
@@ -173,6 +176,9 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
      * presents it in the same press; presented at once, gorhom measured the
      * content before it rendered and, on some phones, left the sheet at that
      * shorter height, its last button below the screen's edge.
+     *
+     * With the keyboard up it first waits for the keyboard to go: gorhom
+     * lifts a sheet that opens over the keyboard by its height, then drops it.
      */
     useImperativeHandle(
       ref,
@@ -180,8 +186,18 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
         new Proxy({} as BottomSheetModal, {
           get: (_, key: keyof BottomSheetModal) => {
             if (key === 'present') {
-              return (...args: Parameters<BottomSheetModal['present']>) =>
-                requestAnimationFrame(() => sheet.current?.present(...args));
+              return (...args: Parameters<BottomSheetModal['present']>) => {
+                const open = () =>
+                  requestAnimationFrame(() => sheet.current?.present(...args));
+                if (!KeyboardController.isVisible()) {
+                  open();
+                  return;
+                }
+                Promise.race([
+                  KeyboardController.dismiss(),
+                  new Promise<void>(done => setTimeout(done, KEYBOARD_GONE_MS)),
+                ]).then(open);
+              };
             }
             const current = sheet.current;
             if (!current) {
@@ -267,14 +283,10 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
         animationConfigs={SHEET_MOTION}
         enablePanDownToClose={enablePanDownToClose}
         stackBehavior="push"
+        topInset={insets.top}
         keyboardBehavior="interactive"
         keyboardBlurBehavior="restore"
         android_keyboardInputMode="adjustResize"
-        onAnimate={(from, to) => {
-          if (from === -1 && to >= 0) {
-            Keyboard.dismiss();
-          }
-        }}
         onChange={changed}
         onDismiss={onDismiss}
         handleComponent={handle ? undefined : null}
