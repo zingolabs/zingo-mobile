@@ -10,6 +10,7 @@ import {
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
 import { formatAmount } from '@app/utils/formatAmount';
+import { isMemoLeg } from '@screens/Swap/swapLegs';
 import { transferStatus } from '@app/utils/transferStatus';
 
 type Translate = (key: string) => string;
@@ -297,6 +298,17 @@ export function legRowText(args: {
     vt.fee && vt.fee > 0
       ? ` · ${t('history.fee')} ${formatAmount(vt.fee)} ${currency}`
       : '';
+  if (isMemoLeg(vt)) {
+    return {
+      title: t('history.memo-sent'),
+      titleMono: false,
+      line: time,
+      lineAmount: fee,
+      top: t('history.no-funds'),
+      topTone: 'muted',
+      bottom: '',
+    };
+  }
   return {
     title: t(received ? 'history.received' : 'history.sent').trim(),
     titleMono: false,

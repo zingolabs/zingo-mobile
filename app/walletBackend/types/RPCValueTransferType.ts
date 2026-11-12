@@ -17,4 +17,6 @@ export type RPCValueTransferType = {
   pools_sent_from?: PoolEnum[];
   pools_received?: PoolEnum[];
   memos?: string[];
+  /** The UTF-8 text of each OP_RETURN output, in output order. */
+  op_return_data?: string[];
 };

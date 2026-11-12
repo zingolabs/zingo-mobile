@@ -134,3 +134,42 @@ describe('Component History ValueTransferDetail - test', () => {
     expect(signOf(5)).toBe(''); // rejection
   });
 });
+
+describe('ValueTransferDetail with an OP_RETURN', () => {
+  test('Tests that the OP_RETURN text shows under its own label when the transaction carries one. A transparent Maya or THORChain payout signs itself there.', () => {
+    const vt = {
+      ...mockValueTransfers[3],
+      memos: undefined,
+      opReturnData: ['OUT:ABC123'],
+    };
+    const props = makeDrawerProps(3);
+    render(
+      <ContextAppLoadedProvider
+        value={{
+          ...defaultAppContextLoaded,
+          translate: mockTranslate,
+          info: mockInfo,
+          totalBalance: mockTotalBalance,
+          valueTransfers: mockValueTransfers,
+        }}
+      >
+        <ValueTransferDetail
+          {...props}
+          route={{
+            ...props.route,
+            params: {
+              index: 3,
+              vt,
+              valueTransfersSliced: mockValueTransfers,
+              totalLength: mockValueTransfers.length,
+            },
+          }}
+        />
+      </ContextAppLoadedProvider>,
+    );
+    expect(
+      screen.getByTestId('valuetransferdetail.op-return'),
+    ).toHaveTextContent('OUT:ABC123');
+    expect(screen.queryByTestId('valuetransferdetail.memo')).toBe(null);
+  });
+});

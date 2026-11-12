@@ -96,6 +96,7 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
         : 0;
   const role = legRole(leg, record, t);
   const { memo } = Utils.splitMemo(leg.memos);
+  const opReturn = (leg.opReturnData ?? []).join('\n');
   const status = transferStatus(leg, t);
   const rows: DetailRow[] = [
     {
@@ -218,6 +219,39 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
           >
             <Text variant="address" selectable>
               {memo}
+            </Text>
+          </Pressable>
+        </View>
+      )}
+      {!!opReturn && (
+        <View
+          style={{
+            marginTop: space12,
+            paddingVertical: space12,
+            paddingHorizontal: space16,
+            rowGap: space4,
+            borderRadius: radiusMd,
+            borderWidth: 1,
+            borderColor: colors.bottomSheetBorder,
+            backgroundColor: colors.bgCanvas,
+          }}
+        >
+          <Text variant="caption" tone="muted">
+            {t('history.tx-op-return')}
+          </Text>
+          <Pressable
+            kind="link"
+            testID="swap.transaction.op-return"
+            onPress={() => {
+              Clipboard.setString(opReturn);
+              addLastSnackbar(
+                t('history.op-return-copied'),
+                SnackbarDurationEnum.short,
+              );
+            }}
+          >
+            <Text variant="address" selectable>
+              {opReturn}
             </Text>
           </Pressable>
         </View>

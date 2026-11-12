@@ -1,10 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Pressable from '@ui/primitives/Pressable';
 import {
   AccessibilityInfo,
   Animated,
   Easing,
+  StyleSheet,
   TextInput,
   View,
 } from 'react-native';
@@ -31,7 +32,7 @@ import AssetButton from './AssetButton';
 import { ZEC_TOKEN_ENTRY } from '@screens/Swap/swapAssets';
 import { singleLineInput } from '@ui/primitives/singleLineInput';
 
-/** The flip: rows trade places while the words cross-fade. */
+/** The flip: the coins trade places while the words that differ cross-fade. */
 const FLIP_MS = 360;
 /** The cards sit this close, with the flip button over the seam. */
 const SEAM = 4;
@@ -40,9 +41,74 @@ const FLIP_SIZE = 40;
 /** A fresh price flashes green, at its strongest 30% of the way. */
 const FLASH_MS = 1100;
 
+/** Where a coin row sits in its card. */
+type RowBox = { x: number; y: number; height: number };
+const NO_ROW: RowBox = { x: 0, y: 0, height: 0 };
+const boxOf = ({ x, y, height }: RowBox): RowBox => ({ x, y, height });
+/** A chip on its way, centred on a row's height as the row centres it. */
+const travellingChip = (row: RowBox) => ({
+  position: 'absolute' as const,
+  top: 0,
+  left: row.x,
+  height: row.height,
+  justifyContent: 'center' as const,
+});
+/** The boxes a flip travels between, held still while it runs. */
+type FlipBoxes = { sendH: number; sendRow: RowBox; receiveRow: RowBox };
+
+/** Out of reach while the other version is on screen. */
+const offscreen = (off: boolean) =>
+  off
+    ? {
+        pointerEvents: 'none' as const,
+        accessibilityElementsHidden: true,
+        importantForAccessibility: 'no-hide-descendants' as const,
+      }
+    : {};
+
+/**
+ * Both directions' versions of a cell, stacked in one place so its size never
+ * changes across a flip; the one on screen fades in, the other out.
+ */
+function Stacked({
+  showFirst,
+  first,
+  second,
+  fadeIn,
+  fadeOut,
+  align,
+}: {
+  showFirst: boolean;
+  first: React.ReactNode;
+  second: React.ReactNode;
+  fadeIn: Animated.AnimatedInterpolation<number>;
+  fadeOut: Animated.AnimatedInterpolation<number>;
+  align: 'flex-start' | 'flex-end';
+}) {
+  const layer = (shown: boolean, under: boolean) => ({
+    width: '100%' as const,
+    marginLeft: under ? ('-100%' as const) : 0,
+    alignItems: align,
+    justifyContent: 'center' as const,
+    opacity: shown ? fadeIn : fadeOut,
+  });
+  return (
+    <View style={{ flex: 1, flexDirection: 'row' }}>
+      <Animated.View style={layer(showFirst, false)} {...offscreen(!showFirst)}>
+        {first}
+      </Animated.View>
+      <Animated.View style={layer(!showFirst, true)} {...offscreen(showFirst)}>
+        {second}
+      </Animated.View>
+    </View>
+  );
+}
+
 export type PairCardsTexts = {
   youSend: string;
   youReceive: string;
+  /** The receive label when buying ZEC. */
+  receiveInZingo: string;
   fromOtherWallet: string;
   available: string;
   pickAsset: string;
@@ -67,7 +133,7 @@ type PairCardsProps = {
   onToggleUnit?: () => void;
   /** The amount in the other unit, for the line under the field. */
   altText: string;
-  /** The spendable balance in the typed unit, outbound only. */
+  /** The spendable balance in the typed unit, shown when selling. */
   availableText?: string;
   onUseMax?: () => void;
   invalid: boolean;
@@ -93,7 +159,7 @@ type PairCardsProps = {
  * The two sides of the swap, what you send on the dark card over what you
  * get on the panel's colour, with the flip button over the seam. ZEC is
  * always one of the two. Flipping leaves the cards where they are: the two
- * coin rows slide past each other and the words cross-fade.
+ * coins slide past each other and the words that differ cross-fade.
  */
 export default function PairCards({
   isOutbound,
@@ -130,41 +196,83 @@ export default function PairCards({
       testID="swap.pick-asset"
     />
   );
+  /** The picker as it looks, edge and chevron included, for the copy that travels. */
+  const tokenChip = (surface: string) => (
+    <AssetButton token={token} surfaceColor={surface} onPress={onPickAsset} />
+  );
 
   const [sendH, setSendH] = useState<number>(0);
-  const progress = useRef(new Animated.Value(1)).current;
-  const flipped = useRef(isOutbound);
+  const [sendRow, setSendRow] = useState<RowBox>(NO_ROW);
+  const [receiveRow, setReceiveRow] = useState<RowBox>(NO_ROW);
+  const [progress] = useState(() => new Animated.Value(1));
+  /**
+   * Read once: asked on the press, the answer came after the flipped layout
+   * had painted, which showed the end state before the animation.
+   */
+  const [reduceMotion, setReduceMotion] = useState<boolean>(false);
   useEffect(() => {
-    if (flipped.current === isOutbound) {
+    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion);
+  }, []);
+  /**
+   * Layout that changes mid-flight (the receive tip, the ring) would move
+   * the ends of the travel, so they are taken when the flip starts.
+   */
+  const [frozen, setFrozen] = useState<FlipBoxes | null>(null);
+  const flipPending = useRef(false);
+  const flip = () => {
+    if (!reduceMotion) {
+      setFrozen({ sendH, sendRow, receiveRow });
+      flipPending.current = true;
+    }
+    onFlip();
+  };
+  /**
+   * Started once the flipped direction has committed, before it paints: run
+   * from the press, the chips swapped mid-flight, or the animation was over
+   * before a busy JS thread committed.
+   */
+  useLayoutEffect(() => {
+    if (!flipPending.current) {
       return;
     }
-    flipped.current = isOutbound;
-    AccessibilityInfo.isReduceMotionEnabled().then(reduce => {
-      if (reduce) {
-        return;
-      }
-      progress.setValue(0);
-      Animated.timing(progress, {
-        toValue: 1,
-        duration: FLIP_MS,
-        easing: Easing.bezier(0.2, 0, 0, 1),
-        useNativeDriver: true,
-      }).start();
-    });
+    flipPending.current = false;
+    progress.setValue(0);
+    Animated.timing(progress, {
+      toValue: 1,
+      duration: FLIP_MS,
+      easing: Easing.bezier(0.2, 0, 0, 1),
+      useNativeDriver: true,
+    }).start(() => setFrozen(null));
   }, [isOutbound, progress]);
-  /** Each row starts where the other one was, a card and the seam away. */
-  const travel = sendH + SEAM;
-  const sendRowShift = progress.interpolate({
+  const boxes = frozen ?? { sendH, sendRow, receiveRow };
+  /** The receive card's coin row, measured from the top of the send card. */
+  const receiveTop = boxes.sendH + SEAM + boxes.receiveRow.y;
+  const sendChipShift = progress.interpolate({
     inputRange: [0, 1],
-    outputRange: [travel, 0],
+    outputRange: [receiveTop, boxes.sendRow.y],
   });
-  const receiveRowShift = progress.interpolate({
+  const receiveChipShift = progress.interpolate({
     inputRange: [0, 1],
-    outputRange: [-travel, 0],
+    outputRange: [boxes.sendRow.y, receiveTop],
   });
-  const words = progress.interpolate({
-    inputRange: [0, 0.35, 1],
+  /** The chips in the rows stand in for the travelling ones once they land. */
+  const landed = progress.interpolate({
+    inputRange: [0, 0.999, 1],
     outputRange: [0, 0, 1],
+  });
+  const travelling = progress.interpolate({
+    inputRange: [0, 0.999, 1],
+    outputRange: [1, 1, 0],
+  });
+  /** The words that differ cross in place: out at once, in after a beat. */
+  const fadeIn = progress.interpolate({
+    inputRange: [0, 0.3, 1],
+    outputRange: [0, 0, 1],
+  });
+  const fadeOut = progress.interpolate({
+    inputRange: [0, 0.3],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
   });
   const spin = progress.interpolate({
     inputRange: [0, 1],
@@ -221,7 +329,6 @@ export default function PairCards({
     alignItems: 'center' as const,
     columnGap: space12,
     marginTop: space8,
-    zIndex: 3,
   };
   const underRow = {
     flexDirection: 'row' as const,
@@ -236,39 +343,53 @@ export default function PairCards({
         style={card(sendSurface)}
         onLayout={e => setSendH(e.nativeEvent.layout.height)}
       >
-        <Animated.View style={[header, { opacity: words }]}>
+        <View style={header}>
           <Text variant="bodySmall" tone="muted" style={{ fontWeight: '600' }}>
             {texts.youSend}
           </Text>
-          {isOutbound && !!availableText && (
-            <Pressable
-              kind="link"
-              accessibilityRole="button"
-              accessibilityLabel={texts.useMax}
-              onPress={onUseMax}
-              hitSlop={8}
-              style={{ flexDirection: 'row', columnGap: space4 }}
-            >
+          <Stacked
+            showFirst={isOutbound}
+            align="flex-end"
+            fadeIn={fadeIn}
+            fadeOut={fadeOut}
+            first={
+              !!availableText && (
+                <Pressable
+                  kind="link"
+                  accessibilityRole="button"
+                  accessibilityLabel={texts.useMax}
+                  onPress={onUseMax}
+                  hitSlop={8}
+                  style={{ flexDirection: 'row', columnGap: space4 }}
+                >
+                  <Text variant="caption" tone="muted">
+                    {texts.available}
+                  </Text>
+                  <PrivateAmount
+                    text={availableText}
+                    variant="caption"
+                    style={{
+                      fontWeight: '700',
+                      textDecorationLine: 'underline',
+                    }}
+                  />
+                </Pressable>
+              )
+            }
+            second={
               <Text variant="caption" tone="muted">
-                {texts.available}
+                {texts.fromOtherWallet}
               </Text>
-              <PrivateAmount
-                text={availableText}
-                variant="caption"
-                style={{ fontWeight: '700', textDecorationLine: 'underline' }}
-              />
-            </Pressable>
-          )}
-          {!isOutbound && (
-            <Text variant="caption" tone="muted">
-              {texts.fromOtherWallet}
-            </Text>
-          )}
-        </Animated.View>
-        <Animated.View
-          style={[coinRow, { transform: [{ translateY: sendRowShift }] }]}
+            }
+          />
+        </View>
+        <View
+          style={coinRow}
+          onLayout={e => setSendRow(boxOf(e.nativeEvent.layout))}
         >
-          {isOutbound ? zecChip : pickChip(sendSurface)}
+          <Animated.View style={{ opacity: landed }}>
+            {isOutbound ? zecChip : pickChip(sendSurface)}
+          </Animated.View>
           <View
             style={{
               flex: 1,
@@ -304,8 +425,8 @@ export default function PairCards({
               }}
             />
           </View>
-        </Animated.View>
-        <Animated.View style={[underRow, { opacity: words }]}>
+        </View>
+        <View style={underRow}>
           {onToggleUnit ? (
             <Pressable
               kind="link"
@@ -331,7 +452,7 @@ export default function PairCards({
               {altText}
             </Text>
           )}
-        </Animated.View>
+        </View>
       </View>
 
       <View style={{ height: 0, alignItems: 'center', zIndex: 4 }}>
@@ -340,7 +461,7 @@ export default function PairCards({
           testID="swap.flip"
           accessibilityRole="button"
           accessibilityLabel={texts.flip}
-          onPress={onFlip}
+          onPress={flip}
           hitSlop={(touchTarget - FLIP_SIZE) / 2}
           style={{
             position: 'absolute',
@@ -364,36 +485,56 @@ export default function PairCards({
       </View>
 
       <View style={[card(receiveSurface), { marginTop: SEAM }]}>
-        <Animated.View style={[header, { opacity: words }]}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              columnGap: space4,
-            }}
-          >
-            <Text
-              variant="bodySmall"
-              tone="muted"
-              style={{ fontWeight: '600' }}
-            >
-              {texts.youReceive}
-            </Text>
-            {!isOutbound && !!texts.receiveTip && (
-              <InfoTooltip
-                testID="swap.receive-info"
-                label={texts.youReceive}
-                text={texts.receiveTip}
+        <View style={header}>
+          <Stacked
+            showFirst={isOutbound}
+            align="flex-start"
+            fadeIn={fadeIn}
+            fadeOut={fadeOut}
+            first={
+              <Text
+                variant="bodySmall"
+                tone="muted"
+                style={{ fontWeight: '600' }}
               >
-                <></>
-              </InfoTooltip>
-            )}
-          </View>
-        </Animated.View>
-        <Animated.View
-          style={[coinRow, { transform: [{ translateY: receiveRowShift }] }]}
+                {texts.youReceive}
+              </Text>
+            }
+            second={
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  columnGap: space4,
+                }}
+              >
+                <Text
+                  variant="bodySmall"
+                  tone="muted"
+                  style={{ fontWeight: '600' }}
+                >
+                  {texts.receiveInZingo}
+                </Text>
+                {!!texts.receiveTip && (
+                  <InfoTooltip
+                    testID="swap.receive-info"
+                    label={texts.receiveInZingo}
+                    text={texts.receiveTip}
+                  >
+                    <></>
+                  </InfoTooltip>
+                )}
+              </View>
+            }
+          />
+        </View>
+        <View
+          style={coinRow}
+          onLayout={e => setReceiveRow(boxOf(e.nativeEvent.layout))}
         >
-          {isOutbound ? pickChip(receiveSurface) : zecChip}
+          <Animated.View style={{ opacity: landed }}>
+            {isOutbound ? pickChip(receiveSurface) : zecChip}
+          </Animated.View>
           <View
             style={{
               flex: 1,
@@ -446,13 +587,39 @@ export default function PairCards({
               {receiveText || receivePlaceholder}
             </Animated.Text>
           </View>
-        </Animated.View>
-        <Animated.View style={[underRow, { opacity: words }]}>
+        </View>
+        <View style={underRow}>
           <Text variant="bodySmall" tone="muted">
             {receiveAltText}
           </Text>
-        </Animated.View>
+        </View>
       </View>
+
+      {/* Only the coins travel, over both cards, so neither hides behind
+          the other at the seam. */}
+      <Animated.View
+        pointerEvents="none"
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        style={[StyleSheet.absoluteFill, { opacity: travelling, zIndex: 5 }]}
+      >
+        <Animated.View
+          style={[
+            travellingChip(boxes.sendRow),
+            { transform: [{ translateY: sendChipShift }] },
+          ]}
+        >
+          {isOutbound ? zecChip : tokenChip(sendSurface)}
+        </Animated.View>
+        <Animated.View
+          style={[
+            travellingChip(boxes.receiveRow),
+            { transform: [{ translateY: receiveChipShift }] },
+          ]}
+        >
+          {isOutbound ? tokenChip(receiveSurface) : zecChip}
+        </Animated.View>
+      </Animated.View>
     </View>
   );
 }

@@ -160,6 +160,20 @@ describe('transformValueTransfer — optional fields', () => {
     expect(result.address).toBe('zs1abc');
   });
 
+  test('Tests that the OP_RETURN text reaches the transfer when zingolib reports one, and is undefined when it reports none', () => {
+    expect(
+      transformValueTransfer(
+        makeVt({ op_return_data: ['OUT:abc'] }),
+        1100,
+        1100,
+      ).opReturnData,
+    ).toEqual(['OUT:abc']);
+    expect(
+      transformValueTransfer(makeVt({ op_return_data: [] }), 1100, 1100)
+        .opReturnData,
+    ).toBeUndefined();
+  });
+
   test('memos is undefined when memos array is absent', () => {
     const result = transformValueTransfer(makeVt(), 1100, 1100);
     expect(result.memos).toBeUndefined();

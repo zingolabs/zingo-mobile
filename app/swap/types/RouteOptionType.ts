@@ -68,7 +68,4 @@ export type RouteOptionType = {
    *  `FASTEST`, `CHEAPEST`). The route picker maps `RECOMMENDED` to the
    *  "Optimal" badge in the design. */
   tags?: ReadonlyArray<string>;
-  /** Paid with a token, whose transfer has no room for a memo: buying ZEC
-   *  only, since ZEC itself is no token. */
-  paidWithToken?: boolean;
 };

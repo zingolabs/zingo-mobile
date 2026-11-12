@@ -61,6 +61,23 @@ describe('payoutNotesFrom', () => {
     ).toEqual([]);
   });
 
+  it('Tests that a received transfer is a payout when its OP_RETURN names a deposit hash. A transparent payout carries no memo.', () => {
+    expect(
+      payoutNotesFrom([
+        vt({ memos: undefined, opReturnData: [`OUT:${HASH}`] }),
+      ]),
+    ).toEqual([{ txid: 'df3fe39c', amount: 0.01732169, inboundHash: HASH }]);
+  });
+
+  it('Tests that nothing is a payout when the OP_RETURN is a refund or anything else', () => {
+    expect(
+      payoutNotesFrom([
+        vt({ memos: undefined, opReturnData: [`REFUND:${HASH}`] }),
+        vt({ memos: undefined, opReturnData: ['=:ZEC.ZEC:t1abc'] }),
+      ]),
+    ).toEqual([]);
+  });
+
   it('Tests that nothing is a payout when the memo is anything else', () => {
     expect(
       payoutNotesFrom([

@@ -387,6 +387,29 @@ describe('applyDefaultTrackUpdate', () => {
     expect(paid.status).toBe(SwapStatusEnum.Failed);
   });
 
+  it('Tests that a purchase keeps waiting for its payment when the provider answers pending or unknown with no deposit hash. NEAR answers pending for a channel nobody has paid.', () => {
+    const purchase = record({
+      direction: SwapDirectionEnum.Inbound,
+      provider: SwapKitProviderEnum.Near,
+      sellAsset: BTC,
+      receiveAsset: ZEC,
+      status: SwapStatusEnum.AwaitingExternalDeposit,
+    });
+
+    expect(
+      applyDefaultTrackUpdate(purchase, { status: 'pending' }).status,
+    ).toBe(SwapStatusEnum.AwaitingExternalDeposit);
+    expect(
+      applyDefaultTrackUpdate(purchase, { status: 'unknown' }).status,
+    ).toBe(SwapStatusEnum.AwaitingExternalDeposit);
+    expect(
+      applyDefaultTrackUpdate(purchase, {
+        status: 'pending',
+        legs: [{ chainId: 'bitcoin', hash: DEPOSIT_HASH }],
+      }).status,
+    ).toBe(SwapStatusEnum.Pending);
+  });
+
   it('finds a provider explorer link at the top level or on a leg', () => {
     const topLevel = applyDefaultTrackUpdate(record(), {
       status: 'PROCESSING',
