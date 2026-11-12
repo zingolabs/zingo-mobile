@@ -90,6 +90,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '@app/services/createAlert';
 import { sendEmail } from '@app/services/sendEmail';
 import Toast from 'react-native-toast-message';
+import { FullWindowOverlay } from 'react-native-screens';
 import { ACTION_SNACKBAR_MS, toastConfig } from '@ui/widgets/toastConfig';
 import { MASK } from '@ui/widgets/PrivateAmount';
 import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
@@ -2134,7 +2135,13 @@ export class LoadedAppClass extends Component<
             </GestureHandlerRootView>
           </SwapServiceProvider>
         </ContextAppLoadedProvider>
-        <Toast config={toastConfig} />
+        {Platform.OS === GlobalConst.platformOSios ? (
+          <FullWindowOverlay>
+            <Toast config={toastConfig} />
+          </FullWindowOverlay>
+        ) : (
+          <Toast config={toastConfig} />
+        )}
       </>
     );
   }
