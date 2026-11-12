@@ -105,7 +105,7 @@ describe('route projection', () => {
     expect(routes[0].minReceiveAmount).toBe('0.98');
     // Rounded up to the minute, so a 10-and-a-half-minute route never reads as
     // ten.
-    expect(routes[0].estimatedTimeText).toBe('~11 min');
+    expect(routes[0].estimatedTimeText).toBe('≈ 11 min');
   });
 
   // Named for what it is on the way in: SwapKit calls it totalSlippageBps,

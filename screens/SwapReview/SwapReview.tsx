@@ -2,7 +2,7 @@
 import React, { useCallback, useContext, useState } from 'react';
 import { View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { space8, space16, useTheme, iconSizeSm } from '@app/theme';
+import { space8, useTheme, iconSizeSm } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import { GlobalConst, Route, SnackbarDurationEnum } from '@app/AppState';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
@@ -35,13 +35,13 @@ import Button from '@ui/primitives/Button';
 import Checkbox from '@ui/primitives/Checkbox';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
+import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import PairHero from '@screens/Swap/components/PairHero';
 import NymNote from '@screens/Swap/components/NymNote';
 import DetailRows from '@screens/Swap/components/DetailRows';
 import { routeFeeValue } from '@screens/Swap/routeFeeValue';
 import { useShieldedRoutes } from '@screens/Swap/useShieldedRoutes';
-import Card from '@ui/widgets/Card';
 import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import { formatSlippagePercent } from '@screens/Swap/components/SwapSettingsSheet';
 import { formatAmount, formatUsd } from '@app/utils/formatAmount';
@@ -280,6 +280,7 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
   });
   const receiveAmount = parseFloat(chosen.expectedReceiveAmount);
   const receiveUsd = receiveAmount * fiatValueBasis.receiveUsdUnitPrice;
+  const minReceive = `${formatAmountForDisplay(chosen.minReceiveAmount)} ${receiveSymbol}`;
 
   const counterpartyChain = counterparty.chain;
   const contact = address
@@ -358,7 +359,7 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
             isOutbound ? 'swap.review-swap-to' : 'swap.review-swap-from',
           ) as string
         ).replace('{coin}', isOutbound ? receiveSymbol : sellSymbol)}
-        amount={formatAmountForDisplay(chosen.expectedReceiveAmount)}
+        amount={`≈ ${formatAmountForDisplay(chosen.expectedReceiveAmount)}`}
         unit={receiveSymbol}
         line={[
           (translate('swap.review-for') as string).replace(
@@ -379,12 +380,34 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
               label: translate('swap.you-send') as string,
               value: `${formatAmountForDisplay(quoteInput.sellAmountHumanDecimal)} ${sellSymbol}`,
             },
-            {
-              label: translate('swap.review-min') as string,
-              value: `${formatAmountForDisplay(chosen.minReceiveAmount)} ${receiveSymbol}`,
-              tone: 'positive',
-              tip: translate('swap.tip-min') as string,
-            },
+            isOutbound
+              ? {
+                  label: translate('swap.review-min') as string,
+                  value: minReceive,
+                  tone: 'positive' as const,
+                  tip: (translate('swap.tip-min') as string).replace(
+                    '{coin}',
+                    sellSymbol,
+                  ),
+                }
+              : {
+                  label: translate('swap.review-you-get') as string,
+                  value: translate(
+                    shielded
+                      ? 'swap.review-get-shielded'
+                      : 'swap.review-get-transparent',
+                  ) as string,
+                  leading: shielded ? (
+                    <ShieldIcon size={iconSizeSm} color={colors.fgAccent} />
+                  ) : undefined,
+                  tip: (
+                    translate(
+                      shielded
+                        ? 'swap.tip-get-shielded'
+                        : 'swap.tip-get-transparent',
+                    ) as string
+                  ).replace('{provider}', providerShortLabel(chosen.provider)),
+                },
             {
               label: translate('swap.review-fees') as string,
               value: feeValue,
@@ -425,6 +448,11 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
               ]
                 .filter(Boolean)
                 .join(' · '),
+              tip: isOutbound
+                ? undefined
+                : (translate('swap.tip-arrives') as string)
+                    .replace('{min}', minReceive)
+                    .replace('{sellCoin}', sellSymbol),
             },
             ...(isOutbound
               ? []
@@ -476,39 +504,6 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
           ]}
         />
       </View>
-      {shielded && (
-        <View testID="swap.review.shielded" style={{ marginTop: space16 }}>
-          <Card flush>
-            <View
-              style={{
-                minHeight: 56,
-                justifyContent: 'center',
-                paddingVertical: space8,
-                paddingHorizontal: space16,
-              }}
-            >
-              <Text variant="bodyStrong">
-                {
-                  translate(
-                    isOutbound
-                      ? 'swap.review-shielded-refund'
-                      : 'swap.review-shielded',
-                  ) as string
-                }
-              </Text>
-              <Text variant="bodySmall" tone="muted" style={{ marginTop: 4 }}>
-                {
-                  translate(
-                    isOutbound
-                      ? 'swap.review-shielded-refund-sub'
-                      : 'swap.review-shielded-sub',
-                  ) as string
-                }
-              </Text>
-            </View>
-          </Card>
-        </View>
-      )}
       <View
         style={{
           flexDirection: 'row',

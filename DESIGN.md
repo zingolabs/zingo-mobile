@@ -743,6 +743,8 @@ and the button on one centred line.
 - Show a contact's name and avatar wherever their address appears, and offer
   "Save contact" wherever an outside address is not in the Address Book.
 - Write every new string in the five catalogs.
+- Mark an approximate amount or time with "≈", never "~". An estimated
+  amount takes no "+": the sign comes with the final amount.
 - Keep the reserved space of text that is invisible for now (Launching's), so
   the logo doesn't jump, but hide it from screen readers while it's invisible
   (`importantForAccessibility="no-hide-descendants"` /

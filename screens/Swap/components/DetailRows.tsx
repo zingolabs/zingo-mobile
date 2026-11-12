@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import Pressable from '@ui/primitives/Pressable';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -8,6 +8,8 @@ import { ContextAppLoaded } from '@app/context';
 import Text from '@ui/primitives/Text';
 import { useInsetFill } from '@ui/primitives/Surface';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
+import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
+import { COPIED_MS } from './CopyPill';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
 
 export type DetailRow = {
@@ -40,6 +42,15 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
   const { translate, addLastSnackbar } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const inset = useInsetFill();
+  /** The row whose value was just copied, which shows a check for a moment. */
+  const [copied, setCopied] = useState('');
+  useEffect(() => {
+    if (!copied) {
+      return;
+    }
+    const timer = setTimeout(() => setCopied(''), COPIED_MS);
+    return () => clearTimeout(timer);
+  }, [copied]);
   const toneColor = (tone: DetailRow['tone']) =>
     tone === 'positive'
       ? colors.fgAccent
@@ -144,7 +155,8 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
                   hitSlop={8}
                   onPress={() => {
                     Clipboard.setString(row.copy ?? '');
-                    addLastSnackbar(translate('swap.copied') as string);
+                    setCopied(row.label);
+                    addLastSnackbar(translate('txtcopied') as string);
                   }}
                   style={{
                     width: 28,
@@ -155,7 +167,11 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
                     justifyContent: 'center',
                   }}
                 >
-                  <CopyIcon size={iconSizeSm} color={colors.fgMuted} />
+                  {copied === row.label ? (
+                    <CheckIcon size={iconSizeSm} color={colors.fgAccent} />
+                  ) : (
+                    <CopyIcon size={iconSizeSm} color={colors.fgMuted} />
+                  )}
                 </Pressable>
               )}
             </View>
