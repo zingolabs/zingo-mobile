@@ -138,19 +138,36 @@ export default function RecipientField({
     </View>
   );
 
+  const saveContact = (
+    <View style={{ marginLeft: 'auto' }}>
+      <Button
+        testID="send.add-address"
+        variant="text"
+        size="small"
+        inline
+        title={t('swap.save-contact')}
+        onPress={onSaveContact}
+      />
+    </View>
+  );
+
   const footer =
     valid !== 1 || token
       ? undefined
       : transparent
         ? line(
             <TriangleAlert size={iconSizeSm} color={colors.fgTransparent} />,
-            <Text
-              testID="send.address.transparent"
-              variant="bodySmall"
-              color={colors.fgTransparent}
-            >
-              {t('send.to-transparent')}
-            </Text>,
+            <>
+              <Text
+                testID="send.address.transparent"
+                variant="bodySmall"
+                color={colors.fgTransparent}
+                style={{ flexShrink: 1 }}
+              >
+                {t('send.to-public')}
+              </Text>
+              {saveContact}
+            </>,
           )
         : line(
             <CheckIcon size={iconSizeSm} color={colors.fgAccent} />,
@@ -163,16 +180,7 @@ export default function RecipientField({
               >
                 {t(kindKey(text))}
               </Text>
-              <View style={{ marginLeft: 'auto' }}>
-                <Button
-                  testID="send.add-address"
-                  variant="text"
-                  size="small"
-                  inline
-                  title={t('swap.save-contact')}
-                  onPress={onSaveContact}
-                />
-              </View>
+              {saveContact}
             </>,
           );
 
