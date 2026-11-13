@@ -340,6 +340,29 @@ androidComponents {
     }
 }
 
+// BackgroundSyncWorker consumes WorkManager's ListenableFuture from the
+// standalone jar. Guava on the runtime classpath would ship its whole
+// library for that one interface, which this check refuses per variant.
+androidComponents {
+    onVariants { variant ->
+        val runtime = variant.runtimeConfiguration
+        val verifyGuavaAbsent = tasks.register("verify${variant.name.replaceFirstChar(Char::uppercase)}GuavaAbsent") {
+            doLast {
+                val modules = runtime.incoming.resolutionResult.allComponents.map { it.id.displayName }
+                check(modules.none { it.startsWith("com.google.guava:guava:") }) {
+                    "Guava resolves on the ${variant.name} runtime classpath"
+                }
+                check(modules.any { it.startsWith("com.google.guava:listenablefuture:") }) {
+                    "listenablefuture is missing from the ${variant.name} runtime classpath"
+                }
+            }
+        }
+        tasks.matching { it.name == "pre${variant.name.replaceFirstChar(Char::uppercase)}Build" }.configureEach {
+            dependsOn(verifyGuavaAbsent)
+        }
+    }
+}
+
 
 // The React Native plugin registers a snapshot repository first on every
 // project, for its nightly builds, so each uncached lookup asks it before
@@ -412,11 +435,9 @@ dependencies {
     val workVersion = "2.10.0"
 
     // BackgroundSyncWorker consumes the ListenableFuture WorkManager
-    // returns, so the class's provider must be declared, not borrowed from
-    // work-runtime's dependency graph. With Guava on the runtime classpath,
-    // its metadata retires the standalone listenablefuture jar (the empty
-    // 9999.0 placeholder supersedes 1.0), so Guava itself is the provider.
-    implementation("com.google.guava:guava:33.3.1-android")
+    // returns. The class comes from its standalone jar, declared here
+    // instead of borrowed from work-runtime's dependency graph.
+    implementation("com.google.guava:listenablefuture:1.0")
 
     implementation("androidx.work:work-runtime:$workVersion")
 
