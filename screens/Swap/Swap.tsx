@@ -3,13 +3,14 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { maxBy } from 'lodash';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import TitleBar from '@ui/widgets/TitleBar';
-import { Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import Animated from 'react-native-reanimated';
 import Pressable from '@ui/primitives/Pressable';
-import { duration } from '@app/theme/motion';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import {
   space12,
+  space16,
   space4,
   space8,
   space20,
@@ -104,7 +105,13 @@ type SwapProps = HomeTabScreenProps<'Swap'>;
  * always one side. The sheet sits fixed under the header's icons; the review
  * and everything after it are screens of their own.
  */
-const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
+/** Where Swap goes when it shows again: back to the history a swap was opened from. */
+type ReturnTo = { kind: 'form' } | { kind: 'history'; prefillAt: number };
+
+const Swap: React.FunctionComponent<SwapProps> = ({
+  route,
+  navigation: tab,
+}) => {
   const { edges, fades } = useScrollEdges({
     sides: 'top',
     surface: 'surface',
@@ -365,6 +372,33 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
     }
     form.cancelReview();
   });
+  const returnTo = useRef<ReturnTo>({ kind: 'form' });
+  /**
+   * Back from a swap opened from the history, the history opens again. A new
+   * quote from that swap, or another tab, ends the way back.
+   */
+  useEffect(() => {
+    const onFocus = tab.addListener('focus', () => {
+      const back = returnTo.current;
+      returnTo.current = { kind: 'form' };
+      const prefillAt =
+        tab.getState().routes.find(r => r.key === route.key)?.params?.prefill
+          ?.requestedAtMs ?? 0;
+      if (back.kind === 'history' && back.prefillAt === prefillAt) {
+        historySheetRef.current?.present();
+      }
+    });
+    const onTabs = tab.addListener('state', e => {
+      const { index, routes } = e.data.state;
+      if (routes[index].key !== route.key) {
+        returnTo.current = { kind: 'form' };
+      }
+    });
+    return () => {
+      onFocus();
+      onTabs();
+    };
+  }, [tab, route.key]);
   const openRecord = (record: SwapRecordType) =>
     navigation.navigate(swapScreenFor(record), { recordId: record.recordId });
   const onContinue = () => {
@@ -518,7 +552,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
               header={sheetHeader}
               animateOnMount={false}
             >
-              <ScrollView
+              <KeyboardAwareScrollView
                 onScroll={e => {
                   onTabScroll(e);
                   edges.onScroll(e);
@@ -526,6 +560,8 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                 onLayout={edges.onLayout}
                 scrollEventThrottle={16}
                 keyboardShouldPersistTaps="handled"
+                keyboardDismissMode="interactive"
+                bottomOffset={space16}
                 testID="swap.scroll-view"
                 contentContainerStyle={{
                   paddingHorizontal: space20,
@@ -1119,7 +1155,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                     onPress={onContinue}
                   />
                 </View>
-              </ScrollView>
+              </KeyboardAwareScrollView>
               {fades}
             </AppSheet>
           )}
@@ -1179,12 +1215,12 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
           records={records}
           nowMs={nowMs}
           onOpen={record => {
+            returnTo.current = {
+              kind: 'history',
+              prefillAt: route.params?.prefill?.requestedAtMs ?? 0,
+            };
+            historySheetRef.current?.dismiss();
             openRecord(record);
-            // Gone at once under the risen panel, without a motion of its own.
-            setTimeout(
-              () => historySheetRef.current?.dismiss({ duration: 0 }),
-              duration.panelIn,
-            );
           }}
         />
         <InsufficientFundsSheet

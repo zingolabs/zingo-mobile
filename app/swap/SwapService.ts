@@ -944,7 +944,7 @@ function toRouteOption(
     feesRaw: route.fees,
     estimatedTimeText:
       estimatedSecondsTotal !== undefined
-        ? `~${Math.max(1, Math.ceil(estimatedSecondsTotal / 60))} min`
+        ? `≈ ${Math.max(1, Math.ceil(estimatedSecondsTotal / 60))} min`
         : undefined,
     expiresAtMs: Number.isFinite(expirationSecs)
       ? expirationSecs * 1000

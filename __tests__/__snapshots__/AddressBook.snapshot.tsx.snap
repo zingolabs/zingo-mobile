@@ -5685,6 +5685,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
               onFocus={[Function]}
               placeholder="text translated"
               placeholderTextColor="#888888"
+              scrollEnabled={true}
               spellCheck={false}
               style={
                 {
@@ -5692,7 +5693,8 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                   "flex": 1,
                   "fontSize": 15,
                   "fontWeight": "600",
-                  "minHeight": 58,
+                  "height": 100,
+                  "lineHeight": 20,
                   "padding": 10,
                   "textAlignVertical": "top",
                 }
@@ -5804,8 +5806,8 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 "alignItems": "center",
                 "flexDirection": "row",
                 "gap": 6,
+                "height": 32,
                 "marginTop": 6,
-                "minHeight": 18,
               }
             }
             testID="addressbook.note.none"

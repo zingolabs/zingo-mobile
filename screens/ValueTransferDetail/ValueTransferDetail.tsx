@@ -40,6 +40,7 @@ import Button from '@ui/primitives/Button';
 import FullPanel from '@ui/widgets/FullPanel';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import SaveContactButton from '@ui/widgets/SaveContactButton';
+import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
 import DetailRows from '@screens/Swap/components/DetailRows';
 import type { DetailRow } from '@screens/Swap/components/DetailRows';
 import { transferIcon } from '@screens/History/transferIcon';
@@ -76,6 +77,7 @@ const ValueTransferDetail: React.FunctionComponent<
     zecPrice,
     setSendPageState,
     launchAddTagModal,
+    readOnly,
   } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const t = (key: string) => (translate(key) as string).trim();
@@ -216,6 +218,14 @@ const ValueTransferDetail: React.FunctionComponent<
     navigation.navigate(Route.Home, { screen: Route.Send }, { pop: true });
   };
 
+  /** Send with only this address filled: a new payment, not this one again. */
+  const sendAgain = () => {
+    const state = new SendPageStateClass(new ToAddrClass(0));
+    state.toaddr.to = vt.address ?? '';
+    setSendPageState(state);
+    navigation.navigate(Route.Home, { screen: Route.Send }, { pop: true });
+  };
+
   const remove = () =>
     showConfirm({
       title: t('history.remove-title'),
@@ -348,13 +358,26 @@ const ValueTransferDetail: React.FunctionComponent<
         <DetailRows rows={rows} />
       </View>
 
-      {sent && !!vt.address && !contact && !ownAddress(vt.address) && (
-        <SaveContactButton
-          testID="valuetransferdetail.save-contact"
-          label={t('swap.save-contact')}
-          onPress={() => launchAddTagModal(vt.address ?? '')}
-        />
-      )}
+      {sent &&
+        !!vt.address &&
+        !ownAddress(vt.address) &&
+        (!contact ? (
+          <SaveContactButton
+            testID="valuetransferdetail.save-contact"
+            label={t('swap.save-contact')}
+            onPress={() => launchAddTagModal(vt.address ?? '')}
+          />
+        ) : (
+          !readOnly &&
+          server.kind !== 'offline' && (
+            <SaveContactButton
+              testID="valuetransferdetail.send-again"
+              label={t('history.send-again')}
+              icon={PlaneIcon}
+              onPress={sendAgain}
+            />
+          )
+        ))}
 
       {(!!memo || !!memoUA) && (
         <View

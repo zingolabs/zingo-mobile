@@ -102,7 +102,7 @@ describe('RecipientField', () => {
       text: 't1abcdefghijklmnopqrstuvwxyz1234567',
       valid: 1,
     });
-    expect(view.getByText('send.to-transparent')).toBeTruthy();
+    expect(view.getByText('send.to-public')).toBeTruthy();
   });
 
   test('Tests that text that is no address, contact or name says what is wrong', () => {
