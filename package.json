@@ -49,7 +49,9 @@
     "check:compiler:changed": "tsx scripts/react_compiler_report.mts --base=dev",
     "release:prod:prep": "node scripts/release/release-prep.mjs prod",
     "release:beta:prep": "node scripts/release/release-prep.mjs beta",
-    "pods": "cd ios && pod install && cd .."
+    "pods": "cd ios && pod install && cd ..",
+    "dupes": "jscpd --fail-on-new-clones 0 --fail-on-empty --baseline-from-ref",
+    "dupes:report": "jscpd"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^5.2.6",
@@ -127,6 +129,7 @@
     "eslint-plugin-ft-flow": "^3.0.11",
     "eslint-plugin-react-native": "^5.0.0",
     "jest": "^30.5.2",
+    "jscpd": "^5.4.3",
     "prettier": "^3.9.10",
     "react-dom": "19.1.4",
     "react-native-web": "^0.21.4",
