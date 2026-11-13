@@ -204,7 +204,7 @@ export default function AmountCard({
         nativeID={AMOUNT_DONE}
         testID="send.amount.done"
         labels={{ confirm: t('confirm'), hide: t('hide-keyboard') }}
-        ready={!invalid && parseAmountInput(value) > 0}
+        ready={parseAmountInput(value) > 0}
       />
     </View>
   );
