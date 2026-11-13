@@ -1,4 +1,4 @@
-import type { FfiResult } from '@app/walletBackend/ffi';
+import { type FfiResult, toFfiError } from '@app/walletBackend/ffi';
 import { RPCShieldType } from '@app/walletBackend/types/RPCShieldType';
 import {
   SendFailureClass,
@@ -96,7 +96,7 @@ const attemptOnce = async (
   } catch (thrown) {
     return {
       kind: 'rejected',
-      failure: classifySendFailure(String(thrown)),
+      failure: classifySendFailure(toFfiError(thrown)),
       since,
     };
   }

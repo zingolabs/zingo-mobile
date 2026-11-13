@@ -28,6 +28,7 @@ import {
   unsentSale,
 } from '@app/swap';
 import { leaveFlow } from '@app/navigation/navigate';
+import { toFfiError } from '@app/walletBackend/ffi';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
@@ -177,7 +178,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
           e.kind === 'pending' &&
           e.deshieldTxId !== deshieldTxId
           ? (translate('swap.deposit-other-held') as string)
-          : `${e}`,
+          : toFfiError(e).message,
       );
     } finally {
       setRetrying(false);
