@@ -1,7 +1,8 @@
 /* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
-import { TextInput, View } from 'react-native';
+import { View } from 'react-native';
+import FieldInput from '@ui/primitives/FieldInput';
 
 import { useTheme, iconSizeMd } from '@app/theme';
 import Pressable from '@ui/primitives/Pressable';
@@ -43,7 +44,7 @@ const SearchField: React.FunctionComponent<SearchFieldProps> = ({
       }}
     >
       <SearchIcon size={16} color={colors.fgMuted} />
-      <TextInput
+      <FieldInput
         testID={testID}
         value={value}
         onChangeText={onChangeText}

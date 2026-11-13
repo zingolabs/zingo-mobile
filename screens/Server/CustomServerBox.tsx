@@ -23,6 +23,7 @@ import TextField from '@ui/primitives/TextField';
 import ServerLog, { LogLine } from './ServerLog';
 import { schemeFor } from './useCustomServer';
 import Button from '@ui/primitives/Button';
+import KeyboardDone, { KeyboardDoneLabels } from '@ui/widgets/KeyboardDone';
 
 type CustomServerBoxProps = {
   chain: ChainNameEnum;
@@ -46,6 +47,7 @@ type CustomServerBoxProps = {
     host: string;
     hostRegtest: string;
     port: string;
+    done: KeyboardDoneLabels;
   };
   // True when the text carried a port, which moved to its own box.
   onHost: (text: string) => boolean;
@@ -57,6 +59,8 @@ type CustomServerBoxProps = {
 
 /** Five digits at the value's size. */
 const PORT_WIDTH = 64;
+/** The port field's done key on iOS. */
+const PORT_DONE = 'server.custom.port.done-bar';
 
 const CustomServerBox: React.FC<CustomServerBoxProps> = ({
   chain,
@@ -201,6 +205,7 @@ const CustomServerBox: React.FC<CustomServerBoxProps> = ({
                 }}
                 editable={!disabled && !busy}
                 keyboardType="number-pad"
+                inputAccessoryViewID={PORT_DONE}
                 maxLength={5}
                 returnKeyType="go"
                 maxFontSizeMultiplier={fontScaleBody}
@@ -255,6 +260,12 @@ const CustomServerBox: React.FC<CustomServerBoxProps> = ({
         shownBefore={shown}
         detailsLabel={labels.details}
         onSwitch={onSwitch}
+      />
+      <KeyboardDone
+        nativeID={PORT_DONE}
+        testID="server.custom.port.done"
+        labels={labels.done}
+        ready={/^d+$/.test(port) && Number(port) >= 1 && Number(port) <= 65535}
       />
     </View>
   );

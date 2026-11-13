@@ -248,6 +248,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
         "paddingHorizontal": 22,
       }
     }
+    keyboardDismissMode="interactive"
     keyboardShouldPersistTaps="handled"
     onContentSizeChange={[Function]}
     onLayout={[Function]}

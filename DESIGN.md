@@ -745,6 +745,13 @@ and the button on one centred line.
 - Write every new string in the five catalogs.
 - Mark an approximate amount or time with "≈", never "~". An estimated
   amount takes no "+": the sign comes with the final amount.
+- Give every iOS number pad the round done key (`KeyboardDone`, or
+  `doneLabels` on `TextField`): a grey chevron hides the keyboard, a green
+  check confirms a good value.
+- Type into a field through `TextField`, `SearchField` or `FieldInput`, so a
+  sheet rises above the keyboard. Scroll a screen with fields in
+  `KeyboardAwareScrollView`, and give every scroll view with a field
+  `keyboardDismissMode={dismissOnDrag}`.
 - Keep the reserved space of text that is invisible for now (Launching's), so
   the logo doesn't jump, but hide it from screen readers while it's invisible
   (`importantForAccessibility="no-hide-descendants"` /

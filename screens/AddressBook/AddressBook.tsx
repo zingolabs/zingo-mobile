@@ -50,6 +50,7 @@ import TitleBar from '@ui/widgets/TitleBar';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { themeTokens } from '@app/theme';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
+import { dismissOnDrag } from '@ui/primitives/keyboardDismiss';
 
 const SIDE = 22;
 const SOFT_INK = themeTokens.fgMuted;
@@ -436,6 +437,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
         ref={scrollRef}
         testID="addressbook.scroll-view"
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode={dismissOnDrag}
         style={{ flex: 1, marginTop: 12 }}
         contentContainerStyle={{
           paddingHorizontal: SIDE,

@@ -97,6 +97,7 @@ import { onTabScroll } from '@app/navigation/tabBarScroll';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { PANEL_TOP } from '@ui/widgets/Header/Header';
 import InsufficientFundsSheet from './components/InsufficientFundsSheet';
+import { dismissOnDrag } from '@ui/primitives/keyboardDismiss';
 
 type SwapProps = HomeTabScreenProps<'Swap'>;
 
@@ -560,7 +561,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                 onLayout={edges.onLayout}
                 scrollEventThrottle={16}
                 keyboardShouldPersistTaps="handled"
-                keyboardDismissMode="interactive"
+                keyboardDismissMode={dismissOnDrag}
                 bottomOffset={space16}
                 testID="swap.scroll-view"
                 contentContainerStyle={{
@@ -680,6 +681,10 @@ const Swap: React.FunctionComponent<SwapProps> = ({
                   onFlip={form.flip}
                   onPickAsset={() => assetSheetRef.current?.present()}
                   texts={{
+                    done: {
+                      confirm: translate('confirm') as string,
+                      hide: translate('hide-keyboard') as string,
+                    },
                     youSend: translate('swap.you-send') as string,
                     youReceive: translate('swap.you-receive') as string,
                     receiveInZingo: translate(

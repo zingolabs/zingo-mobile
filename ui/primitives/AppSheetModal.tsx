@@ -30,6 +30,8 @@ import {
 } from '@gorhom/bottom-sheet';
 import { radiusSheet, useTheme, radiusPill, space20 } from '@app/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { InModalSheet } from './FieldInput';
+import { dismissOnDrag } from './keyboardDismiss';
 import { KeyboardController } from 'react-native-keyboard-controller';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { SurfaceContext } from './Surface';
@@ -243,19 +245,21 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
           ]}
         >
           <SurfaceContext.Provider value="surface">
-            <SheetFooterStore.Provider value={footerStore}>
-              <TooltipHost>
-                {header}
-                {fixed || ownScroll ? (
-                  children
-                ) : (
-                  <SheetScrollView keyboardShouldPersistTaps="handled">
-                    {children}
-                  </SheetScrollView>
-                )}
-                <FooterOutlet store={footerStore} />
-              </TooltipHost>
-            </SheetFooterStore.Provider>
+            <InModalSheet.Provider value={true}>
+              <SheetFooterStore.Provider value={footerStore}>
+                <TooltipHost>
+                  {header}
+                  {fixed || ownScroll ? (
+                    children
+                  ) : (
+                    <SheetScrollView keyboardShouldPersistTaps="handled">
+                      {children}
+                    </SheetScrollView>
+                  )}
+                  <FooterOutlet store={footerStore} />
+                </TooltipHost>
+              </SheetFooterStore.Provider>
+            </InModalSheet.Provider>
           </SurfaceContext.Provider>
         </View>
         {!handle && <SheetRim />}
@@ -405,6 +409,7 @@ export function SheetScrollView({
         ]}
         contentContainerStyle={contentContainerStyle}
         keyboardShouldPersistTaps={keyboardShouldPersistTaps}
+        keyboardDismissMode={dismissOnDrag}
         onLayout={e => {
           edges.onLayout(e);
           frame.current = e.nativeEvent.layout.height;
@@ -438,7 +443,12 @@ export function SheetFlatList<T>(
   const { edges, fades } = useScrollEdges({ surface: 'surface' });
   return (
     <>
-      <BottomSheetFlatList {...props} {...edges} style={styles.fill} />
+      <BottomSheetFlatList
+        {...props}
+        {...edges}
+        keyboardDismissMode={dismissOnDrag}
+        style={styles.fill}
+      />
       {fades}
     </>
   );

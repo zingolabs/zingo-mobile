@@ -22,6 +22,11 @@ import PrivateAmount from '@ui/widgets/PrivateAmount';
 import { useInsetFill } from '@ui/primitives/Surface';
 import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
 import { singleLineInput } from '@ui/primitives/singleLineInput';
+import KeyboardDone from '@ui/widgets/KeyboardDone';
+import { parseAmountInput } from '@app/utils/formatAmount';
+
+/** The amount field's done key on iOS. */
+const AMOUNT_DONE = 'send.amount.done-bar';
 
 type AmountCardProps = {
   value: string;
@@ -102,6 +107,7 @@ export default function AmountCard({
             placeholder="0"
             placeholderTextColor={colors.borderFocus}
             keyboardType="decimal-pad"
+            inputAccessoryViewID={AMOUNT_DONE}
             maxLength={20}
             maxFontSizeMultiplier={fontScaleDisplay}
             accessibilityLabel={t(
@@ -194,6 +200,12 @@ export default function AmountCard({
           )}
         </View>
       </View>
+      <KeyboardDone
+        nativeID={AMOUNT_DONE}
+        testID="send.amount.done"
+        labels={{ confirm: t('confirm'), hide: t('hide-keyboard') }}
+        ready={!invalid && parseAmountInput(value) > 0}
+      />
     </View>
   );
 }

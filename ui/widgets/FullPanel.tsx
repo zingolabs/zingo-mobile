@@ -37,6 +37,7 @@ import { SurfaceContext } from '@ui/primitives/Surface';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { dismissOnDrag } from '@ui/primitives/keyboardDismiss';
 
 const MIN_PANEL = 200;
 /** The panel rising, and lowering when it leaves. */
@@ -324,6 +325,7 @@ export default function FullPanel({
                     testID={testID}
                     bottomOffset={16}
                     keyboardShouldPersistTaps="handled"
+                    keyboardDismissMode={dismissOnDrag}
                     bounces={false}
                     alwaysBounceVertical={false}
                     style={{ flex: 1 }}
