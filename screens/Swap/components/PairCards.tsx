@@ -29,6 +29,7 @@ import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
 import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
 import AssetButton from './AssetButton';
+import { parseAmountInput } from '@app/utils/formatAmount';
 import AmountDoneBar, { AMOUNT_DONE_BAR } from './AmountDoneBar';
 import { ZEC_TOKEN_ENTRY } from '@screens/Swap/swapAssets';
 import { singleLineInput } from '@ui/primitives/singleLineInput';
@@ -622,7 +623,7 @@ export default function PairCards({
           {isOutbound ? tokenChip(receiveSurface) : zecChip}
         </Animated.View>
       </Animated.View>
-      <AmountDoneBar />
+      <AmountDoneBar ready={parseAmountInput(amountText) > 0} />
     </View>
   );
 }

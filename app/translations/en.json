@@ -775,6 +775,8 @@
     "pending-detected": "Payment detected, confirming",
     "close": "Close",
     "done": "Done",
+    "amount-confirm": "Confirm amount",
+    "hide-keyboard": "Hide keyboard",
     "assets-title": "Choose a coin",
     "assets-search": "Search coin or network",
     "assets-popular": "Popular",

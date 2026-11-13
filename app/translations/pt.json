@@ -775,6 +775,8 @@
     "pending-detected": "Pagamento detectado, confirmando",
     "close": "Fechar",
     "done": "Pronto",
+    "amount-confirm": "Confirmar valor",
+    "hide-keyboard": "Ocultar teclado",
     "assets-title": "Escolha uma moeda",
     "assets-search": "Buscar moeda ou rede",
     "assets-popular": "Populares",

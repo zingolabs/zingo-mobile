@@ -775,6 +775,8 @@
     "pending-detected": "Ödeme algılandı, onaylanıyor",
     "close": "Kapat",
     "done": "Tamam",
+    "amount-confirm": "Tutarı onayla",
+    "hide-keyboard": "Klavyeyi gizle",
     "assets-title": "Bir varlık seçin",
     "assets-search": "Varlık veya ağ ara",
     "assets-popular": "Popüler",

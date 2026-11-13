@@ -775,6 +775,8 @@
     "pending-detected": "Платёж обнаружен, подтверждается",
     "close": "Закрыть",
     "done": "Готово",
+    "amount-confirm": "Подтвердить сумму",
+    "hide-keyboard": "Скрыть клавиатуру",
     "assets-title": "Выберите монету",
     "assets-search": "Поиск монеты или сети",
     "assets-popular": "Популярные",
