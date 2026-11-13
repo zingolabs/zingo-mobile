@@ -68,6 +68,13 @@ import { SheetPresence } from './SheetPresence';
 /** The measured height of a dynamic sheet's whole body, for its `SheetScrollView`. */
 const SheetBodyHeight = createContext<number>(0);
 
+/**
+ * What a sheet's own list shares the screen with: its title, its actions and
+ * its bottom pad, each measured on its own. Absent when the list sits in the
+ * body with more above it.
+ */
+const SheetChrome = createContext<number | undefined>(undefined);
+
 /** A sheet of a set height, whose list takes the room left under its title. */
 const FixedSheet = createContext<boolean>(false);
 
@@ -237,6 +244,8 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
     const insets = useSafeAreaInsets();
     const { height: windowHeight } = useWindowDimensions();
     const [bodyHeight, setBodyHeight] = useState<number>(0);
+    const [headerHeight, setHeaderHeight] = useState<number>(0);
+    const [footerHeight, setFooterHeight] = useState<number>(0);
     const bottomPad = useBottomActionPad();
     const presence = useContext(SheetPresence);
     const wasOpen = useRef(false);
@@ -266,15 +275,35 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
             <InModalSheet.Provider value={true}>
               <SheetFooterStore.Provider value={footerStore}>
                 <TooltipHost>
-                  {header}
                   {fixed || ownScroll ? (
-                    children
-                  ) : (
-                    <SheetScrollView keyboardShouldPersistTaps="handled">
+                    <>
+                      {header}
                       {children}
-                    </SheetScrollView>
+                      <FooterOutlet store={footerStore} />
+                    </>
+                  ) : (
+                    <SheetChrome.Provider
+                      value={headerHeight + footerHeight + bottomPad}
+                    >
+                      <View
+                        onLayout={e =>
+                          setHeaderHeight(e.nativeEvent.layout.height)
+                        }
+                      >
+                        {header}
+                      </View>
+                      <SheetScrollView keyboardShouldPersistTaps="handled">
+                        {children}
+                      </SheetScrollView>
+                      <View
+                        onLayout={e =>
+                          setFooterHeight(e.nativeEvent.layout.height)
+                        }
+                      >
+                        <FooterOutlet store={footerStore} />
+                      </View>
+                    </SheetChrome.Provider>
                   )}
-                  <FooterOutlet store={footerStore} />
                 </TooltipHost>
               </SheetFooterStore.Provider>
             </InModalSheet.Provider>
@@ -389,6 +418,7 @@ export function SheetScrollView({
 }) {
   const { animatedLayoutState } = useBottomSheetInternal();
   const bodyHeight = useContext(SheetBodyHeight);
+  const known = useContext(SheetChrome);
   const fixed = useContext(FixedSheet);
   const insets = useSafeAreaInsets();
   const { height: windowHeight } = useWindowDimensions();
@@ -421,10 +451,13 @@ export function SheetScrollView({
 
   /** Runs after gorhom's own report, so the sheet takes this height. */
   const report = useCallback(() => {
-    if (!bodyHeight || !frame.current || !content.current) {
+    if (!content.current) {
       return;
     }
-    const rest = Math.max(0, bodyHeight - frame.current);
+    if (known === undefined && (!bodyHeight || !frame.current)) {
+      return;
+    }
+    const rest = known ?? Math.max(0, bodyHeight - frame.current);
     setChrome(rest);
     const total = content.current + rest;
     animatedLayoutState.modify(state => {
@@ -432,7 +465,7 @@ export function SheetScrollView({
       state.contentHeight = total;
       return state;
     });
-  }, [animatedLayoutState, bodyHeight]);
+  }, [animatedLayoutState, bodyHeight, known]);
 
   useEffect(report, [report]);
 
@@ -449,7 +482,7 @@ export function SheetScrollView({
           style,
           fixed
             ? styles.fill
-            : { maxHeight: windowHeight - insets.top - chrome },
+            : { maxHeight: windowHeight - insets.top - (known ?? chrome) },
         ]}
         contentContainerStyle={contentContainerStyle}
         keyboardShouldPersistTaps={keyboardShouldPersistTaps}
