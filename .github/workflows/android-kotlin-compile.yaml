@@ -24,7 +24,7 @@ jobs:
           node-version-file: .nvmrc
           cache: yarn
 
-      - run: yarn
+      - run: yarn setup
 
       - name: Setup Java
         uses: actions/setup-java@v6
