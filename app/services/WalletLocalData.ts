@@ -8,12 +8,14 @@ import {
 } from '@app/swap';
 import { callFfi } from '@app/walletBackend/ffi';
 import { RECEIVE_PIN_KEY_PREFIX } from './ReceivePinImpl';
+import AddressBookFileImpl from './AddressBookFileImpl';
 import { IRONWOOD_HIDDEN_KEY_PREFIX } from './IronwoodNoticeImpl';
 
 /**
  * What the app keeps beside the wallet file, keyed by the wallet's
  * fingerprint: its swap records, its pinned Receive address and whether it
- * hid the Ironwood notice. They must leave with the wallet file on every
+ * hid the Ironwood notice. The address book is shared by every wallet, and
+ * only the tags of the addresses its swaps made go with it. They must leave with the wallet file on every
  * path that deletes or replaces it, or they outlive a wallet the user
  * removed.
  *
@@ -30,6 +32,9 @@ const WALLET_SCOPED_PREFIXES = [
 ];
 
 async function forget(fingerprint: string): Promise<void> {
+  await AddressBookFileImpl.removeAddresses(
+    await SwapStore.madeAddressesFor(fingerprint),
+  );
   await SwapStore.clearForWallet(fingerprint);
   await AsyncStorage.removeItem(RECEIVE_PIN_KEY_PREFIX + fingerprint);
   await AsyncStorage.removeItem(IRONWOOD_HIDDEN_KEY_PREFIX + fingerprint);

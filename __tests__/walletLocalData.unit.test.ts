@@ -2,6 +2,12 @@ jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
 );
 
+const mockRemoveAddresses = jest.fn(async (_addresses: string[]) => []);
+jest.mock('@app/services/AddressBookFileImpl', () => ({
+  __esModule: true,
+  default: { removeAddresses: (a: string[]) => mockRemoveAddresses(a) },
+}));
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RPCModule from '@app/RPCModule';
 import {
@@ -163,4 +169,30 @@ test('Tests that restoring the backup keeps the wallet it swaps out when replace
   expect(result.kind).toBe('done');
   expect(keysOf(FP_A)).toHaveLength(3);
   expect(disk.has('wallet:fingerprint')).toBe(false);
+});
+
+test('Tests that forgetting the wallet removes the address book tags of the addresses its swaps made when its swaps go. A purchase made its destination and a sale its refund address.', async () => {
+  disk.set(
+    `swap:records:${FP_A}`,
+    JSON.stringify([
+      { recordId: 'buy', direction: 'inbound', destinationAddress: 'u1bought' },
+      {
+        recordId: 'sell',
+        direction: 'outbound',
+        destinationAddress: '0xeth',
+        refundAddress: 'u1refund',
+      },
+      {
+        recordId: 'plain',
+        direction: 'inbound',
+        destinationAddress: 't1plain',
+      },
+    ]),
+  );
+  disk.set('wallet:fingerprint', FP_A);
+
+  await forgetWalletOnFile();
+
+  expect(mockRemoveAddresses).toHaveBeenCalledWith(['u1bought', 'u1refund']);
+  expect(keysOf(FP_A)).toEqual([]);
 });
