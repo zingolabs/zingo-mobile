@@ -390,20 +390,20 @@ exports[`Component Unified Address List - test Your addresses - snapshot 1`] = `
       </View>
     </View>
     <View
-      collapsable={false}
-      onLayout={[Function]}
       style={
-        {
-          "flexGrow": 1,
-        }
+        [
+          {},
+          null,
+        ]
       }
     >
       <View
+        collapsable={false}
+        onLayout={[Function]}
         style={
-          [
-            {},
-            null,
-          ]
+          {
+            "flexGrow": 1,
+          }
         }
       >
         <Text
