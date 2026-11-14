@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState } from 'react';
+import React, { useId, useState } from 'react';
 import Pressable from '@ui/primitives/Pressable';
 import { Platform, TextInput, View } from 'react-native';
 import {
@@ -20,6 +20,11 @@ import { fieldBorder, FieldValidity } from './fieldBorder';
 import { Icon } from './Icons/Icon';
 import { XIcon } from './Icons/XIcon';
 import { singleLineInput } from '@ui/primitives/singleLineInput';
+import FieldInput from './FieldInput';
+import KeyboardDone, {
+  isNumberPad,
+  KeyboardDoneLabels,
+} from '@ui/widgets/KeyboardDone';
 
 /** An action inside a field: 36 on screen, its tap area grown to 44. */
 const ACTION = 36;
@@ -143,6 +148,8 @@ type TextFieldProps = {
   >['onContentSizeChange'];
   maxLength?: number;
   keyboardType?: React.ComponentProps<typeof TextInput>['keyboardType'];
+  /** A number pad's done key on iOS; it confirms once the value is good. */
+  doneLabels?: KeyboardDoneLabels;
   autoCapitalize?: React.ComponentProps<typeof TextInput>['autoCapitalize'];
   autoCorrect?: boolean;
   accessibilityLabel?: string;
@@ -189,6 +196,7 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
   onContentSizeChange,
   maxLength,
   keyboardType,
+  doneLabels,
   autoCapitalize,
   autoCorrect,
   accessibilityLabel,
@@ -198,6 +206,8 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
   const { colors } = useTheme();
   const inset = useInsetFill();
   const [focused, setFocused] = useState(false);
+  const doneId = useId();
+  const done = !!doneLabels && isNumberPad(keyboardType);
   const validity: FieldValidity =
     error !== undefined || invalid ? 'invalid' : valid ? 'valid' : 'unknown';
   const valueStyle = mono ? textVariants.address : textVariants.bodyStrong;
@@ -242,7 +252,7 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
           </Text>
         )}
         {replacement ?? (
-          <TextInput
+          <FieldInput
             ref={inputRef}
             autoFocus={autoFocus}
             testID={testID}
@@ -251,6 +261,7 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
             onEndEditing={onEndEditing}
             onContentSizeChange={onContentSizeChange}
             keyboardType={keyboardType}
+            inputAccessoryViewID={done ? doneId : undefined}
             autoCapitalize={autoCapitalize}
             autoCorrect={autoCorrect}
             spellCheck={autoCorrect}
@@ -330,6 +341,14 @@ const TextField: React.FunctionComponent<TextFieldProps> = ({
         </Text>
       ) : (
         (footer ?? null)
+      )}
+      {done && (
+        <KeyboardDone
+          nativeID={doneId}
+          labels={doneLabels}
+          ready={!!value && validity !== 'invalid'}
+          testID={testID ? `${testID}.done` : undefined}
+        />
       )}
     </View>
   );

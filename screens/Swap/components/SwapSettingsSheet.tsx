@@ -179,6 +179,10 @@ const SwapSettingsSheet = forwardRef<BottomSheetModal, SwapSettingsSheetProps>(
                 value={custom}
                 onChangeText={text => edit({ custom: text })}
                 keyboardType="decimal-pad"
+                doneLabels={{
+                  confirm: translate('confirm') as string,
+                  hide: translate('hide-keyboard') as string,
+                }}
                 placeholder={formatSlippagePercent(slippageBps)}
                 error={customError}
                 helper={customHelper}

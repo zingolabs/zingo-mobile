@@ -41,6 +41,7 @@ import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { useCompact } from '@app/hooks/useCompact';
 import { EDGE_FADE, useScrollEdges } from '@ui/widgets/ScrollEdges';
+import { dismissOnDrag } from '@ui/primitives/keyboardDismiss';
 
 // Positions from the 402 x 874 design.
 const FIELD_WIDTH = 270;
@@ -270,6 +271,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
       <KeyboardAwareScrollView
         {...edges}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode={dismissOnDrag}
         bottomOffset={BUTTON_HEIGHT + space12 + space16 + EDGE_FADE}
         bounces={false}
         onScrollBeginDrag={() => setTipOpen(false)}
@@ -366,6 +368,10 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
               clearable
               clearLabel={translate('clear') as string}
               keyboardType="number-pad"
+              doneLabels={{
+                confirm: translate('confirm') as string,
+                hide: translate('hide-keyboard') as string,
+              }}
             />
           </View>
         </View>
