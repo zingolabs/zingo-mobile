@@ -29,11 +29,15 @@ import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
 import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
 import AssetButton from './AssetButton';
-import AmountDoneBar, { AMOUNT_DONE_BAR } from './AmountDoneBar';
+import { parseAmountInput } from '@app/utils/formatAmount';
+import KeyboardDone, { KeyboardDoneLabels } from '@ui/widgets/KeyboardDone';
 import { ZEC_TOKEN_ENTRY } from '@screens/Swap/swapAssets';
 import { singleLineInput } from '@ui/primitives/singleLineInput';
 
 /** The flip: the coins trade places while the words that differ cross-fade. */
+/** The amount field's done key on iOS. */
+const AMOUNT_DONE = 'swap.amount.done-bar';
+
 const FLIP_MS = 360;
 /** The cards sit this close, with the flip button over the seam. */
 const SEAM = 4;
@@ -106,6 +110,7 @@ function Stacked({
 }
 
 export type PairCardsTexts = {
+  done: KeyboardDoneLabels;
   youSend: string;
   youReceive: string;
   /** The receive label when buying ZEC. */
@@ -413,7 +418,7 @@ export default function PairCards({
               placeholder={amountPlaceholder}
               placeholderTextColor={colors.borderFocus}
               keyboardType="decimal-pad"
-              inputAccessoryViewID={AMOUNT_DONE_BAR}
+              inputAccessoryViewID={AMOUNT_DONE}
               style={{
                 flex: 1,
                 minWidth: 0,
@@ -622,7 +627,12 @@ export default function PairCards({
           {isOutbound ? tokenChip(receiveSurface) : zecChip}
         </Animated.View>
       </Animated.View>
-      <AmountDoneBar />
+      <KeyboardDone
+        nativeID={AMOUNT_DONE}
+        testID="swap.amount.done"
+        labels={texts.done}
+        ready={parseAmountInput(amountText) > 0}
+      />
     </View>
   );
 }

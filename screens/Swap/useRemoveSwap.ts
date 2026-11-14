@@ -1,10 +1,20 @@
 import { useCallback, useContext } from 'react';
 import { SnackbarDurationEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
-import { SwapStore } from '@app/swap';
+import { SwapStore, swapAddressOf } from '@app/swap';
+import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import type { SwapRecordType } from '@app/swap';
 import { showConfirm } from '@app/services/showConfirm';
 import { swapOutcome } from './swapProgress';
+
+/** Deletes a swap and the address book entry of the address it made. */
+export async function deleteSwapAndTag(record: SwapRecordType) {
+  await SwapStore.deleteByRecordId(record.recordId);
+  const made = swapAddressOf(record);
+  return made
+    ? AddressBookFileImpl.removeAddresses([made])
+    : AddressBookFileImpl.readAddressBook();
+}
 
 /**
  * Deletes a swap after the user confirms, the sheet saying which swap goes:
@@ -12,7 +22,8 @@ import { swapOutcome } from './swapProgress';
  * swaps that can be deleted). `onDone` runs once it is gone.
  */
 export function useRemoveSwap(onDone: () => void) {
-  const { translate, addLastSnackbar } = useContext(ContextAppLoaded);
+  const { translate, addLastSnackbar, setAddressBook } =
+    useContext(ContextAppLoaded);
   return useCallback(
     (record: SwapRecordType) => {
       const t = (key: string) => (translate(key) as string).trim();
@@ -33,7 +44,8 @@ export function useRemoveSwap(onDone: () => void) {
             text: t('swap.delete'),
             style: 'destructive',
             onPress: () => {
-              SwapStore.deleteByRecordId(record.recordId).then(() => {
+              deleteSwapAndTag(record).then(book => {
+                setAddressBook(book);
                 addLastSnackbar(t('swap.deleted'), SnackbarDurationEnum.short);
                 onDone();
               });
@@ -42,6 +54,6 @@ export function useRemoveSwap(onDone: () => void) {
         ],
       });
     },
-    [translate, addLastSnackbar, onDone],
+    [translate, addLastSnackbar, setAddressBook, onDone],
   );
 }

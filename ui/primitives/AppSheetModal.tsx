@@ -11,8 +11,10 @@ import React, {
 } from 'react';
 import {
   FlatListProps,
+  Platform,
   StyleProp,
   StyleSheet,
+  TextInput,
   View,
   ViewStyle,
   useWindowDimensions,
@@ -25,12 +27,24 @@ import {
   BottomSheetFooterProps,
   BottomSheetModal,
   BottomSheetScrollView,
+  BottomSheetScrollViewMethods,
   BottomSheetView,
   useBottomSheetInternal,
 } from '@gorhom/bottom-sheet';
-import { radiusSheet, useTheme, radiusPill, space20 } from '@app/theme';
+import {
+  radiusSheet,
+  useTheme,
+  radiusPill,
+  space16,
+  space20,
+} from '@app/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { KeyboardController } from 'react-native-keyboard-controller';
+import { InModalSheet } from './FieldInput';
+import { dismissOnDrag } from './keyboardDismiss';
+import {
+  KeyboardController,
+  KeyboardEvents,
+} from 'react-native-keyboard-controller';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { SurfaceContext } from './Surface';
 import TooltipHost from '@ui/widgets/TooltipHost';
@@ -38,6 +52,12 @@ import { duration, ease } from '@app/theme/motion';
 
 /** Every sheet opens and closes in 420 ms on (.2,0,0,1). */
 const SHEET_MOTION = { duration: duration.sheet, easing: ease.emphasized };
+
+/**
+ * The body's bottom pad holds the keyboard's height. On iOS gorhom lifts the
+ * sheet by it too, and the two moves fight: the sheet shakes.
+ */
+const KEYBOARD_BEHAVIOR = Platform.OS === 'ios' ? 'extend' : 'interactive';
 
 /** The longest a sheet waits for the keyboard to close before it opens anyway. */
 const KEYBOARD_GONE_MS = 400;
@@ -47,6 +67,13 @@ import { SheetPresence } from './SheetPresence';
 
 /** The measured height of a dynamic sheet's whole body, for its `SheetScrollView`. */
 const SheetBodyHeight = createContext<number>(0);
+
+/**
+ * What a sheet's own list shares the screen with: its title, its actions and
+ * its bottom pad, each measured on its own. Absent when the list sits in the
+ * body with more above it.
+ */
+const SheetChrome = createContext<number | undefined>(undefined);
 
 /** A sheet of a set height, whose list takes the room left under its title. */
 const FixedSheet = createContext<boolean>(false);
@@ -217,6 +244,8 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
     const insets = useSafeAreaInsets();
     const { height: windowHeight } = useWindowDimensions();
     const [bodyHeight, setBodyHeight] = useState<number>(0);
+    const [headerHeight, setHeaderHeight] = useState<number>(0);
+    const [footerHeight, setFooterHeight] = useState<number>(0);
     const bottomPad = useBottomActionPad();
     const presence = useContext(SheetPresence);
     const wasOpen = useRef(false);
@@ -243,19 +272,41 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
           ]}
         >
           <SurfaceContext.Provider value="surface">
-            <SheetFooterStore.Provider value={footerStore}>
-              <TooltipHost>
-                {header}
-                {fixed || ownScroll ? (
-                  children
-                ) : (
-                  <SheetScrollView keyboardShouldPersistTaps="handled">
-                    {children}
-                  </SheetScrollView>
-                )}
-                <FooterOutlet store={footerStore} />
-              </TooltipHost>
-            </SheetFooterStore.Provider>
+            <InModalSheet.Provider value={true}>
+              <SheetFooterStore.Provider value={footerStore}>
+                <TooltipHost>
+                  {fixed || ownScroll ? (
+                    <>
+                      {header}
+                      {children}
+                      <FooterOutlet store={footerStore} />
+                    </>
+                  ) : (
+                    <SheetChrome.Provider
+                      value={headerHeight + footerHeight + bottomPad}
+                    >
+                      <View
+                        onLayout={e =>
+                          setHeaderHeight(e.nativeEvent.layout.height)
+                        }
+                      >
+                        {header}
+                      </View>
+                      <SheetScrollView keyboardShouldPersistTaps="handled">
+                        {children}
+                      </SheetScrollView>
+                      <View
+                        onLayout={e =>
+                          setFooterHeight(e.nativeEvent.layout.height)
+                        }
+                      >
+                        <FooterOutlet store={footerStore} />
+                      </View>
+                    </SheetChrome.Provider>
+                  )}
+                </TooltipHost>
+              </SheetFooterStore.Provider>
+            </InModalSheet.Provider>
           </SurfaceContext.Provider>
         </View>
         {!handle && <SheetRim />}
@@ -284,7 +335,7 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
         enablePanDownToClose={enablePanDownToClose}
         stackBehavior="push"
         topInset={insets.top}
-        keyboardBehavior="interactive"
+        keyboardBehavior={KEYBOARD_BEHAVIOR}
         keyboardBlurBehavior="restore"
         android_keyboardInputMode="adjustResize"
         onChange={changed}
@@ -367,6 +418,7 @@ export function SheetScrollView({
 }) {
   const { animatedLayoutState } = useBottomSheetInternal();
   const bodyHeight = useContext(SheetBodyHeight);
+  const known = useContext(SheetChrome);
   const fixed = useContext(FixedSheet);
   const insets = useSafeAreaInsets();
   const { height: windowHeight } = useWindowDimensions();
@@ -374,13 +426,38 @@ export function SheetScrollView({
   const content = useRef<number>(0);
   const [chrome, setChrome] = useState<number>(0);
   const { edges, fades } = useScrollEdges({ surface: 'surface' });
+  const scroll = useRef<BottomSheetScrollViewMethods>(null);
+  const offset = useRef<number>(0);
+
+  /** Scrolls the focused field into view, 16 above the list's end. */
+  const reveal = useCallback(() => {
+    const input = TextInput.State.currentlyFocusedInput();
+    const inner = scroll.current?.getInnerViewNode();
+    if (!input || !inner) {
+      return;
+    }
+    input.measureLayout(inner, (_x, y, _w, h) => {
+      const end = y + h + space16;
+      if (end > offset.current + frame.current) {
+        scroll.current?.scrollTo({ y: end - frame.current, animated: true });
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    const shown = KeyboardEvents.addListener('keyboardDidShow', reveal);
+    return () => shown.remove();
+  }, [reveal]);
 
   /** Runs after gorhom's own report, so the sheet takes this height. */
   const report = useCallback(() => {
-    if (!bodyHeight || !frame.current || !content.current) {
+    if (!content.current) {
       return;
     }
-    const rest = Math.max(0, bodyHeight - frame.current);
+    if (known === undefined && (!bodyHeight || !frame.current)) {
+      return;
+    }
+    const rest = known ?? Math.max(0, bodyHeight - frame.current);
     setChrome(rest);
     const total = content.current + rest;
     animatedLayoutState.modify(state => {
@@ -388,27 +465,35 @@ export function SheetScrollView({
       state.contentHeight = total;
       return state;
     });
-  }, [animatedLayoutState, bodyHeight]);
+  }, [animatedLayoutState, bodyHeight, known]);
 
   useEffect(report, [report]);
 
   return (
     <>
       <BottomSheetScrollView
+        ref={scroll}
         testID={testID}
-        onScroll={edges.onScroll}
+        onScroll={e => {
+          offset.current = e.nativeEvent.contentOffset.y;
+          edges.onScroll(e);
+        }}
         style={[
           style,
           fixed
             ? styles.fill
-            : { maxHeight: windowHeight - insets.top - chrome },
+            : { maxHeight: windowHeight - insets.top - (known ?? chrome) },
         ]}
         contentContainerStyle={contentContainerStyle}
         keyboardShouldPersistTaps={keyboardShouldPersistTaps}
+        keyboardDismissMode={dismissOnDrag}
         onLayout={e => {
           edges.onLayout(e);
           frame.current = e.nativeEvent.layout.height;
           report();
+          if (KeyboardController.isVisible()) {
+            reveal();
+          }
         }}
         onContentSizeChange={(w: number, h: number) => {
           edges.onContentSizeChange(w, h);
@@ -438,7 +523,12 @@ export function SheetFlatList<T>(
   const { edges, fades } = useScrollEdges({ surface: 'surface' });
   return (
     <>
-      <BottomSheetFlatList {...props} {...edges} style={styles.fill} />
+      <BottomSheetFlatList
+        {...props}
+        {...edges}
+        keyboardDismissMode={dismissOnDrag}
+        style={styles.fill}
+      />
       {fades}
     </>
   );
