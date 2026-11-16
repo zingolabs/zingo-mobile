@@ -130,7 +130,7 @@ export type AppDrawerParamList = {
   [Route.AddressBook]: AddressBookNavigationState | undefined;
   [Route.AddressList]: AddressListNavigationState | undefined;
   [Route.ValueTransferDetail]: ValueTransferDetailNavigationState | undefined;
-  [Route.Confirm]: ConfirmNavigationState | undefined;
+  [Route.Confirm]: ConfirmNavigationState;
   [Route.SwapReview]: SwapReviewNavigationState;
   [Route.SwapDeposit]: SwapRecordNavigationState;
   [Route.SwapTracking]: SwapRecordNavigationState;
