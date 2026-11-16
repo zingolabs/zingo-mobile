@@ -32,6 +32,7 @@ import {
   isTerminalStatus,
   isThorchainFamily,
   lacksDelivery,
+  prefillFromContact,
   prefillFromRecord,
   providerLongLabel,
   swapAddressOf,
@@ -41,6 +42,7 @@ import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
 import { TxSwapIcon } from '@ui/primitives/Icons/TxSwapIcon';
+import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
 import { TxPendingIcon } from '@ui/primitives/Icons/TxPendingIcon';
 import { swapInFlight } from '@screens/History/historyRowText';
 import { ChevronRight } from '@ui/primitives/Icons/Chevron';
@@ -90,6 +92,8 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
     addressBook,
     setAddressBook,
     addLastSnackbar,
+    readOnly,
+    server,
   } = useContext(ContextAppLoaded);
   const saveSheetRef = useRef<BottomSheetModal>(null);
   const { colors } = useTheme();
@@ -211,6 +215,24 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
           c.address === outsideAddress,
       )
     : undefined;
+  const canSwap = !readOnly && server.kind === 'remote' && !!swapService;
+  /** A new swap the same way with the same coin, to or from that contact; the amount is left to the user. */
+  const swapMore = () =>
+    navigation.navigate(
+      Route.Home,
+      {
+        screen: Route.Swap,
+        params: {
+          prefill: prefillFromContact(
+            record.direction,
+            sell ? record.receiveAsset : record.sellAsset,
+            outsideAddress,
+            Date.now(),
+          ),
+        },
+      },
+      { pop: true },
+    );
   /** The new unified address a Maya swap used: where a purchase landed, or a sale's refund. */
   const shieldedAddress = swapAddressOf(record);
   const depositMemo = depositMemoOf(record);
@@ -465,13 +487,23 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         </View>
       )}
 
-      {!!outside.address && !contact && (
-        <SaveContactButton
-          testID="swap.detail.save-contact"
-          label={t('swap.save-contact')}
-          onPress={() => saveSheetRef.current?.present()}
-        />
-      )}
+      {!!outside.address &&
+        (!contact ? (
+          <SaveContactButton
+            testID="swap.detail.save-contact"
+            label={t('swap.save-contact')}
+            onPress={() => saveSheetRef.current?.present()}
+          />
+        ) : (
+          canSwap && (
+            <SaveContactButton
+              testID="swap.detail.swap-more"
+              label={t('swap.swap-more')}
+              icon={SwapIcon}
+              onPress={swapMore}
+            />
+          )
+        ))}
 
       {legs.length > 0 && (
         <View style={{ marginTop: space12 }}>
