@@ -183,10 +183,9 @@ export default interface AppContextLoaded {
   privacy: boolean;
   biometrics: boolean;
   selectServer: SelectServerEnum;
-  // The loaded wallet's OWN chain (main/test/regtest). Reliable even Offline,
-  // unlike `server.chainName` which is empty in Offline mode. Empty when no
-  // wallet / unknown. Used to decide, on a server change, whether to open the
-  // wallet directly or launch a chain switch.
+  // The loaded wallet's OWN chain (main/test/regtest). Empty when no wallet /
+  // unknown. Used to decide, on a server change, whether to open the wallet
+  // directly or launch a chain switch.
   walletChainName: ChainNameEnum;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;

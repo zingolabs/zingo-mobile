@@ -252,23 +252,21 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
       }
       if (settings.server) {
-        // Offline (empty uri) still carries the user's chosen chain: create and
-        // restore derive keys chain-specifically, so onboarding must never face
-        // an empty chain. The wallet-open path ignores this value anyway — it
-        // tries every chain and adopts the one the wallet deserializes under.
-        // Only fall back to mainnet when a chain is genuinely absent (e.g. an
-        // old config persisted before offline carried a chain), and persist
-        // that migration once.
-        const normalizedServer =
-          settings.server.kind === 'offline' && !settings.server.chainName
-            ? offlineServer(ChainNameEnum.mainChainName)
-            : settings.server;
+        // Offline carries a chain for create and restore to derive keys on.
+        // A config saved before offline had one falls back to mainnet.
+        const chainless =
+          settings.server.kind === 'offline' && !settings.server.chainName;
+        const normalizedServer = chainless
+          ? offlineServer(ChainNameEnum.mainChainName)
+          : settings.server;
         setServer(normalizedServer);
         setSelectServer(settings.selectServer);
-        await SettingsFileImpl.writeServer(
-          normalizedServer,
-          settings.selectServer,
-        );
+        if (chainless) {
+          await SettingsFileImpl.writeServer(
+            normalizedServer,
+            settings.selectServer,
+          );
+        }
       } else {
         await SettingsFileImpl.writeServer(server, selectServer);
       }

@@ -158,10 +158,7 @@ export default class SettingsFileImpl {
         } else {
           if (settings.server.uri && !settings.server.chainName) {
             // Only repair a REAL server (non-empty uri) that is missing its
-            // chain. An offline server (uri '') legitimately has an empty
-            // chainName — Offline has no chain; the real one is derived from
-            // the wallet at open time. Forcing mainnet here broke testnet
-            // wallets going Offline.
+            // chain. A chainless offline server is LoadingApp's to settle.
             settings.server = {
               uri: settings.server.uri,
               chainName: ChainNameEnum.mainChainName,
