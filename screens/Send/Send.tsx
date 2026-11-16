@@ -38,6 +38,7 @@ import AppSheet from '@ui/primitives/AppSheet';
 import {
   KeyboardAwareScrollView,
   KeyboardAwareScrollViewRef,
+  useKeyboardState,
 } from 'react-native-keyboard-controller';
 import {
   SendPageStateClass,
@@ -185,7 +186,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
   const [proposeSendLastError, setProposeSendLastError] = useState<string>('');
   const [spendableBalanceLastError, setSpendableBalanceLastError] =
     useState<string>('');
-  const [keyboardVisible, setKeyboardVisible] = useState<boolean>(false);
+  const keyboardVisible = useKeyboardState(state => state.isVisible);
   const [contentHeight, setContentHeight] = useState<number>(0);
   const [addressText, setAddressText] = useState<string>(
     sendPageState.toaddr.to,
@@ -213,8 +214,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
     }
     return BARE_NAME.test(typed) ? `${typed}.zec` : '';
   })();
-  const [keyboardListenersDone, setKeyboardListenersDone] =
-    useState<boolean>(false);
   const [containerH, setContainerH] = useState<number>(0);
 
   const scrollViewRef = useRef<KeyboardAwareScrollViewRef>(null);
@@ -748,19 +747,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
     sendPageState.toaddr.to,
   ]);
 
-  const keyboardListeners = (titleViewHeightPar: number) => {
-    if (titleViewHeightPar > 0 && !keyboardListenersDone) {
-      //only the first time if the height is more than 0.
-      setKeyboardListenersDone(true);
-      Keyboard.addListener('keyboardDidShow', () => {
-        setKeyboardVisible(true);
-      });
-      Keyboard.addListener('keyboardDidHide', () => {
-        setKeyboardVisible(false);
-      });
-    }
-  };
-
   /** A contact or own address chosen in the book; replacing a valid address asks first. */
   const pickFromBook = async (itemValue: string) => {
     if (
@@ -1003,11 +989,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
           width: '100%',
         }}
       >
-        <View
-          onLayout={e => {
-            keyboardListeners(e.nativeEvent.layout.height);
-          }}
-        >
+        <View>
           <Header
             title={''}
             noBalance={true}
