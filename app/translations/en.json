@@ -939,6 +939,7 @@
     "detail-remove-unpaid": "The unsent swap will be deleted from this device.",
     "delete": "Delete",
     "deleted": "Deleted",
+    "delete-error": "The swap couldn’t be deleted. Try again.",
     "delete-expired-body": "The swap with no deposit will be deleted from this device.",
     "delete-failed-body": "The failed swap will be deleted from this device.",
     "get-new-quote": "Get a new quote",

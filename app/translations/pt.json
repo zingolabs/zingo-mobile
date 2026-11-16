@@ -939,6 +939,7 @@
     "detail-remove-unpaid": "O swap não enviado será excluído deste dispositivo.",
     "delete": "Excluir",
     "deleted": "Excluído",
+    "delete-error": "Não foi possível excluir o swap. Tente novamente.",
     "delete-expired-body": "O swap sem depósito será excluído deste dispositivo.",
     "delete-failed-body": "O swap falhado será excluído deste dispositivo.",
     "get-new-quote": "Pedir uma nova cotação",

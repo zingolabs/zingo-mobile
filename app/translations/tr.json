@@ -939,6 +939,7 @@
     "detail-remove-unpaid": "Gönderilmemiş takas bu cihazdan silinecek.",
     "delete": "Sil",
     "deleted": "Silindi",
+    "delete-error": "Takas silinemedi. Tekrar deneyin.",
     "delete-expired-body": "Yatırımı olmayan takas bu cihazdan silinecek.",
     "delete-failed-body": "Başarısız takas bu cihazdan silinecek.",
     "get-new-quote": "Yeni teklif al",
