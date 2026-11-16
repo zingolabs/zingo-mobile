@@ -342,6 +342,18 @@ export class SwapStore {
     });
   }
 
+  /** The shielded addresses a wallet's swaps made, removed swaps included. */
+  static async madeAddressesFor(fingerprint: string): Promise<string[]> {
+    return this.enqueue(async () => {
+      const raw = await swapStorage.getItem(storageKeyFor(fingerprint));
+      const records = raw === null ? [] : (tryParseRecordsArray(raw) ?? []);
+      return records.flatMap(r => {
+        const made = swapAddressOf(r);
+        return made ? [made] : [];
+      });
+    });
+  }
+
   /**
    * Wipe the records for a specific wallet's bucket. Called through
    * `WalletLocalData` on every path that deletes or replaces the wallet

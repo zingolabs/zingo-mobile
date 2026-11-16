@@ -174,7 +174,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
                 ),
           }
         : {
-            amount: `${done ? '+' : '≈ +'}${formatAmountForDisplay(got)}`,
+            amount: `${done ? '+' : '≈ '}${formatAmountForDisplay(got)}`,
             unit: getSym,
             tone: done
               ? ('positive' as const)
@@ -223,7 +223,6 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         language,
       ),
     },
-    { label: t('swap.provider'), value: providerLongLabel(record.provider) },
     ...(!sell && sharedVault && isRealLegHash(record.destinationTxHash)
       ? [
           {
@@ -297,7 +296,13 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
     ...(shieldedAddress
       ? [
           {
-            label: t(sell ? 'swap.refund-address' : 'swap.detail-received-at'),
+            label: t(
+              sell
+                ? 'swap.refund-address'
+                : done
+                  ? 'swap.detail-received-at'
+                  : 'swap.detail-receive-at',
+            ),
             value: Utils.trimToSmall(shieldedAddress, 6),
             mono: true,
             copy: shieldedAddress,
@@ -331,7 +336,6 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         pill: { text: t('history.state-refunding'), tone: 'warning' as const },
         rows: [
           rows[0],
-          rows[1],
           {
             label: t('swap.result-reason'),
             value: t('swap.late-why'),
@@ -422,9 +426,9 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         unit={view.hero.unit}
         tone={view.hero.tone}
         line={view.hero.line}
-        pill={view.pill.text}
+        pill={`${view.pill.text} · ${providerLongLabel(record.provider)}`}
         pillTone={view.pill.tone}
-        strike={(expired && !unfoundPurchase) || outcome === 'failed'}
+        strike={expired || outcome === 'failed'}
       />
 
       {awaitingDeposit && (
@@ -433,7 +437,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
             {t(sell ? 'swap.deposit-unsent-title' : 'swap.deposit-title')}
           </Text>
           {!(sell && sharedVault) && (
-            <DepositSlip record={record} paid={sell} />
+            <DepositSlip record={record} paid={sell} inDetail />
           )}
         </View>
       )}

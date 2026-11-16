@@ -336,20 +336,20 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
       </View>
     </View>
     <View
-      collapsable={false}
-      onLayout={[Function]}
       style={
-        {
-          "flexGrow": 1,
-        }
+        [
+          {},
+          null,
+        ]
       }
     >
       <View
+        collapsable={false}
+        onLayout={[Function]}
         style={
-          [
-            {},
-            null,
-          ]
+          {
+            "flexGrow": 1,
+          }
         }
       >
         <View
@@ -1342,20 +1342,20 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
       </View>
     </View>
     <View
-      collapsable={false}
-      onLayout={[Function]}
       style={
-        {
-          "flexGrow": 1,
-        }
+        [
+          {},
+          null,
+        ]
       }
     >
       <View
+        collapsable={false}
+        onLayout={[Function]}
         style={
-          [
-            {},
-            null,
-          ]
+          {
+            "flexGrow": 1,
+          }
         }
       >
         <View

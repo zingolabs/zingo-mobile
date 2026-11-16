@@ -267,7 +267,7 @@ export function swapRowText(args: {
           ),
           tone: 'warning',
         },
-        top: `≈ +${got} ${getSym}`,
+        top: `≈ ${got} ${getSym}`,
         topTone: 'default',
         bottom: `−${sold}`,
       };

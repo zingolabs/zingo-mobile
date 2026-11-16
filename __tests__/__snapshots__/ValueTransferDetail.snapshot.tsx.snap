@@ -336,20 +336,20 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
       </View>
     </View>
     <View
-      collapsable={false}
-      onLayout={[Function]}
       style={
-        {
-          "flexGrow": 1,
-        }
+        [
+          {},
+          null,
+        ]
       }
     >
       <View
+        collapsable={false}
+        onLayout={[Function]}
         style={
-          [
-            {},
-            null,
-          ]
+          {
+            "flexGrow": 1,
+          }
         }
       >
         <View
@@ -1350,20 +1350,20 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
       </View>
     </View>
     <View
-      collapsable={false}
-      onLayout={[Function]}
       style={
-        {
-          "flexGrow": 1,
-        }
+        [
+          {},
+          null,
+        ]
       }
     >
       <View
+        collapsable={false}
+        onLayout={[Function]}
         style={
-          [
-            {},
-            null,
-          ]
+          {
+            "flexGrow": 1,
+          }
         }
       >
         <View

@@ -1,7 +1,8 @@
 /* geometry-gap: DESIGN.md known gap */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Keyboard, TextInput, View } from 'react-native';
+import { Keyboard, View } from 'react-native';
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import { useTheme, slopFor, iconSizeMd } from '@app/theme';
@@ -85,6 +86,14 @@ const kindKey = (address: string): string =>
       : /^zs/i.test(address)
         ? 'addressbook.kind-sapling'
         : 'addressbook.kind-unified';
+
+/**
+ * The address box and the note under it keep one height while the user
+ * types: a sheet that grows over the keyboard re-measures and shakes.
+ */
+const ADDRESS_LINE = 20;
+const ADDRESS_HEIGHT = 4 * ADDRESS_LINE + 20;
+const NOTE_HEIGHT = 32;
 
 /**
  * The form that adds or edits a contact anywhere in the app: its name, its
@@ -343,7 +352,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             backgroundColor: colors.bgCanvas,
           }}
         >
-          <TextInput
+          <BottomSheetTextInput
             testID="addressbook.name-field"
             onFocus={() => setFocus('name')}
             onBlur={() => setFocus('none')}
@@ -406,7 +415,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             backgroundColor: colors.bgCanvas,
           }}
         >
-          <TextInput
+          <BottomSheetTextInput
             testID="addressbook.address-field"
             onFocus={() => setFocus('address')}
             onBlur={() => {
@@ -428,10 +437,12 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             autoCapitalize="none"
             autoCorrect={false}
             spellCheck={false}
+            scrollEnabled
             style={{
               flex: 1,
               padding: 10,
-              minHeight: 58,
+              height: ADDRESS_HEIGHT,
+              lineHeight: ADDRESS_LINE,
               textAlignVertical: 'top',
               color: colors.fgDefault,
               fontWeight: '600',
@@ -497,7 +508,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
         <View
           testID={`addressbook.note.${note.tone}`}
           style={{
-            minHeight: 18,
+            height: NOTE_HEIGHT,
             marginTop: 6,
             flexDirection: 'row',
             alignItems: 'center',
@@ -510,6 +521,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
           {note.tone !== 'none' && (
             <RegText
               color={noteInk[note.tone]}
+              numberOfLines={2}
               style={{ flex: 1, fontSize: 12, lineHeight: 16 }}
             >
               {note.text}

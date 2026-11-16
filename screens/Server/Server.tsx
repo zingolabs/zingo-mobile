@@ -52,6 +52,7 @@ import { LogLine } from './ServerLog';
 import { hostOf, useCustomServer } from './useCustomServer';
 import { EDGE_FADE, useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { BUTTON_HEIGHT } from '@ui/primitives/Button';
+import { dismissOnDrag } from '@ui/primitives/keyboardDismiss';
 
 export type ServerProps = {
   translate: (key: string) => TranslateType;
@@ -430,6 +431,10 @@ const Server: React.FunctionComponent<ServerProps> = ({
         host: t('host-placeholder'),
         hostRegtest: t('host-placeholder-regtest'),
         port: t('port'),
+        done: {
+          confirm: translate('confirm') as string,
+          hide: translate('hide-keyboard') as string,
+        },
       }}
       onHost={text => custom.setHost(tab, text)}
       onPort={text => custom.setPort(tab, text)}
@@ -615,6 +620,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
           style={{ flex: 1 }}
           contentContainerStyle={{ paddingBottom: 16 }}
           keyboardShouldPersistTaps="handled"
+          keyboardDismissMode={dismissOnDrag}
           showsVerticalScrollIndicator={false}
         >
           <Animated.View

@@ -30,7 +30,8 @@ export const TooltipHostContext = createContext<TooltipHostValue | null>(null);
 
 /**
  * The layer a screen's tooltips open in: over everything else in the
- * screen, closed by a tap anywhere. It sits inside the panel or sheet it
+ * screen, closed by a tap or a drag anywhere. The bubble is placed once, so
+ * a scroll would leave it beside the wrong row. It sits inside the panel or sheet it
  * serves, so it moves with it: an icon measured against it keeps its true
  * place even while the sheet slides, since Reanimated's transforms, which
  * the layout tree does not see, move the host and the icon alike.
@@ -86,6 +87,7 @@ export default function TooltipHost({
         ref={hostRef}
         collapsable={false}
         style={{ flexGrow: 1 }}
+        onTouchMove={spec ? dismiss : undefined}
         onLayout={e =>
           setSize({
             width: e.nativeEvent.layout.width,
