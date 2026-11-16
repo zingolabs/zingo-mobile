@@ -70,6 +70,10 @@ export function transformValueTransfer(
     !vt.memos || vt.memos.length === 0 || !vt.memos.join('')
       ? undefined
       : vt.memos;
+  result.opReturnData =
+    !vt.op_return_data || vt.op_return_data.length === 0
+      ? undefined
+      : vt.op_return_data;
   // `pools_received` is in protocol order (transparent, sapling, orchard,
   // ironwood); a transfer can span pools, and the app displays one, so
   // surface the newest pool present.

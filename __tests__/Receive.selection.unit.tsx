@@ -101,3 +101,25 @@ describe('Receive selection', () => {
     expect(result.current[0]).toBe('u-old');
   });
 });
+
+describe('Receive selection with swap addresses', () => {
+  const swaps: ReadonlySet<string> = new Set(['u-swap']);
+  const withSwap = [...shielded, ua(2, 'u-swap')];
+
+  test('Tests that Receive opens on the newest address you made when a swap made a newer one', () => {
+    const { result } = renderHook(() =>
+      useReceiveSelection(withSwap, transparent, '', true, swaps),
+    );
+    expect(result.current[0]).toBe('u-new');
+  });
+
+  test('Tests that Receive stays put when a swap makes a new address', () => {
+    const { result, rerender } = renderHook(
+      ({ s }: { s: UnifiedAddressClass[] }) =>
+        useReceiveSelection(s, transparent, '', true, swaps),
+      { initialProps: { s: shielded } },
+    );
+    rerender({ s: withSwap });
+    expect(result.current[0]).toBe('u-new');
+  });
+});

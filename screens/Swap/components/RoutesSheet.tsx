@@ -6,16 +6,23 @@ import { space8, space20 } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   formatAmountForDisplay,
+  providerRequiresMemo,
   providerShortLabel,
   renderSwapText,
 } from '@app/swap';
 import type { SwapTextType } from '@app/swap';
 import { formatUsd } from '@app/utils/formatAmount';
-import type { RouteOptionType, UnavailableProviderType } from '@app/swap';
+import type {
+  RouteOptionType,
+  SwapKitProviderEnum,
+  UnavailableProviderType,
+} from '@app/swap';
 import AppSheetModal, { SheetScrollView } from '@ui/primitives/AppSheetModal';
 import Text from '@ui/primitives/Text';
 import ListRow from '@ui/primitives/ListRow';
 import Tag from '@ui/widgets/Tag';
+import Banner from '@ui/widgets/Banner';
+import type { ShieldedNoteType } from '@screens/Swap/useShieldedRoutes';
 import RadioRow, { RadioList } from '@ui/widgets/RadioRow';
 import SheetTitle from './SheetTitle';
 
@@ -28,6 +35,14 @@ type RoutesSheetProps = {
   /** USD per unit of the delivered asset at quote time; 0 when unpriced. */
   receiveUsdUnitPrice: number;
   onSelect: (routeId: string) => void;
+  /** Whether a route through this provider lands the ZEC shielded. */
+  isShielded: (provider: SwapKitProviderEnum) => boolean;
+  /** The note under the list about shielded routes, if any. */
+  shieldedNote: ShieldedNoteType;
+  /** The coin a purchase is paid with, for the note that none is shielded. */
+  payCoin: string;
+  /** Buying ZEC: the deposit is paid from another wallet, which may not add a memo. */
+  paidFromOutside: boolean;
 };
 
 /**
@@ -44,6 +59,10 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
       receiveSymbol,
       receiveUsdUnitPrice,
       onSelect,
+      isShielded,
+      shieldedNote,
+      payCoin,
+      paidFromOutside,
     },
     ref,
   ) => {
@@ -97,13 +116,26 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
               {sorted.map((route, index) => {
                 const selected = route.routeId === selectedRouteId;
                 const best = index === 0;
+                const needsMemo =
+                  paidFromOutside && providerRequiresMemo(route.provider);
                 const details = [
                   usd(route.expectedReceiveAmount),
                   route.estimatedTimeText ?? '',
                   providerShortLabel(route.provider),
+                  paidFromOutside && !needsMemo
+                    ? (translate('swap.pay-address-only') as string)
+                    : '',
                 ]
                   .filter(Boolean)
                   .join(' · ');
+                const warning = [
+                  route.warningsText ?? '',
+                  needsMemo
+                    ? (translate('swap.routes-needs-memo') as string)
+                    : '',
+                ]
+                  .filter(Boolean)
+                  .join('\n');
                 return (
                   <RadioRow
                     key={route.routeId}
@@ -116,15 +148,20 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
                             text: translate('swap.routes-best') as string,
                             tone: 'accent',
                           }
-                        : undefined
+                        : isShielded(route.provider)
+                          ? {
+                              text: translate('swap.routes-shielded') as string,
+                              tone: 'accent',
+                            }
+                          : undefined
                     }
                     sub={
-                      route.warningsText ? (
+                      warning ? (
                         <>
                           {details}
                           {'\n'}
                           <Text variant="bodySmall" tone="warning">
-                            {route.warningsText}
+                            {warning}
                           </Text>
                         </>
                       ) : (
@@ -164,6 +201,26 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
               subtitle={say(entry.reason)}
             />
           ))}
+          {!!shieldedNote && (
+            <View style={{ marginTop: space8, marginHorizontal: space20 }}>
+              <Banner
+                testID="swap.routes.shielded-note"
+                tone="info"
+                title={
+                  shieldedNote === 'none'
+                    ? (translate('swap.routes-no-shielded') as string).replace(
+                        '{coin}',
+                        payCoin,
+                      )
+                    : (translate(
+                        shieldedNote === 'refund'
+                          ? 'swap.routes-shielded-refund-note'
+                          : 'swap.routes-shielded-note',
+                      ) as string)
+                }
+              />
+            </View>
+          )}
         </SheetScrollView>
       </AppSheetModal>
     );

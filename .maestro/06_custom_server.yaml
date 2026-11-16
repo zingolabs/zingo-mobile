@@ -24,6 +24,11 @@ appId: org.ZingoLabs.Zingo
     visible:
       id: "server.custom.host"
     timeout: 5000
+# The host takes the focus as the box opens, and Done rises with the
+# keyboard across the port box. A tap resolved before both settle lands
+# on Done and leaves the screen.
+- waitForAnimationToEnd:
+    timeout: 5000
 
 # The driver can drop characters while it types, and a save then targets
 # a host that does not exist. Each box is read back and typed again when
@@ -52,21 +57,25 @@ appId: org.ZingoLabs.Zingo
       - assertVisible:
           id: "server.custom.port"
           text: "443"
-- hideKeyboard
 
 # Save tests the server first, then reconnects the wallet to it. The
-# message box ends in a green line once Zingo uses it.
+# message box ends in a green line once Zingo uses it, below the fold
+# once the box has grown. The button shows above the keyboard.
 - tapOn:
     id: "server.custom.save"
-- extendedWaitUntil:
-    visible:
+- scrollUntilVisible:
+    element:
       id: "server.custom.log.final.ok"
+    centerElement: true
     timeout: 120000
 
-# Back on History, the check icon renders once the sync on the saved
-# server is not in progress.
+# Back leads to the options panel the Server screen opened from. On
+# History, the check icon renders once the sync on the saved server is not
+# in progress.
 - tapOn:
     id: "server.back"
+- tapOn:
+    id: "optionspanel.close"
 - extendedWaitUntil:
     visible:
       id: "header.checkicon"
@@ -100,7 +109,8 @@ appId: org.ZingoLabs.Zingo
           text: "na\\.zec\\.rocks, .*"
 # The custom box opens on the saved address, and its message box says
 # Zingo uses it once the card has checked the server.
-- extendedWaitUntil:
-    visible:
+- scrollUntilVisible:
+    element:
       id: "server.custom.log.final.ok"
+    centerElement: true
     timeout: 30000

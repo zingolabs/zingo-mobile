@@ -235,8 +235,11 @@ export function useSwapForm({
       setCatalogError('');
       setCatalogEdgeBlocked(false);
       setCatalogUnreachable(false);
+      // A flip asks the catalog again; the coin the user chose stays when it is there.
       setSelectedToken(
-        catalog.find(t => t.identifier === DEFAULT_TOKEN_IDENTIFIER) ??
+        current =>
+          catalog.find(t => t.identifier === current?.identifier) ??
+          catalog.find(t => t.identifier === DEFAULT_TOKEN_IDENTIFIER) ??
           catalog[0] ??
           null,
       );

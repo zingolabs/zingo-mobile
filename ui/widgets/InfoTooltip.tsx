@@ -186,34 +186,9 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
       : !!below;
   const ready = !!icon && (!host || bubbleH > 0);
 
-  const bubble = (
-    <Animated.View
-      entering={bubbleEnter(under ? -4 : 4)}
-      pointerEvents="none"
-      onLayout={e => setBubbleH(e.nativeEvent.layout.height)}
-      style={{
-        position: 'absolute',
-        width: across?.width ?? Math.min(BUBBLE_W, screenW - EDGE * 2),
-        ...(host
-          ? {
-              left: across?.left ?? EDGE,
-              top: icon
-                ? under
-                  ? icon.y + icon.h + GAP
-                  : icon.y - GAP - bubbleH
-                : 0,
-            }
-          : {
-              /** Hanging from the icon: left is relative to the icon. */
-              left: across && icon ? across.left - icon.x : 0,
-              ...(under
-                ? { top: '100%', marginTop: GAP }
-                : { bottom: '100%', marginBottom: GAP }),
-            }),
-        /** Hidden until it is measured and placed. */
-        opacity: ready ? 1 : 0,
-      }}
-    >
+  const width = across?.width ?? Math.min(BUBBLE_W, screenW - EDGE * 2);
+  const body = (
+    <>
       <View
         style={{
           backgroundColor: colors.bgSurface,
@@ -249,8 +224,48 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
           transform: [{ rotate: '45deg' }],
         }}
       />
-    </Animated.View>
+    </>
   );
+  /**
+   * Measured unseen first, without its entrance, then mounted once in place:
+   * the entrance sets the opacity, so a bubble mounted before it was
+   * measured showed at the wrong place and then jumped.
+   */
+  const bubble =
+    ready && icon ? (
+      <Animated.View
+        key="bubble"
+        entering={bubbleEnter(under ? -4 : 4)}
+        pointerEvents="none"
+        style={{
+          position: 'absolute',
+          width,
+          ...(host
+            ? {
+                left: across?.left ?? EDGE,
+                top: under ? icon.y + icon.h + GAP : icon.y - GAP - bubbleH,
+              }
+            : {
+                /** Hanging from the icon: left is relative to the icon. */
+                left: across ? across.left - icon.x : 0,
+                ...(under
+                  ? { top: '100%', marginTop: GAP }
+                  : { bottom: '100%', marginBottom: GAP }),
+              }),
+        }}
+      >
+        {body}
+      </Animated.View>
+    ) : (
+      <View
+        key="measure"
+        pointerEvents="none"
+        onLayout={e => setBubbleH(e.nativeEvent.layout.height)}
+        style={{ position: 'absolute', width, left: 0, top: 0, opacity: 0 }}
+      >
+        {body}
+      </View>
+    );
 
   /** In a host, the bubble is drawn there, and redrawn as it is measured. */
   useEffect(() => {

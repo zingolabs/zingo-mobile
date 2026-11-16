@@ -260,3 +260,54 @@ describe('SwapStore corruption', () => {
     expect(disk.get('swap:records:wallet-aaa')).toBe(stored);
   });
 });
+
+/**
+ * A removed swap that made an address of the wallet stays as a marker without
+ * its swap ID, so the address still reads as a swap's; one that made none goes.
+ */
+describe('SwapStore removal markers', () => {
+  beforeEach(async () => {
+    await SwapStore.bindToWallet('wallet-aaa');
+  });
+
+  it('Tests that a removed swap that made an address is kept as a marker only readRemoved sees', async () => {
+    await SwapStore.upsert(
+      makeRecord('sale', {
+        refundAddress: 'u1refund',
+        swapKitInternalId: 'swap-1',
+      }),
+    );
+    const heard: SwapRecordType[][] = [];
+    const unsubscribe = SwapStore.subscribe(records => heard.push(records));
+
+    await SwapStore.deleteByRecordId('sale');
+    unsubscribe();
+
+    expect(await SwapStore.readAll()).toEqual([]);
+    expect(heard[heard.length - 1]).toEqual([]);
+    const [marker] = await SwapStore.readRemoved();
+    expect(marker.recordId).toBe('sale');
+    expect(marker.refundAddress).toBe('u1refund');
+    expect(marker.swapKitInternalId).toBeUndefined();
+    expect(marker.removedAtMs).toEqual(expect.any(Number));
+  });
+
+  it('Tests that a removed swap that made no address leaves nothing behind', async () => {
+    await SwapStore.upsert(makeRecord('plain'));
+
+    await SwapStore.deleteByRecordId('plain');
+
+    expect(await SwapStore.readAll()).toEqual([]);
+    expect(await SwapStore.readRemoved()).toEqual([]);
+  });
+
+  it('Tests that removing a marker again changes nothing', async () => {
+    await SwapStore.upsert(makeRecord('sale', { refundAddress: 'u1refund' }));
+    await SwapStore.deleteByRecordId('sale');
+    const [before] = await SwapStore.readRemoved();
+
+    await SwapStore.deleteByRecordId('sale');
+
+    expect(await SwapStore.readRemoved()).toEqual([before]);
+  });
+});

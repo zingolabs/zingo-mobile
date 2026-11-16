@@ -17,28 +17,31 @@ appId: org.ZingoLabs.Zingo
 - waitForAnimationToEnd:
     timeout: 5000
 
-# The parser rejects a string that is no Zcash address.
+# The parser rejects a string that is no Zcash address. Letters and
+# digits alone would be looked up as a Zcash Name instead, so the string
+# holds a character no name can.
 - tapOn:
     id: "send.addressplaceholder"
-- inputText: "thisisaninvalidaddress"
+- inputText: "not-an-address"
 - extendedWaitUntil:
     visible:
-      id: "send.address.error"
+      id: "send.addressplaceholder.error"
     timeout: 10000
 
 # The ZIP 320 example from the zcash_address 0.13.0 test vectors, a
-# mainnet TEX address.
+# mainnet TEX address. A TEX address takes transparent funds only, so the
+# field warns that the payment will be public.
 - runFlow:
     file: common/clear_send_address.yaml
 - inputText: "tex1s2rt77ggv6q989lr49rkgzmh5slsksa9khdgte"
 - extendedWaitUntil:
     visible:
-      id: "send.address.check"
+      id: "send.address.transparent"
     timeout: 10000
 
 # The zingolib Zennies-for-Zingo donation address, a mainnet unified
-# address with Orchard and Sapling receivers. A shielded receiver opens
-# the memo field.
+# address with Orchard and Sapling receivers. A shielded receiver offers
+# a memo, which opens on "Add a memo".
 - runFlow:
     file: common/clear_send_address.yaml
 - inputText: "u1p32nu0pgev5cr0u6t4ja9lcn29kaw37xch8nyglwvp7grl07f72c46hxvw0u3q58ks43ntg324fmulc2xqf4xl3pv42s232m25vaukp05s6av9z76s3evsstax4u6f5g7tql5yqwuks9t4ef6vdayfmrsymenqtshgxzj59hdydzygesqa7pdpw463hu7afqf4an29m69kfasdwr494"
@@ -46,6 +49,11 @@ appId: org.ZingoLabs.Zingo
     visible:
       id: "send.address.check"
     timeout: 10000
+- scrollUntilVisible:
+    element:
+      id: "send.memo-open"
+- tapOn:
+    id: "send.memo-open"
 - scrollUntilVisible:
     element:
       id: "send.memo-field"

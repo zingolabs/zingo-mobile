@@ -71,6 +71,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   sendSwapDeposit: async () => [],
   resumeSwapDeposit: async () => [],
   setServerOption: async () => ({ kind: 'ok' }),
+  switchServerForRetry: async () => {},
   clearToAddr: () => {},
   doRescan: async () => {},
   setAddressBook: () => {},

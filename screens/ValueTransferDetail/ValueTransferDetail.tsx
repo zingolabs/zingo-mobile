@@ -40,6 +40,7 @@ import Button from '@ui/primitives/Button';
 import FullPanel from '@ui/widgets/FullPanel';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import SaveContactButton from '@ui/widgets/SaveContactButton';
+import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
 import DetailRows from '@screens/Swap/components/DetailRows';
 import type { DetailRow } from '@screens/Swap/components/DetailRows';
 import { transferIcon } from '@screens/History/transferIcon';
@@ -76,12 +77,14 @@ const ValueTransferDetail: React.FunctionComponent<
     zecPrice,
     setSendPageState,
     launchAddTagModal,
+    readOnly,
   } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const t = (key: string) => (translate(key) as string).trim();
 
   const vt: ValueTransferType = route.params?.vt ?? ({} as ValueTransferType);
   const { memo, memoUA } = Utils.splitMemo(vt.memos);
+  const opReturn = (vt.opReturnData ?? []).join('\n');
   const failed = vt.status === RPCValueTransfersStatusEnum.failed;
   const received = vt.kind === ValueTransferKindEnum.Received;
   const sent = vt.kind === ValueTransferKindEnum.Sent;
@@ -211,6 +214,14 @@ const ValueTransferDetail: React.FunctionComponent<
     state.toaddr.to = vt.address ?? '';
     state.toaddr.amount = toAmountInput(vt.amount);
     state.toaddr.memo = memo ?? '';
+    setSendPageState(state);
+    navigation.navigate(Route.Home, { screen: Route.Send }, { pop: true });
+  };
+
+  /** Send with only this address filled: a new payment, not this one again. */
+  const sendAgain = () => {
+    const state = new SendPageStateClass(new ToAddrClass(0));
+    state.toaddr.to = vt.address ?? '';
     setSendPageState(state);
     navigation.navigate(Route.Home, { screen: Route.Send }, { pop: true });
   };
@@ -347,13 +358,26 @@ const ValueTransferDetail: React.FunctionComponent<
         <DetailRows rows={rows} />
       </View>
 
-      {sent && !!vt.address && !contact && !ownAddress(vt.address) && (
-        <SaveContactButton
-          testID="valuetransferdetail.save-contact"
-          label={t('swap.save-contact')}
-          onPress={() => launchAddTagModal(vt.address ?? '')}
-        />
-      )}
+      {sent &&
+        !!vt.address &&
+        !ownAddress(vt.address) &&
+        (!contact ? (
+          <SaveContactButton
+            testID="valuetransferdetail.save-contact"
+            label={t('swap.save-contact')}
+            onPress={() => launchAddTagModal(vt.address ?? '')}
+          />
+        ) : (
+          !readOnly &&
+          server.kind !== 'offline' && (
+            <SaveContactButton
+              testID="valuetransferdetail.send-again"
+              label={t('history.send-again')}
+              icon={PlaneIcon}
+              onPress={sendAgain}
+            />
+          )
+        ))}
 
       {(!!memo || !!memoUA) && (
         <View
@@ -423,6 +447,40 @@ const ValueTransferDetail: React.FunctionComponent<
               <Text variant="address">{memoUA}</Text>
             </Pressable>
           )}
+        </View>
+      )}
+
+      {!!opReturn && (
+        <View
+          style={{
+            marginTop: 12,
+            paddingVertical: 12,
+            paddingHorizontal: 16,
+            rowGap: 4,
+            borderRadius: radiusMd,
+            borderWidth: 1,
+            borderColor: colors.bottomSheetBorder,
+            backgroundColor: colors.bgCanvas,
+          }}
+        >
+          <Text variant="caption" tone="muted">
+            {t('history.tx-op-return')}
+          </Text>
+          <Pressable
+            kind="link"
+            testID="valuetransferdetail.op-return"
+            onPress={() => {
+              Clipboard.setString(opReturn);
+              addLastSnackbar(
+                t('history.op-return-copied'),
+                SnackbarDurationEnum.short,
+              );
+            }}
+          >
+            <Text variant="body" selectable>
+              {opReturn}
+            </Text>
+          </Pressable>
         </View>
       )}
     </FullPanel>

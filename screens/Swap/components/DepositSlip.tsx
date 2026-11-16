@@ -1,15 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import DetailRows from './DetailRows';
+import CopyPill from './CopyPill';
 import { View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import Clipboard from '@react-native-clipboard/clipboard';
-import { radiusMd, space12, space16, space4, useTheme } from '@app/theme';
+import { radiusMd, space12, space4, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   buildDepositQr,
   formatAmountForDisplay,
   isEvmSourceChain,
+  isTokenAsset,
   isUtxoSourceChain,
   memoToHexCalldata,
   providerShortLabel,
@@ -19,15 +20,12 @@ import type { SwapRecordType } from '@app/swap';
 import { formatExactAmount } from '@app/utils/formatAmount';
 import Text from '@ui/primitives/Text';
 import { useInsetFill } from '@ui/primitives/Surface';
-import Button from '@ui/primitives/Button';
 import Banner from '@ui/widgets/Banner';
-import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
-import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 
 /** The memo a provider's order carries, when its data names one. */
 export function depositMemoOf(record: SwapRecordType): string | undefined {
-  const memo = (record.providerData as { memo?: string }).memo;
+  const memo = (record.providerData as { memo?: string } | undefined)?.memo;
   return memo && memo.length > 0 ? memo : undefined;
 }
 
@@ -35,6 +33,8 @@ type DepositSlipProps = {
   record: SwapRecordType;
   /** The QR goes once this wallet paid: a code for a paid deposit invites paying twice. */
   paid?: boolean;
+  /** Inside Swap details, whose hero and status already give the amount and the provider. */
+  inDetail?: boolean;
 };
 
 /**
@@ -43,21 +43,15 @@ type DepositSlipProps = {
  * network the coin must travel on, the exact amount and the memo with where
  * it goes. The detail shows the same slip for a deposit still unpaid.
  */
-export default function DepositSlip({ record, paid }: DepositSlipProps) {
+export default function DepositSlip({
+  record,
+  paid,
+  inDetail,
+}: DepositSlipProps) {
   const { translate, info } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const inset = useInsetFill();
   const t = (key: string) => translate(key) as string;
-  const [copiedKey, setCopiedKey] = React.useState<string>('');
-  const copy = (key: string, value: string) => {
-    Clipboard.setString(value);
-    setCopiedKey(key);
-    setTimeout(
-      () => setCopiedKey(current => (current === key ? '' : current)),
-      1600,
-    );
-  };
-
   const memo = depositMemoOf(record);
   const asset = record.sellAsset;
   const ticker = asset.ticker ?? asset.symbol;
@@ -73,30 +67,38 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
   const utxo = isUtxoSourceChain(asset.chain);
   const bitcoin = asset.chain === 'BTC';
 
-  const memoHint = isEvmSourceChain(asset.chain)
-    ? t('swap.memo-hint-evm')
-    : bitcoin
-      ? t('swap.memo-hint-btc')
-      : t('swap.memo-hint-other');
-
-  const pill = (key: string, label: string, value: string) => {
-    const done = copiedKey === key;
-    return (
-      <View style={{ flex: 1 }}>
-        <Button
-          testID={`swap.deposit.${key}`}
-          variant="secondary"
-          size="small"
-          icon={done ? CheckIcon : CopyIcon}
-          title={done ? t('swap.copied') : label}
-          onPress={() => copy(key, value)}
-        />
-      </View>
-    );
-  };
+  /** A token transfer has no data field of its own: the memo is the wallet's to add. */
+  const token = isTokenAsset(asset);
+  /** No code can carry it, so the one banner under the box says both rules. */
+  const tokenMemo = token && !!memo;
+  const memoHint = token
+    ? t('swap.memo-hint-token')
+    : isEvmSourceChain(asset.chain)
+      ? t('swap.memo-hint-evm')
+      : bitcoin
+        ? t('swap.memo-hint-btc')
+        : t('swap.memo-hint-other');
+  const provider = providerShortLabel(record.provider);
+  const amount = `${formatExactAmount(record.sellAmountHumanDecimal)} ${ticker}`;
+  /** What the code holds, said under it: a bare address leaves the amount to type. */
+  const qrCaption = memo
+    ? 'swap.qr-carries-memo'
+    : qr?.value === record.depositAddress
+      ? 'swap.qr-carries-address'
+      : 'swap.qr-carries-amount';
 
   return (
     <View style={{ rowGap: space12 }}>
+      {/* Exchanges take their fee out of the withdrawal, which is what refunds these. */}
+      {showExactAmount && !memo && !paid && (
+        <Banner
+          testID="swap.deposit.exchange-fee"
+          tone="warning"
+          title={t('swap.exact-amount-exchange')
+            .replace('{amount}', amount)
+            .replace('{provider}', provider)}
+        />
+      )}
       <View
         style={{
           alignItems: 'center',
@@ -125,11 +127,15 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
               tone="muted"
               style={{ textAlign: 'center', marginTop: 12 }}
             >
-              {t(memo ? 'swap.qr-carries-memo' : 'swap.qr-carries-amount')}
+              {t(qrCaption)}
             </Text>
           </>
-        ) : !paid && memo ? (
-          <Banner tone="warning" title={t('swap.qr-no-memo')} />
+        ) : !paid && memo && !token ? (
+          <Banner
+            testID="swap.deposit.no-qr"
+            tone="warning"
+            title={t('swap.qr-no-memo')}
+          />
         ) : null}
         <Text
           variant="address"
@@ -146,15 +152,26 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
             alignSelf: 'stretch',
           }}
         >
-          {pill('address', t('swap.copy-address'), record.depositAddress)}
-          {!!qr && pill('link', t('swap.copy-link'), qr.value)}
+          <CopyPill
+            testID="swap.deposit.address"
+            label={t('swap.copy-address')}
+            value={record.depositAddress}
+          />
+          {!!qr && (
+            <CopyPill
+              testID="swap.deposit.link"
+              label={t('swap.copy-link')}
+              value={qr.value}
+            />
+          )}
         </View>
       </View>
 
-      {isToken && (
+      {(isToken || tokenMemo) && (
         <Banner
+          testID={tokenMemo ? 'swap.deposit.network-memo' : undefined}
           tone="warning"
-          title={t('swap.network-only')
+          title={t(tokenMemo ? 'swap.network-memo-only' : 'swap.network-only')
             .replace('{coin}', ticker)
             .replace('{network}', network)}
         />
@@ -164,7 +181,7 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
         rows={[
           {
             label: t(memo ? 'swap.amount' : 'swap.send-exactly'),
-            value: `${formatExactAmount(record.sellAmountHumanDecimal)} ${ticker}`,
+            value: amount,
             tip: memo ? undefined : t('swap.tip-exact'),
             copy: record.sellAmountHumanDecimal,
             mono: false,
@@ -185,34 +202,20 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
                       <View
                         style={{
                           flexDirection: 'row',
-                          justifyContent: 'center',
-                          columnGap: space16,
+                          columnGap: space12,
+                          marginTop: space4,
                         }}
                       >
-                        <Button
-                          variant="text"
-                          size="small"
-                          inline
-                          title={
-                            copiedKey === 'memo'
-                              ? t('swap.copied')
-                              : t('swap.copy-memo')
-                          }
-                          onPress={() => copy('memo', memo)}
+                        <CopyPill
+                          testID="swap.deposit.memo"
+                          label={t('swap.copy-memo')}
+                          value={memo}
                         />
-                        {isEvmSourceChain(asset.chain) && (
-                          <Button
-                            variant="text"
-                            size="small"
-                            inline
-                            title={
-                              copiedKey === 'memo-hex'
-                                ? t('swap.copied')
-                                : t('swap.memo-hex')
-                            }
-                            onPress={() =>
-                              copy('memo-hex', memoToHexCalldata(memo))
-                            }
+                        {isEvmSourceChain(asset.chain) && !token && (
+                          <CopyPill
+                            testID="swap.deposit.memo-hex"
+                            label={t('swap.memo-hex')}
+                            value={memoToHexCalldata(memo)}
                           />
                         )}
                       </View>
@@ -221,14 +224,18 @@ export default function DepositSlip({ record, paid }: DepositSlipProps) {
                 },
               ]
             : []),
-          {
-            label: t('swap.deposit-you-get'),
-            value: `≈ ${formatAmountForDisplay(record.expectedReceiveAmount)} ${info.currencyName}`,
-          },
-          {
-            label: t('swap.provider'),
-            value: providerShortLabel(record.provider),
-          },
+          ...(inDetail
+            ? []
+            : [
+                {
+                  label: t('swap.deposit-you-get'),
+                  value: `≈ ${formatAmountForDisplay(record.expectedReceiveAmount)} ${info.currencyName}`,
+                },
+                {
+                  label: t('swap.provider'),
+                  value: provider,
+                },
+              ]),
         ]}
       />
 

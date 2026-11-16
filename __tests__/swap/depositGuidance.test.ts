@@ -114,6 +114,17 @@ describe('buildDepositQr', () => {
     expect(qr?.hint).toContain('by hand');
   });
 
+  // 100 DAI, at 18 decimals, would otherwise ask the wallet for 100 ETH.
+  it('shows no QR for a token whose deposit carries a memo', () => {
+    const qr = buildDepositQr({
+      sellAsset: USDC,
+      depositAddress: '0x2222222222222222222222222222222222222222',
+      amountHumanDecimal: '25',
+      memoText: MAYA_MEMO,
+    });
+    expect(qr).toBeNull();
+  });
+
   it('falls back to an address-only QR on a chain with no payment URI scheme', () => {
     const qr = buildDepositQr({
       sellAsset: NEAR,

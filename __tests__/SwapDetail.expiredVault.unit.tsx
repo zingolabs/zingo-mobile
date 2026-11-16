@@ -78,12 +78,12 @@ describe.each([
   SwapKitProviderEnum.MayachainStreaming,
   SwapKitProviderEnum.ThorchainStreaming,
 ])('an expired %s purchase', provider => {
-  test('Tests that it shows the address the user gave and no vault when its deposit was not found', () => {
+  test('Tests that it shows the address the user gave, the vault and the late-deposit note when its deposit was not found', () => {
     renderDetail(expiredPurchase(provider));
 
     expect(screen.getByText('swap.your-address')).toBeTruthy();
-    expect(screen.queryByText('swap.deposit-address')).toBeNull();
-    expect(screen.queryByTestId('swap.detail.dont-send')).toBeNull();
+    expect(screen.getByText('swap.deposit-address')).toBeTruthy();
+    expect(screen.getByText('swap.late-deposit-vault')).toBeTruthy();
     expect(screen.getByText('swap.expired-why-vault')).toBeTruthy();
   });
 
@@ -131,5 +131,5 @@ test('Tests that an expired NEAR purchase keeps its own deposit address and no h
   renderDetail(expiredPurchase(SwapKitProviderEnum.Near));
 
   expect(screen.getByText('swap.deposit-address')).toBeTruthy();
-  expect(screen.getByTestId('swap.detail.dont-send')).toBeTruthy();
+  expect(screen.getByText('swap.late-deposit')).toBeTruthy();
 });

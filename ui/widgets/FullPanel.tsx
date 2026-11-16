@@ -18,7 +18,13 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import { radiusSheet, rowMinHeight, space20, useTheme } from '@app/theme';
+import {
+  radiusSheet,
+  rowMinHeight,
+  space12,
+  space20,
+  useTheme,
+} from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { contentTopPad } from '@app/navigation/safeArea';
@@ -31,6 +37,7 @@ import { SurfaceContext } from '@ui/primitives/Surface';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { dismissOnDrag } from '@ui/primitives/keyboardDismiss';
 
 const MIN_PANEL = 200;
 /** The panel rising, and lowering when it leaves. */
@@ -46,7 +53,7 @@ const PANEL_OUT = {
 };
 /** The content fades in as the panel nears its place. */
 const CONTENT_DELAY = 160;
-/** The footer's top pad and button, and the gap above them. */
+/** The footer's top pad and one button, and the gap above them: the least a footer clears. */
 const FOOTER_CLEAR = 108;
 
 type FullPanelProps = {
@@ -303,54 +310,56 @@ export default function FullPanel({
             />
           </View>
           <SurfaceContext.Provider value="surface">
-            <TooltipHost>
-              {ownScroll ? (
+            {ownScroll ? (
+              <TooltipHost>
                 <Animated.View
                   testID={testID}
                   style={[{ flex: 1 }, contentStyle]}
                 >
                   {children}
                 </Animated.View>
-              ) : (
-                <>
-                  <KeyboardAwareScrollView
-                    {...edges}
-                    testID={testID}
-                    bottomOffset={16}
-                    keyboardShouldPersistTaps="handled"
-                    bounces={false}
-                    alwaysBounceVertical={false}
-                    style={{ flex: 1 }}
-                    onContentSizeChange={(w: number, h: number) => {
-                      edges.onContentSizeChange(w, h);
-                      if (fit) {
-                        setContentH(h);
-                      }
-                    }}
-                    contentContainerStyle={{
-                      flexGrow: center ? 1 : undefined,
-                      justifyContent: center ? 'center' : 'flex-start',
-                      paddingHorizontal: space20,
-                      paddingTop: 8,
-                      /** Clears the footer (its top pad and button) and the bottom pad. */
-                      paddingBottom: bottomPad + (footer ? FOOTER_CLEAR : 28),
-                    }}
+              </TooltipHost>
+            ) : (
+              <>
+                <KeyboardAwareScrollView
+                  {...edges}
+                  testID={testID}
+                  bottomOffset={16}
+                  keyboardShouldPersistTaps="handled"
+                  keyboardDismissMode={dismissOnDrag}
+                  bounces={false}
+                  alwaysBounceVertical={false}
+                  style={{ flex: 1 }}
+                  onContentSizeChange={(w: number, h: number) => {
+                    edges.onContentSizeChange(w, h);
+                    if (fit) {
+                      setContentH(h);
+                    }
+                  }}
+                  contentContainerStyle={{
+                    flexGrow: center ? 1 : undefined,
+                    justifyContent: center ? 'center' : 'flex-start',
+                    paddingHorizontal: space20,
+                    paddingTop: 8,
+                    /** Clears the footer and the bottom pad; a taller footer (two buttons, a checkbox) by its measured height. */
+                    paddingBottom: footer
+                      ? Math.max(bottomPad + FOOTER_CLEAR, footerH + space12)
+                      : bottomPad + 28,
+                  }}
+                >
+                  <Animated.View
+                    style={[
+                      contentStyle,
+                      center ? { flexGrow: 1, justifyContent: 'center' } : null,
+                    ]}
                   >
-                    <Animated.View
-                      style={[
-                        contentStyle,
-                        center
-                          ? { flexGrow: 1, justifyContent: 'center' }
-                          : null,
-                      ]}
-                    >
-                      {children}
-                    </Animated.View>
-                  </KeyboardAwareScrollView>
-                  {fades}
-                </>
-              )}
-            </TooltipHost>
+                    {/** Inside the scrolled content: an icon measured across the scroll view lands off by the scroll offset on iOS. */}
+                    <TooltipHost>{children}</TooltipHost>
+                  </Animated.View>
+                </KeyboardAwareScrollView>
+                {fades}
+              </>
+            )}
           </SurfaceContext.Provider>
           {!!footer && (
             <View

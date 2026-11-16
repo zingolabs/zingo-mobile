@@ -90,6 +90,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '@app/services/createAlert';
 import { sendEmail } from '@app/services/sendEmail';
 import Toast from 'react-native-toast-message';
+import { FullWindowOverlay } from 'react-native-screens';
 import { ACTION_SNACKBAR_MS, toastConfig } from '@ui/widgets/toastConfig';
 import { MASK } from '@ui/widgets/PrivateAmount';
 import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
@@ -662,6 +663,7 @@ export class LoadedAppClass extends Component<
       sendSwapDeposit: this.sendSwapDeposit,
       resumeSwapDeposit: this.resumeSwapDeposit,
       setServerOption: this.setServerOption,
+      switchServerForRetry: this.switchServerForRetry,
       clearToAddr: this.clearToAddr,
       doRescan: this.doRescan,
       setAddressBook: this.setAddressBook,
@@ -1571,6 +1573,7 @@ export class LoadedAppClass extends Component<
       // Propagate the new server into WalletBackend so sub-services
       // (DataService etc.) stop using the URI captured at construction.
       this.rpc.setServer(value);
+      this.rpc.walletReopened();
       await this.rpc.clearTimers();
       await this.rpc.configure();
       return { kind: 'ok' };
@@ -1598,6 +1601,39 @@ export class LoadedAppClass extends Component<
     };
   };
 
+  /**
+   * Points the open wallet at `next` without reopening it, so the client keeps
+   * its mixnet. The dial is capped: a dead server's changeServer can otherwise
+   * block for minutes (see checkServerURI).
+   */
+  moveToServer = async (next: ServerType): Promise<boolean> => {
+    if (next.kind !== 'remote') {
+      return false;
+    }
+    const changed = await Promise.race([
+      changeServer(next.uri).then(result => result.ok),
+      new Promise<boolean>(resolve => setTimeout(() => resolve(false), 15_000)),
+    ]);
+    if (!changed) {
+      return false;
+    }
+    await SettingsFileImpl.writeServer(next, this.state.selectServer);
+    this.setState({ server: next });
+    this.rpc.setServer(next);
+    return true;
+  };
+
+  /**
+   * The server switch of a send retry. setServerOption would reopen the wallet,
+   * and the retry would meet a new client with no mixnet attached yet.
+   */
+  switchServerForRetry = async (next: ServerType): Promise<void> => {
+    if (await this.moveToServer(next)) {
+      await this.rpc.clearTimers();
+      await this.rpc.configure();
+    }
+  };
+
   // Dials each candidate in order and activates the first that connects.
   activateReachableServer = async (
     candidates: ServerUrisType[],
@@ -1606,21 +1642,13 @@ export class LoadedAppClass extends Component<
       if (!candidate.uri) {
         continue;
       }
-      const next = remoteServer(candidate.uri, candidate.chainName);
-      // Cap each dial: a dead candidate's changeServer can otherwise block for
-      // minutes (see checkServerURI), stalling the whole rotation.
-      const changed = await Promise.race([
-        changeServer(candidate.uri).then(result => result.ok),
-        new Promise<boolean>(resolve =>
-          setTimeout(() => resolve(false), 15_000),
-        ),
-      ]);
-      if (!changed) {
+      if (
+        !(await this.moveToServer(
+          remoteServer(candidate.uri, candidate.chainName),
+        ))
+      ) {
         continue;
       }
-      await SettingsFileImpl.writeServer(next, this.state.selectServer);
-      this.setState({ server: next });
-      this.rpc.setServer(next);
       this.addLastSnackbar(
         `${this.state.translate('loadedapp.selectingserverbest') as string} ${candidate.uri}`,
         SnackbarDurationEnum.long,
@@ -2070,6 +2098,7 @@ export class LoadedAppClass extends Component<
       sendSwapDeposit: this.sendSwapDeposit,
       resumeSwapDeposit: this.resumeSwapDeposit,
       setServerOption: this.setServerOption,
+      switchServerForRetry: this.switchServerForRetry,
       clearToAddr: this.clearToAddr,
       doRescan: this.doRescan,
       setAddressBook: this.setAddressBook,
@@ -2106,7 +2135,13 @@ export class LoadedAppClass extends Component<
             </GestureHandlerRootView>
           </SwapServiceProvider>
         </ContextAppLoadedProvider>
-        <Toast config={toastConfig} />
+        {Platform.OS === GlobalConst.platformOSios ? (
+          <FullWindowOverlay>
+            <Toast config={toastConfig} />
+          </FullWindowOverlay>
+        ) : (
+          <Toast config={toastConfig} />
+        )}
       </>
     );
   }

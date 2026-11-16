@@ -76,11 +76,19 @@ export function applyDefaultTrackUpdate(
   // quote lapses with nothing received) did not fail it: no deposit arrived.
   // Failed stays for a swap the provider rejected with money in it.
   const providerStatus = mapSwapStatus(response.status) ?? record.status;
+  const depositSeen = hasDepositEvidence({ ...record, observedDepositTxHash });
+  /** A purchase waits for its payment until a deposit hash shows: NEAR answers `pending` for a channel nobody has paid. */
+  const stillAwaiting =
+    record.status === SwapStatusEnum.AwaitingExternalDeposit &&
+    !depositSeen &&
+    (providerStatus === SwapStatusEnum.Pending ||
+      providerStatus === SwapStatusEnum.ProviderStatusUnknown);
   const nextStatus =
-    providerStatus === SwapStatusEnum.Failed &&
-    !hasDepositEvidence({ ...record, observedDepositTxHash })
+    providerStatus === SwapStatusEnum.Failed && !depositSeen
       ? SwapStatusEnum.Expired
-      : providerStatus;
+      : stillAwaiting
+        ? SwapStatusEnum.AwaitingExternalDeposit
+        : providerStatus;
   const nextTrackingStatus = mapTrackingStatus(response.trackingStatus);
 
   const destinationTxHash =

@@ -3,13 +3,14 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { maxBy } from 'lodash';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import TitleBar from '@ui/widgets/TitleBar';
-import { Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import Animated from 'react-native-reanimated';
 import Pressable from '@ui/primitives/Pressable';
-import { duration } from '@app/theme/motion';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import {
   space12,
+  space16,
   space4,
   space8,
   space20,
@@ -23,7 +24,6 @@ import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import { HomeTabScreenProps } from '@app/types';
 import { ContextAppLoaded, useSwapRecords, useSwapService } from '@app/context';
 import {
-  awaitsDeposit,
   canonicalChainAddress,
   formatAmountForDisplay,
   isRefunding,
@@ -33,6 +33,7 @@ import {
   rateLimitedNotice,
   renderSwapText,
 } from '@app/swap';
+import { useNowMs } from '@app/hooks/useNowMs';
 import type { SwapRecordType } from '@app/swap';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
 import {
@@ -85,14 +86,18 @@ import {
 import PairCards from './components/PairCards';
 import AssetPickerSheet from './components/AssetPickerSheet';
 import RoutesSheet from './components/RoutesSheet';
+import { useShieldedRoutes } from './useShieldedRoutes';
+import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
 import SwapSettingsSheet from './components/SwapSettingsSheet';
 import SwapHistorySheet, { swapPairLabel } from './components/SwapHistorySheet';
 import { tokenToSwapAsset } from './swapAssets';
 import { useCoinPrice } from './useCoinPrice';
+import { routeFeeValue } from './routeFeeValue';
 import { onTabScroll } from '@app/navigation/tabBarScroll';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { PANEL_TOP } from '@ui/widgets/Header/Header';
 import InsufficientFundsSheet from './components/InsufficientFundsSheet';
+import { dismissOnDrag } from '@ui/primitives/keyboardDismiss';
 
 type SwapProps = HomeTabScreenProps<'Swap'>;
 
@@ -101,7 +106,13 @@ type SwapProps = HomeTabScreenProps<'Swap'>;
  * always one side. The sheet sits fixed under the header's icons; the review
  * and everything after it are screens of their own.
  */
-const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
+/** Where Swap goes when it shows again: back to the history a swap was opened from. */
+type ReturnTo = { kind: 'form' } | { kind: 'history'; prefillAt: number };
+
+const Swap: React.FunctionComponent<SwapProps> = ({
+  route,
+  navigation: tab,
+}) => {
   const { edges, fades } = useScrollEdges({
     sides: 'top',
     surface: 'surface',
@@ -226,13 +237,17 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
       form.setAmount(text);
     }
   };
-  /** USD typed before the price was known becomes the coin amount once it is. */
-  useEffect(() => {
+  /**
+   * USD typed before the price was known becomes the coin amount once it is.
+   * Only when the price changes: a form emptied after a swap stays empty.
+   */
+  const [pricedAt, setPricedAt] = useState<number>(price);
+  if (pricedAt !== price) {
+    setPricedAt(price);
     if (usdMode && price > 0 && usdText && !form.amount) {
       form.setAmount(toZecText(usdText, price));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [price]);
+  }
   const toggleUnit = () => {
     if (usdMode) {
       setUnit('coin');
@@ -257,6 +272,11 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
 
   const counterpartyTicker =
     form.selectedToken?.ticker || form.selectedToken?.symbol || '';
+  const shielded = useShieldedRoutes({
+    direction: form.direction,
+    sellChain: form.isOutbound ? 'ZEC' : form.counterpartyChain,
+    providers: (form.routes ?? []).map(r => r.provider),
+  });
   const receiveAsset = form.quoteContext?.quoteInput.receiveAsset;
   const receiveSymbol =
     receiveAsset?.ticker ??
@@ -271,6 +291,22 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
     form.chosenRoute && receiveUsdUnitPrice > 0
       ? `≈ ${formatUsd(parseFloat(form.chosenRoute.expectedReceiveAmount) * receiveUsdUnitPrice)}`
       : '';
+  const feeValue =
+    form.chosenRoute && form.quoteContext
+      ? routeFeeValue({
+          route: form.chosenRoute,
+          quoteInput: form.quoteContext.quoteInput,
+          fiatValueBasis: form.quoteContext.fiatValueBasis,
+          isOutbound: form.isOutbound,
+        })
+      : '';
+  const providerRow = {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    columnGap: space8,
+    minHeight: 44,
+    paddingHorizontal: 4,
+  };
 
   // The newest swap in progress. A late payment on its way back is not one;
   // it has no card.
@@ -279,15 +315,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
     r => r.createdAtMs,
   );
   // The card turns to its warning half an hour after the payment address.
-  const [nowMs, setNowMs] = useState<number>(() => Date.now());
-  const awaiting = !!pending && awaitsDeposit(pending);
-  useEffect(() => {
-    if (!awaiting) {
-      return;
-    }
-    const timer = setInterval(() => setNowMs(Date.now()), 30_000);
-    return () => clearInterval(timer);
-  }, [awaiting]);
+  const nowMs = useNowMs();
   const pendingState = pending
     ? pendingSwapLabel(pending, nowMs, key => translate(key) as string)
     : null;
@@ -345,6 +373,33 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
     }
     form.cancelReview();
   });
+  const returnTo = useRef<ReturnTo>({ kind: 'form' });
+  /**
+   * Back from a swap opened from the history, the history opens again. A new
+   * quote from that swap, or another tab, ends the way back.
+   */
+  useEffect(() => {
+    const onFocus = tab.addListener('focus', () => {
+      const back = returnTo.current;
+      returnTo.current = { kind: 'form' };
+      const prefillAt =
+        tab.getState().routes.find(r => r.key === route.key)?.params?.prefill
+          ?.requestedAtMs ?? 0;
+      if (back.kind === 'history' && back.prefillAt === prefillAt) {
+        historySheetRef.current?.present();
+      }
+    });
+    const onTabs = tab.addListener('state', e => {
+      const { index, routes } = e.data.state;
+      if (routes[index].key !== route.key) {
+        returnTo.current = { kind: 'form' };
+      }
+    });
+    return () => {
+      onFocus();
+      onTabs();
+    };
+  }, [tab, route.key]);
   const openRecord = (record: SwapRecordType) =>
     navigation.navigate(swapScreenFor(record), { recordId: record.recordId });
   const onContinue = () => {
@@ -498,7 +553,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
               header={sheetHeader}
               animateOnMount={false}
             >
-              <ScrollView
+              <KeyboardAwareScrollView
                 onScroll={e => {
                   onTabScroll(e);
                   edges.onScroll(e);
@@ -506,6 +561,8 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                 onLayout={edges.onLayout}
                 scrollEventThrottle={16}
                 keyboardShouldPersistTaps="handled"
+                keyboardDismissMode={dismissOnDrag}
+                bottomOffset={space16}
                 testID="swap.scroll-view"
                 contentContainerStyle={{
                   paddingHorizontal: space20,
@@ -590,12 +647,10 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                   onToggleUnit={toggleUnit}
                   altText={altText}
                   availableText={
-                    !form.isOutbound
-                      ? undefined
-                      : usdMode
-                        ? toFiatText(String(form.maxSpendableForSwap), price) ||
-                          Utils.parseNumberFloatToStringLocale(0, 2)
-                        : `${formatAmountForDisplay(String(form.maxSpendableForSwap))} ${info.currencyName}`
+                    usdMode
+                      ? toFiatText(String(form.maxSpendableForSwap), price) ||
+                        Utils.parseNumberFloatToStringLocale(0, 2)
+                      : `${formatAmountForDisplay(String(form.maxSpendableForSwap))} ${info.currencyName}`
                   }
                   onUseMax={() =>
                     onChangeAmountText(
@@ -612,7 +667,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                   receivePlaceholder="0"
                   receiveAltText={receiveUsd}
                   ring={
-                    form.routes?.length
+                    form.routes?.length || form.quoting
                       ? {
                           resetKey: form.refreshedAtMs,
                           durationMs: QUOTE_REFRESH_MS,
@@ -626,10 +681,15 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                   onFlip={form.flip}
                   onPickAsset={() => assetSheetRef.current?.present()}
                   texts={{
+                    done: {
+                      confirm: translate('confirm') as string,
+                      hide: translate('hide-keyboard') as string,
+                    },
                     youSend: translate('swap.you-send') as string,
-                    youReceive: form.isOutbound
-                      ? (translate('swap.you-receive') as string)
-                      : (translate('swap.receive-in-zingo') as string),
+                    youReceive: translate('swap.you-receive') as string,
+                    receiveInZingo: translate(
+                      'swap.receive-in-zingo',
+                    ) as string,
                     receiveTip: translate('swap.tip-derived') as string,
                     fromOtherWallet: translate(
                       'swap.from-other-wallet',
@@ -703,65 +763,116 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                   </View>
                 )}
 
-                {!!form.selectedToken && (
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      columnGap: space8,
-                      minHeight: 44,
-                      paddingHorizontal: 4,
-                    }}
-                  >
-                    <Text
-                      variant="bodySmall"
-                      tone="muted"
-                      style={{ flex: 1, fontWeight: '600' }}
-                    >
-                      {translate('swap.provider') as string}
-                    </Text>
-                    {form.chosenRoute ? (
-                      <>
-                        <Pressable
-                          kind="link"
-                          testID="swap.change-route"
-                          accessibilityRole="button"
-                          accessibilityLabel={
-                            translate('swap.change-route-acc') as string
-                          }
-                          onPress={() => routesSheetRef.current?.present()}
-                          hitSlop={8}
-                          style={{ minHeight: 32, justifyContent: 'center' }}
+                {!!form.selectedToken &&
+                  (form.chosenRoute ? (
+                    /** One block, so the scroll's gap does not open between the rows. */
+                    <View>
+                      <Pressable
+                        kind="row"
+                        testID="swap.change-route"
+                        accessibilityRole="button"
+                        accessibilityLabel={
+                          translate('swap.change-route-acc') as string
+                        }
+                        onPress={() => routesSheetRef.current?.present()}
+                        style={providerRow}
+                      >
+                        <Text
+                          variant="bodySmall"
+                          tone="muted"
+                          style={{ flex: 1, fontWeight: '600' }}
+                        >
+                          {translate('swap.provider') as string}
+                        </Text>
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            columnGap: 4,
+                          }}
                         >
                           <Text
                             variant="bodySmall"
-                            style={{
-                              fontWeight: '600',
-                              textDecorationLine: 'underline',
-                            }}
+                            style={{ fontWeight: '600' }}
                           >
                             {providerShortLabel(form.chosenRoute.provider)}
                           </Text>
-                        </Pressable>
-                        {!!form.chosenRoute.estimatedTimeText && (
-                          <Text variant="caption" tone="muted">
-                            {form.chosenRoute.estimatedTimeText}
+                          {shielded.isShielded(form.chosenRoute.provider) && (
+                            <View testID="swap.provider.shielded">
+                              <ShieldIcon
+                                size={iconSizeSm}
+                                color={colors.fgAccent}
+                              />
+                            </View>
+                          )}
+                          {!!form.chosenRoute.estimatedTimeText && (
+                            <Text variant="caption" tone="muted">
+                              {form.chosenRoute.estimatedTimeText}
+                            </Text>
+                          )}
+                          <ChevronRight
+                            size={iconSizeSm}
+                            color={colors.fgMuted}
+                          />
+                        </View>
+                      </Pressable>
+                      {!!feeValue && (
+                        <View style={[providerRow, { minHeight: 24 }]}>
+                          <View
+                            style={{
+                              flex: 1,
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              columnGap: 4,
+                            }}
+                          >
+                            <Text
+                              variant="bodySmall"
+                              tone="muted"
+                              style={{ fontWeight: '600' }}
+                            >
+                              {translate('swap.review-fees') as string}
+                            </Text>
+                            <InfoTooltip
+                              testID="swap.fees-info"
+                              label={translate('swap.review-fees') as string}
+                              text={translate('swap.tip-fees') as string}
+                            >
+                              <></>
+                            </InfoTooltip>
+                          </View>
+                          <Text
+                            variant="bodySmall"
+                            testID="swap.fees"
+                            style={{ fontVariant: ['tabular-nums'] }}
+                          >
+                            {feeValue}
                           </Text>
-                        )}
-                      </>
-                    ) : (
+                        </View>
+                      )}
+                    </View>
+                  ) : (
+                    <View style={providerRow}>
+                      <Text
+                        variant="bodySmall"
+                        tone="muted"
+                        style={{ flex: 1, fontWeight: '600' }}
+                      >
+                        {translate('swap.provider') as string}
+                      </Text>
                       <Text variant="caption" tone="muted">
                         {
                           translate(
-                            form.cta === 'noRoutes'
-                              ? 'swap.provider-none'
-                              : 'swap.provider-pending',
+                            form.quoting
+                              ? 'swap.cta-quoting'
+                              : form.cta === 'noRoutes'
+                                ? 'swap.provider-none'
+                                : 'swap.provider-pending',
                           ) as string
                         }
                       </Text>
-                    )}
-                  </View>
-                )}
+                    </View>
+                  ))}
                 {form.rateLimited && (
                   <Banner
                     tone="warning"
@@ -1049,7 +1160,7 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
                     onPress={onContinue}
                   />
                 </View>
-              </ScrollView>
+              </KeyboardAwareScrollView>
               {fades}
             </AppSheet>
           )}
@@ -1069,6 +1180,10 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
           receiveSymbol={receiveSymbol}
           receiveUsdUnitPrice={receiveUsdUnitPrice}
           onSelect={form.pickRoute}
+          isShielded={shielded.isShielded}
+          shieldedNote={shielded.note}
+          payCoin={counterpartyTicker}
+          paidFromOutside={!form.isOutbound}
         />
         <SaveContactSheet
           ref={saveContactSheetRef}
@@ -1105,12 +1220,12 @@ const Swap: React.FunctionComponent<SwapProps> = ({ route }) => {
           records={records}
           nowMs={nowMs}
           onOpen={record => {
+            returnTo.current = {
+              kind: 'history',
+              prefillAt: route.params?.prefill?.requestedAtMs ?? 0,
+            };
+            historySheetRef.current?.dismiss();
             openRecord(record);
-            // Gone at once under the risen panel, without a motion of its own.
-            setTimeout(
-              () => historySheetRef.current?.dismiss({ duration: 0 }),
-              duration.panelIn,
-            );
           }}
         />
         <InsufficientFundsSheet

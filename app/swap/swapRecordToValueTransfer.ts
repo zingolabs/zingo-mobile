@@ -1,5 +1,5 @@
-import ValueTransferType from '@app/AppState/types/ValueTransferType';
-import { ValueTransferKindEnum } from '@app/AppState/enums/ValueTransferKindEnum';
+import { ValueTransferType } from '@app/wallet/types';
+import { ValueTransferKindEnum } from '@app/wallet/enums';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { SwapStatusEnum, isTerminalStatus } from './enums/SwapStatusEnum';
 import { SwapDirectionEnum } from './enums/SwapDirectionEnum';

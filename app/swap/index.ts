@@ -205,6 +205,7 @@ export type { UnavailableProviderType } from './unavailableProviders';
 export {
   buildDepositQr,
   exactAmountWarningText,
+  isTokenAsset,
   memoFieldHintForChain,
   providerRequiresMemo,
   requiresExactAmountWarning,
@@ -248,3 +249,10 @@ export {
   rateLimitedNotice,
   RATE_LIMITED_MESSAGE,
 } from './rateLimited';
+export {
+  chainCarriesShieldedPurchase,
+  paysPurchaseShielded,
+  routeIsShielded,
+  swapAddressOf,
+} from './shieldedPurchase';
+export { fetchMayaShieldedMemoTarget } from './mayaShieldedMemo';

@@ -103,6 +103,17 @@ export default class AddressBookFileImpl {
   }
 
   // remove one item
+  /** Removes every entry of the given addresses, whatever its label. */
+  static async removeAddresses(
+    addresses: string[],
+  ): Promise<AddressBookFileClass[]> {
+    const book = await this.readAddressBook();
+    const kept = book.filter(item => !addresses.includes(item.address));
+    return kept.length === book.length
+      ? book
+      : await this.writeAddressBook(kept);
+  }
+
   static async removeAddressBookItem(
     label: string,
     address: string,

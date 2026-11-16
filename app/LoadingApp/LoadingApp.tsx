@@ -125,7 +125,7 @@ import {
 // no lazy load because slowing down screens.
 import SeedSheet from '@ui/widgets/SeedSheet';
 import DeleteWalletSheet from '@ui/widgets/DeleteWalletSheet';
-import { DeleteWalletContext } from '@app/AppState/types/DeleteWalletContext';
+import { DeleteWalletContext } from '@app/wallet/types';
 import { walletErrorKind } from './walletErrorKind';
 import { sanitizePaths } from '@app/utils/sanitizePaths';
 import { duration as motionDuration } from '@app/theme/motion';

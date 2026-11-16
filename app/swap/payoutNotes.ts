@@ -1,5 +1,5 @@
 import type { ValueTransferType } from '@app/AppState';
-import { ValueTransferKindEnum } from '@app/AppState/enums/ValueTransferKindEnum';
+import { ValueTransferKindEnum } from '@app/wallet/enums';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
 import { SwapStatusEnum } from './enums/SwapStatusEnum';
@@ -17,9 +17,8 @@ export type PayoutNoteType = {
 
 /**
  * Maya and THORChain sign every payout `OUT:<inbound hash>`. A shielded one
- * carries it in the note's memo, which reaches the value transfer. A
- * transparent one carries it in an OP_RETURN zingolib does not hand over yet
- * (zingolib#3139).
+ * carries it in the note's memo, a transparent one in an OP_RETURN; both reach
+ * the value transfer.
  */
 const PAYOUT_MEMO = /^OUT:([0-9a-f]{64})$/i;
 
@@ -34,7 +33,7 @@ export function payoutNotesFrom(
     ) {
       return [];
     }
-    const hash = (vt.memos ?? [])
+    const hash = [...(vt.memos ?? []), ...(vt.opReturnData ?? [])]
       .map(memo => PAYOUT_MEMO.exec(memo.trim())?.[1])
       .find((match): match is string => !!match);
     return hash

@@ -71,3 +71,25 @@ export function swapOutcome(status: SwapStatusEnum): SwapOutcome {
       return 'inFlight';
   }
 }
+
+/** The pill a swap's state reads under: the detail's, and its address's. */
+export function swapStatePill(
+  status: SwapStatusEnum,
+  t: (key: string) => string,
+): {
+  text: string;
+  tone: 'accent' | 'warning' | 'danger' | 'neutral';
+} {
+  switch (swapOutcome(status)) {
+    case 'completed':
+      return { text: t('swap.history-done'), tone: 'accent' };
+    case 'refunded':
+      return { text: t('swap.history-refunded'), tone: 'warning' };
+    case 'failed':
+      return { text: t('swap.history-failed'), tone: 'danger' };
+    case 'expired':
+      return { text: t('history.state-expired'), tone: 'neutral' };
+    default:
+      return { text: t('swap.history-in-progress'), tone: 'neutral' };
+  }
+}

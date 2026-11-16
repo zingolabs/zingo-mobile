@@ -13,7 +13,7 @@ import {
   space20,
   touchTarget,
 } from '@app/theme';
-import { AddressKindEnum, SnackbarDurationEnum } from '@app/AppState';
+import { AddressKindEnum, Route, SnackbarDurationEnum } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { deliver } from '@app/navigation/results';
@@ -33,6 +33,8 @@ import { TagIcon } from '@ui/primitives/Icons/TagIcon';
 import { PinButton } from '@screens/Receive/components/AddressCard';
 import { addressKindKey } from '@screens/Receive/addressKind';
 import { OwnAddress, useOwnAddresses } from '@screens/Receive/ownAddresses';
+import { useSwapAddresses } from '@screens/Receive/useSwapAddresses';
+import SwapAddresses from './SwapAddresses';
 
 /** Long enough for the radio to show the pick before the panel leaves. */
 const PICK_LEAVE_MS = 260;
@@ -56,7 +58,16 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
     useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const t = (key: string) => translate(key) as string;
-  const { shielded, transparent } = useOwnAddresses();
+  const { shielded: own, transparent } = useOwnAddresses();
+  const swapAddresses = useSwapAddresses();
+  /** A swap's address sits in its own group, not among the ones you made. */
+  const shielded = own.filter(a => !swapAddresses.has(a.address));
+  const swaps = own
+    .flatMap(a => {
+      const record = swapAddresses.get(a.address);
+      return record ? [{ address: a.address, record }] : [];
+    })
+    .sort((a, b) => b.record.createdAtMs - a.record.createdAtMs);
   const { pin, setPin } = usePinnedAddress();
   const [current, setCurrent] = useState<string>(route.params?.current ?? '');
   const [tagging, setTagging] = useState<string>('');
@@ -205,6 +216,15 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
             {pinnedFirst(transparent).map(row)}
           </RadioList>
         </>
+      )}
+      {swaps.length > 0 && (
+        <SwapAddresses
+          entries={swaps}
+          tagOf={address => tagOf(address)?.label}
+          onViewSwap={recordId =>
+            navigation.navigate(Route.SwapDetail, { recordId })
+          }
+        />
       )}
       <AppSheetModal
         ref={tagSheetRef}

@@ -35,6 +35,18 @@ jobs:
       - name: Check formatting
         run: yarn prettier:check
 
+      # The React Compiler ratchet: only files changed against the PR base
+      # run, each compared with its base version, so existing bailouts stay
+      # green while no PR adds one. The full strict sweep (yarn check:compiler
+      # --strict) waits until the bailout backlog is gone.
+      - name: React Compiler changed-file gate
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git fetch --no-tags --depth=1 origin "$BASE"
+          yarn check:compiler:changed --base="$BASE"
+
       # DESIGN.md mirrors app/theme ("Changing the system" in it): a PR that
       # changes a theme value changes DESIGN.md too. The label
       # design-md-unchanged lets a change with no visible effect through.

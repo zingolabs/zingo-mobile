@@ -3,7 +3,6 @@ import React from 'react';
 import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import Toast from 'react-native-toast-message';
 import {
   isIosModal,
   ScreenLayoutProps,
@@ -11,20 +10,19 @@ import {
   skipExitingWithScreen,
 } from './screenLayout';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
-import { toastConfig } from '@ui/widgets/toastConfig';
 import AddTagModalHost from '@app/LoadedApp/components/AddTagModalHost';
 
 /**
  * An iOS transparent modal sits above everything LoadedApp's root holds, so
- * it brings its own: a home for its sheets and the confirmation, add-tag and
- * snackbar hosts, which answer while it is on top.
+ * it brings its own: a home for its sheets and the confirmation and add-tag
+ * hosts, which answer while it is on top. Snackbars keep the one root host,
+ * which draws above every modal.
  */
 const IosModal = ({ children }: { children: React.ReactNode }) => (
   <GestureHandlerRootView style={{ flex: 1 }}>
     <BottomSheetModalProvider>
       <ScreenSafeArea>
         <View style={{ flex: 1 }}>{children}</View>
-        <Toast config={toastConfig} />
       </ScreenSafeArea>
       <ConfirmBottomSheet />
       <AddTagModalHost />

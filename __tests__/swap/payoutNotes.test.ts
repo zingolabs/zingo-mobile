@@ -1,5 +1,5 @@
 import type { ValueTransferType } from '@app/AppState';
-import { ValueTransferKindEnum } from '@app/AppState/enums/ValueTransferKindEnum';
+import { ValueTransferKindEnum } from '@app/wallet/enums';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { SwapDirectionEnum } from '@app/swap/enums/SwapDirectionEnum';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
@@ -57,6 +57,23 @@ describe('payoutNotesFrom', () => {
         vt({ kind: ValueTransferKindEnum.Sent }),
         vt({ status: RPCValueTransfersStatusEnum.failed }),
         vt({ swapRecordId: 'rec-1' }),
+      ]),
+    ).toEqual([]);
+  });
+
+  it('Tests that a received transfer is a payout when its OP_RETURN names a deposit hash. A transparent payout carries no memo.', () => {
+    expect(
+      payoutNotesFrom([
+        vt({ memos: undefined, opReturnData: [`OUT:${HASH}`] }),
+      ]),
+    ).toEqual([{ txid: 'df3fe39c', amount: 0.01732169, inboundHash: HASH }]);
+  });
+
+  it('Tests that nothing is a payout when the OP_RETURN is a refund or anything else', () => {
+    expect(
+      payoutNotesFrom([
+        vt({ memos: undefined, opReturnData: [`REFUND:${HASH}`] }),
+        vt({ memos: undefined, opReturnData: ['=:ZEC.ZEC:t1abc'] }),
       ]),
     ).toEqual([]);
   });

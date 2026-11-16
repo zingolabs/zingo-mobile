@@ -21,6 +21,7 @@ import { FileTextIcon } from '@ui/primitives/Icons/FileTextIcon';
 import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
 import { shortWhen, transferRowText } from '@screens/History/historyRowText';
 import { transferIcon } from '@screens/History/transferIcon';
+import { useNowMs } from '@app/hooks/useNowMs';
 import HistoryAvatar from './HistoryAvatar';
 import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import HistoryRowBody from './HistoryRowBody';
@@ -69,6 +70,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   } = context;
   const { colors } = useTheme();
   const t = (key: string) => (translate(key) as string).trim();
+  const nowMs = useNowMs();
 
   // A recycled row keeps its Swipeable open unless it is closed on rebind.
   const swipeableRef = useRef<Swipeable | null>(null);
@@ -100,7 +102,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     : undefined;
   const text = transferRowText({
     vt,
-    when: shortWhen(vt.time * 1000, Date.now(), t, ms =>
+    when: shortWhen(vt.time * 1000, nowMs, t, ms =>
       Utils.formatDate(ms, 'MMM d', language),
     ),
     currency: info.currencyName,

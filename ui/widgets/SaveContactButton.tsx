@@ -10,13 +10,16 @@ type SaveContactButtonProps = {
   label: string;
   onPress: () => void;
   testID?: string;
+  /** The book's own action in the same place: Send again once the contact is saved. */
+  icon?: React.ComponentType<{ size?: number; color?: string }>;
 };
 
-/** The details' "Save contact" for an address the book lacks. */
+/** The details' action for an outside address: Save contact, or Send again once it is saved. */
 export default function SaveContactButton({
   label,
   onPress,
   testID,
+  icon: Icon = UserPlusIcon,
 }: SaveContactButtonProps) {
   const { colors } = useTheme();
   return (
@@ -34,7 +37,7 @@ export default function SaveContactButton({
         marginTop: space8,
       }}
     >
-      <UserPlusIcon size={iconSizeMd} color={colors.fgAccent} />
+      <Icon size={iconSizeMd} color={colors.fgAccent} />
       <Text
         variant="caption"
         style={{ flexShrink: 1, fontWeight: '700', color: colors.fgAccent }}

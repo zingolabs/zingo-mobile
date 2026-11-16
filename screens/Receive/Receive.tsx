@@ -40,6 +40,7 @@ import { onTabScroll } from '@app/navigation/tabBarScroll';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { PANEL_TOP } from '@ui/widgets/Header/Header';
 import { useReceiveSelection } from './useReceiveSelection';
+import { useSwapAddresses } from './useSwapAddresses';
 import { useCompact } from '@app/hooks/useCompact';
 
 type ReceiveProps = HomeTabScreenProps<'Receive'>;
@@ -91,11 +92,17 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
     [containerH],
   );
 
+  const swapAddresses = useSwapAddresses();
+  const swapAddressSet = useMemo(
+    () => new Set(swapAddresses.keys()),
+    [swapAddresses],
+  );
   const [selected, setSelected] = useReceiveSelection(
     shielded,
     transparent,
     pin,
     pinLoaded,
+    swapAddressSet,
   );
   useResult('receive.pick', setSelected);
 

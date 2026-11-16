@@ -16,10 +16,13 @@ import {
 import { lacksDelivery } from './deliveryWatch';
 import { SwapStatusEnum, isTerminalStatus } from './enums/SwapStatusEnum';
 import { DEPOSIT_WAIT_MS } from './depositDeadline';
+import { isTokenAsset } from './depositGuidance';
 import { hasDepositEvidence } from './depositEvidence';
 import { SwapKitError } from './errors';
 import { awaitsPayout, claimPayout } from './payoutNotes';
 import type { PayoutNoteType } from './payoutNotes';
+import { awaitsRefund, claimRefund, paidIn } from './refundNotes';
+import type { RefundNoteType } from './refundNotes';
 import { awaitsSaleDeposit, claimSaleDeposit, paysSale } from './saleDeposits';
 import type { SentPaymentType } from './saleDeposits';
 import { isMemoTooLong, paysPurchaseShielded } from './shieldedPurchase';
@@ -36,6 +39,7 @@ import { RouteOptionType } from './types/RouteOptionType';
 import { SwapAssetType } from './types/SwapAssetType';
 import { SwapRecordType } from './types/SwapRecordType';
 import { TokenEntryType } from './types/TokensResponseType';
+import { isThorchainFamily } from './thorchainFamily';
 import { unavailableProviders } from './unavailableProviders';
 import type { UnavailableProviderType } from './unavailableProviders';
 
@@ -257,11 +261,19 @@ export class SwapService {
       )
       .filter((route): route is RouteOptionType => route !== null);
 
+    // Paid with a token from another wallet, a Maya or THORChain route cannot
+    // be taken: their memo travels only through the router contract, which no
+    // wallet's Send calls, and a plain transfer to the vault is neither seen
+    // nor refunded (65 USDT were lost that way on 2026-11-10).
+    const tokenMemoRoutes = isTokenAsset(input.sellAsset)
+      ? projected.filter(route => isThorchainFamily(route.provider))
+      : [];
+    const offered = projected.filter(route => !tokenMemoRoutes.includes(route));
     // Split rather than filtered: a route through a provider with no executor
     // is a real offer this app cannot take, and dropping it without a trace is
     // indistinguishable on screen from the provider never having answered.
-    const routes = projected.filter(route => this.registry.has(route.provider));
-    const unsupportedRoutes = projected.filter(
+    const routes = offered.filter(route => this.registry.has(route.provider));
+    const unsupportedRoutes = offered.filter(
       route => !this.registry.has(route.provider),
     );
 
@@ -272,6 +284,7 @@ export class SwapService {
         routes,
         input,
         unsupportedRoutes,
+        tokenMemoRoutes,
       ),
       rawResponse: response,
     };
@@ -282,12 +295,14 @@ export class SwapService {
     routes: readonly RouteOptionType[],
     input: QuoteInput,
     unsupportedRoutes: readonly RouteOptionType[] = [],
+    tokenMemoRoutes: readonly RouteOptionType[] = [],
   ): UnavailableProviderType[] {
     return unavailableProviders({
       response,
       supported: this.registry.supportedProviders(),
       routes,
       unsupportedRoutes,
+      tokenMemoRoutes,
       sellAssetTicker: input.sellAsset.ticker,
     });
   }
@@ -307,6 +322,16 @@ export class SwapService {
         ? await fetchMayaShieldedMemoTarget()
         : null;
     const namedBySwapKit = shieldedMemoAddressFromSwap(swapResponse);
+    /** A shielded memo has room for a unified address: the refund comes back shielded. */
+    const shieldedRefund =
+      shieldedMemoTarget && this.newShieldedAddress
+        ? await this.newShieldedAddress().catch(error => {
+            console.error(
+              `SwapService: no shielded address for the refund ${error}`,
+            );
+            return undefined;
+          })
+        : undefined;
 
     const instructions = executor.extractDepositInstructions({
       swapResponse,
@@ -318,8 +343,12 @@ export class SwapService {
       receiveAsset: quoteInput.receiveAsset,
       sellAmountHumanDecimal: quoteInput.sellAmountHumanDecimal,
       destinationAddress,
-      sourceAddress: quoteInput.sourceAddress,
+      sourceAddress: shieldedRefund ?? quoteInput.sourceAddress,
     });
+    const refundAddress =
+      shieldedRefund && instructions.shieldedMemoAddress
+        ? shieldedRefund
+        : undefined;
 
     const now = Date.now();
     const initialStatus =
@@ -343,6 +372,7 @@ export class SwapService {
       feesRaw: chosenRoute.feesRaw,
       destinationAddress,
       sourceAddress: quoteInput.sourceAddress,
+      refundAddress,
       requestedSlippageBps: quoteInput.slippageBps,
       status: initialStatus,
       depositDeadlineMs:
@@ -562,6 +592,30 @@ export class SwapService {
         settled.push(note.txid);
         break;
       }
+    }
+    return settled;
+  }
+
+  /**
+   * Ties each refund the wallet received to the sale whose deposit it names.
+   * The memo carries the wallet's own deposit txid, so no provider is asked.
+   * Resolves to the refunds settled, tied to a sale or known to be no sale's.
+   */
+  async claimRefunds(notes: readonly RefundNoteType[]): Promise<string[]> {
+    const settled: string[] = [];
+    for (const note of notes) {
+      const records = await this.store.readAll();
+      const record = records.find(
+        r => awaitsRefund(r) && paidIn(r, note.depositTxid),
+      );
+      if (record) {
+        await this.store.update(record.recordId, current =>
+          awaitsRefund(current)
+            ? claimRefund(current, note, Date.now())
+            : current,
+        );
+      }
+      settled.push(note.txid);
     }
     return settled;
   }
@@ -890,7 +944,7 @@ function toRouteOption(
     feesRaw: route.fees,
     estimatedTimeText:
       estimatedSecondsTotal !== undefined
-        ? `~${Math.max(1, Math.ceil(estimatedSecondsTotal / 60))} min`
+        ? `≈ ${Math.max(1, Math.ceil(estimatedSecondsTotal / 60))} min`
         : undefined,
     expiresAtMs: Number.isFinite(expirationSecs)
       ? expirationSecs * 1000

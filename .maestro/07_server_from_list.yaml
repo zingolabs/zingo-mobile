@@ -67,9 +67,12 @@ appId: org.ZingoLabs.Zingo
             text: "zec\\.rocks, .*"
           timeout: 120000
 
-# History shows the check icon once no sync is in progress on the server.
+# Back leads to the options panel the Server screen opened from. History
+# shows the check icon once no sync is in progress on the server.
 - tapOn:
     id: "server.back"
+- tapOn:
+    id: "optionspanel.close"
 - extendedWaitUntil:
     visible:
       id: "header.checkicon"

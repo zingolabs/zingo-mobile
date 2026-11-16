@@ -32,16 +32,25 @@ const LOSS_WINDOW_MILLIS = 10 * 60 * 1000;
  */
 export class MixnetJournal {
   private entries: readonly MixnetJournalEntry[] = [];
+  private listeners = new Set<() => void>();
 
   note(kind: MixnetJournalKind, text: string): void {
     this.entries = takeRight(
       [...this.entries, { atMillis: Date.now(), kind, text }],
       MIXNET_JOURNAL_LIMIT,
     );
+    this.listeners.forEach(listener => listener());
   }
 
   list(): readonly MixnetJournalEntry[] {
     return this.entries;
+  }
+
+  subscribe(listener: () => void): () => void {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   count(kind: MixnetJournalKind): number {
@@ -49,20 +58,36 @@ export class MixnetJournal {
   }
 
   recentLosses(nowMillis: number): number {
-    return filter(
-      this.entries,
-      entry =>
-        entry.kind === 'retry' &&
-        nowMillis - entry.atMillis <= LOSS_WINDOW_MILLIS,
-    ).length;
+    return recentLossesOf(this.entries, nowMillis);
   }
 
   clear(): void {
     this.entries = [];
+    this.listeners.forEach(listener => listener());
   }
 }
 
 export const mixnetJournal = new MixnetJournal();
+
+export function recentLossesOf(
+  entries: readonly MixnetJournalEntry[],
+  nowMillis: number,
+): number {
+  return filter(
+    entries,
+    entry =>
+      entry.kind === 'retry' &&
+      nowMillis - entry.atMillis <= LOSS_WINDOW_MILLIS,
+  ).length;
+}
+
+export function listJournal(): readonly MixnetJournalEntry[] {
+  return mixnetJournal.list();
+}
+
+export function subscribeJournal(listener: () => void): () => void {
+  return mixnetJournal.subscribe(listener);
+}
 
 /** Exit identities run to a hundred characters; the start tells them apart. */
 export function shortExit(exit: string): string {

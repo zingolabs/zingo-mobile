@@ -10,7 +10,6 @@ import React, {
 import TitleBar from '@ui/widgets/TitleBar';
 import {
   View,
-  ScrollView,
   Keyboard,
   Platform,
   StyleSheet,
@@ -37,6 +36,10 @@ import {
 import Button from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import {
+  KeyboardAwareScrollView,
+  KeyboardAwareScrollViewRef,
+} from 'react-native-keyboard-controller';
+import {
   SendPageStateClass,
   ToAddrClass,
   GlobalConst,
@@ -44,7 +47,7 @@ import {
   Route,
   ProposalPoolsType,
 } from '@app/AppState';
-import { hasUnconfirmedFunds } from '@app/AppState/classes/TotalBalanceClass';
+import { hasUnconfirmedFunds } from '@app/wallet/classes';
 // Imported straight from the module rather than through the `uris` barrel, so
 // the ZNS SDK stays out of the module graph of everything else that barrel
 // serves (the wallet backend among them).
@@ -98,6 +101,7 @@ import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import { PANEL_TOP } from '@ui/widgets/Header/Header';
 import { onTabScroll } from '@app/navigation/tabBarScroll';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
+import { dismissOnDrag } from '@ui/primitives/keyboardDismiss';
 
 type SendProps = HomeTabScreenProps<'Send'>;
 
@@ -121,7 +125,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
     clearToAddr,
     setScrollToTop,
     setScrollToBottom,
-    setServerOption,
+    switchServerForRetry,
     setShieldingAmount,
     translate,
     info,
@@ -213,7 +217,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
     useState<boolean>(false);
   const [containerH, setContainerH] = useState<number>(0);
 
-  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollViewRef = useRef<KeyboardAwareScrollViewRef>(null);
   // A press on the tab while it is open scrolls the form to the top.
   useScrollToTop(scrollViewRef);
   // The user asked for the whole balance: MAX sets it, typing in the amount
@@ -838,7 +842,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
       async () => {
         const target = await retryServer(server, translate);
         if (target !== server) {
-          await setServerOption(target, selectServer, false, true);
+          await switchServerForRetry(target);
         }
       },
       // A `custom` server is the user's own choice, and the retry keeps it.
@@ -1029,7 +1033,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
             animateOnMount={false}
             header={sendHeader}
           >
-            <ScrollView
+            <KeyboardAwareScrollView
               onScroll={e => {
                 onTabScroll(e);
                 edges.onScroll(e);
@@ -1039,6 +1043,8 @@ const Send: React.FunctionComponent<SendProps> = () => {
               ref={scrollViewRef}
               onContentSizeChange={(_, height) => setContentHeight(height)}
               keyboardShouldPersistTaps="handled"
+              keyboardDismissMode={dismissOnDrag}
+              bottomOffset={space16}
               contentContainerStyle={{}}
               testID="send.scroll-view"
               bounces={false}
@@ -1385,7 +1391,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                   )}
                 </View>
               </View>
-            </ScrollView>
+            </KeyboardAwareScrollView>
             {fades}
           </AppSheet>
         )}
