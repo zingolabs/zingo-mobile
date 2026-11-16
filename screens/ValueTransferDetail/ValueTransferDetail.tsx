@@ -219,7 +219,7 @@ const ValueTransferDetail: React.FunctionComponent<
   };
 
   /** Send with only this address filled: a new payment, not this one again. */
-  const sendAgain = () => {
+  const sendMore = () => {
     const state = new SendPageStateClass(new ToAddrClass(0));
     state.toaddr.to = vt.address ?? '';
     setSendPageState(state);
@@ -371,10 +371,10 @@ const ValueTransferDetail: React.FunctionComponent<
           !readOnly &&
           server.kind !== 'offline' && (
             <SaveContactButton
-              testID="valuetransferdetail.send-again"
-              label={t('history.send-again')}
+              testID="valuetransferdetail.send-more"
+              label={t('history.send-more')}
               icon={PlaneIcon}
-              onPress={sendAgain}
+              onPress={sendMore}
             />
           )
         ))}
