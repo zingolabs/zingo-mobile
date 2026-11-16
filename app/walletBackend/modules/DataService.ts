@@ -71,6 +71,8 @@ export class DataService {
 
   fetchWalletHeightLock: boolean = false;
   fetchWalletBirthdaySeedUfvkLock: boolean = false;
+  /** The raised-birthday notice shows once per wallet open, however often configure runs. */
+  birthdayAdjustedNoticed: boolean = false;
   fetchInfoAndServerHeightLock: boolean = false;
   fetchTandZandOValueTransfersLock: boolean = false;
   /**
@@ -415,7 +417,8 @@ export class DataService {
       if (wallet) {
         this.walletBirthday = wallet.birthday;
         this.config.onBirthdayChanged(wallet.birthday || 0);
-        if (wallet.birthdayAdjustedFrom) {
+        if (wallet.birthdayAdjustedFrom && !this.birthdayAdjustedNoticed) {
+          this.birthdayAdjustedNoticed = true;
           this.config.onBirthdayAdjusted(wallet.birthday);
         }
       }

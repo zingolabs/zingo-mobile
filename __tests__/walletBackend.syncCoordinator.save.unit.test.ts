@@ -23,6 +23,7 @@ import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { mockWalletBackendConfig } from '../__mocks__/dataMocks/mockWalletBackendConfig';
 
 const mockedDoSave = RPCModule.doSave as jest.Mock;
+const mockedBridge = RPCModule as unknown as Record<string, jest.Mock>;
 const mockedSetConfigWalletToProd =
   RPCModule.setConfigWalletToProdProcess as jest.Mock;
 
@@ -91,4 +92,25 @@ describe('SyncCoordinator.runTaskPromises', () => {
     // The raw bridge rejects; only the seam classifies and contains that.
     expect(doSaveSeam).toHaveBeenCalledTimes(1);
   });
+});
+
+test('Tests that a sync tick does not read the seed when it fetches the wallet data', async () => {
+  const fetchWalletBirthdaySeedUfvk = jest.fn().mockResolvedValue(undefined);
+  const coordinator = coordinatorWith({
+    getWalletSaveRequired: jest.fn().mockResolvedValue(true),
+    fetchWalletHeight: jest.fn().mockResolvedValue(undefined),
+    fetchWalletBirthdaySeedUfvk,
+    fetchInfoAndServerHeight: jest.fn().mockResolvedValue(undefined),
+    fetchAddresses: jest.fn().mockResolvedValue(undefined),
+    fetchTotalBalance: jest.fn().mockResolvedValue(undefined),
+    fetchTandZandOValueTransfers: jest.fn().mockResolvedValue(undefined),
+    fetchTandZandOMessages: jest.fn().mockResolvedValue(undefined),
+  });
+  coordinator.walletConfigPerformanceLevel = RPCPerformanceLevelEnum.High;
+  mockedDoSave.mockResolvedValue(true);
+
+  await coordinator.runTaskPromises();
+
+  expect(fetchWalletBirthdaySeedUfvk).not.toHaveBeenCalled();
+  expect(mockedBridge.getSeedInfo).not.toHaveBeenCalled();
 });
