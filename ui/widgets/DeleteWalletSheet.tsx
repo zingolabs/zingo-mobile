@@ -1,8 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { forwardRef, useCallback, useRef } from 'react';
+import React, { forwardRef, useCallback, useEffect, useRef } from 'react';
 import { Pressable, View } from 'react-native';
 import Animated, {
   Easing,
+  ReduceMotion,
   cancelAnimation,
   runOnJS,
   useAnimatedStyle,
@@ -49,6 +50,9 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
     const progress = useSharedValue(0);
     const pulse = useSharedValue(1);
     const done = useRef(false);
+    const settle = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+    useEffect(() => () => clearTimeout(settle.current), []);
 
     const dismiss = useCallback(() => {
       (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss();
@@ -63,7 +67,7 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
         withTiming(0.97, { duration: PULSE_MS / 2, easing: ease.spring }),
         withTiming(1, { duration: PULSE_MS / 2, easing: ease.spring }),
       );
-      setTimeout(() => {
+      settle.current = setTimeout(() => {
         dismiss();
         onConfirmed();
       }, SETTLE_MS);
@@ -77,7 +81,11 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
       const remaining = duration.hold * (1 - progress.value);
       progress.value = withTiming(
         1,
-        { duration: remaining, easing: Easing.linear },
+        {
+          duration: remaining,
+          easing: Easing.linear,
+          reduceMotion: ReduceMotion.Never,
+        },
         finished => {
           if (finished) {
             runOnJS(complete)();

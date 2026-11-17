@@ -128,7 +128,6 @@ export class SyncCoordinator {
       if (
         this.dataService.getWalletSaveRequiredLock ||
         this.dataService.fetchWalletHeightLock ||
-        this.dataService.fetchWalletBirthdaySeedUfvkLock ||
         this.dataService.fetchInfoAndServerHeightLock ||
         this.dataService.fetchAddressesLock ||
         this.dataService.fetchTotalBalanceLock ||
@@ -144,7 +143,6 @@ export class SyncCoordinator {
       } else {
         taskPromises.push(this.fetchSyncPoll());
         taskPromises.push(this.dataService.fetchWalletHeight());
-        taskPromises.push(this.dataService.fetchWalletBirthdaySeedUfvk());
         taskPromises.push(this.dataService.fetchInfoAndServerHeight());
         taskPromises.push(this.dataService.fetchAddresses());
         taskPromises.push(this.dataService.fetchTotalBalance());

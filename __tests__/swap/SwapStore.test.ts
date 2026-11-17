@@ -245,19 +245,40 @@ describe('SwapStore corruption', () => {
     expect(disk.get('swap:records:wallet-aaa')).toBe('[]');
   });
 
-  // A read that fails is different from a bucket with no records in it, and
-  // the store must not let a swap in flight vanish from the history because a
-  // single read went wrong. It answers empty for that read and leaves the
-  // stored records where they are.
-  it('leaves the records on disk when a read fails', async () => {
+  it('Tests that readAll rejects when storage fails to read. The records stay on disk.', async () => {
     await SwapStore.bindToWallet('wallet-aaa');
     await SwapStore.upsert(makeRecord('rec-1'));
     const stored = disk.get('swap:records:wallet-aaa');
 
     mockStorage.getItem.mockRejectedValueOnce(new Error('storage unavailable'));
-    expect(await SwapStore.readAll()).toEqual([]);
+    await expect(SwapStore.readAll()).rejects.toThrow('storage unavailable');
 
     expect(disk.get('swap:records:wallet-aaa')).toBe(stored);
+  });
+
+  it('Tests that a write keeps the stored records when its read fails.', async () => {
+    await SwapStore.bindToWallet('wallet-aaa');
+    await SwapStore.upsert(makeRecord('rec-1'));
+    const stored = disk.get('swap:records:wallet-aaa');
+
+    mockStorage.getItem.mockRejectedValueOnce(new Error('storage unavailable'));
+    await expect(SwapStore.upsert(makeRecord('rec-2'))).rejects.toThrow(
+      'storage unavailable',
+    );
+
+    expect(disk.get('swap:records:wallet-aaa')).toBe(stored);
+    expect((await SwapStore.readAll()).map(r => r.recordId)).toEqual(['rec-1']);
+  });
+
+  it('Tests that a bind holds when its read fails. Later reads reach the bucket.', async () => {
+    await SwapStore.bindToWallet('wallet-aaa');
+    await SwapStore.upsert(makeRecord('rec-1'));
+    await SwapStore.unbind();
+
+    mockStorage.getItem.mockRejectedValueOnce(new Error('storage unavailable'));
+    await SwapStore.bindToWallet('wallet-aaa');
+
+    expect((await SwapStore.readAll()).map(r => r.recordId)).toEqual(['rec-1']);
   });
 });
 

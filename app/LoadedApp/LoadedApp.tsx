@@ -305,19 +305,18 @@ export default function LoadedApp(props: LoadedAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
       }
       if (settings.server) {
-        // Offline has no chain. Normalize any residual chainName to the empty
-        // sentinel so a stale value never reaches the wallet open (the real
-        // chain is derived from the wallet). Persist it only when we actually
-        // cleared a residual, so we don't rewrite on every boot.
-        const residual =
+        // Offline carries the open wallet's chain, the one onboarding shows
+        // next time.
+        const stale =
           settings.server.kind === 'offline' &&
-          settings.server.chainName !== ChainNameEnum.noneChainName;
-        const normalizedServer = residual
-          ? offlineServer(ChainNameEnum.noneChainName)
+          !!walletChainName &&
+          settings.server.chainName !== walletChainName;
+        const normalizedServer = stale
+          ? offlineServer(walletChainName)
           : settings.server;
         setServer(normalizedServer);
         setSelectServer(settings.selectServer);
-        if (residual) {
+        if (stale) {
           await SettingsFileImpl.writeServer(
             normalizedServer,
             settings.selectServer,

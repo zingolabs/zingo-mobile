@@ -1,8 +1,6 @@
-import * as RNFS from 'react-native-fs';
-
+import { readAppFile, writeAppFile } from '@app/services/appFiles';
 import {
   ChainNameEnum,
-  GlobalConst,
   SelectServerEnum,
   ServerType,
   ServerUrisType,
@@ -67,10 +65,6 @@ const decodeServer = (
 };
 
 export default class SettingsFileImpl {
-  static async getFileName() {
-    return RNFS.DocumentDirectoryPath + '/settings.json';
-  }
-
   // Writes run one at a time. Every write is a read-modify-write of the
   // same file, so two of them in flight both rebuild it from the contents
   // they read before either landed, and whichever finishes last drops the
@@ -99,16 +93,11 @@ export default class SettingsFileImpl {
 
   private static async writePatch(patch: Partial<SettingsWire>): Promise<void> {
     const write = this.writeQueue.then(async () => {
-      const fileName = await this.getFileName();
       const settings = await this.readWire();
       const newSettings: SettingsWire = { ...settings, ...patch };
 
       try {
-        await RNFS.writeFile(
-          fileName,
-          JSON.stringify(newSettings),
-          GlobalConst.utf8,
-        );
+        await writeAppFile('settings.json', JSON.stringify(newSettings));
       } catch (err) {
         // A settings write that cannot land must not break the caller, and
         // must not wedge the queue for every write after it either.
@@ -128,9 +117,8 @@ export default class SettingsFileImpl {
 
   private static async readWire(): Promise<SettingsWire> {
     try {
-      const fileName = await this.getFileName();
-      const fileExits: boolean = await RNFS.exists(fileName);
-      if (!fileExits) {
+      const file = await readAppFile('settings.json');
+      if (file.kind === 'missing') {
         console.log('settings read file: The file does not exists');
         const settings: SettingsWire = {
           firstInstall: true,
@@ -139,9 +127,7 @@ export default class SettingsFileImpl {
         return settings;
       }
 
-      const settings: SettingsWire = await JSON.parse(
-        (await RNFS.readFile(fileName, GlobalConst.utf8)).toString(),
-      );
+      const settings: SettingsWire = JSON.parse(file.text);
       // If server as string is found, I need to convert to: ServerWire
       // if not, I'm losing the value
       if (!settings.hasOwnProperty(SettingsNameEnum.server)) {
@@ -158,10 +144,7 @@ export default class SettingsFileImpl {
         } else {
           if (settings.server.uri && !settings.server.chainName) {
             // Only repair a REAL server (non-empty uri) that is missing its
-            // chain. An offline server (uri '') legitimately has an empty
-            // chainName — Offline has no chain; the real one is derived from
-            // the wallet at open time. Forcing mainnet here broke testnet
-            // wallets going Offline.
+            // chain. A chainless offline server is LoadingApp's to settle.
             settings.server = {
               uri: settings.server.uri,
               chainName: ChainNameEnum.mainChainName,
