@@ -10,6 +10,11 @@ jest.mock('react-native', () => {
     walletBackupExists: jest.fn(() => 'false'),
     restoreExistingWalletBackup: jest.fn(() => 'true'),
     replaceWalletWithBackup: jest.fn(() => 'true'),
+    walletsInfo: jest.fn(() => '{ "active": null, "wallets": [] }'),
+    updateWalletMetaProcess: jest.fn(() => '{}'),
+    loadWalletProcess: jest.fn(() => '{}'),
+    deleteWalletProcess: jest.fn(() => 'true'),
+    diskSpaceInfo: jest.fn(() => '{ "free": 0, "largest": 0 }'),
     getValueTransfersList: jest.fn(
       () => '{ "value_transfers": [], "total": 0 }',
     ),
