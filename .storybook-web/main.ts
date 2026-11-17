@@ -129,10 +129,6 @@ const main: StorybookConfig = {
         ),
       },
       {
-        find: 'react-native-fs',
-        replacement: path.resolve(__dirname, './shims/react-native-fs.ts'),
-      },
-      {
         find: 'react-native-linear-gradient',
         replacement: path.resolve(__dirname, './shims/linearGradient.tsx'),
       },

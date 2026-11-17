@@ -17,7 +17,6 @@ test('Tests that a transfers fetch asked for while one runs reads the list again
       server: mockOfflineServer,
     }),
   );
-  service.onSyncError = jest.fn();
 
   // The running fetch reads the list before the send lands; the one after it sees the send.
   let releaseFirst: (value: string) => void = () => {};

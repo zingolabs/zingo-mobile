@@ -58,7 +58,6 @@ import {
   hasRecoveryWalletInfo,
   saveRecoveryWalletInfo,
 } from '@app/services/recoveryWalletInfo';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
   CommonActions,
@@ -71,8 +70,6 @@ import { sendEmail } from '@app/services/sendEmail';
 import SaveSheet from '@ui/widgets/SaveSheet';
 import Switch from '@ui/primitives/Switch';
 import { ChevronRight } from '@ui/primitives/Icons/Chevron';
-import { RadioOffIcon } from '@ui/primitives/Icons/RadioOffIcon';
-import { RadioOnIcon } from '@ui/primitives/Icons/RadioOnIcon';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { useCompact } from '@app/hooks/useCompact';
@@ -82,8 +79,7 @@ type Options = {
   text: string;
 };
 
-type SettingName =
-  'language' | 'privacy' | 'biometrics' | 'performance' | 'blockexplorer';
+type SettingName = 'language' | 'privacy' | 'biometrics' | 'blockexplorer';
 
 const fill = (text: string, values: Record<string, string>) =>
   Object.entries(values).reduce((s, [k, v]) => s.split(`{${k}}`).join(v), text);
@@ -95,7 +91,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   const {
     setLanguageOption,
     setBiometricsOption,
-    setPerformanceLevelOption,
     setBlockExplorerOption,
     restoreBackup,
     translate,
@@ -104,7 +99,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
     addLastSnackbar,
     biometrics: biometricsContext,
     mixnetView,
-    performanceLevel: performanceLevelContext,
     blockExplorer: blockExplorerContext,
     readOnly,
     server,
@@ -126,12 +120,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   let PRIVACYS: Options[] = [];
   if (typeof privacysArray === 'object') {
     PRIVACYS = privacysArray as Options[];
-  }
-
-  const performanceLevelsArray = translate('settings.performancelevels');
-  let PERFORMANCELEVELMENU: Options[] = [];
-  if (typeof performanceLevelsArray === 'object') {
-    PERFORMANCELEVELMENU = performanceLevelsArray as Options[];
   }
 
   const blockExplorersArray = translate('settings.blockexplorers');
@@ -159,8 +147,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   const [language, setLanguage] = useState<LanguageEnum>(languageContext);
   const [privacy, setPrivacy] = useState<boolean>(privacyContext);
   const [biometrics, setBiometrics] = useState<boolean>(biometricsContext);
-  const [performanceLevel, setPerformanceLevel] =
-    useState<RPCPerformanceLevelEnum>(performanceLevelContext);
   const [blockExplorer, setBlockExplorer] =
     useState<BlockExplorerEnum>(blockExplorerContext);
 
@@ -277,7 +263,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
       languageContext === language &&
       privacyContext === privacy &&
       biometricsContext === biometrics &&
-      performanceLevelContext === performanceLevel &&
       blockExplorerContext === blockExplorer
     ) {
       setDisabledButton(true);
@@ -289,8 +274,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
     languageContext,
     privacy,
     privacyContext,
-    performanceLevel,
-    performanceLevelContext,
     blockExplorer,
     blockExplorerContext,
     biometrics,
@@ -313,7 +296,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
       ['language', languageContext !== language],
       ['privacy', privacyContext !== privacy],
       ['biometrics', biometricsContext !== biometrics],
-      ['performance', performanceLevelContext !== performanceLevel],
       ['blockexplorer', blockExplorerContext !== blockExplorer],
     ] as const
   )
@@ -389,9 +371,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
       if (biometricsContext !== biometrics) {
         await setBiometricsOption(biometrics);
       }
-      if (performanceLevelContext !== performanceLevel) {
-        await setPerformanceLevelOption(performanceLevel);
-      }
       if (blockExplorerContext !== blockExplorer) {
         await setBlockExplorerOption(blockExplorer);
       }
@@ -463,51 +442,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const optionsRadio = (
-    DATA: Options[],
-    setOption: React.Dispatch<React.SetStateAction<string | boolean>>,
-    typeOption: StringConstructor | BooleanConstructor,
-    valueOption: string | boolean,
-    label: string, // in lowercase to match with the translation json files.
-  ) => {
-    return DATA.map(item => {
-      const infoSection = `${label}-${item.value}`;
-      return (
-        <View key={'view-' + item.value}>
-          <View style={{ justifyContent: 'center', minHeight: rowMinHeight }}>
-            <InfoTooltip
-              testID={`settings.${infoSection}-info`}
-              label={
-                translate(`settings.value-${label}-${item.value}`) as string
-              }
-              text={item.text}
-              open={openInfoSection === infoSection}
-              onToggle={open => setOpenInfoSection(open ? infoSection : null)}
-              alignStart
-            >
-              <Pressable
-                kind="row"
-                testID={`settings.${label}-${item.value}`}
-                disabled={disabled}
-                style={{ flexDirection: 'row', alignItems: 'center' }}
-                onPress={() => setOption(typeOption(item.value))}
-              >
-                {typeOption(item.value) === valueOption ? (
-                  <RadioOnIcon size={iconSizeMd} color={colors.fgAccent} />
-                ) : (
-                  <RadioOffIcon size={iconSizeMd} color={colors.fgMuted} />
-                )}
-                <Text variant="body" style={{ marginLeft: space12 }}>
-                  {translate(`settings.value-${label}-${item.value}`) as string}
-                </Text>
-              </Pressable>
-            </InfoTooltip>
-          </View>
-        </View>
-      );
-    });
-  };
-
   const languageSelectRef = useRef<BottomSheetModal>(null);
   const blockExplorerSelectRef = useRef<BottomSheetModal>(null);
   useDismissSheetsOnBlur();
@@ -527,19 +461,22 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   };
 
   /** A section: its label over one card that holds its rows. */
+  const sectionTitle = (key: string) => (
+    <Text
+      variant="caption"
+      tone="muted"
+      style={{
+        fontWeight: '600',
+        textTransform: 'uppercase',
+        marginBottom: space8,
+      }}
+    >
+      {translate(key) as string}
+    </Text>
+  );
   const section = (key: string, rows: React.ReactNode) => (
     <View style={{ marginHorizontal: space20, marginTop: gap(space24) }}>
-      <Text
-        variant="caption"
-        tone="muted"
-        style={{
-          fontWeight: '600',
-          textTransform: 'uppercase',
-          marginBottom: space8,
-        }}
-      >
-        {translate(key) as string}
-      </Text>
+      {sectionTitle(key)}
       <Card flush>{rows}</Card>
     </View>
   );
@@ -846,25 +783,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
           {/* SECTION: Developer */}
           {showDeveloperOptions && (
             <>
-              {section(
-                'settings.section-developer',
-                <View
-                  style={{ paddingHorizontal: space16, paddingTop: space12 }}
-                >
-                  <Text variant="bodyStrong">
-                    {translate('settings.performancelevel-title') as string}
-                  </Text>
-                  {optionsRadio(
-                    PERFORMANCELEVELMENU,
-                    setPerformanceLevel as React.Dispatch<
-                      React.SetStateAction<string | boolean>
-                    >,
-                    String,
-                    performanceLevel,
-                    'performancelevel',
-                  )}
-                </View>,
-              )}
+              <View
+                style={{ marginHorizontal: space20, marginTop: gap(space24) }}
+              >
+                {sectionTitle('settings.section-developer')}
+              </View>
               <View
                 style={{ marginHorizontal: space20, marginBottom: space20 }}
               >

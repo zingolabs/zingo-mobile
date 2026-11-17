@@ -32,6 +32,7 @@ export {
   getTotalValueToAddress,
   getVersionInfo,
   getWalletKind,
+  readWalletKind,
   getZecPrice,
   isWalletAddress,
   loadExistingWallet,

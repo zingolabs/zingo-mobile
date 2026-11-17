@@ -885,3 +885,72 @@ describe('SwapPoller on an expired Maya purchase Midgard finds a payment for', (
     expect(upsert.mock.calls[0][0].lateDepositAtMs).toBeUndefined();
   });
 });
+
+describe('SwapPoller one walk at a time', () => {
+  const pending = (recordId: string, hashChar: string) =>
+    makeRecord({
+      recordId,
+      status: SwapStatusEnum.Pending,
+      broadcast: {
+        status: BroadcastStatusEnum.Broadcasted,
+        txId: hashChar.repeat(64),
+      },
+    });
+
+  /** A `/track` that answers only when the test says so. */
+  const holdTrack = (track: jest.Mock) => {
+    const answers: Array<() => void> = [];
+    track.mockImplementation(
+      () =>
+        new Promise<TrackResponseType>(resolve => {
+          answers.push(() => resolve({ status: 'PENDING' }));
+        }),
+    );
+    return answers;
+  };
+
+  const flush = async () => {
+    for (let i = 0; i < 10; i += 1) {
+      await Promise.resolve();
+    }
+  };
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('Tests that a tick does not ask /track again when the interval fires while the last walk is slow', async () => {
+    jest.useFakeTimers();
+    const { poller, track } = harnessFor([pending('rec-1', 'd')]);
+    const answers = holdTrack(track);
+    poller.start();
+    await flush();
+    expect(track).toHaveBeenCalledTimes(1);
+
+    jest.advanceTimersByTime(10_000);
+    await flush();
+    const manual = poller.tickOnce();
+    await flush();
+    expect(track).toHaveBeenCalledTimes(1);
+
+    answers[0]();
+    await manual;
+    poller.stop();
+  });
+
+  it('Tests that a walk in flight polls no further record when the poller stops', async () => {
+    const { poller, track } = harnessFor([
+      pending('rec-1', 'e'),
+      pending('rec-2', 'f'),
+    ]);
+    const answers = holdTrack(track);
+    poller.start();
+    await flush();
+    expect(track).toHaveBeenCalledTimes(1);
+
+    poller.stop();
+    answers[0]();
+    await flush();
+    expect(track).toHaveBeenCalledTimes(1);
+  });
+});

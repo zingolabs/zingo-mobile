@@ -190,6 +190,16 @@ export function useSwapForm({
   const [refreshedAtMs, setRefreshedAtMs] = useState<number>(0);
   const [nowMs, setNowMs] = useState<number>(() => Date.now());
   const [quoting, setQuoting] = useState<boolean>(false);
+  /**
+   * Each quote request takes a number, and clearing the quote takes one too:
+   * an answer that is no longer the latest question is dropped, so a quote
+   * for the previous coin or amount never lands on the form.
+   */
+  const quoteGenRef = useRef<number>(0);
+  const dropQuoteInFlight = useCallback(() => {
+    quoteGenRef.current += 1;
+    setQuoting(false);
+  }, []);
   const [quoteError, setQuoteError] = useState<string>('');
   const [quoteNotice, setQuoteNotice] = useState<QuoteNotice | null>(null);
   const shownQuoteRef = useRef<{
@@ -289,6 +299,7 @@ export function useSwapForm({
   // Only the changes that make a shown quote meaningless clear it. The
   // amount, the slippage and the address re-quote in place instead.
   useEffect(() => {
+    dropQuoteInFlight();
     setRoutes(null);
     setUnavailable([]);
     setChosenRouteId('');
@@ -297,7 +308,7 @@ export function useSwapForm({
     setQuoteContext(null);
     setReviewed(null);
     setQuoteError('');
-  }, [direction, selectedToken]);
+  }, [direction, selectedToken, dropQuoteInFlight]);
 
   // A swap intent is a direction and an asset. One address across intents
   // would let a provider tie two unrelated swaps to one identifier.
@@ -444,6 +455,7 @@ export function useSwapForm({
       return;
     }
     const timer = setTimeout(() => {
+      dropQuoteInFlight();
       setRoutes(null);
       setUnavailable([]);
       setChosenRouteId('');
@@ -454,7 +466,7 @@ export function useSwapForm({
       setQuoteAttemptFailed(false);
     }, QUOTE_DEBOUNCE_MS);
     return () => clearTimeout(timer);
-  }, [amountValid]);
+  }, [amountValid, dropQuoteInFlight]);
 
   const canQuote = !!swapService && !!selectedToken && amountValid;
   const addressReady = activeAddress.trim().length > 0 && addressValid;
@@ -502,6 +514,8 @@ export function useSwapForm({
     if (!swapService || !selectedToken) {
       return;
     }
+    const generation = ++quoteGenRef.current;
+    const stale = () => quoteGenRef.current !== generation;
     setQuoting(true);
     setQuoteError('');
     let questionKey: string | null = null;
@@ -538,6 +552,9 @@ export function useSwapForm({
     };
     try {
       const ephemeral = await deriveEphemeral();
+      if (stale()) {
+        return;
+      }
       const other = tokenToSwapAsset(selectedToken);
       const quoteInput: QuoteInput = {
         sellAsset: isOutbound ? ZEC_ASSET : other,
@@ -553,6 +570,9 @@ export function useSwapForm({
       };
       questionKey = quoteQuestionKey(quoteInput);
       const result = await swapService.quote(quoteInput);
+      if (stale()) {
+        return;
+      }
       const carried = carriedFrom(result.routes);
       const refusedProviders = new Set(
         refusedRef.current.map(row => row.provider),
@@ -629,6 +649,9 @@ export function useSwapForm({
         setRateLimitedUntilMs(now + rateLimitWaitMs(error));
         setNowMs(now);
       }
+      if (stale()) {
+        return;
+      }
       const carried = carriedFrom([]);
       if (carried.length > 0) {
         setQuoteNotice(noticeFor(carried));
@@ -645,7 +668,9 @@ export function useSwapForm({
       setQuoteContext(null);
       setQuoteAttemptFailed(true);
     } finally {
-      setQuoting(false);
+      if (!stale()) {
+        setQuoting(false);
+      }
     }
   }, [
     swapService,
@@ -665,7 +690,6 @@ export function useSwapForm({
     if (
       !canQuote ||
       reviewing ||
-      quoting ||
       rateLimitedUntilMs > 0 ||
       quoteAttemptFailed
     ) {
@@ -890,6 +914,7 @@ export function useSwapForm({
 
   // A completed swap leaves the form empty: the next swap is a new decision.
   const finish = useCallback(() => {
+    dropQuoteInFlight();
     setReviewed(null);
     setRoutes(null);
     setUnavailable([]);
@@ -900,7 +925,7 @@ export function useSwapForm({
     setDestinationAddress('');
     setRefundAddress('');
     setEphemeralAddress('');
-  }, []);
+  }, [dropQuoteInFlight]);
 
   return {
     direction,

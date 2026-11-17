@@ -66,6 +66,10 @@ interface RPCModuleAPI {
   walletFileRecoveryInfo(): Promise<string>;
   walletChainInfo(): Promise<string>;
   deleteExistingWallet(): Promise<string>;
+  // The app's own JSON files in its private folder; see appFiles.
+  appFileExists(name: string): Promise<boolean>;
+  readAppFile(name: string): Promise<string>;
+  writeAppFile(name: string, text: string): Promise<boolean>;
   // The save results are trimodal across the bridges: Android resolves a
   // boolean, iOS resolves "true"/"false", and both resolve "Error: ..."
   // prose from their catch blocks (zingo-mobile#1151). Classify with
