@@ -251,10 +251,19 @@ class WalletStoreTest {
     }
 
     @Test
-    fun `Tests that the info reports no active wallet as null`() {
-        committed("Wallet 1")
-
+    fun `Tests that the info reports no active wallet as null when there is none`() {
         assertTrue(WalletStore.info(base).isNull("active"))
+    }
+
+    @Test
+    fun `Tests that the first wallet is the active one when the pointer names none`() {
+        val first = committed("Wallet 1")
+        val second = committed("Wallet 2")
+        WalletStore.setActive(base, second)
+
+        WalletStore.delete(base, second)
+
+        assertEquals(first, WalletStore.active(base))
     }
 
     @Test

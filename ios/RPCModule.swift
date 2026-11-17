@@ -205,10 +205,15 @@ enum WalletStore {
     readJSON("\(root(base))/\(activeName)")?["id"] as? String ?? ""
   }
 
-  /// The wallet the app opens, when its folder is committed.
-  static func active(_ base: String) -> String? {
+  /// The wallet the pointer names, when its folder is committed.
+  private static func pointed(_ base: String) -> String? {
     let id = pointer(base)
     return !id.isEmpty && isCommitted(base, id) ? id : nil
+  }
+
+  /// The wallet the app opens: the one the pointer names, or the first wallet when it names none, as after the open one is deleted.
+  static func active(_ base: String) -> String? {
+    pointed(base) ?? list(base).first?.id
   }
 
   static func setActive(_ base: String, _ id: String?) throws {
@@ -342,7 +347,7 @@ enum WalletStore {
       meta["migratedFrom"] = sum
       try writeMeta(base, id, meta)
     }
-    if active && self.active(base) == nil { try setActive(base, id) }
+    if active && pointed(base) == nil { try setActive(base, id) }
     let broken = "\(legacyPath).broken"
     if fm.fileExists(atPath: broken) {
       try? fm.moveItem(atPath: broken, toPath: "\(dir(base, id))/\(legacy).broken")

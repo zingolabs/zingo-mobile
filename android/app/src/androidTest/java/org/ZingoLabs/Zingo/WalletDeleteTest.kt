@@ -129,7 +129,7 @@ class WalletDeleteTest {
     }
 
     @Test
-    fun deletingTheActiveWalletKeepsTheOtherWallets() {
+    fun deletingTheActiveWalletLeavesTheFirstOneActive() {
         val first = folder()
         val second = anActiveWallet()
 
@@ -137,6 +137,7 @@ class WalletDeleteTest {
 
         assertThat(first.exists()).isTrue()
         assertThat(second.exists()).isFalse()
-        assertThat(walletExists()).isEqualTo(false)
+        assertThat(walletExists()).isEqualTo(true)
+        assertThat(WalletStore.active(context.filesDir)).isEqualTo(first.name)
     }
 }

@@ -1242,10 +1242,18 @@ class WalletStoreTests: XCTestCase {
         XCTAssertNotNil(try JSONSerialization.data(withJSONObject: info))
     }
 
-    func testTheInfoReportsNoActiveWalletAsNull() throws {
-        _ = try committed("Wallet 1")
-
+    func testTheInfoReportsNoActiveWalletAsNullWhenThereIsNone() throws {
         XCTAssertTrue(WalletStore.info(base)["active"] is NSNull)
+    }
+
+    func testTheFirstWalletIsTheActiveOneWhenThePointerNamesNone() throws {
+        let first = try committed("Wallet 1")
+        let second = try committed("Wallet 2")
+        try WalletStore.setActive(base, second)
+
+        _ = try WalletStore.delete(base, second)
+
+        XCTAssertEqual(WalletStore.active(base), first)
     }
 
     func testTheLargestWalletIsTheBiggestFileOnDisk() throws {
