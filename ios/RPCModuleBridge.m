@@ -148,6 +148,19 @@ RCT_EXTERN_METHOD(parseAddressInfo:
     (NSString)address 
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(appFileExists:
+    (NSString)name
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(readAppFile:
+    (NSString)name
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(writeAppFile:
+    (NSString)name
+                  text:(NSString)text
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(parseUfvkInfo:
     (NSString)ufvk 
                   resolve:(RCTPromiseResolveBlock)resolve

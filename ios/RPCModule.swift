@@ -313,6 +313,62 @@ class RPCModule: NSObject {
     }
   }
 
+  /// The app's own JSON files in Documents: settings, the address book and
+  /// the background sync report. Only these names are accepted, so the
+  /// bridge can never reach a wallet file or a path outside the folder.
+  static let appFileNames: Set<String> = ["settings.json", "addressbook.json", "background.json"]
+
+  func appFilePath(_ name: String) throws -> String {
+    guard RPCModule.appFileNames.contains(name) else {
+      throw NSError(domain: "RPCModule", code: 1, userInfo: [NSLocalizedDescriptionKey: "Error: [Native] \(name) is not an app file"])
+    }
+    return try getFileName(name)
+  }
+
+  @objc(appFileExists:resolve:reject:)
+  func appFileExists(_ name: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    do {
+      let exists = FileManager.default.fileExists(atPath: try appFilePath(name))
+      DispatchQueue.main.async {
+        resolve(exists)
+      }
+    } catch {
+      DispatchQueue.main.async {
+        reject("Read", error.localizedDescription, error)
+      }
+    }
+  }
+
+  @objc(readAppFile:resolve:reject:)
+  func readAppFile(_ name: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    do {
+      let text = try String(contentsOfFile: appFilePath(name), encoding: .utf8)
+      DispatchQueue.main.async {
+        resolve(text)
+      }
+    } catch {
+      DispatchQueue.main.async {
+        reject("Read", error.localizedDescription, error)
+      }
+    }
+  }
+
+  /// Atomic: a reader, the background task included, sees the old text or
+  /// the new one, never part of it.
+  @objc(writeAppFile:text:resolve:reject:)
+  func writeAppFile(_ name: String, text: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    do {
+      try text.write(toFile: appFilePath(name), atomically: true, encoding: .utf8)
+      DispatchQueue.main.async {
+        resolve(true)
+      }
+    } catch {
+      DispatchQueue.main.async {
+        reject("Write", error.localizedDescription, error)
+      }
+    }
+  }
+
   @objc(walletBackupExists:reject:)
   func walletBackupExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     completePendingSwap()

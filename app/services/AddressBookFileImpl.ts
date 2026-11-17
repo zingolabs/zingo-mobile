@@ -1,6 +1,5 @@
-import * as RNFS from 'react-native-fs';
-
 import { isWalletAddress } from '@app/walletBackend';
+import { readAppFile, writeAppFile } from '@app/services/appFiles';
 import Utils from '@app/utils';
 import { canonicalChainAddress } from '@app/swap';
 
@@ -11,10 +10,6 @@ import {
 } from '@app/AppState';
 
 export default class AddressBookFileImpl {
-  static async getFileName() {
-    return RNFS.DocumentDirectoryPath + '/addressbook.json';
-  }
-
   static async updateColorAndOwnItem(
     label: string,
     address: string,
@@ -175,16 +170,12 @@ export default class AddressBookFileImpl {
   // Read the entire address book
   static async readAddressBook(): Promise<AddressBookFileClass[]> {
     try {
-      const fileName = await this.getFileName();
-      const fileExits: boolean = await RNFS.exists(fileName);
-      if (!fileExits) {
+      const file = await readAppFile('addressbook.json');
+      if (file.kind === 'missing') {
         console.log('address book read file: The file does not exists');
         return [] as AddressBookFileClass[];
       }
-
-      const addressBook: AddressBookFileClass[] = await JSON.parse(
-        (await RNFS.readFile(fileName, GlobalConst.utf8)).toString(),
-      );
+      const addressBook: AddressBookFileClass[] = JSON.parse(file.text);
       return addressBook;
     } catch {
       // The File doesn't exist, so return nothing
@@ -197,12 +188,7 @@ export default class AddressBookFileImpl {
     newAddressBook: AddressBookFileClass[],
   ): Promise<AddressBookFileClass[]> {
     try {
-      const fileName = await this.getFileName();
-      await RNFS.writeFile(
-        fileName,
-        JSON.stringify(newAddressBook),
-        GlobalConst.utf8,
-      );
+      await writeAppFile('addressbook.json', JSON.stringify(newAddressBook));
       return newAddressBook;
     } catch {
       return [] as AddressBookFileClass[];
