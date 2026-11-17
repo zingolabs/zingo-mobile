@@ -2,17 +2,10 @@ package org.ZingoLabs.Zingo
 
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
-/**
- * The app's own JSON files in its private folder: settings, the address book
- * and the background sync report. Only these names are accepted, so the
- * bridge can never reach a wallet file or a path outside the folder.
- *
- * A write goes to a synced temp file renamed onto the target, so a reader,
- * BackgroundSyncWorker included, sees the old text or the new one and never
- * part of it, even when the process dies mid-write.
- */
+/** Reads and atomically replaces the three app JSON files in the private folder, and refuses any other name. */
 object AppFiles {
     val NAMES = setOf("settings.json", "addressbook.json", "background.json")
 
@@ -38,9 +31,12 @@ object AppFiles {
                     out.write(text.toByteArray(Charsets.UTF_8))
                     out.fd.sync()
                 }
-                if (!temp.renameTo(target)) {
-                    throw IOException("Error: could not rename ${temp.name} onto $name")
-                }
+                Files.move(
+                    temp.toPath(),
+                    target.toPath(),
+                    StandardCopyOption.ATOMIC_MOVE,
+                    StandardCopyOption.REPLACE_EXISTING,
+                )
             } finally {
                 temp.delete()
             }
