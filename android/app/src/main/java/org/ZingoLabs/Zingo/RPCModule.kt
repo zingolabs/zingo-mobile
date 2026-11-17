@@ -65,12 +65,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-    private fun writeFile(fileName: String, fileBytes: ByteArray) {
-        val file = applicationContext.openFileOutput(fileName, Context.MODE_PRIVATE)
-        file?.write(fileBytes)
-        file?.close()
-    }
-
     private fun deleteFile(fileName: String): Boolean {
         val file = applicationContext.getFileStreamPath(fileName)
         return file!!.delete()
@@ -337,6 +331,34 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }.settle(promise)
     }
 
+    @ReactMethod
+    fun appFileExists(name: String, promise: Promise) {
+        try {
+            promise.resolve(AppFiles.exists(applicationContext.filesDir, name))
+        } catch (e: Exception) {
+            promise.reject("Read", e.message, e)
+        }
+    }
+
+    @ReactMethod
+    fun readAppFile(name: String, promise: Promise) {
+        try {
+            promise.resolve(AppFiles.read(applicationContext.filesDir, name))
+        } catch (e: Exception) {
+            promise.reject("Read", e.message, e)
+        }
+    }
+
+    @ReactMethod
+    fun writeAppFile(name: String, text: String, promise: Promise) {
+        try {
+            AppFiles.write(applicationContext.filesDir, name, text)
+            promise.resolve(true)
+        } catch (e: Exception) {
+            promise.reject("Write", e.message, e)
+        }
+    }
+
     /** Whether a wallet besides the active one is on disk, which takes the legacy backup's place. */
     @ReactMethod
     fun walletBackupExists(promise: Promise) {
@@ -586,11 +608,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     fun saveBackgroundFile(json: String) {
         try {
-            val fileBytes = json.toByteArray()
-            Log.i("MAIN", "file background size: ${fileBytes.size} bytes")
-
-            // Save file to disk
-            writeFile(BackgroundFileName.value, fileBytes)
+            AppFiles.write(applicationContext.filesDir, BackgroundFileName.value, json)
         } catch (e: Exception) {
             Log.e("MAIN", "[Native] Unexpected error. Couldn't save the background file")
         }

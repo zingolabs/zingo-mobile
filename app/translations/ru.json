@@ -326,24 +326,6 @@
         "text": "Обычный режим, вы сможете увидеть всю информацию на экране."
       }
     ],
-    "performancelevels": [
-      {
-        "value": "Maximum",
-        "text": "For very powerful devices."
-      },
-      {
-        "value": "High",
-        "text": "For devices with a lot of Memory."
-      },
-      {
-        "value": "Medium",
-        "text": "For regular devices."
-      },
-      {
-        "value": "Low",
-        "text": "For old devices."
-      }
-    ],
     "blockexplorers": [
       {
         "value": "Zcashexplorer",
@@ -372,7 +354,6 @@
     "unsaved-name-language": "язык",
     "unsaved-name-privacy": "конфиденциальность",
     "unsaved-name-biometrics": "биометрическую блокировку",
-    "unsaved-name-performance": "уровень производительности",
     "unsaved-name-blockexplorer": "обозреватель блоков",
     "ismemo": "Вам необходимо выбрать опцию сохранения заметок для загрузки.",
     "isthreshold": "Вам необходимо выбрать порог фильтрации транзакций для сохранения.",
@@ -389,7 +370,6 @@
     "language-title": "Язык",
     "islanguage": "Выберите язык для приложения.",
     "privacy-title": "Скрывать конфиденциальные значения",
-    "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
     "value-language-en": "Английский",
     "value-language-es": "Испанский",
@@ -400,10 +380,6 @@
     "value-chainname-main": "Основная сеть",
     "value-chainname-test": "Тестовая сеть",
     "value-chainname-regtest": "Регтест",
-    "value-performancelevel-Maximum": "Maximum",
-    "value-performancelevel-High": "High",
-    "value-performancelevel-Medium": "Medium",
-    "value-performancelevel-Low": "Low",
     "value-blockexplorer-Zcashexplorer": "Zcashexplorer",
     "value-blockexplorer-ZecBlock": "ZecBlock",
     "value-blockexplorer-Zexplorer": "Zexplorer",
@@ -939,6 +915,7 @@
     "detail-remove-unpaid": "Неотправленный обмен будет удалён с этого устройства.",
     "delete": "Удалить",
     "deleted": "Удалено",
+    "delete-error": "Не удалось удалить обмен. Попробуйте ещё раз.",
     "delete-expired-body": "Обмен без депозита будет удалён с этого устройства.",
     "delete-failed-body": "Неудачный обмен будет удалён с этого устройства.",
     "get-new-quote": "Получить новую котировку",

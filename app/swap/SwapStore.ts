@@ -310,15 +310,17 @@ export class SwapStore {
    * After binding, all current subscribers are notified with the freshly-
    * loaded bucket so any reader that called `readAll` before the bind
    * resolved gets the real data via the subscription rather than the
-   * empty placeholder.
+   * empty placeholder. A failed read leaves the binding in place and skips
+   * that notification: the swap service still starts, and the next read or
+   * write reaches the bucket.
    */
   static async bindToWallet(walletId: string): Promise<void> {
     return this.enqueue(async () => {
       currentWalletId = walletId;
-      // Push the current bucket out to subscribers so anyone that read
-      // before the bind sees the real records now.
-      const fresh = await this._readRaw();
-      SwapStore.notify(fresh);
+      const fresh = await this._readRaw().catch(() => undefined);
+      if (fresh) {
+        SwapStore.notify(fresh);
+      }
     });
   }
 
@@ -380,17 +382,15 @@ export class SwapStore {
     return this.clearForWallet(currentWalletId);
   }
 
-  /** Bypasses the queue — only call from within an `enqueue` callback. */
+  /**
+   * Reads the bound bucket, rejecting when storage fails so a
+   * read-modify-write never overwrites records it could not read. Bypasses
+   * the queue — only call from within an `enqueue` callback.
+   */
   private static async _readRaw(): Promise<SwapRecordType[]> {
     if (!currentWalletId) return [];
     const key = storageKeyFor(currentWalletId);
-    let raw: string | null = null;
-    try {
-      raw = await swapStorage.getItem(key);
-    } catch (err) {
-      console.log('SwapStore: read failed, returning empty:', err);
-      return [];
-    }
+    const raw = await swapStorage.getItem(key);
     if (raw === null) return [];
     const parsed = tryParseRecordsArray(raw);
     if (parsed === null) {

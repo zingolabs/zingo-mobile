@@ -43,7 +43,7 @@ import {
   createNewWallet,
   deleteExistingWallet,
   getVersionInfo,
-  getWalletKind,
+  readWalletKind,
   hasRepairableWalletFile,
   loadExistingWallet,
   readWalletChain,
@@ -95,7 +95,6 @@ import { createAlert } from '@app/services/createAlert';
 import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
 import Utils from '@app/utils';
 import { formatInteger } from '@app/utils/formatAmount';
-import { RPCWalletKindType } from '@app/walletBackend/types/RPCWalletKindType';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '@ui/widgets/toastConfig';
 import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
@@ -130,9 +129,8 @@ import { sanitizePaths } from '@app/utils/sanitizePaths';
 import { duration as motionDuration } from '@app/theme/motion';
 
 import { sendEmail } from '@app/services/sendEmail';
-import { RPCWalletKindEnum } from '@app/walletBackend/enums/RPCWalletKindEnum';
 import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { DEFAULT_PERFORMANCE_LEVEL } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import {
   RootParamList,
   LoadedAppNavigationState,
@@ -175,8 +173,6 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(
     SelectServerEnum.auto,
   );
-  const [performanceLevel, setPerformanceLevel] =
-    useState<RPCPerformanceLevelEnum>(RPCPerformanceLevelEnum.Medium);
   const [blockExplorer, setBlockExplorer] = useState<BlockExplorerEnum>(
     BlockExplorerEnum.Zcashexplorer,
   );
@@ -251,23 +247,21 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
       }
       if (settings.server) {
-        // Offline (empty uri) still carries the user's chosen chain: create and
-        // restore derive keys chain-specifically, so onboarding must never face
-        // an empty chain. The wallet-open path ignores this value anyway — it
-        // tries every chain and adopts the one the wallet deserializes under.
-        // Only fall back to mainnet when a chain is genuinely absent (e.g. an
-        // old config persisted before offline carried a chain), and persist
-        // that migration once.
-        const normalizedServer =
-          settings.server.kind === 'offline' && !settings.server.chainName
-            ? offlineServer(ChainNameEnum.mainChainName)
-            : settings.server;
+        // Offline carries a chain for create and restore to derive keys on.
+        // A config saved before offline had one falls back to mainnet.
+        const chainless =
+          settings.server.kind === 'offline' && !settings.server.chainName;
+        const normalizedServer = chainless
+          ? offlineServer(ChainNameEnum.mainChainName)
+          : settings.server;
         setServer(normalizedServer);
         setSelectServer(settings.selectServer);
-        await SettingsFileImpl.writeServer(
-          normalizedServer,
-          settings.selectServer,
-        );
+        if (chainless) {
+          await SettingsFileImpl.writeServer(
+            normalizedServer,
+            settings.selectServer,
+          );
+        }
       } else {
         await SettingsFileImpl.writeServer(server, selectServer);
       }
@@ -282,19 +276,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings(
           SettingsNameEnum.biometrics,
           biometrics,
-        );
-      }
-      if (
-        settings.performanceLevel === RPCPerformanceLevelEnum.High ||
-        settings.performanceLevel === RPCPerformanceLevelEnum.Low ||
-        settings.performanceLevel === RPCPerformanceLevelEnum.Maximum ||
-        settings.performanceLevel === RPCPerformanceLevelEnum.Medium
-      ) {
-        setPerformanceLevel(settings.performanceLevel);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.performanceLevel,
-          performanceLevel,
         );
       }
       if (
@@ -347,7 +328,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         firstLaunchingMessage={firstLaunchingMessage}
         biometrics={biometrics}
         selectServer={selectServer}
-        performanceLevel={performanceLevel}
         blockExplorer={blockExplorer}
       />
     );
@@ -369,7 +349,6 @@ type LoadingAppClassProps = {
   firstLaunchingMessage: LaunchingModeEnum;
   biometrics: boolean;
   selectServer: SelectServerEnum;
-  performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
 };
 
@@ -417,7 +396,6 @@ export class LoadingAppClass extends Component<
       privacy: props.privacy,
       biometrics: props.biometrics,
       selectServer: props.selectServer,
-      performanceLevel: props.performanceLevel,
       blockExplorer: props.blockExplorer,
 
       // state
@@ -875,7 +853,7 @@ export class LoadingAppClass extends Component<
     const result = await loadExistingWallet(
       nativeUri(this.state.server),
       this.state.server.chainName,
-      this.state.performanceLevel,
+      DEFAULT_PERFORMANCE_LEVEL,
       GlobalConst.minConfirmations.toString(),
     );
 
@@ -887,38 +865,17 @@ export class LoadingAppClass extends Component<
         const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(
           result.value,
         );
-        if (!resultJson.error) {
-          // Load the wallet and navigate to the vts screen
-          let readOnly: boolean = false;
-          let orchardPool: boolean = false;
-          let saplingPool: boolean = false;
-          let transparentPool: boolean = false;
-          const walletKindResult = await getWalletKind();
-          const walletKindStr: string = walletKindResult.ok
-            ? walletKindResult.value
-            : walletKindResult.error.message;
-          try {
-            const walletKindJSON: RPCWalletKindType =
-              await JSON.parse(walletKindStr);
-            console.log('KIND... JSON', walletKindJSON);
-            // there are 4 kinds:
-            // 1. seed
-            // 2. USK
-            // 3. UFVK - watch-only wallet
-            // 4. No keys - watch-only wallet (possibly an error)
-
-            if (
-              walletKindJSON.kind ===
-                RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
-              walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound
-            ) {
-              readOnly = true;
-            } else {
-              readOnly = false;
-            }
-            orchardPool = walletKindJSON.orchard;
-            saplingPool = walletKindJSON.sapling;
-            transparentPool = walletKindJSON.transparent;
+        if (resultJson.error) {
+          error = true;
+          errorText = resultJson.error;
+        } else {
+          const kind = await readWalletKind();
+          if (!kind.ok) {
+            error = true;
+            errorText = kind.error.message;
+          } else {
+            const { readOnly, orchardPool, saplingPool, transparentPool } =
+              kind.value;
             await recordWalletKind(readOnly ? 'ufvk' : 'seed');
             // store this wallet's recovery info in the Keychain/Keystore; if
             // it can't be read, whatever the device holds is removed.
@@ -930,35 +887,24 @@ export class LoadingAppClass extends Component<
               transparentPool,
               actionButtonsDisabled: false,
             });
-          } catch {
-            this.setState({
+            // if the App is restoring another wallet backup...
+            // needs to recalculate the Address Book.
+            const newWallet =
+              this.props.session.kind === 'boot' &&
+              this.props.session.newWallet;
+            this.navigateToLoadedApp(
               readOnly,
               orchardPool,
               saplingPool,
               transparentPool,
-              actionButtonsDisabled: false,
-            });
-            this.addLastSnackbar(walletKindStr);
+              newWallet,
+              this.state.firstLaunchingMessage,
+              // The wallet's own chain, surfaced by the native result (reliable
+              // even Offline). The server's chain is only a pre-rebuild fallback.
+              (resultJson.chain_name as ChainNameEnum) ||
+                this.state.server.chainName,
+            );
           }
-          // if the App is restoring another wallet backup...
-          // needs to recalculate the Address Book.
-          const newWallet =
-            this.props.session.kind === 'boot' && this.props.session.newWallet;
-          this.navigateToLoadedApp(
-            readOnly,
-            orchardPool,
-            saplingPool,
-            transparentPool,
-            newWallet,
-            this.state.firstLaunchingMessage,
-            // The wallet's own chain, surfaced by the native result (reliable
-            // even Offline). The server's chain is only a pre-rebuild fallback.
-            (resultJson.chain_name as ChainNameEnum) ||
-              this.state.server.chainName,
-          );
-        } else {
-          error = true;
-          errorText = resultJson.error;
         }
       } catch (e: unknown) {
         error = true;
@@ -1192,7 +1138,7 @@ export class LoadingAppClass extends Component<
       serverUri,
       birthday,
       this.state.server.chainName,
-      this.state.performanceLevel,
+      DEFAULT_PERFORMANCE_LEVEL,
       GlobalConst.minConfirmations.toString(),
     );
 
@@ -1375,7 +1321,7 @@ export class LoadingAppClass extends Component<
         walletBirthday,
         nativeUri(this.state.server),
         this.state.server.chainName,
-        this.state.performanceLevel,
+        DEFAULT_PERFORMANCE_LEVEL,
         GlobalConst.minConfirmations.toString(),
       );
     } else {
@@ -1384,7 +1330,7 @@ export class LoadingAppClass extends Component<
         walletBirthday,
         nativeUri(this.state.server),
         this.state.server.chainName,
-        this.state.performanceLevel,
+        DEFAULT_PERFORMANCE_LEVEL,
         GlobalConst.minConfirmations.toString(),
       );
     }
@@ -1397,38 +1343,17 @@ export class LoadingAppClass extends Component<
         const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(
           result.value,
         );
-        if (!resultJson.error) {
-          // Load the wallet and navigate to the vts screen
-          let readOnly: boolean = false;
-          let orchardPool: boolean = false;
-          let saplingPool: boolean = false;
-          let transparentPool: boolean = false;
-          const walletKindResult = await getWalletKind();
-          const walletKindStr: string = walletKindResult.ok
-            ? walletKindResult.value
-            : walletKindResult.error.message;
-          console.log('KIND...', walletKindStr);
-          try {
-            const walletKindJSON: RPCWalletKindType =
-              await JSON.parse(walletKindStr);
-            // there are 4 kinds:
-            // 1. seed
-            // 2. USK
-            // 3. UFVK - watch-only wallet
-            // 4. No keys - watch-only wallet (possibly an error)
-
-            if (
-              walletKindJSON.kind ===
-                RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
-              walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound
-            ) {
-              readOnly = true;
-            } else {
-              readOnly = false;
-            }
-            orchardPool = walletKindJSON.orchard;
-            saplingPool = walletKindJSON.sapling;
-            transparentPool = walletKindJSON.transparent;
+        if (resultJson.error) {
+          error = true;
+          errorText = resultJson.error;
+        } else {
+          const kind = await readWalletKind();
+          if (!kind.ok) {
+            error = true;
+            errorText = kind.error.message;
+          } else {
+            const { readOnly, orchardPool, saplingPool, transparentPool } =
+              kind.value;
             // store this wallet's recovery info in the Keychain/Keystore; if
             // it can't be read, whatever the device holds is removed.
             await createUpdateRecoveryWalletInfo(await fetchWallet(readOnly));
@@ -1451,30 +1376,18 @@ export class LoadingAppClass extends Component<
               transparentPool,
               actionButtonsDisabled: false,
             });
-          } catch {
-            this.setState({
+            clearTimeout(showImporting);
+            this.navigateToLoadedApp(
               readOnly,
               orchardPool,
               saplingPool,
               transparentPool,
-              actionButtonsDisabled: false,
-            });
-            this.addLastSnackbar(walletKindStr);
+              true,
+              LaunchingModeEnum.opening,
+              // restore requires a live server → its chain is the wallet's chain.
+              this.state.server.chainName,
+            );
           }
-          clearTimeout(showImporting);
-          this.navigateToLoadedApp(
-            readOnly,
-            orchardPool,
-            saplingPool,
-            transparentPool,
-            true,
-            LaunchingModeEnum.opening,
-            // restore requires a live server → its chain is the wallet's chain.
-            this.state.server.chainName,
-          );
-        } else {
-          error = true;
-          errorText = resultJson.error;
         }
       } catch (e: unknown) {
         error = true;
@@ -1831,7 +1744,6 @@ export class LoadingAppClass extends Component<
       privacy: this.state.privacy,
       biometrics: this.state.biometrics,
       selectServer: this.state.selectServer,
-      performanceLevel: this.state.performanceLevel,
       blockExplorer: this.state.blockExplorer,
 
       // the loading section

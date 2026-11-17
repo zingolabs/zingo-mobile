@@ -20,7 +20,6 @@ import type { ValueTransferType } from '@app/wallet/types';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RescanState } from '@app/walletBackend/utils/syncProgress';
 import { TransparentAddressClass } from '@app/wallet/classes';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 import type { SwapDepositArgs } from '@app/walletBackend/modules/TransactionService';
@@ -126,7 +125,6 @@ export default interface AppContextLoaded {
   setAddressBook: (ab: AddressBookFileClass[]) => void;
   setLanguageOption: (value: LanguageEnum) => Promise<void>;
   setBiometricsOption: (value: boolean) => Promise<void>;
-  setPerformanceLevelOption: (value: RPCPerformanceLevelEnum) => Promise<void>;
   setBlockExplorerOption: (value: BlockExplorerEnum) => Promise<void>;
   // The seed and viewing key screens confirm these; each leaves the wallet
   // section or its server.
@@ -183,12 +181,10 @@ export default interface AppContextLoaded {
   privacy: boolean;
   biometrics: boolean;
   selectServer: SelectServerEnum;
-  // The loaded wallet's OWN chain (main/test/regtest). Reliable even Offline,
-  // unlike `server.chainName` which is empty in Offline mode. Empty when no
-  // wallet / unknown. Used to decide, on a server change, whether to open the
-  // wallet directly or launch a chain switch.
+  // The loaded wallet's OWN chain (main/test/regtest). Empty when no wallet /
+  // unknown. Used to decide, on a server change, whether to open the wallet
+  // directly or launch a chain switch.
   walletChainName: ChainNameEnum;
-  performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
   // The persisted send-route preference; the transport runs either way.
 

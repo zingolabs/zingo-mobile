@@ -20,7 +20,6 @@ import {
 } from '@app/AppState';
 
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 
 export const defaultAppContextLoaded: AppContextLoaded = {
   netInfo: {} as NetInfoType,
@@ -77,7 +76,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   setAddressBook: () => {},
   setLanguageOption: async () => {},
   setBiometricsOption: async () => {},
-  setPerformanceLevelOption: async () => {},
   setBlockExplorerOption: async () => {},
   changeWallet: async () => {},
   restoreBackup: async () => {},
@@ -94,7 +92,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   doRefresh: () => {},
   setZecPrice: () => {},
   zingolibVersion: '',
-  performanceLevel: RPCPerformanceLevelEnum.Medium,
   setPrivacyOption: async () => {},
   seedBackedUp: true,
   seedBackedUpAt: 0,

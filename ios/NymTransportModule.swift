@@ -77,7 +77,8 @@ class NymTransportModule: NSObject {
   /// started with, so a dying predecessor's late report cannot wipe a fresh
   /// replacement. `watched` is weak so the observer the Rust monitor retains
   /// never keeps the handle alive across the FFI boundary.
-  private final class HandleClearingObserver: ProxyDeathObserver {
+  private final class HandleClearingObserver: ProxyDeathObserver, @unchecked Sendable {
+    /// The handle this observer speaks for, read and written under `handleLock`.
     weak var watched: MixnetProxyHandle?
 
     func onDeath(reason: ProxyDeathReason) {
