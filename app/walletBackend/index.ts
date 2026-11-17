@@ -64,6 +64,26 @@ export type {
   ZecPriceOutcome,
 } from './utils/walletUtils';
 export {
+  activeWalletEntry,
+  deleteWallet,
+  diskSpace,
+  hasRoomForWallet,
+  loadWallet,
+  MIN_FREE_BYTES,
+  recordWalletKind,
+  updateWalletMeta,
+  walletsOnDevice,
+} from './utils/walletStore';
+export type {
+  ActiveWallet,
+  DiskSpace,
+  WalletEntry,
+  WalletKind,
+  WalletMeta,
+  WalletMetaPatch,
+  WalletsOnDevice,
+} from './utils/walletStore';
+export {
   hasRepairableWalletFile,
   repairDoubleWrappedWallet,
   repairSucceeded,

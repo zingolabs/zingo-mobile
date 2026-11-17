@@ -86,7 +86,7 @@ import {
 import { serverUris } from '@app/uris';
 import { staticAlternatives, staticServers } from '@app/uris/serverChoice';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
-import { fetchWallet } from '@app/walletBackend';
+import { fetchWallet, recordWalletKind } from '@app/walletBackend';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoadingProvider } from '@app/context';
 import BackgroundFileImpl from '@app/services/BackgroundFileImpl';
@@ -915,6 +915,7 @@ export class LoadingAppClass extends Component<
             orchardPool = walletKindJSON.orchard;
             saplingPool = walletKindJSON.sapling;
             transparentPool = walletKindJSON.transparent;
+            await recordWalletKind(readOnly ? 'ufvk' : 'seed');
             // store this wallet's recovery info in the Keychain/Keystore; if
             // it can't be read, whatever the device holds is removed.
             await createUpdateRecoveryWalletInfo(await fetchWallet(readOnly));

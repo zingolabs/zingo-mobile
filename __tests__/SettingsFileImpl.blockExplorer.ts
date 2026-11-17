@@ -22,6 +22,12 @@ jest.mock('@app/uris', () => ({
   ],
 }));
 
+// No wallet is active: the settings read and write the file alone.
+jest.mock('@app/walletBackend/utils/walletStore', () => ({
+  activeWalletEntry: jest.fn(async () => ({ kind: 'none' })),
+  updateWalletMeta: jest.fn(),
+}));
+
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { BlockExplorerEnum } from '@app/AppState';
 

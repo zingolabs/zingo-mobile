@@ -14,8 +14,14 @@ import {
   remoteServer,
 } from '@app/AppState';
 import { serverUris } from '@app/uris';
-import { isEqual } from 'lodash';
+import { defaultTo, isEmpty, isEqual, omit, pick } from 'lodash';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import {
+  activeWalletEntry,
+  updateWalletMeta,
+  WalletMeta,
+  WalletMetaPatch,
+} from '@app/walletBackend/utils/walletStore';
 
 type ServerWire = { uri: string; chainName: ChainNameEnum };
 type SelectServerWire = SelectServerEnum | 'offline';
@@ -24,6 +30,19 @@ type SettingsWire = Omit<SettingsFileClass, 'server' | 'selectServer'> & {
   selectServer: SelectServerWire;
 };
 type ServerSettings = Pick<SettingsFileClass, 'server' | 'selectServer'>;
+
+/** Settings each wallet keeps in its meta, which a wallet without them reads as these defaults. */
+const WALLET_FLAGS = [
+  'seedBackedUp',
+  'seedBackedUpAt',
+  'viewOnlyNoticeDismissed',
+] as const;
+const WALLET_FIELDS = ['server', 'selectServer', ...WALLET_FLAGS] as const;
+const DEFAULT_FLAGS = {
+  seedBackedUp: false,
+  seedBackedUpAt: 0,
+  viewOnlyNoticeDismissed: false,
+};
 
 const defaultWire = (): ServerWire => ({
   uri: serverUris(() => {})[0].uri,
@@ -97,11 +116,36 @@ export default class SettingsFileImpl {
     return this.writePatch(encodeServer(server, selectServer));
   }
 
+  /**
+   * The server goes to the active wallet's meta and to the file, the default
+   * of the next wallet; the wallet flags go to the meta alone, or to the
+   * file while no wallet is active, for the next read to move them.
+   */
   private static async writePatch(patch: Partial<SettingsWire>): Promise<void> {
+    const walletPart = pick(patch, WALLET_FIELDS);
+    if (!isEmpty(walletPart)) {
+      const entry = await activeWalletEntry();
+      if (entry.kind === 'wallet') {
+        const written = await updateWalletMeta(entry.wallet.id, walletPart);
+        if (written.ok) {
+          patch = omit(patch, WALLET_FLAGS);
+        } else {
+          console.log('settings write meta:', written.error.message);
+        }
+      }
+    }
+    if (isEmpty(patch)) {
+      return;
+    }
+    return this.rewrite(settings => ({ ...settings, ...patch }));
+  }
+
+  private static async rewrite(
+    change: (settings: SettingsWire) => SettingsWire,
+  ): Promise<void> {
     const write = this.writeQueue.then(async () => {
       const fileName = await this.getFileName();
-      const settings = await this.readWire();
-      const newSettings: SettingsWire = { ...settings, ...patch };
+      const newSettings = change(await this.readWire());
 
       try {
         await RNFS.writeFile(
@@ -119,11 +163,62 @@ export default class SettingsFileImpl {
     return write;
   }
 
+  /** The file's settings with the active wallet's own on top, defaulted when the wallet has none. */
   static async readSettings(): Promise<SettingsFileClass> {
-    const { server, selectServer, ...rest } = await this.readWire();
-    return server
-      ? { ...rest, ...decodeServer(server, selectServer) }
-      : (rest as SettingsFileClass);
+    const file = await this.readWire();
+    const entry = await activeWalletEntry();
+    const meta =
+      entry.kind === 'wallet'
+        ? await this.adoptFileFlags(entry.wallet.id, entry.wallet.meta, file)
+        : {};
+    const flags = {
+      ...DEFAULT_FLAGS,
+      ...(entry.kind === 'wallet' ? {} : pick(file, WALLET_FLAGS)),
+      ...pick(meta, WALLET_FLAGS),
+    };
+    const rest = { ...omit(file, ['server', 'selectServer']), ...flags };
+    if (!file.server) {
+      return rest as SettingsFileClass;
+    }
+    const server: ServerWire = meta.server
+      ? {
+          uri: meta.server.uri,
+          chainName:
+            meta.server.chainName || meta.chain || file.server.chainName,
+        }
+      : file.server;
+    const selectServer = defaultTo(
+      meta.selectServer,
+      file.selectServer,
+    ) as SelectServerWire;
+    return {
+      ...rest,
+      ...decodeServer(server, selectServer),
+    } as SettingsFileClass;
+  }
+
+  /** Moves the flags a file still holds into the wallet's meta, once, then drops them from the file. */
+  private static async adoptFileFlags(
+    walletId: string,
+    meta: WalletMeta,
+    file: SettingsWire,
+  ): Promise<WalletMetaPatch> {
+    const inFile = pick(file, WALLET_FLAGS);
+    if (isEmpty(inFile)) {
+      return meta;
+    }
+    const missing = omit(inFile, Object.keys(pick(meta, WALLET_FLAGS)));
+    const written = isEmpty(missing)
+      ? ({ ok: true, value: meta } as const)
+      : await updateWalletMeta(walletId, missing);
+    if (!written.ok) {
+      console.log('settings move flags:', written.error.message);
+      return { ...meta, ...missing };
+    }
+    await this.rewrite(
+      settings => omit(settings, WALLET_FLAGS) as SettingsWire,
+    );
+    return written.value;
   }
 
   private static async readWire(): Promise<SettingsWire> {
@@ -256,15 +351,6 @@ export default class SettingsFileImpl {
         // the wallet hasn't shown the "Meet Ironwood" onboarding yet; it
         // launches once, the first time spendable Orchard funds are detected.
         settings.ironwoodOnboardSeen = false;
-      }
-      if (!settings.hasOwnProperty(SettingsNameEnum.seedBackedUp)) {
-        settings.seedBackedUp = false;
-      }
-      if (!settings.hasOwnProperty(SettingsNameEnum.seedBackedUpAt)) {
-        settings.seedBackedUpAt = 0;
-      }
-      if (!settings.hasOwnProperty(SettingsNameEnum.viewOnlyNoticeDismissed)) {
-        settings.viewOnlyNoticeDismissed = false;
       }
       return settings;
     } catch (err) {
