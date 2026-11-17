@@ -354,6 +354,36 @@ The decline consequence of an app-level trigger: the locked launch screen,
 whose retry asks the gate controller unconditionally. A lock exists only
 while the app runs; a cold start begins unlocked unless a trigger asks.
 
+## Hardened runtime
+
+Vocabulary for the trust the JavaScript runtime extends to npm
+dependencies (zingo-adrs zingo-mobile/0021).
+
+**Hardened JavaScript**:
+The runtime state after `lockdown()` and `hardenIntrinsics()`: every
+language intrinsic is frozen. The host globals are outside it.
+_Avoid_: SES mode, locked runtime
+
+**Host global**:
+A global React Native installs rather than the language: the networking
+family (`fetch`, `XMLHttpRequest`, `WebSocket`, …) and the timers.
+_Avoid_: RN global, polyfill
+
+**Pinned Global**:
+A host global whose binding on `globalThis` cannot change: a read returns
+the value React Native installed, and a write throws, in debug and release
+alike. The pin covers the binding alone; the object behind it stays
+writable. It is complete for the timers and a binding-level defense for
+networking.
+_Avoid_: frozen global, pin (names the Bundle Pin elsewhere in this file)
+
+**Prototype hardening**:
+Freezing the objects behind the networking host globals, such as
+`XMLHttpRequest.prototype`, in debug and release alike. The fourth step of
+the LavaMoat arc. The in-app Network Inspector of the dev menu, which
+rewrites that prototype, is given up for it.
+_Avoid_: deep pin, full pin
+
 ## Decision records
 
 **zingo-adrs**:
