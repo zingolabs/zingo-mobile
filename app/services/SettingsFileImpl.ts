@@ -13,7 +13,6 @@ import {
 } from '@app/AppState';
 import { serverUris } from '@app/uris';
 import { isEqual } from 'lodash';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 
 type ServerWire = { uri: string; chainName: ChainNameEnum };
 type SelectServerWire = SelectServerEnum | 'offline';
@@ -212,7 +211,8 @@ export default class SettingsFileImpl {
       // with the first-view-seed flag only the basic mode ever wrote, and
       // the per-screen security options, now the one biometrics switch, and
       // the switch that kept the recovery info off the device: it is always
-      // stored now, and the first start after the update writes it.
+      // stored now, and the first start after the update writes it, and the
+      // performance level: every wallet syncs at the default one.
       const obsolete = settings as unknown as Record<string, unknown>;
       delete obsolete.donation;
       delete obsolete.firstUpdateWithDonation;
@@ -224,10 +224,7 @@ export default class SettingsFileImpl {
       delete obsolete.basicFirstViewSeed;
       delete obsolete.security;
       delete obsolete.recoveryWalletInfoOnDevice;
-      if (!settings.hasOwnProperty(SettingsNameEnum.performanceLevel)) {
-        // by default medium
-        settings.performanceLevel = RPCPerformanceLevelEnum.Medium;
-      }
+      delete obsolete.performanceLevel;
       if (!settings.hasOwnProperty(SettingsNameEnum.blockExplorer)) {
         // by default Zcashexplorer
         settings.blockExplorer = BlockExplorerEnum.Zcashexplorer;
