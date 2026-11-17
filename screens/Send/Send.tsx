@@ -241,7 +241,9 @@ const Send: React.FunctionComponent<SendProps> = () => {
     defaultUnifiedAddress,
   );
   const memoTooLong = memoBytes > GlobalConst.memoMaxLength;
+  /** Each calculation takes a number; a reply that is no longer the latest is dropped. */
   const feeCalculationGenRef = useRef<number>(0);
+  const spendableGenRef = useRef<number>(0);
   const { decimalSeparator } = getNumberFormatSettings();
   useDismissSheetsOnBlur();
   const sheetSlideStyle = useOptionsPanelSheetSlide();
@@ -300,7 +302,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
       memoPar: string,
       includeUAMemoPar: boolean,
     ): Promise<void> => {
-      const generation = feeCalculationGenRef.current;
+      const generation = ++feeCalculationGenRef.current;
 
       // if no address -> make no sense to run the propose
       if (!addressPar || validAddress !== 1) {
@@ -425,6 +427,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
 
   const calculateSpendableBalance = useCallback(
     async (addressPar: string): Promise<void> => {
+      const generation = ++spendableGenRef.current;
       // if no address -> make no sense to run the propose
       if (!addressPar || validAddress !== 1) {
         defaultValuesSpendableMaxAmount();
@@ -441,6 +444,9 @@ const Send: React.FunctionComponent<SendProps> = () => {
           '=========================================== > spendable balance with address - ',
           Date.now() - start,
         );
+      }
+      if (spendableGenRef.current !== generation) {
+        return;
       }
       if (!runSpendableBalance.ok) {
         // snack with error
@@ -624,8 +630,12 @@ const Send: React.FunctionComponent<SendProps> = () => {
       );
     };
 
+    let cancelled = false;
     if (addressText) {
       getMemoEnabled(addressText, server.chainName).then(r => {
+        if (cancelled) {
+          return;
+        }
         setMemoEnabled(r);
         if (!r) {
           setMemoText('');
@@ -635,13 +645,20 @@ const Send: React.FunctionComponent<SendProps> = () => {
       setMemoEnabled(false);
       setMemoText('');
     }
+    return () => {
+      cancelled = true;
+    };
   }, [server.chainName, addressText]);
 
   useEffect(() => {
+    let cancelled = false;
     if (addressText) {
       // A name is not an address: the lookup above owns what it shows.
       if (!nameQuery) {
         Utils.isValidAddress(addressText, server.chainName).then(r => {
+          if (cancelled) {
+            return;
+          }
           setValidAddress(r.isValid ? 1 : -1);
           if (!r.isValid) {
             setSpendableBalanceLastError('');
@@ -693,6 +710,9 @@ const Send: React.FunctionComponent<SendProps> = () => {
         setValidAmount(0); // empty
       }
     }
+    return () => {
+      cancelled = true;
+    };
   }, [
     decimalSeparator,
     server.chainName,
@@ -777,6 +797,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
 
   const clearState = () => {
     feeCalculationGenRef.current += 1;
+    spendableGenRef.current += 1;
     sendAllRef.current = false;
     setAddressText('');
     setAmountText('');
