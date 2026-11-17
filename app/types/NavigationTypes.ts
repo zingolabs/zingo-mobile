@@ -64,6 +64,10 @@ export type HomeTabParamList = {
 
 // What the loading section hands the wallet section when a wallet opens.
 export type LoadedAppNavigationState = {
+  /** The open wallet: a new id remounts the wallet section, as a switch does. */
+  walletId: string;
+  /** Opened at launch, or picked in Wallets while another was open. */
+  arrival: 'boot' | 'switch';
   readOnly: boolean;
   orchardPool: boolean;
   saplingPool: boolean;

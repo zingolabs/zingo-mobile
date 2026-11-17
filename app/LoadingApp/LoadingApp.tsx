@@ -86,7 +86,8 @@ import {
 import { serverUris } from '@app/uris';
 import { staticAlternatives, staticServers } from '@app/uris/serverChoice';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
-import { fetchWallet, recordWalletKind } from '@app/walletBackend';
+import { fetchWallet, readOpenWalletId } from '@app/walletBackend';
+import { finishWalletOpen } from '@app/services/openWallet';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoadingProvider } from '@app/context';
 import BackgroundFileImpl from '@app/services/BackgroundFileImpl';
@@ -313,7 +314,14 @@ export default function LoadingApp(props: LoadingAppProps) {
     return (
       <LoadingAppClass
         {...props}
-        openWallet={params => setSession({ kind: 'wallet', params })}
+        openWallet={params =>
+          readOpenWalletId().then(walletId =>
+            setSession({
+              kind: 'wallet',
+              params: { ...params, walletId, arrival: 'boot' },
+            }),
+          )
+        }
         openOnboarding={start => setSession({ kind: 'onboarding', start })}
         openBoot={() =>
           setSession({ kind: 'boot', startingApp: true, newWallet: false })
@@ -336,7 +344,9 @@ export default function LoadingApp(props: LoadingAppProps) {
 
 type LoadingAppClassProps = {
   session: LoadingSession;
-  openWallet: (params: LoadedAppNavigationState) => void;
+  openWallet: (
+    params: Omit<LoadedAppNavigationState, 'walletId' | 'arrival'>,
+  ) => void;
   openOnboarding: (start: 'Welcome' | 'OpenError') => void;
   openBoot: () => void;
   openLock: (gate: GateDeclined) => void;
@@ -857,75 +867,41 @@ export class LoadingAppClass extends Component<
       GlobalConst.minConfirmations.toString(),
     );
 
-    let error = false;
-    let errorText = '';
-    if (result.ok && result.value) {
-      try {
-        // here result can have an `error` field for watch-only which is actually OK.
-        const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(
-          result.value,
-        );
-        if (resultJson.error) {
-          error = true;
-          errorText = resultJson.error;
-        } else {
-          const kind = await readWalletKind();
-          if (!kind.ok) {
-            error = true;
-            errorText = kind.error.message;
-          } else {
-            const { readOnly, orchardPool, saplingPool, transparentPool } =
-              kind.value;
-            await recordWalletKind(readOnly ? 'ufvk' : 'seed');
-            // store this wallet's recovery info in the Keychain/Keystore; if
-            // it can't be read, whatever the device holds is removed.
-            await createUpdateRecoveryWalletInfo(await fetchWallet(readOnly));
-            this.setState({
-              readOnly,
-              orchardPool,
-              saplingPool,
-              transparentPool,
-              actionButtonsDisabled: false,
-            });
-            // if the App is restoring another wallet backup...
-            // needs to recalculate the Address Book.
-            const newWallet =
-              this.props.session.kind === 'boot' &&
-              this.props.session.newWallet;
-            this.navigateToLoadedApp(
-              readOnly,
-              orchardPool,
-              saplingPool,
-              transparentPool,
-              newWallet,
-              this.state.firstLaunchingMessage,
-              // The wallet's own chain, surfaced by the native result (reliable
-              // even Offline). The server's chain is only a pre-rebuild fallback.
-              (resultJson.chain_name as ChainNameEnum) ||
-                this.state.server.chainName,
-            );
-          }
-        }
-      } catch (e: unknown) {
-        error = true;
-        errorText = e instanceof Error ? e.message : String(e);
-      }
-    } else {
-      if (!result.ok && result.error.code === 'WalletChainMismatch') {
-        const chain = await readWalletChain();
-        if (chain.ok) {
-          await this.showChainError(chain.value);
-          return;
-        }
-      }
-      error = true;
-      errorText = result.ok ? result.value : result.error.message;
-    }
-    if (error) {
-      await this.walletLoadFailed(
-        Utils.humanizeChainTokens(errorText, this.state.translate),
+    const opened = await finishWalletOpen(result, this.state.server.chainName);
+    if (opened.kind === 'opened') {
+      const { readOnly, orchardPool, saplingPool, transparentPool } = opened;
+      this.setState({
+        readOnly,
+        orchardPool,
+        saplingPool,
+        transparentPool,
+        actionButtonsDisabled: false,
+      });
+      // if the App is restoring another wallet backup...
+      // needs to recalculate the Address Book.
+      const newWallet =
+        this.props.session.kind === 'boot' && this.props.session.newWallet;
+      this.navigateToLoadedApp(
+        readOnly,
+        orchardPool,
+        saplingPool,
+        transparentPool,
+        newWallet,
+        this.state.firstLaunchingMessage,
+        opened.walletChainName,
       );
+      return;
     }
+    if (opened.error.code === 'WalletChainMismatch') {
+      const chain = await readWalletChain();
+      if (chain.ok) {
+        await this.showChainError(chain.value);
+        return;
+      }
+    }
+    await this.walletLoadFailed(
+      Utils.humanizeChainTokens(opened.error.message, this.state.translate),
+    );
   };
 
   // A repairable file is repaired and reloaded once; anything else lands on

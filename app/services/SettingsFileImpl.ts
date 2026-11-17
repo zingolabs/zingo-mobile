@@ -82,6 +82,24 @@ const decodeServer = (
   };
 };
 
+/** The wallet's own server over the file's, the default of a wallet that has none. */
+const walletServer = (
+  meta: WalletMetaPatch,
+  file: SettingsWire,
+): ServerSettings => {
+  const fallback = file.server ?? defaultWire();
+  const server: ServerWire = meta.server
+    ? {
+        uri: meta.server.uri,
+        chainName: meta.server.chainName || meta.chain || fallback.chainName,
+      }
+    : fallback;
+  return decodeServer(
+    server,
+    defaultTo(meta.selectServer, file.selectServer) as SelectServerWire,
+  );
+};
+
 export default class SettingsFileImpl {
   // Writes run one at a time. Every write is a read-modify-write of the
   // same file, so two of them in flight both rebuild it from the contents
@@ -168,21 +186,12 @@ export default class SettingsFileImpl {
     if (!file.server) {
       return rest as SettingsFileClass;
     }
-    const server: ServerWire = meta.server
-      ? {
-          uri: meta.server.uri,
-          chainName:
-            meta.server.chainName || meta.chain || file.server.chainName,
-        }
-      : file.server;
-    const selectServer = defaultTo(
-      meta.selectServer,
-      file.selectServer,
-    ) as SelectServerWire;
-    return {
-      ...rest,
-      ...decodeServer(server, selectServer),
-    } as SettingsFileClass;
+    return { ...rest, ...walletServer(meta, file) } as SettingsFileClass;
+  }
+
+  /** A wallet's server and its remote mode, read from its meta before it opens. */
+  static async serverOf(meta: WalletMetaPatch): Promise<ServerSettings> {
+    return walletServer(meta, await this.readWire());
   }
 
   /** Moves the flags a file still holds into the wallet's meta, once, then drops them from the file. */

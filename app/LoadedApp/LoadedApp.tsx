@@ -4,6 +4,7 @@ import {
   AppState,
   NativeEventSubscription,
   Platform,
+  View,
 } from 'react-native';
 import { useTheme } from '@app/theme';
 import { I18n } from 'i18n-js';
@@ -27,6 +28,7 @@ import {
   doSave,
   isWalletAddress,
   loadExistingWallet,
+  loadWallet,
   parseAddress,
   cancelOldPrivateMigration,
 } from '@app/walletBackend';
@@ -140,6 +142,8 @@ import { RootParamList } from '@app/types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { publishReport } from '@app/services/reportDiagnostics';
+import { finishWalletOpen } from '@app/services/openWallet';
+import type { WalletEntry } from '@app/walletBackend';
 
 const en = require('@app/translations/en.json');
 const es = require('@app/translations/es.json');
@@ -170,6 +174,11 @@ type LoadedAppProps = NativeStackScreenProps<RootParamList, 'Wallet'> & {
 
 // The wallet fades in over the loading screen as it opens.
 const HOME_FADE_MS = 300;
+
+const FILL = { flex: 1 } as const;
+
+/** How long a switch waits for the open wallet's sync to stop before it saves. */
+const SWITCH_STOP_WAIT_MS = 5 * 1000;
 
 /** iOS gives a backgrounded app a few seconds; the save still has to fit. */
 const BACKGROUND_STOP_WAIT_MS = 3 * 1000;
@@ -500,7 +509,11 @@ export default function LoadedApp(props: LoadedAppProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (loading) {
+  if (loading && props.wallet.arrival === 'switch') {
+    // Picked in Wallets: Home stayed while it opened, so no launch screen
+    // now, only the canvas the new Home fades in over.
+    return <View style={[FILL, { backgroundColor: theme.colors.bgCanvas }]} />;
+  } else if (loading) {
     return (
       <Launching
         translate={translate}
@@ -513,6 +526,8 @@ export default function LoadedApp(props: LoadedAppProps) {
       <LoadedAppClass
         {...props}
         leaveWallet={setSession}
+        openWallet={params => setSession({ kind: 'wallet', params })}
+        walletId={props.wallet.walletId}
         pendingLink={pendingLink}
         clearLink={clearLink}
         theme={theme}
@@ -549,6 +564,9 @@ export default function LoadedApp(props: LoadedAppProps) {
 
 type LoadedAppClassProps = {
   leaveWallet: (session: LoadingSession) => void;
+  /** Hands the wallet section to another open wallet, which remounts it. */
+  openWallet: (params: LoadedAppNavigationState) => void;
+  walletId: string;
   // A `zcash:` link waiting for Send, from the session.
   pendingLink: string | undefined;
   clearLink: () => void;
@@ -652,6 +670,7 @@ export class LoadedAppClass extends Component<
       setBiometricsOption: this.setBiometricsOption,
       setBlockExplorerOption: this.setBlockExplorerOption,
       changeWallet: this.onClickOKChangeWallet,
+      switchWallet: this.switchWallet,
       restoreBackup: this.onClickOKRestoreBackup,
       applyPendingServer: this.onClickOKServerWallet,
       cancelPendingServer: this.cancelPendingServer,
@@ -689,6 +708,8 @@ export class LoadedAppClass extends Component<
           ? AppStateStatusEnum.active
           : AppState.currentState,
       pendingServer: { kind: 'none' },
+      walletId: props.walletId,
+      switching: { kind: 'none' },
       scrollToTop: false,
       scrollToBottom: false,
     };
@@ -1725,6 +1746,65 @@ export class LoadedAppClass extends Component<
     this.props.leaveWallet(session);
   };
 
+  /**
+   * Opens another wallet in place: Home stays, faded, while it opens, then
+   * the wallet section remounts on it. One that does not open hands back to
+   * the wallet that was open.
+   */
+  switchWallet = async (entry: WalletEntry): Promise<void> => {
+    if (
+      this.state.switching.kind === 'opening' ||
+      entry.id === this.state.walletId
+    ) {
+      return;
+    }
+    this.setState({ switching: { kind: 'opening', name: entry.meta.name } });
+    await this.rpc.stopSyncProcess(SWITCH_STOP_WAIT_MS);
+    await doSave();
+    await this.rpc.clearTimers();
+    this.keepAwake(false);
+
+    const { server } = await SettingsFileImpl.serverOf(entry.meta);
+    const opened = await finishWalletOpen(
+      await loadWallet(
+        entry.id,
+        nativeUri(server),
+        server.chainName,
+        DEFAULT_PERFORMANCE_LEVEL,
+        GlobalConst.minConfirmations.toString(),
+      ),
+      server.chainName,
+    );
+    if (opened.kind === 'opened') {
+      this.props.openWallet({
+        walletId: entry.id,
+        arrival: 'switch',
+        readOnly: opened.readOnly,
+        orchardPool: opened.orchardPool,
+        saplingPool: opened.saplingPool,
+        transparentPool: opened.transparentPool,
+        newWallet: false,
+        firstLaunchingMessage: LaunchingModeEnum.opening,
+        walletChainName: opened.walletChainName,
+      });
+      return;
+    }
+
+    await loadWallet(
+      this.state.walletId,
+      nativeUri(this.state.server),
+      this.state.server.chainName,
+      DEFAULT_PERFORMANCE_LEVEL,
+      GlobalConst.minConfirmations.toString(),
+    );
+    this.rpc.walletReopened();
+    await this.rpc.configure();
+    this.setState({ switching: { kind: 'none' } });
+    this.addLastSnackbar(
+      `${this.state.translate('loadedapp.readingwallet-error')} ${entry.meta.name}: ${Utils.humanizeChainTokens(opened.error.message, this.state.translate)}`,
+    );
+  };
+
   onClickOKChangeWallet = async () => {
     const changed = await this.rpc.changeWallet();
 
@@ -2052,6 +2132,9 @@ export class LoadedAppClass extends Component<
       setBiometricsOption: this.setBiometricsOption,
       setBlockExplorerOption: this.setBlockExplorerOption,
       changeWallet: this.onClickOKChangeWallet,
+      walletId: this.state.walletId,
+      switchWallet: this.switchWallet,
+      switching: this.state.switching,
       restoreBackup: this.onClickOKRestoreBackup,
       applyPendingServer: this.onClickOKServerWallet,
       cancelPendingServer: this.cancelPendingServer,

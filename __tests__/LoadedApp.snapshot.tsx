@@ -31,6 +31,8 @@ function makeDrawerProps(): NativeStackScreenProps<RootParamList, 'Wallet'> & {
       params: undefined,
     },
     wallet: {
+      walletId: 'w1',
+      arrival: 'boot',
       readOnly: false,
       orchardPool: true,
       saplingPool: true,

@@ -28,6 +28,9 @@ import type {
   SendPermit,
 } from '@app/walletBackend/transforms/sendPermit';
 import { SetServerResult } from './types/SetServerResult';
+import type { WalletEntry } from '@app/walletBackend/utils/walletStore';
+
+export type WalletSwitch = { kind: 'none' } | { kind: 'opening'; name: string };
 
 export default interface AppContextLoaded {
   netInfo: NetInfoType;
@@ -129,6 +132,12 @@ export default interface AppContextLoaded {
   // The seed and viewing key screens confirm these; each leaves the wallet
   // section or its server.
   changeWallet: () => Promise<void>;
+  /** The open wallet's id. */
+  walletId: string;
+  /** Opens another wallet in place, Home staying until it is open. */
+  switchWallet: (entry: WalletEntry) => Promise<void>;
+  /** The wallet being opened in place, named on Home's sync line. */
+  switching: WalletSwitch;
   restoreBackup: () => Promise<void>;
   applyPendingServer: () => Promise<void>;
   cancelPendingServer: () => Promise<void>;
