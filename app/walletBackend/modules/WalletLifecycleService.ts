@@ -8,10 +8,7 @@
  */
 import { GlobalConst, Done, DONE, ErrorKeyed, errorKeyed } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
-import {
-  forgetWalletOnFile,
-  releaseWalletOnFile,
-} from '@app/services/WalletLocalData';
+import { forgetWalletOnFile } from '@app/services/WalletLocalData';
 import { SyncCoordinator } from './SyncCoordinator';
 
 export type WalletLifecycleErrorKey =
@@ -79,11 +76,9 @@ export class WalletLifecycleService {
     let result: string | boolean;
     try {
       // The wallet replaced is lost with its data; the one swapped out
-      // lives on as the backup and keeps its own.
+      // stays on the device and keeps its own.
       if (replace) {
         await forgetWalletOnFile();
-      } else {
-        await releaseWalletOnFile();
       }
       result = replace
         ? await RPCModule.replaceWalletWithBackup()

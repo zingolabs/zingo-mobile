@@ -64,7 +64,7 @@ function tryParseRecordsArray(raw: string): SwapRecordType[] | null {
  * swap-tracking metadata rather than seeds or keys.
  *
  * Storage layout — one key per wallet, holding a single JSON array:
- *   - One `swapStorage` entry under `storageKeyFor(fingerprint)` holding
+ *   - One `swapStorage` entry under `storageKeyFor(walletId)` holding
  *     the whole `SwapRecord[]`. Writes are full-array overwrites.
  *
  * Why one key (vs one per record + an index):
@@ -96,14 +96,14 @@ function tryParseRecordsArray(raw: string): SwapRecordType[] | null {
  */
 /**
  * Storage key for the current wallet's swap bucket. The suffix is the
- * wallet's UFVK-derived fingerprint (see `walletFingerprint.ts`). Different
+ * wallet's id, the name of its folder on the device. Different
  * wallets on the same device write to different keys; that is the privacy
  * boundary.
  */
 export const SWAP_RECORDS_KEY_PREFIX = 'swap:records:';
 
-function storageKeyFor(fingerprint: string): string {
-  return SWAP_RECORDS_KEY_PREFIX + fingerprint;
+function storageKeyFor(walletId: string): string {
+  return SWAP_RECORDS_KEY_PREFIX + walletId;
 }
 
 /**
@@ -112,7 +112,7 @@ function storageKeyFor(fingerprint: string): string {
  * read-paths return empty and write-paths no-op so the activity list never
  * surfaces records from a wallet that is not the current one.
  */
-let currentWalletFingerprint: string | null = null;
+let currentWalletId: string | null = null;
 
 /**
  * Callback fired after every mutation that successfully reaches storage.
@@ -302,7 +302,7 @@ export class SwapStore {
   }
 
   /**
-   * Bind the store to the wallet identified by `fingerprint`. Must be called
+   * Bind the store to the wallet identified by `walletId`. Must be called
    * before any read/write path returns useful data — until then `readAll`
    * yields `[]` and writes are no-ops (the activity list shows nothing
    * rather than risking exposure of records from a different wallet).
@@ -312,9 +312,9 @@ export class SwapStore {
    * resolved gets the real data via the subscription rather than the
    * empty placeholder.
    */
-  static async bindToWallet(fingerprint: string): Promise<void> {
+  static async bindToWallet(walletId: string): Promise<void> {
     return this.enqueue(async () => {
-      currentWalletFingerprint = fingerprint;
+      currentWalletId = walletId;
       // Push the current bucket out to subscribers so anyone that read
       // before the bind sees the real records now.
       const fresh = await this._readRaw();
@@ -337,15 +337,15 @@ export class SwapStore {
    */
   static async unbind(): Promise<void> {
     return this.enqueue(async () => {
-      currentWalletFingerprint = null;
+      currentWalletId = null;
       SwapStore.notify([]);
     });
   }
 
   /** The shielded addresses a wallet's swaps made, removed swaps included. */
-  static async madeAddressesFor(fingerprint: string): Promise<string[]> {
+  static async madeAddressesFor(walletId: string): Promise<string[]> {
     return this.enqueue(async () => {
-      const raw = await swapStorage.getItem(storageKeyFor(fingerprint));
+      const raw = await swapStorage.getItem(storageKeyFor(walletId));
       const records = raw === null ? [] : (tryParseRecordsArray(raw) ?? []);
       return records.flatMap(r => {
         const made = swapAddressOf(r);
@@ -359,12 +359,12 @@ export class SwapStore {
    * `WalletLocalData` on every path that deletes or replaces the wallet
    * file, so its swap records do not outlive it.
    */
-  static async clearForWallet(fingerprint: string): Promise<void> {
+  static async clearForWallet(walletId: string): Promise<void> {
     return this.enqueue(async () => {
       // Overwrite to `[]` (and best-effort remove) so future binds see a
       // clean empty bucket even if the platform rejects the removal.
-      await markKeyAsCleared(storageKeyFor(fingerprint), '[]');
-      if (fingerprint === currentWalletFingerprint) {
+      await markKeyAsCleared(storageKeyFor(walletId), '[]');
+      if (walletId === currentWalletId) {
         SwapStore.notify([]);
       }
     });
@@ -373,17 +373,17 @@ export class SwapStore {
   /**
    * Wipe the current wallet's records. No-op if no wallet is bound (we
    * cannot know which bucket to target). Callers that hold an explicit
-   * fingerprint should prefer `clearForWallet`.
+   * wallet id should prefer `clearForWallet`.
    */
   static async clear(): Promise<void> {
-    if (!currentWalletFingerprint) return;
-    return this.clearForWallet(currentWalletFingerprint);
+    if (!currentWalletId) return;
+    return this.clearForWallet(currentWalletId);
   }
 
   /** Bypasses the queue — only call from within an `enqueue` callback. */
   private static async _readRaw(): Promise<SwapRecordType[]> {
-    if (!currentWalletFingerprint) return [];
-    const key = storageKeyFor(currentWalletFingerprint);
+    if (!currentWalletId) return [];
+    const key = storageKeyFor(currentWalletId);
     let raw: string | null = null;
     try {
       raw = await swapStorage.getItem(key);
@@ -412,12 +412,12 @@ export class SwapStore {
 
   /** Bypasses the queue — only call from within an `enqueue` callback. */
   private static async _writeRaw(records: SwapRecordType[]): Promise<void> {
-    if (!currentWalletFingerprint) {
+    if (!currentWalletId) {
       console.log('SwapStore: write skipped — no wallet bound');
       return;
     }
     await swapStorage.setItem(
-      storageKeyFor(currentWalletFingerprint),
+      storageKeyFor(currentWalletId),
       JSON.stringify(records),
     );
   }

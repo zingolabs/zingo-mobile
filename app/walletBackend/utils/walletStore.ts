@@ -20,8 +20,9 @@ export type WalletMeta = {
   chain?: ChainNameEnum;
   kind?: WalletKind;
   category?: number;
-  fingerprint?: string;
   migratedFrom?: string;
+  /** A migrated wallet's local data, once moved from its fingerprint keys to its id. */
+  localDataMoved?: boolean;
   server?: WalletServerWire;
   selectServer?: string;
   seedBackedUp?: boolean;
@@ -87,6 +88,14 @@ export async function activeWalletEntry(): Promise<
   const id = result.value.active.id;
   const wallet = result.value.wallets.find(w => w.id === id);
   return wallet ? { kind: 'wallet', wallet } : { kind: 'none' };
+}
+
+/** The id of the wallet the app has open, '' when none is. */
+export async function readOpenWalletId(): Promise<string> {
+  const result = await walletsOnDevice();
+  return result.ok && result.value.active.kind === 'wallet'
+    ? result.value.active.id
+    : '';
 }
 
 /** Sets the patch's fields on the wallet's meta; resolves the meta written. */

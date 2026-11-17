@@ -70,6 +70,7 @@ export {
   hasRoomForWallet,
   loadWallet,
   MIN_FREE_BYTES,
+  readOpenWalletId,
   recordWalletKind,
   updateWalletMeta,
   walletsOnDevice,

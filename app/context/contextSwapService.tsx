@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 
 import { ChainNameEnum, ReceiverEnum, ValueTransferType } from '@app/AppState';
-import { createNewUnifiedAddress } from '@app/walletBackend';
+import { createNewUnifiedAddress, readOpenWalletId } from '@app/walletBackend';
 import type { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddressType';
 import { resetPinnedAddress } from '@app/hooks/usePinnedAddress';
 import { resetIronwoodNoticeHide } from '@app/hooks/useIronwoodNoticeHide';
@@ -18,7 +18,6 @@ import {
   SwapService,
   SwapStore,
   createSwapService,
-  readCurrentWalletFingerprint,
   swapRecordToValueTransfer,
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
@@ -82,18 +81,16 @@ export function SwapServiceProvider({
 
     (async () => {
       try {
-        const fingerprint = await readCurrentWalletFingerprint();
+        const walletId = await readOpenWalletId();
         if (cancelled) {
           return;
         }
-        if (!fingerprint) {
-          console.error(
-            'SwapServiceProvider: the wallet yielded an empty fingerprint',
-          );
+        if (!walletId) {
+          console.error('SwapServiceProvider: no wallet is open');
           return;
         }
-        await adoptWalletOnFile(fingerprint);
-        await SwapStore.bindToWallet(fingerprint);
+        await adoptWalletOnFile(walletId);
+        await SwapStore.bindToWallet(walletId);
         if (cancelled || chainName !== ChainNameEnum.mainChainName) {
           return;
         }
