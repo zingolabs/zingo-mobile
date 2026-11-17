@@ -49,9 +49,10 @@ import { saplingReceiverOf } from './saplingReceiver';
  * Stop conditions:
  *   - Records reaching a terminal `SwapStatusEnum` are dropped from polling
  *     and never re-queried, even if `stop()` is never called.
- *   - `stop()` cancels the timer. Any in-flight `/track` request that
- *     completes after `stop()` is silently discarded by checking the
- *     generation token.
+ *   - `stop()` cancels the timer and bumps the generation token: a tick in
+ *     flight polls no further record, and a `/track` answer that lands after
+ *     `stop()` is discarded.
+ *   - One tick walks the records at a time; see `runTick`.
  */
 
 /**
@@ -110,6 +111,7 @@ export class SwapPoller {
 
   private timer: ReturnType<typeof setInterval> | null = null;
   private generation = 0;
+  private walking: { generation: number; done: Promise<void> } | null = null;
 
   /** Per-record poll bookkeeping (in-memory; resets on app restart). */
   private readonly lastPolledAtMs = new Map<string, number>();
@@ -151,8 +153,7 @@ export class SwapPoller {
     if (this.timer === null) return;
     clearInterval(this.timer);
     this.timer = null;
-    // generation++ would invalidate in-flight requests; we bump on the next
-    // start() to keep the math simple.
+    this.generation += 1;
   }
 
   /**
@@ -163,7 +164,27 @@ export class SwapPoller {
     await this.runTick(this.generation);
   }
 
-  private async runTick(callerGeneration: number): Promise<void> {
+  /**
+   * One walk at a time. A tick asked for while one of the same generation
+   * runs joins it, so a slow walk never doubles `/track` or a failure count;
+   * one asked for after a stop or a restart waits for the old walk to end.
+   */
+  private runTick(callerGeneration: number): Promise<void> {
+    const running = this.walking;
+    if (running && running.generation === callerGeneration) {
+      return running.done;
+    }
+    const done: Promise<void> = (running?.done ?? Promise.resolve())
+      .catch(() => {})
+      .then(() => this.walk(callerGeneration))
+      .finally(() => {
+        if (this.walking?.done === done) this.walking = null;
+      });
+    this.walking = { generation: callerGeneration, done };
+    return done;
+  }
+
+  private async walk(callerGeneration: number): Promise<void> {
     const all = await this.store.readAll();
     const now = Date.now();
     let hasPollableRecord = false;
