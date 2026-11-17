@@ -29,6 +29,7 @@ import {
   isWalletAddress,
   loadExistingWallet,
   loadWallet,
+  deleteWallet,
   updateWalletMeta,
   walletsOnDevice,
   parseAddress,
@@ -144,7 +145,9 @@ import { RootParamList } from '@app/types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { publishReport } from '@app/services/reportDiagnostics';
-import { finishWalletOpen } from '@app/services/openWallet';
+import { finishWalletOpen, WalletOpen } from '@app/services/openWallet';
+import { forgetWallet } from '@app/services/WalletLocalData';
+import type { FfiResult } from '@app/walletBackend';
 import { writeSavedBalance } from '@app/services/savedBalance';
 import { avatarCategoryOf } from '@ui/widgets/Avatar';
 import type { WalletEntry } from '@app/walletBackend';
@@ -675,6 +678,7 @@ export class LoadedAppClass extends Component<
       setBlockExplorerOption: this.setBlockExplorerOption,
       changeWallet: this.onClickOKChangeWallet,
       switchWallet: this.switchWallet,
+      deleteWallet: this.deleteWallet,
       refreshWallets: this.refreshWallets,
       restoreBackup: this.onClickOKRestoreBackup,
       applyPendingServer: this.onClickOKServerWallet,
@@ -1797,6 +1801,32 @@ export class LoadedAppClass extends Component<
     await this.rpc.clearTimers();
     this.keepAwake(false);
 
+    const opened = await this.openInPlace(entry);
+    if (opened.kind === 'opened') {
+      return;
+    }
+    await loadWallet(
+      this.state.walletId,
+      nativeUri(this.state.server),
+      this.state.server.chainName,
+      DEFAULT_PERFORMANCE_LEVEL,
+      GlobalConst.minConfirmations.toString(),
+    );
+    this.rpc.walletReopened();
+    await this.rpc.configure();
+    this.setState({ switching: { kind: 'none' } });
+    this.addLastSnackbar(
+      (this.state.translate('wallets.open-error') as string)
+        .replace('{name}', entry.meta.name)
+        .replace(
+          '{error}',
+          Utils.humanizeChainTokens(opened.error.message, this.state.translate),
+        ),
+    );
+  };
+
+  /** Opens a wallet with its own server and hands the wallet section to it; a failure is the caller's. */
+  openInPlace = async (entry: WalletEntry): Promise<WalletOpen> => {
     const { server } = await SettingsFileImpl.serverOf(entry.meta);
     const opened = await finishWalletOpen(
       await loadWallet(
@@ -1820,27 +1850,64 @@ export class LoadedAppClass extends Component<
         firstLaunchingMessage: LaunchingModeEnum.opening,
         walletChainName: opened.walletChainName,
       });
+    }
+    return opened;
+  };
+
+  /**
+   * Deletes a wallet with what the app keeps beside it. The open one closes
+   * first and the first wallet left opens in its place; with none left the
+   * app goes back to the welcome.
+   */
+  deleteWallet = async (entry: WalletEntry): Promise<void> => {
+    const open = entry.id === this.state.walletId;
+    if (open) {
+      await this.rpc.stopSyncProcess(SWITCH_STOP_WAIT_MS);
+      await this.rpc.clearTimers();
+      this.keepAwake(false);
+    }
+    const deleted = await forgetWallet(entry.id)
+      .then(() => deleteWallet(entry.id))
+      .catch((e): FfiResult<boolean> => ({
+        ok: false,
+        error: { code: 'Unknown', message: String(e) },
+      }));
+    if (!deleted.ok || !deleted.value) {
+      if (open) {
+        await this.rpc.configure();
+      }
+      this.addLastSnackbar(
+        this.state.translate('rpc.deletewallet-error') as string,
+      );
       return;
     }
-
-    await loadWallet(
-      this.state.walletId,
-      nativeUri(this.state.server),
-      this.state.server.chainName,
-      DEFAULT_PERFORMANCE_LEVEL,
-      GlobalConst.minConfirmations.toString(),
-    );
-    this.rpc.walletReopened();
-    await this.rpc.configure();
-    this.setState({ switching: { kind: 'none' } });
     this.addLastSnackbar(
-      (this.state.translate('wallets.open-error') as string)
-        .replace('{name}', entry.meta.name)
-        .replace(
-          '{error}',
-          Utils.humanizeChainTokens(opened.error.message, this.state.translate),
-        ),
+      (this.state.translate('wallets.deleted') as string).replace(
+        '{name}',
+        entry.meta.name,
+      ),
     );
+    const left = this.state.wallets.filter(w => w.id !== entry.id);
+    if (!open) {
+      await this.refreshWallets();
+      return;
+    }
+    if (left.length === 0) {
+      this.navigateToLoadingApp({ kind: 'onboarding', start: 'Welcome' });
+      return;
+    }
+    this.setState({
+      wallets: left,
+      switching: { kind: 'opening', wallet: left[0] },
+    });
+    const opened = await this.openInPlace(left[0]);
+    if (opened.kind === 'failed') {
+      this.navigateToLoadingApp({
+        kind: 'boot',
+        startingApp: false,
+        newWallet: false,
+      });
+    }
   };
 
   onClickOKChangeWallet = async () => {
@@ -2172,6 +2239,7 @@ export class LoadedAppClass extends Component<
       changeWallet: this.onClickOKChangeWallet,
       walletId: this.state.walletId,
       switchWallet: this.switchWallet,
+      deleteWallet: this.deleteWallet,
       switching: this.state.switching,
       wallets: this.state.wallets,
       refreshWallets: this.refreshWallets,

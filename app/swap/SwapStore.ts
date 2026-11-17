@@ -1,4 +1,5 @@
 import swapStorage from './swapStorage';
+import { isTerminalStatus } from './enums/SwapStatusEnum';
 
 import { SwapRecordType } from './types/SwapRecordType';
 import { swapAddressOf } from './shieldedPurchase';
@@ -353,6 +354,17 @@ export class SwapStore {
         const made = swapAddressOf(r);
         return made ? [made] : [];
       });
+    });
+  }
+
+  /** Whether a wallet has a swap still running: one not removed and not final. */
+  static async inFlightFor(walletId: string): Promise<boolean> {
+    return this.enqueue(async () => {
+      const raw = await swapStorage.getItem(storageKeyFor(walletId));
+      const records = raw === null ? [] : (tryParseRecordsArray(raw) ?? []);
+      return records.some(
+        r => r.removedAtMs === undefined && !isTerminalStatus(r.status),
+      );
     });
   }
 

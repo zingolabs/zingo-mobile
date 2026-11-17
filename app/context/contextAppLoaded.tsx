@@ -80,6 +80,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   changeWallet: async () => {},
   walletId: '',
   switchWallet: async () => {},
+  deleteWallet: async () => {},
   switching: { kind: 'none' },
   wallets: [],
   refreshWallets: async () => {},

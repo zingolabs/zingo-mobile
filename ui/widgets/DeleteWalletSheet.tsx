@@ -30,6 +30,7 @@ import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
 import Button, { BUTTON_HEIGHT } from '@ui/primitives/Button';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import { useCompact } from '@app/hooks/useCompact';
+import Banner from '@ui/widgets/Banner';
 
 type DeleteWalletSheetProps = {
   context: DeleteWalletContext;
@@ -124,13 +125,17 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
       transform: [{ scale: pulse.value }],
     }));
 
-    const sub = translate(
-      context === 'import'
-        ? 'deletesheet.import-sub'
-        : context === 'create'
-          ? 'deletesheet.create-sub'
-          : 'deletesheet.replace-sub',
-    ) as string;
+    const sub =
+      typeof context === 'object'
+        ? context.sub
+        : (translate(
+            context === 'import'
+              ? 'deletesheet.import-sub'
+              : context === 'create'
+                ? 'deletesheet.create-sub'
+                : 'deletesheet.replace-sub',
+          ) as string);
+    const warning = typeof context === 'object' ? context.warning : '';
 
     return (
       <AppSheetModal ref={ref} onDismiss={reset}>
@@ -174,6 +179,11 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
           >
             {sub}
           </Text>
+          {!!warning && (
+            <View style={{ alignSelf: 'stretch', marginTop: gap(space16) }}>
+              <Banner tone="warning" title={warning} />
+            </View>
+          )}
           <Animated.View style={[{ alignSelf: 'stretch' }, holdStyle]}>
             <Pressable
               testID="deletesheet.hold"

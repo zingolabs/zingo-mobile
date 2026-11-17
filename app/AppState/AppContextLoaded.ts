@@ -141,6 +141,8 @@ export default interface AppContextLoaded {
   switching: WalletSwitch;
   /** The wallets on the device, in the order they were added. */
   wallets: WalletEntry[];
+  /** Deletes a wallet; the open one hands over to the first wallet left. */
+  deleteWallet: (entry: WalletEntry) => Promise<void>;
   /** Reads the wallets again, after one is renamed or deleted. */
   refreshWallets: () => Promise<void>;
   restoreBackup: () => Promise<void>;
