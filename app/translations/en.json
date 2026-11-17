@@ -1590,5 +1590,31 @@
     "message": "An unexpected error occurred. Please restart the app.",
     "report": "Report",
     "restart": "Restart"
+  },
+  "wallets": {
+    "title": "Wallets",
+    "add": "Add wallet",
+    "switch-acc": "Wallet: {name}. Change wallet",
+    "view-only": "View only",
+    "not-backed-up": "Not backed up",
+    "type-seed": "Seed phrase",
+    "type-key": "Viewing key",
+    "row-sub": "{balance} {unit} · {type}",
+    "settings-acc": "Settings for {name}",
+    "delete-acc": "Delete {name}",
+    "opening": "Opening {name}…",
+    "settings": "Wallet settings",
+    "name": "Name",
+    "network": "Network",
+    "created-from": "Created from",
+    "server": "Server",
+    "network-fixed": "The network can’t change once a wallet exists.",
+    "save": "Save",
+    "delete-sub-seed": "{name} and its history leave this device. You’ll need its seed phrase to get it back.",
+    "delete-sub-key": "{name} and its history leave this device. You can import it again from its viewing key.",
+    "delete-only": "{name} is your only wallet. Once it’s deleted, Zingo goes back to the start.",
+    "delete-swap": "A swap is in progress in {name}. Once it’s deleted, Zingo stops following that swap.",
+    "deleted": "{name} deleted from this device",
+    "open-error": "{name} didn’t open. {error}"
   }
 }

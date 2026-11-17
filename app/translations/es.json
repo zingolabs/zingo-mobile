@@ -1590,5 +1590,31 @@
     "message": "Ocurrió un error inesperado. Reinicia la aplicación.",
     "report": "Informar",
     "restart": "Reiniciar"
+  },
+  "wallets": {
+    "title": "Billeteras",
+    "add": "Añadir billetera",
+    "switch-acc": "Billetera: {name}. Cambiar de billetera",
+    "view-only": "Solo lectura",
+    "not-backed-up": "Sin copia",
+    "type-seed": "Frase semilla",
+    "type-key": "Clave de visualización",
+    "row-sub": "{balance} {unit} · {type}",
+    "settings-acc": "Ajustes de {name}",
+    "delete-acc": "Borrar {name}",
+    "opening": "Abriendo {name}…",
+    "settings": "Ajustes de la billetera",
+    "name": "Nombre",
+    "network": "Red",
+    "created-from": "Creada con",
+    "server": "Servidor",
+    "network-fixed": "La red no puede cambiar una vez creada la billetera.",
+    "save": "Guardar",
+    "delete-sub-seed": "{name} y su historial salen de este dispositivo. Necesitarás su frase semilla para recuperarla.",
+    "delete-sub-key": "{name} y su historial salen de este dispositivo. Puedes volver a importarla con su clave de visualización.",
+    "delete-only": "{name} es tu única billetera. Al borrarla, Zingo vuelve al inicio.",
+    "delete-swap": "Hay un intercambio en curso en {name}. Al borrarla, Zingo deja de seguir ese intercambio.",
+    "deleted": "{name} borrada de este dispositivo",
+    "open-error": "{name} no se abrió. {error}"
   }
 }

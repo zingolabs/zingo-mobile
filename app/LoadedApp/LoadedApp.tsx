@@ -29,6 +29,8 @@ import {
   isWalletAddress,
   loadExistingWallet,
   loadWallet,
+  updateWalletMeta,
+  walletsOnDevice,
   parseAddress,
   cancelOldPrivateMigration,
 } from '@app/walletBackend';
@@ -143,6 +145,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { publishReport } from '@app/services/reportDiagnostics';
 import { finishWalletOpen } from '@app/services/openWallet';
+import { writeSavedBalance } from '@app/services/savedBalance';
+import { avatarCategoryOf } from '@ui/widgets/Avatar';
 import type { WalletEntry } from '@app/walletBackend';
 
 const en = require('@app/translations/en.json');
@@ -671,6 +675,7 @@ export class LoadedAppClass extends Component<
       setBlockExplorerOption: this.setBlockExplorerOption,
       changeWallet: this.onClickOKChangeWallet,
       switchWallet: this.switchWallet,
+      refreshWallets: this.refreshWallets,
       restoreBackup: this.onClickOKRestoreBackup,
       applyPendingServer: this.onClickOKServerWallet,
       cancelPendingServer: this.cancelPendingServer,
@@ -710,6 +715,7 @@ export class LoadedAppClass extends Component<
       pendingServer: { kind: 'none' },
       walletId: props.walletId,
       switching: { kind: 'none' },
+      wallets: [],
       scrollToTop: false,
       scrollToBottom: false,
     };
@@ -743,6 +749,7 @@ export class LoadedAppClass extends Component<
 
   componentDidMount = async () => {
     this.publishReportState();
+    await this.refreshWallets();
     const netInfoState = await NetInfo.fetch();
     this.setState({
       netInfo: {
@@ -1131,6 +1138,13 @@ export class LoadedAppClass extends Component<
     if (!isEqual(this.state.totalBalance, totalBalance)) {
       //const start = Date.now();
       this.setState({ totalBalance });
+      writeSavedBalance(
+        this.state.walletId,
+        totalBalance.totalIronwoodBalance +
+          totalBalance.totalOrchardBalance +
+          totalBalance.totalSaplingBalance +
+          totalBalance.totalTransparentBalance,
+      ).catch(e => console.log(`saved balance not written: ${e}`));
     }
   };
 
@@ -1746,6 +1760,25 @@ export class LoadedAppClass extends Component<
     this.props.leaveWallet(session);
   };
 
+  /** Reads the wallets on the device; one without a category gets the one its id gives, kept in its meta. */
+  refreshWallets = async (): Promise<void> => {
+    const result = await walletsOnDevice();
+    if (!result.ok) {
+      return;
+    }
+    const wallets: WalletEntry[] = [];
+    for (const wallet of result.value.wallets) {
+      if (wallet.meta.category) {
+        wallets.push(wallet);
+        continue;
+      }
+      const category = avatarCategoryOf(wallet.id);
+      await updateWalletMeta(wallet.id, { category });
+      wallets.push({ ...wallet, meta: { ...wallet.meta, category } });
+    }
+    this.setState({ wallets });
+  };
+
   /**
    * Opens another wallet in place: Home stays, faded, while it opens, then
    * the wallet section remounts on it. One that does not open hands back to
@@ -1758,7 +1791,7 @@ export class LoadedAppClass extends Component<
     ) {
       return;
     }
-    this.setState({ switching: { kind: 'opening', name: entry.meta.name } });
+    this.setState({ switching: { kind: 'opening', wallet: entry } });
     await this.rpc.stopSyncProcess(SWITCH_STOP_WAIT_MS);
     await doSave();
     await this.rpc.clearTimers();
@@ -1801,7 +1834,12 @@ export class LoadedAppClass extends Component<
     await this.rpc.configure();
     this.setState({ switching: { kind: 'none' } });
     this.addLastSnackbar(
-      `${this.state.translate('loadedapp.readingwallet-error')} ${entry.meta.name}: ${Utils.humanizeChainTokens(opened.error.message, this.state.translate)}`,
+      (this.state.translate('wallets.open-error') as string)
+        .replace('{name}', entry.meta.name)
+        .replace(
+          '{error}',
+          Utils.humanizeChainTokens(opened.error.message, this.state.translate),
+        ),
     );
   };
 
@@ -2135,6 +2173,8 @@ export class LoadedAppClass extends Component<
       walletId: this.state.walletId,
       switchWallet: this.switchWallet,
       switching: this.state.switching,
+      wallets: this.state.wallets,
+      refreshWallets: this.refreshWallets,
       restoreBackup: this.onClickOKRestoreBackup,
       applyPendingServer: this.onClickOKServerWallet,
       cancelPendingServer: this.cancelPendingServer,

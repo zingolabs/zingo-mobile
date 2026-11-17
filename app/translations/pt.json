@@ -1590,5 +1590,31 @@
     "message": "Ocorreu um erro inesperado. Reinicie o aplicativo.",
     "report": "Relatar",
     "restart": "Reiniciar"
+  },
+  "wallets": {
+    "title": "Carteiras",
+    "add": "Adicionar carteira",
+    "switch-acc": "Carteira: {name}. Trocar de carteira",
+    "view-only": "Somente leitura",
+    "not-backed-up": "Sem backup",
+    "type-seed": "Frase semente",
+    "type-key": "Chave de visualização",
+    "row-sub": "{balance} {unit} · {type}",
+    "settings-acc": "Ajustes de {name}",
+    "delete-acc": "Excluir {name}",
+    "opening": "Abrindo {name}…",
+    "settings": "Ajustes da carteira",
+    "name": "Nome",
+    "network": "Rede",
+    "created-from": "Criada com",
+    "server": "Servidor",
+    "network-fixed": "A rede não pode mudar depois que a carteira existe.",
+    "save": "Salvar",
+    "delete-sub-seed": "{name} e seu histórico saem deste dispositivo. Você precisará da frase semente para recuperá-la.",
+    "delete-sub-key": "{name} e seu histórico saem deste dispositivo. Você pode importá-la de novo com a chave de visualização.",
+    "delete-only": "{name} é sua única carteira. Depois de excluí-la, o Zingo volta ao início.",
+    "delete-swap": "Há uma troca em andamento em {name}. Depois de excluí-la, o Zingo deixa de acompanhar essa troca.",
+    "deleted": "{name} excluída deste dispositivo",
+    "open-error": "{name} não abriu. {error}"
   }
 }

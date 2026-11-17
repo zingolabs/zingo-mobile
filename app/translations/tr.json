@@ -1590,5 +1590,31 @@
     "message": "Beklenmeyen bir hata oluştu. Lütfen uygulamayı yeniden başlatın.",
     "report": "Bildir",
     "restart": "Yeniden başlat"
+  },
+  "wallets": {
+    "title": "Cüzdanlar",
+    "add": "Cüzdan ekle",
+    "switch-acc": "Cüzdan: {name}. Cüzdanı değiştir",
+    "view-only": "Yalnızca görüntüleme",
+    "not-backed-up": "Yedeklenmedi",
+    "type-seed": "Tohum ifadesi",
+    "type-key": "Görüntüleme anahtarı",
+    "row-sub": "{balance} {unit} · {type}",
+    "settings-acc": "{name} ayarları",
+    "delete-acc": "{name} cüzdanını sil",
+    "opening": "{name} açılıyor…",
+    "settings": "Cüzdan ayarları",
+    "name": "Ad",
+    "network": "Ağ",
+    "created-from": "Oluşturulduğu yer",
+    "server": "Sunucu",
+    "network-fixed": "Cüzdan oluşturulduktan sonra ağ değiştirilemez.",
+    "save": "Kaydet",
+    "delete-sub-seed": "{name} ve geçmişi bu cihazdan silinir. Geri almak için tohum ifadesine ihtiyacın olacak.",
+    "delete-sub-key": "{name} ve geçmişi bu cihazdan silinir. Görüntüleme anahtarıyla yeniden içe aktarabilirsin.",
+    "delete-only": "{name} tek cüzdanın. Silindiğinde Zingo başa döner.",
+    "delete-swap": "{name} içinde devam eden bir takas var. Silindiğinde Zingo bu takası izlemeyi bırakır.",
+    "deleted": "{name} bu cihazdan silindi",
+    "open-error": "{name} açılmadı. {error}"
   }
 }

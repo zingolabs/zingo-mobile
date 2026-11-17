@@ -30,7 +30,8 @@ import type {
 import { SetServerResult } from './types/SetServerResult';
 import type { WalletEntry } from '@app/walletBackend/utils/walletStore';
 
-export type WalletSwitch = { kind: 'none' } | { kind: 'opening'; name: string };
+export type WalletSwitch =
+  { kind: 'none' } | { kind: 'opening'; wallet: WalletEntry };
 
 export default interface AppContextLoaded {
   netInfo: NetInfoType;
@@ -138,6 +139,10 @@ export default interface AppContextLoaded {
   switchWallet: (entry: WalletEntry) => Promise<void>;
   /** The wallet being opened in place, named on Home's sync line. */
   switching: WalletSwitch;
+  /** The wallets on the device, in the order they were added. */
+  wallets: WalletEntry[];
+  /** Reads the wallets again, after one is renamed or deleted. */
+  refreshWallets: () => Promise<void>;
   restoreBackup: () => Promise<void>;
   applyPendingServer: () => Promise<void>;
   cancelPendingServer: () => Promise<void>;
