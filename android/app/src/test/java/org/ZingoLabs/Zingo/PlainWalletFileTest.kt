@@ -3,6 +3,8 @@ package org.ZingoLabs.Zingo
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Assert.assertThrows
 import org.junit.Before
@@ -51,6 +53,49 @@ class PlainWalletFileTest {
         val newer = plainWallet(fill = 11)
         PlainWalletFile.write(dir, fileName, newer)
         assertArrayEquals(newer, File(dir, fileName).readBytes())
+    }
+
+    /** Tests that the directory sync sees the replacement when the rename succeeds. */
+    @Test
+    fun writeSyncsTheDirectoryAfterReplacement() {
+        File(dir, fileName).writeBytes(plainWallet(fill = 3))
+        val newer = plainWallet(fill = 11)
+        var syncCount = 0
+
+        PlainWalletFile.write(dir, fileName, newer) { directory ->
+            assertEquals(dir, directory)
+            assertArrayEquals(newer, File(directory, fileName).readBytes())
+            assertFalse(File(directory, "$fileName.plain.tmp").exists())
+            syncCount++
+        }
+
+        assertEquals(1, syncCount)
+    }
+
+    /** Tests that a save reports failure when the directory sync fails. */
+    @Test
+    fun writePropagatesDirectorySyncFailure() {
+        val bytes = plainWallet()
+        val failure = IOException("directory sync failed")
+
+        val error = assertThrows(IOException::class.java) {
+            PlainWalletFile.write(dir, fileName, bytes) { throw failure }
+        }
+
+        assertSame(failure, error)
+        assertArrayEquals(bytes, File(dir, fileName).readBytes())
+        assertFalse(File(dir, "$fileName.plain.tmp").exists())
+    }
+
+    /** Tests that a valid wallet replaces the target when the target is corrupt. */
+    @Test
+    fun writeReplacesACorruptTarget() {
+        File(dir, fileName).writeBytes(byteArrayOf(42))
+        val bytes = plainWallet()
+
+        PlainWalletFile.write(dir, fileName, bytes)
+
+        assertArrayEquals(bytes, File(dir, fileName).readBytes())
     }
 
     @Test
