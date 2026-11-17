@@ -131,6 +131,18 @@ without losing meaning, the "so" was decorative. Delete it.
 - Don't add guards for conditions that can't occur. Don't wrap non-throwing code in try/catch. Don't swallow-and-log errors; let them propagate.
 - Match the surrounding codebase's idioms and conventions over textbook-uniform formatting.
 
+### No duplicated code
+
+A pull request that adds duplicated TypeScript, Kotlin or Swift fails CI.
+The `code-duplication` check runs jscpd against the base branch and fails on
+each clone the base branch lacks. It is a blocking check under fail-all. A
+clone is 50 tokens or 5 lines, inside one file or across files, in production
+code, tests, mocks and stories. An edit that touches an existing clone must
+remove it. Extract the shared code into one function, hook, component or
+fixture. Never raise the thresholds or add an ignore to pass the check. Run
+`yarn dupes zingolabs/dev` before a push. `yarn dupes:report` lists every
+clone the tree holds.
+
 ### Documentation in code
 
 Every item doc-comment (Rust `///`, KDoc, Swift doc-comment) is one sentence
