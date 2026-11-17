@@ -4,6 +4,8 @@ import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.util.UUID
 
 /** The wallets on disk, one folder per wallet under `wallets/`, where the meta is the commit point. */
@@ -52,9 +54,10 @@ object WalletStore {
             out.write(bytes)
             out.fd.sync()
         }
-        if (!temp.renameTo(target)) {
+        try {
+            Files.move(temp.toPath(), target.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
+        } finally {
             temp.delete()
-            throw IOException("Error: could not rename ${temp.name} onto ${target.name}")
         }
     }
 

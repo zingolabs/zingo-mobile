@@ -51,3 +51,17 @@ test.each([
     expect(onBirthdayAdjusted).not.toHaveBeenCalled();
   },
 );
+
+test('Tests that the notice shows once when the wallet data is fetched again in the same session', async () => {
+  const { service, onBirthdayChanged, onBirthdayAdjusted } = serviceReporting({
+    seed_phrase: 'a b c',
+    birthday: 419200,
+    birthday_adjusted_from: 1000,
+  });
+
+  await service.fetchWalletBirthdaySeedUfvk();
+  await service.fetchWalletBirthdaySeedUfvk();
+
+  expect(onBirthdayChanged).toHaveBeenCalledTimes(2);
+  expect(onBirthdayAdjusted).toHaveBeenCalledTimes(1);
+});

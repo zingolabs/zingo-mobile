@@ -38,6 +38,7 @@ import AppSheet from '@ui/primitives/AppSheet';
 import {
   KeyboardAwareScrollView,
   KeyboardAwareScrollViewRef,
+  useKeyboardState,
 } from 'react-native-keyboard-controller';
 import {
   SendPageStateClass,
@@ -185,7 +186,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
   const [proposeSendLastError, setProposeSendLastError] = useState<string>('');
   const [spendableBalanceLastError, setSpendableBalanceLastError] =
     useState<string>('');
-  const [keyboardVisible, setKeyboardVisible] = useState<boolean>(false);
+  const keyboardVisible = useKeyboardState(state => state.isVisible);
   const [contentHeight, setContentHeight] = useState<number>(0);
   const [addressText, setAddressText] = useState<string>(
     sendPageState.toaddr.to,
@@ -213,8 +214,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
     }
     return BARE_NAME.test(typed) ? `${typed}.zec` : '';
   })();
-  const [keyboardListenersDone, setKeyboardListenersDone] =
-    useState<boolean>(false);
   const [containerH, setContainerH] = useState<number>(0);
 
   const scrollViewRef = useRef<KeyboardAwareScrollViewRef>(null);
@@ -242,7 +241,9 @@ const Send: React.FunctionComponent<SendProps> = () => {
     defaultUnifiedAddress,
   );
   const memoTooLong = memoBytes > GlobalConst.memoMaxLength;
+  /** Each calculation takes a number; a reply that is no longer the latest is dropped. */
   const feeCalculationGenRef = useRef<number>(0);
+  const spendableGenRef = useRef<number>(0);
   const { decimalSeparator } = getNumberFormatSettings();
   useDismissSheetsOnBlur();
   const sheetSlideStyle = useOptionsPanelSheetSlide();
@@ -301,7 +302,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
       memoPar: string,
       includeUAMemoPar: boolean,
     ): Promise<void> => {
-      const generation = feeCalculationGenRef.current;
+      const generation = ++feeCalculationGenRef.current;
 
       // if no address -> make no sense to run the propose
       if (!addressPar || validAddress !== 1) {
@@ -426,6 +427,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
 
   const calculateSpendableBalance = useCallback(
     async (addressPar: string): Promise<void> => {
+      const generation = ++spendableGenRef.current;
       // if no address -> make no sense to run the propose
       if (!addressPar || validAddress !== 1) {
         defaultValuesSpendableMaxAmount();
@@ -442,6 +444,9 @@ const Send: React.FunctionComponent<SendProps> = () => {
           '=========================================== > spendable balance with address - ',
           Date.now() - start,
         );
+      }
+      if (spendableGenRef.current !== generation) {
+        return;
       }
       if (!runSpendableBalance.ok) {
         // snack with error
@@ -625,8 +630,12 @@ const Send: React.FunctionComponent<SendProps> = () => {
       );
     };
 
+    let cancelled = false;
     if (addressText) {
       getMemoEnabled(addressText, server.chainName).then(r => {
+        if (cancelled) {
+          return;
+        }
         setMemoEnabled(r);
         if (!r) {
           setMemoText('');
@@ -636,13 +645,20 @@ const Send: React.FunctionComponent<SendProps> = () => {
       setMemoEnabled(false);
       setMemoText('');
     }
+    return () => {
+      cancelled = true;
+    };
   }, [server.chainName, addressText]);
 
   useEffect(() => {
+    let cancelled = false;
     if (addressText) {
       // A name is not an address: the lookup above owns what it shows.
       if (!nameQuery) {
         Utils.isValidAddress(addressText, server.chainName).then(r => {
+          if (cancelled) {
+            return;
+          }
           setValidAddress(r.isValid ? 1 : -1);
           if (!r.isValid) {
             setSpendableBalanceLastError('');
@@ -694,6 +710,9 @@ const Send: React.FunctionComponent<SendProps> = () => {
         setValidAmount(0); // empty
       }
     }
+    return () => {
+      cancelled = true;
+    };
   }, [
     decimalSeparator,
     server.chainName,
@@ -748,19 +767,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
     sendPageState.toaddr.to,
   ]);
 
-  const keyboardListeners = (titleViewHeightPar: number) => {
-    if (titleViewHeightPar > 0 && !keyboardListenersDone) {
-      //only the first time if the height is more than 0.
-      setKeyboardListenersDone(true);
-      Keyboard.addListener('keyboardDidShow', () => {
-        setKeyboardVisible(true);
-      });
-      Keyboard.addListener('keyboardDidHide', () => {
-        setKeyboardVisible(false);
-      });
-    }
-  };
-
   /** A contact or own address chosen in the book; replacing a valid address asks first. */
   const pickFromBook = async (itemValue: string) => {
     if (
@@ -791,6 +797,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
 
   const clearState = () => {
     feeCalculationGenRef.current += 1;
+    spendableGenRef.current += 1;
     sendAllRef.current = false;
     setAddressText('');
     setAmountText('');
@@ -1003,11 +1010,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
           width: '100%',
         }}
       >
-        <View
-          onLayout={e => {
-            keyboardListeners(e.nativeEvent.layout.height);
-          }}
-        >
+        <View>
           <Header
             title={''}
             noBalance={true}

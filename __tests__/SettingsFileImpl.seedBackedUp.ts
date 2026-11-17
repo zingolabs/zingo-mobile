@@ -5,11 +5,11 @@
 
 let mockFile: string | null = null;
 
-jest.mock('react-native-fs', () => ({
-  DocumentDirectoryPath: '/settings-test',
-  exists: jest.fn(async () => mockFile !== null),
-  readFile: jest.fn(async () => mockFile as string),
-  writeFile: jest.fn(async (_path: string, contents: string) => {
+jest.mock('@app/services/appFiles', () => ({
+  readAppFile: jest.fn(async () =>
+    mockFile === null ? { kind: 'missing' } : { kind: 'text', text: mockFile },
+  ),
+  writeAppFile: jest.fn(async (_name: string, contents: string) => {
     mockFile = contents;
   }),
 }));

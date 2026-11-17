@@ -326,24 +326,6 @@
         "text": "Privacidad Normal, se puede ver toda la información."
       }
     ],
-    "performancelevels": [
-      {
-        "value": "Maximum",
-        "text": "For very powerful devices."
-      },
-      {
-        "value": "High",
-        "text": "For devices with a lot of Memory."
-      },
-      {
-        "value": "Medium",
-        "text": "For regular devices."
-      },
-      {
-        "value": "Low",
-        "text": "For old devices."
-      }
-    ],
     "blockexplorers": [
       {
         "value": "Zcashexplorer",
@@ -372,7 +354,6 @@
     "unsaved-name-language": "el idioma",
     "unsaved-name-privacy": "la privacidad",
     "unsaved-name-biometrics": "el bloqueo biométrico",
-    "unsaved-name-performance": "el nivel de rendimiento",
     "unsaved-name-blockexplorer": "el explorador de bloques",
     "ismemo": "Necesitas escoger una opción de Memos para poder guardar.",
     "isthreshold": "Necesitas escoger una opción de umbral para poder guardar.",
@@ -389,7 +370,6 @@
     "language-title": "Idioma",
     "islanguage": "Necesitas escoger un Idioma para poder guardar.",
     "privacy-title": "Ocultar valores sensibles",
-    "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
     "value-language-en": "Inglés",
     "value-language-es": "Español",
@@ -400,10 +380,6 @@
     "value-chainname-main": "Mainnet",
     "value-chainname-test": "Testnet",
     "value-chainname-regtest": "Regtest",
-    "value-performancelevel-Maximum": "Maximum",
-    "value-performancelevel-High": "High",
-    "value-performancelevel-Medium": "Medium",
-    "value-performancelevel-Low": "Low",
     "value-blockexplorer-Zcashexplorer": "Zcashexplorer",
     "value-blockexplorer-ZecBlock": "ZecBlock",
     "value-blockexplorer-Zexplorer": "Zexplorer",
@@ -939,6 +915,7 @@
     "detail-remove-unpaid": "Se eliminará el swap no enviado de este dispositivo.",
     "delete": "Eliminar",
     "deleted": "Eliminado",
+    "delete-error": "No se pudo eliminar el swap. Inténtalo de nuevo.",
     "delete-expired-body": "Se eliminará el swap sin depósito de este dispositivo.",
     "delete-failed-body": "Se eliminará el swap fallido de este dispositivo.",
     "get-new-quote": "Pedir una nueva cotización",
