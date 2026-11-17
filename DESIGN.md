@@ -504,7 +504,7 @@ One variant per role. Weight overrides are limited to the cases listed here.
 | Value typed in a field | `bodyStrong` (`address` for an address or a key) |
 | Chip label | `bodySmall` 600: `fgMuted`, `fgAccent` when selected |
 | Tag | `caption` 600 in the tone's colour |
-| Avatar initial | `bodyStrong` 700 (md), `subtitle` (lg); the own wallet's avatar is the wallet icon in `fgViewOnly` |
+| Avatar initial | `bodySmall` 700 (sm), `bodyStrong` 700 (md), `subtitle` (lg); a single own wallet's avatar is the wallet icon in `fgViewOnly`, and with several each wallet shows its initial on its category |
 | Row title, notice title, what happened in a detail hero | `bodyStrong` 15/21 |
 | Body text, empty state | `body` 15/21 (empty state in `fgMuted`) |
 | Label over a field or a card | `bodySmall` 600, `fgMuted` |
@@ -659,9 +659,9 @@ bars, rows and fields), 24 (`iconSize`, navigation and standalone). Logos
 - Close is one `XIcon` at 20 in `fgMuted`.
 - A status icon takes its role's colour (`fgDanger` for a failure).
 
-**Avatars.** Contacts and the own wallet use `Avatar`: md 36, lg 48, the
-category's 12 % tint behind the initial, the chain badge in the corner when it
-matters.
+**Avatars.** Contacts and the own wallets use `Avatar`: sm 28 (the Header's
+wallet switcher), md 36, lg 48, the category's 12 % tint behind the initial,
+the chain badge in the corner when it matters.
 
 ## Components
 
