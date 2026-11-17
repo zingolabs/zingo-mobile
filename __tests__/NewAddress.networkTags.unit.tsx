@@ -35,31 +35,27 @@ jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
 );
 
-jest.mock('react-native-fs', () => {
+jest.mock('@app/services/appFiles', () => {
   const fs =
     jest.requireActual<typeof import('node:fs/promises')>('node:fs/promises');
+  const path = (name: string) => `${mockDirectory}/${name}`;
   return {
-    get DocumentDirectoryPath() {
-      return mockDirectory;
-    },
-    exists: async (filename: string) => {
+    readAppFile: async (name: string) => {
       try {
-        await fs.access(filename);
-        return true;
+        return { kind: 'text', text: await fs.readFile(path(name), 'utf8') };
       } catch (error) {
         if (
           error instanceof Error &&
           'code' in error &&
           error.code === 'ENOENT'
         ) {
-          return false;
+          return { kind: 'missing' };
         }
         throw error;
       }
     },
-    readFile: (filename: string) => fs.readFile(filename, 'utf8'),
-    writeFile: (filename: string, contents: string) =>
-      fs.writeFile(filename, contents, 'utf8'),
+    writeAppFile: (name: string, contents: string) =>
+      fs.writeFile(path(name), contents, 'utf8'),
   };
 });
 

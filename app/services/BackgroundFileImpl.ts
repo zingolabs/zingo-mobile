@@ -1,35 +1,28 @@
-import * as RNFS from 'react-native-fs';
+import { BackgroundType } from '@app/AppState';
+import { readAppFile } from '@app/services/appFiles';
 
-import { BackgroundType, GlobalConst } from '@app/AppState';
+const EMPTY_BACKGROUND: BackgroundType = {
+  batches: 0,
+  message: '',
+  date: 0,
+  dateEnd: 0,
+};
 
 export default class BackgroundFileImpl {
-  static async getFileName() {
-    return RNFS.DocumentDirectoryPath + '/background.json';
-  }
-
   // [{"batches": "622", "date": "1673817518.324613" }]
 
   // Read the server background
   static async readBackground(): Promise<BackgroundType> {
     try {
-      const fileName = await this.getFileName();
-      const fileExits: boolean = await RNFS.exists(fileName);
-      if (!fileExits) {
+      const file = await readAppFile('background.json');
+      if (file.kind === 'missing') {
         console.log('background read file: The file does not exists');
-        return {
-          batches: 0,
-          message: '',
-          date: 0,
-          dateEnd: 0,
-        } as BackgroundType;
+        return { ...EMPTY_BACKGROUND };
       }
-
-      const rStr = (await RNFS.readFile(fileName, GlobalConst.utf8)).toString();
-      const r = JSON.parse(rStr) as BackgroundType;
-      return r;
+      return JSON.parse(file.text) as BackgroundType;
     } catch {
       // File probably doesn't exist, so return nothing
-      return { batches: 0, message: '', date: 0, dateEnd: 0 } as BackgroundType;
+      return { ...EMPTY_BACKGROUND };
     }
   }
 }

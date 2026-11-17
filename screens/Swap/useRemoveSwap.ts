@@ -44,11 +44,17 @@ export function useRemoveSwap(onDone: () => void) {
             text: t('swap.delete'),
             style: 'destructive',
             onPress: () => {
-              deleteSwapAndTag(record).then(book => {
-                setAddressBook(book);
-                addLastSnackbar(t('swap.deleted'), SnackbarDurationEnum.short);
-                onDone();
-              });
+              deleteSwapAndTag(record).then(
+                book => {
+                  setAddressBook(book);
+                  addLastSnackbar(
+                    t('swap.deleted'),
+                    SnackbarDurationEnum.short,
+                  );
+                  onDone();
+                },
+                () => addLastSnackbar(t('swap.delete-error')),
+              );
             },
           },
         ],

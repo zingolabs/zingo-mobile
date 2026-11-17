@@ -745,6 +745,49 @@ class WalletFileProtectionTests: XCTestCase {
         XCTAssertEqual(after, .completeUntilFirstUserAuthentication)
     }
 
+    func testTheBackupAndTheBrokenCopyAreExcludedAtStartup() throws {
+        let rpc = RPCModule()
+        let fm = FileManager.default
+        try fm.createDirectory(
+            atPath: rpc.getDocumentsDirectory(),
+            withIntermediateDirectories: true
+        )
+        let paths = try [
+            rpc.getFileName(Constants.WalletBackupFileName.rawValue),
+            rpc.getFileName("\(Constants.WalletFileName.rawValue).broken"),
+        ]
+        for path in paths {
+            try "d2FsbGV0".write(toFile: path, atomically: true, encoding: .utf8)
+        }
+        defer { paths.forEach { try? fm.removeItem(atPath: $0) } }
+
+        rpc.applyWalletFileProtection()
+
+        for path in paths {
+            let excluded = try URL(fileURLWithPath: path)
+                .resourceValues(forKeys: [.isExcludedFromBackupKey]).isExcludedFromBackup
+            XCTAssertEqual(excluded, true, path)
+        }
+    }
+
+    func testAWalletWriteLeavesTheNewFileExcluded() throws {
+        let rpc = RPCModule()
+        let fm = FileManager.default
+        try fm.createDirectory(
+            atPath: rpc.getDocumentsDirectory(),
+            withIntermediateDirectories: true
+        )
+        let path = try rpc.getFileName(Constants.WalletBackupFileName.rawValue)
+        defer { try? fm.removeItem(atPath: path) }
+
+        try rpc.writeFile(Constants.WalletBackupFileName.rawValue, walletBytes: Data([42, 0, 0, 0]))
+
+        let excluded = try URL(fileURLWithPath: path)
+            .resourceValues(forKeys: [.isExcludedFromBackupKey]).isExcludedFromBackup
+        XCTAssertEqual(excluded, true)
+        XCTAssertTrue(rpc.excludeFromBackup(path))
+    }
+
     func testAMissingWalletFileIsANoOp() throws {
         let rpc = RPCModule()
         let fm = FileManager.default

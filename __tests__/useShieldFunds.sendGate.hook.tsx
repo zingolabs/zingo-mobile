@@ -8,6 +8,11 @@ jest.mock('@app/walletBackend', () => ({
   shieldConfirm: jest.fn(),
 }));
 
+jest.mock('@app/navigation/navigate', () => ({
+  ...jest.requireActual('@app/navigation/navigate'),
+  isOnTop: () => true,
+}));
+
 jest.mock('@app/services/showConfirm', () => ({
   showConfirm: jest.fn(),
 }));
@@ -18,7 +23,12 @@ import { useNavigation } from '@react-navigation/native';
 import type { TranslateType } from '@app/AppState';
 import { useShieldFunds } from '@app/hooks/useShieldFunds';
 import { showConfirm } from '@app/services/showConfirm';
-import { shieldConfirm, shieldPropose } from '@app/walletBackend';
+import {
+  shieldConfirm,
+  shieldPreview,
+  shieldPropose,
+} from '@app/walletBackend';
+import { TotalBalanceClass } from '@app/wallet/classes';
 import {
   SendPermitInputs,
   sendPermit,
@@ -137,5 +147,70 @@ describe('useShieldFunds send permit', () => {
 
     expect(confirmMock).toHaveBeenCalledTimes(1);
     expect(addLastSnackbar).not.toHaveBeenCalled();
+  });
+});
+
+describe('useShieldFunds propose and preview', () => {
+  test('Tests that confirming does not transmit when the shield proposal fails. The proposal error is what the send screen shows.', async () => {
+    const navigate = jest.fn();
+    (useNavigation as jest.Mock).mockReturnValue({ navigate });
+    proposeMock.mockResolvedValue({
+      ok: false,
+      error: { code: 'Send', message: 'insufficient funds to cover the fee' },
+    });
+    const { result } = renderHook(() =>
+      useShieldFunds(hookInput(online, jest.fn())),
+    );
+    const confirm = openConfirmDialog(result.current.onPressShieldFunds);
+    await act(async () => {
+      await confirm();
+    });
+
+    expect(confirmMock).not.toHaveBeenCalled();
+    expect(navigate).toHaveBeenLastCalledWith(
+      'Computing',
+      expect.objectContaining({
+        phase: 'failed',
+        failure: {
+          kind: 'verbatim',
+          text: 'insufficient funds to cover the fee',
+        },
+      }),
+    );
+  });
+
+  test('Tests that the shieldable amount is the latest balance one when an older preview answers last', async () => {
+    const previewMock = shieldPreview as jest.Mock;
+    const answers: Array<(value: string) => void> = [];
+    previewMock.mockImplementation(
+      () =>
+        new Promise(resolve => {
+          answers.push(value => resolve({ ok: true, value }));
+        }),
+    );
+    const setShieldingAmount = jest.fn();
+    const balance = (transparent: number) =>
+      ({ confirmedTransparentBalance: transparent }) as TotalBalanceClass;
+    const { rerender } = renderHook(
+      ({ totalBalance }: { totalBalance: TotalBalanceClass }) =>
+        useShieldFunds({
+          ...hookInput(online, jest.fn()),
+          setShieldingAmount,
+          totalBalance,
+        }),
+      { initialProps: { totalBalance: balance(0.1) } },
+    );
+    rerender({ totalBalance: balance(0.2) });
+
+    await act(async () => {
+      answers[1](JSON.stringify({ value_to_shield: 0.2 * 10 ** 8, fee: 1 }));
+    });
+    await act(async () => {
+      answers[0](JSON.stringify({ value_to_shield: 0.1 * 10 ** 8, fee: 1 }));
+    });
+
+    expect(answers).toHaveLength(2);
+    expect(setShieldingAmount).toHaveBeenCalledTimes(1);
+    expect(setShieldingAmount).toHaveBeenLastCalledWith(0.2);
   });
 });

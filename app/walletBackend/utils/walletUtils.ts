@@ -25,6 +25,8 @@ import { RPCZecPriceType } from '@app/walletBackend/types/RPCZecPriceType';
 import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
 import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
 import { RPCMigrationStatusType } from '@app/walletBackend/types/RPCMigrationStatusType';
+import { RPCWalletKindType } from '@app/walletBackend/types/RPCWalletKindType';
+import { RPCWalletKindEnum } from '@app/walletBackend/enums/RPCWalletKindEnum';
 
 export type ZecPriceErrorKey =
   'info.error-price-fetch' | 'info.error-price-payload';
@@ -235,6 +237,48 @@ export async function getVersionInfo(): Promise<FfiResult<string>> {
 // caller parses.
 export async function getWalletKind(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.walletKindInfo());
+}
+
+export type WalletKind = {
+  readOnly: boolean;
+  orchardPool: boolean;
+  saplingPool: boolean;
+  transparentPool: boolean;
+};
+
+/**
+ * What the loaded wallet can do: a viewing key, or no keys at all, makes it
+ * watch-only. A kind that cannot be read is an error, never a guess, because
+ * the session keeps whatever the load decides.
+ */
+export async function readWalletKind(): Promise<FfiResult<WalletKind>> {
+  const result = await getWalletKind();
+  if (!result.ok) {
+    return result;
+  }
+  let json: RPCWalletKindType;
+  try {
+    json = JSON.parse(result.value);
+  } catch {
+    return {
+      ok: false,
+      error: {
+        code: 'Unknown',
+        message: `unexpected wallet kind: ${result.value}`,
+      },
+    };
+  }
+  return {
+    ok: true,
+    value: {
+      readOnly:
+        json.kind === RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
+        json.kind === RPCWalletKindEnum.NoKeysFound,
+      orchardPool: json.orchard,
+      saplingPool: json.sapling,
+      transparentPool: json.transparent,
+    },
+  };
 }
 
 // The fee and validation of a send, without broadcasting, storing a proposal

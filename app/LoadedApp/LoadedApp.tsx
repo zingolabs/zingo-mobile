@@ -29,7 +29,6 @@ import {
   loadExistingWallet,
   parseAddress,
   cancelOldPrivateMigration,
-  setConfigWalletToProd,
 } from '@app/walletBackend';
 import {
   AppStateLoaded,
@@ -136,7 +135,7 @@ import {
   stopMixnetTransport,
   takeMixnetProxyDeath,
 } from '@app/walletBackend/utils/nymTransport';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { DEFAULT_PERFORMANCE_LEVEL } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { RootParamList } from '@app/types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
@@ -202,8 +201,6 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(
     SelectServerEnum.auto,
   );
-  const [performanceLevel, setPerformanceLevel] =
-    useState<RPCPerformanceLevelEnum>(RPCPerformanceLevelEnum.Medium);
   const [blockExplorer, setBlockExplorer] = useState<BlockExplorerEnum>(
     BlockExplorerEnum.Zcashexplorer,
   );
@@ -305,19 +302,18 @@ export default function LoadedApp(props: LoadedAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
       }
       if (settings.server) {
-        // Offline has no chain. Normalize any residual chainName to the empty
-        // sentinel so a stale value never reaches the wallet open (the real
-        // chain is derived from the wallet). Persist it only when we actually
-        // cleared a residual, so we don't rewrite on every boot.
-        const residual =
+        // Offline carries the open wallet's chain, the one onboarding shows
+        // next time.
+        const stale =
           settings.server.kind === 'offline' &&
-          settings.server.chainName !== ChainNameEnum.noneChainName;
-        const normalizedServer = residual
-          ? offlineServer(ChainNameEnum.noneChainName)
+          !!walletChainName &&
+          settings.server.chainName !== walletChainName;
+        const normalizedServer = stale
+          ? offlineServer(walletChainName)
           : settings.server;
         setServer(normalizedServer);
         setSelectServer(settings.selectServer);
-        if (residual) {
+        if (stale) {
           await SettingsFileImpl.writeServer(
             normalizedServer,
             settings.selectServer,
@@ -344,19 +340,6 @@ export default function LoadedApp(props: LoadedAppProps) {
         await SettingsFileImpl.writeSettings(
           SettingsNameEnum.biometrics,
           biometrics,
-        );
-      }
-      if (
-        settings.performanceLevel === RPCPerformanceLevelEnum.High ||
-        settings.performanceLevel === RPCPerformanceLevelEnum.Low ||
-        settings.performanceLevel === RPCPerformanceLevelEnum.Maximum ||
-        settings.performanceLevel === RPCPerformanceLevelEnum.Medium
-      ) {
-        setPerformanceLevel(settings.performanceLevel);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.performanceLevel,
-          performanceLevel,
         );
       }
       if (
@@ -558,7 +541,6 @@ export default function LoadedApp(props: LoadedAppProps) {
         selectServer={selectServer}
         walletChainName={walletChainName}
         firstLaunchingMessage={firstLaunchingMessage}
-        performanceLevel={performanceLevel}
         blockExplorer={blockExplorer}
       />
     );
@@ -593,7 +575,6 @@ type LoadedAppClassProps = {
   selectServer: SelectServerEnum;
   walletChainName: ChainNameEnum;
   firstLaunchingMessage: LaunchingModeEnum;
-  performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
 };
 
@@ -669,7 +650,6 @@ export class LoadedAppClass extends Component<
       setAddressBook: this.setAddressBook,
       setLanguageOption: this.setLanguageOption,
       setBiometricsOption: this.setBiometricsOption,
-      setPerformanceLevelOption: this.setPerformanceLevelOption,
       setBlockExplorerOption: this.setBlockExplorerOption,
       changeWallet: this.onClickOKChangeWallet,
       restoreBackup: this.onClickOKRestoreBackup,
@@ -697,7 +677,6 @@ export class LoadedAppClass extends Component<
       biometrics: props.biometrics,
       selectServer: props.selectServer,
       walletChainName: props.walletChainName,
-      performanceLevel: props.performanceLevel,
       blockExplorer: props.blockExplorer,
 
       mixnetView: INITIAL_MIXNET_VIEW,
@@ -734,7 +713,7 @@ export class LoadedAppClass extends Component<
       mixnetSupported: true,
       readOnly: props.readOnly,
       server: props.server,
-      performanceLevel: props.performanceLevel,
+      performanceLevel: DEFAULT_PERFORMANCE_LEVEL,
     });
 
     this.appstate = {} as NativeEventSubscription;
@@ -1536,7 +1515,7 @@ export class LoadedAppClass extends Component<
     const result = await loadExistingWallet(
       nativeUri(value),
       value.chainName,
-      this.state.performanceLevel,
+      DEFAULT_PERFORMANCE_LEVEL,
       GlobalConst.minConfirmations.toString(),
     );
 
@@ -1732,38 +1711,6 @@ export class LoadedAppClass extends Component<
   setBiometricsOption = async (value: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.biometrics, value);
     this.setState({ biometrics: value });
-  };
-
-  setPerformanceLevelOption = async (
-    value: RPCPerformanceLevelEnum,
-  ): Promise<void> => {
-    await SettingsFileImpl.writeSettings(
-      SettingsNameEnum.performanceLevel,
-      value,
-    );
-    this.setState({
-      performanceLevel: value as RPCPerformanceLevelEnum,
-    });
-    // Propagate the new performance level into the shared WalletBackend
-    // config so SyncCoordinator's runTaskPromises doesn't see a diff
-    // between zingolib (which we set below) and the stale config and
-    // silently revert the user's choice on the next poll.
-    this.rpc.setPerformanceLevel(value);
-
-    // change it in zingolib as well. Use `value` directly — `setState`
-    // above is async, so `this.state.performanceLevel` here is still the
-    // OLD value at this point in the same event handler.
-    const setConfigWallet = await setConfigWalletToProd(
-      value,
-      GlobalConst.minConfirmations.toString(),
-    );
-    // Audit Issue K — do not log the setConfigWallet response; on actual
-    // failure it is propagated via setLastError below.
-    if (!setConfigWallet.ok) {
-      this.setLastError(
-        `Set performance level error: ${setConfigWallet.error.message}`,
-      );
-    }
   };
 
   setBlockExplorerOption = async (value: BlockExplorerEnum): Promise<void> => {
@@ -2082,7 +2029,6 @@ export class LoadedAppClass extends Component<
       biometrics: this.state.biometrics,
       selectServer: this.state.selectServer,
       walletChainName: this.state.walletChainName,
-      performanceLevel: this.state.performanceLevel,
       blockExplorer: this.state.blockExplorer,
       mixnetView: this.state.mixnetView,
       reenableMixnet: this.reenableMixnet,
@@ -2104,7 +2050,6 @@ export class LoadedAppClass extends Component<
       setAddressBook: this.setAddressBook,
       setLanguageOption: this.setLanguageOption,
       setBiometricsOption: this.setBiometricsOption,
-      setPerformanceLevelOption: this.setPerformanceLevelOption,
       setBlockExplorerOption: this.setBlockExplorerOption,
       changeWallet: this.onClickOKChangeWallet,
       restoreBackup: this.onClickOKRestoreBackup,

@@ -4,6 +4,8 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.security.MessageDigest
 
 /**
@@ -36,9 +38,12 @@ object PlainWalletFile {
                 if (!matchesFile(temp, bytes)) {
                     throw IOException("Error: read-back of ${temp.name} does not match the wallet bytes")
                 }
-                if (!temp.renameTo(File(dir, fileName))) {
-                    throw IOException("Error: could not rename ${temp.name} onto $fileName")
-                }
+                Files.move(
+                    temp.toPath(),
+                    File(dir, fileName).toPath(),
+                    StandardCopyOption.ATOMIC_MOVE,
+                    StandardCopyOption.REPLACE_EXISTING,
+                )
             } finally {
                 temp.delete()
             }
