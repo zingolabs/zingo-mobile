@@ -51,6 +51,29 @@ RCT_EXTERN_METHOD(loadExistingWallet:
                   minconfirmations:(NSString)minconfirmations
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(loadWalletProcess:
+    (NSString)walletId
+                  serveruri:(NSString)serveruri
+                  chainhint:(NSString)chainhint
+                  performancelevel:(NSString)performancelevel
+                  minconfirmations:(NSString)minconfirmations
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(walletsInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(updateWalletMetaProcess:
+    (NSString)walletId
+                  patch:(NSString)patch
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(deleteWalletProcess:
+    (NSString)walletId
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(diskSpaceInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(restoreExistingWalletBackup:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)

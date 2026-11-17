@@ -205,4 +205,74 @@ class WalletStoreTest {
 
         assertEquals(JSONObject().toString(), WalletStore.list(base).single().meta.toString())
     }
+
+    @Test
+    fun `Tests that a patch sets and removes fields but never the store's own`() {
+        val id = committed("Wallet 1")
+        val meta = WalletStore.list(base).single().meta.put("migratedFrom", "abc").put("category", 2)
+        val patch = JSONObject()
+            .put("name", "Savings")
+            .put("category", JSONObject.NULL)
+            .put("id", "other")
+            .put("v", 9)
+            .put("migratedFrom", "def")
+
+        val patched = WalletStore.patchMeta(meta, patch)
+
+        assertEquals("Savings", patched.getString("name"))
+        assertFalse(patched.has("category"))
+        assertEquals(id, patched.getString("id"))
+        assertEquals(1, patched.getInt("v"))
+        assertEquals("abc", patched.getString("migratedFrom"))
+        assertEquals(2, meta.getInt("category"))
+    }
+
+    @Test
+    fun `Tests that a new wallet's meta carries its kind when given`() {
+        val id = WalletStore.allocate(base)
+
+        assertEquals("ufvk", WalletStore.newMeta(base, id, "Wallet 1", "main", null, "ufvk").getString("kind"))
+        assertFalse(WalletStore.newMeta(base, id, "Wallet 1", "main", null).has("kind"))
+    }
+
+    @Test
+    fun `Tests that the info lists the wallets in order with the active one`() {
+        val first = committed("Wallet 1")
+        val second = committed("Wallet 2")
+        WalletStore.setActive(base, second)
+
+        val info = WalletStore.info(base)
+
+        assertEquals(second, info.getString("active"))
+        val wallets = info.getJSONArray("wallets")
+        assertEquals(first, wallets.getJSONObject(0).getString("id"))
+        assertEquals("Wallet 2", wallets.getJSONObject(1).getJSONObject("meta").getString("name"))
+        assertTrue(wallets.getJSONObject(1).getBoolean("hasFile"))
+    }
+
+    @Test
+    fun `Tests that the info reports no active wallet as null`() {
+        committed("Wallet 1")
+
+        assertTrue(WalletStore.info(base).isNull("active"))
+    }
+
+    @Test
+    fun `Tests that the largest wallet is the biggest file on disk`() {
+        val small = committed("Wallet 1")
+        val big = committed("Wallet 2")
+        walletFile(big).writeBytes(ByteArray(500))
+
+        assertEquals(500L, WalletStore.largestWallet(base))
+        assertEquals(64L, walletFile(small).length())
+    }
+
+    @Test
+    fun `Tests that a full storage is told apart from other write failures`() {
+        val errno = RuntimeException("write failed: ENOSPC (No space left on device)")
+
+        assertTrue(WalletStore.isDiskFull(java.io.IOException("wrapped", errno)))
+        assertTrue(WalletStore.isDiskFull(java.io.IOException("No space left on device")))
+        assertFalse(WalletStore.isDiskFull(java.io.IOException("Permission denied")))
+    }
 }
