@@ -131,7 +131,7 @@ import { duration as motionDuration } from '@app/theme/motion';
 
 import { sendEmail } from '@app/services/sendEmail';
 import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { DEFAULT_PERFORMANCE_LEVEL } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import {
   RootParamList,
   LoadedAppNavigationState,
@@ -174,8 +174,6 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(
     SelectServerEnum.auto,
   );
-  const [performanceLevel, setPerformanceLevel] =
-    useState<RPCPerformanceLevelEnum>(RPCPerformanceLevelEnum.Medium);
   const [blockExplorer, setBlockExplorer] = useState<BlockExplorerEnum>(
     BlockExplorerEnum.Zcashexplorer,
   );
@@ -282,19 +280,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         );
       }
       if (
-        settings.performanceLevel === RPCPerformanceLevelEnum.High ||
-        settings.performanceLevel === RPCPerformanceLevelEnum.Low ||
-        settings.performanceLevel === RPCPerformanceLevelEnum.Maximum ||
-        settings.performanceLevel === RPCPerformanceLevelEnum.Medium
-      ) {
-        setPerformanceLevel(settings.performanceLevel);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.performanceLevel,
-          performanceLevel,
-        );
-      }
-      if (
         settings.blockExplorer === BlockExplorerEnum.ZecBlock ||
         settings.blockExplorer === BlockExplorerEnum.Zcashexplorer ||
         settings.blockExplorer === BlockExplorerEnum.Zexplorer ||
@@ -344,7 +329,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         firstLaunchingMessage={firstLaunchingMessage}
         biometrics={biometrics}
         selectServer={selectServer}
-        performanceLevel={performanceLevel}
         blockExplorer={blockExplorer}
       />
     );
@@ -366,7 +350,6 @@ type LoadingAppClassProps = {
   firstLaunchingMessage: LaunchingModeEnum;
   biometrics: boolean;
   selectServer: SelectServerEnum;
-  performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
 };
 
@@ -414,7 +397,6 @@ export class LoadingAppClass extends Component<
       privacy: props.privacy,
       biometrics: props.biometrics,
       selectServer: props.selectServer,
-      performanceLevel: props.performanceLevel,
       blockExplorer: props.blockExplorer,
 
       // state
@@ -867,7 +849,7 @@ export class LoadingAppClass extends Component<
     const result = await loadExistingWallet(
       nativeUri(this.state.server),
       this.state.server.chainName,
-      this.state.performanceLevel,
+      DEFAULT_PERFORMANCE_LEVEL,
       GlobalConst.minConfirmations.toString(),
     );
 
@@ -1151,7 +1133,7 @@ export class LoadingAppClass extends Component<
       serverUri,
       birthday,
       this.state.server.chainName,
-      this.state.performanceLevel,
+      DEFAULT_PERFORMANCE_LEVEL,
       GlobalConst.minConfirmations.toString(),
     );
 
@@ -1334,7 +1316,7 @@ export class LoadingAppClass extends Component<
         walletBirthday,
         nativeUri(this.state.server),
         this.state.server.chainName,
-        this.state.performanceLevel,
+        DEFAULT_PERFORMANCE_LEVEL,
         GlobalConst.minConfirmations.toString(),
       );
     } else {
@@ -1343,7 +1325,7 @@ export class LoadingAppClass extends Component<
         walletBirthday,
         nativeUri(this.state.server),
         this.state.server.chainName,
-        this.state.performanceLevel,
+        DEFAULT_PERFORMANCE_LEVEL,
         GlobalConst.minConfirmations.toString(),
       );
     }
@@ -1757,7 +1739,6 @@ export class LoadingAppClass extends Component<
       privacy: this.state.privacy,
       biometrics: this.state.biometrics,
       selectServer: this.state.selectServer,
-      performanceLevel: this.state.performanceLevel,
       blockExplorer: this.state.blockExplorer,
 
       // the loading section

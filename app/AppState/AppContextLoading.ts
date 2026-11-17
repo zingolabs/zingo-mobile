@@ -8,7 +8,6 @@ import ServerType from './types/ServerType';
 import { LanguageEnum } from './enums/LanguageEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
 import type { WalletType } from '@app/wallet/types';
@@ -42,7 +41,6 @@ export default interface AppContextLoading extends OnboardingContext {
   privacy: boolean;
   biometrics: boolean;
   selectServer: SelectServerEnum;
-  performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
 }
 
