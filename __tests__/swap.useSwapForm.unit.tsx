@@ -291,3 +291,84 @@ test('Tests that the chosen coin stays when a flip loads the other direction’s
   );
   expect(result.current.selectedToken).toEqual(USDT);
 });
+
+const ETH: TokenEntryType = {
+  chain: 'ETH',
+  chainId: '1',
+  ticker: 'ETH',
+  identifier: 'ETH.ETH',
+  symbol: 'ETH',
+  name: 'Ethereum',
+  decimals: 18,
+};
+
+type QuoteReply = Awaited<ReturnType<SwapService['quote']>>;
+
+/** A service whose quotes answer only when the test says so, in any order. */
+const heldService = () => {
+  const replies: Array<(reply: QuoteReply) => void> = [];
+  const quote = jest.fn(
+    (_input: QuoteInput) =>
+      new Promise<QuoteReply>(resolve => {
+        replies.push(resolve);
+      }),
+  );
+  const listRoutableTokens = jest.fn(async () => [BTC, ETH]);
+  return {
+    swapService: { quote, listRoutableTokens } as unknown as SwapService,
+    quote,
+    answer: (index: number, routeId: string) =>
+      act(async () => {
+        replies[index]({
+          routes: [route({ routeId })],
+          unavailable: [],
+          rawResponse: {},
+        } as unknown as QuoteReply);
+      }),
+  };
+};
+
+test('Tests that a quote for the previous coin is dropped when the coin changes while it is asked', async () => {
+  const { swapService, quote, answer } = heldService();
+  const { result } = render(swapService);
+  await waitFor(() => expect(result.current.selectedToken).toEqual(BTC));
+  act(() => result.current.setAmount('1'));
+  await settle(1000);
+  await waitFor(() => expect(quote).toHaveBeenCalledTimes(1));
+
+  act(() => result.current.setSelectedToken(ETH));
+  await settle(1000);
+  await waitFor(() => expect(quote).toHaveBeenCalledTimes(2));
+  expect(quote.mock.calls[1][0]).toMatchObject({
+    receiveAsset: { swapKitId: 'ETH.ETH' },
+  });
+  await answer(0, 'route-btc');
+
+  expect(result.current.routes).toBeNull();
+  expect(result.current.quoteContext).toBeNull();
+  await answer(1, 'route-eth');
+  expect(result.current.chosenRoute?.routeId).toBe('route-eth');
+  expect(result.current.quoteContext?.quoteInput.receiveAsset.swapKitId).toBe(
+    'ETH.ETH',
+  );
+});
+
+test('Tests that a quote for the previous amount is dropped when the amount changes while it is asked', async () => {
+  const { swapService, quote, answer } = heldService();
+  const { result } = render(swapService);
+  await waitFor(() => expect(result.current.selectedToken).toEqual(BTC));
+  act(() => result.current.setAmount('1'));
+  await settle(1000);
+  await waitFor(() => expect(quote).toHaveBeenCalledTimes(1));
+
+  act(() => result.current.setAmount('2'));
+  await settle(1000);
+  await waitFor(() => expect(quote).toHaveBeenCalledTimes(2));
+  await answer(1, 'route-two');
+  await answer(0, 'route-one');
+
+  expect(result.current.chosenRoute?.routeId).toBe('route-two');
+  expect(result.current.quoteContext?.quoteInput.sellAmountHumanDecimal).toBe(
+    '2',
+  );
+});
