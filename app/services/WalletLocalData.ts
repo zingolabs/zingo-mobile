@@ -10,6 +10,7 @@ import {
   WalletEntry,
 } from '@app/walletBackend/utils/walletStore';
 import { RECEIVE_PIN_KEY_PREFIX } from './ReceivePinImpl';
+import { forgetRecoveryEntry } from './recoveryWalletInfo';
 import AddressBookFileImpl from './AddressBookFileImpl';
 import { IRONWOOD_HIDDEN_KEY_PREFIX } from './IronwoodNoticeImpl';
 
@@ -18,7 +19,8 @@ import { IRONWOOD_HIDDEN_KEY_PREFIX } from './IronwoodNoticeImpl';
  * records, its pinned Receive address and whether it hid the Ironwood
  * notice. The address book is shared by every wallet, and only the tags of
  * the addresses its swaps made go with it. They leave with the wallet, or
- * they outlive a wallet the user removed.
+ * they outlive a wallet the user removed. Its Keychain entry goes too,
+ * unless it is the last wallet: a later restore reads that one.
  *
  * Single-wallet builds keyed them by the wallet's fingerprint. A wallet
  * migrated from that layout takes the data of its fingerprint on its first
@@ -52,6 +54,7 @@ async function forget(owner: string): Promise<void> {
 export async function forgetWallet(walletId: string): Promise<void> {
   if (walletId) {
     await forget(walletId);
+    await forgetRecoveryEntry(walletId);
   }
 }
 
@@ -59,7 +62,7 @@ export async function forgetWallet(walletId: string): Promise<void> {
 export async function forgetWalletOnFile(): Promise<void> {
   const result = await walletsOnDevice();
   if (result.ok && result.value.active.kind === 'wallet') {
-    await forget(result.value.active.id);
+    await forgetWallet(result.value.active.id);
   }
 }
 

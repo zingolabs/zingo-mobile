@@ -118,8 +118,7 @@ import {
 import { defaultTo, isEqual } from 'lodash';
 import {
   createUpdateRecoveryWalletInfo,
-  getRecoveryWalletInfo,
-  hasRecoveryWalletInfo,
+  recoveryEntriesOnDevice,
 } from '@app/services/recoveryWalletInfo';
 
 // no lazy load because slowing down screens.
@@ -549,12 +548,17 @@ export class LoadingAppClass extends Component<
     this.setState({ actionButtonsDisabled: true });
 
     // has the device the Wallet Keys stored?
-    const has = await hasRecoveryWalletInfo();
-    const recovery = has ? await getRecoveryWalletInfo() : null;
+    const entries = await recoveryEntriesOnDevice();
+    const recovery = entries.length > 0 ? entries[0] : null;
     this.setState({
-      hasRecoveryWalletInfoSaved: has,
-      recoveryWallet:
-        recovery && (recovery.seed || recovery.ufvk) ? recovery : null,
+      hasRecoveryWalletInfoSaved: entries.length > 0,
+      recoveryWallet: recovery
+        ? {
+            seed: recovery.seed,
+            ufvk: recovery.ufvk,
+            birthday: recovery.birthday,
+          }
+        : null,
     });
 
     // Boot-time server selection. `auto` refetches the live list and activates
