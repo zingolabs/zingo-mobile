@@ -30,7 +30,6 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlin.time.toJavaDuration
-import org.ZingoLabs.Zingo.Constants.*
 import java.io.FileInputStream
 
 class BackgroundSyncWorker(private val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
@@ -80,8 +79,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             return Result.failure()
         }
 
-        // checking if the wallet file exists
-        val exists: Boolean = rpcModule.fileExists(WalletFileName.value)
+        val exists: Boolean = rpcModule.hasActiveWallet()
 
         if (exists) {
             try {

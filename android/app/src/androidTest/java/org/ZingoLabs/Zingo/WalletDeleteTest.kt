@@ -9,16 +9,14 @@ import org.junit.Test
 import java.io.File
 
 /**
- * Wallet deletion removes every sidecar that the startup recovery paths
- * could rename or copy back onto the wallet path.
+ * Wallet deletion removes the active wallet's folder with every sidecar
+ * the recovery paths could rename or copy back onto the wallet file.
  *
  * Run: ./gradlew :app:connectedProdDebugAndroidTest \
  *   -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.WalletDeleteTest
  */
 @OfflineDeviceTest
 class WalletDeleteTest {
-    private val mainName = Constants.WalletFileName.value
-    private val backupName = Constants.WalletBackupFileName.value
     private val swapName = Constants.WalletTempSwapFileName.value
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val rpcModule = RPCModule(MainApplication.getAppReactContext())
@@ -43,6 +41,8 @@ class WalletDeleteTest {
 
     private fun file(name: String) = File(context.filesDir, name)
 
+    private fun folder() = rpcModule.activeWalletDir()
+
     private fun deleteWallet(): Any? {
         val promise = CapturingPromise()
         rpcModule.deleteExistingWallet(promise)
@@ -55,51 +55,55 @@ class WalletDeleteTest {
         return promise.resolved.single()
     }
 
+    private fun anActiveWallet(): File {
+        val base = context.filesDir
+        val id = WalletStore.allocate(base)
+        PlainWalletFile.write(WalletStore.dir(base, id), WalletStore.WALLET, plainWallet)
+        WalletStore.writeMeta(base, id, WalletStore.newMeta(base, id, "Wallet 1", "main", ""))
+        WalletStore.setActive(base, id)
+        return WalletStore.dir(base, id)
+    }
+
     @Before
     fun aRealWalletOnDisk() {
         val suffixes = listOf("", ".migrating", ".write.tmp", ".plain.tmp", ".prerepair", ".broken")
-        for (name in listOf(mainName, backupName)) {
+        for (name in listOf(Constants.WalletFileName.value, Constants.WalletBackupFileName.value)) {
             for (suffix in suffixes) file("$name$suffix").delete()
         }
         file(swapName).delete()
-        RPCModule.walletFileClosed = false
+        WalletStore.root(context.filesDir).deleteRecursively()
+        RPCModule.openWalletId = null
         uniffi.zingo.initLogging()
         uniffi.zingo.initFromSeed(seed = Seeds.HOSPITAL, birthday = 2000000u, connection = testConnection("", "main"))
         plainWallet = uniffi.zingo.saveWalletBytes()!!
-        file(mainName).writeBytes(plainWallet)
+        anActiveWallet()
     }
 
     @Test
     fun aSaveAfterDeleteIsRefusedUntilTheNextLoad() {
+        rpcModule.loadExistingWalletNative("", "main", "Medium", "1")
+        val deleted = folder()
+
         assertThat(deleteWallet()).isEqualTo(true)
 
         assertThat(rpcModule.saveWalletFile()).isFalse()
-        assertThat(file(mainName).exists()).isFalse()
+        assertThat(deleted.exists()).isFalse()
 
-        file(mainName).writeBytes(plainWallet)
+        anActiveWallet()
         rpcModule.loadExistingWalletNative("", "main", "Medium", "1")
         assertThat(rpcModule.saveWalletFile()).isTrue()
     }
 
     @Test
-    fun aMigratingSidecarDoesNotResurrectTheDeletedWallet() {
-        file("$mainName.migrating").writeBytes(plainWallet)
+    fun theSidecarsInTheFolderDoNotResurrectTheDeletedWallet() {
+        for (suffix in listOf(".migrating", ".write.tmp")) {
+            File(folder(), WalletStore.WALLET + suffix).writeBytes(plainWallet)
+        }
 
         assertThat(deleteWallet()).isEqualTo(true)
 
         assertThat(walletExists()).isEqualTo(false)
-        assertThat(file(mainName).exists()).isFalse()
-        assertThat(file("$mainName.migrating").exists()).isFalse()
-    }
-
-    @Test
-    fun aWriteTempSidecarDoesNotResurrectTheDeletedWallet() {
-        file("$mainName.write.tmp").writeBytes(plainWallet)
-
-        assertThat(deleteWallet()).isEqualTo(true)
-
-        assertThat(walletExists()).isEqualTo(false)
-        assertThat(file("$mainName.write.tmp").exists()).isFalse()
+        assertThat(WalletStore.list(context.filesDir)).isEmpty()
     }
 
     @Test
@@ -108,23 +112,31 @@ class WalletDeleteTest {
 
         assertThat(deleteWallet()).isEqualTo(true)
 
-        assertThat(file(mainName).exists()).isFalse()
         assertThat(file(swapName).exists()).isTrue()
         file(swapName).delete()
     }
 
     @Test
     fun theEvidenceCopiesGoWithTheWallet() {
+        val deleted = folder()
         for (suffix in listOf(".broken", ".prerepair", ".plain.tmp")) {
-            file("$mainName$suffix").writeBytes(plainWallet)
+            File(deleted, WalletStore.WALLET + suffix).writeBytes(plainWallet)
         }
-        file(swapName).writeBytes(plainWallet)
 
         assertThat(deleteWallet()).isEqualTo(true)
 
-        for (suffix in listOf(".broken", ".prerepair", ".plain.tmp")) {
-            assertThat(file("$mainName$suffix").exists()).isFalse()
-        }
-        assertThat(file(swapName).exists()).isFalse()
+        assertThat(deleted.exists()).isFalse()
+    }
+
+    @Test
+    fun deletingTheActiveWalletKeepsTheOtherWallets() {
+        val first = folder()
+        val second = anActiveWallet()
+
+        assertThat(deleteWallet()).isEqualTo(true)
+
+        assertThat(first.exists()).isTrue()
+        assertThat(second.exists()).isFalse()
+        assertThat(walletExists()).isEqualTo(false)
     }
 }

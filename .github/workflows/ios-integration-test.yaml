@@ -111,7 +111,8 @@ jobs:
             FfiArgsTests \
             WalletFileProtectionTests \
             WalletFileDiagnosisTests \
-            WalletSwapRecoveryTests
+            WalletSwapRecoveryTests \
+            WalletStoreTests
           do
             only+=("-only-testing:ZingoTests/$class")
           done

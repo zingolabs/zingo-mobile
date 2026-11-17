@@ -9,8 +9,9 @@ import org.junit.Test
 import java.io.File
 
 /**
- * The wallet and retained-wallet swap recovered from every interruption
- * window, with real zingolib wallets on both sides.
+ * The legacy wallet and backup swap recovered from every interruption
+ * window, and the backup restore and replace on the folder layout, with
+ * real zingolib wallets on both sides.
  *
  * Run: ./gradlew :app:connectedProdDebugAndroidTest \
  *   -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.WalletSwapRecoveryTest
@@ -44,6 +45,8 @@ class WalletSwapRecoveryTest {
 
     private fun file(name: String) = File(context.filesDir, name)
 
+    private fun activeWallet() = File(rpcModule.activeWalletDir(), WalletStore.WALLET).readBytes()
+
     private fun offlineWallet(birthday: UInt): ByteArray {
         uniffi.zingo.initFromSeed(seed = Seeds.HOSPITAL, birthday = birthday, connection = testConnection("", "main"))
         return uniffi.zingo.saveWalletBytes()!!
@@ -56,7 +59,8 @@ class WalletSwapRecoveryTest {
             for (suffix in suffixes) file("$name$suffix").delete()
         }
         file(swapName).delete()
-        RPCModule.walletFileClosed = false
+        WalletStore.root(context.filesDir).deleteRecursively()
+        RPCModule.openWalletId = null
         uniffi.zingo.initLogging()
         walletA = offlineWallet(2000000u)
         walletB = offlineWallet(2100000u)
@@ -115,7 +119,7 @@ class WalletSwapRecoveryTest {
     }
 
     @Test
-    fun theRestoreSwapExchangesMainAndBackup() {
+    fun theRestoreMakesTheMigratedBackupTheActiveWallet() {
         file(mainName).writeBytes(walletA)
         file(backupName).writeBytes(walletB)
 
@@ -123,13 +127,14 @@ class WalletSwapRecoveryTest {
         rpcModule.restoreExistingWalletBackup(promise)
 
         assertThat(promise.resolved).containsExactly(true)
-        assertThat(file(mainName).readBytes()).isEqualTo(walletB)
-        assertThat(file(backupName).readBytes()).isEqualTo(walletA)
-        assertThat(file(swapName).exists()).isFalse()
+        assertThat(activeWallet()).isEqualTo(walletB)
+        assertThat(WalletStore.list(context.filesDir)).hasSize(2)
+        assertThat(file(mainName).exists()).isFalse()
+        assertThat(file(backupName).exists()).isFalse()
     }
 
     @Test
-    fun theReplaceTakesTheBackupAndDropsTheBackupFile() {
+    fun theReplaceDeletesTheActiveWalletAndActivatesTheBackup() {
         file(mainName).writeBytes(walletA)
         file(backupName).writeBytes(walletB)
 
@@ -137,8 +142,7 @@ class WalletSwapRecoveryTest {
         rpcModule.replaceWalletWithBackup(promise)
 
         assertThat(promise.resolved).containsExactly(true)
-        assertThat(file(mainName).readBytes()).isEqualTo(walletB)
-        assertThat(file(backupName).exists()).isFalse()
-        assertThat(file(swapName).exists()).isFalse()
+        assertThat(activeWallet()).isEqualTo(walletB)
+        assertThat(WalletStore.list(context.filesDir)).hasSize(1)
     }
 }

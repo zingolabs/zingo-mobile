@@ -23,12 +23,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         return "RPCModule"
     }
 
-    private fun getDocumentDirectory(): String {
-        return applicationContext.filesDir.absolutePath
-    }
-
-    private fun buildEncryptedFile(fileName: String): EncryptedFile =
-        buildEncryptedFile(File(applicationContext.filesDir, fileName))
+    private val filesDir: File get() = applicationContext.filesDir
 
     // The keyset is one per app; the file *name* is the AAD, so a file with
     // the same name in another directory decrypts with the same keyset.
@@ -44,15 +39,18 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     // The legacy decrypt used only as load recovery. Injectable so a test
     // can replay a transient Keystore failure (DoubleWrapReproTest).
-    internal var legacyDecrypt: (String) -> String = { readEncryptedFile(it) }
+    internal var legacyDecrypt: (File) -> String = { readEncryptedFile(it) }
 
     companion object {
-        // Set by delete and restore, cleared by the next successful wallet
-        // init: a stray save of the in-memory wallet must not resurrect a
-        // file the user replaced.
+        /** The wallet whose folder saves land in, null while no wallet file is open. */
         @Volatile
         @JvmField
-        internal var walletFileClosed = false
+        internal var openWalletId: String? = null
+
+        /** The meta a new wallet commits with on its first save. */
+        @Volatile
+        @JvmField
+        internal var pendingMeta: JSONObject? = null
     }
 
     fun fileExists(fileName: String): Boolean {
@@ -67,11 +65,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-    private fun readFile(fileName: String): ByteArray {
-        val file = applicationContext.openFileInput(fileName)
-        return file.readBytes()
-    }
-
     private fun writeFile(fileName: String, fileBytes: ByteArray) {
         val file = applicationContext.openFileOutput(fileName, Context.MODE_PRIVATE)
         file?.write(fileBytes)
@@ -83,8 +76,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         return file!!.delete()
     }
 
-    private fun readEncryptedFile(fileName: String): String {
-        return buildEncryptedFile(fileName).openFileInput().use { input ->
+    private fun readEncryptedFile(file: File): String {
+        return buildEncryptedFile(file).openFileInput().use { input ->
             input.bufferedReader(Charsets.UTF_8).readText()
         }
     }
@@ -99,9 +92,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     // Writes validated plain wallet bytes.
-    private fun writeWalletBytes(fileName: String, bytes: ByteArray) {
+    private fun writeWalletBytes(dir: File, fileName: String, bytes: ByteArray) {
         uniffi.zingo.validateWalletBytes(walletBytes = bytes)
-        PlainWalletFile.write(applicationContext.filesDir, fileName, bytes)
+        PlainWalletFile.write(dir, fileName, bytes)
     }
 
     // Reads a wallet file as raw bytes: the plain format first (the
@@ -119,18 +112,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // A thrown IOException here is outside the FFI's typed family, so a
     // bridge caller rejects it under the "Unknown" code; the message text
     // is the user-actionable diagnosis.
-    private fun readWalletBytes(fileName: String): ByteArray {
-        val filesDir = applicationContext.filesDir
-        PlainWalletFile.resolveInterruptedMigration(filesDir, fileName, ::isIntactWallet)
-        PlainWalletFile.readIfPlain(filesDir, fileName)?.let {
+    private fun readWalletBytes(dir: File, fileName: String): ByteArray {
+        PlainWalletFile.resolveInterruptedMigration(dir, fileName, ::isIntactWallet)
+        PlainWalletFile.readIfPlain(dir, fileName)?.let {
             return it
         }
-        val file = File(filesDir, fileName)
+        val file = File(dir, fileName)
         if (!file.exists()) {
             throw FileNotFoundException("Error: $fileName does not exist")
         }
         val payload = try {
-            Base64.decode(legacyDecrypt(fileName), Base64.NO_WRAP)
+            Base64.decode(legacyDecrypt(file), Base64.NO_WRAP)
         } catch (decryptError: Exception) {
             Log.e(
                 "MAIN",
@@ -154,7 +146,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                         "removed ($unwrapErrors). Please restore the wallet from your " +
                         "seed phrase or from your Viewing Key (UFVK)."
                     )
-                file.copyTo(File(filesDir, "$fileName.prerepair"), overwrite = true)
+                file.copyTo(File(dir, "$fileName.prerepair"), overwrite = true)
                 Log.i("MAIN", "[$fileName] removed ${unwrapped.second} extra envelope layer(s)")
                 unwrapped.first
             }
@@ -166,7 +158,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
         try {
             uniffi.zingo.validateWalletBytes(walletBytes = plain)
-            if (PlainWalletFile.migrateIfStillLegacy(filesDir, fileName, plain)) {
+            if (PlainWalletFile.migrateIfStillLegacy(dir, fileName, plain)) {
                 Log.i("MAIN", "[$fileName] migrated to plain wallet bytes")
             }
         } catch (writeError: Exception) {
@@ -175,30 +167,30 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         return plain
     }
 
-    // The content digest of a wallet file, streamed when the file is
-    // plain and decrypted when it is legacy.
+    // The content digest of a legacy root wallet file, streamed when the
+    // file is plain and decrypted when it is legacy.
     private fun walletDigest(fileName: String): ByteArray =
-        if (PlainWalletFile.readsPlain(applicationContext.filesDir, fileName)) {
-            PlainWalletFile.digest(applicationContext.filesDir, fileName)
+        if (PlainWalletFile.readsPlain(filesDir, fileName)) {
+            PlainWalletFile.digest(filesDir, fileName)
         } else {
-            PlainWalletFile.digest(readWalletBytes(fileName))
+            PlainWalletFile.digest(readWalletBytes(filesDir, fileName))
         }
 
-    // Restores the wallet file from its legacy "$fileName.write.tmp" stash
-    // when the file fails the full parse, and drops the orphan once the
-    // file passes.
+    // Restores the legacy root wallet file from its "$fileName.write.tmp"
+    // stash when the file fails the full parse, and drops the orphan once
+    // the file passes.
     fun completePendingWrite() {
         val fileName = WalletFileName.value
         val tempName = "$fileName.write.tmp"
         if (!fileExists(tempName)) return
         try {
             val targetIntact = fileExists(fileName) && try {
-                isIntactWallet(readWalletBytes(fileName))
+                isIntactWallet(readWalletBytes(filesDir, fileName))
             } catch (_: Exception) {
                 false
             }
             if (!targetIntact) {
-                writeWalletBytes(fileName, readWalletBytes(tempName))
+                writeWalletBytes(filesDir, fileName, readWalletBytes(filesDir, tempName))
                 Log.i("MAIN", "[Native] completePendingWrite: restored $fileName from $tempName")
             }
             deleteFile(tempName)
@@ -208,8 +200,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-    // Wallet and retained-wallet swap recovery (audit Issue P (b)). The
-    // swap in `restoreExistingWalletBackup` runs as:
+    // The legacy wallet and backup swap of older builds, finished before
+    // the root files move into folders (audit Issue P (b)). The swap ran as:
     //   (1) write temp(originalMain)
     //   (2) write main(originalBackup)
     //   (3) write backup(originalMain)
@@ -224,7 +216,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     //   between (3)–(4): main != temp AND backup == temp → nothing to write
     // Idempotent, a no-op when no temp file is present.
     fun completePendingSwap() {
-        val tempFile = File(applicationContext.filesDir, WalletTempSwapFileName.value)
+        val tempFile = File(filesDir, WalletTempSwapFileName.value)
         if (!tempFile.exists()) return
         try {
             val tempDigest = walletDigest(WalletTempSwapFileName.value)
@@ -232,22 +224,22 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 if (walletDigest(WalletFileName.value).contentEquals(tempDigest)) {
                     // (1)–(2) window: main not yet overwritten.
                     if (fileExists(WalletBackupFileName.value)) {
-                        writeWalletBytes(WalletFileName.value, readWalletBytes(WalletBackupFileName.value))
+                        writeWalletBytes(filesDir, WalletFileName.value, readWalletBytes(filesDir, WalletBackupFileName.value))
                     }
-                    writeWalletBytes(WalletBackupFileName.value, readWalletBytes(WalletTempSwapFileName.value))
+                    writeWalletBytes(filesDir, WalletBackupFileName.value, readWalletBytes(filesDir, WalletTempSwapFileName.value))
                 } else {
                     // (2)–(3) or post-(3) window: main already holds the new content.
                     val backupMatches = fileExists(WalletBackupFileName.value) &&
                         walletDigest(WalletBackupFileName.value).contentEquals(tempDigest)
                     if (!backupMatches) {
                         // (2)–(3) window or backup missing: write the lost content.
-                        writeWalletBytes(WalletBackupFileName.value, readWalletBytes(WalletTempSwapFileName.value))
+                        writeWalletBytes(filesDir, WalletBackupFileName.value, readWalletBytes(filesDir, WalletTempSwapFileName.value))
                     }
                     // else: post-(3), backup already correct.
                 }
             } else {
                 // Main missing: restore from temp.
-                writeWalletBytes(WalletFileName.value, readWalletBytes(WalletTempSwapFileName.value))
+                writeWalletBytes(filesDir, WalletFileName.value, readWalletBytes(filesDir, WalletTempSwapFileName.value))
             }
             deleteFile(WalletTempSwapFileName.value)
             Log.i("MAIN", "[Native] completePendingSwap: interrupted swap recovered")
@@ -263,21 +255,82 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         // `.migrating` copy answers "exists". Write recovery runs before
         // swap recovery: a half-written save can leave main missing, which
         // would make a pending swap unable to read main.
-        PlainWalletFile.resolveInterruptedMigration(applicationContext.filesDir, WalletFileName.value, ::isIntactWallet)
+        PlainWalletFile.resolveInterruptedMigration(filesDir, WalletFileName.value, ::isIntactWallet)
         completePendingWrite()
         completePendingSwap()
     }
 
-    @ReactMethod
-    fun walletExists(promise: Promise) {
-        resolvePendingWalletFiles()
-        promise.resolve(fileExists(WalletFileName.value))
+    private fun legacyServer(): JSONObject? = try {
+        JSONObject(File(filesDir, "settings.json").readText()).optJSONObject("server")
+    } catch (e: Exception) {
+        null
+    }
+
+    /** Moves a root wallet file into its folder, made plain first because a backup's encrypted bytes decrypt only under the legacy name. */
+    private fun adoptLegacy(fileName: String, name: String, active: Boolean) {
+        if (!fileExists(fileName)) return
+        val server = legacyServer()
+        val chain = try {
+            val bytes = readWalletBytes(filesDir, fileName)
+            if (!PlainWalletFile.readsPlain(filesDir, fileName)) {
+                writeWalletBytes(filesDir, fileName, bytes)
+            }
+            uniffi.zingo.readWalletChain(walletBytes = bytes)
+        } catch (e: Exception) {
+            if (fileName != WalletStore.WALLET) {
+                Log.e("MAIN", "[Native] $fileName stays in place, it does not read: $e")
+                return
+            }
+            Log.w("MAIN", "[Native] $fileName moves unread: $e")
+            server?.optString("chainName")
+        }
+        WalletStore.adoptLegacy(filesDir, fileName, name, active, chain, server?.optString("uri"))
+    }
+
+    /** Brings the files dir to the folder layout and ends what a crash interrupted. */
+    fun prepareWallets() {
+        PlainWalletFile.locked {
+            resolvePendingWalletFiles()
+            WalletStore.sweep(filesDir, openWalletId)
+            adoptLegacy(WalletFileName.value, "Wallet 1", true)
+            adoptLegacy(WalletBackupFileName.value, "Wallet Backup", false)
+        }
+    }
+
+    fun hasActiveWallet(): Boolean {
+        prepareWallets()
+        return WalletStore.active(filesDir) != null
+    }
+
+    private fun otherWallet(): String? {
+        val active = WalletStore.active(filesDir)
+        return WalletStore.list(filesDir).firstOrNull { it.id != active }?.id
+    }
+
+    internal fun activeWalletDir(): File =
+        WalletStore.active(filesDir)?.let { WalletStore.dir(filesDir, it) } ?: filesDir
+
+    private fun closeWalletFile() {
+        PlainWalletFile.locked {
+            openWalletId = null
+            pendingMeta = null
+        }
     }
 
     @ReactMethod
+    fun walletExists(promise: Promise) {
+        FfiOutcome.of("wallet_exists") {
+            hasActiveWallet()
+        }.settle(promise)
+    }
+
+    /** Whether a wallet besides the active one is on disk, which takes the legacy backup's place. */
+    @ReactMethod
     fun walletBackupExists(promise: Promise) {
-        resolvePendingWalletFiles()
-        promise.resolve(fileExists(WalletBackupFileName.value))
+        FfiOutcome.of("wallet_backup_exists") {
+            prepareWallets()
+            otherWallet() != null
+        }.settle(promise)
     }
 
     // The FFI contract is structural (zingo-mobile#1151; audit Issue Q):
@@ -288,6 +341,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         return try {
             uniffi.zingo.initLogging()
 
+            val id = openWalletId
+            if (id == null) {
+                Log.w("MAIN", "[Native] no wallet file open, save refused")
+                return false
+            }
             val walletBytes = uniffi.zingo.saveWalletBytes()
             if (walletBytes == null) {
                 Log.i("MAIN", "[Native] No need to save the wallet.")
@@ -295,11 +353,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             } else {
                 Log.i("MAIN", "[Native] file size: ${walletBytes.size} bytes")
                 PlainWalletFile.locked {
-                    if (walletFileClosed) {
-                        Log.w("MAIN", "[Native] wallet file closed, save refused")
+                    if (openWalletId != id) {
+                        Log.w("MAIN", "[Native] another wallet opened during the export, save refused")
                         false
                     } else {
-                        PlainWalletFile.write(applicationContext.filesDir, WalletFileName.value, walletBytes)
+                        PlainWalletFile.write(WalletStore.dir(filesDir, id), WalletStore.WALLET, walletBytes)
+                        pendingMeta?.let { meta ->
+                            WalletStore.writeMeta(filesDir, id, meta)
+                            WalletStore.setActive(filesDir, id)
+                            pendingMeta = null
+                        }
                         true
                     }
                 }
@@ -317,9 +380,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     // Includes each .migrating twin, a plain copy that flags an interrupted migration, but not the encrypted .prerepair/.broken copies that would only read as undecryptable.
     private fun walletFileNames(): List<String> =
-        WalletFileName.value.let {
+        WalletStore.WALLET.let {
             listOf(it, "$it.write.tmp", "$it.migrating")
-        } + WalletTempSwapFileName.value
+        }
 
     // The outer layer stored the base64 text of an inner envelope. The inner
     // envelope goes under the same file name in a scratch dir, because the
@@ -370,8 +433,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         return null
     }
 
-    internal fun decryptedPayload(fileName: String): ByteArray =
-        Base64.decode(legacyDecrypt(fileName), Base64.NO_WRAP)
+    internal fun decryptedPayload(file: File): ByteArray =
+        Base64.decode(legacyDecrypt(file), Base64.NO_WRAP)
 
     private fun fileHeadHex(file: File): String =
         file.inputStream().use { input ->
@@ -381,8 +444,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
 
     // state: missing | plainWallet | encryptedLegacy | doubleWrapped | undecryptable | unknown
-    internal fun diagnoseWalletFile(fileName: String): JSONObject {
-        val file = File(applicationContext.filesDir, fileName)
+    internal fun diagnoseWalletFile(dir: File, fileName: String): JSONObject {
+        val file = File(dir, fileName)
         val report = JSONObject()
             .put("name", fileName)
             .put("size", if (file.exists()) file.length() else 0)
@@ -391,11 +454,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             .put("repairable", false)
         if (!file.exists()) return report.put("state", "missing")
         report.put("head", fileHeadHex(file))
-        if (PlainWalletFile.readIfPlain(applicationContext.filesDir, fileName) != null) {
+        if (PlainWalletFile.readIfPlain(dir, fileName) != null) {
             return report.put("state", "plainWallet")
         }
         val payload = try {
-            decryptedPayload(fileName)
+            decryptedPayload(file)
         } catch (e: Exception) {
             Log.w("MAIN", "[$fileName] diagnosis: encrypted read failed: $e")
             return report.put("readError", e.toString()).put("state", "undecryptable")
@@ -417,11 +480,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun walletFileDiagnosisInfo(promise: Promise) {
         FfiOutcome.settling(promise, "wallet_file_diagnosis") {
+            val dir = activeWalletDir()
             val files = JSONArray()
             for (name in walletFileNames()) {
                 files.put(
                     try {
-                        diagnoseWalletFile(name)
+                        diagnoseWalletFile(dir, name)
                     } catch (e: Exception) {
                         Log.e("MAIN", "[$name] diagnosis failed: $e")
                         JSONObject().put("name", name).put("state", "unknown")
@@ -436,13 +500,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // Outcome per file: repaired | skipped | failed. The untouched original
     // stays at "$fileName.prerepair" (raw copy, decryptable only under the
     // original name), and the repaired file holds plain wallet bytes.
-    internal fun repairDoubleWrappedFile(fileName: String): String {
-        val filesDir = applicationContext.filesDir
-        val file = File(filesDir, fileName)
+    internal fun repairDoubleWrappedFile(dir: File, fileName: String): String {
+        val file = File(dir, fileName)
         if (!file.exists()) return "skipped"
-        if (PlainWalletFile.readIfPlain(filesDir, fileName) != null) return "skipped"
+        if (PlainWalletFile.readIfPlain(dir, fileName) != null) return "skipped"
         val payload = try {
-            decryptedPayload(fileName)
+            decryptedPayload(file)
         } catch (e: Exception) {
             Log.w("MAIN", "[$fileName] repair: encrypted read failed, nothing to unwrap: $e")
             return "skipped"
@@ -451,9 +514,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val unwrapped = unwrapToPlainWallet(fileName, payload) ?: return "failed"
         return try {
             uniffi.zingo.validateWalletBytes(walletBytes = unwrapped.first)
-            file.copyTo(File(filesDir, "$fileName.prerepair"), overwrite = true)
-            PlainWalletFile.write(filesDir, fileName, unwrapped.first)
-            val verified = PlainWalletFile.readIfPlain(filesDir, fileName) != null
+            file.copyTo(File(dir, "$fileName.prerepair"), overwrite = true)
+            PlainWalletFile.write(dir, fileName, unwrapped.first)
+            val verified = PlainWalletFile.readIfPlain(dir, fileName) != null
             Log.i("MAIN", "[$fileName] repair: removed ${unwrapped.second} layer(s), verified=$verified")
             if (verified) "repaired" else "failed"
         } catch (e: Exception) {
@@ -465,9 +528,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // Salvages seed and birthday from the raw bytes of the closed wallet
     // file and keeps the damaged bytes at "$fileName.broken".
     internal fun walletFileRecoveryInfoNative(): String {
-        val file = File(applicationContext.filesDir, WalletFileName.value)
+        val dir = activeWalletDir()
+        val file = File(dir, WalletStore.WALLET)
         val salvaged = uniffi.zingo.readWalletRecoveryInfo(walletBytes = file.readBytes())
-        file.copyTo(File(applicationContext.filesDir, "${WalletFileName.value}.broken"), overwrite = true)
+        file.copyTo(File(dir, "${WalletStore.WALLET}.broken"), overwrite = true)
         return salvaged
     }
 
@@ -484,7 +548,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun walletChainInfo(promise: Promise) {
         FfiOutcome.settling(promise, "read_wallet_chain") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.readWalletChain(walletBytes = readWalletBytes(WalletFileName.value))
+            uniffi.zingo.readWalletChain(walletBytes = readWalletBytes(activeWalletDir(), WalletStore.WALLET))
         }
     }
 
@@ -492,7 +556,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun repairDoubleWrappedWalletProcess(promise: Promise) {
         FfiOutcome.settling(promise, "repair_double_wrapped_wallet") {
             JSONObject()
-                .put(WalletFileName.value, repairDoubleWrappedFile(WalletFileName.value))
+                .put(WalletStore.WALLET, repairDoubleWrappedFile(activeWalletDir(), WalletStore.WALLET))
                 .toString()
         }
     }
@@ -515,18 +579,28 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     private fun connection(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String) =
         uniffi.zingo.IndexerConnection(indexer = indexerChoice(serveruri), chainHint = chainhint, sync = syncSettings(performancelevel, minconfirmations))
 
+    /** Opens a folder for the wallet just initialized, committed by its first save as the active wallet. */
+    private fun openNewWallet(serveruri: String, chainhint: String) {
+        val id = WalletStore.allocate(filesDir)
+        PlainWalletFile.locked {
+            pendingMeta = WalletStore.newMeta(filesDir, id, WalletStore.defaultName(filesDir), chainhint, serveruri)
+            openWalletId = id
+        }
+        saveWalletFile()
+    }
+
     @ReactMethod
     fun createNewWallet(serveruri: String, birthday: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
         FfiOutcome.settling(promise, "init_new") {
             uniffi.zingo.initLogging()
+            closeWalletFile()
 
             // Create a seed. initNew throws on failure, so reaching the save
             // implies the wallet exists. Offline (empty serveruri) uses
             // `birthday` in place of the chain tip; online it is ignored
             // (pass "0").
             val resp = uniffi.zingo.initNew(connection = connection(serveruri, chainhint, performancelevel, minconfirmations), birthday = birthday.toUInt())
-            walletFileClosed = false
-            saveWalletFile()
+            openNewWallet(serveruri, chainhint)
             resp
         }
     }
@@ -535,10 +609,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun restoreWalletFromSeed(seed: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
         FfiOutcome.settling(promise, "init_from_seed") {
             uniffi.zingo.initLogging()
+            closeWalletFile()
 
             val resp = uniffi.zingo.initFromSeed(seed = seed, birthday = birthday.toUInt(), connection = connection(serveruri, chainhint, performancelevel, minconfirmations))
-            walletFileClosed = false
-            saveWalletFile()
+            openNewWallet(serveruri, chainhint)
             resp
         }
     }
@@ -547,13 +621,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun restoreWalletFromUfvk(ufvk: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
         FfiOutcome.settling(promise, "init_from_ufvk") {
             uniffi.zingo.initLogging()
+            closeWalletFile()
 
             val resp = uniffi.zingo.initFromUfvk(ufvk = ufvk, birthday = birthday.toUInt(), connection = connection(serveruri, chainhint, performancelevel, minconfirmations))
-            walletFileClosed = false
-            saveWalletFile()
+            openNewWallet(serveruri, chainhint)
             resp
         }
-}
+    }
 
     @ReactMethod
     fun loadExistingWallet(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
@@ -567,122 +641,60 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun loadExistingWalletNative(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String): String {
         uniffi.zingo.initLogging()
 
-        val walletBytes = readWalletBytes(WalletFileName.value)
+        prepareWallets()
+        val id = WalletStore.active(filesDir) ?: throw FileNotFoundException("Error: no wallet is active")
+        closeWalletFile()
+        val walletBytes = readWalletBytes(WalletStore.dir(filesDir, id), WalletStore.WALLET)
         Log.i("MAIN", "file size: ${walletBytes.size} bytes")
 
         val resp = uniffi.zingo.initFromBytes(walletBytes = walletBytes, connection = connection(serveruri, chainhint, performancelevel, minconfirmations))
-        walletFileClosed = false
+        openWalletId = id
         return resp
     }
 
+    /** Makes the other wallet the active one, the legacy backup restore on the folder layout. */
     @ReactMethod
     fun restoreExistingWalletBackup(promise: Promise) {
-        try {
-            val backup = readWalletBytes(WalletBackupFileName.value)
-            if (!isIntactWallet(backup)) {
-                Log.e("MAIN", "[Native] backup restore: content failed validation")
-                promise.resolve(false)
-                return
-            }
-            // Closed across the swap; the reload after a successful restore
-            // clears it.
-            walletFileClosed = true
-            if (fileExists(WalletFileName.value)) {
-                // Durable swap via temp file (audit Issue P (b)): the temp
-                // copy written at step (1) is what `completePendingSwap`
-                // restores after a crash before step (3).
-                //
-                // Recover any orphan temp from a prior crash before starting
-                // a new swap: it can hold the only copy of that crash's
-                // original main.
-                completePendingSwap()
-                val wallet = try {
-                    readWalletBytes(WalletFileName.value)
-                } catch (e: Exception) {
-                    // Keep the unreadable main's raw bytes aside and restore the backup into both slots.
-                    Log.w("MAIN", "[Native] backup restore: main unreadable, preserving raw and restoring backup: $e")
-                    File(applicationContext.filesDir, WalletFileName.value)
-                        .copyTo(File(applicationContext.filesDir, "${WalletFileName.value}.broken"), overwrite = true)
-                    writeWalletBytes(WalletFileName.value, backup)
-                    promise.resolve(true)
-                    return
-                }
-                writeWalletBytes(WalletTempSwapFileName.value, wallet)
-                writeWalletBytes(WalletFileName.value, backup)
-                writeWalletBytes(WalletBackupFileName.value, wallet)
-                deleteFile(WalletTempSwapFileName.value)
+        FfiOutcome.of("restore_wallet_backup") {
+            prepareWallets()
+            val other = otherWallet()
+            if (other == null) {
+                false
             } else {
-                // No wallet exists: restore backup as wallet, but KEEP the
-                // backup file. Deleting it here left the user with no backup
-                // right after a restore, so if they then created/restored a
-                // different wallet the just-restored one was gone. Keeping a
-                // duplicate copy as backup is far safer than none.
-                writeWalletBytes(WalletFileName.value, backup)
+                closeWalletFile()
+                WalletStore.setActive(filesDir, other)
+                true
             }
-            promise.resolve(true)
-        } catch (e: FileNotFoundException) {
-            Log.e("MAIN", "[Native] file not found during backup restore", e)
-            promise.resolve(false)
-        } catch (e: Exception) {
-            Log.e("MAIN", "[Native] Unexpected error during backup restore: $e")
-            promise.resolve(false)
-        }
+        }.settle(promise)
     }
 
-    // The backup takes the main wallet's place and the backup file goes:
-    // for a wallet that is never backed up (not mainnet), which is lost.
-    // A crash between the write and the delete leaves the same wallet in
-    // both files, which is harmless.
+    /** Makes the other wallet the active one and deletes the active one, the legacy backup replace on the folder layout. */
     @ReactMethod
     fun replaceWalletWithBackup(promise: Promise) {
-        try {
-            val backup = readWalletBytes(WalletBackupFileName.value)
-            if (!isIntactWallet(backup)) {
-                Log.e("MAIN", "[Native] backup replace: content failed validation")
-                promise.resolve(false)
-                return
+        FfiOutcome.of("replace_wallet_with_backup") {
+            prepareWallets()
+            val other = otherWallet()
+            if (other == null) {
+                false
+            } else {
+                val replaced = WalletStore.active(filesDir)
+                closeWalletFile()
+                WalletStore.setActive(filesDir, other)
+                if (replaced != null) WalletStore.delete(filesDir, replaced)
+                true
             }
-            // Closed until the reload after the replace.
-            walletFileClosed = true
-            completePendingSwap()
-            writeWalletBytes(WalletFileName.value, backup)
-            PlainWalletFile.locked {
-                deleteFile(WalletBackupFileName.value)
-                deleteWalletSidecars(WalletBackupFileName.value)
-            }
-            promise.resolve(true)
-        } catch (e: FileNotFoundException) {
-            Log.e("MAIN", "[Native] file not found during backup replace", e)
-            promise.resolve(false)
-        } catch (e: Exception) {
-            Log.e("MAIN", "[Native] Unexpected error during backup replace: $e")
-            promise.resolve(false)
-        }
+        }.settle(promise)
     }
 
-    // Deletes every sidecar the recovery paths could rename or copy back
-    // onto the wallet path.
-    private fun deleteWalletSidecars(fileName: String) {
-        for (suffix in listOf(".migrating", ".write.tmp", ".plain.tmp", ".prerepair", ".broken")) {
-            File(applicationContext.filesDir, "$fileName$suffix").delete()
-        }
-    }
-
-    // A swap temp that `completePendingSwap` could not consume can hold
-    // the only copy of a wallet, and it survives the delete.
     @ReactMethod
     fun deleteExistingWallet(promise: Promise) {
-        completePendingSwap()
-        val deleted = PlainWalletFile.locked {
-            val gone = fileExists(WalletFileName.value) && deleteFile(WalletFileName.value)
-            if (!fileExists(WalletFileName.value)) {
-                walletFileClosed = true
-                deleteWalletSidecars(WalletFileName.value)
-                File(applicationContext.filesDir, "${WalletTempSwapFileName.value}.plain.tmp").delete()
+        FfiOutcome.of("delete_wallet") {
+            PlainWalletFile.locked {
+                val id = WalletStore.active(filesDir)
+                closeWalletFile()
+                id != null && WalletStore.delete(filesDir, id)
             }
-            gone
-        }
-        promise.resolve(deleted)
+        }.settle(promise)
     }
 
     // saveWalletFile still contains its own failures

@@ -8,7 +8,7 @@
 import Foundation
 
 enum Constants: String {
-    // wallet files
+    // legacy wallet files, moved into wallets/ on launch
     case WalletFileName = "wallet.dat.txt"
     case WalletBackupFileName = "wallet.backup.dat.txt"
     // Marker file for Audit Issue P (b) — only present mid-swap during
