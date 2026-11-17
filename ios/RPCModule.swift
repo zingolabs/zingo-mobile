@@ -190,27 +190,60 @@ class RPCModule: NSObject {
   // sandbox, and backup exclusion. Class `complete` locked the file
   // seconds after screen lock and broke background saves. Backup
   // exclusion is the guard against restoring a stale wallet over a
-  // newer one and must never regress.
+  // newer one and must never regress. An atomic write lands a new file,
+  // which carries no exclusion yet, so every write marks it again.
   func writeFile(_ fileName: String, walletBytes: Data) throws {
     let filePath = try getFileName(fileName)
     try walletBytes.write(to: URL(fileURLWithPath: filePath), options: .atomic)
-    var fileURL = URL(fileURLWithPath: filePath)
-    var resourceValues = URLResourceValues()
-    resourceValues.isExcludedFromBackup = true
-    try? fileURL.setResourceValues(resourceValues)
-    try? FileManager.default.setAttributes(
-      [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication],
-      ofItemAtPath: filePath
-    )
+    excludeFromBackup(filePath)
+    applyRestingProtection(filePath)
   }
 
   func deleteFile(_ fileName: String) throws {
     try FileManager.default.removeItem(atPath: getFileName(fileName))
   }
 
-  // Moves the existing wallet file to the resting protection this build
-  // writes: class C plus backup exclusion. Old builds wrote class A, and
-  // a synced wallet can open without a save.
+  /// Keeps a file or folder out of iCloud and computer backups and reads the
+  /// mark back, with one retry. A mark that still does not hold is logged
+  /// with its cause and the caller goes on: the bytes are on disk already,
+  /// so failing the caller would not keep them out of the next backup, and
+  /// every save and every launch marks the wallet files again.
+  @discardableResult
+  func excludeFromBackup(_ path: String) -> Bool {
+    for attempt in 1...2 {
+      do {
+        var target = URL(fileURLWithPath: path)
+        var values = URLResourceValues()
+        values.isExcludedFromBackup = true
+        try target.setResourceValues(values)
+        // A fresh URL: the one just set answers from its own cache.
+        let held = try URL(fileURLWithPath: path)
+          .resourceValues(forKeys: [.isExcludedFromBackupKey])
+          .isExcludedFromBackup
+        if held == true {
+          return true
+        }
+        NSLog("Error: [Native] backup exclusion did not hold on \((path as NSString).lastPathComponent), attempt \(attempt)")
+      } catch {
+        NSLog("Error: [Native] backup exclusion failed on \((path as NSString).lastPathComponent), attempt \(attempt): \(error.localizedDescription)")
+      }
+    }
+    return false
+  }
+
+  /// Class C, the protection wallet files rest under. A failure leaves the
+  /// iOS default, which is the same class, so it is logged and left.
+  func applyRestingProtection(_ path: String) {
+    do {
+      try FileManager.default.setAttributes(
+        [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication],
+        ofItemAtPath: path
+      )
+    } catch {
+      NSLog("Error: [Native] protection class not set on \((path as NSString).lastPathComponent): \(error.localizedDescription)")
+    }
+  }
+
   // The swap records live in AsyncStorage, in Application Support. iCloud
   // backs that folder up unless told otherwise, and the wallet file it
   // belongs with is excluded, so the folder is created ahead of the first
@@ -219,24 +252,32 @@ class RPCModule: NSObject {
     let fm = FileManager.default
     guard let support = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first,
           let bundleId = Bundle.main.bundleIdentifier else { return }
-    var storage = support.appendingPathComponent(bundleId).appendingPathComponent("RCTAsyncLocalStorage_V1")
-    try? fm.createDirectory(at: storage, withIntermediateDirectories: true)
-    var resourceValues = URLResourceValues()
-    resourceValues.isExcludedFromBackup = true
-    try? storage.setResourceValues(resourceValues)
+    let storage = support.appendingPathComponent(bundleId).appendingPathComponent("RCTAsyncLocalStorage_V1")
+    do {
+      try fm.createDirectory(at: storage, withIntermediateDirectories: true)
+    } catch {
+      NSLog("Error: [Native] swap store folder not created: \(error.localizedDescription)")
+      return
+    }
+    excludeFromBackup(storage.path)
   }
 
+  // Moves every wallet file on disk to the resting state this build writes:
+  // class C plus backup exclusion. Old builds wrote class A, a synced wallet
+  // can open without a save, and the backup and the ".broken" copy are
+  // full wallets too.
   func applyWalletFileProtection() {
     let fm = FileManager.default
-    guard let path = try? getFileName(Constants.WalletFileName.rawValue), fm.fileExists(atPath: path) else { return }
-    var fileURL = URL(fileURLWithPath: path)
-    var resourceValues = URLResourceValues()
-    resourceValues.isExcludedFromBackup = true
-    try? fileURL.setResourceValues(resourceValues)
-    try? fm.setAttributes(
-      [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication],
-      ofItemAtPath: path
-    )
+    let names = [
+      Constants.WalletFileName.rawValue,
+      Constants.WalletBackupFileName.rawValue,
+      "\(Constants.WalletFileName.rawValue).broken",
+    ]
+    for name in names {
+      guard let path = try? getFileName(name), fm.fileExists(atPath: path) else { continue }
+      excludeFromBackup(path)
+      applyRestingProtection(path)
+    }
   }
 
   // Audit Issue P (b) — wallet ↔ backup swap recovery.
@@ -787,6 +828,9 @@ class RPCModule: NSObject {
         let brokenPath = "\(mainPath).broken"
         try? fm.removeItem(atPath: brokenPath)
         try? fm.copyItem(atPath: mainPath, toPath: brokenPath)
+        if fm.fileExists(atPath: brokenPath) {
+          self.excludeFromBackup(brokenPath)
+        }
         return salvaged
       }.settle(resolve: resolve, reject: reject)
     }
