@@ -561,6 +561,20 @@ class RPCModule: NSObject {
     try adoptLegacy(Constants.WalletBackupFileName.rawValue, name: "Wallet Backup", active: false)
   }
 
+  /// The active wallet's server uri and chain as its meta records them, the legacy settings.json server when the meta has none.
+  func activeServer() throws -> (uri: String, chain: String)? {
+    try prepareWallets()
+    let documents = try getDocumentsDirectory()
+    let legacy = legacyServer()
+    let id = WalletStore.active(documents)
+    let meta = WalletStore.list(documents).first { $0.id == id }?.meta
+    guard let server = (meta?["server"] as? [String: Any]) ?? legacy else { return nil }
+    let chain = [server["chainName"], meta?["chain"], legacy?["chainName"]]
+      .compactMap { $0 as? String }
+      .first { !$0.isEmpty } ?? ""
+    return (server["uri"] as? String ?? "", chain)
+  }
+
   func activeWalletId() throws -> String? {
     WalletStore.active(try getDocumentsDirectory())
   }

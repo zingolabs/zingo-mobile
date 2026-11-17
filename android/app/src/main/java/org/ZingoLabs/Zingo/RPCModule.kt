@@ -297,6 +297,19 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    /** The active wallet's server uri and chain as its meta records them, the legacy settings.json server when the meta has none. */
+    fun activeServer(): Pair<String, String>? {
+        prepareWallets()
+        val legacy = legacyServer()
+        val id = WalletStore.active(filesDir)
+        val meta = WalletStore.list(filesDir).firstOrNull { it.id == id }?.meta
+        val server = meta?.optJSONObject("server") ?: legacy ?: return null
+        val chain = server.optString("chainName")
+            .ifEmpty { meta?.optString("chain") ?: "" }
+            .ifEmpty { legacy?.optString("chainName") ?: "" }
+        return Pair(server.optString("uri"), chain)
+    }
+
     fun hasActiveWallet(): Boolean {
         prepareWallets()
         return WalletStore.active(filesDir) != null
