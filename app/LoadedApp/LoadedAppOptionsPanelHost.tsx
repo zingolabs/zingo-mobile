@@ -20,7 +20,7 @@ import WalletSeedIcon from '../../assets/img/options/wallet-seed.svg';
 import SyncRescanReportIcon from '../../assets/img/options/sync-rescan-report.svg';
 import FundsPoolsIcon from '../../assets/img/options/funds-pools.svg';
 import FinancialInsightIcon from '../../assets/img/options/financial-insight.svg';
-import { MessagesIcon } from '@ui/primitives/Icons/MessagesIcon';
+import MessagesArt from '../../assets/img/options/messages.svg';
 import { themeTokens } from '@app/theme';
 
 const SOCIAL_X_URL = 'https://x.com/ZingoLabs';
@@ -187,12 +187,11 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       onPress: () => dispatch(MenuItemEnum.Insight),
     });
 
-    // The app's icon until the panel's own artwork for Messages arrives.
     list.push({
       id: MenuItemEnum.Messages,
       testID: MENU_TEST_IDS[MenuItemEnum.Messages],
       label: translate('messages.title') as string,
-      icon: <MessagesIcon size={30} color={themeTokens.fgOptionIcon} />,
+      icon: <MessagesArt width={28} height={28} />,
       onPress: () => dispatch(MenuItemEnum.Messages),
     });
 
