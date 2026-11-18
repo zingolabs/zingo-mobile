@@ -113,6 +113,7 @@ import AddTagModalHost from './components/AddTagModalHost';
 import { showAddTag } from '@app/services/showAddTag';
 import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
+import WalletsSheet from '@screens/Wallets';
 import FadeInOnMount from '@ui/widgets/FadeInOnMount';
 import { showConfirm } from '@app/services/showConfirm';
 import { WalletNavigator } from '@app/navigation/WalletNavigator';
@@ -2258,6 +2259,7 @@ export class LoadedAppClass extends Component<
               <BottomSheetModalProvider>
                 <BottomSheetBackHandler />
                 <ConfirmBottomSheet />
+                <WalletsSheet />
                 <OptionsPanelProvider>
                   <FadeInOnMount duration={HOME_FADE_MS}>
                     {/* The tooltip layer for screens outside any sheet or panel. */}

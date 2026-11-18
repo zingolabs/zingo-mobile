@@ -13,11 +13,11 @@ import {
 } from '@app/theme';
 import Text from '@ui/primitives/Text';
 import Radio from '@ui/primitives/Radio';
-import Tag from '@ui/widgets/Tag';
+import Tag, { TagTone } from '@ui/widgets/Tag';
 import { useInsetFill } from '@ui/primitives/Surface';
 
-/** A pool or a recommendation beside a row's title. */
-export type PillTone = 'accent' | 'transparent';
+/** A pool, a recommendation or a wallet's state beside a row's title. */
+export type PillTone = TagTone;
 
 /** The card a group of radio rows sits in. */
 export function RadioList({
