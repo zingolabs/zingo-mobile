@@ -36,6 +36,7 @@ import { WifiIcon } from '@ui/primitives/Icons/WifiIcon';
 import { DatabaseIcon } from '@ui/primitives/Icons/DatabaseIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
+import { useCompact } from '@app/hooks/useCompact';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 // The title's place in the 402 x 874 design, as a fraction of the height.
@@ -117,6 +118,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
 
   const [containerH, setContainerH] = useState<number>(0);
   const bottomPad = useBottomActionPad();
+  const { gap } = useCompact();
   const { edges, fades } = useScrollEdges();
   const [backOnline, setBackOnline] = useState<boolean>(false);
   const [started, setStarted] = useState<string | null>(null);
@@ -344,21 +346,11 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           )}
         </View>
 
-        <View style={{ flexGrow: 1, minHeight: space16 }} />
-      </ScrollView>
-      {fades}
-
-      <Animated.View
-        entering={actionsEnter()}
-        style={{
-          alignItems: 'center',
-          paddingHorizontal: space20,
-          paddingTop: space8,
-          paddingBottom: bottomPad,
-        }}
-      >
         {found && (
-          <View style={{ alignSelf: 'stretch', marginBottom: space16 }}>
+          <Animated.View
+            entering={tagEnter()}
+            style={{ marginTop: gap(space24), marginHorizontal: space24 }}
+          >
             <Card>
               <View>
                 <View
@@ -417,8 +409,21 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             >
               <XIcon size={iconSizeSm} color={colors.fgMuted} />
             </Pressable>
-          </View>
+          </Animated.View>
         )}
+        <View style={{ flexGrow: 1, minHeight: space16 }} />
+      </ScrollView>
+      {fades}
+
+      <Animated.View
+        entering={actionsEnter()}
+        style={{
+          alignItems: 'center',
+          paddingHorizontal: space20,
+          paddingTop: space8,
+          paddingBottom: bottomPad,
+        }}
+      >
         {nonMain && server.kind === 'remote' && (
           <View style={{ marginBottom: space16 }}>
             {chip(

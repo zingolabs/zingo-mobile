@@ -1681,7 +1681,7 @@ export class LoadingAppClass extends Component<
    * Imports every wallet a previous install left in the Keychain, each on
    * its own network with its name, colour and server, then opens the first.
    * A single-wallet entry is a Mainnet wallet. No name step: each keeps its
-   * entry's name, or a default one, marked as imported.
+   * entry's name, or a default one.
    */
   importAllRecovery = async (entries: RecoveryEntry[]) => {
     if (entries.length === 0) {
@@ -1741,10 +1741,8 @@ export class LoadingAppClass extends Component<
               .map(w => w.meta.name)
           : [];
       await updateWalletMeta(added.id, {
-        name: (this.state.translate('found.imported-name') as string).replace(
-          '{name}',
-          entry.name || defaultWalletName(this.state.translate, others),
-        ),
+        name: entry.name || defaultWalletName(this.state.translate, others),
+        fromPrevious: true,
         ...(entry.category ? { category: entry.category } : {}),
         seedBackedUp: true,
         seedBackedUpAt: 0,

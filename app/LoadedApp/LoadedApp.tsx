@@ -1986,6 +1986,7 @@ export class LoadedAppClass extends Component<
     }
     await updateWalletMeta(result.params.walletId, {
       order: entry.meta.order,
+      ...(entry.meta.fromPrevious ? { fromPrevious: true } : {}),
       ...(entry.meta.category ? { category: entry.meta.category } : {}),
     });
     await forgetWallet(entry.id).then(() => deleteWallet(entry.id));
@@ -2149,8 +2150,7 @@ export class LoadedAppClass extends Component<
 
   /**
    * Imports the chosen wallets of a previous install beside the others, each
-   * on its own network and server with its name marked as imported, then
-   * opens the last one. Fails only when none could be added.
+   * on its own network and server with its name, then opens the last one. Fails only when none could be added.
    */
   importFound = async (
     entries: RecoveryEntry[],
@@ -2167,12 +2167,7 @@ export class LoadedAppClass extends Component<
       });
       const listed = await walletsOnDevice();
       const names = listed.ok ? listed.value.wallets.map(w => w.meta.name) : [];
-      const name = (
-        this.state.translate('found.imported-name') as string
-      ).replace(
-        '{name}',
-        entry.name || defaultWalletName(this.state.translate, names),
-      );
+      const name = entry.name || defaultWalletName(this.state.translate, names);
       const result = await this.addWallet(
         {
           kind: 'restore',
@@ -2191,11 +2186,10 @@ export class LoadedAppClass extends Component<
         message = result.message;
         continue;
       }
-      if (entry.category) {
-        await updateWalletMeta(result.params.walletId, {
-          category: entry.category,
-        });
-      }
+      await updateWalletMeta(result.params.walletId, {
+        fromPrevious: true,
+        ...(entry.category ? { category: entry.category } : {}),
+      });
       await retireImportedEntry(entry);
       added.push(result.params);
     }

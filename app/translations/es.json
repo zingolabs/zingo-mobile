@@ -1579,7 +1579,11 @@
     "restore-place": "Restaurar en su sitio",
     "open-other": "Abrir otra billetera",
     "restored-place": "{name} restaurada. El reescaneo sigue en segundo plano.",
-    "no-entry": "La frase semilla de esta billetera no está guardada en este dispositivo."
+    "no-entry": "La frase semilla de esta billetera no está guardada en este dispositivo.",
+    "previous": "Copias de billeteras anteriores",
+    "previous-sub": "{n} billeteras de una instalación anterior de Zingo",
+    "previous-sub-one": "1 billetera de una instalación anterior de Zingo",
+    "created-from-prev": "Instalación anterior"
   },
   "add": {
     "title": "Añadir billetera",
@@ -1629,8 +1633,7 @@
     "import-n": "Importar {n}",
     "importing": "Importando tus billeteras",
     "imported": "{n} billeteras importadas. Los reescaneos siguen en segundo plano.",
-    "imported-one": "1 billetera importada. El reescaneo sigue en segundo plano.",
-    "imported-name": "{name} (Importada)"
+    "imported-one": "1 billetera importada. El reescaneo sigue en segundo plano."
   },
   "disk": {
     "full-note": "No hay espacio suficiente en este dispositivo. Zingo necesita unos {mb} MB libres para guardar una billetera.",

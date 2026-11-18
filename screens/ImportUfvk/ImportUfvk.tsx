@@ -103,8 +103,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
 }) => {
   const context = useContext(ContextAppLoading);
   const { translate, netInfo, server, addLastSnackbar } = env ?? context;
-  /** Inside the wallet the blocks sit closer: 16 under the bar, 24 apart. */
-  const inApp = !!env;
   const { colors } = useTheme();
   const { gap } = useCompact();
   const bottomPad = useBottomActionPad();
@@ -327,7 +325,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
         onScrollBeginDrag={() => setTipOpen(false)}
         style={{ flex: 1 }}
         contentContainerStyle={{
-          paddingTop: inApp ? space16 : gap(space32),
+          paddingTop: gap(space32),
           paddingHorizontal: space20,
           paddingBottom: 200,
         }}
@@ -389,7 +387,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
 
         <View
           style={{
-            marginTop: inApp ? space24 : gap(space32),
+            marginTop: gap(space32),
             alignItems: 'center',
           }}
         >

@@ -1579,7 +1579,11 @@
     "restore-place": "Restaurar no lugar",
     "open-other": "Abrir outra carteira",
     "restored-place": "{name} restaurada. A nova verificação segue em segundo plano.",
-    "no-entry": "A frase semente desta carteira não está salva neste dispositivo."
+    "no-entry": "A frase semente desta carteira não está salva neste dispositivo.",
+    "previous": "Backups de carteiras anteriores",
+    "previous-sub": "{n} carteiras de uma instalação anterior do Zingo",
+    "previous-sub-one": "1 carteira de uma instalação anterior do Zingo",
+    "created-from-prev": "Instalação anterior"
   },
   "add": {
     "title": "Adicionar carteira",
@@ -1629,8 +1633,7 @@
     "import-n": "Importar {n}",
     "importing": "Importando suas carteiras",
     "imported": "{n} carteiras importadas. As novas verificações seguem em segundo plano.",
-    "imported-one": "1 carteira importada. A nova verificação segue em segundo plano.",
-    "imported-name": "{name} (Importada)"
+    "imported-one": "1 carteira importada. A nova verificação segue em segundo plano."
   },
   "disk": {
     "full-note": "Não há espaço suficiente neste dispositivo. O Zingo precisa de cerca de {mb} MB livres para salvar uma carteira.",

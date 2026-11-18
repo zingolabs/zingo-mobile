@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { Platform, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Route } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
@@ -21,19 +21,16 @@ import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 type AddWalletProps = NativeStackScreenProps<AppDrawerParamList, 'AddWallet'>;
 
-/** The system store that keeps the recovery entries, by its platform name. */
-const SECURE_STORE = Platform.OS === 'ios' ? 'Keychain' : 'Keystore';
-
 /** Where a new wallet comes from: made here, or restored from a seed phrase or a viewing key. */
 const AddWallet: React.FC<AddWalletProps> = ({ navigation }) => {
   const { translate } = useContext(ContextAppLoaded);
   const t = (key: string) => translate(key) as string;
   const { colors } = useTheme();
   const { edges, fades } = useScrollEdges();
-  const [found, setFound] = useState(false);
+  const [found, setFound] = useState(0);
 
   useEffect(() => {
-    recoveryEntriesOnDevice().then(entries => setFound(entries.length > 0));
+    recoveryEntriesOnDevice().then(entries => setFound(entries.length));
   }, []);
 
   /** A new wallet starts on the server the next one defaults to. */
@@ -118,7 +115,7 @@ const AddWallet: React.FC<AddWalletProps> = ({ navigation }) => {
             navigation.navigate(Route.RestoreWallet, { mode: 'key' })
           }
         />
-        {found && (
+        {found > 0 && (
           <>
             <View style={{ height: space8 }} />
             <OptionCard
@@ -126,11 +123,12 @@ const AddWallet: React.FC<AddWalletProps> = ({ navigation }) => {
               icon={HistoryIcon}
               iconBg={colors.bgAccentSubtle}
               iconColor={colors.fgAccent}
-              title={t('import.chooser-previous')}
-              sub={t('import.chooser-previous-sub').replace(
-                '{store}',
-                SECURE_STORE,
-              )}
+              title={t('wallets.previous')}
+              sub={
+                found === 1
+                  ? t('wallets.previous-sub-one')
+                  : t('wallets.previous-sub').replace('{n}', String(found))
+              }
               subColor={colors.fgMuted}
               disabled={false}
               onPress={() => navigation.navigate(Route.FoundWallets)}

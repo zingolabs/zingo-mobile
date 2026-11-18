@@ -1579,7 +1579,11 @@
     "restore-place": "Restore in place",
     "open-other": "Open another wallet",
     "restored-place": "{name} restored. The rescan runs in the background.",
-    "no-entry": "This wallet’s seed phrase isn’t saved on this device."
+    "no-entry": "This wallet’s seed phrase isn’t saved on this device.",
+    "previous": "Previous wallet backups",
+    "previous-sub": "{n} wallets from an earlier Zingo installation",
+    "previous-sub-one": "1 wallet from an earlier Zingo installation",
+    "created-from-prev": "Previous install"
   },
   "add": {
     "title": "Add wallet",
@@ -1629,8 +1633,7 @@
     "import-n": "Import {n}",
     "importing": "Importing your wallets",
     "imported": "{n} wallets imported. Rescans run in the background.",
-    "imported-one": "1 wallet imported. The rescan runs in the background.",
-    "imported-name": "{name} (Imported)"
+    "imported-one": "1 wallet imported. The rescan runs in the background."
   },
   "disk": {
     "full-note": "Not enough space on this device. Zingo needs about {mb} MB free to save a wallet.",

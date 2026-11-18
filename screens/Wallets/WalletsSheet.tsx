@@ -17,6 +17,8 @@ import {
 } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import {
+  iconSizeSm,
+  radiusPill,
   space4,
   space8,
   space12,
@@ -33,7 +35,13 @@ import { formatZecAmount } from '@app/utils/formatZecAmount';
 import type { WalletEntry } from '@app/walletBackend';
 import { updateWalletMeta } from '@app/walletBackend';
 import { askGate } from '@app/services/gateController';
-import { recoveryEntryFor } from '@app/services/recoveryWalletInfo';
+import {
+  recoveryEntriesOnDevice,
+  recoveryEntryFor,
+} from '@app/services/recoveryWalletInfo';
+import Card from '@ui/widgets/Card';
+import ListRow from '@ui/primitives/ListRow';
+import { HistoryIcon } from '@ui/primitives/Icons/HistoryIcon';
 import { DeleteWalletContext } from '@app/wallet/types';
 import AppSheetModal, { SheetScrollView } from '@ui/primitives/AppSheetModal';
 import Button from '@ui/primitives/Button';
@@ -53,6 +61,8 @@ import DetailRows from '@screens/Swap/components/DetailRows';
 
 /** A wallet's name, at most this long. */
 const NAME_MAX = 24;
+/** The icon disc of the previous backups row, as an option card's. */
+const HISTORY_DISC = 40;
 /** A row action's square, as Address Book's. */
 const ACTION = 36;
 /** The networks in the order the sheet lists them. */
@@ -106,6 +116,11 @@ export default function WalletsSheet() {
       }),
     [refreshWallets],
   );
+
+  const [previous, setPrevious] = useState(0);
+  useEffect(() => {
+    recoveryEntriesOnDevice().then(entries => setPrevious(entries.length));
+  }, [wallets]);
 
   useEffect(() => {
     readSavedBalances(wallets.map(w => w.id))
@@ -280,6 +295,25 @@ export default function WalletsSheet() {
               navigateWallet({ screen: Route.AddWallet });
             }}
           />
+          {previous > 0 && (
+            <Card flush>
+              <ListRow
+                testID="wallets.previous"
+                title={t('wallets.previous')}
+                subtitle={
+                  previous === 1
+                    ? t('wallets.previous-sub-one')
+                    : t('wallets.previous-sub').replace('{n}', String(previous))
+                }
+                leading={<HistoryDisc />}
+                chevron
+                onPress={() => {
+                  closeList();
+                  navigateWallet({ screen: Route.FoundWallets });
+                }}
+              />
+            </Card>
+          )}
         </SheetScrollView>
       </AppSheetModal>
 
@@ -555,7 +589,11 @@ const WalletSettingsSheet = React.forwardRef<
                 },
                 {
                   label: t('wallets.created-from'),
-                  value: t(viewOnly ? 'wallets.type-key' : 'wallets.type-seed'),
+                  value:
+                    t(viewOnly ? 'wallets.type-key' : 'wallets.type-seed') +
+                    (wallet.meta.fromPrevious
+                      ? ` · ${t('wallets.created-from-prev')}`
+                      : ''),
                 },
                 {
                   label: t('wallets.server'),
@@ -677,3 +715,22 @@ const WontOpenSheet = React.forwardRef<BottomSheetModal, WontOpenSheetProps>(
     );
   },
 );
+
+/** The icon disc of the row that leads to a previous install's wallets. */
+function HistoryDisc() {
+  const { colors } = useTheme();
+  return (
+    <View
+      style={{
+        width: HISTORY_DISC,
+        height: HISTORY_DISC,
+        borderRadius: radiusPill,
+        backgroundColor: colors.bgAccentSubtle,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <HistoryIcon size={iconSizeSm} color={colors.fgAccent} />
+    </View>
+  );
+}

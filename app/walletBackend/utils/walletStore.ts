@@ -30,6 +30,8 @@ export type WalletMeta = {
   viewOnlyNoticeDismissed?: boolean;
   /** The last attempt to open the wallet failed. */
   openFailed?: boolean;
+  /** Imported from what a previous install left in the Keychain. */
+  fromPrevious?: boolean;
 };
 
 /** The meta fields a patch may set; the store owns the rest. */
