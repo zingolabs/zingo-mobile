@@ -82,7 +82,7 @@ const decodeServer = (
   };
 };
 
-/** The wallet's own server over the file's, the default of a wallet that has none. */
+/** The wallet's own server over the file's, the default of a wallet that has none, and its network's default in Automatic when the list marks it obsolete and the user did not set it as custom. */
 const walletServer = (
   meta: WalletMetaPatch,
   file: SettingsWire,
@@ -94,10 +94,25 @@ const walletServer = (
         chainName: meta.server.chainName || meta.chain || fallback.chainName,
       }
     : fallback;
-  return decodeServer(
-    server,
-    defaultTo(meta.selectServer, file.selectServer) as SelectServerWire,
+  const mode = defaultTo(
+    meta.selectServer,
+    file.selectServer,
+  ) as SelectServerWire;
+  const replacement = serverUris(() => {}).find(
+    s => s.default && !s.obsolete && s.chainName === server.chainName,
   );
+  if (
+    mode !== SelectServerEnum.custom &&
+    mode !== 'offline' &&
+    replacement &&
+    listed(server, s => s.obsolete)
+  ) {
+    return decodeServer(
+      { uri: replacement.uri, chainName: replacement.chainName },
+      SelectServerEnum.auto,
+    );
+  }
+  return decodeServer(server, mode);
 };
 
 export default class SettingsFileImpl {
