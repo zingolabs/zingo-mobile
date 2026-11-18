@@ -379,6 +379,13 @@ const Server: React.FunctionComponent<ServerProps> = ({
     }
     setCustomOpen(null);
     setTab(chain);
+    if (
+      !offline &&
+      chain !== ChainNameEnum.regtestChainName &&
+      chain !== server.chainName
+    ) {
+      onAuto(chain);
+    }
   };
 
   const switchTo = (chain: ChainNameEnum) => {
