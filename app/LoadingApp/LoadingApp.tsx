@@ -91,6 +91,7 @@ import {
 import type { WalletErrorKind } from '@app/wallet/types';
 import { finishWalletOpen } from '@app/services/openWallet';
 import { entryChain, entryServer } from '@app/services/recoveryImport';
+import { askDiskRetry, isDiskFull } from '@app/services/diskFull';
 import { defaultWalletName } from '@screens/AddWallet/draftParts';
 import { isViewingKey } from '@app/utils/seedPhrase';
 import { AppTheme } from '@app/theme';
@@ -1248,6 +1249,11 @@ export class LoadingAppClass extends Component<
         LaunchingModeEnum.opening,
         this.state.server.chainName,
       );
+    } else if (isDiskFull(seed)) {
+      clearTimeout(showProgress);
+      this.setState({ actionButtonsDisabled: false });
+      goBack();
+      askDiskRetry(this.state.translate, () => this.createNewWallet(name));
     } else {
       clearTimeout(showProgress);
       this.setState({ actionButtonsDisabled: false });
@@ -1439,6 +1445,15 @@ export class LoadingAppClass extends Component<
     } else {
       error = true;
       errorText = result.ok ? result.value : result.error.message;
+    }
+    if (error && isDiskFull(result)) {
+      clearTimeout(showImporting);
+      this.setState({ actionButtonsDisabled: false });
+      returnTo(origin);
+      askDiskRetry(this.state.translate, () =>
+        this.doRestore(seedUfvk, birthday, origin, name),
+      );
+      return;
     }
     if (error) {
       clearTimeout(showImporting);
@@ -1683,6 +1698,7 @@ export class LoadingAppClass extends Component<
     });
     const opened: { id: string; server: ServerType }[] = [];
     const failed: string[] = [];
+    let diskFull = false;
     for (const entry of entries) {
       const chain = entryChain(entry);
       const { server, selectServer } = await entryServer(entry, chain, {
@@ -1710,6 +1726,10 @@ export class LoadingAppClass extends Component<
         after && after.ok
           ? after.value.wallets.find(w => !known.has(w.id))
           : undefined;
+      if (isDiskFull(result)) {
+        diskFull = true;
+        break;
+      }
       if (!added) {
         failed.push(entry.name || text.slice(0, 8));
         continue;
@@ -1746,6 +1766,12 @@ export class LoadingAppClass extends Component<
         sendEmail,
         this.state.zingolibVersion,
       );
+    }
+    if (opened.length === 0 && diskFull) {
+      this.setState({ actionButtonsDisabled: false });
+      returnTo(Route.FoundWallets);
+      askDiskRetry(this.state.translate, () => this.importAllRecovery(entries));
+      return;
     }
     if (opened.length === 0) {
       this.setState({ actionButtonsDisabled: false });

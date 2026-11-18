@@ -39,11 +39,13 @@ export type NewWalletSource =
 
 export type AddWalletResult =
   | { kind: 'added'; name: string; params: LoadedAppNavigationState }
+  | { kind: 'diskFull' }
   | { kind: 'failed'; message: string };
 
 export type ImportFoundFailed = { kind: 'failed'; message: string };
 
-export type ImportFoundResult = { kind: 'imported' } | ImportFoundFailed;
+export type ImportFoundResult =
+  { kind: 'imported' } | { kind: 'diskFull' } | ImportFoundFailed;
 
 export type WalletSwitchOutcome = { kind: 'opened' } | { kind: 'failed' };
 

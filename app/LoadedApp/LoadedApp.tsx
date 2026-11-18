@@ -156,6 +156,7 @@ import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTr
 import { publishReport } from '@app/services/reportDiagnostics';
 import { finishWalletOpen, WalletOpen } from '@app/services/openWallet';
 import { showWallets } from '@app/services/showWallets';
+import { askDiskRetry, isDiskFull } from '@app/services/diskFull';
 import { entryChain, entryServer } from '@app/services/recoveryImport';
 import {
   RecoveryEntry,
@@ -1968,6 +1969,11 @@ export class LoadedAppClass extends Component<
       entry.meta.name,
       { ...choice, keyChain: { kind: 'none' } },
     );
+    if (result.kind === 'diskFull') {
+      this.setState({ switching: { kind: 'none' } });
+      askDiskRetry(this.state.translate, () => this.restoreInPlace(entry));
+      return;
+    }
     if (result.kind === 'failed') {
       this.setState({ switching: { kind: 'none' } });
       this.addLastSnackbar(
@@ -2093,6 +2099,7 @@ export class LoadedAppClass extends Component<
       };
     }
 
+    const diskFull = isDiskFull(result);
     const message = !result.ok
       ? result.error.message
       : opened && opened.kind === 'failed'
@@ -2108,6 +2115,9 @@ export class LoadedAppClass extends Component<
     this.rpc.walletReopened();
     await this.rpc.configure();
     await this.refreshWallets();
+    if (diskFull) {
+      return { kind: 'diskFull' };
+    }
     return {
       kind: 'failed',
       message: Utils.humanizeChainTokens(message, this.state.translate),
@@ -2147,6 +2157,7 @@ export class LoadedAppClass extends Component<
   ): Promise<ImportFoundResult> => {
     const added: LoadedAppNavigationState[] = [];
     let lastOpen = false;
+    let diskFull = false;
     let message = '';
     for (const entry of entries) {
       const chain = entryChain(entry);
@@ -2172,6 +2183,10 @@ export class LoadedAppClass extends Component<
         { ...choice, keyChain: { kind: 'none' } },
       );
       lastOpen = result.kind === 'added';
+      if (result.kind === 'diskFull') {
+        diskFull = true;
+        break;
+      }
       if (result.kind === 'failed') {
         message = result.message;
         continue;
@@ -2186,7 +2201,7 @@ export class LoadedAppClass extends Component<
     }
     const last = added[added.length - 1];
     if (!last) {
-      return { kind: 'failed', message };
+      return diskFull ? { kind: 'diskFull' } : { kind: 'failed', message };
     }
     const opened = lastOpen
       ? { kind: 'reopened' as const, params: last }

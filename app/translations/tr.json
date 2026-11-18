@@ -1631,5 +1631,11 @@
     "imported": "{n} cüzdan içe aktarıldı. Yeniden taramalar arka planda sürüyor.",
     "imported-one": "1 cüzdan içe aktarıldı. Yeniden tarama arka planda sürüyor.",
     "imported-name": "{name} (İçe aktarıldı)"
+  },
+  "disk": {
+    "full-note": "Bu cihazda yeterli alan yok. Zingo'nun bir cüzdanı kaydetmek için yaklaşık {mb} MB boş alana ihtiyacı var.",
+    "fail-title": "Cüzdan kaydedilemedi",
+    "fail-body": "Cihazın depolama alanı dolu. Biraz yer açıp yeniden deneyin.",
+    "retry": "Yeniden dene"
   }
 }

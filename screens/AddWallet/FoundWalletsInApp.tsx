@@ -6,6 +6,7 @@ import { ContextAppLoaded } from '@app/context';
 import { AppDrawerParamList } from '@app/types';
 import { useTheme } from '@app/theme';
 import { askGate } from '@app/services/gateController';
+import { askDiskRetry } from '@app/services/diskFull';
 import {
   RecoveryEntry,
   recoveryEntriesOnDevice,
@@ -45,6 +46,11 @@ export default function FoundWalletsInApp({
     }
     setPhase({ kind: 'working' });
     const result = await importFound(chosen);
+    if (result.kind === 'diskFull') {
+      setPhase({ kind: 'list', entries: await recoveryEntriesOnDevice() });
+      askDiskRetry(translate, () => run(chosen));
+      return;
+    }
     if (result.kind === 'failed') {
       addLastSnackbar(
         (translate('add.error') as string).replace('{error}', result.message),

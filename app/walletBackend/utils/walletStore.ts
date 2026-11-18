@@ -156,7 +156,6 @@ export function hasRoomForWallet(space: DiskSpace): boolean {
   return space.free >= Math.max(2 * space.largest, MIN_FREE_BYTES);
 }
 
-/** Records the kind on the active wallet's meta when it has none, as a wallet migrated from the single-wallet layout. */
 /** Records whether a wallet's last open failed, writing only when that changes. */
 export async function recordOpenFailed(
   wallet: WalletEntry,
@@ -179,6 +178,7 @@ export async function recordActiveOpened(): Promise<void> {
   }
 }
 
+/** Records the kind on the active wallet's meta when it has none, as a wallet migrated from the single-wallet layout. */
 export async function recordWalletKind(kind: WalletKind): Promise<void> {
   const entry = await activeWalletEntry();
   if (entry.kind === 'wallet' && !entry.wallet.meta.kind) {

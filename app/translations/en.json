@@ -1631,5 +1631,11 @@
     "imported": "{n} wallets imported. Rescans run in the background.",
     "imported-one": "1 wallet imported. The rescan runs in the background.",
     "imported-name": "{name} (Imported)"
+  },
+  "disk": {
+    "full-note": "Not enough space on this device. Zingo needs about {mb} MB free to save a wallet.",
+    "fail-title": "Couldn’t save the wallet",
+    "fail-body": "The device’s storage is full. Free some space and try again.",
+    "retry": "Retry"
   }
 }

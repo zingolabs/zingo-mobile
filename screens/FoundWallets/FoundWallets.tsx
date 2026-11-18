@@ -16,6 +16,8 @@ import type { TranslateType } from '@app/AppState';
 import type { RecoveryEntry } from '@app/services/recoveryWalletInfo';
 import { formatInteger } from '@app/utils/formatAmount';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
+import { useRoomForWallet } from '@app/hooks/useRoomForWallet';
+import RoomNote from '@screens/AddWallet/RoomNote';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import Checkbox from '@ui/primitives/Checkbox';
@@ -49,6 +51,7 @@ export default function FoundWallets({
   const bottomPad = useBottomActionPad();
   const { edges, fades } = useScrollEdges();
   const [off, setOff] = useState<Set<number>>(() => new Set());
+  const room = useRoomForWallet();
   const t = (key: string) => translate(key) as string;
 
   const chosen = entries.filter((_e, i) => !off.has(i));
@@ -162,6 +165,7 @@ export default function FoundWallets({
       </ScrollView>
       {fades}
       <View style={{ paddingHorizontal: space20, paddingBottom: bottomPad }}>
+        <RoomNote room={room} translate={translate} />
         <Button
           testID="found.import"
           variant="primary"
@@ -171,7 +175,7 @@ export default function FoundWallets({
               : t('found.import-n').replace('{n}', String(chosen.length))
           }
           busy={busy}
-          disabled={chosen.length === 0}
+          disabled={chosen.length === 0 || room.kind === 'full'}
           onPress={() => onImport(chosen)}
         />
       </View>

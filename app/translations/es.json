@@ -1631,5 +1631,11 @@
     "imported": "{n} billeteras importadas. Los reescaneos siguen en segundo plano.",
     "imported-one": "1 billetera importada. El reescaneo sigue en segundo plano.",
     "imported-name": "{name} (Importada)"
+  },
+  "disk": {
+    "full-note": "No hay espacio suficiente en este dispositivo. Zingo necesita unos {mb} MB libres para guardar una billetera.",
+    "fail-title": "No se pudo guardar la billetera",
+    "fail-body": "El almacenamiento del dispositivo está lleno. Libera espacio e inténtalo de nuevo.",
+    "retry": "Reintentar"
   }
 }

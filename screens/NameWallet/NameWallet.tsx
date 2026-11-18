@@ -9,6 +9,8 @@ import Text from '@ui/primitives/Text';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import TitleBar from '@ui/widgets/TitleBar';
 import { NameField, WalletHero } from '@screens/AddWallet/draftParts';
+import RoomNote from '@screens/AddWallet/RoomNote';
+import { useRoomForWallet } from '@app/hooks/useRoomForWallet';
 
 type NameWalletProps = {
   /** What the first wallet is made from: a new seed, a seed phrase or a viewing key. */
@@ -32,6 +34,7 @@ const NameWallet: React.FC<NameWalletProps> = ({
   const t = (key: string) => translate(key) as string;
   const bottomPad = useBottomActionPad();
   const [name, setName] = useState('');
+  const room = useRoomForWallet();
   return (
     <View style={{ flex: 1 }}>
       <TitleBar
@@ -78,13 +81,14 @@ const NameWallet: React.FC<NameWalletProps> = ({
         </Text>
       </ScrollView>
       <View style={{ paddingHorizontal: space20, paddingBottom: bottomPad }}>
+        <RoomNote room={room} translate={translate} />
         <Button
           testID="namewallet.go"
           variant="primary"
           title={t(
             from === 'create' ? 'onboarding.create-go' : 'onboarding.import-go',
           )}
-          disabled={busy}
+          disabled={busy || room.kind === 'full'}
           onPress={() => onGo(name.trim() || placeholder)}
         />
       </View>

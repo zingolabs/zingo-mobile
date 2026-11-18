@@ -79,6 +79,8 @@ type ImportUfvkProps = {
   onKeyNetwork?: (network: KeyNetwork) => void;
   /** Off until the wallet's server is set, whatever the field holds. */
   goDisabled?: boolean;
+  /** A warning over the button, in place of the rescan note. */
+  goNote?: React.ReactNode;
 };
 // Waits for typing to pause before decoding the key.
 const KEY_CHECK_DELAY_MS = 300;
@@ -97,6 +99,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   extra,
   onKeyNetwork,
   goDisabled,
+  goNote,
 }) => {
   const context = useContext(ContextAppLoading);
   const { translate, netInfo, server, addLastSnackbar } = env ?? context;
@@ -442,7 +445,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
         }}
       />
 
-      {keyboardHeight === 0 && (
+      {keyboardHeight === 0 && !goNote && (
         <View
           pointerEvents="none"
           onLayout={e => setNoteH(e.nativeEvent.layout.height)}
@@ -469,6 +472,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           bottom: buttonBottom,
         }}
       >
+        {goNote}
         <View>
           <Button
             variant="primary"

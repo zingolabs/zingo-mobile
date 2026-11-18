@@ -7,6 +7,9 @@ import { AppDrawerParamList, LoadedAppNavigationState } from '@app/types';
 import { space16, space20, useTheme } from '@app/theme';
 import { readAddWalletDraft } from '@app/services/addWalletDraft';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
+import { useRoomForWallet } from '@app/hooks/useRoomForWallet';
+import RoomNote from './RoomNote';
+import { askDiskRetry } from '@app/services/diskFull';
 import Button from '@ui/primitives/Button';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import TitleBar from '@ui/widgets/TitleBar';
@@ -34,6 +37,7 @@ const NewWallet: React.FC<NewWalletProps> = ({ navigation }) => {
   const bottomPad = useBottomActionPad();
   const [name, setName] = useState('');
   const [phase, setPhase] = useState<Phase>({ kind: 'form' });
+  const room = useRoomForWallet();
   const placeholder = defaultWalletName(
     translate,
     wallets.map(w => w.meta.name),
@@ -46,6 +50,11 @@ const NewWallet: React.FC<NewWalletProps> = ({ navigation }) => {
       name.trim() || placeholder,
       readAddWalletDraft(),
     );
+    if (result.kind === 'diskFull') {
+      setPhase({ kind: 'form' });
+      askDiskRetry(translate, create);
+      return;
+    }
     if (result.kind === 'failed') {
       setPhase({ kind: 'form' });
       addLastSnackbar(t('add.error').replace('{error}', result.message));
@@ -121,10 +130,12 @@ const NewWallet: React.FC<NewWalletProps> = ({ navigation }) => {
         />
       </ScrollView>
       <View style={{ paddingHorizontal: space20, paddingBottom: bottomPad }}>
+        <RoomNote room={room} translate={translate} />
         <Button
           testID="newwallet.go"
           variant="primary"
           title={t('add.create-go')}
+          disabled={room.kind === 'full'}
           onPress={create}
         />
       </View>

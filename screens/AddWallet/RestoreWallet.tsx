@@ -13,6 +13,9 @@ import {
 import ImportUfvk, { KeyNetwork } from '@screens/ImportUfvk/ImportUfvk';
 import { ProgressScreen } from '@screens/WalletProgress/WalletProgress';
 import { DraftServerAction, NameField, defaultWalletName } from './draftParts';
+import RoomNote from './RoomNote';
+import { askDiskRetry } from '@app/services/diskFull';
+import { useRoomForWallet } from '@app/hooks/useRoomForWallet';
 
 type RestoreWalletProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -38,6 +41,7 @@ const RestoreWallet: React.FC<RestoreWalletProps> = ({ navigation }) => {
   const draft = useAddWalletDraft();
   const [name, setName] = useState('');
   const [working, setWorking] = useState(false);
+  const room = useRoomForWallet();
   const placeholder = defaultWalletName(
     translate,
     wallets.map(w => w.meta.name),
@@ -55,6 +59,11 @@ const RestoreWallet: React.FC<RestoreWalletProps> = ({ navigation }) => {
       chosen,
       readAddWalletDraft(),
     );
+    if (result.kind === 'diskFull') {
+      setWorking(false);
+      askDiskRetry(translate, () => restore(text, birthday));
+      return;
+    }
     if (result.kind === 'failed') {
       setWorking(false);
       addLastSnackbar(t('add.error').replace('{error}', result.message));
@@ -92,6 +101,8 @@ const RestoreWallet: React.FC<RestoreWalletProps> = ({ navigation }) => {
               translate={translate}
             />
           }
+          goDisabled={room.kind === 'full'}
+          goNote={<RoomNote room={room} translate={translate} />}
           onClickCancel={() => navigation.goBack()}
           onClickOK={restore}
         />
