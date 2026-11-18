@@ -1295,7 +1295,7 @@
     "chooser-previous-sub": "Guardada en el {store}",
     "chooser-or": "o",
     "chooser-seed": "Introducir una semilla o clave de visualización",
-    "chooser-seed-sub": "Reemplaza el monedero de este dispositivo.",
+    "chooser-seed-sub": "Tus 24 palabras o una clave de visualización.",
     "seed-label": "Semilla (24 palabras) / Clave de visualización",
     "submit": "Importar",
     "birthday-placeholder": "Introduce la altura de bloque",
@@ -1642,5 +1642,14 @@
     "optional": "Opcional",
     "server-acc": "Servidor",
     "error": "La billetera no se añadió. {error}"
+  },
+  "onboarding": {
+    "name-title": "Ponle nombre a tu billetera",
+    "name-create": "Zingo crea una frase semilla nueva en este dispositivo. Después harás la copia.",
+    "name-seed": "Tu frase semilla está lista. Zingo la reescanea al importarla.",
+    "name-key": "Una billetera de solo lectura: verás sus fondos y su historial, pero no podrás gastar.",
+    "name-later": "Puedes cambiarlo luego desde Billeteras.",
+    "create-go": "Crear billetera",
+    "import-go": "Importar billetera"
   }
 }

@@ -75,6 +75,7 @@ export const defaultAppContextLoading: AppContextLoading = {
   serverUnreachable: () => {},
   serversFor: () => [],
   doRestore: async () => {},
+  nameNewWallet: () => {},
 };
 
 export const ContextAppLoading = React.createContext(defaultAppContextLoading);

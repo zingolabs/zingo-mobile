@@ -83,8 +83,15 @@ import {
 import { serverUris } from '@app/uris';
 import { staticAlternatives, staticServers } from '@app/uris/serverChoice';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
-import { fetchWallet, readOpenWalletId } from '@app/walletBackend';
+import {
+  fetchWallet,
+  readOpenWalletId,
+  updateWalletMeta,
+  walletsOnDevice,
+} from '@app/walletBackend';
 import { finishWalletOpen } from '@app/services/openWallet';
+import { defaultWalletName } from '@screens/AddWallet/draftParts';
+import { isViewingKey } from '@app/utils/seedPhrase';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoadingProvider } from '@app/context';
 import BackgroundFileImpl from '@app/services/BackgroundFileImpl';
@@ -987,7 +994,6 @@ export class LoadingAppClass extends Component<
     await this.loadExistingWalletOnBoot();
   };
 
-
   fetchBackgroundSyncInfo = async () => {
     const backgroundSyncInfoJson: BackgroundType =
       await BackgroundFileImpl.readBackground();
@@ -1034,7 +1040,52 @@ export class LoadingAppClass extends Component<
     });
   };
 
-  createNewWallet = async (): Promise<void> => {
+  /** What Import read, kept while the name step asks for the wallet's name. */
+  pendingImport = { text: '', birthday: 0 };
+
+  toNameCreate = () =>
+    navigateOnboarding({
+      screen: Route.NameWallet,
+      params: { from: 'create' },
+    });
+
+  toNameImport = async (text: string, birthday: number) => {
+    this.pendingImport = { text, birthday };
+    navigateOnboarding({
+      screen: Route.NameWallet,
+      params: { from: isViewingKey(text.toLowerCase()) ? 'key' : 'seed' },
+    });
+  };
+
+  nameNewWallet = (from: 'create' | 'seed' | 'key', name: string) => {
+    if (from === 'create') {
+      this.createNewWallet(name);
+    } else {
+      this.doRestore(
+        this.pendingImport.text,
+        this.pendingImport.birthday,
+        Route.ImportWallet,
+        name,
+      );
+    }
+  };
+
+  /** Names the wallet just made, as given or "Wallet n", before its recovery entry records it. */
+  nameMadeWallet = async (name: string) => {
+    const listed = await walletsOnDevice();
+    if (!listed.ok || listed.value.active.kind === 'none') {
+      return;
+    }
+    const id = listed.value.active.id;
+    const others = listed.value.wallets
+      .filter(w => w.id !== id)
+      .map(w => w.meta.name);
+    await updateWalletMeta(id, {
+      name: name || defaultWalletName(this.state.translate, others),
+    });
+  };
+
+  createNewWallet = async (name: string = ''): Promise<void> => {
     const offline = this.state.server.kind === 'offline';
     // Block only when the device is genuinely offline AND not in explicit
     // Offline mode. Offline mode is a deliberate no-server flow: the wallet is
@@ -1112,6 +1163,7 @@ export class LoadingAppClass extends Component<
         seed: seedJSON.seed_phrase || '',
         birthday: seedJSON.birthday || 0,
       };
+      await this.nameMadeWallet(name);
       // storing the seed & birthday in KeyChain/KeyStore
       await createUpdateRecoveryWalletInfo(wallet);
       await SettingsFileImpl.writeSettings(
@@ -1169,6 +1221,7 @@ export class LoadingAppClass extends Component<
     seedUfvk: string,
     birthday: number,
     origin: OnboardingRoute = Route.ImportWallet,
+    name: string = '',
   ) => {
     if (!seedUfvk) {
       // no reporting button, no needed.
@@ -1268,6 +1321,7 @@ export class LoadingAppClass extends Component<
     let error = false;
     let errorText = '';
     if (result.ok && result.value) {
+      await this.nameMadeWallet(name);
       try {
         // here result can have an `error` field for watch-only which is actually OK.
         const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(
@@ -1700,7 +1754,7 @@ export class LoadingAppClass extends Component<
       closeServer: this.closeServer,
       stepBack: this.onHardwareBack,
       openCurrentWallet: this.openCurrentWallet,
-      createNewWallet: this.createNewWallet,
+      createNewWallet: this.toNameCreate,
       getwalletToRestore: this.getwalletToRestore,
       retryOpenWallet: this.retryOpenWallet,
       switchToWalletChain: this.switchToWalletChain,
@@ -1711,7 +1765,8 @@ export class LoadingAppClass extends Component<
       probeServers: this.probeServers,
       serverUnreachable: this.serverUnreachable,
       serversFor: this.serversFor,
-      doRestore: this.doRestore,
+      doRestore: this.toNameImport,
+      nameNewWallet: this.nameNewWallet,
     };
 
     return (

@@ -16,6 +16,7 @@ export const Route = {
   ImportChooser: 'ImportChooser',
   ImportWallet: 'ImportWallet',
   Progress: 'Progress',
+  NameWallet: 'NameWallet',
   OpenError: 'OpenError',
   Server: 'Server',
   ServerList: 'ServerList',

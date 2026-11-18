@@ -1295,7 +1295,7 @@
     "chooser-previous-sub": "Salvo no {store}",
     "chooser-or": "ou",
     "chooser-seed": "Inserir uma frase de recuperação ou chave de visualização",
-    "chooser-seed-sub": "Substitui a carteira neste dispositivo.",
+    "chooser-seed-sub": "Suas 24 palavras ou uma chave de visualização.",
     "seed-label": "Frase de recuperação (24 palavras) / Chave de visualização",
     "submit": "Importar",
     "birthday-placeholder": "Insira a altura do bloco",
@@ -1642,5 +1642,14 @@
     "optional": "Opcional",
     "server-acc": "Servidor",
     "error": "A carteira não foi adicionada. {error}"
+  },
+  "onboarding": {
+    "name-title": "Dê um nome à sua carteira",
+    "name-create": "O Zingo cria uma frase semente nova neste dispositivo. Você fará o backup em seguida.",
+    "name-seed": "Sua frase semente está pronta. O Zingo a verifica de novo ao importá-la.",
+    "name-key": "Uma carteira somente leitura: você vê os fundos e o histórico, mas não pode gastar.",
+    "name-later": "Você pode mudar depois em Carteiras.",
+    "create-go": "Criar carteira",
+    "import-go": "Importar carteira"
   }
 }

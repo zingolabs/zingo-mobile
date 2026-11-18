@@ -4,27 +4,21 @@ import { ScrollView, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ContextAppLoaded } from '@app/context';
 import { AppDrawerParamList, LoadedAppNavigationState } from '@app/types';
-import {
-  iconSize,
-  radiusPill,
-  space8,
-  space16,
-  space20,
-  useTheme,
-} from '@app/theme';
+import { space16, space20, useTheme } from '@app/theme';
 import { readAddWalletDraft } from '@app/services/addWalletDraft';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import Button from '@ui/primitives/Button';
-import Text from '@ui/primitives/Text';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
-import { WalletIcon } from '@ui/primitives/Icons/WalletIcon';
 import TitleBar from '@ui/widgets/TitleBar';
 import { ProgressScreen } from '@screens/WalletProgress/WalletProgress';
-import { DraftServerAction, NameField, defaultWalletName } from './draftParts';
+import {
+  DraftServerAction,
+  NameField,
+  WalletHero,
+  defaultWalletName,
+} from './draftParts';
 
 type NewWalletProps = NativeStackScreenProps<AppDrawerParamList, 'NewWallet'>;
-
-const DISC = 56;
 
 type Phase =
   | { kind: 'form' }
@@ -118,32 +112,13 @@ const NewWallet: React.FC<NewWalletProps> = ({ navigation }) => {
           paddingTop: space16,
         }}
       >
-        <View style={{ alignItems: 'center', marginBottom: space20 }}>
-          <View
-            style={{
-              width: DISC,
-              height: DISC,
-              borderRadius: radiusPill,
-              backgroundColor: colors.bgAccentSubtle,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <WalletIcon size={iconSize} color={colors.fgAccent} />
-          </View>
-          <Text
-            variant="bodySmall"
-            tone="muted"
-            style={{
-              textAlign: 'center',
-              marginTop: space8,
-              marginHorizontal: space16,
-            }}
-          >
-            {t('add.new-lead')}
-          </Text>
-        </View>
-        <NameField value={name} onChange={setName} placeholder={placeholder} />
+        <WalletHero from="create" lead={t('add.new-lead')} />
+        <NameField
+          value={name}
+          onChange={setName}
+          placeholder={placeholder}
+          translate={translate}
+        />
       </ScrollView>
       <View style={{ paddingHorizontal: space20, paddingBottom: bottomPad }}>
         <Button

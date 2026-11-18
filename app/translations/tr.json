@@ -1295,7 +1295,7 @@
     "chooser-previous-sub": "{store} içinde kayıtlı",
     "chooser-or": "veya",
     "chooser-seed": "Tohum ifadesi veya görüntüleme anahtarı girin",
-    "chooser-seed-sub": "Bu cihazdaki cüzdanı değiştirir.",
+    "chooser-seed-sub": "24 kelimen ya da bir görüntüleme anahtarı.",
     "seed-label": "Tohum ifadesi (24 kelime) / Görüntüleme anahtarı",
     "submit": "İçe aktar",
     "birthday-placeholder": "Blok yüksekliğini girin",
@@ -1642,5 +1642,14 @@
     "optional": "İsteğe bağlı",
     "server-acc": "Sunucu",
     "error": "Cüzdan eklenmedi. {error}"
+  },
+  "onboarding": {
+    "name-title": "Cüzdanına ad ver",
+    "name-create": "Zingo bu cihazda yeni bir tohum ifadesi oluşturur. Ardından yedeklersin.",
+    "name-seed": "Tohum ifaden hazır. Zingo içe aktarınca yeniden tarar.",
+    "name-key": "Yalnızca görüntüleme cüzdanı: bakiye ve geçmişi görürsün ama harcayamazsın.",
+    "name-later": "Daha sonra Cüzdanlar'dan değiştirebilirsin.",
+    "create-go": "Cüzdan oluştur",
+    "import-go": "Cüzdanı içe aktar"
   }
 }

@@ -89,6 +89,7 @@ const RestoreWallet: React.FC<RestoreWalletProps> = ({ navigation }) => {
               value={name}
               onChange={setName}
               placeholder={placeholder}
+              translate={translate}
             />
           }
           onClickCancel={() => navigation.goBack()}

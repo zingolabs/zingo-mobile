@@ -1,4 +1,17 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
+import { View } from 'react-native';
+import {
+  iconSize,
+  radiusPill,
+  space8,
+  space16,
+  space20,
+  useTheme,
+} from '@app/theme';
+import { SnowflakeIcon } from '@ui/primitives/Icons/SnowflakeIcon';
+import { SproutIcon } from '@ui/primitives/Icons/SproutIcon';
+import { WalletIcon } from '@ui/primitives/Icons/WalletIcon';
 import { ChainNameEnum, Route, TranslateType } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { navigateWallet } from '@app/navigation/navigate';
@@ -9,6 +22,7 @@ import ServerAction from '@ui/widgets/ServerAction';
 
 /** A wallet's name, at most this long. */
 export const NAME_MAX = 24;
+const HERO_DISC = 56;
 
 /** "Wallet n" in the app's language with the lowest n no wallet uses. */
 export function defaultWalletName(
@@ -53,12 +67,13 @@ export function NameField({
   value,
   onChange,
   placeholder,
+  translate,
 }: {
   value: string;
   onChange: (name: string) => void;
   placeholder: string;
+  translate: (key: string) => TranslateType;
 }) {
-  const { translate } = useContext(ContextAppLoaded);
   return (
     <TextField
       testID="addwallet.name"
@@ -73,5 +88,53 @@ export function NameField({
       placeholder={placeholder}
       maxLength={NAME_MAX}
     />
+  );
+}
+
+/** What a wallet being added is made from: its mark in a 56 disc and one line under it. */
+export function WalletHero({
+  from,
+  lead,
+}: {
+  from: 'create' | 'seed' | 'key';
+  lead: string;
+}) {
+  const { colors } = useTheme();
+  const viewOnly = from === 'key';
+  const color = viewOnly ? colors.fgViewOnly : colors.fgAccent;
+  return (
+    <View style={{ alignItems: 'center', marginBottom: space20 }}>
+      <View
+        style={{
+          width: HERO_DISC,
+          height: HERO_DISC,
+          borderRadius: radiusPill,
+          backgroundColor: viewOnly
+            ? colors.bgViewOnlySubtle
+            : colors.bgAccentSubtle,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {from === 'create' ? (
+          <WalletIcon size={iconSize} color={color} />
+        ) : from === 'seed' ? (
+          <SproutIcon size={iconSize} color={color} />
+        ) : (
+          <SnowflakeIcon size={iconSize} color={color} />
+        )}
+      </View>
+      <Text
+        variant="bodySmall"
+        tone="muted"
+        style={{
+          textAlign: 'center',
+          marginTop: space8,
+          marginHorizontal: space16,
+        }}
+      >
+        {lead}
+      </Text>
+    </View>
   );
 }

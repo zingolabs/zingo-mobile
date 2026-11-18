@@ -1295,7 +1295,7 @@
     "chooser-previous-sub": "Saved in the {store}",
     "chooser-or": "or",
     "chooser-seed": "Enter a seed phrase or viewing key",
-    "chooser-seed-sub": "Replaces the wallet on this device.",
+    "chooser-seed-sub": "Your 24 words or a viewing key.",
     "seed-label": "Seed phrase (24 words) / Viewing key",
     "submit": "Import",
     "birthday-placeholder": "Enter block height",
@@ -1642,5 +1642,14 @@
     "optional": "Optional",
     "server-acc": "Server",
     "error": "The wallet wasn’t added. {error}"
+  },
+  "onboarding": {
+    "name-title": "Name your wallet",
+    "name-create": "Zingo makes a new seed phrase on this device. You’ll back it up next.",
+    "name-seed": "Your seed phrase is ready. Zingo rescans it once it’s imported.",
+    "name-key": "A view-only wallet: you’ll see its funds and history, but can’t spend.",
+    "name-later": "You can change it later from Wallets.",
+    "create-go": "Create wallet",
+    "import-go": "Import wallet"
   }
 }

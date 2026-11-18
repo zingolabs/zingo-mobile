@@ -88,7 +88,7 @@ const ImportChooser: React.FunctionComponent<ImportChooserProps> = ({
             iconColor={colors.fgAccent}
             title={translate('import.chooser-seed') as string}
             sub={translate('import.chooser-seed-sub') as string}
-            subColor={colors.fgWarning}
+            subColor={colors.fgMuted}
             disabled={busy}
             onPress={onSeed}
           />

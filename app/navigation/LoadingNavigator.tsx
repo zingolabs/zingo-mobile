@@ -10,6 +10,7 @@ import {
   ImportWalletScreen,
   OpenErrorScreen,
   ProgressScreen,
+  NameWalletScreen,
   ServerListScreen,
   ServerScreen,
   WelcomeScreen,
@@ -52,6 +53,7 @@ function OnboardingSection() {
     <Onboarding.Navigator initialRouteName={start}>
       <Onboarding.Screen name={Route.Welcome} component={WelcomeScreen} />
       <Onboarding.Screen name={Route.Progress} component={ProgressScreen} />
+      <Onboarding.Screen name={Route.NameWallet} component={NameWalletScreen} />
       <Onboarding.Screen
         name={Route.ImportChooser}
         component={ImportChooserScreen}

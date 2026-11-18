@@ -91,4 +91,6 @@ export interface OnboardingContext {
   serverUnreachable: () => void;
   serversFor: (chain: ChainNameEnum) => ServerUrisType[];
   doRestore: (seedUfvk: string, birthday: number) => Promise<void>;
+  /** The name step's go: the first wallet made, or imported, with its name. */
+  nameNewWallet: (from: 'create' | 'seed' | 'key', name: string) => void;
 }

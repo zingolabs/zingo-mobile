@@ -50,6 +50,8 @@ export type OnboardingParamList = {
   [Route.Server]: { chain?: ChainNameEnum } | undefined;
   [Route.ServerList]: { chain: ChainNameEnum };
   [Route.Progress]: { kind: 'import' | 'create' };
+  // `from`: what the first wallet is made from, for its mark and its button.
+  [Route.NameWallet]: { from: 'create' | 'seed' | 'key' };
   [Route.OpenError]: undefined;
 };
 
