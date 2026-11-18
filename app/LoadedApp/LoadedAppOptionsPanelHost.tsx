@@ -20,6 +20,7 @@ import WalletSeedIcon from '../../assets/img/options/wallet-seed.svg';
 import SyncRescanReportIcon from '../../assets/img/options/sync-rescan-report.svg';
 import FundsPoolsIcon from '../../assets/img/options/funds-pools.svg';
 import FinancialInsightIcon from '../../assets/img/options/financial-insight.svg';
+import { MessagesIcon } from '@ui/primitives/Icons/MessagesIcon';
 import { themeTokens } from '@app/theme';
 
 const SOCIAL_X_URL = 'https://x.com/ZingoLabs';
@@ -34,6 +35,7 @@ const MENU_TEST_IDS: Partial<Record<MenuItemEnum, string>> = {
   [MenuItemEnum.SyncReport]: 'menu.syncreport',
   [MenuItemEnum.FundPools]: 'menu.fundpools',
   [MenuItemEnum.Insight]: 'menu.insight',
+  [MenuItemEnum.Messages]: 'menu.messages',
   [MenuItemEnum.Server]: 'menu.server',
 };
 
@@ -43,6 +45,7 @@ type PanelItem =
   | MenuItemEnum.SyncReport
   | MenuItemEnum.FundPools
   | MenuItemEnum.Insight
+  | MenuItemEnum.Messages
   | MenuItemEnum.Server
   | MenuItemEnum.Settings;
 
@@ -64,6 +67,8 @@ const walletScreen = (
       return { screen: Route.Pools };
     case MenuItemEnum.Insight:
       return { screen: Route.Insight };
+    case MenuItemEnum.Messages:
+      return { screen: Route.Messages };
     case MenuItemEnum.Server:
       return { screen: Route.Server };
     case MenuItemEnum.Settings:
@@ -180,6 +185,15 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       label: translate('loadedapp.insight') as string,
       icon: <FinancialInsightIcon width={30} height={30} />,
       onPress: () => dispatch(MenuItemEnum.Insight),
+    });
+
+    // The app's icon until the panel's own artwork for Messages arrives.
+    list.push({
+      id: MenuItemEnum.Messages,
+      testID: MENU_TEST_IDS[MenuItemEnum.Messages],
+      label: translate('messages.title') as string,
+      icon: <MessagesIcon size={30} color={themeTokens.fgOptionIcon} />,
+      onPress: () => dispatch(MenuItemEnum.Messages),
     });
 
     // Server — always visible, always last; its dot says how Zingo connects.
