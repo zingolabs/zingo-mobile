@@ -189,6 +189,19 @@ export default class SettingsFileImpl {
     return { ...rest, ...walletServer(meta, file) } as SettingsFileClass;
   }
 
+  /** Keeps a server choice in a wallet's meta, for a wallet that is not the open one. */
+  static async writeWalletServer(
+    walletId: string,
+    server: ServerType,
+    selectServer: SelectServerEnum,
+  ): Promise<boolean> {
+    const written = await updateWalletMeta(
+      walletId,
+      encodeServer(server, selectServer),
+    );
+    return written.ok;
+  }
+
   /** A wallet's server and its remote mode, read from its meta before it opens. */
   static async serverOf(meta: WalletMetaPatch): Promise<ServerSettings> {
     return walletServer(meta, await this.readWire());

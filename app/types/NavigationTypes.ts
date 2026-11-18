@@ -109,7 +109,8 @@ export type AppDrawerParamList = {
   [Route.Swap]: { prefill?: SwapPrefillType } | undefined;
   [Route.Messages]: undefined;
   [Route.Settings]: undefined;
-  [Route.Server]: undefined;
+  // `walletId`: the wallet whose server changes; none is the open one.
+  [Route.Server]: { walletId: string } | undefined;
   [Route.About]: undefined;
   [Route.MixnetDoctor]: undefined;
   [Route.Insight]: undefined;

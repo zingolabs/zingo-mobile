@@ -242,13 +242,17 @@ export default function WalletsSheet() {
       <WalletSettingsSheet
         ref={settingsRef}
         wallet={editing}
-        open={!!editing && editing.id === walletId}
         viewOnly={!!editing && isViewOnly(editing)}
         onSaved={refreshWallets}
         onServer={() => {
           settingsRef.current?.dismiss();
           closeList();
-          navigateWallet({ screen: Route.Server, params: undefined } as never);
+          if (editing) {
+            navigateWallet({
+              screen: Route.Server,
+              params: { walletId: editing.id },
+            });
+          }
         }}
       />
 
@@ -373,8 +377,6 @@ function WalletRow({
 
 type WalletSettingsSheetProps = {
   wallet: WalletEntry | null;
-  /** The open wallet's server can change from here; another's opens with it. */
-  open: boolean;
   viewOnly: boolean;
   onSaved: () => Promise<void>;
   onServer: () => void;
@@ -384,7 +386,7 @@ type WalletSettingsSheetProps = {
 const WalletSettingsSheet = React.forwardRef<
   BottomSheetModal,
   WalletSettingsSheetProps
->(({ wallet, open, viewOnly, onSaved, onServer }, ref) => {
+>(({ wallet, viewOnly, onSaved, onServer }, ref) => {
   const { translate } = useContext(ContextAppLoaded);
   const t = (key: string) => translate(key) as string;
   const [name, setName] = useState('');
@@ -476,7 +478,7 @@ const WalletSettingsSheet = React.forwardRef<
                 {
                   label: t('wallets.server'),
                   value: server,
-                  onPress: open ? onServer : undefined,
+                  onPress: onServer,
                   testID: 'wallets.settings.server',
                 },
               ]}
