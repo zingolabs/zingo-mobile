@@ -1311,7 +1311,6 @@
     "miss-address": "That code isn't a Zcash address.",
     "hint-any": "Point the camera at an address QR code.",
     "text": "Scan a Unified Full Viewing Key",
-    "scanaddress": "Scan a Zcash Address",
     "hint-chain": "Point the camera at a {chain} address QR code.",
     "miss-chain": "That code isn't a {chain} address."
   },
@@ -1337,7 +1336,7 @@
     "title2": "What you can do",
     "orchard": "ORCHARD",
     "ironwood": "IRONWOOD",
-    "step1-body-1": "**Ironwood** is a new, more private home for your Zcash. Its privacy is mathematically proven to work.",
+    "step1-body-1": "**Ironwood** is a new, more private home for your {currency}. Its privacy is mathematically proven to work.",
     "step1-body-2": "After the **NU6.3** upgrade, the old **Orchard** pool stops taking in new funds, and new payments go to Ironwood.",
     "option1-label": "Continue as normal",
     "option1-body": "Keep using your wallet as usual. Each transaction will reveal its amount.",
@@ -1414,7 +1413,7 @@
   },
   "uris": {
     "baduri": "Error: Bad URI.",
-    "notvalid": "Was not a valid zcash address",
+    "notvalid": "Was not a valid Zcash address",
     "notvalidparameter": "was not understood as a valid parameter",
     "notvalidvalue": "Didn't understand parameter value",
     "noindex": "Unknown index",

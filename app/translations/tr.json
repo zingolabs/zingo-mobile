@@ -1311,7 +1311,6 @@
     "miss-address": "Bu kod bir Zcash adresi değil.",
     "hint-any": "Kamerayı bir adresin QR koduna doğrultun.",
     "text": "Birleştirilmiş Tam Görüntüleme Anahtarını Tara",
-    "scanaddress": "Bir Zcash Adresini Tara",
     "hint-chain": "Kamerayı bir {chain} adresinin QR koduna doğrultun.",
     "miss-chain": "Bu kod bir {chain} adresi değil."
   },
@@ -1337,7 +1336,7 @@
     "title2": "Neler yapabilirsiniz",
     "orchard": "ORCHARD",
     "ironwood": "IRONWOOD",
-    "step1-body-1": "**Ironwood**, Zcash'iniz için yeni ve daha gizli bir yuva. Gizliliğinin çalıştığı matematiksel olarak kanıtlanmıştır.",
+    "step1-body-1": "**Ironwood**, {currency} varlıklarınız için yeni ve daha gizli bir yuva. Gizliliğinin çalıştığı matematiksel olarak kanıtlanmıştır.",
     "step1-body-2": "**NU6.3** güncellemesinden sonra eski **Orchard** havuzu yeni fon kabul etmeyi durdurur ve yeni ödemeler Ironwood'a gider.",
     "option1-label": "Normal şekilde devam et",
     "option1-body": "Cüzdanınızı normal şekilde kullanmaya devam edin. Her işlem tutarını açığa çıkarır.",
