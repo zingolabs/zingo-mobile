@@ -180,14 +180,12 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
     };
   }, [typedKey]);
 
+  const keyChain = check.kind === 'ufvk' ? check.chainName : '';
   useEffect(() => {
     onKeyNetwork?.(
-      check.kind === 'ufvk'
-        ? { kind: 'key', chain: check.chainName }
-        : { kind: 'none' },
+      keyChain ? { kind: 'key', chain: keyChain } : { kind: 'none' },
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [check.kind, check.kind === 'ufvk' ? check.chainName : '']);
+  }, [keyChain, onKeyNetwork]);
 
   useEffect(() => {
     setKeyPaused(false);

@@ -516,14 +516,13 @@ const WalletSettingsSheet = React.forwardRef<
     SettingsFileImpl.serverOf(wallet.meta).then(({ server: s, selectServer }) =>
       setServer(
         s.kind === 'offline'
-          ? t('server.offline')
+          ? (translate('server.offline') as string)
           : selectServer === SelectServerEnum.auto
-            ? t('server.automatic')
+            ? (translate('server.automatic') as string)
             : s.uri.replace(/^[a-z]+:\/\//i, '').replace(/[:/].*$/, ''),
       ),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wallet]);
+  }, [wallet, translate]);
 
   const dismiss = () =>
     (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss();
