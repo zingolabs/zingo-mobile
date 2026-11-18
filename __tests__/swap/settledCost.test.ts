@@ -39,7 +39,7 @@ const record = (overrides: Partial<SwapRecordType> = {}): SwapRecordType =>
   ({
     recordId: 'rec-1',
     depositAddress: 't1deposit',
-    provider: SwapKitProviderEnum.NearIntents,
+    provider: SwapKitProviderEnum.Near,
     direction: SwapDirectionEnum.Outbound,
     routeId: 'route-1',
     sellAsset: ZEC,
