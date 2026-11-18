@@ -326,24 +326,6 @@
         "text": "Normal Privacy, you can see all the information."
       }
     ],
-    "performancelevels": [
-      {
-        "value": "Maximum",
-        "text": "For very powerful devices."
-      },
-      {
-        "value": "High",
-        "text": "For devices with a lot of Memory."
-      },
-      {
-        "value": "Medium",
-        "text": "For regular devices."
-      },
-      {
-        "value": "Low",
-        "text": "For old devices."
-      }
-    ],
     "blockexplorers": [
       {
         "value": "Zcashexplorer",
@@ -372,7 +354,6 @@
     "unsaved-name-language": "the language",
     "unsaved-name-privacy": "privacy",
     "unsaved-name-biometrics": "the biometric lock",
-    "unsaved-name-performance": "the performance level",
     "unsaved-name-blockexplorer": "the block explorer",
     "ismemo": "You need to choose the download memos option to save.",
     "isthreshold": "You need to choose the transaction filter threshold option to save.",
@@ -389,7 +370,6 @@
     "language-title": "Language",
     "islanguage": "You need to choose a language to save.",
     "privacy-title": "Hide Sensitive Values",
-    "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
     "value-language-en": "English",
     "value-language-es": "Spanish",
@@ -400,10 +380,6 @@
     "value-chainname-main": "Mainnet",
     "value-chainname-test": "Testnet",
     "value-chainname-regtest": "Regtest",
-    "value-performancelevel-Maximum": "Maximum",
-    "value-performancelevel-High": "High",
-    "value-performancelevel-Medium": "Medium",
-    "value-performancelevel-Low": "Low",
     "value-blockexplorer-Zcashexplorer": "Zcashexplorer",
     "value-blockexplorer-ZecBlock": "ZecBlock",
     "value-blockexplorer-Zexplorer": "Zexplorer",
@@ -939,6 +915,7 @@
     "detail-remove-unpaid": "The unsent swap will be deleted from this device.",
     "delete": "Delete",
     "deleted": "Deleted",
+    "delete-error": "The swap couldn’t be deleted. Try again.",
     "delete-expired-body": "The swap with no deposit will be deleted from this device.",
     "delete-failed-body": "The failed swap will be deleted from this device.",
     "get-new-quote": "Get a new quote",
@@ -1008,6 +985,7 @@
     "address-valid": "{asset} address",
     "address-in-book": "in your address book",
     "save-contact": "Save contact",
+    "swap-more": "Swap more",
     "address-zcash": "That’s a Zcash address. Swap sends to another coin.",
     "see-why": "See why",
     "nym-wait": "Your ZEC travels the NYM mixnet. Waiting for it.",
@@ -1176,7 +1154,7 @@
     "tx-fee": "Network fee",
     "tx-memo": "Memo",
     "tx-op-return": "OP_RETURN",
-    "send-again": "Send again",
+    "send-more": "Send more",
     "op-return-copied": "OP_RETURN copied to Clipboard",
     "tx-explorer": "View in block explorer",
     "try-again": "Try again",

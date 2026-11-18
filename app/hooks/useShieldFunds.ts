@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { showConfirm } from '@app/services/showConfirm';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
@@ -15,7 +15,6 @@ import {
   shieldPreview,
   shieldPropose,
 } from '@app/walletBackend';
-import type { FfiResult } from '@app/walletBackend';
 import { RPCShieldProposeType } from '@app/walletBackend/types/RPCShieldProposeType';
 import {
   ComputingSubject,
@@ -83,26 +82,9 @@ export function useShieldFunds({
   const navigation = useNavigation<WalletNavigation>();
   const [showShieldButton, setShowShieldButton] = useState<boolean>(false);
   const [shieldingFee, setShieldingFee] = useState<number>(0);
-  // useRef so the lock persists across re-renders (a `let` inside useEffect resets every invocation)
-  const shieldProposeLockRef = useRef<boolean>(false);
-
   useEffect(() => {
-    const runShieldPropose = async (): Promise<FfiResult<string>> => {
-      if (shieldProposeLockRef.current) {
-        return {
-          ok: false,
-          error: {
-            code: 'Unknown',
-            message: 'shield propose already running...',
-          },
-        };
-      }
-      shieldProposeLockRef.current = true;
-      const propose = await shieldPreview();
-      shieldProposeLockRef.current = false;
-      return propose;
-    };
-
+    // A newer balance asks again; an answer for an older one is dropped.
+    let cancelled = false;
     if (
       !readOnly &&
       !!setShieldingAmount &&
@@ -112,7 +94,10 @@ export function useShieldFunds({
       (async () => {
         let proposeFee = 0;
         let proposeAmount = 0;
-        const runPropose = await runShieldPropose();
+        const runPropose = await shieldPreview();
+        if (cancelled) {
+          return;
+        }
         if (!runPropose.ok) {
           console.log('Error shield proposing', runPropose.error.message);
         } else {
@@ -141,6 +126,9 @@ export function useShieldFunds({
       setShieldingFee(0);
       setShieldingAmount?.(0);
     }
+    return () => {
+      cancelled = true;
+    };
   }, [
     readOnly,
     setShieldingAmount,
@@ -176,9 +164,11 @@ export function useShieldFunds({
     };
     const since = nowSeconds();
     navigation.navigate(Route.Computing, { subject });
+    // `confirm` transmits whatever proposal is stored, so it runs only on
+    // the one this shield just stored; a failed propose ends with its own error.
     const shield = await withSyncStopped(async () => {
-      await shieldPropose();
-      return shieldConfirm();
+      const proposed = await shieldPropose();
+      return proposed.ok ? shieldConfirm() : proposed;
     });
 
     setScrollToTop?.(true);

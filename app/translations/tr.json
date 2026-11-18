@@ -326,24 +326,6 @@
         "text": "Normal Gizlilik: Tüm bilgileri görebilirsiniz."
       }
     ],
-    "performancelevels": [
-      {
-        "value": "Maximum",
-        "text": "For very powerful devices."
-      },
-      {
-        "value": "High",
-        "text": "For devices with a lot of Memory."
-      },
-      {
-        "value": "Medium",
-        "text": "For regular devices."
-      },
-      {
-        "value": "Low",
-        "text": "For old devices."
-      }
-    ],
     "blockexplorers": [
       {
         "value": "Zcashexplorer",
@@ -372,7 +354,6 @@
     "unsaved-name-language": "dil",
     "unsaved-name-privacy": "gizlilik",
     "unsaved-name-biometrics": "biyometrik kilit",
-    "unsaved-name-performance": "performans seviyesi",
     "unsaved-name-blockexplorer": "blok gezgini",
     "ismemo": "Kaydetmek için notları indirme seçeneğini seçmeniz gerekiyor.",
     "isthreshold": "Kaydetmek için işlem filtre eşiği seçeneğini seçmeniz gerekiyor.",
@@ -389,7 +370,6 @@
     "language-title": "Dil",
     "islanguage": "Kaydetmek için bir dil seçmeniz gerekiyor.",
     "privacy-title": "Hassas değerleri gizle",
-    "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
     "value-language-en": "İngilizce",
     "value-language-es": "İspanyolca",
@@ -400,10 +380,6 @@
     "value-chainname-main": "Mainnet",
     "value-chainname-test": "Testnet",
     "value-chainname-regtest": "Regtest",
-    "value-performancelevel-Maximum": "Maximum",
-    "value-performancelevel-High": "High",
-    "value-performancelevel-Medium": "Medium",
-    "value-performancelevel-Low": "Low",
     "value-blockexplorer-Zcashexplorer": "Zcashexplorer",
     "value-blockexplorer-ZecBlock": "ZecBlock",
     "value-blockexplorer-Zexplorer": "Zexplorer",
@@ -939,6 +915,7 @@
     "detail-remove-unpaid": "Gönderilmemiş takas bu cihazdan silinecek.",
     "delete": "Sil",
     "deleted": "Silindi",
+    "delete-error": "Takas silinemedi. Tekrar deneyin.",
     "delete-expired-body": "Yatırımı olmayan takas bu cihazdan silinecek.",
     "delete-failed-body": "Başarısız takas bu cihazdan silinecek.",
     "get-new-quote": "Yeni teklif al",
@@ -1008,6 +985,7 @@
     "address-valid": "{asset} adresi",
     "address-in-book": "adres defterinizde",
     "save-contact": "Kişiyi kaydet",
+    "swap-more": "Yeni takas",
     "address-zcash": "Bu bir Zcash adresi. Takas başka bir varlığa gönderir.",
     "see-why": "Nedenini gör",
     "nym-wait": "ZEC’iniz NYM mixnet üzerinden gider. Bağlantı bekleniyor.",
@@ -1176,7 +1154,7 @@
     "tx-fee": "Ağ ücreti",
     "tx-memo": "Not",
     "tx-op-return": "OP_RETURN",
-    "send-again": "Tekrar gönder",
+    "send-more": "Daha fazla gönder",
     "op-return-copied": "OP_RETURN panoya kopyalandı",
     "tx-explorer": "Blok gezgininde görüntüle",
     "try-again": "Tekrar dene",

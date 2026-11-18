@@ -1,6 +1,5 @@
 import { SendJsonToTypeType, ServerType } from '@app/AppState';
 import { WalletBackendConfig, isOffline } from './config/WalletBackendConfig';
-import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { DataService } from './modules/DataService';
 import { MixnetCoordinator } from './modules/MixnetCoordinator';
 import { SyncCoordinator } from './modules/SyncCoordinator';
@@ -35,10 +34,6 @@ export default class WalletBackend {
       config.stopMixnetTransport,
       config.takeMixnetProxyDeath,
     );
-    this.dataService.onSyncError = async () => {
-      await this.syncCoordinator.clearTimers();
-      await this.syncCoordinator.configure();
-    };
     this.transactionService = new TransactionService(
       config,
       this.syncCoordinator,
@@ -173,9 +168,5 @@ export default class WalletBackend {
   // Mutates the shared config so every sub-service reads the new server.
   setServer(server: ServerType) {
     this.config.server = server;
-  }
-
-  setPerformanceLevel(performanceLevel: RPCPerformanceLevelEnum) {
-    this.config.performanceLevel = performanceLevel;
   }
 }

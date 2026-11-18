@@ -5,7 +5,6 @@ export enum SettingsNameEnum {
   privacy = 'privacy',
   biometrics = 'biometrics',
   selectServer = 'selectServer',
-  performanceLevel = 'performanceLevel',
   blockExplorer = 'blockExplorer',
 
   // internal management

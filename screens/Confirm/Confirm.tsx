@@ -23,7 +23,7 @@ import { sendSubject } from '@screens/Send/sendSubject';
 import { fiatQuote } from '@app/price/fiatQuote';
 import { formatAmount, formatUsd } from '@app/utils/formatAmount';
 import { sendPermit } from '@app/walletBackend/transforms/sendPermit';
-import { Route, SendPageStateClass, ProposalPoolsType } from '@app/AppState';
+import { Route, ProposalPoolsType } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type ConfirmProps = NativeStackScreenProps<AppDrawerParamList, 'Confirm'>;
@@ -83,14 +83,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   });
   const authPassed = screenGate.kind === 'passed';
 
-  const calculatedFee = route.params?.calculatedFee ?? 0;
-  const proposalPools: ProposalPoolsType = route.params?.proposalPools ?? {
-    source: [],
-    destination: [],
-  };
-  const sendAllAmount = route.params?.sendAllAmount ?? false;
-  const sendPageState: SendPageStateClass =
-    route.params?.sendPageState ?? ({} as SendPageStateClass);
+  const { calculatedFee, proposalPools, sendAllAmount, sendPageState } =
+    route.params;
   const to = sendPageState.toaddr;
 
   const memoTotal = Utils.buildMemo(
