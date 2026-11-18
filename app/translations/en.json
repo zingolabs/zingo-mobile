@@ -1259,7 +1259,8 @@
     "unsaved-keeps": " If you leave now, Zingo keeps using {current}.",
     "unsaved-offline": "working offline",
     "dont-save": "Don’t Save",
-    "keep-editing": "Keep editing"
+    "keep-editing": "Keep editing",
+    "from-key": "The network comes from the viewing key."
   },
   "seedsheet": {
     "title": "Seed phrase",
@@ -1615,6 +1616,36 @@
     "delete-only": "{name} is your only wallet. Once it’s deleted, Zingo goes back to the start.",
     "delete-swap": "A swap is in progress in {name}. Once it’s deleted, Zingo stops following that swap.",
     "deleted": "{name} deleted from this device",
-    "open-error": "{name} didn’t open. {error}"
+    "open-error": "{name} didn’t open. {error}",
+    "default-name": "Wallet {n}",
+    "created": "{name} is ready. Rename it from Wallets.",
+    "restored": "{name} restored. The rescan runs in the background."
+  },
+  "add": {
+    "title": "Add wallet",
+    "others-stay": "Your other wallets stay on this device.",
+    "group-new": "New",
+    "group-restore": "Restore",
+    "create": "Create a new wallet",
+    "create-sub": "A new seed phrase, made on this device.",
+    "seed": "Seed phrase",
+    "seed-sub": "Your 24 words and, if you have it, the birthday.",
+    "key": "Viewing key",
+    "key-sub": "View only: see the funds and history, can’t spend.",
+    "new-title": "New wallet",
+    "new-lead": "Zingo makes a new seed phrase on this device. You’ll back it up next.",
+    "create-go": "Create wallet",
+    "restore-title": "Restore wallet",
+    "restore-go": "Restore wallet",
+    "creating": "Creating your wallet",
+    "restoring": "Restoring your wallet",
+    "ready": "{name} is ready",
+    "ready-body": "Write down its seed phrase now. It’s the only way to get this wallet back if you lose this phone.",
+    "backup": "Back up seed phrase",
+    "later": "Later",
+    "later-toast": "Back it up from Wallet Seed when you’re ready.",
+    "optional": "Optional",
+    "server-acc": "Server",
+    "error": "The wallet wasn’t added. {error}"
   }
 }

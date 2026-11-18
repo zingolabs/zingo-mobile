@@ -1259,7 +1259,8 @@
     "unsaved-keeps": " Si sales ahora, Zingo sigue usando {current}.",
     "unsaved-offline": "sin conexión",
     "dont-save": "No guardar",
-    "keep-editing": "Seguir editando"
+    "keep-editing": "Seguir editando",
+    "from-key": "La red viene de la clave de visualización."
   },
   "seedsheet": {
     "title": "Semilla",
@@ -1615,6 +1616,36 @@
     "delete-only": "{name} es tu única billetera. Al borrarla, Zingo vuelve al inicio.",
     "delete-swap": "Hay un intercambio en curso en {name}. Al borrarla, Zingo deja de seguir ese intercambio.",
     "deleted": "{name} borrada de este dispositivo",
-    "open-error": "{name} no se abrió. {error}"
+    "open-error": "{name} no se abrió. {error}",
+    "default-name": "Billetera {n}",
+    "created": "{name} está lista. Cámbiale el nombre desde Billeteras.",
+    "restored": "{name} restaurada. El reescaneo sigue en segundo plano."
+  },
+  "add": {
+    "title": "Añadir billetera",
+    "others-stay": "Tus otras billeteras se quedan en este dispositivo.",
+    "group-new": "Nueva",
+    "group-restore": "Restaurar",
+    "create": "Crear una billetera nueva",
+    "create-sub": "Una frase semilla nueva, creada en este dispositivo.",
+    "seed": "Frase semilla",
+    "seed-sub": "Tus 24 palabras y, si la tienes, la fecha de nacimiento.",
+    "key": "Clave de visualización",
+    "key-sub": "Solo lectura: ves los fondos y el historial, no puedes gastar.",
+    "new-title": "Billetera nueva",
+    "new-lead": "Zingo crea una frase semilla nueva en este dispositivo. Después harás la copia.",
+    "create-go": "Crear billetera",
+    "restore-title": "Restaurar billetera",
+    "restore-go": "Restaurar billetera",
+    "creating": "Creando tu billetera",
+    "restoring": "Restaurando tu billetera",
+    "ready": "{name} está lista",
+    "ready-body": "Apunta ahora su frase semilla. Es la única forma de recuperar esta billetera si pierdes este teléfono.",
+    "backup": "Copiar la frase semilla",
+    "later": "Más tarde",
+    "later-toast": "Haz la copia desde Frase semilla cuando quieras.",
+    "optional": "Opcional",
+    "server-acc": "Servidor",
+    "error": "La billetera no se añadió. {error}"
   }
 }

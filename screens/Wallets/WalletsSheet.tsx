@@ -28,6 +28,7 @@ import Text from '@ui/primitives/Text';
 import TextField from '@ui/primitives/TextField';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { PlusIcon } from '@ui/primitives/Icons/PlusIcon';
 import Avatar, { AvatarCategory } from '@ui/widgets/Avatar';
 import DeleteWalletSheet from '@ui/widgets/DeleteWalletSheet';
 import { MASK } from '@ui/widgets/PrivateAmount';
@@ -236,6 +237,16 @@ export default function WalletsSheet() {
               </RadioList>
             </View>
           ))}
+          <Button
+            testID="wallets.add"
+            variant="text"
+            icon={PlusIcon}
+            title={t('wallets.add')}
+            onPress={() => {
+              closeList();
+              navigateWallet({ screen: Route.AddWallet });
+            }}
+          />
         </SheetScrollView>
       </AppSheetModal>
 

@@ -124,6 +124,10 @@ export type AppDrawerParamList = {
   [Route.Pools]: undefined;
   [Route.MeetIronwood]: undefined;
   [Route.SeedBackup]: { entry: SeedBackupEntry };
+  [Route.AddWallet]: undefined;
+  [Route.NewWallet]: undefined;
+  // `mode`: what the user said they restore from; the field takes either.
+  [Route.RestoreWallet]: { mode: 'seed' | 'key' };
   // Absent for the plain view; set when the seed is shown before leaving
   // this wallet or its server.
   [Route.WalletSeed]: { action: WalletSeedAction } | undefined;

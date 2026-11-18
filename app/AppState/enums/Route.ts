@@ -47,6 +47,9 @@ export const Route = {
   MigrationStrategy: 'MigrationStrategy',
   MigrationTransactions: 'MigrationTransactions',
   MigrationSending: 'MigrationSending',
+  AddWallet: 'AddWallet',
+  NewWallet: 'NewWallet',
+  RestoreWallet: 'RestoreWallet',
 
   // Drawer with params
   AddressBook: 'AddressBook',

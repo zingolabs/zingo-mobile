@@ -1259,7 +1259,8 @@
     "unsaved-keeps": " Se sair agora, o Zingo continua usando {current}.",
     "unsaved-offline": "sem conexão",
     "dont-save": "Não salvar",
-    "keep-editing": "Continuar editando"
+    "keep-editing": "Continuar editando",
+    "from-key": "A rede vem da chave de visualização."
   },
   "seedsheet": {
     "title": "Frase de recuperação",
@@ -1615,6 +1616,36 @@
     "delete-only": "{name} é sua única carteira. Depois de excluí-la, o Zingo volta ao início.",
     "delete-swap": "Há uma troca em andamento em {name}. Depois de excluí-la, o Zingo deixa de acompanhar essa troca.",
     "deleted": "{name} excluída deste dispositivo",
-    "open-error": "{name} não abriu. {error}"
+    "open-error": "{name} não abriu. {error}",
+    "default-name": "Carteira {n}",
+    "created": "{name} está pronta. Renomeie em Carteiras.",
+    "restored": "{name} restaurada. A nova verificação segue em segundo plano."
+  },
+  "add": {
+    "title": "Adicionar carteira",
+    "others-stay": "Suas outras carteiras continuam neste dispositivo.",
+    "group-new": "Nova",
+    "group-restore": "Restaurar",
+    "create": "Criar uma carteira nova",
+    "create-sub": "Uma frase semente nova, criada neste dispositivo.",
+    "seed": "Frase semente",
+    "seed-sub": "Suas 24 palavras e, se tiver, o aniversário.",
+    "key": "Chave de visualização",
+    "key-sub": "Somente leitura: veja os fundos e o histórico, sem gastar.",
+    "new-title": "Carteira nova",
+    "new-lead": "O Zingo cria uma frase semente nova neste dispositivo. Você fará o backup em seguida.",
+    "create-go": "Criar carteira",
+    "restore-title": "Restaurar carteira",
+    "restore-go": "Restaurar carteira",
+    "creating": "Criando sua carteira",
+    "restoring": "Restaurando sua carteira",
+    "ready": "{name} está pronta",
+    "ready-body": "Anote agora a frase semente. É a única forma de recuperar esta carteira se você perder este telefone.",
+    "backup": "Fazer backup da frase semente",
+    "later": "Depois",
+    "later-toast": "Faça o backup em Frase semente quando quiser.",
+    "optional": "Opcional",
+    "server-acc": "Servidor",
+    "error": "A carteira não foi adicionada. {error}"
   }
 }

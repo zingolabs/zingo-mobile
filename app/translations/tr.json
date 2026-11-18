@@ -1259,7 +1259,8 @@
     "unsaved-keeps": " Şimdi çıkarsanız Zingo {current} kullanmaya devam eder.",
     "unsaved-offline": "çevrimdışı",
     "dont-save": "Kaydetme",
-    "keep-editing": "Düzenlemeye devam et"
+    "keep-editing": "Düzenlemeye devam et",
+    "from-key": "Ağ, görüntüleme anahtarından gelir."
   },
   "seedsheet": {
     "title": "Tohum ifadesi",
@@ -1615,6 +1616,36 @@
     "delete-only": "{name} tek cüzdanın. Silindiğinde Zingo başa döner.",
     "delete-swap": "{name} içinde devam eden bir takas var. Silindiğinde Zingo bu takası izlemeyi bırakır.",
     "deleted": "{name} bu cihazdan silindi",
-    "open-error": "{name} açılmadı. {error}"
+    "open-error": "{name} açılmadı. {error}",
+    "default-name": "Cüzdan {n}",
+    "created": "{name} hazır. Adını Cüzdanlar'dan değiştirebilirsin.",
+    "restored": "{name} geri yüklendi. Yeniden tarama arka planda sürüyor."
+  },
+  "add": {
+    "title": "Cüzdan ekle",
+    "others-stay": "Diğer cüzdanların bu cihazda kalır.",
+    "group-new": "Yeni",
+    "group-restore": "Geri yükle",
+    "create": "Yeni cüzdan oluştur",
+    "create-sub": "Bu cihazda oluşturulan yeni bir tohum ifadesi.",
+    "seed": "Tohum ifadesi",
+    "seed-sub": "24 kelimen ve varsa doğum bloğu.",
+    "key": "Görüntüleme anahtarı",
+    "key-sub": "Yalnızca görüntüleme: bakiye ve geçmiş görünür, harcama yapılamaz.",
+    "new-title": "Yeni cüzdan",
+    "new-lead": "Zingo bu cihazda yeni bir tohum ifadesi oluşturur. Ardından yedeklersin.",
+    "create-go": "Cüzdan oluştur",
+    "restore-title": "Cüzdanı geri yükle",
+    "restore-go": "Cüzdanı geri yükle",
+    "creating": "Cüzdanın oluşturuluyor",
+    "restoring": "Cüzdanın geri yükleniyor",
+    "ready": "{name} hazır",
+    "ready-body": "Tohum ifadesini şimdi yaz. Bu telefonu kaybedersen cüzdanı geri almanın tek yolu bu.",
+    "backup": "Tohum ifadesini yedekle",
+    "later": "Sonra",
+    "later-toast": "Hazır olduğunda Cüzdan Tohumu'ndan yedekle.",
+    "optional": "İsteğe bağlı",
+    "server-acc": "Sunucu",
+    "error": "Cüzdan eklenmedi. {error}"
   }
 }
