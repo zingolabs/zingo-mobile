@@ -855,6 +855,40 @@ hello
       }
     >
       <View
+        pointerEvents="none"
+        style={
+          [
+            {
+              "height": 24,
+              "left": 0,
+              "position": "absolute",
+              "right": 0,
+              "top": -24,
+            },
+            {},
+          ]
+        }
+      >
+        <View
+          colors={
+            [
+              "#03112400",
+              "#031124",
+            ]
+          }
+          pointerEvents="none"
+          style={
+            {
+              "bottom": 0,
+              "left": 0,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+            }
+          }
+        />
+      </View>
+      <View
         style={
           {
             "rowGap": 8,
@@ -1962,6 +1996,40 @@ hello
         }
       }
     >
+      <View
+        pointerEvents="none"
+        style={
+          [
+            {
+              "height": 24,
+              "left": 0,
+              "position": "absolute",
+              "right": 0,
+              "top": -24,
+            },
+            {},
+          ]
+        }
+      >
+        <View
+          colors={
+            [
+              "#03112400",
+              "#031124",
+            ]
+          }
+          pointerEvents="none"
+          style={
+            {
+              "bottom": 0,
+              "left": 0,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+            }
+          }
+        />
+      </View>
       <View
         style={
           {

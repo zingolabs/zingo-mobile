@@ -86,6 +86,8 @@ export function useScrollEdges({
   edges: ScrollEdgeProps;
   fades: React.ReactNode;
   scrolledTo: (y: number) => void;
+  /** Content runs on below the visible part. */
+  below: boolean;
 } {
   const { colors } = useTheme();
   const context = useContext(SurfaceContext);
@@ -155,9 +157,44 @@ export function useScrollEdges({
     </>
   );
 
-  return { edges, fades, scrolledTo };
+  return { edges, fades, scrolledTo, below };
+}
+
+/**
+ * The bottom fade drawn from a footer laid over the scroll, as its first
+ * child: it sits on the footer's top edge wherever the footer lands.
+ */
+export function FooterFade({
+  shown,
+  color,
+}: {
+  shown: boolean;
+  color: string;
+}) {
+  const style = useAnimatedStyle(() => ({
+    opacity: withTiming(shown ? 1 : 0, {
+      duration: duration.fast,
+      reduceMotion: ReduceMotion.System,
+    }),
+  }));
+  return (
+    <Animated.View pointerEvents="none" style={[styles.footerFade, style]}>
+      <LinearGradient
+        colors={[clear(color), color]}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
+    </Animated.View>
+  );
 }
 
 const styles = StyleSheet.create({
   fade: { position: 'absolute', height: EDGE_FADE },
+  footerFade: {
+    position: 'absolute',
+    top: -EDGE_FADE,
+    left: 0,
+    right: 0,
+    height: EDGE_FADE,
+  },
 });
