@@ -160,7 +160,7 @@ export default interface AppContextLoaded {
     params: LoadedAppNavigationState,
     next: 'home' | 'backup',
     notice: string,
-  ) => void;
+  ) => Promise<void>;
   /** Deletes a wallet; the open one hands over to the first wallet left. */
   deleteWallet: (entry: WalletEntry) => Promise<void>;
   /** Reads the wallets again, after one is renamed or deleted. */

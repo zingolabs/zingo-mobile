@@ -95,7 +95,6 @@ import selectingServer from '@app/services/selectingServer';
 import BackgroundFileImpl from '@app/services/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '@app/services/createAlert';
-import { sendEmail } from '@app/services/sendEmail';
 import Toast from 'react-native-toast-message';
 import { FullWindowOverlay } from 'react-native-screens';
 import { ACTION_SNACKBAR_MS, toastConfig } from '@ui/widgets/toastConfig';
@@ -159,6 +158,12 @@ import type {
 import { forgetWallet } from '@app/services/WalletLocalData';
 import type { FfiResult } from '@app/walletBackend';
 import { writeSavedBalance } from '@app/services/savedBalance';
+import {
+  leaveHandoff,
+  PendingHandoff,
+  takeHandoff,
+  WalletHandoff,
+} from '@app/services/walletHandoff';
 import { avatarCategoryOf } from '@ui/widgets/Avatar';
 import type { WalletEntry } from '@app/walletBackend';
 
@@ -194,6 +199,9 @@ const HOME_FADE_MS = 300;
 
 const FILL = { flex: 1 } as const;
 
+/** How long Home waits faded for a wallet opened in place before it shows what it has. */
+const OPENING_MAX_MS = 15 * 1000;
+
 /** How long a switch waits for the open wallet's sync to stop before it saves. */
 const SWITCH_STOP_WAIT_MS = 5 * 1000;
 
@@ -208,27 +216,49 @@ const SERVER_DEFAULT_0: ServerType = remoteServer(
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme();
   const { setSession, pendingLink, clearLink } = useSession();
-  const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
-  const [privacy, setPrivacy] = useState<boolean>(false);
-  const [backgroundSyncInfo, setBackgroundSyncInfo] = useState<BackgroundType>({
-    batches: 0,
-    message: '',
-    date: 0,
-    dateEnd: 0,
-  });
-  const [addressBook, setAddressBook] = useState<AddressBookFileClass[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [biometrics, setBiometrics] = useState<boolean>(true);
-  const [seedBackedUp, setSeedBackedUp] = useState<boolean>(true);
-  const [seedBackedUpAt, setSeedBackedUpAt] = useState<number>(0);
-  const [viewOnlyNoticeDismissed, setViewOnlyNoticeDismissed] =
-    useState<boolean>(false);
-  const [selectServer, setSelectServer] = useState<SelectServerEnum>(
-    SelectServerEnum.auto,
+  const [handoff] = useState(() => takeHandoff(props.wallet.walletId));
+  const carried = <T,>(
+    pick: (c: WalletHandoff['settings']) => T,
+    fallback: T,
+  ) => (handoff.kind === 'handoff' ? pick(handoff.handoff.settings) : fallback);
+  const [language, setLanguage] = useState<LanguageEnum>(() =>
+    carried(c => c.language, LanguageEnum.en),
   );
-  const [blockExplorer, setBlockExplorer] = useState<BlockExplorerEnum>(
-    BlockExplorerEnum.Zcashexplorer,
+  const [server, setServer] = useState<ServerType>(() =>
+    carried(c => c.server, SERVER_DEFAULT_0),
+  );
+  const [privacy, setPrivacy] = useState<boolean>(() =>
+    carried(c => c.privacy, false),
+  );
+  const [backgroundSyncInfo, setBackgroundSyncInfo] = useState<BackgroundType>(
+    () =>
+      carried(c => c.backgroundSyncInfo, {
+        batches: 0,
+        message: '',
+        date: 0,
+        dateEnd: 0,
+      }),
+  );
+  const [addressBook, setAddressBook] = useState<AddressBookFileClass[]>(() =>
+    carried(c => c.addressBook, []),
+  );
+  const [loading, setLoading] = useState<boolean>(handoff.kind === 'none');
+  const [biometrics, setBiometrics] = useState<boolean>(() =>
+    carried(c => c.biometrics, true),
+  );
+  const [seedBackedUp, setSeedBackedUp] = useState<boolean>(() =>
+    carried(c => c.seedBackedUp, true),
+  );
+  const [seedBackedUpAt, setSeedBackedUpAt] = useState<number>(() =>
+    carried(c => c.seedBackedUpAt, 0),
+  );
+  const [viewOnlyNoticeDismissed, setViewOnlyNoticeDismissed] =
+    useState<boolean>(() => carried(c => c.viewOnlyNoticeDismissed, false));
+  const [selectServer, setSelectServer] = useState<SelectServerEnum>(() =>
+    carried(c => c.selectServer, SelectServerEnum.auto),
+  );
+  const [blockExplorer, setBlockExplorer] = useState<BlockExplorerEnum>(() =>
+    carried(c => c.blockExplorer, BlockExplorerEnum.Zcashexplorer),
   );
   const file = useMemo(
     () => ({
@@ -244,8 +274,11 @@ export default function LoadedApp(props: LoadedAppProps) {
     const instance = new I18n(file);
     /** A key missing in a locale shows the English text, never `[missing … translation]`. */
     instance.enableFallback = true;
+    if (handoff.kind === 'handoff') {
+      instance.locale = handoff.handoff.settings.language;
+    }
     return instance;
-  }, [file]);
+  }, [file, handoff]);
 
   // `translate` carries `language` in its memo deps so its identity changes
   // when the user switches language. Memoized children that include
@@ -276,6 +309,9 @@ export default function LoadedApp(props: LoadedAppProps) {
   } = props.wallet;
 
   useEffect(() => {
+    if (handoff.kind === 'handoff') {
+      return;
+    }
     (async () => {
       // fallback if no available language fits
       const fallback = { languageTag: LanguageEnum.en, isRTL: false };
@@ -545,6 +581,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         leaveWallet={setSession}
         openWallet={params => setSession({ kind: 'wallet', params })}
         walletId={props.wallet.walletId}
+        handoff={handoff}
         arrivalNext={props.wallet.next}
         arrivalNotice={props.wallet.notice}
         pendingLink={pendingLink}
@@ -586,6 +623,8 @@ type LoadedAppClassProps = {
   /** Hands the wallet section to another open wallet, which remounts it. */
   openWallet: (params: LoadedAppNavigationState) => void;
   walletId: string;
+  /** What the wallet replaced in place handed over: its figures, shown faded while this one opens. */
+  handoff: PendingHandoff;
   /** A wallet just added opens on its seed backup when asked, and with its note. */
   arrivalNext: 'home' | 'backup';
   arrivalNotice: string;
@@ -630,14 +669,19 @@ export class LoadedAppClass extends Component<
   unsubscribeNetInfo: NetInfoSubscription;
   constructor(props: LoadedAppClassProps) {
     super(props);
+    const shown: WalletHandoff['figures'] =
+      props.handoff.kind === 'handoff'
+        ? props.handoff.handoff.figures
+        : { kind: 'none' };
 
     this.state = {
       //context
       netInfo: {} as NetInfoType,
-      totalBalance: null,
+      totalBalance: shown.kind === 'shown' ? shown.totalBalance : null,
       addresses: null,
-      valueTransfers: null,
-      valueTransfersTotal: null,
+      valueTransfers: shown.kind === 'shown' ? shown.valueTransfers : null,
+      valueTransfersTotal:
+        shown.kind === 'shown' ? shown.valueTransfersTotal : null,
       messages: null,
       messagesTotal: null,
       sendPageState: new SendPageStateClass(new ToAddrClass(0)),
@@ -730,7 +774,10 @@ export class LoadedAppClass extends Component<
           ? AppStateStatusEnum.active
           : AppState.currentState,
       walletId: props.walletId,
-      switching: { kind: 'none' },
+      switching:
+        props.handoff.kind === 'handoff'
+          ? { kind: 'opening', wallet: props.handoff.handoff.opening }
+          : { kind: 'none' },
       wallets: [],
       scrollToTop: false,
       scrollToBottom: false,
@@ -767,6 +814,12 @@ export class LoadedAppClass extends Component<
     this.publishReportState();
     await this.refreshWallets();
     this.arrive();
+    if (this.state.switching.kind === 'opening') {
+      this.openingTimer = setTimeout(
+        () => this.setState({ switching: { kind: 'none' } }),
+        OPENING_MAX_MS,
+      );
+    }
     const netInfoState = await NetInfo.fetch();
     this.setState({
       netInfo: {
@@ -1040,7 +1093,24 @@ export class LoadedAppClass extends Component<
     }
   };
 
+  /** What a wallet opened in place still waits for before its own figures replace the faded ones. */
+  awaiting = { balance: true, transfers: true };
+  openingTimer: ReturnType<typeof setTimeout> | undefined = undefined;
+
+  /** Ends the opening once the balance and the history of this wallet arrived. */
+  arrived = (part: 'balance' | 'transfers') => {
+    if (this.state.switching.kind !== 'opening' || !this.awaiting[part]) {
+      return;
+    }
+    this.awaiting = { ...this.awaiting, [part]: false };
+    if (!this.awaiting.balance && !this.awaiting.transfers) {
+      clearTimeout(this.openingTimer);
+      this.setState({ switching: { kind: 'none' } });
+    }
+  };
+
   componentWillUnmount = async () => {
+    clearTimeout(this.openingTimer);
     publishReport({ session: { kind: 'closed' } });
     await this.rpc.clearTimers();
     this.rpc.stopMixnetPolling();
@@ -1152,7 +1222,8 @@ export class LoadedAppClass extends Component<
   };
 
   setTotalBalance = (totalBalance: TotalBalanceClass) => {
-    if (!isEqual(this.state.totalBalance, totalBalance)) {
+    const opening = this.state.switching.kind === 'opening';
+    if (opening || !isEqual(this.state.totalBalance, totalBalance)) {
       //const start = Date.now();
       this.setState({ totalBalance });
       writeSavedBalance(
@@ -1163,6 +1234,7 @@ export class LoadedAppClass extends Component<
           totalBalance.totalTransparentBalance,
       ).catch(e => console.log(`saved balance not written: ${e}`));
     }
+    this.arrived('balance');
   };
 
   setSyncingStatus = (syncingStatus: RPCSyncStatusType) => {
@@ -1194,7 +1266,9 @@ export class LoadedAppClass extends Component<
     valueTransfers: ValueTransferType[],
     valueTransfersTotal: number,
   ) => {
+    const opening = this.state.switching.kind === 'opening';
     if (
+      opening ||
       !isEqual(this.state.valueTransfers, valueTransfers) ||
       this.state.valueTransfersTotal !== valueTransfersTotal
     ) {
@@ -1213,7 +1287,8 @@ export class LoadedAppClass extends Component<
               ).length
           : 0;
       // if a ValueTransfer go from 3 confirmations to > 3 -> Show a message about a ValueTransfer is confirmed
-      this.state.valueTransfers &&
+      !opening &&
+        this.state.valueTransfers &&
         this.state.valueTransfersTotal !== null &&
         this.state.valueTransfersTotal > 0 &&
         this.state.valueTransfers
@@ -1375,6 +1450,7 @@ export class LoadedAppClass extends Component<
       //  Date.now() - start,
       //);
     }
+    this.arrived('transfers');
   };
 
   setMessagesList = (messages: ValueTransferType[], messagesTotal: number) => {
@@ -1849,6 +1925,7 @@ export class LoadedAppClass extends Component<
       server.chainName,
     );
     if (opened.kind === 'opened') {
+      await this.leaveHandoffFor(entry, true);
       this.props.openWallet({
         walletId: entry.id,
         arrival: 'switch',
@@ -1979,12 +2056,51 @@ export class LoadedAppClass extends Component<
   };
 
   /** Opens the wallet just added, with what it shows on arrival. */
-  enterAdded = (
+  enterAdded = async (
     params: LoadedAppNavigationState,
     next: 'home' | 'backup',
     notice: string,
   ) => {
+    const listed = await walletsOnDevice();
+    const added = listed.ok
+      ? listed.value.wallets.find(w => w.id === params.walletId)
+      : undefined;
+    if (added) {
+      await this.leaveHandoffFor(added, false);
+    }
     this.props.openWallet({ ...params, next, notice });
+  };
+
+  /** Leaves what the next wallet section takes from this one: the app's settings, the next wallet's, and these figures when they belong on screen. */
+  leaveHandoffFor = async (entry: WalletEntry, keepFigures: boolean) => {
+    const settings = await SettingsFileImpl.readSettings();
+    const { totalBalance, valueTransfers, valueTransfersTotal } = this.state;
+    leaveHandoff({
+      walletId: entry.id,
+      opening: entry,
+      settings: {
+        language: this.state.language,
+        privacy: this.state.privacy,
+        biometrics: this.state.biometrics,
+        blockExplorer: this.state.blockExplorer,
+        addressBook: this.state.addressBook,
+        backgroundSyncInfo: this.state.backgroundSyncInfo,
+        server: settings.server,
+        selectServer: settings.selectServer,
+        seedBackedUp: settings.seedBackedUp === true,
+        seedBackedUpAt: settings.seedBackedUpAt || 0,
+        viewOnlyNoticeDismissed: settings.viewOnlyNoticeDismissed === true,
+      },
+      figures:
+        keepFigures && totalBalance && valueTransfers
+          ? {
+              kind: 'shown',
+              totalBalance,
+              valueTransfers,
+              valueTransfersTotal: valueTransfersTotal ?? 0,
+            }
+          : { kind: 'none' },
+    });
   };
 
   /**
@@ -2221,7 +2337,11 @@ export class LoadedAppClass extends Component<
                 <ConfirmBottomSheet />
                 <WalletsSheet />
                 <OptionsPanelProvider>
-                  <FadeInOnMount duration={HOME_FADE_MS}>
+                  <FadeInOnMount
+                    duration={
+                      this.props.handoff.kind === 'handoff' ? 0 : HOME_FADE_MS
+                    }
+                  >
                     {/* The tooltip layer for screens outside any sheet or panel. */}
                     <TooltipHost>
                       <WalletNavigator />

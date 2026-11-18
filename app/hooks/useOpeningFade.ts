@@ -18,8 +18,8 @@ const FADE_MS = 240;
  */
 export function useOpeningFade() {
   const { switching } = useContext(ContextAppLoaded);
-  const opacity = useSharedValue(1);
   const opening = switching.kind === 'opening';
+  const opacity = useSharedValue(opening ? OPENING_OPACITY : 1);
   useEffect(() => {
     opacity.value = withTiming(opening ? OPENING_OPACITY : 1, {
       duration: FADE_MS,
