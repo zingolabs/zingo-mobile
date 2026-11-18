@@ -11,7 +11,7 @@ import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { defaultTo, isEqual } from 'lodash';
 import { LoadingSession, useSession } from '@app/navigation/session';
-import { navigateWallet } from '@app/navigation/navigate';
+import { navigateWallet, popRoutes } from '@app/navigation/navigate';
 import { LoadedAppNavigationState } from '@app/types';
 import NetInfo, {
   NetInfoSubscription,
@@ -2055,7 +2055,7 @@ export class LoadedAppClass extends Component<
     return finishWalletOpen(result, server.chainName);
   };
 
-  /** Opens the wallet just added, with what it shows on arrival. */
+  /** Opens the wallet just added on the screen the add flow started from, with what it shows on arrival. */
   enterAdded = async (
     params: LoadedAppNavigationState,
     next: 'home' | 'backup',
@@ -2068,6 +2068,7 @@ export class LoadedAppClass extends Component<
     if (added) {
       await this.leaveHandoffFor(added, false);
     }
+    popRoutes([Route.AddWallet, Route.NewWallet, Route.RestoreWallet]);
     this.props.openWallet({ ...params, next, notice });
   };
 
