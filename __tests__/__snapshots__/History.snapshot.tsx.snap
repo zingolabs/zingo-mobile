@@ -135,14 +135,17 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
           </View>
           <View
             style={
-              {
-                "alignItems": "baseline",
-                "columnGap": 8,
-                "flexDirection": "row",
-                "justifyContent": "center",
-                "marginBottom": 20,
-                "marginTop": 4,
-              }
+              [
+                {
+                  "alignItems": "baseline",
+                  "columnGap": 8,
+                  "flexDirection": "row",
+                  "justifyContent": "center",
+                  "marginBottom": 20,
+                  "marginTop": 4,
+                },
+                {},
+              ]
             }
           >
             <View
@@ -386,146 +389,64 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
         <View
           style={
             {
-              "left": 0,
-              "paddingBottom": 11.5,
-              "paddingLeft": 20,
-              "paddingRight": 11.5,
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 14,
+              "paddingRight": 20,
               "paddingTop": 16,
               "position": "absolute",
+              "right": 0,
               "top": 0,
             }
           }
         >
           <View
-            style={
+            accessibilityLabel="text translated"
+            accessibilityState={
               {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "gap": 14,
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
               }
             }
-          >
-            <View
-              accessibilityLabel="text translated"
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              hitSlop={
-                {
-                  "bottom": 10,
-                  "left": 10,
-                  "right": 10,
-                  "top": 10,
-                }
-              }
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              style={
-                [
-                  undefined,
-                  {},
-                ]
-              }
-              testID="header.drawmenu"
-            />
-          </View>
-        </View>
-        <View
-          style={
-            [
-              {},
+            accessibilityValue={
               {
-                "padding": 13,
-                "position": "absolute",
-                "right": 0,
-                "top": 0,
-              },
-            ]
-          }
-        >
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "gap": 14,
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
               }
             }
-          >
-            <View
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            hitSlop={
+              {
+                "bottom": 10,
+                "left": 10,
+                "right": 10,
+                "top": 10,
               }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              hitSlop={
-                {
-                  "bottom": 10,
-                  "left": 10,
-                  "right": 10,
-                  "top": 10,
-                }
-              }
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              style={
-                [
-                  {
-                    "marginRight": 5,
-                    "marginTop": 4.5,
-                  },
-                  {},
-                ]
-              }
-              testID="header.messages"
-            />
-          </View>
+            }
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                undefined,
+                {},
+              ]
+            }
+            testID="header.drawmenu"
+          />
         </View>
       </View>
     </View>
@@ -851,9 +772,12 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
             <View
               onLayout={[Function]}
               style={
-                {
-                  "flex": 1,
-                }
+                [
+                  {
+                    "flex": 1,
+                  },
+                  {},
+                ]
               }
             >
               <RCTScrollView
@@ -1925,14 +1849,17 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
           </View>
           <View
             style={
-              {
-                "alignItems": "baseline",
-                "columnGap": 8,
-                "flexDirection": "row",
-                "justifyContent": "center",
-                "marginBottom": 20,
-                "marginTop": 4,
-              }
+              [
+                {
+                  "alignItems": "baseline",
+                  "columnGap": 8,
+                  "flexDirection": "row",
+                  "justifyContent": "center",
+                  "marginBottom": 20,
+                  "marginTop": 4,
+                },
+                {},
+              ]
             }
           >
             <View
@@ -2176,146 +2103,64 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
         <View
           style={
             {
-              "left": 0,
-              "paddingBottom": 11.5,
-              "paddingLeft": 20,
-              "paddingRight": 11.5,
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 14,
+              "paddingRight": 20,
               "paddingTop": 16,
               "position": "absolute",
+              "right": 0,
               "top": 0,
             }
           }
         >
           <View
-            style={
+            accessibilityLabel="text translated"
+            accessibilityState={
               {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "gap": 14,
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
               }
             }
-          >
-            <View
-              accessibilityLabel="text translated"
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              hitSlop={
-                {
-                  "bottom": 10,
-                  "left": 10,
-                  "right": 10,
-                  "top": 10,
-                }
-              }
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              style={
-                [
-                  undefined,
-                  {},
-                ]
-              }
-              testID="header.drawmenu"
-            />
-          </View>
-        </View>
-        <View
-          style={
-            [
-              {},
+            accessibilityValue={
               {
-                "padding": 13,
-                "position": "absolute",
-                "right": 0,
-                "top": 0,
-              },
-            ]
-          }
-        >
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "gap": 14,
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
               }
             }
-          >
-            <View
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            hitSlop={
+              {
+                "bottom": 10,
+                "left": 10,
+                "right": 10,
+                "top": 10,
               }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              hitSlop={
-                {
-                  "bottom": 10,
-                  "left": 10,
-                  "right": 10,
-                  "top": 10,
-                }
-              }
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              style={
-                [
-                  {
-                    "marginRight": 5,
-                    "marginTop": 4.5,
-                  },
-                  {},
-                ]
-              }
-              testID="header.messages"
-            />
-          </View>
+            }
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                undefined,
+                {},
+              ]
+            }
+            testID="header.drawmenu"
+          />
         </View>
       </View>
     </View>
@@ -2640,9 +2485,12 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
             <View
               onLayout={[Function]}
               style={
-                {
-                  "flex": 1,
-                }
+                [
+                  {
+                    "flex": 1,
+                  },
+                  {},
+                ]
               }
             >
               <RCTScrollView

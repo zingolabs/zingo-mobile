@@ -234,7 +234,6 @@ export default function FullPanel({
             noBalance={true}
             noSyncingStatus={true}
             noPrivacy={true}
-            showMessagesIcon={true}
           />
         </View>
         {fit && (
