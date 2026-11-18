@@ -47,6 +47,8 @@ type Options = {
   savedUri: (chain: ChainNameEnum) => string | null;
   netName: (chain: ChainNameEnum) => string;
   onSave: (chain: ChainNameEnum, uri: string) => Promise<boolean>;
+  /** The wallet's network stays: a server on another one offers no switch. */
+  networkLocked?: boolean;
 };
 
 const fill = (text: string, values: Record<string, string | number>) =>
@@ -61,6 +63,7 @@ export const useCustomServer = ({
   savedUri,
   netName,
   onSave,
+  networkLocked,
 }: Options) => {
   const t = (key: string, values: Record<string, string | number> = {}) =>
     fill(translate(`server.${key}`) as string, values);
@@ -236,12 +239,13 @@ export const useCustomServer = ({
         : probe.chainName;
       const mismatch: LogLine = {
         ...final('bad', t('fix-chain', { got, want: netName(chain) })),
-        switchTo: known
-          ? {
-              chain: probe.chainName as ChainNameEnum,
-              label: t('switch-to', { net: got }),
-            }
-          : undefined,
+        switchTo:
+          known && !networkLocked
+            ? {
+                chain: probe.chainName as ChainNameEnum,
+                label: t('switch-to', { net: got }),
+              }
+            : undefined,
       };
       return fail(chain, [
         reached,

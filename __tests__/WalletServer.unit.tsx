@@ -111,7 +111,6 @@ test('Tests that Automatic on the wallet’s network reconnects the wallet and s
     remoteServer('https://na.zec.rocks:443', ChainNameEnum.mainChainName),
     SelectServerEnum.auto,
     true,
-    true,
   );
   expect(navigation.navigate).not.toHaveBeenCalled();
 });
@@ -140,7 +139,6 @@ test('Tests that the network stays the wallet’s when another network is tapped
   expect(setServerOption).toHaveBeenCalledWith(
     remoteServer('https://zec.rocks:443', ChainNameEnum.mainChainName),
     SelectServerEnum.auto,
-    true,
     true,
   );
   expect(navigation.navigate).not.toHaveBeenCalled();

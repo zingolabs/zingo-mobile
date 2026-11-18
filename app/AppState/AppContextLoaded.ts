@@ -131,7 +131,6 @@ export default interface AppContextLoaded {
     value: ServerType,
     selectServer: SelectServerEnum,
     toast: boolean,
-    sameServerChainName: boolean,
   ) => Promise<SetServerResult>;
   switchServerForRetry: (server: ServerType) => Promise<void>;
   clearToAddr: () => void;
@@ -142,7 +141,6 @@ export default interface AppContextLoaded {
   setBlockExplorerOption: (value: BlockExplorerEnum) => Promise<void>;
   // The seed and viewing key screens confirm these; each leaves the wallet
   // section or its server.
-  changeWallet: () => Promise<void>;
   /** The open wallet's id. */
   walletId: string;
   /** Opens another wallet in place, Home staying until it is open. */
@@ -167,9 +165,6 @@ export default interface AppContextLoaded {
   deleteWallet: (entry: WalletEntry) => Promise<void>;
   /** Reads the wallets again, after one is renamed or deleted. */
   refreshWallets: () => Promise<void>;
-  restoreBackup: () => Promise<void>;
-  applyPendingServer: () => Promise<void>;
-  cancelPendingServer: () => Promise<void>;
 
   // some ValueTransfer is pending?
   somePending: boolean;

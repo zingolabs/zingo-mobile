@@ -61,14 +61,6 @@ export async function forgetWallet(walletId: string): Promise<void> {
   }
 }
 
-/** Before the active wallet is deleted or replaced, as forgetWallet. */
-export async function forgetWalletOnFile(): Promise<void> {
-  const result = await walletsOnDevice();
-  if (result.ok && result.value.active.kind === 'wallet') {
-    await forgetWallet(result.value.active.id);
-  }
-}
-
 /** Moves each fingerprint key to the wallet's id, unless the id already has one. */
 async function moveFingerprintData(
   fingerprint: string,

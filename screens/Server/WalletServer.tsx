@@ -205,25 +205,11 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation, route }) => {
       }
       return kept;
     }
-    const sameChain =
-      next.kind === 'offline' || next.chainName === walletChainName;
-    const result = await setServerOption(next, mode, true, sameChain);
+    const result = await setServerOption(next, mode, true);
     if (!mounted.current) {
       return result.kind === 'ok';
     }
     setBusy(false);
-    if (result.kind === 'chain-changed') {
-      setLeaving('away');
-      if (readOnly) {
-        navigation.navigate(Route.ViewingKey, {
-          entry: { kind: 'push' },
-          switchTo: next.chainName,
-        });
-      } else {
-        navigation.navigate(Route.WalletSeed, { action: 'server' });
-      }
-      return false;
-    }
     if (result.kind === 'error') {
       probeCurrent(server);
     }

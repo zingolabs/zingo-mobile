@@ -1,11 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import Animated, {
   ReduceMotion,
@@ -37,8 +31,7 @@ import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { Route, SnackbarDurationEnum } from '@app/AppState';
 import Header from '@ui/widgets/Header';
-import { AppDrawerParamList, WalletSeedAction } from '@app/types';
-import { showConfirm } from '@app/services/showConfirm';
+import { AppDrawerParamList } from '@app/types';
 import { useBiometricGate } from '@app/hooks/useBiometricGate';
 import { useSecureScreen } from '@app/hooks/useSecureScreen';
 import { useScreenCapture } from '@app/hooks/useScreenCapture';
@@ -68,30 +61,13 @@ const KEY_QR = 190;
 
 type Tip = 'none' | 'birthday' | 'vk';
 
-const TITLE: Record<WalletSeedAction, string> = {
-  change: 'loadedapp.changewallet',
-  server: 'walletseed.title-server',
-};
-
-const WARNING: Record<WalletSeedAction, string> = {
-  change: 'seed.change-warning',
-  server: 'seed.server-warning',
-};
-
-// A view-only wallet only gets here through Switch Wallet: its server
-// change shows the viewing key screen instead.
-const WARNING_VIEW_ONLY = 'walletseed.change-warning-vo';
-
-// The seed phrase with its backup status, birthday and viewing key. With an
-// action, the last look at them before leaving this wallet or its server.
-// A view-only wallet shows its viewing key in place of the words.
+// The seed phrase with its backup status, birthday and viewing key. A
+// view-only wallet shows its viewing key in place of the words.
 type WalletSeedProps = NativeStackScreenProps<AppDrawerParamList, 'WalletSeed'>;
 
 const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
   navigation,
-  route,
 }) => {
-  const action = route.params?.action;
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -102,41 +78,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
     language,
     birthday: walletBirthday,
     readOnly,
-    changeWallet,
-    applyPendingServer,
-    cancelPendingServer,
   } = context;
-  // What confirming or backing out does depends on why the seed is shown.
-  const onConfirm = async () => {
-    if (action === 'change') {
-      await changeWallet();
-    } else if (action === 'server') {
-      await applyPendingServer();
-    }
-  };
-  /** The pending action was confirmed or cancelled already. */
-  const settled = useRef(false);
-  const onCancel = async () => {
-    settled.current = true;
-    if (action === 'server') {
-      await cancelPendingServer();
-    }
-  };
-  /**
-   * Any other way out (iOS's swipe, Android's back) cancels a pending server
-   * change, as the back arrow does.
-   */
-  useEffect(
-    () =>
-      navigation.addListener('beforeRemove', () => {
-        if (!settled.current) {
-          onCancel();
-        }
-      }),
-    // onCancel reads only the route's action, fixed for this screen.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [navigation],
-  );
   const { colors } = useTheme();
   const { edges, fades } = useScrollEdges();
   const bottomPad = useBottomActionPad();
@@ -229,29 +171,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
     );
   };
 
-  const leave = async () => {
-    await onCancel();
-    navigation.goBack();
-  };
-
-  const confirm = (to: WalletSeedAction) =>
-    showConfirm({
-      title: translate('walletseed.confirm-title') as string,
-      message: translate(readOnly ? WARNING_VIEW_ONLY : WARNING[to]) as string,
-      buttons: [
-        {
-          text: translate('confirm') as string,
-          onPress: async () => {
-            settled.current = true;
-            await onConfirm();
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            }
-          },
-        },
-        { text: translate('cancel') as string, style: 'cancel' },
-      ],
-    });
+  const leave = () => navigation.goBack();
 
   const toggle = (which: Tip) => (open: boolean) =>
     setTip(open ? which : 'none');
@@ -277,7 +197,6 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
         bg: colors.bgWarning,
         tile: colors.bgWarningSubtle,
       };
-  const ready = readOnly ? !!vk : words.length > 0;
   const veiled = hidden || shot !== 'none' || captured;
   const vkShort =
     vk.length > VK_HEAD + VK_TAIL
@@ -296,9 +215,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
         style={{ flex: 1, paddingTop: 4 }}
       >
         <Header
-          title={
-            translate(action ? TITLE[action] : 'loadedapp.walletseed') as string
-          }
+          title={translate('loadedapp.walletseed') as string}
           closeScreen={leave}
           backTestID="walletseed.back"
           backAccessibilityLabel={translate('walletseed.back-acc') as string}
@@ -315,105 +232,82 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
           contentContainerStyle={{ paddingBottom: space16 }}
           keyboardShouldPersistTaps="handled"
         >
-          {action && (
-            <Text
-              testID="walletseed.leaving"
-              variant="body"
-              tone="muted"
-              style={{
-                marginHorizontal: SIDE,
-                marginBottom: space16,
-                textAlign: 'center',
-              }}
-            >
-              {
-                translate(
-                  `walletseed.sub-${action}${readOnly ? '-vo' : ''}`,
-                ) as string
-              }
-            </Text>
-          )}
-          {!action && (
-            <View
-              testID={seedBackedUp ? 'walletseed.ok' : 'walletseed.no'}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: space12,
-                minHeight: rowMinHeight,
-                marginHorizontal: SIDE,
-                marginBottom: space12,
-                paddingHorizontal: space12,
-                paddingVertical: space8,
-                borderRadius: radiusMd,
-                borderWidth: 1,
-                borderColor: strip.border,
-                backgroundColor: strip.bg,
-              }}
-            >
-              <View style={{ flex: 1, gap: space4 }}>
+          <View
+            testID={seedBackedUp ? 'walletseed.ok' : 'walletseed.no'}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: space12,
+              minHeight: rowMinHeight,
+              marginHorizontal: SIDE,
+              marginBottom: space12,
+              paddingHorizontal: space12,
+              paddingVertical: space8,
+              borderRadius: radiusMd,
+              borderWidth: 1,
+              borderColor: strip.border,
+              backgroundColor: strip.bg,
+            }}
+          >
+            <View style={{ flex: 1, gap: space4 }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  columnGap: space8,
+                  rowGap: space4,
+                }}
+              >
                 <View
                   style={{
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
+                    width: 24,
+                    height: 24,
+                    borderRadius: radiusXs,
+                    backgroundColor: strip.tile,
                     alignItems: 'center',
-                    columnGap: space8,
-                    rowGap: space4,
+                    justifyContent: 'center',
                   }}
                 >
-                  <View
-                    style={{
-                      width: 24,
-                      height: 24,
-                      borderRadius: radiusXs,
-                      backgroundColor: strip.tile,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    {seedBackedUp ? (
-                      <ShieldCheckIcon
-                        size={iconSizeSm}
-                        color={colors.fgAccent}
-                      />
-                    ) : (
-                      <TriangleAlert
-                        size={iconSizeSm}
-                        color={colors.fgWarning}
-                      />
-                    )}
-                  </View>
-                  <Text
-                    variant="bodyStrong"
-                    tone={seedBackedUp ? 'accent' : 'warning'}
-                  >
-                    {
-                      translate(
-                        seedBackedUp
-                          ? 'walletseed.ok-title'
-                          : 'walletseed.no-title',
-                      ) as string
-                    }
-                  </Text>
+                  {seedBackedUp ? (
+                    <ShieldCheckIcon
+                      size={iconSizeSm}
+                      color={colors.fgAccent}
+                    />
+                  ) : (
+                    <TriangleAlert size={iconSizeSm} color={colors.fgWarning} />
+                  )}
                 </View>
-                <Text variant="caption" tone="muted">
-                  {seedBackedUp
-                    ? backedUpOn
-                    : (translate('walletseed.no-sub') as string)}
+                <Text
+                  variant="bodyStrong"
+                  tone={seedBackedUp ? 'accent' : 'warning'}
+                >
+                  {
+                    translate(
+                      seedBackedUp
+                        ? 'walletseed.ok-title'
+                        : 'walletseed.no-title',
+                    ) as string
+                  }
                 </Text>
               </View>
-              {!seedBackedUp && (
-                <Button
-                  testID="walletseed.backup"
-                  variant="primary"
-                  size="small"
-                  inline
-                  title={translate('seednotice.button') as string}
-                  onPress={() => openFlow('push')}
-                />
-              )}
+              <Text variant="caption" tone="muted">
+                {seedBackedUp
+                  ? backedUpOn
+                  : (translate('walletseed.no-sub') as string)}
+              </Text>
             </View>
-          )}
+            {!seedBackedUp && (
+              <Button
+                testID="walletseed.backup"
+                variant="primary"
+                size="small"
+                inline
+                title={translate('seednotice.button') as string}
+                onPress={() => openFlow('push')}
+              />
+            )}
+          </View>
 
           {readOnly ? (
             <KeyCard
@@ -491,17 +385,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
             paddingBottom: bottomPad,
           }}
         >
-          {action ? (
-            <View style={{ marginHorizontal: SIDE }}>
-              <Button
-                testID="walletseed.go"
-                variant="primary"
-                disabled={!ready}
-                title={translate(`walletseed.go-${action}`) as string}
-                onPress={() => confirm(action)}
-              />
-            </View>
-          ) : seedBackedUp ? (
+          {seedBackedUp ? (
             <StepActions
               testID="walletseed.actions"
               link={translate('walletseed.verify') as string}

@@ -259,6 +259,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
   const custom = useCustomServer({
     translate,
     online,
+    networkLocked,
     savedUri: chain =>
       server.kind === 'remote' &&
       selectServer === SelectServerEnum.custom &&

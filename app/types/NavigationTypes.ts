@@ -86,8 +86,6 @@ export type LoadedAppNavigationState = {
 // A card's rect in window coordinates.
 export type CardRect = { x: number; y: number; width: number; height: number };
 
-export type WalletSeedAction = 'change' | 'server';
-
 // How the viewing key screen opens: a circle out of the header snowflake,
 // the view-only card growing, or pushed from the menu.
 export type ViewingKeyEntry =
@@ -130,10 +128,10 @@ export type AppDrawerParamList = {
   [Route.RestoreWallet]: { mode: 'seed' | 'key' };
   // Absent for the plain view; set when the seed is shown before leaving
   // this wallet or its server.
-  [Route.WalletSeed]: { action: WalletSeedAction } | undefined;
+  [Route.WalletSeed]: undefined;
   // `switchTo`: shown before a view-only wallet moves to a server on that
   // network.
-  [Route.ViewingKey]: { entry: ViewingKeyEntry; switchTo?: ChainNameEnum };
+  [Route.ViewingKey]: { entry: ViewingKeyEntry };
   [Route.MigrationStrategy]: undefined;
   [Route.MigrationTransactions]: undefined;
   // The immediate drain broadcasts here; `transactions` is the previewed plan,

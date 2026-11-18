@@ -691,15 +691,11 @@ export class LoadedAppClass extends Component<
       setLanguageOption: this.setLanguageOption,
       setBiometricsOption: this.setBiometricsOption,
       setBlockExplorerOption: this.setBlockExplorerOption,
-      changeWallet: this.onClickOKChangeWallet,
       switchWallet: this.switchWallet,
       deleteWallet: this.deleteWallet,
       addWallet: this.addWallet,
       enterAdded: this.enterAdded,
       refreshWallets: this.refreshWallets,
-      restoreBackup: this.onClickOKRestoreBackup,
-      applyPendingServer: this.onClickOKServerWallet,
-      cancelPendingServer: this.cancelPendingServer,
       somePending: false,
       addressBook: props.addressBook,
       launchAddTagModal: this.launchAddTagModal,
@@ -733,7 +729,6 @@ export class LoadedAppClass extends Component<
         Platform.OS === GlobalConst.platformOSios
           ? AppStateStatusEnum.active
           : AppState.currentState,
-      pendingServer: { kind: 'none' },
       walletId: props.walletId,
       switching: { kind: 'none' },
       wallets: [],
@@ -1538,7 +1533,6 @@ export class LoadedAppClass extends Component<
     value: ServerType,
     selectServer: SelectServerEnum,
     toast: boolean,
-    sameServerChainName: boolean,
   ): Promise<SetServerResult> => {
     // The server is changing — stop the ongoing sync tasks before touching
     // anything else.
@@ -1546,29 +1540,7 @@ export class LoadedAppClass extends Component<
     this.setSyncingStatus({} as RPCSyncStatusType);
     this.keepAwake(false);
 
-    // Caller pre-detected a chain change (`sameServerChainName === false`).
-    // We can't open the existing wallet against a different chain; stash
-    // the desired server in state so the recovery screen can pick it up,
-    // restore the previous server, and signal `chain-changed` so the
-    // caller navigates to Seed/Ufvk recovery. We deliberately do NOT
-    // navigate from here — navigation policy lives in the caller now.
-    if (!sameServerChainName) {
-      const oldSettings = await SettingsFileImpl.readSettings();
-      await changeServer(nativeUri(oldSettings.server));
-      this.setState({
-        pendingServer: { kind: 'pending', server: value, selectServer },
-        server: oldSettings.server,
-        selectServer: oldSettings.selectServer,
-      });
-      if (toast) {
-        this.addLastSnackbar(
-          `${this.state.translate('loadedapp.readingwallet-error')} ${nativeUri(value)}`,
-        );
-      }
-      return { kind: 'chain-changed' };
-    }
-
-    // Same chain — try to open the wallet on the new server.
+    // The wallet's network never changes: open it on the new server.
     const result = await loadExistingWallet(
       nativeUri(value),
       value.chainName,
@@ -2071,176 +2043,6 @@ export class LoadedAppClass extends Component<
     }
   };
 
-  onClickOKChangeWallet = async () => {
-    const changed = await this.rpc.changeWallet();
-
-    if (changed.kind === 'error') {
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        this.state.translate('loadedapp.changingwallet-label') as string,
-        this.state.translate(changed.errorKey) as string,
-        false,
-        this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
-      );
-      return;
-    }
-
-    this.keepAwake(false);
-    this.navigateToLoadingApp({
-      kind: 'boot',
-      startingApp: false,
-      newWallet: false,
-    });
-  };
-
-  // Runs from a confirm button, where a throw would vanish: every failure
-  // ends in the alert.
-  onClickOKRestoreBackup = async () => {
-    try {
-      await this.restoreBackupAndRestart();
-    } catch (e) {
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        this.state.translate('loadedapp.restoringwallet-label') as string,
-        `${this.state.translate('rpc.restorebackup-error') as string} ${e}`,
-        false,
-        this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
-      );
-    }
-  };
-
-  restoreBackupAndRestart = async () => {
-    // Only mainnet wallets are backed up: any other wallet is replaced by
-    // the backup instead of swapping places with it.
-    const restored = await this.rpc.restoreBackup(
-      this.state.walletChainName !== ChainNameEnum.mainChainName,
-    );
-
-    if (restored.kind === 'error') {
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        this.state.translate('loadedapp.restoringwallet-label') as string,
-        this.state.translate(restored.errorKey) as string,
-        false,
-        this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
-      );
-      return;
-    }
-
-    // The swapped-in wallet is a restore, which counts as backed up. The
-    // previous wallet's flag must not carry over.
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUp, true);
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUpAt, 0);
-    await SettingsFileImpl.writeSettings(
-      SettingsNameEnum.viewOnlyNoticeDismissed,
-      false,
-    );
-    // Only mainnet wallets were ever backed up, so another network's server
-    // could not open it: the restart picks the best mainnet server instead.
-    const { server } = this.state;
-    if (
-      server.kind !== 'offline' &&
-      server.chainName !== ChainNameEnum.mainChainName
-    ) {
-      const mainnet = serverUris(this.state.translate).find(
-        s => s.chainName === ChainNameEnum.mainChainName && s.default,
-      );
-      if (mainnet) {
-        await SettingsFileImpl.writeServer(
-          remoteServer(mainnet.uri, mainnet.chainName),
-          SelectServerEnum.auto,
-        );
-      }
-    }
-    this.keepAwake(false);
-    this.navigateToLoadingApp({
-      kind: 'boot',
-      startingApp: false,
-      newWallet: true,
-    });
-  };
-
-  // The server change was dropped on the seed or key screen: the tasks
-  // restart against the server still in use.
-  cancelPendingServer = async () => {
-    await this.rpc.clearTimers();
-    await this.rpc.configure();
-  };
-
-  onClickOKServerWallet = async () => {
-    const { pendingServer } = this.state;
-    if (pendingServer.kind === 'pending') {
-      // No `await` here so Promise.race can actually enforce the 15s cap.
-      // With `await` the RPC call resolves before the race starts and the
-      // timer becomes a no-op (a failing server then blocks ~minutes).
-      const resultServerPromise = changeServer(nativeUri(pendingServer.server));
-      const timeoutServerPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => {
-          reject(new Error('Promise changeserver Timeout 15 seconds'));
-        }, 15 * 1000);
-      });
-
-      const resultServer = await Promise.race([
-        resultServerPromise,
-        timeoutServerPromise,
-      ]);
-
-      if (!resultServer.ok) {
-        this.addLastSnackbar(
-          `${this.state.translate('loadedapp.changeservernew-error')} ${resultServer.error.message}`,
-        );
-        return;
-      }
-
-      await SettingsFileImpl.writeServer(
-        pendingServer.server,
-        pendingServer.selectServer,
-      );
-      this.setState({
-        server: pendingServer.server,
-        selectServer: pendingServer.selectServer,
-        pendingServer: { kind: 'none' },
-      });
-      // Propagate to WalletBackend's shared config so sub-services pick up
-      // the new URI without needing the instance to be recreated.
-      this.rpc.setServer(pendingServer.server);
-
-      await this.rpc.fetchInfoAndServerHeight();
-
-      const changed = await this.rpc.changeWallet();
-
-      if (changed.kind === 'error') {
-        createAlert(
-          this.setBackgroundError,
-          this.addLastSnackbar,
-          this.state.translate('loadedapp.changingwallet-label') as string,
-          this.state.translate(changed.errorKey) as string,
-          false,
-          this.state.translate,
-          sendEmail,
-          this.state.zingolibVersion,
-        );
-        //return;
-      }
-
-      // no need to restart the tasks because is about to restart the app.
-      this.navigateToLoadingApp({
-        kind: 'boot',
-        startingApp: false,
-        newWallet: false,
-      });
-    }
-  };
-
   setBackgroundError = (title: string, error: string) => {
     this.setState({ backgroundError: { title, error } });
   };
@@ -2397,7 +2199,6 @@ export class LoadedAppClass extends Component<
       setLanguageOption: this.setLanguageOption,
       setBiometricsOption: this.setBiometricsOption,
       setBlockExplorerOption: this.setBlockExplorerOption,
-      changeWallet: this.onClickOKChangeWallet,
       walletId: this.state.walletId,
       switchWallet: this.switchWallet,
       deleteWallet: this.deleteWallet,
@@ -2406,9 +2207,6 @@ export class LoadedAppClass extends Component<
       switching: this.state.switching,
       wallets: this.state.wallets,
       refreshWallets: this.refreshWallets,
-      restoreBackup: this.onClickOKRestoreBackup,
-      applyPendingServer: this.onClickOKServerWallet,
-      cancelPendingServer: this.cancelPendingServer,
     };
 
     return (

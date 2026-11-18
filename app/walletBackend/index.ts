@@ -44,7 +44,6 @@ export {
   removeTransaction,
   reserveRefundAddress,
   deriveRefundAddress,
-  deleteExistingWallet,
   resolvedTrue,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,
@@ -54,7 +53,6 @@ export {
   shieldConfirm,
   shieldPreview,
   shieldPropose,
-  walletBackupExists,
   walletExists,
   readWalletChain,
 } from './utils/walletUtils';
