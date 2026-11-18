@@ -37,7 +37,11 @@ export default function ServerAction({
         : colors.fgAccent;
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: space4 }}>
-      {!!network && <Tag tone="warning">{network}</Tag>}
+      {!!network && (
+        <View>
+          <Tag tone="warning">{network}</Tag>
+        </View>
+      )}
       <Pressable
         kind="icon"
         testID={testID}
