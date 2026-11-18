@@ -1,8 +1,6 @@
 package org.ZingoLabs.Zingo
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.facebook.react.bridge.Promise
-import com.facebook.react.bridge.WritableMap
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -26,22 +24,6 @@ class WalletSwapRecoveryTest {
 
     private lateinit var walletA: ByteArray
     private lateinit var walletB: ByteArray
-
-    private class CapturingPromise : Promise {
-        val resolved = mutableListOf<Any?>()
-        override fun resolve(value: Any?) { resolved.add(value) }
-        override fun reject(code: String, message: String?) {}
-        override fun reject(code: String, throwable: Throwable?) {}
-        override fun reject(code: String, message: String?, throwable: Throwable?) {}
-        override fun reject(throwable: Throwable) {}
-        override fun reject(throwable: Throwable, userInfo: WritableMap) {}
-        override fun reject(code: String, userInfo: WritableMap) {}
-        override fun reject(code: String, throwable: Throwable?, userInfo: WritableMap) {}
-        override fun reject(code: String, message: String?, userInfo: WritableMap) {}
-        override fun reject(code: String?, message: String?, throwable: Throwable?, userInfo: WritableMap?) {}
-        @Deprecated("Deprecated in the React Native Promise interface")
-        override fun reject(message: String) {}
-    }
 
     private fun file(name: String) = File(context.filesDir, name)
 
@@ -119,30 +101,15 @@ class WalletSwapRecoveryTest {
     }
 
     @Test
-    fun theRestoreMakesTheMigratedBackupTheActiveWallet() {
+    fun theMigratedBackupIsListedBesideTheActiveMainWallet() {
         file(mainName).writeBytes(walletA)
         file(backupName).writeBytes(walletB)
 
-        val promise = CapturingPromise()
-        rpcModule.restoreExistingWalletBackup(promise)
+        rpcModule.prepareWallets()
 
-        assertThat(promise.resolved).containsExactly(true)
-        assertThat(activeWallet()).isEqualTo(walletB)
+        assertThat(activeWallet()).isEqualTo(walletA)
         assertThat(WalletStore.list(context.filesDir)).hasSize(2)
         assertThat(file(mainName).exists()).isFalse()
         assertThat(file(backupName).exists()).isFalse()
-    }
-
-    @Test
-    fun theReplaceDeletesTheActiveWalletAndActivatesTheBackup() {
-        file(mainName).writeBytes(walletA)
-        file(backupName).writeBytes(walletB)
-
-        val promise = CapturingPromise()
-        rpcModule.replaceWalletWithBackup(promise)
-
-        assertThat(promise.resolved).containsExactly(true)
-        assertThat(activeWallet()).isEqualTo(walletB)
-        assertThat(WalletStore.list(context.filesDir)).hasSize(1)
     }
 }

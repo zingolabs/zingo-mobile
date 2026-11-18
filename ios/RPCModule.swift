@@ -642,12 +642,6 @@ class RPCModule: NSObject {
     return WalletStore.walletPath(documents, id)
   }
 
-  private func otherWallet() throws -> String? {
-    let documents = try getDocumentsDirectory()
-    let active = WalletStore.active(documents)
-    return WalletStore.list(documents).first { $0.id != active }?.id
-  }
-
   @objc(walletExists:reject:)
   func walletExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     FfiOutcome.of {
@@ -712,15 +706,6 @@ class RPCModule: NSObject {
     }
   }
 
-  /// Whether a wallet besides the active one is on disk, which takes the legacy backup's place.
-  @objc(walletBackupExists:reject:)
-  func walletBackupExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    FfiOutcome.of {
-      try self.prepareWallets()
-      return try self.otherWallet() == nil ? "false" : "true"
-    }.settle(resolve: resolve, reject: reject)
-  }
-
   // The background sync state is written from BGAppRefreshTask paths in
   // AppDelegate while the device may be locked. It stays at the iOS
   // default protection class (`completeUntilFirstUserAuthentication`
@@ -764,35 +749,6 @@ class RPCModule: NSObject {
 
   func readWalletBytes() throws -> Data {
     try readWalletFileBytes(atPath: activeWalletPath())
-  }
-
-  func fnDeleteExistingWallet() throws -> Bool {
-    RPCModule.walletFileHold.lock()
-    defer { RPCModule.walletFileHold.unlock() }
-    RPCModule.openWalletId = nil
-    RPCModule.pendingMeta = nil
-    let documents = try getDocumentsDirectory()
-    guard let id = WalletStore.active(documents) else { return false }
-    do {
-      return try WalletStore.delete(documents, id)
-    } catch {
-      throw FileError.deleteFileError("Error: [Native] deleting wallet error: \(error.localizedDescription)")
-    }
-  }
-
-  @objc(deleteExistingWallet:reject:)
-  func deleteExistingWallet(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    do {
-      let deleted = try self.fnDeleteExistingWallet()
-      DispatchQueue.main.async {
-        resolve(deleted ? "true" : "false")
-      }
-    } catch {
-      NSLog("Error: [Native] deleting wallet \(error.localizedDescription)")
-      DispatchQueue.main.async {
-        resolve("false")
-      }
-    }
   }
 
   // The FFI contract is structural (zingo-mobile#1151; audit Issue Q):
@@ -1137,33 +1093,6 @@ class RPCModule: NSObject {
   ) {
     FfiOutcome.of {
       try self.fnLoadExistingWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
-    }.settle(resolve: resolve, reject: reject)
-  }
-
-  /// Makes the other wallet the active one, the legacy backup restore on the folder layout.
-  @objc(restoreExistingWalletBackup:reject:)
-  func restoreExistingWalletBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    FfiOutcome.of {
-      try self.prepareWallets()
-      guard let other = try self.otherWallet() else { return "false" }
-      self.closeWalletFile()
-      try WalletStore.setActive(try self.getDocumentsDirectory(), other)
-      return "true"
-    }.settle(resolve: resolve, reject: reject)
-  }
-
-  /// Makes the other wallet the active one and deletes the active one, the legacy backup replace on the folder layout.
-  @objc(replaceWalletWithBackup:reject:)
-  func replaceWalletWithBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    FfiOutcome.of {
-      try self.prepareWallets()
-      guard let other = try self.otherWallet() else { return "false" }
-      let documents = try self.getDocumentsDirectory()
-      let replaced = WalletStore.active(documents)
-      self.closeWalletFile()
-      try WalletStore.setActive(documents, other)
-      if let replaced { _ = try WalletStore.delete(documents, replaced) }
-      return "true"
     }.settle(resolve: resolve, reject: reject)
   }
 

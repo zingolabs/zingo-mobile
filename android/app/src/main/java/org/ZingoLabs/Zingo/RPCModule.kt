@@ -309,11 +309,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         return WalletStore.active(filesDir) != null
     }
 
-    private fun otherWallet(): String? {
-        val active = WalletStore.active(filesDir)
-        return WalletStore.list(filesDir).firstOrNull { it.id != active }?.id
-    }
-
     internal fun activeWalletDir(): File =
         WalletStore.active(filesDir)?.let { WalletStore.dir(filesDir, it) } ?: filesDir
 
@@ -357,15 +352,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         } catch (e: Exception) {
             promise.reject("Write", e.message, e)
         }
-    }
-
-    /** Whether a wallet besides the active one is on disk, which takes the legacy backup's place. */
-    @ReactMethod
-    fun walletBackupExists(promise: Promise) {
-        FfiOutcome.of("wallet_backup_exists") {
-            prepareWallets()
-            otherWallet() != null
-        }.settle(promise)
     }
 
     // The FFI contract is structural (zingo-mobile#1151; audit Issue Q):
@@ -762,51 +748,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 .put("free", filesDir.usableSpace)
                 .put("largest", WalletStore.largestWallet(filesDir))
                 .toString()
-        }.settle(promise)
-    }
-
-    /** Makes the other wallet the active one, the legacy backup restore on the folder layout. */
-    @ReactMethod
-    fun restoreExistingWalletBackup(promise: Promise) {
-        FfiOutcome.of("restore_wallet_backup") {
-            prepareWallets()
-            val other = otherWallet()
-            if (other == null) {
-                false
-            } else {
-                closeWalletFile()
-                WalletStore.setActive(filesDir, other)
-                true
-            }
-        }.settle(promise)
-    }
-
-    /** Makes the other wallet the active one and deletes the active one, the legacy backup replace on the folder layout. */
-    @ReactMethod
-    fun replaceWalletWithBackup(promise: Promise) {
-        FfiOutcome.of("replace_wallet_with_backup") {
-            prepareWallets()
-            val other = otherWallet()
-            if (other == null) {
-                false
-            } else {
-                val replaced = WalletStore.active(filesDir)
-                closeWalletFile()
-                WalletStore.setActive(filesDir, other)
-                if (replaced != null) WalletStore.delete(filesDir, replaced)
-                true
-            }
-        }.settle(promise)
-    }
-
-    @ReactMethod
-    fun deleteExistingWallet(promise: Promise) {
-        FfiOutcome.of("delete_wallet") {
-            PlainWalletFile.locked {
-                val id = WalletStore.active(filesDir)
-                closeWalletFile()
-                id != null && WalletStore.delete(filesDir, id)
-            }
         }.settle(promise)
     }
 

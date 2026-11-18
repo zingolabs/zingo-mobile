@@ -963,7 +963,7 @@ class WalletSwapRecoveryTests: XCTestCase {
         RPCModule.openWalletId = id
         try walletA.write(toFile: "\(WalletStore.walletPath(documents, id)).broken", atomically: true, encoding: .utf8)
 
-        XCTAssertTrue(try rpc.fnDeleteExistingWallet())
+        XCTAssertTrue(try rpc.fnDeleteWallet(walletId: id))
 
         XCTAssertNil(RPCModule.openWalletId)
         XCTAssertFalse(FileManager.default.fileExists(atPath: WalletStore.dir(documents, id)))
@@ -976,7 +976,7 @@ class WalletSwapRecoveryTests: XCTestCase {
         let first = try activeWallet(rpc, walletA)
         let second = try activeWallet(rpc, walletB)
 
-        XCTAssertTrue(try rpc.fnDeleteExistingWallet())
+        XCTAssertTrue(try rpc.fnDeleteWallet(walletId: second))
 
         XCTAssertTrue(FileManager.default.fileExists(atPath: WalletStore.dir(documents, first)))
         XCTAssertFalse(FileManager.default.fileExists(atPath: WalletStore.dir(documents, second)))
