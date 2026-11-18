@@ -212,8 +212,6 @@
     "walletseed": "Cüzdan Tohumu",
     "walletufvk": "İzleme Anahtarı",
     "report": "Eşitleme Raporu",
-    "changewallet": "Başka bir cüzdana geç",
-    "restorebackupwallet": "Son Cüzdan Yedeğini Geri Yükle",
     "fundpools": "Havuzlar",
     "insight": "Finansal İçgörü",
     "addressbook": "Adres Defteri",
@@ -222,8 +220,6 @@
     "readingwallet-error": "Error Yeni sunucuyla cüzdanı okuma girişiminde hata oluştu:",
     "differentchain-error": "Farklı bir zincire sahip bir sunucuya geçiyorsunuz, bu kurtarma ifadesi olmadan bu cüzdana artık erişiminiz olmayacak.",
     "serverchain-mismatch": "Sunucu seçtiğinizden farklı bir zincir bildiriyor. Zincir seçiciyi kontrol edip tekrar deneyin.",
-    "changingwallet-label": "Error Cüzdan değiştirilirken bir hata oluştu",
-    "restoringwallet-label": "Error Cüzdan geri yüklenirken bir hata oluştu",
     "computingtx": "İşlem Hesaplanıyor...",
     "computingtx-hangon": "Sabırlı olun,\nbir an sürecek...",
     "transactioncreated-title": "İşlem oluşturuldu",
@@ -259,18 +255,10 @@
     "tab-swap": "Takas"
   },
   "rpc": {
-    "restorebackup-error": "Hata: Cüzdan yedeği geri yüklenemedi.",
-    "walletnotfound-error": "Error: Herhangi bir cüzdan bulunamadı.",
-    "backupnotfound-error": "Error: Herhangi bir cüzdan yedeği bulunamadı.",
     "deletewallet-error": "Error: Mevcut cüzdan silinemedi."
   },
   "settings": {
     "back-acc": "Geri",
-    "restorebackup-replace": "Yedek bir Mainnet cüzdanıdır ve yalnızca Mainnet cüzdanları yedeklenir. Onu açmak bu {net} cüzdanını telefondan siler: kurtarma ifadesi yoksa ona erişiminizi kaybedersiniz. Zingo bir Mainnet sunucusuna geçer ve yedek boşalır.",
-    "restorebackup-replace-vo": "Yedek bir Mainnet cüzdanıdır ve yalnızca Mainnet cüzdanları yedeklenir. Onu açmak bu salt görüntüleme {net} cüzdanını telefondan siler: görüntüleme anahtarı (UFVK) yoksa ona erişiminizi kaybedersiniz. Zingo bir Mainnet sunucusuna geçer ve yedek boşalır.",
-    "restorebackup-switch": "Mainnet'e geç",
-    "restorebackup": "Geri yükle",
-    "restorebackup-warning": "Mevcut cüzdan ile yedek yer değiştirir ve uygulama yedekle yeniden açılır. Geri dönmek için bunu tekrarlayın.",
     "section-preferences": "Tercihler",
     "section-privacysecurity": "Gizlilik ve Güvenlik",
     "section-networkadvanced": "Ağ ve Gelişmiş",
@@ -517,8 +505,6 @@
     "tapcopy-birthday-message": "Cüzdan oluşturulma tarihi panoya kopyalandı",
     "birthday-readonly": "Cüzdan oluşturulma tarihi",
     "birthday-no-readonly": "İlk işlemin blok yüksekliği. (Bilmiyorsanız sorun değil) Değer aralığı arasında",
-    "change-warning": "Başka bir cüzdana geçerseniz, bu cüzdana seed phrase olmadan artık erişemezsiniz.",
-    "server-warning": "Farklı bir zincire sahip bir sunucuya geçerseniz, bu cüzdana seed phrase olmadan artık erişemezsiniz.",
     "seedplaceholder": "Seed (24 kelime)",
     "seed-acc": "Seed Phrase Alanı",
     "birthday-acc": "Doğum Tarihi Alanı",
@@ -1505,8 +1491,6 @@
     "birthday-tip-body": "Zingo taramaya baştan değil buradan başlar, bu yüzden çok daha hızlı senkronize olur."
   },
   "walletseed": {
-    "sub-change-vo": "Başka bir cüzdana geçmeden önce bu cüzdanın görüntüleme anahtarını ve doğum gününü dikkatlice kaydedin. Ona geri dönmek için bunlara ihtiyacınız olacak.",
-    "change-warning-vo": "Başka bir cüzdana geçerseniz, görüntüleme anahtarı olmadan bu cüzdana artık erişemezsiniz.",
     "back-acc": "Geri",
     "ok-title": "Yedeklendi",
     "ok-sub": "{date} · 3 kelime onaylandı",
@@ -1518,19 +1502,9 @@
     "vk-tip-body": "Fonlarınızı harcayamaz. Yalnızca güvendiğiniz kişi ve hizmetlerle paylaşın.",
     "vk-copy": "Görüntüleme anahtarını kopyala",
     "vk-copied": "Görüntüleme anahtarı kopyalandı",
-    "verify": "Yeniden doğrula",
-    "title-server": "Sunucuyu değiştir",
-    "sub-change": "Başka bir cüzdana geçmeden önce bu cüzdanın kurtarma ifadesini, doğum gününü ve görüntüleme anahtarını kaydedin.",
-    "sub-server": "Sunucuyu değiştirmeden önce bu cüzdanın kurtarma ifadesini, doğum gününü ve görüntüleme anahtarını kaydedin.",
-    "go-change": "Yenisini aç",
-    "go-server": "Değiştir",
-    "confirm-title": "Emin misiniz?"
+    "verify": "Yeniden doğrula"
   },
   "viewingkey": {
-    "switch-title": "{net} ağına geç",
-    "switch-sub": "{net} ağına geçmeden önce bu cüzdanın görüntüleme anahtarını dikkatlice kaydedin. Ona geri dönmek için buna ihtiyacınız olacak.",
-    "switch": "Geç",
-    "switch-warning": "Başka bir ağdaki sunucuya geçerseniz, görüntüleme anahtarı olmadan bu cüzdana artık erişemezsiniz.",
     "title": "Görüntüleme anahtarınız",
     "sub": "Bu anahtara sahip olan herkes bu cüzdanın bakiyesini ve geçmişini görebilir. Fon harcayamaz.",
     "label": "Birleşik görüntüleme anahtarı",

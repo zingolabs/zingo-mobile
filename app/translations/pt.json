@@ -212,8 +212,6 @@
     "walletseed": "Frases da Carteira",
     "walletufvk": "Chave de leitura",
     "report": "Relatório de sincronia",
-    "changewallet": "Abrir outra Carteira",
-    "restorebackupwallet": "Restaurar Último Backup da Carteira",
     "fundpools": "Pools",
     "insight": "Visão Financeira",
     "addressbook": "Agenda de Endereços",
@@ -222,8 +220,6 @@
     "readingwallet-error": "Error ao tentar ler a carteira com o novo servidor:",
     "differentchain-error": "Você está mudando para um servidor com uma rede diferente, você não terá mais acesso a essa carteira sem suas frases de recuperação.",
     "serverchain-mismatch": "O servidor informa uma rede diferente da selecionada. Verifique o seletor de rede e tente novamente.",
-    "changingwallet-label": "Error ao Alterar a Carteira",
-    "restoringwallet-label": "Error ao Restaurar a Carteira",
     "computingtx": "Processando Transação...",
     "computingtx-hangon": "Aguarde um momento,\nisto vai demorar só um instante...",
     "transactioncreated-title": "Transação criada",
@@ -259,18 +255,10 @@
     "tab-swap": "Swap"
   },
   "rpc": {
-    "restorebackup-error": "Erro: Não foi possível restaurar o backup da carteira.",
-    "walletnotfound-error": "Error: não foi possível encontrar nenhuma carteira.",
-    "backupnotfound-error": "Error: não foi possível encontrar nenhum backup de nenhuma carteira.",
     "deletewallet-error": "Error: não foi possível excluir a carteira atual."
   },
   "settings": {
     "back-acc": "Voltar",
-    "restorebackup-replace": "O backup é uma carteira Mainnet, e só se faz backup de carteiras Mainnet. Abri-lo apaga esta carteira {net} do telefone: você perderá o acesso a ela se não tiver a frase semente. O Zingo muda para um servidor Mainnet e o backup fica vazio.",
-    "restorebackup-replace-vo": "O backup é uma carteira Mainnet, e só se faz backup de carteiras Mainnet. Abri-lo apaga esta carteira somente leitura {net} do telefone: você perderá o acesso a ela se não tiver a chave de visualização (UFVK). O Zingo muda para um servidor Mainnet e o backup fica vazio.",
-    "restorebackup-switch": "Mudar para Mainnet",
-    "restorebackup": "Restaurar",
-    "restorebackup-warning": "A carteira atual e o backup trocam de lugar, e o app reabre com o backup. Repita isso para voltar.",
     "section-preferences": "Preferências",
     "section-privacysecurity": "Privacidade e Segurança",
     "section-networkadvanced": "Rede e Avançado",
@@ -517,8 +505,6 @@
     "tapcopy-birthday-message": "Aniversário copiado para a Área de Transferência",
     "birthday-readonly": "Aniversário da Carteira",
     "birthday-no-readonly": "Altura do bloco da primeira transação. (Tudo bem, se você não sabe)\nIntervalo de valores entre ",
-    "change-warning": "Se você alterar para outra carteira, não será possível ter acesso a essa carteira sem as Frases de Recuperação.",
-    "server-warning": "Se você alterar para um servidor com uma rede diferente, não terá mais acesso a essa carteira sem as Frases de Recuperação.",
     "seedplaceholder": "Frases de Recuperação (24 Frases)",
     "seed-acc": "Campo das Frases de Recuperação",
     "birthday-acc": "Campo de Aniversário",
@@ -1505,8 +1491,6 @@
     "birthday-tip-body": "O Zingo começa a escanear a partir daqui em vez do início, então sincroniza muito mais rápido."
   },
   "walletseed": {
-    "sub-change-vo": "Antes de acessar outra carteira, guarde com cuidado a chave de visualização e o aniversário desta carteira. Você vai precisar deles para voltar a ela.",
-    "change-warning-vo": "Se você mudar para outra carteira, não terá mais acesso a esta carteira sem a chave de visualização.",
     "back-acc": "Voltar",
     "ok-title": "Com backup",
     "ok-sub": "{date} · 3 palavras confirmadas",
@@ -1518,19 +1502,9 @@
     "vk-tip-body": "Ela não pode gastar seus fundos. Compartilhe só com pessoas ou serviços de confiança.",
     "vk-copy": "Copiar chave de visualização",
     "vk-copied": "Chave de visualização copiada",
-    "verify": "Verificar de novo",
-    "title-server": "Mudar servidor",
-    "sub-change": "Antes de abrir outra carteira, guarde a frase semente, o aniversário e a chave de visualização desta.",
-    "sub-server": "Antes de mudar de servidor, guarde a frase semente, o aniversário e a chave de visualização desta carteira.",
-    "go-change": "Abrir nova",
-    "go-server": "Mudar",
-    "confirm-title": "Tem certeza?"
+    "verify": "Verificar de novo"
   },
   "viewingkey": {
-    "switch-title": "Mudar para {net}",
-    "switch-sub": "Antes de mudar para {net}, guarde com cuidado a chave de visualização desta carteira. Você vai precisar dela para voltar a ela.",
-    "switch": "Mudar",
-    "switch-warning": "Se você mudar para um servidor de outra rede, não terá mais acesso a esta carteira sem a chave de visualização.",
     "title": "Sua chave de visualização",
     "sub": "Qualquer pessoa com esta chave pode ver o saldo e o histórico desta carteira. Ela não pode gastar fundos.",
     "label": "Chave de visualização unificada",

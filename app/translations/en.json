@@ -212,8 +212,6 @@
     "walletseed": "Wallet Seed",
     "walletufvk": "Wallet Viewing Key",
     "report": "Sync / Rescan Report",
-    "changewallet": "Change to another Wallet",
-    "restorebackupwallet": "Restore Last Wallet Backup",
     "fundpools": "Pools",
     "insight": "Financial Insight",
     "addressbook": "Address Book",
@@ -222,8 +220,6 @@
     "readingwallet-error": "Error trying to read the wallet with the new server:",
     "differentchain-error": "You are changing to a server with a different chain, you will no longer have access to this wallet without the seed phrase.",
     "serverchain-mismatch": "The server reports a different chain than the one you selected. Check the chain selector and try again.",
-    "changingwallet-label": "Error changing Wallet",
-    "restoringwallet-label": "Error restoring Wallet",
     "computingtx": "Computing Transaction...",
     "computingtx-hangon": "Hang on tight,\nthis will just take a moment...",
     "transactioncreated-title": "Transaction created",
@@ -259,18 +255,10 @@
     "tab-swap": "Swap"
   },
   "rpc": {
-    "restorebackup-error": "Error: Couldn't restore the wallet backup.",
-    "walletnotfound-error": "Error: Couldn't find any wallet.",
-    "backupnotfound-error": "Error: Couldn't find any backup of any wallet.",
     "deletewallet-error": "Error: Couldn't delete the current wallet."
   },
   "settings": {
     "back-acc": "Back",
-    "restorebackup-replace": "The backup is a Mainnet wallet and only Mainnet wallets are backed up. Opening it deletes this {net} wallet from this phone: you'll lose access to it unless you have its seed phrase. Zingo switches to a Mainnet server, and the backup is emptied.",
-    "restorebackup-replace-vo": "The backup is a Mainnet wallet and only Mainnet wallets are backed up. Opening it deletes this view-only {net} wallet from this phone: you'll lose access to it unless you have its viewing key (UFVK). Zingo switches to a Mainnet server, and the backup is emptied.",
-    "restorebackup-switch": "Switch to Mainnet",
-    "restorebackup": "Restore",
-    "restorebackup-warning": "The current wallet and the backup swap places, and the app reopens with the backup. Repeat this to switch back.",
     "section-preferences": "Preferences",
     "section-privacysecurity": "Privacy & Security",
     "section-networkadvanced": "Network & Advanced",
@@ -517,8 +505,6 @@
     "tapcopy-birthday-message": "Birthday copied to Clipboard",
     "birthday-readonly": "Wallet Birthday",
     "birthday-no-readonly": "Block height of first transaction. (It's OK, if you don't know)\nValue range between ",
-    "change-warning": "If you change to another wallet, you will no longer have access to this wallet without the seed phrase.",
-    "server-warning": "If you change to a server with different chain, you will no longer have access to this wallet without the seed phrase.",
     "seedplaceholder": "Seed (24 words)",
     "seed-acc": "Seed Phrase Field",
     "birthday-acc": "Birthday Field",
@@ -1505,8 +1491,6 @@
     "birthday-tip-body": "Zingo starts scanning from here instead of from the beginning, so it syncs much faster."
   },
   "walletseed": {
-    "sub-change-vo": "Before accessing another wallet, carefully save this wallet's viewing key and birthday. You'll need them to get back to it.",
-    "change-warning-vo": "If you change to another wallet, you will no longer have access to this wallet without the viewing key.",
     "back-acc": "Back",
     "ok-title": "Backed up",
     "ok-sub": "{date} · confirmed 3 words",
@@ -1518,19 +1502,9 @@
     "vk-tip-body": "It can't spend your funds. Only share it with people or services you trust.",
     "vk-copy": "Copy viewing key",
     "vk-copied": "Viewing key copied",
-    "verify": "Verify again",
-    "title-server": "Change server",
-    "sub-change": "Before opening another wallet, save this wallet's seed phrase, birthday and viewing key.",
-    "sub-server": "Before changing the server, save this wallet's seed phrase, birthday and viewing key.",
-    "go-change": "Open new",
-    "go-server": "Change",
-    "confirm-title": "Are you certain?"
+    "verify": "Verify again"
   },
   "viewingkey": {
-    "switch-title": "Switch to {net}",
-    "switch-sub": "Before switching to {net}, carefully save this wallet's viewing key. You'll need it to get back to it.",
-    "switch": "Switch",
-    "switch-warning": "If you change to a server on another network, you will no longer have access to this wallet without the viewing key.",
     "title": "Your viewing key",
     "sub": "Anyone with this key can see this wallet's balance and history. It can't spend funds.",
     "label": "Unified viewing key",

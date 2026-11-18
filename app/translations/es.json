@@ -212,8 +212,6 @@
     "walletseed": "Semilla del Monedero",
     "walletufvk": "Clave de lectura",
     "report": "Informe de sincronía",
-    "changewallet": "Abrir otro Monedero",
-    "restorebackupwallet": "Restaurar Copia de Seguridad",
     "fundpools": "Pools",
     "insight": "Visión Financiera",
     "addressbook": "Libreta de Direcciones",
@@ -222,8 +220,6 @@
     "readingwallet-error": "Error al intentar leer el monedero activo usando el Servidor nuevo:",
     "differentchain-error": "Estás cambiando a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin tu frase semilla.",
     "serverchain-mismatch": "El servidor reporta una cadena diferente a la seleccionada. Revisa el selector de cadena e inténtalo de nuevo.",
-    "changingwallet-label": "Error cambiando de Monedero",
-    "restoringwallet-label": "Error restaurando el Monedero",
     "computingtx": "Procesando Transacción...",
     "computingtx-hangon": "Aguanta un poco,\nesto solo tardará un momento...",
     "transactioncreated-title": "Transacción creada",
@@ -259,18 +255,10 @@
     "tab-swap": "Swap"
   },
   "rpc": {
-    "restorebackup-error": "Error: No se pudo restaurar la copia de seguridad del monedero.",
-    "walletnotfound-error": "Error: No se encuentra ningún monedero.",
-    "backupnotfound-error": "Error: No se encuentra ninguna copia de seguridad de ningún monedero.",
     "deletewallet-error": "Error: No se pudo borrar el monedero actual."
   },
   "settings": {
     "back-acc": "Atrás",
-    "restorebackup-replace": "La copia de seguridad es un monedero de Mainnet, y solo se guarda copia de los monederos de Mainnet. Abrirla borra este monedero de {net} del teléfono: perderás el acceso a él si no tienes su frase semilla. Zingo cambia a un servidor de Mainnet y la copia queda vacía.",
-    "restorebackup-replace-vo": "La copia de seguridad es un monedero de Mainnet, y solo se guarda copia de los monederos de Mainnet. Abrirla borra este monedero de solo lectura de {net} del teléfono: perderás el acceso a él si no tienes su clave de visualización (UFVK). Zingo cambia a un servidor de Mainnet y la copia queda vacía.",
-    "restorebackup-switch": "Cambiar a Mainnet",
-    "restorebackup": "Restaurar",
-    "restorebackup-warning": "El monedero actual y la copia de seguridad se intercambian, y la app se reabre con la copia. Repite esto para volver.",
     "section-preferences": "Preferencias",
     "section-privacysecurity": "Privacidad y Seguridad",
     "section-networkadvanced": "Red y Avanzado",
@@ -517,8 +505,6 @@
     "tapcopy-birthday-message": "Cumpleaños copiado al Portapapeles",
     "birthday-readonly": "Cumpleaños del Monedero",
     "birthday-no-readonly": "Altura de bloque de la primera transacción. (Está bien si no la sabes o no te acuerdas)\nRango de valores entre ",
-    "change-warning": "Si cambias a otro monedero, ya no tendrás acceso a este monedero sin la frase semilla.",
-    "server-warning": "Si cambias a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin la frase semilla.",
     "seedplaceholder": "Semilla (24 palabras)",
     "seed-acc": "Campo Frase Semilla",
     "birthday-acc": "Campo Cumpleaños",
@@ -1505,8 +1491,6 @@
     "birthday-tip-body": "Zingo empieza a escanear desde aquí en vez de desde el principio, así sincroniza mucho más rápido."
   },
   "walletseed": {
-    "sub-change-vo": "Antes de abrir otro monedero, guarda con cuidado la clave de visualización y el cumpleaños de este. Los necesitarás para volver a él.",
-    "change-warning-vo": "Si cambias a otro monedero, ya no tendrás acceso a este monedero sin la clave de visualización.",
     "back-acc": "Atrás",
     "ok-title": "Respaldada",
     "ok-sub": "{date} · 3 palabras confirmadas",
@@ -1518,19 +1502,9 @@
     "vk-tip-body": "No puede gastar tus fondos. Compártela solo con personas o servicios de confianza.",
     "vk-copy": "Copiar clave de visualización",
     "vk-copied": "Clave de visualización copiada",
-    "verify": "Verificar de nuevo",
-    "title-server": "Cambiar servidor",
-    "sub-change": "Antes de abrir otro monedero, guarda la frase semilla, el cumpleaños y la clave de visualización de este.",
-    "sub-server": "Antes de cambiar de servidor, guarda la frase semilla, el cumpleaños y la clave de visualización de este monedero.",
-    "go-change": "Abrir otro",
-    "go-server": "Cambiar",
-    "confirm-title": "¿Estás seguro?"
+    "verify": "Verificar de nuevo"
   },
   "viewingkey": {
-    "switch-title": "Cambiar a {net}",
-    "switch-sub": "Antes de cambiar a {net}, guarda con cuidado la clave de visualización de este monedero. La necesitarás para volver a él.",
-    "switch": "Cambiar",
-    "switch-warning": "Si cambias a un servidor de otra red, ya no tendrás acceso a este monedero sin la clave de visualización.",
     "title": "Tu clave de visualización",
     "sub": "Cualquiera con esta clave puede ver el saldo y el historial de este monedero. No puede gastar fondos.",
     "label": "Clave de visualización unificada",
