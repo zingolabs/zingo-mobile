@@ -1,36 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { Platform, ScrollView, View } from 'react-native';
-import Animated, {
-  interpolateColor,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
 
-import {
-  iconSizeSm,
-  radiusMd,
-  radiusPill,
-  rowMinHeight,
-  space8,
-  space12,
-  space16,
-  space20,
-  space24,
-  useTheme,
-} from '@app/theme';
-import { duration, ease } from '@app/theme/motion';
-import Pressable from '@ui/primitives/Pressable';
+import { space8, space16, space20, space24, useTheme } from '@app/theme';
 import { ContextAppLoading } from '@app/context';
 import Text from '@ui/primitives/Text';
 import TitleBar from '@ui/widgets/TitleBar';
-import { ChevronLeft, ChevronRight } from '@ui/primitives/Icons/Chevron';
+import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { HistoryIcon } from '@ui/primitives/Icons/HistoryIcon';
-import { Icon } from '@ui/primitives/Icons/Icon';
 import { KeyboardIcon } from '@ui/primitives/Icons/KeyboardIcon';
 import { useCompact } from '@app/hooks/useCompact';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
+import OptionCard from '@ui/widgets/OptionCard';
 
 type ImportChooserProps = {
   busy: boolean;
@@ -41,96 +22,6 @@ type ImportChooserProps = {
 
 // The system store that keeps the recovery phrase, by its platform name.
 const SECURE_STORE = Platform.OS === 'ios' ? 'Keychain' : 'Keystore';
-const ICON_DISC = 40;
-// On touch the card shrinks a little and its border brightens.
-const PRESS_MS = duration.fast;
-const PRESS_SCALE = 0.985;
-
-type OptionProps = {
-  icon: React.ComponentType<React.ComponentProps<typeof Icon>>;
-  iconBg: string;
-  iconColor: string;
-  title: string;
-  sub: string;
-  subColor: string;
-  disabled: boolean;
-  onPress: () => void;
-  testID: string;
-};
-
-const Option: React.FC<OptionProps> = ({
-  icon: OptionIcon,
-  iconBg,
-  iconColor,
-  title,
-  sub,
-  subColor,
-  disabled,
-  onPress,
-  testID,
-}) => {
-  const { colors } = useTheme();
-  const press = useSharedValue(0);
-  const to = (v: number) => {
-    press.value = withTiming(v, { duration: PRESS_MS, easing: ease.out });
-  };
-  const pressStyle = useAnimatedStyle(() => ({
-    borderColor: interpolateColor(
-      press.value,
-      [0, 1],
-      [colors.bottomSheetBorder, colors.borderFocus],
-    ),
-    transform: [{ scale: 1 - (1 - PRESS_SCALE) * press.value }],
-  }));
-  return (
-    <Pressable
-      kind="row"
-      testID={testID}
-      onPress={onPress}
-      onPressIn={() => to(1)}
-      onPressOut={() => to(0)}
-      disabled={disabled}
-      accessibilityRole="button"
-    >
-      <Animated.View
-        style={[
-          {
-            minHeight: rowMinHeight,
-            borderRadius: radiusMd,
-            borderWidth: 1,
-            backgroundColor: colors.bgSurface,
-            flexDirection: 'row',
-            alignItems: 'center',
-            paddingHorizontal: space16,
-            paddingVertical: space12,
-            gap: space12,
-          },
-          pressStyle,
-        ]}
-      >
-        <View
-          style={{
-            width: ICON_DISC,
-            height: ICON_DISC,
-            borderRadius: radiusPill,
-            backgroundColor: iconBg,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <OptionIcon size={iconSizeSm} color={iconColor} />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text variant="bodyStrong">{title}</Text>
-          <Text variant="caption" color={subColor}>
-            {sub}
-          </Text>
-        </View>
-        <ChevronRight size={iconSizeSm} color={colors.fgMuted} />
-      </Animated.View>
-    </Pressable>
-  );
-};
 
 const ImportChooser: React.FunctionComponent<ImportChooserProps> = ({
   busy,
@@ -169,7 +60,7 @@ const ImportChooser: React.FunctionComponent<ImportChooserProps> = ({
           {translate('import.chooser-sub') as string}
         </Text>
         <View style={{ marginTop: space16, marginHorizontal: space20 }}>
-          <Option
+          <OptionCard
             testID="import.chooser.previous"
             icon={HistoryIcon}
             iconBg={colors.bgAccentSubtle}
@@ -190,7 +81,7 @@ const ImportChooser: React.FunctionComponent<ImportChooserProps> = ({
           >
             {translate('import.chooser-or') as string}
           </Text>
-          <Option
+          <OptionCard
             testID="import.chooser.seed"
             icon={KeyboardIcon}
             iconBg={colors.bgAccentSubtle}
