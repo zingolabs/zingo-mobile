@@ -82,7 +82,11 @@ import {
   formatInteger,
   toAmountInput,
 } from '@app/utils/formatAmount';
-import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
+import {
+  getZingoVersion,
+  substituteCurrency,
+  substituteZingoName,
+} from '@app/utils/ZingoAppData';
 import { AppTheme } from '@app/theme';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
@@ -293,8 +297,14 @@ export default function LoadedApp(props: LoadedAppProps) {
   // `language` is what forces this memo to rebuild and gives `translate` a
   // fresh identity that downstream useMemo/useCallback deps can observe.
   const translate: (key: string) => TranslateType = useMemo(
-    () => (key: string) => substituteZingoName(i18n.t(key) as TranslateType),
-    [i18n, language], // eslint-disable-line react-hooks/exhaustive-deps
+    () => (key: string) =>
+      substituteCurrency(
+        substituteZingoName(i18n.t(key) as TranslateType),
+        props.wallet.walletChainName === ChainNameEnum.mainChainName
+          ? CurrencyNameEnum.ZEC
+          : CurrencyNameEnum.TAZ,
+      ),
+    [i18n, language, props.wallet.walletChainName], // eslint-disable-line react-hooks/exhaustive-deps
   );
   const {
     readOnly,
