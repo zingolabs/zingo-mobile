@@ -19,6 +19,7 @@ export const Route = {
   Progress: 'Progress',
   NameWallet: 'NameWallet',
   OpenError: 'OpenError',
+  WalletOpenError: 'WalletOpenError',
   Server: 'Server',
   ServerList: 'ServerList',
 

@@ -2,6 +2,7 @@ import { ChainNameEnum } from '@app/AppState';
 import {
   fetchWallet,
   readWalletKind,
+  recordActiveOpened,
   recordWalletKind,
 } from '@app/walletBackend';
 import { FfiError, FfiResult } from '@app/walletBackend/ffi';
@@ -56,6 +57,7 @@ export async function finishWalletOpen(
   }
   const { readOnly, orchardPool, saplingPool, transparentPool } = kind.value;
   await recordWalletKind(readOnly ? 'ufvk' : 'seed');
+  await recordActiveOpened();
   // The wallet's recovery info in the Keychain/Keystore; if it can't be
   // read, whatever the entry holds is removed.
   await createUpdateRecoveryWalletInfo(await fetchWallet(readOnly));

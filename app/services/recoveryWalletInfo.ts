@@ -241,6 +241,21 @@ export const getRecoveryWalletInfo = async (): Promise<WalletType> => {
   return {} as WalletType;
 };
 
+/** The entry a wallet on the device saved, by its id. */
+export const recoveryEntryFor = async (
+  walletId: string,
+): Promise<{ kind: 'none' } | { kind: 'entry'; entry: RecoveryEntry }> => {
+  try {
+    const entry = parseEntry(walletId, await readEntry(serviceFor(walletId)));
+    return entry.seed || entry.ufvk
+      ? { kind: 'entry', entry }
+      : { kind: 'none' };
+  } catch (error) {
+    console.log('Error parsing recovery keys:', error);
+    return { kind: 'none' };
+  }
+};
+
 /** Whether the open wallet has its entry on the device. */
 export const hasRecoveryWalletInfo = async (): Promise<boolean> => {
   const entry = await activeWalletEntry();

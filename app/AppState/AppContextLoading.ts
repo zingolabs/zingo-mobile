@@ -63,6 +63,8 @@ export interface OnboardingContext {
   // The saved phrase outlived an uninstall.
   freshInstall: boolean;
   walletError: WalletErrorInfo | null;
+  /** From the error screen: opens another wallet on the device, on the Wallets sheet. */
+  openOtherWallet: () => void;
   // A retry worked: the error badge shrinks before the wallet opens.
   errorResolved: boolean;
   retrying: boolean;

@@ -1566,10 +1566,20 @@
     "delete-only": "{name} tek cüzdanın. Silindiğinde Zingo başa döner.",
     "delete-swap": "{name} içinde devam eden bir takas var. Silindiğinde Zingo bu takası izlemeyi bırakır.",
     "deleted": "{name} bu cihazdan silindi",
-    "open-error": "{name} açılmadı. {error}",
     "default-name": "Cüzdan {n}",
     "created": "{name} hazır. Adını Cüzdanlar'dan değiştirebilirsin.",
-    "restored": "{name} geri yüklendi. Yeniden tarama arka planda sürüyor."
+    "restored": "{name} geri yüklendi. Yeniden tarama arka planda sürüyor.",
+    "cant-open": "Açılamıyor",
+    "wont-open-step": "Cüzdan açılmıyor",
+    "wont-open-step-body": "Zingo {name} cüzdanını açamadı. Cüzdan dosyası hasarlı olabilir.",
+    "wont-open": "{name} açılmıyor",
+    "wont-open-body": "Zingo bu cüzdanı açamadı. Dosya hasarlı olabilir.",
+    "retry": "Yeniden dene",
+    "view-seed": "Tohum ifadesini göster",
+    "restore-place": "Yerinde geri yükle",
+    "open-other": "Başka bir cüzdan aç",
+    "restored-place": "{name} geri yüklendi. Yeniden tarama arka planda sürüyor.",
+    "no-entry": "Bu cüzdanın tohum ifadesi bu cihazda kayıtlı değil."
   },
   "add": {
     "title": "Cüzdan ekle",

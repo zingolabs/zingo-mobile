@@ -80,12 +80,15 @@ import { serverUris } from '@app/uris';
 import { staticAlternatives, staticServers } from '@app/uris/serverChoice';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import {
+  activeWalletEntry,
   fetchWallet,
   loadWallet,
   readOpenWalletId,
+  recordOpenFailed,
   updateWalletMeta,
   walletsOnDevice,
 } from '@app/walletBackend';
+import type { WalletErrorKind } from '@app/wallet/types';
 import { finishWalletOpen } from '@app/services/openWallet';
 import { entryChain, entryServer } from '@app/services/recoveryImport';
 import { defaultWalletName } from '@screens/AddWallet/draftParts';
@@ -116,7 +119,7 @@ import {
   probeUri,
   recommendedServers,
 } from '@app/services/serverPicking';
-import { defaultTo, isEqual } from 'lodash';
+import { defaultTo, isEqual, sortBy } from 'lodash';
 import {
   createUpdateRecoveryWalletInfo,
   recoveryEntriesOnDevice,
@@ -321,7 +324,6 @@ export default function LoadingApp(props: LoadingAppProps) {
                 ...params,
                 walletId,
                 arrival: 'boot',
-                next: 'home',
               },
             }),
           )
@@ -349,7 +351,7 @@ export default function LoadingApp(props: LoadingAppProps) {
 type LoadingAppClassProps = {
   session: LoadingSession;
   openWallet: (
-    params: Omit<LoadedAppNavigationState, 'walletId' | 'arrival' | 'next'>,
+    params: Omit<LoadedAppNavigationState, 'walletId' | 'arrival'>,
   ) => void;
   openOnboarding: (start: 'Welcome' | 'OpenError') => void;
   openBoot: () => void;
@@ -820,7 +822,13 @@ export class LoadingAppClass extends Component<
   showChainError = async (walletChain: ChainNameEnum) => {
     const details = await this.chainDetails(walletChain);
     this.setState({
-      walletError: { kind: 'chain', details, walletChain },
+      walletError: {
+        kind: 'chain',
+        details,
+        walletChain,
+        others: false,
+        name: '',
+      },
       errorResolved: false,
       retrying: false,
       actionButtonsDisabled: false,
@@ -933,7 +941,8 @@ export class LoadingAppClass extends Component<
   showWalletError = (details: string) => {
     const kind = walletErrorKind(details);
     const again = currentRoute() === Route.OpenError;
-    const apply = () => {
+    const apply = async () => {
+      const failed = await this.failedWallet(kind);
       if (again) {
         this.addLastSnackbar(
           this.state.translate(
@@ -944,7 +953,7 @@ export class LoadingAppClass extends Component<
         );
       }
       this.setState(state => ({
-        walletError: { kind, details },
+        walletError: { kind, details, ...failed },
         errorResolved: false,
         retrying: false,
         errorShake: again ? state.errorShake + 1 : state.errorShake,
@@ -955,6 +964,67 @@ export class LoadingAppClass extends Component<
     const elapsed = Date.now() - this.retryStartedAt;
     const wait = this.state.retrying ? Math.max(0, RETRY_MIN_MS - elapsed) : 0;
     setTimeout(apply, wait);
+  };
+
+  /** The wallet that failed to open, marked when its file is at fault, and whether others are here. */
+  failedWallet = async (
+    kind: WalletErrorKind,
+  ): Promise<{ others: boolean; name: string }> => {
+    const active = await activeWalletEntry();
+    const listed = await walletsOnDevice();
+    if (active.kind === 'wallet' && kind === 'open') {
+      await recordOpenFailed(active.wallet, true);
+    }
+    return {
+      others: listed.ok && listed.value.wallets.length > 1,
+      name: active.kind === 'wallet' ? active.wallet.meta.name : '',
+    };
+  };
+
+  /** Opens the first other wallet that opens, on the Wallets sheet. */
+  openOtherWallet = async () => {
+    this.setState({ actionButtonsDisabled: true });
+    const active = await activeWalletEntry();
+    const listed = await walletsOnDevice();
+    const others = sortBy(
+      (listed.ok ? listed.value.wallets : []).filter(
+        w => active.kind !== 'wallet' || w.id !== active.wallet.id,
+      ),
+      w => (w.meta.openFailed ? 1 : 0),
+    );
+    for (const wallet of others) {
+      const { server } = await SettingsFileImpl.serverOf(wallet.meta);
+      const open = await finishWalletOpen(
+        await loadWallet(
+          wallet.id,
+          nativeUri(server),
+          server.chainName,
+          DEFAULT_PERFORMANCE_LEVEL,
+          GlobalConst.minConfirmations.toString(),
+        ),
+        server.chainName,
+      );
+      if (open.kind === 'opened') {
+        this.setState({ actionButtonsDisabled: false });
+        this.navigateToLoadedApp(
+          open.readOnly,
+          open.orchardPool,
+          open.saplingPool,
+          open.transparentPool,
+          false,
+          LaunchingModeEnum.opening,
+          open.walletChainName,
+          '',
+          'wallets',
+        );
+        return;
+      }
+      await recordOpenFailed(wallet, true);
+    }
+    this.setState(state => ({
+      actionButtonsDisabled: false,
+      errorShake: state.errorShake + 1,
+    }));
   };
 
   retryOpenWallet = async () => {
@@ -991,6 +1061,7 @@ export class LoadingAppClass extends Component<
     firstLaunchingMessage: LaunchingModeEnum,
     walletChainName: ChainNameEnum,
     notice: string = '',
+    next: LoadedAppNavigationState['next'] = 'home',
   ) => {
     // Leaving the error screen after a retry worked: its badge shrinks and
     // the server dot turns green first.
@@ -1007,6 +1078,7 @@ export class LoadingAppClass extends Component<
             firstLaunchingMessage,
             walletChainName,
             notice,
+            next,
           ),
         ERROR_RESOLVE_MS,
       );
@@ -1022,6 +1094,7 @@ export class LoadingAppClass extends Component<
       firstLaunchingMessage,
       walletChainName,
       notice,
+      next,
     });
   };
 
@@ -1780,6 +1853,7 @@ export class LoadingAppClass extends Component<
       foundDismissed: this.state.foundDismissed,
       dismissFound: this.dismissFound,
       importAllRecovery: this.importAllRecovery,
+      openOtherWallet: this.openOtherWallet,
       freshInstall: firstLaunchingMessage === LaunchingModeEnum.installing,
       walletError: this.state.walletError,
       errorResolved: this.state.errorResolved,

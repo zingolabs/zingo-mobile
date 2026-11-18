@@ -11,7 +11,8 @@ import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { defaultTo, isEqual } from 'lodash';
 import { LoadingSession, useSession } from '@app/navigation/session';
-import { navigateWallet, popRoutes } from '@app/navigation/navigate';
+import { isOnTop, navigateWallet, popRoutes } from '@app/navigation/navigate';
+import { walletErrorKind } from '@app/LoadingApp/walletErrorKind';
 import { LoadedAppNavigationState } from '@app/types';
 import NetInfo, {
   NetInfoSubscription,
@@ -33,6 +34,7 @@ import {
   createNewWallet,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,
+  recordOpenFailed,
   updateWalletMeta,
   walletsOnDevice,
   parseAddress,
@@ -153,9 +155,11 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { publishReport } from '@app/services/reportDiagnostics';
 import { finishWalletOpen, WalletOpen } from '@app/services/openWallet';
+import { showWallets } from '@app/services/showWallets';
 import { entryChain, entryServer } from '@app/services/recoveryImport';
 import {
   RecoveryEntry,
+  recoveryEntryFor,
   retireImportedEntry,
 } from '@app/services/recoveryWalletInfo';
 import { defaultWalletName } from '@screens/AddWallet/draftParts';
@@ -165,6 +169,7 @@ import type {
   AddWalletResult,
   ImportFoundFailed,
   ImportFoundResult,
+  WalletSwitchOutcome,
   NewWalletSource,
 } from '@app/AppState/AppContextLoaded';
 import { forgetWallet } from '@app/services/WalletLocalData';
@@ -644,7 +649,7 @@ type LoadedAppClassProps = {
   /** What the wallet replaced in place handed over: its figures, shown faded while this one opens. */
   handoff: PendingHandoff;
   /** A wallet just added opens on its seed backup when asked, and with its note. */
-  arrivalNext: 'home' | 'backup';
+  arrivalNext: LoadedAppNavigationState['next'];
   arrivalNotice: string;
   // A `zcash:` link waiting for Send, from the session.
   pendingLink: string | undefined;
@@ -754,6 +759,7 @@ export class LoadedAppClass extends Component<
       setBiometricsOption: this.setBiometricsOption,
       setBlockExplorerOption: this.setBlockExplorerOption,
       switchWallet: this.switchWallet,
+      restoreInPlace: this.restoreInPlace,
       deleteWallet: this.deleteWallet,
       addWallet: this.addWallet,
       enterAdded: this.enterAdded,
@@ -1857,6 +1863,9 @@ export class LoadedAppClass extends Component<
         HOME_FADE_MS,
       );
     }
+    if (this.props.arrivalNext === 'wallets') {
+      setTimeout(showWallets, HOME_FADE_MS);
+    }
     if (this.props.arrivalNext === 'backup') {
       setTimeout(
         () =>
@@ -1893,12 +1902,12 @@ export class LoadedAppClass extends Component<
    * the wallet section remounts on it. One that does not open hands back to
    * the wallet that was open.
    */
-  switchWallet = async (entry: WalletEntry): Promise<void> => {
+  switchWallet = async (entry: WalletEntry): Promise<WalletSwitchOutcome> => {
     if (
       this.state.switching.kind === 'opening' ||
       entry.id === this.state.walletId
     ) {
-      return;
+      return { kind: 'failed' };
     }
     this.setState({ switching: { kind: 'opening', wallet: entry } });
     await this.rpc.stopSyncProcess(SWITCH_STOP_WAIT_MS);
@@ -1908,7 +1917,7 @@ export class LoadedAppClass extends Component<
 
     const opened = await this.openInPlace(entry);
     if (opened.kind === 'opened') {
-      return;
+      return { kind: 'opened' };
     }
     await loadWallet(
       this.state.walletId,
@@ -1920,13 +1929,67 @@ export class LoadedAppClass extends Component<
     this.rpc.walletReopened();
     await this.rpc.configure();
     this.setState({ switching: { kind: 'none' } });
-    this.addLastSnackbar(
-      (this.state.translate('wallets.open-error') as string)
-        .replace('{name}', entry.meta.name)
-        .replace(
+    const details = Utils.humanizeChainTokens(
+      opened.error.message,
+      this.state.translate,
+    );
+    if (walletErrorKind(details) === 'open') {
+      await recordOpenFailed(entry, true);
+    }
+    await this.refreshWallets();
+    if (!isOnTop(Route.WalletOpenError)) {
+      navigateWallet({
+        screen: Route.WalletOpenError,
+        params: { walletId: entry.id, details },
+      });
+    }
+    return { kind: 'failed' };
+  };
+
+  /**
+   * Restores a wallet that won't open from the phrase its entry saved: the
+   * new one takes its name, colour and place, the broken one leaves the
+   * device, and the new one opens.
+   */
+  restoreInPlace = async (entry: WalletEntry): Promise<void> => {
+    const found = await recoveryEntryFor(entry.id);
+    if (found.kind === 'none') {
+      this.addLastSnackbar(this.state.translate('wallets.no-entry') as string);
+      return;
+    }
+    this.setState({ switching: { kind: 'opening', wallet: entry } });
+    const choice = await SettingsFileImpl.serverOf(entry.meta);
+    const result = await this.addWallet(
+      {
+        kind: 'restore',
+        text: found.entry.seed || found.entry.ufvk || '',
+        birthday: found.entry.birthday,
+      },
+      entry.meta.name,
+      { ...choice, keyChain: { kind: 'none' } },
+    );
+    if (result.kind === 'failed') {
+      this.setState({ switching: { kind: 'none' } });
+      this.addLastSnackbar(
+        (this.state.translate('add.error') as string).replace(
           '{error}',
-          Utils.humanizeChainTokens(opened.error.message, this.state.translate),
+          result.message,
         ),
+      );
+      return;
+    }
+    await updateWalletMeta(result.params.walletId, {
+      order: entry.meta.order,
+      ...(entry.meta.category ? { category: entry.meta.category } : {}),
+    });
+    await forgetWallet(entry.id).then(() => deleteWallet(entry.id));
+    await this.enterAdded(
+      result.params,
+      'home',
+      (this.state.translate('wallets.restored-place') as string).replace(
+        '{name}',
+        entry.meta.name,
+      ),
     );
   };
 
@@ -2454,6 +2517,7 @@ export class LoadedAppClass extends Component<
       setBlockExplorerOption: this.setBlockExplorerOption,
       walletId: this.state.walletId,
       switchWallet: this.switchWallet,
+      restoreInPlace: this.restoreInPlace,
       deleteWallet: this.deleteWallet,
       addWallet: this.addWallet,
       enterAdded: this.enterAdded,

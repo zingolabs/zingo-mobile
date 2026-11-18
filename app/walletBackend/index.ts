@@ -70,6 +70,8 @@ export {
   loadWallet,
   MIN_FREE_BYTES,
   readOpenWalletId,
+  recordActiveOpened,
+  recordOpenFailed,
   recordWalletKind,
   updateWalletMeta,
   walletsOnDevice,

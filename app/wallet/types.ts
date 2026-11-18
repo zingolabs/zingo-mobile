@@ -90,6 +90,9 @@ export type WalletErrorKind = 'open' | 'server' | 'chain';
 export type WalletErrorInfo = {
   kind: WalletErrorKind;
   details: string;
+  /** Other wallets are on the device, so the failed one is named. */
+  others: boolean;
+  name: string;
   // The wallet's own network, for the 'chain' kind.
   walletChain?: ChainNameEnum;
 };

@@ -19,6 +19,9 @@ import { useInsetFill } from '@ui/primitives/Surface';
 /** A pool, a recommendation or a wallet's state beside a row's title. */
 export type PillTone = TagTone;
 
+/** The dimmed radio of a choice that can't be picked. */
+const UNAVAILABLE_OPACITY = 0.35;
+
 /** The card a group of radio rows sits in. */
 export function RadioList({
   children,
@@ -100,6 +103,8 @@ type RadioRowProps = {
   /** Buttons at the end of the row, outside its own press. */
   trailing?: React.ReactNode;
   first?: boolean;
+  /** The choice can't be picked: its radio dims and a press leads elsewhere. */
+  unavailable?: boolean;
   testID?: string;
 };
 
@@ -114,6 +119,7 @@ export default function RadioRow({
   aside,
   trailing,
   first,
+  unavailable = false,
   testID,
 }: RadioRowProps) {
   const { colors } = useTheme();
@@ -130,7 +136,11 @@ export default function RadioRow({
         kind="row"
         testID={testID}
         accessibilityRole="radio"
-        accessibilityState={{ checked: selected }}
+        accessibilityState={
+          unavailable
+            ? { checked: selected, disabled: true }
+            : { checked: selected }
+        }
         onPress={onPress}
         style={{
           flex: 1,
@@ -143,7 +153,13 @@ export default function RadioRow({
           paddingRight: trailing ? 0 : space16,
         }}
       >
-        <Radio selected={selected} />
+        {unavailable ? (
+          <View style={{ opacity: UNAVAILABLE_OPACITY }}>
+            <Radio selected={selected} />
+          </View>
+        ) : (
+          <Radio selected={selected} />
+        )}
         {leading}
         <View style={{ flex: 1, minWidth: 0 }}>
           <View

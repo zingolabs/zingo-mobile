@@ -45,6 +45,8 @@ export type ImportFoundFailed = { kind: 'failed'; message: string };
 
 export type ImportFoundResult = { kind: 'imported' } | ImportFoundFailed;
 
+export type WalletSwitchOutcome = { kind: 'opened' } | { kind: 'failed' };
+
 export type WalletSwitch =
   { kind: 'none' } | { kind: 'opening'; wallet: WalletEntry };
 
@@ -149,7 +151,9 @@ export default interface AppContextLoaded {
   /** The open wallet's id. */
   walletId: string;
   /** Opens another wallet in place, Home staying until it is open. */
-  switchWallet: (entry: WalletEntry) => Promise<void>;
+  switchWallet: (entry: WalletEntry) => Promise<WalletSwitchOutcome>;
+  /** A wallet that won't open, restored from its saved phrase in its place, with its name. */
+  restoreInPlace: (entry: WalletEntry) => Promise<void>;
   /** The wallet being opened in place, named on Home's sync line. */
   switching: WalletSwitch;
   /** The wallets on the device, in the order they were added. */

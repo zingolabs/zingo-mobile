@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import Animated, {
   Keyframe,
@@ -28,12 +28,11 @@ import {
 } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
 import Pressable from '@ui/primitives/Pressable';
-import { ContextAppLoading } from '@app/context';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import Tag from '@ui/widgets/Tag';
 import { WalletErrorKind } from '@app/wallet/types';
-import { ChainNameEnum } from '@app/AppState';
+import { ChainNameEnum, ServerType, TranslateType } from '@app/AppState';
 import { showConfirm } from '@app/services/showConfirm';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { DatabaseIcon } from '@ui/primitives/Icons/DatabaseIcon';
@@ -41,7 +40,16 @@ import { ChevronDown } from '@ui/primitives/Icons/Chevron';
 import { WalletIcon } from '@ui/primitives/Icons/WalletIcon';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
+/** The wallet that failed, named when it is one of several, with the way to another one. */
+export type FailedWallet =
+  | { kind: 'only' }
+  | { kind: 'oneOfMany'; name: string; onOpenOther: () => void };
+
 type WalletErrorProps = {
+  translate: (key: string) => TranslateType;
+  online: boolean;
+  server: ServerType;
+  failed: FailedWallet;
   kind: WalletErrorKind;
   details: string;
   // The wallet's network, for the 'chain' kind.
@@ -141,6 +149,10 @@ const DetailsBox: React.FunctionComponent<{
 };
 
 const WalletError: React.FunctionComponent<WalletErrorProps> = ({
+  translate,
+  online,
+  server,
+  failed,
   kind,
   details,
   walletChain,
@@ -153,7 +165,6 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
   onSwitchChain,
   resolved = false,
 }) => {
-  const { translate, netInfo, server } = useContext(ContextAppLoading);
   const { colors } = useTheme();
   const { edges, fades } = useScrollEdges();
   const bottomPad = useBottomActionPad();
@@ -208,7 +219,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
   const offline = server.kind === 'offline';
   const dotColor = resolved
     ? colors.fgAccent
-    : !netInfo.isConnected || kind === 'server'
+    : !online || kind === 'server'
       ? colors.fgDanger
       : offline
         ? colors.fgMuted
@@ -231,18 +242,27 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         '{net}',
         netName(chain),
       )
-    : (translate(
-        kind === 'server'
-          ? 'walleterror.server-title'
-          : 'walleterror.open-title',
-      ) as string);
+    : kind !== 'server' && failed.kind === 'oneOfMany'
+      ? (translate('wallets.wont-open') as string).replace(
+          '{name}',
+          failed.name,
+        )
+      : (translate(
+          kind === 'server'
+            ? 'walleterror.server-title'
+            : 'walleterror.open-title',
+        ) as string);
   const sub = chain
     ? (translate('walleterror.chain-sub') as string)
         .replace('{server}', netName(server.chainName))
         .replace('{net}', netName(chain))
     : kind === 'server'
       ? (translate('walleterror.server-sub') as string).replace('{host}', host)
-      : (translate('walleterror.open-sub') as string);
+      : (translate(
+          failed.kind === 'oneOfMany'
+            ? 'wallets.wont-open-body'
+            : 'walleterror.open-sub',
+        ) as string);
   const primaryLabel = chain
     ? (translate('walleterror.chain-action') as string).replace(
         '{net}',
@@ -539,13 +559,21 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
             'walleterror.more',
             true,
           )
-        : link(
-            translate('walleterror.import') as string,
-            onImport,
-            topLinkBottom,
-            'walleterror.import',
-            true,
-          )}
+        : failed.kind === 'oneOfMany'
+          ? link(
+              translate('wallets.open-other') as string,
+              failed.onOpenOther,
+              topLinkBottom,
+              'walleterror.other',
+              true,
+            )
+          : link(
+              translate('walleterror.import') as string,
+              onImport,
+              topLinkBottom,
+              'walleterror.import',
+              true,
+            )}
       <View
         style={{
           position: 'absolute',

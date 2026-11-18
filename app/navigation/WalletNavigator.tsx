@@ -28,6 +28,7 @@ import {
   NewWallet,
   RestoreWallet,
 } from '@screens/AddWallet';
+import WalletOpenError from '@screens/Wallets/WalletOpenError';
 import WalletServer from '@screens/Server/WalletServer';
 import { MessageList } from '@screens/Messages';
 import { AddressList } from '@screens/AddressList';
@@ -228,6 +229,11 @@ export function WalletNavigator() {
         <Stack.Screen
           name={Route.FoundWallets}
           component={FoundWalletsInApp}
+          options={MENU}
+        />
+        <Stack.Screen
+          name={Route.WalletOpenError}
+          component={WalletOpenError}
           options={MENU}
         />
         <Stack.Screen

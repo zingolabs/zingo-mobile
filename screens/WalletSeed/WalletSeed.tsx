@@ -35,7 +35,10 @@ import { AppDrawerParamList } from '@app/types';
 import { useBiometricGate } from '@app/hooks/useBiometricGate';
 import { useSecureScreen } from '@app/hooks/useSecureScreen';
 import { useScreenCapture } from '@app/hooks/useScreenCapture';
-import { getRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
+import {
+  getRecoveryWalletInfo,
+  recoveryEntryFor,
+} from '@app/services/recoveryWalletInfo';
 import { fetchWallet } from '@app/walletBackend';
 import { copySensitive } from '@app/utils/sensitiveClipboard';
 import { formatInteger } from '@app/utils/formatAmount';
@@ -67,18 +70,27 @@ type WalletSeedProps = NativeStackScreenProps<AppDrawerParamList, 'WalletSeed'>;
 
 const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
   navigation,
+  route,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
     translate,
     biometrics,
     addLastSnackbar,
-    seedBackedUp,
-    seedBackedUpAt,
+    seedBackedUp: openBackedUp,
+    seedBackedUpAt: openBackedUpAt,
     language,
     birthday: walletBirthday,
-    readOnly,
+    readOnly: openReadOnly,
+    wallets,
   } = context;
+  /** A wallet that won't open shows the phrase its entry saved, and no backup flow. */
+  const saved = wallets.find(w => w.id === route.params?.walletId);
+  const readOnly = saved ? saved.meta.kind === 'ufvk' : openReadOnly;
+  const seedBackedUp = saved ? !!saved.meta.seedBackedUp : openBackedUp;
+  const seedBackedUpAt = saved
+    ? (saved.meta.seedBackedUpAt ?? 0)
+    : openBackedUpAt;
   const { colors } = useTheme();
   const { edges, fades } = useScrollEdges();
   const bottomPad = useBottomActionPad();
@@ -106,6 +118,17 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
       return;
     }
     (async () => {
+      if (saved) {
+        const found = await recoveryEntryFor(saved.id);
+        const entry =
+          found.kind === 'entry'
+            ? found.entry
+            : { seed: '', ufvk: '', birthday: 0 };
+        setWords((entry.seed || '').split(' ').filter(w => !!w));
+        setBirthday(entry.birthday);
+        setVk(entry.ufvk || '');
+        return;
+      }
       const stored = await getRecoveryWalletInfo();
       if (readOnly) {
         const viewOnly = stored.ufvk ? stored : await fetchWallet(true);
@@ -118,7 +141,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
       setBirthday(wallet?.birthday || walletBirthday);
       setVk((await fetchWallet(true))?.ufvk || '');
     })();
-  }, [passed, walletBirthday, readOnly]);
+  }, [passed, walletBirthday, readOnly, saved]);
 
   useEffect(() => {
     if (focused) {
@@ -297,7 +320,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
                   : (translate('walletseed.no-sub') as string)}
               </Text>
             </View>
-            {!seedBackedUp && (
+            {!seedBackedUp && !saved && (
               <Button
                 testID="walletseed.backup"
                 variant="primary"
@@ -385,7 +408,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
             paddingBottom: bottomPad,
           }}
         >
-          {seedBackedUp ? (
+          {seedBackedUp && !saved ? (
             <StepActions
               testID="walletseed.actions"
               link={translate('walletseed.verify') as string}

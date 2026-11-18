@@ -71,8 +71,8 @@ export type LoadedAppNavigationState = {
   walletId: string;
   /** Opened at launch, or picked in Wallets while another was open. */
   arrival: 'boot' | 'switch';
-  /** Where the wallet goes once open: Home, or straight to backing up its new seed. */
-  next: 'home' | 'backup';
+  /** Where the wallet goes once open: Home, straight to backing up its new seed, or the Wallets sheet. */
+  next: 'home' | 'backup' | 'wallets';
   /** A note to show once it is open: the toast of a wallet just added. */
   notice: string;
   readOnly: boolean;
@@ -130,9 +130,12 @@ export type AppDrawerParamList = {
   // `mode`: what the user said they restore from; the field takes either.
   [Route.RestoreWallet]: { mode: 'seed' | 'key' };
   [Route.FoundWallets]: undefined;
+  /** A wallet that failed to open in place, with why. */
+  [Route.WalletOpenError]: { walletId: string; details: string };
   // Absent for the plain view; set when the seed is shown before leaving
   // this wallet or its server.
-  [Route.WalletSeed]: undefined;
+  /** Another wallet's saved phrase, by its id, when it won't open; the open wallet's otherwise. */
+  [Route.WalletSeed]: { walletId: string } | undefined;
   // `switchTo`: shown before a view-only wallet moves to a server on that
   // network.
   [Route.ViewingKey]: { entry: ViewingKeyEntry };

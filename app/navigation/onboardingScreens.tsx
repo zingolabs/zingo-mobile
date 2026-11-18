@@ -83,7 +83,11 @@ export function FoundWalletsScreen() {
 
 export function OpenErrorScreen() {
   const {
+    translate,
+    netInfo,
+    server,
     walletError,
+    openOtherWallet,
     errorResolved,
     retrying,
     errorShake,
@@ -98,6 +102,18 @@ export function OpenErrorScreen() {
   }
   return (
     <WalletError
+      translate={translate}
+      online={!!netInfo.isConnected}
+      server={server}
+      failed={
+        walletError.others
+          ? {
+              kind: 'oneOfMany',
+              name: walletError.name,
+              onOpenOther: openOtherWallet,
+            }
+          : { kind: 'only' }
+      }
       kind={walletError.kind}
       details={walletError.details}
       walletChain={walletError.walletChain}

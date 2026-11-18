@@ -76,6 +76,7 @@ export const defaultAppContextLoading: AppContextLoading = {
   importAllRecovery: () => {},
   foundDismissed: false,
   dismissFound: () => {},
+  openOtherWallet: () => {},
   nameNewWallet: () => {},
 };
 

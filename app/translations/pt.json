@@ -1566,10 +1566,20 @@
     "delete-only": "{name} é sua única carteira. Depois de excluí-la, o Zingo volta ao início.",
     "delete-swap": "Há uma troca em andamento em {name}. Depois de excluí-la, o Zingo deixa de acompanhar essa troca.",
     "deleted": "{name} excluída deste dispositivo",
-    "open-error": "{name} não abriu. {error}",
     "default-name": "Carteira {n}",
     "created": "{name} está pronta. Renomeie em Carteiras.",
-    "restored": "{name} restaurada. A nova verificação segue em segundo plano."
+    "restored": "{name} restaurada. A nova verificação segue em segundo plano.",
+    "cant-open": "Não abre",
+    "wont-open-step": "A carteira não abre",
+    "wont-open-step-body": "O Zingo não conseguiu abrir {name}. O arquivo da carteira pode estar danificado.",
+    "wont-open": "{name} não abre",
+    "wont-open-body": "O Zingo não conseguiu abrir esta carteira. O arquivo pode estar danificado.",
+    "retry": "Tentar de novo",
+    "view-seed": "Ver frase semente",
+    "restore-place": "Restaurar no lugar",
+    "open-other": "Abrir outra carteira",
+    "restored-place": "{name} restaurada. A nova verificação segue em segundo plano.",
+    "no-entry": "A frase semente desta carteira não está salva neste dispositivo."
   },
   "add": {
     "title": "Adicionar carteira",

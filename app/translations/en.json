@@ -1566,10 +1566,20 @@
     "delete-only": "{name} is your only wallet. Once it’s deleted, Zingo goes back to the start.",
     "delete-swap": "A swap is in progress in {name}. Once it’s deleted, Zingo stops following that swap.",
     "deleted": "{name} deleted from this device",
-    "open-error": "{name} didn’t open. {error}",
     "default-name": "Wallet {n}",
     "created": "{name} is ready. Rename it from Wallets.",
-    "restored": "{name} restored. The rescan runs in the background."
+    "restored": "{name} restored. The rescan runs in the background.",
+    "cant-open": "Can’t open",
+    "wont-open-step": "Wallet won’t open",
+    "wont-open-step-body": "Zingo couldn’t open {name}. The wallet file may be damaged.",
+    "wont-open": "{name} won’t open",
+    "wont-open-body": "Zingo couldn’t open this wallet. The file may be damaged.",
+    "retry": "Retry",
+    "view-seed": "View seed phrase",
+    "restore-place": "Restore in place",
+    "open-other": "Open another wallet",
+    "restored-place": "{name} restored. The rescan runs in the background.",
+    "no-entry": "This wallet’s seed phrase isn’t saved on this device."
   },
   "add": {
     "title": "Add wallet",

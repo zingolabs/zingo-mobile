@@ -16,7 +16,14 @@ import {
   SelectServerEnum,
 } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
-import { space4, space8, space12, space20, useTheme } from '@app/theme';
+import {
+  space4,
+  space8,
+  space12,
+  space16,
+  space20,
+  useTheme,
+} from '@app/theme';
 import { navigateWallet } from '@app/navigation/navigate';
 import { registerWalletsListener } from '@app/services/showWallets';
 import { readSavedBalances, SavedBalance } from '@app/services/savedBalance';
@@ -25,6 +32,8 @@ import { SwapStore } from '@app/swap';
 import { formatZecAmount } from '@app/utils/formatZecAmount';
 import type { WalletEntry } from '@app/walletBackend';
 import { updateWalletMeta } from '@app/walletBackend';
+import { askGate } from '@app/services/gateController';
+import { recoveryEntryFor } from '@app/services/recoveryWalletInfo';
 import { DeleteWalletContext } from '@app/wallet/types';
 import AppSheetModal, { SheetScrollView } from '@ui/primitives/AppSheetModal';
 import Button from '@ui/primitives/Button';
@@ -70,12 +79,18 @@ export default function WalletsSheet() {
     switchWallet,
     deleteWallet,
     refreshWallets,
+    restoreInPlace,
   } = useContext(ContextAppLoaded);
   const t = useCallback((key: string) => translate(key) as string, [translate]);
   const { colors } = useTheme();
   const listRef = useRef<BottomSheetModal>(null);
   const settingsRef = useRef<BottomSheetModal>(null);
   const deleteRef = useRef<BottomSheetModal>(null);
+  const brokenRef = useRef<BottomSheetModal>(null);
+  const [broken, setBroken] = useState<{
+    wallet: WalletEntry;
+    saved: boolean;
+  } | null>(null);
   const [balances, setBalances] = useState<Record<string, SavedBalance>>({});
   const [editing, setEditing] = useState<WalletEntry | null>(null);
   const [deleting, setDeleting] = useState<{
@@ -133,6 +148,13 @@ export default function WalletsSheet() {
     if (wallet.id !== walletId) {
       switchWallet(wallet);
     }
+  };
+
+  /** A wallet that won't open leads to its own step instead of opening. */
+  const openBroken = async (wallet: WalletEntry) => {
+    const found = await recoveryEntryFor(wallet.id);
+    setBroken({ wallet, saved: found.kind === 'entry' });
+    brokenRef.current?.present();
   };
 
   const edit = (wallet: WalletEntry) => {
@@ -213,16 +235,19 @@ export default function WalletsSheet() {
                     wallet={wallet}
                     first={index === 0}
                     selected={wallet.id === walletId}
+                    unavailable={!!wallet.meta.openFailed}
                     pill={
-                      isViewOnly(wallet)
-                        ? { text: t('wallets.view-only'), tone: 'viewOnly' }
-                        : !isBackedUp(wallet) &&
-                            (wallet.meta.kind || wallet.id === walletId)
-                          ? {
-                              text: t('wallets.not-backed-up'),
-                              tone: 'warning',
-                            }
-                          : undefined
+                      wallet.meta.openFailed
+                        ? { text: t('wallets.cant-open'), tone: 'danger' }
+                        : isViewOnly(wallet)
+                          ? { text: t('wallets.view-only'), tone: 'viewOnly' }
+                          : !isBackedUp(wallet) &&
+                              (wallet.meta.kind || wallet.id === walletId)
+                            ? {
+                                text: t('wallets.not-backed-up'),
+                                tone: 'warning',
+                              }
+                            : undefined
                     }
                     sub={subOf(wallet)}
                     editLabel={t('wallets.settings-acc').replace(
@@ -235,7 +260,9 @@ export default function WalletsSheet() {
                     )}
                     editColor={colors.fgDefault}
                     deleteColor={colors.fgDanger}
-                    onPress={() => pick(wallet)}
+                    onPress={() =>
+                      wallet.meta.openFailed ? openBroken(wallet) : pick(wallet)
+                    }
                     onEdit={() => edit(wallet)}
                     onDelete={() => askDelete(wallet)}
                   />
@@ -273,6 +300,41 @@ export default function WalletsSheet() {
         }}
       />
 
+      <WontOpenSheet
+        ref={brokenRef}
+        wallet={broken?.wallet ?? null}
+        saved={!!broken?.saved}
+        onRetry={() => {
+          if (broken) {
+            brokenRef.current?.dismiss();
+            closeList();
+            switchWallet(broken.wallet);
+          }
+        }}
+        onViewSeed={() => {
+          if (broken) {
+            brokenRef.current?.dismiss();
+            closeList();
+            navigateWallet({
+              screen: Route.WalletSeed,
+              params: { walletId: broken.wallet.id },
+            });
+          }
+        }}
+        onRestore={async () => {
+          if (!broken) {
+            return;
+          }
+          const answer = await askGate({ translate });
+          if (answer.kind === 'declined') {
+            return;
+          }
+          brokenRef.current?.dismiss();
+          closeList();
+          restoreInPlace(broken.wallet);
+        }}
+      />
+
       <DeleteWalletSheet
         ref={deleteRef}
         context={deleting?.context ?? { sub: '', warning: '' }}
@@ -293,6 +355,7 @@ type WalletRowProps = {
   wallet: WalletEntry;
   first: boolean;
   selected: boolean;
+  unavailable: boolean;
   pill: React.ComponentProps<typeof RadioRow>['pill'];
   sub: string;
   editLabel: string;
@@ -309,6 +372,7 @@ function WalletRow({
   wallet,
   first,
   selected,
+  unavailable,
   pill,
   sub,
   editLabel,
@@ -354,6 +418,7 @@ function WalletRow({
       pill={pill}
       sub={sub}
       selected={selected}
+      unavailable={unavailable}
       onPress={onPress}
       leading={
         <Avatar
@@ -520,3 +585,95 @@ const WalletSettingsSheet = React.forwardRef<
     </AppSheetModal>
   );
 });
+
+type WontOpenSheetProps = {
+  wallet: WalletEntry | null;
+  /** Its phrase is saved on the device, so it can be shown and restored. */
+  saved: boolean;
+  onRetry: () => void;
+  onViewSeed: () => void;
+  onRestore: () => void;
+};
+
+/** A wallet that won't open: try again, see its saved phrase, or restore it in its place. */
+const WontOpenSheet = React.forwardRef<BottomSheetModal, WontOpenSheetProps>(
+  ({ wallet, saved, onRetry, onViewSeed, onRestore }, ref) => {
+    const { translate } = useContext(ContextAppLoaded);
+    const t = (key: string) => translate(key) as string;
+    const dismiss = () =>
+      (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss();
+    return (
+      <AppSheetModal
+        ownScroll
+        ref={ref}
+        header={
+          <TitleBar
+            title={t('wallets.wont-open-step')}
+            left={{
+              icon: ChevronLeft,
+              accent: true,
+              accessibilityLabel: t('wallets.title'),
+              onPress: dismiss,
+              testID: 'wallets.broken.back',
+            }}
+          />
+        }
+      >
+        <SheetScrollView
+          contentContainerStyle={{
+            paddingTop: space8,
+            paddingHorizontal: space20,
+            rowGap: space12,
+          }}
+        >
+          {!!wallet && (
+            <>
+              <View style={{ alignItems: 'center', paddingVertical: space4 }}>
+                <Avatar
+                  kind="contact"
+                  size="lg"
+                  name={wallet.meta.name}
+                  category={categoryOf(wallet)}
+                />
+              </View>
+              <Text
+                variant="bodySmall"
+                tone="muted"
+                style={{ textAlign: 'center', marginHorizontal: space16 }}
+              >
+                {t('wallets.wont-open-step-body').replace(
+                  '{name}',
+                  wallet.meta.name,
+                )}
+              </Text>
+              <View style={{ rowGap: space8 }}>
+                <Button
+                  testID="wallets.broken.retry"
+                  variant="primary"
+                  title={t('wallets.retry')}
+                  onPress={onRetry}
+                />
+                {saved && (
+                  <>
+                    <Button
+                      testID="wallets.broken.seed"
+                      variant="text"
+                      title={t('wallets.view-seed')}
+                      onPress={onViewSeed}
+                    />
+                    <Button
+                      testID="wallets.broken.restore"
+                      variant="text"
+                      title={t('wallets.restore-place')}
+                      onPress={onRestore}
+                    />
+                  </>
+                )}
+              </View>
+            </>
+          )}
+        </SheetScrollView>
+      </AppSheetModal>
+    );
+  },
+);
