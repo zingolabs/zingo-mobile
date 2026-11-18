@@ -29,6 +29,16 @@ import type {
 } from '@app/walletBackend/transforms/sendPermit';
 import { SetServerResult } from './types/SetServerResult';
 import type { WalletEntry } from '@app/walletBackend/utils/walletStore';
+import type { AddWalletDraft } from '@app/services/addWalletDraft';
+import type { LoadedAppNavigationState } from '@app/types/NavigationTypes';
+
+/** What a wallet being added is made from. */
+export type NewWalletSource =
+  { kind: 'create' } | { kind: 'restore'; text: string; birthday: number };
+
+export type AddWalletResult =
+  | { kind: 'added'; name: string; params: LoadedAppNavigationState }
+  | { kind: 'failed'; message: string };
 
 export type WalletSwitch =
   { kind: 'none' } | { kind: 'opening'; wallet: WalletEntry };
@@ -141,6 +151,18 @@ export default interface AppContextLoaded {
   switching: WalletSwitch;
   /** The wallets on the device, in the order they were added. */
   wallets: WalletEntry[];
+  /** Adds a wallet beside the others; the open one stays as it was when it fails. */
+  addWallet: (
+    source: NewWalletSource,
+    name: string,
+    draft: AddWalletDraft,
+  ) => Promise<AddWalletResult>;
+  /** Opens a wallet just added: Home, or its seed backup first, with a note. */
+  enterAdded: (
+    params: LoadedAppNavigationState,
+    next: 'home' | 'backup',
+    notice: string,
+  ) => void;
   /** Deletes a wallet; the open one hands over to the first wallet left. */
   deleteWallet: (entry: WalletEntry) => Promise<void>;
   /** Reads the wallets again, after one is renamed or deleted. */

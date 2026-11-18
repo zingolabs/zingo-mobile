@@ -318,7 +318,13 @@ export default function LoadingApp(props: LoadingAppProps) {
           readOpenWalletId().then(walletId =>
             setSession({
               kind: 'wallet',
-              params: { ...params, walletId, arrival: 'boot' },
+              params: {
+                ...params,
+                walletId,
+                arrival: 'boot',
+                next: 'home',
+                notice: '',
+              },
             }),
           )
         }
@@ -345,7 +351,10 @@ export default function LoadingApp(props: LoadingAppProps) {
 type LoadingAppClassProps = {
   session: LoadingSession;
   openWallet: (
-    params: Omit<LoadedAppNavigationState, 'walletId' | 'arrival'>,
+    params: Omit<
+      LoadedAppNavigationState,
+      'walletId' | 'arrival' | 'next' | 'notice'
+    >,
   ) => void;
   openOnboarding: (start: 'Welcome' | 'OpenError') => void;
   openBoot: () => void;

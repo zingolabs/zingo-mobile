@@ -28,6 +28,8 @@ const Probe: React.FC = () => {
 const walletParams = {
   walletId: 'w1',
   arrival: 'boot' as const,
+  next: 'home' as const,
+  notice: '',
   readOnly: false,
   orchardPool: true,
   saplingPool: true,

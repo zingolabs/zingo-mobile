@@ -68,6 +68,10 @@ export type LoadedAppNavigationState = {
   walletId: string;
   /** Opened at launch, or picked in Wallets while another was open. */
   arrival: 'boot' | 'switch';
+  /** Where the wallet goes once open: Home, or straight to backing up its new seed. */
+  next: 'home' | 'backup';
+  /** A note to show once it is open: the toast of a wallet just added. */
+  notice: string;
   readOnly: boolean;
   orchardPool: boolean;
   saplingPool: boolean;
@@ -110,7 +114,8 @@ export type AppDrawerParamList = {
   [Route.Messages]: undefined;
   [Route.Settings]: undefined;
   // `walletId`: the wallet whose server changes; none is the open one.
-  [Route.Server]: { walletId: string } | undefined;
+  // `draft`: the wallet being added, which has no id yet.
+  [Route.Server]: { walletId: string } | { draft: true } | undefined;
   [Route.About]: undefined;
   [Route.MixnetDoctor]: undefined;
   [Route.Insight]: undefined;

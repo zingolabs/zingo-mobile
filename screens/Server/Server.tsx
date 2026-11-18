@@ -60,6 +60,8 @@ export type ServerProps = {
   initialChain?: ChainNameEnum;
   /** The network is the wallet's for its whole life: the segments stay put. */
   networkLocked?: boolean;
+  /** Why the network is set, over the servers: a viewing key carries its own. */
+  networkNote?: string;
   server: ServerType;
   selectServer: SelectServerEnum;
   status: ServerStatus;
@@ -209,6 +211,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
   translate,
   initialChain,
   networkLocked,
+  networkNote,
   server,
   selectServer,
   status,
@@ -630,6 +633,19 @@ const Server: React.FunctionComponent<ServerProps> = ({
             style={[lockStyle, bodyFade]}
             pointerEvents={offline ? 'none' : 'auto'}
           >
+            {!!networkNote && (
+              <Text
+                variant="caption"
+                tone="muted"
+                style={{
+                  marginHorizontal: CARD_SIDE,
+                  marginTop: space8,
+                  marginBottom: space8,
+                }}
+              >
+                {networkNote}
+              </Text>
+            )}
             {body}
           </Animated.View>
           <Animated.View

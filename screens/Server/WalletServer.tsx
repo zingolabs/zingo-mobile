@@ -38,6 +38,10 @@ import ServerList from '@screens/ServerList';
 import Server from './Server';
 import Header from '@ui/widgets/Header';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
+import {
+  setAddWalletDraft,
+  useAddWalletDraft,
+} from '@app/services/addWalletDraft';
 
 // The Server screen inside the wallet, for one wallet: a choice reconnects
 // the open wallet, or is kept in another wallet's meta for when it opens. The
@@ -57,11 +61,14 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation, route }) => {
     wallets,
     refreshWallets,
   } = context;
+  /** The wallet being added, whose server lives in its draft until it exists. */
+  const forDraft = !!route.params && 'draft' in route.params;
+  const draft = useAddWalletDraft();
   /** The wallet this screen sets the server of; another than the open one is only stored. */
-  const target = wallets.find(
-    w => w.id === (route.params?.walletId ?? walletId),
-  );
-  const isOpen = !target || target.id === walletId;
+  const paramsId =
+    route.params && 'walletId' in route.params ? route.params.walletId : '';
+  const target = wallets.find(w => w.id === (paramsId || walletId));
+  const isOpen = !forDraft && (!target || target.id === walletId);
   const [stored, setStored] = useState<{
     server: ServerType;
     selectServer: SelectServerEnum;
@@ -72,13 +79,25 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation, route }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, target?.id]);
-  const server = isOpen ? context.server : (stored?.server ?? context.server);
-  const selectServer = isOpen
-    ? context.selectServer
-    : (stored?.selectServer ?? context.selectServer);
-  const walletChainName = isOpen
-    ? context.walletChainName
-    : ((target?.meta.chain as ChainNameEnum) ?? context.walletChainName);
+  const server = forDraft
+    ? draft.server
+    : isOpen
+      ? context.server
+      : (stored?.server ?? context.server);
+  const selectServer = forDraft
+    ? draft.selectServer
+    : isOpen
+      ? context.selectServer
+      : (stored?.selectServer ?? context.selectServer);
+  const walletChainName = forDraft
+    ? draft.keyChain.kind === 'key'
+      ? draft.keyChain.chain
+      : draft.server.chainName
+    : isOpen
+      ? context.walletChainName
+      : ((target?.meta.chain as ChainNameEnum) ?? context.walletChainName);
+  /** A wallet's network never changes; one being added picks it, unless its viewing key set it. */
+  const networkLocked = !forDraft || draft.keyChain.kind === 'key';
   const online = !!netInfo.isConnected;
   const [status, setStatus] = useState<ServerStatus>('wait');
   const [blockHeight, setBlockHeight] = useState('');
@@ -162,6 +181,12 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation, route }) => {
   ): Promise<boolean> => {
     setBusy(true);
     setStatus('wait');
+    if (forDraft) {
+      setAddWalletDraft({ server: next, selectServer: mode });
+      setBusy(false);
+      probeCurrent(next);
+      return true;
+    }
     if (!isOpen && target) {
       const kept = await SettingsFileImpl.writeWalletServer(
         target.id,
@@ -312,7 +337,12 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation, route }) => {
               placement="belowHeader"
               translate={translate}
               initialChain={walletChainName}
-              networkLocked
+              networkLocked={networkLocked}
+              networkNote={
+                forDraft && draft.keyChain.kind === 'key'
+                  ? (translate('server.from-key') as string)
+                  : undefined
+              }
               server={server}
               selectServer={selectServer}
               status={status}

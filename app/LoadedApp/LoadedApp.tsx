@@ -9,7 +9,7 @@ import {
 import { useTheme } from '@app/theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
-import { isEqual } from 'lodash';
+import { defaultTo, isEqual } from 'lodash';
 import { LoadingSession, useSession } from '@app/navigation/session';
 import { navigateWallet } from '@app/navigation/navigate';
 import { LoadedAppNavigationState } from '@app/types';
@@ -30,6 +30,9 @@ import {
   loadExistingWallet,
   loadWallet,
   deleteWallet,
+  createNewWallet,
+  restoreWalletFromSeed,
+  restoreWalletFromUfvk,
   updateWalletMeta,
   walletsOnDevice,
   parseAddress,
@@ -147,6 +150,12 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { publishReport } from '@app/services/reportDiagnostics';
 import { finishWalletOpen, WalletOpen } from '@app/services/openWallet';
+import { AddWalletDraft } from '@app/services/addWalletDraft';
+import { isViewingKey } from '@app/utils/seedPhrase';
+import type {
+  AddWalletResult,
+  NewWalletSource,
+} from '@app/AppState/AppContextLoaded';
 import { forgetWallet } from '@app/services/WalletLocalData';
 import type { FfiResult } from '@app/walletBackend';
 import { writeSavedBalance } from '@app/services/savedBalance';
@@ -536,6 +545,8 @@ export default function LoadedApp(props: LoadedAppProps) {
         leaveWallet={setSession}
         openWallet={params => setSession({ kind: 'wallet', params })}
         walletId={props.wallet.walletId}
+        arrivalNext={props.wallet.next}
+        arrivalNotice={props.wallet.notice}
         pendingLink={pendingLink}
         clearLink={clearLink}
         theme={theme}
@@ -575,6 +586,9 @@ type LoadedAppClassProps = {
   /** Hands the wallet section to another open wallet, which remounts it. */
   openWallet: (params: LoadedAppNavigationState) => void;
   walletId: string;
+  /** A wallet just added opens on its seed backup when asked, and with its note. */
+  arrivalNext: 'home' | 'backup';
+  arrivalNotice: string;
   // A `zcash:` link waiting for Send, from the session.
   pendingLink: string | undefined;
   clearLink: () => void;
@@ -680,6 +694,8 @@ export class LoadedAppClass extends Component<
       changeWallet: this.onClickOKChangeWallet,
       switchWallet: this.switchWallet,
       deleteWallet: this.deleteWallet,
+      addWallet: this.addWallet,
+      enterAdded: this.enterAdded,
       refreshWallets: this.refreshWallets,
       restoreBackup: this.onClickOKRestoreBackup,
       applyPendingServer: this.onClickOKServerWallet,
@@ -755,6 +771,7 @@ export class LoadedAppClass extends Component<
   componentDidMount = async () => {
     this.publishReportState();
     await this.refreshWallets();
+    this.arrive();
     const netInfoState = await NetInfo.fetch();
     this.setState({
       netInfo: {
@@ -1765,6 +1782,26 @@ export class LoadedAppClass extends Component<
     this.props.leaveWallet(session);
   };
 
+  /** What a wallet just added does once open: its note, and its seed backup when asked. */
+  arrive = () => {
+    if (this.props.arrivalNotice) {
+      setTimeout(
+        () => this.addLastSnackbar(this.props.arrivalNotice),
+        HOME_FADE_MS,
+      );
+    }
+    if (this.props.arrivalNext === 'backup') {
+      setTimeout(
+        () =>
+          navigateWallet({
+            screen: Route.SeedBackup,
+            params: { entry: { kind: 'push' } },
+          }),
+        HOME_FADE_MS,
+      );
+    }
+  };
+
   /** Reads the wallets on the device; one without a category gets the one its id gives, kept in its meta. */
   refreshWallets = async (): Promise<void> => {
     const result = await walletsOnDevice();
@@ -1843,6 +1880,8 @@ export class LoadedAppClass extends Component<
       this.props.openWallet({
         walletId: entry.id,
         arrival: 'switch',
+        next: 'home',
+        notice: '',
         readOnly: opened.readOnly,
         orchardPool: opened.orchardPool,
         saplingPool: opened.saplingPool,
@@ -1853,6 +1892,127 @@ export class LoadedAppClass extends Component<
       });
     }
     return opened;
+  };
+
+  /**
+   * Adds a wallet beside the others, from a new seed or a restore, with the
+   * network and server picked for it, and opens it. Its name, server and
+   * seed backup state go to its meta. A wallet that cannot be added leaves the
+   * open one as it was.
+   */
+  addWallet = async (
+    source: NewWalletSource,
+    name: string,
+    draft: AddWalletDraft,
+  ): Promise<AddWalletResult> => {
+    await this.rpc.stopSyncProcess(SWITCH_STOP_WAIT_MS);
+    await doSave();
+    await this.rpc.clearTimers();
+    this.keepAwake(false);
+
+    const before = new Set(this.state.wallets.map(w => w.id));
+    const chain =
+      draft.keyChain.kind === 'key'
+        ? draft.keyChain.chain
+        : draft.server.chainName;
+    const server =
+      draft.server.kind === 'offline' ? offlineServer(chain) : draft.server;
+    const args = [
+      nativeUri(server),
+      chain,
+      DEFAULT_PERFORMANCE_LEVEL,
+      GlobalConst.minConfirmations.toString(),
+    ] as const;
+    const text = source.kind === 'restore' ? source.text.toLowerCase() : '';
+    const birthday =
+      source.kind === 'restore' ? String(defaultTo(source.birthday, 0)) : '0';
+    const result =
+      source.kind === 'create'
+        ? await createNewWallet(args[0], birthday, args[1], args[2], args[3])
+        : isViewingKey(text)
+          ? await restoreWalletFromUfvk(text, birthday, ...args)
+          : await restoreWalletFromSeed(text, birthday, ...args);
+
+    const listed = result.ok ? await walletsOnDevice() : null;
+    const added =
+      listed && listed.ok
+        ? listed.value.wallets.find(w => !before.has(w.id))
+        : undefined;
+    const opened =
+      added !== undefined
+        ? await this.prepareAdded(added, source, name, server, draft, result)
+        : null;
+    if (added !== undefined && opened && opened.kind === 'opened') {
+      return {
+        kind: 'added',
+        name: name || added.meta.name,
+        params: {
+          walletId: added.id,
+          arrival: 'switch',
+          next: 'home',
+          notice: '',
+          readOnly: opened.readOnly,
+          orchardPool: opened.orchardPool,
+          saplingPool: opened.saplingPool,
+          transparentPool: opened.transparentPool,
+          newWallet: true,
+          firstLaunchingMessage: LaunchingModeEnum.opening,
+          walletChainName: opened.walletChainName,
+        },
+      };
+    }
+
+    const message = !result.ok
+      ? result.error.message
+      : opened && opened.kind === 'failed'
+        ? opened.error.message
+        : '';
+    await loadWallet(
+      this.state.walletId,
+      nativeUri(this.state.server),
+      this.state.server.chainName,
+      DEFAULT_PERFORMANCE_LEVEL,
+      GlobalConst.minConfirmations.toString(),
+    );
+    this.rpc.walletReopened();
+    await this.rpc.configure();
+    await this.refreshWallets();
+    return {
+      kind: 'failed',
+      message: Utils.humanizeChainTokens(message, this.state.translate),
+    };
+  };
+
+  /** A wallet just added: its name, server and backup state in its meta, then what opening it needs. */
+  prepareAdded = async (
+    added: WalletEntry,
+    source: NewWalletSource,
+    name: string,
+    server: ServerType,
+    draft: AddWalletDraft,
+    result: FfiResult<string>,
+  ): Promise<WalletOpen> => {
+    await updateWalletMeta(added.id, {
+      ...(name ? { name } : {}),
+      seedBackedUp: source.kind !== 'create',
+      seedBackedUpAt: 0,
+      viewOnlyNoticeDismissed: false,
+    });
+    await SettingsFileImpl.writeWalletServer(
+      added.id,
+      server,
+      draft.selectServer,
+    );
+    return finishWalletOpen(result, server.chainName);
+  };
+
+  /** Opens the wallet just added, with what it shows on arrival. */
+  enterAdded = (
+    params: LoadedAppNavigationState,
+    next: 'home' | 'backup',
+    notice: string,
+  ) => {
+    this.props.openWallet({ ...params, next, notice });
   };
 
   /**
@@ -2241,6 +2401,8 @@ export class LoadedAppClass extends Component<
       walletId: this.state.walletId,
       switchWallet: this.switchWallet,
       deleteWallet: this.deleteWallet,
+      addWallet: this.addWallet,
+      enterAdded: this.enterAdded,
       switching: this.state.switching,
       wallets: this.state.wallets,
       refreshWallets: this.refreshWallets,
