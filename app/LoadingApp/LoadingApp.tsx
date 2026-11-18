@@ -87,6 +87,7 @@ import {
   walletsOnDevice,
 } from '@app/walletBackend';
 import { finishWalletOpen } from '@app/services/openWallet';
+import { entryChain, entryServer } from '@app/services/recoveryImport';
 import { defaultWalletName } from '@screens/AddWallet/draftParts';
 import { isViewingKey } from '@app/utils/seedPhrase';
 import { AppTheme } from '@app/theme';
@@ -1589,32 +1590,6 @@ export class LoadingAppClass extends Component<
   dismissFound = () => this.setState({ foundDismissed: true });
 
   /**
-   * The server a saved wallet comes back on: the one its entry kept, or this
-   * server on its network, or that network's default.
-   */
-  recoveryServer = async (
-    entry: RecoveryEntry,
-    chain: ChainNameEnum,
-  ): Promise<{ server: ServerType; selectServer: SelectServerEnum }> => {
-    if (entry.server.kind === 'kept') {
-      const kept = await SettingsFileImpl.serverOf({
-        chain,
-        server: entry.server.server,
-        selectServer: entry.server.selectServer,
-      });
-      if (kept.server.chainName === chain) {
-        return kept;
-      }
-    }
-    return chain === this.state.server.chainName
-      ? { server: this.state.server, selectServer: this.state.selectServer }
-      : {
-          server: this.defaultServerForChain(chain),
-          selectServer: SelectServerEnum.auto,
-        };
-  };
-
-  /**
    * Imports every wallet a previous install left in the Keychain, each on
    * its own network with its name, colour and server, then opens the first.
    * A single-wallet entry is a Mainnet wallet. No name step: each keeps its
@@ -1636,9 +1611,11 @@ export class LoadingAppClass extends Component<
     const opened: { id: string; server: ServerType }[] = [];
     const failed: string[] = [];
     for (const entry of entries) {
-      const chain = (entry.chain ||
-        ChainNameEnum.mainChainName) as ChainNameEnum;
-      const { server, selectServer } = await this.recoveryServer(entry, chain);
+      const chain = entryChain(entry);
+      const { server, selectServer } = await entryServer(entry, chain, {
+        server: this.state.server,
+        selectServer: this.state.selectServer,
+      });
       const before = await walletsOnDevice();
       const known = new Set(
         before.ok ? before.value.wallets.map(w => w.id) : [],

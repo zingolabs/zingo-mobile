@@ -153,10 +153,18 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { publishReport } from '@app/services/reportDiagnostics';
 import { finishWalletOpen, WalletOpen } from '@app/services/openWallet';
+import { entryChain, entryServer } from '@app/services/recoveryImport';
+import {
+  RecoveryEntry,
+  retireImportedEntry,
+} from '@app/services/recoveryWalletInfo';
+import { defaultWalletName } from '@screens/AddWallet/draftParts';
 import { AddWalletDraft } from '@app/services/addWalletDraft';
 import { isViewingKey } from '@app/utils/seedPhrase';
 import type {
   AddWalletResult,
+  ImportFoundFailed,
+  ImportFoundResult,
   NewWalletSource,
 } from '@app/AppState/AppContextLoaded';
 import { forgetWallet } from '@app/services/WalletLocalData';
@@ -749,6 +757,7 @@ export class LoadedAppClass extends Component<
       deleteWallet: this.deleteWallet,
       addWallet: this.addWallet,
       enterAdded: this.enterAdded,
+      importFound: this.importFound,
       refreshWallets: this.refreshWallets,
       somePending: false,
       addressBook: props.addressBook,
@@ -2065,6 +2074,118 @@ export class LoadedAppClass extends Component<
     return finishWalletOpen(result, server.chainName);
   };
 
+  /**
+   * Imports the chosen wallets of a previous install beside the others, each
+   * on its own network and server with its name marked as imported, then
+   * opens the last one. Fails only when none could be added.
+   */
+  importFound = async (
+    entries: RecoveryEntry[],
+  ): Promise<ImportFoundResult> => {
+    const added: LoadedAppNavigationState[] = [];
+    let lastOpen = false;
+    let message = '';
+    for (const entry of entries) {
+      const chain = entryChain(entry);
+      const choice = await entryServer(entry, chain, {
+        server: this.state.server,
+        selectServer: this.state.selectServer,
+      });
+      const listed = await walletsOnDevice();
+      const names = listed.ok ? listed.value.wallets.map(w => w.meta.name) : [];
+      const name = (
+        this.state.translate('found.imported-name') as string
+      ).replace(
+        '{name}',
+        entry.name || defaultWalletName(this.state.translate, names),
+      );
+      const result = await this.addWallet(
+        {
+          kind: 'restore',
+          text: entry.seed || entry.ufvk || '',
+          birthday: entry.birthday,
+        },
+        name,
+        { ...choice, keyChain: { kind: 'none' } },
+      );
+      lastOpen = result.kind === 'added';
+      if (result.kind === 'failed') {
+        message = result.message;
+        continue;
+      }
+      if (entry.category) {
+        await updateWalletMeta(result.params.walletId, {
+          category: entry.category,
+        });
+      }
+      await retireImportedEntry(entry);
+      added.push(result.params);
+    }
+    const last = added[added.length - 1];
+    if (!last) {
+      return { kind: 'failed', message };
+    }
+    const opened = lastOpen
+      ? { kind: 'reopened' as const, params: last }
+      : await this.reopenAdded(last);
+    if (opened.kind === 'failed') {
+      return opened;
+    }
+    await this.enterAdded(
+      opened.params,
+      'home',
+      added.length === 1
+        ? (this.state.translate('found.imported-one') as string)
+        : (this.state.translate('found.imported') as string).replace(
+            '{n}',
+            String(added.length),
+          ),
+    );
+    return { kind: 'imported' };
+  };
+
+  /** Opens again a wallet added earlier in an import, after a later one failed and left the first wallet open. */
+  reopenAdded = async (
+    last: LoadedAppNavigationState,
+  ): Promise<
+    { kind: 'reopened'; params: LoadedAppNavigationState } | ImportFoundFailed
+  > => {
+    const listed = await walletsOnDevice();
+    const entry = listed.ok
+      ? listed.value.wallets.find(w => w.id === last.walletId)
+      : undefined;
+    if (!entry) {
+      return { kind: 'failed', message: '' };
+    }
+    await this.rpc.stopSyncProcess(SWITCH_STOP_WAIT_MS);
+    await doSave();
+    await this.rpc.clearTimers();
+    const { server } = await SettingsFileImpl.serverOf(entry.meta);
+    const opened = await finishWalletOpen(
+      await loadWallet(
+        entry.id,
+        nativeUri(server),
+        server.chainName,
+        DEFAULT_PERFORMANCE_LEVEL,
+        GlobalConst.minConfirmations.toString(),
+      ),
+      server.chainName,
+    );
+    return opened.kind === 'opened'
+      ? {
+          kind: 'reopened',
+          params: {
+            ...last,
+            readOnly: opened.readOnly,
+            orchardPool: opened.orchardPool,
+            saplingPool: opened.saplingPool,
+            transparentPool: opened.transparentPool,
+            walletChainName: opened.walletChainName,
+          },
+        }
+      : { kind: 'failed', message: opened.error.message };
+  };
+
   /** Opens the wallet just added on the screen the add flow started from, with what it shows on arrival. */
   enterAdded = async (
     params: LoadedAppNavigationState,
@@ -2078,7 +2199,12 @@ export class LoadedAppClass extends Component<
     if (added) {
       await this.leaveHandoffFor(added, false);
     }
-    popRoutes([Route.AddWallet, Route.NewWallet, Route.RestoreWallet]);
+    popRoutes([
+      Route.AddWallet,
+      Route.NewWallet,
+      Route.RestoreWallet,
+      Route.FoundWallets,
+    ]);
     this.props.openWallet({ ...params, next, notice });
   };
 
@@ -2331,6 +2457,7 @@ export class LoadedAppClass extends Component<
       deleteWallet: this.deleteWallet,
       addWallet: this.addWallet,
       enterAdded: this.enterAdded,
+      importFound: this.importFound,
       switching: this.state.switching,
       wallets: this.state.wallets,
       refreshWallets: this.refreshWallets,

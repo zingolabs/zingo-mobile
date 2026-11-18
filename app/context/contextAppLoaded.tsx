@@ -82,6 +82,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   deleteWallet: async () => {},
   addWallet: async () => ({ kind: 'failed', message: '' }),
   enterAdded: async () => {},
+  importFound: async () => ({ kind: 'failed', message: '' }),
   switching: { kind: 'none' },
   wallets: [],
   refreshWallets: async () => {},

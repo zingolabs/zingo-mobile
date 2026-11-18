@@ -150,6 +150,23 @@ test('Tests that the entries list every wallet in order with the single-wallet e
   ]);
 });
 
+test('Tests that the entries leave out the wallets on the device when a previous install left others', async () => {
+  onDevice({ id: 'here' });
+  store.set(serviceOf('here'), JSON.stringify({ seed: 'h', order: 1 }));
+  store.set(serviceOf('gone'), JSON.stringify({ seed: 'g', order: 1 }));
+
+  const entries = await recoveryEntriesOnDevice();
+
+  expect(entries.map(e => e.walletId)).toEqual(['gone']);
+});
+
+test('Tests that the single-wallet entry is left out when a migrated wallet holds it', async () => {
+  onDevice({ id: 'w1', migratedFrom: 'fp' });
+  store.set(LEGACY, JSON.stringify({ seed: 'legacy' }));
+
+  expect(await recoveryEntriesOnDevice()).toEqual([]);
+});
+
 test('Tests that a deleted wallet’s entry goes when other wallets remain', async () => {
   onDevice({ id: 'w1' }, { id: 'w2' });
   store.set(serviceOf('w2'), JSON.stringify({ seed: 'b' }));

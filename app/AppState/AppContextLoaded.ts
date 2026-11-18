@@ -30,6 +30,7 @@ import type {
 import { SetServerResult } from './types/SetServerResult';
 import type { WalletEntry } from '@app/walletBackend/utils/walletStore';
 import type { AddWalletDraft } from '@app/services/addWalletDraft';
+import type { RecoveryEntry } from '@app/services/recoveryWalletInfo';
 import type { LoadedAppNavigationState } from '@app/types/NavigationTypes';
 
 /** What a wallet being added is made from. */
@@ -39,6 +40,10 @@ export type NewWalletSource =
 export type AddWalletResult =
   | { kind: 'added'; name: string; params: LoadedAppNavigationState }
   | { kind: 'failed'; message: string };
+
+export type ImportFoundFailed = { kind: 'failed'; message: string };
+
+export type ImportFoundResult = { kind: 'imported' } | ImportFoundFailed;
 
 export type WalletSwitch =
   { kind: 'none' } | { kind: 'opening'; wallet: WalletEntry };
@@ -161,6 +166,8 @@ export default interface AppContextLoaded {
     next: 'home' | 'backup',
     notice: string,
   ) => Promise<void>;
+  /** Imports wallets a previous install left in the Keychain and opens the last one. */
+  importFound: (entries: RecoveryEntry[]) => Promise<ImportFoundResult>;
   /** Deletes a wallet; the open one hands over to the first wallet left. */
   deleteWallet: (entry: WalletEntry) => Promise<void>;
   /** Reads the wallets again, after one is renamed or deleted. */
