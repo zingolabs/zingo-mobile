@@ -1176,7 +1176,7 @@
     "chip-wallet": "Carteira",
     "chip-server": "Servidor",
     "more": "Mais opções",
-    "more-warn": "Estas opções substituem a carteira {net} deste telefone. Você não precisa delas para resolver isto.",
+    "more-warn": "Elas adicionam uma carteira ao lado da de {net} neste telefone. Você não precisa delas para resolver isto.",
     "more-import": "Importar outra carteira",
     "more-create": "Criar nova carteira",
     "open-title": "O Zingo não conseguiu abrir sua carteira",
@@ -1192,12 +1192,7 @@
   },
   "deletesheet": {
     "title": "Excluir a carteira deste dispositivo?",
-    "import-sub": "Importar uma carteira exclui a atual deste dispositivo.",
-    "create-sub": "Criar uma nova carteira exclui a atual deste dispositivo.",
-    "replace-title": "Substituir a carteira salva?",
-    "replace-sub": "Criar uma nova carteira exclui a que está salva neste dispositivo.",
     "hold": "Segure para excluir",
-    "hold-replace": "Segure para substituir",
     "keep-holding": "Continue segurando para excluir"
   },
   "server": {

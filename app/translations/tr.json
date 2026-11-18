@@ -1176,7 +1176,7 @@
     "chip-wallet": "Cüzdan",
     "chip-server": "Sunucu",
     "more": "Diğer seçenekler",
-    "more-warn": "Bunlar bu telefondaki {net} cüzdanının yerine geçer. Bunu düzeltmek için gerekmezler.",
+    "more-warn": "Bunlar bu telefondaki {net} cüzdanının yanına bir cüzdan ekler. Bunu düzeltmek için gerekmezler.",
     "more-import": "Başka bir cüzdan içe aktar",
     "more-create": "Yeni cüzdan oluştur",
     "open-title": "Zingo cüzdanınızı açamadı",
@@ -1192,12 +1192,7 @@
   },
   "deletesheet": {
     "title": "Bu cihazdaki cüzdan silinsin mi?",
-    "import-sub": "Bir cüzdan içe aktarmak bu cihazdaki mevcut cüzdanı siler.",
-    "create-sub": "Yeni bir cüzdan oluşturmak bu cihazdaki mevcut cüzdanı siler.",
-    "replace-title": "Kayıtlı cüzdan değiştirilsin mi?",
-    "replace-sub": "Yeni bir cüzdan oluşturmak bu cihazda kayıtlı olanı siler.",
     "hold": "Silmek için basılı tutun",
-    "hold-replace": "Değiştirmek için basılı tutun",
     "keep-holding": "Silmek için basılı tutmaya devam edin"
   },
   "server": {

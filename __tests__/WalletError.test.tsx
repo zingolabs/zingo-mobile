@@ -114,13 +114,13 @@ test('Tests that a wallet on another network names both networks and offers to s
   expect(h.onRetry).not.toHaveBeenCalled();
 });
 
-test('Tests that More options holds Import and Create behind a warning that they replace the wallet', () => {
+test('Tests that More options holds Import and Create behind a note that they add a wallet beside this one', () => {
   const confirms: ConfirmOptions[] = [];
   registerConfirmListener(options => confirms.push(options));
   const h = mountChain();
   fireEvent.press(screen.getByTestId('walleterror.more'));
-  expect(confirms[0].messageTone).toBe('danger');
-  expect(confirms[0].message).toContain('replace the Mainnet wallet');
+  expect(confirms[0].messageTone).toBeUndefined();
+  expect(confirms[0].message).toContain('beside the Mainnet one');
   confirms[0].buttons[0].onPress?.();
   confirms[0].buttons[1].onPress?.();
   expect(h.onImport).toHaveBeenCalledTimes(1);

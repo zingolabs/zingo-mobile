@@ -125,17 +125,7 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
       transform: [{ scale: pulse.value }],
     }));
 
-    const sub =
-      typeof context === 'object'
-        ? context.sub
-        : (translate(
-            context === 'import'
-              ? 'deletesheet.import-sub'
-              : context === 'create'
-                ? 'deletesheet.create-sub'
-                : 'deletesheet.replace-sub',
-          ) as string);
-    const warning = typeof context === 'object' ? context.warning : '';
+    const { sub, warning } = context;
 
     return (
       <AppSheetModal ref={ref} onDismiss={reset}>
@@ -164,13 +154,7 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
             variant="bodyStrong"
             style={{ marginTop: space16, textAlign: 'center' }}
           >
-            {
-              translate(
-                context === 'replace'
-                  ? 'deletesheet.replace-title'
-                  : 'deletesheet.title',
-              ) as string
-            }
+            {translate('deletesheet.title') as string}
           </Text>
           <Text
             variant="caption"
@@ -217,13 +201,7 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
                 ]}
               />
               <Text variant="button">
-                {
-                  translate(
-                    context === 'replace'
-                      ? 'deletesheet.hold-replace'
-                      : 'deletesheet.hold',
-                  ) as string
-                }
+                {translate('deletesheet.hold') as string}
               </Text>
             </Pressable>
           </Animated.View>

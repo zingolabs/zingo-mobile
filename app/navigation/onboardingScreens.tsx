@@ -72,8 +72,8 @@ export function OpenErrorScreen() {
     retrying,
     errorShake,
     retryOpenWallet,
-    deleteThenImport,
-    deleteThenCreate,
+    getwalletToRestore,
+    createNewWallet,
     openServer,
     switchToWalletChain,
   } = useContext(ContextAppLoading);
@@ -89,8 +89,8 @@ export function OpenErrorScreen() {
       busy={retrying}
       shake={errorShake}
       onRetry={retryOpenWallet}
-      onImport={deleteThenImport}
-      onCreate={deleteThenCreate}
+      onImport={getwalletToRestore}
+      onCreate={createNewWallet}
       onServer={() => openServer(walletError.walletChain)}
       onSwitchChain={switchToWalletChain}
     />

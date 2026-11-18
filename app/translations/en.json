@@ -1176,7 +1176,7 @@
     "chip-wallet": "Wallet",
     "chip-server": "Server",
     "more": "More options",
-    "more-warn": "These replace the {net} wallet on this phone. You don't need them to fix this.",
+    "more-warn": "These add a wallet beside the {net} one on this phone. You don’t need them to fix this.",
     "more-import": "Import another wallet",
     "more-create": "Create new wallet",
     "open-title": "Zingo couldn't open your wallet",
@@ -1192,12 +1192,7 @@
   },
   "deletesheet": {
     "title": "Delete the wallet on this device?",
-    "import-sub": "Importing a wallet deletes the current one from this device.",
-    "create-sub": "Creating a new wallet deletes the current one from this device.",
-    "replace-title": "Replace the saved wallet?",
-    "replace-sub": "Creating a new wallet deletes the one saved on this device.",
     "hold": "Hold to delete",
-    "hold-replace": "Hold to replace",
     "keep-holding": "Keep holding to delete"
   },
   "server": {

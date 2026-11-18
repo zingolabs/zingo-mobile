@@ -21,7 +21,6 @@ import {
   focusedStackRouteNames,
   goBack,
   navigateOnboarding,
-  restartOnboarding,
   returnTo,
 } from '@app/navigation/navigate';
 import NetInfo, {
@@ -41,7 +40,6 @@ import { viewingKeyChain } from '@app/utils/seedPhrase';
 
 import {
   createNewWallet,
-  deleteExistingWallet,
   getVersionInfo,
   readWalletKind,
   hasRepairableWalletFile,
@@ -49,7 +47,6 @@ import {
   readWalletChain,
   repairDoubleWrappedWallet,
   repairSucceeded,
-  resolvedTrue,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,
   walletExists as rpcWalletExists,
@@ -123,8 +120,6 @@ import {
 
 // no lazy load because slowing down screens.
 import SeedSheet from '@ui/widgets/SeedSheet';
-import DeleteWalletSheet from '@ui/widgets/DeleteWalletSheet';
-import { DeleteWalletContext } from '@app/wallet/types';
 import { walletErrorKind } from './walletErrorKind';
 import { sanitizePaths } from '@app/utils/sanitizePaths';
 import { duration as motionDuration } from '@app/theme/motion';
@@ -138,7 +133,6 @@ import {
   OnboardingRoute,
 } from '@app/types';
 import { publishReport, reportState } from '@app/services/reportDiagnostics';
-import { forgetWalletOnFile } from '@app/services/WalletLocalData';
 
 const en = require('@app/translations/en.json');
 const es = require('@app/translations/es.json');
@@ -384,9 +378,6 @@ export class LoadingAppClass extends Component<
   appstate?: NativeEventSubscription;
   unsubscribeNetInfo?: NetInfoSubscription;
   seedSheetRef = React.createRef<BottomSheetModal>();
-  deleteSheetRef = React.createRef<BottomSheetModal>();
-  // Runs once the hold completes; set with the sheet's context.
-  afterDelete: () => void = () => {};
   retryStartedAt = 0;
 
   constructor(props: LoadingAppClassProps) {
@@ -435,7 +426,6 @@ export class LoadingAppClass extends Component<
       walletError: null,
       retrying: false,
       errorShake: 0,
-      deleteContext: 'import',
       serverStatus: 'ok',
       serverBlockHeight: '',
       serverLatencies: {},
@@ -997,51 +987,6 @@ export class LoadingAppClass extends Component<
     await this.loadExistingWalletOnBoot();
   };
 
-  // The sheet's hold runs `next` after the wallet file is gone; replacing a
-  // Keychain phrase has nothing to delete first.
-  confirmDelete = (context: DeleteWalletContext, next: () => void) => {
-    this.afterDelete = async () => {
-      if (context !== 'replace') {
-        // No wallet is open here, so the data goes by the pointer to the
-        // wallet on file; if it cannot, the file stays too.
-        const forgotten = await forgetWalletOnFile().then(
-          () => true,
-          e => {
-            console.log(`confirmDelete: forgetting the wallet failed: ${e}`);
-            return false;
-          },
-        );
-        const deleted = forgotten && resolvedTrue(await deleteExistingWallet());
-        if (!deleted) {
-          this.addLastSnackbar(
-            this.state.translate('rpc.deletewallet-error') as string,
-          );
-          return;
-        }
-        this.setState({ walletExists: false, walletError: null });
-        restartOnboarding();
-      }
-      next();
-    };
-    this.setState({ deleteContext: context }, () =>
-      this.deleteSheetRef.current?.present(),
-    );
-  };
-
-  deleteThenImport = () =>
-    this.confirmDelete('import', this.getwalletToRestore);
-
-  deleteThenCreate = () => this.confirmDelete('create', this.createNewWallet);
-
-  createNewWalletChecked = () => {
-    if (this.state.walletExists) {
-      this.confirmDelete('create', this.createNewWallet);
-    } else if (this.state.recoveryWallet) {
-      this.confirmDelete('replace', this.createNewWallet);
-    } else {
-      this.createNewWallet();
-    }
-  };
 
   fetchBackgroundSyncInfo = async () => {
     const backgroundSyncInfoJson: BackgroundType =
@@ -1755,11 +1700,9 @@ export class LoadingAppClass extends Component<
       closeServer: this.closeServer,
       stepBack: this.onHardwareBack,
       openCurrentWallet: this.openCurrentWallet,
-      createNewWallet: this.createNewWalletChecked,
+      createNewWallet: this.createNewWallet,
       getwalletToRestore: this.getwalletToRestore,
       retryOpenWallet: this.retryOpenWallet,
-      deleteThenImport: this.deleteThenImport,
-      deleteThenCreate: this.deleteThenCreate,
       switchToWalletChain: this.switchToWalletChain,
       chooseAutomatic: this.chooseAutomatic,
       pickServer: this.pickServer,
@@ -1783,18 +1726,6 @@ export class LoadingAppClass extends Component<
                 ref={this.seedSheetRef}
                 wallet={this.state.recoveryWallet}
                 translate={translate}
-              />
-              <DeleteWalletSheet
-                ref={this.deleteSheetRef}
-                context={this.state.deleteContext}
-                translate={translate}
-                onConfirmed={() => this.afterDelete()}
-                onReleasedEarly={() =>
-                  this.addLastSnackbar(
-                    translate('deletesheet.keep-holding') as string,
-                    SnackbarDurationEnum.short,
-                  )
-                }
               />
             </BottomSheetModalProvider>
           </GestureHandlerRootView>

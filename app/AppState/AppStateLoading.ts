@@ -3,7 +3,6 @@ import { LaunchingModeEnum } from './enums/LaunchingModeEnum';
 import type { WalletType } from '@app/wallet/types';
 import { GateFailure } from './types/GateFailure';
 import type { WalletErrorInfo } from '@app/wallet/types';
-import type { DeleteWalletContext } from '@app/wallet/types';
 import { ServerStatus } from './types/ServerStatus';
 import ServerUrisType from './types/ServerUrisType';
 
@@ -27,7 +26,6 @@ export default interface AppStateLoading {
   walletError: WalletErrorInfo | null;
   retrying: boolean;
   errorShake: number;
-  deleteContext: DeleteWalletContext;
   serverStatus: ServerStatus;
   serverBlockHeight: string;
   // uri → latency in ms, null when the server did not answer the probe.

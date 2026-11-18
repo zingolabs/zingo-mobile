@@ -251,7 +251,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
     : (translate('walleterror.open') as string);
 
   // Import and Create are not needed to fix a network mismatch; they wait in
-  // a sheet that says they replace this wallet.
+  // a sheet that says they add a wallet beside this one.
   const moreOptions = () =>
     chain &&
     showConfirm({
@@ -260,16 +260,13 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         '{net}',
         netName(chain),
       ),
-      messageTone: 'danger',
       buttons: [
         {
           text: translate('walleterror.more-import') as string,
-          style: 'destructive',
           onPress: onImport,
         },
         {
           text: translate('walleterror.more-create') as string,
-          style: 'destructive',
           onPress: onCreate,
         },
         { text: translate('cancel') as string, style: 'cancel' },

@@ -147,7 +147,6 @@ export default function WalletsSheet() {
     setDeleting({
       wallet,
       context: {
-        kind: 'wallet',
         sub: sub.replace('{name}', name),
         warning: swapping
           ? t('wallets.delete-swap').replace('{name}', name)
@@ -269,7 +268,7 @@ export default function WalletsSheet() {
 
       <DeleteWalletSheet
         ref={deleteRef}
-        context={deleting?.context ?? 'replace'}
+        context={deleting?.context ?? { sub: '', warning: '' }}
         translate={translate}
         onConfirmed={() => {
           if (deleting) {

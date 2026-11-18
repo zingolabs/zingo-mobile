@@ -82,8 +82,6 @@ export interface OnboardingContext {
   getwalletToRestore: () => void;
   retryOpenWallet: () => void;
   // The hold-to-delete sheet, then the import or the create.
-  deleteThenImport: () => void;
-  deleteThenCreate: () => void;
   switchToWalletChain: (chain: ChainNameEnum) => void;
   chooseAutomatic: (chain: ChainNameEnum) => Promise<void>;
   pickServer: (server: ServerUrisType) => Promise<void>;
