@@ -9,6 +9,7 @@ import {
 import {
   activeWalletEntry,
   walletsOnDevice,
+  WalletServerWire,
 } from '@app/walletBackend/utils/walletStore';
 
 const service = GlobalConst.serviceKeyChain;
@@ -50,6 +51,11 @@ const optionsFor = (svc: string) => ({
   get: buildGetOptions(svc, 'SILENT_SECURE'),
 });
 
+/** The server an entry kept, absent from single-wallet entries and from those saved before it was kept. */
+export type RecoveryServer =
+  | { kind: 'none' }
+  | { kind: 'kept'; server: WalletServerWire; selectServer: string };
+
 /** What an entry holds: the keys and what the wallet looked like on the device. */
 export type RecoveryEntry = WalletType & {
   walletId: string;
@@ -57,6 +63,7 @@ export type RecoveryEntry = WalletType & {
   chain: string;
   category: number;
   order: number;
+  server: RecoveryServer;
 };
 
 // The raw stored password, or '' when there is none or it can't be read.
@@ -124,7 +131,12 @@ const removeEntry = async (svc: string): Promise<void> => {
  * hold the phrase without one. Throws when the entry is not JSON.
  */
 const parseEntry = (walletId: string, password: string): RecoveryEntry => {
-  const saved: Partial<RecoveryEntry> = password ? JSON.parse(password) : {};
+  const saved: Partial<
+    Omit<RecoveryEntry, 'server'> & {
+      server: WalletServerWire;
+      selectServer: string;
+    }
+  > = password ? JSON.parse(password) : {};
   return {
     seed: saved.seed,
     ufvk: saved.ufvk,
@@ -134,6 +146,14 @@ const parseEntry = (walletId: string, password: string): RecoveryEntry => {
     chain: defaultTo(saved.chain, ''),
     category: defaultTo(saved.category, 0),
     order: defaultTo(saved.order, 0),
+    server:
+      saved.server && saved.selectServer
+        ? {
+            kind: 'kept',
+            server: saved.server,
+            selectServer: saved.selectServer,
+          }
+        : { kind: 'none' },
   };
 };
 
@@ -187,6 +207,8 @@ export const saveRecoveryWalletInfo = async (
       name: meta.name,
       category: defaultTo(meta.category, 0),
       order: meta.order,
+      server: meta.server,
+      selectServer: meta.selectServer,
     });
     const error = await writeEntry(svc, password);
     if ((await readEntry(svc)) === password) {

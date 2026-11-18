@@ -9,15 +9,12 @@ import {
   ChainNameEnum,
   LanguageEnum,
   LaunchingModeEnum,
-  Route,
   SelectServerEnum,
 } from '@app/AppState';
 import { remoteServer } from '@app/AppState/types/ServerType';
 import RPCModule from '@app/RPCModule';
-import {
-  ConfirmOptions,
-  registerConfirmListener,
-} from '@app/services/showConfirm';
+import { registerConfirmListener } from '@app/services/showConfirm';
+import type { RecoveryEntry } from '@app/services/recoveryWalletInfo';
 
 jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
@@ -68,52 +65,70 @@ afterEach(() => {
   registerConfirmListener(null);
 });
 
-test('Tests that a saved phrase born past the network tip warns instead of restoring', async () => {
-  const confirms: ConfirmOptions[] = [];
-  registerConfirmListener(options => confirms.push(options));
-  const { app, doRestore } = appWithSaved(3700000);
-
-  await app.importRecoveryWallet(Route.Welcome);
-
-  expect(doRestore).not.toHaveBeenCalled();
-  expect(confirms[0].title).toBe('loadingapp.saved-wallet-net-title');
+const entry = (over: Partial<RecoveryEntry>): RecoveryEntry => ({
+  seed: 'abandon ability able',
+  birthday: 2900000,
+  walletId: '',
+  name: '',
+  chain: '',
+  category: 0,
+  order: 0,
+  server: { kind: 'none' },
+  ...over,
 });
 
-test('Tests that a saved phrase born before the network tip restores', async () => {
-  const { app, doRestore } = appWithSaved(2900000);
+const restoredWith = async (app: LoadingAppClass, saved: RecoveryEntry) => {
+  app.state = { ...app.state, recoveryEntries: [saved] };
+  jest.spyOn(app, 'setState').mockImplementation(() => {});
+  const restore = jest.mocked(RPCModule.restoreWalletFromSeed);
+  restore.mockRejectedValue(new Error('stop here'));
+  await app.importAllRecovery();
+  return restore.mock.calls[0];
+};
 
-  await app.importRecoveryWallet(Route.Welcome);
+test('Tests that a single-wallet entry restores on Mainnet when the start menu is on Testnet. Those entries predate networks and were all Mainnet.', async () => {
+  const { app } = appWithSaved(2900000);
+  app.state = {
+    ...app.state,
+    server: remoteServer(
+      'https://testnet.example:443',
+      ChainNameEnum.testChainName,
+    ),
+  };
 
-  expect(doRestore).toHaveBeenCalledWith(
-    'abandon ability able',
-    2900000,
-    expect.anything(),
+  const call = await restoredWith(app, entry({}));
+
+  expect(call).toEqual(expect.arrayContaining([ChainNameEnum.mainChainName]));
+  expect(call).not.toEqual(
+    expect.arrayContaining(['https://testnet.example:443']),
   );
 });
 
-test('Tests that a saved viewing key of another network offers a server of its network instead of restoring', async () => {
-  const confirms: ConfirmOptions[] = [];
-  registerConfirmListener(options => confirms.push(options));
-  const { app, doRestore } = appWithSaved(2900000, { ufvk: 'uviewtest1qqqq' });
-  const openServer = jest.spyOn(app, 'openServer').mockImplementation(() => {});
+test('Tests that a wallet entry restores on its own network with the server it kept', async () => {
+  const { app } = appWithSaved(2900000);
 
-  await app.importRecoveryWallet(Route.Welcome);
+  const call = await restoredWith(
+    app,
+    entry({
+      walletId: 'w1',
+      name: 'Savings',
+      chain: ChainNameEnum.testChainName,
+      server: {
+        kind: 'kept',
+        server: {
+          uri: 'https://kept.testnet:443',
+          chainName: ChainNameEnum.testChainName,
+        },
+        selectServer: SelectServerEnum.custom,
+      },
+    }),
+  );
 
-  expect(doRestore).not.toHaveBeenCalled();
-  expect(confirms[0].message).toBe('loadingapp.saved-key-net-body');
-  confirms[0].buttons[0].onPress?.();
-  expect(openServer).toHaveBeenCalledWith(ChainNameEnum.testChainName);
-});
-
-test('Tests that a saved viewing key of the server network restores', async () => {
-  const { app, doRestore } = appWithSaved(2900000, { ufvk: 'uview1qqqq' });
-
-  await app.importRecoveryWallet(Route.Welcome);
-
-  expect(doRestore).toHaveBeenCalledWith(
-    'uview1qqqq',
-    2900000,
-    expect.anything(),
+  expect(call).toEqual(
+    expect.arrayContaining([
+      'https://kept.testnet:443',
+      ChainNameEnum.testChainName,
+    ]),
   );
 });
 

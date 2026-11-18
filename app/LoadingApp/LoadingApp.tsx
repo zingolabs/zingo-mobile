@@ -36,7 +36,6 @@ import {
 import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
 import { showConfirm } from '@app/services/showConfirm';
-import { viewingKeyChain } from '@app/utils/seedPhrase';
 
 import {
   createNewWallet,
@@ -100,7 +99,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '@app/services/createAlert';
 import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
 import Utils from '@app/utils';
-import { formatInteger } from '@app/utils/formatAmount';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '@ui/widgets/toastConfig';
 import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
@@ -124,6 +122,7 @@ import { defaultTo, isEqual } from 'lodash';
 import {
   createUpdateRecoveryWalletInfo,
   recoveryEntriesOnDevice,
+  RecoveryEntry,
   retireImportedEntry,
 } from '@app/services/recoveryWalletInfo';
 
@@ -1604,78 +1603,48 @@ export class LoadingAppClass extends Component<
     });
   };
 
-  // Importing the stored recovery info asks first, as viewing it does: the
-  // start gate does not cover it when there is no wallet file.
-  importRecoveryWallet = async (origin: OnboardingRoute) => {
-    const wallet = this.state.recoveryWallet;
-    if (!wallet) {
-      return;
-    }
-    const { server, translate } = this.state;
-    const netName = (chain: ChainNameEnum) =>
-      translate(`settings.value-chainname-${chain}`) as string;
-    // A saved viewing key names its network in its prefix: one for another
-    // network offers a server of its own, not an "invalid key" to fix.
-    const keyChain = wallet.ufvk ? viewingKeyChain(wallet.ufvk) : null;
-    if (keyChain && server.kind === 'remote' && keyChain !== server.chainName) {
-      showConfirm({
-        title: translate('loadingapp.saved-wallet-net-title') as string,
-        message: (translate('loadingapp.saved-key-net-body') as string)
-          .replace(/\{keynet\}/g, netName(keyChain))
-          .replace('{net}', netName(server.chainName)),
-        buttons: [
-          {
-            text: translate('loadingapp.saved-wallet-net-server') as string,
-            onPress: () => this.openServer(keyChain),
-          },
-          { text: translate('cancel') as string, style: 'cancel' },
-        ],
+  /** The card of one saved wallet imports it as the card of several does. */
+  importRecoveryWallet = async () => this.importAllRecovery();
+
+  /**
+   * The server a saved wallet comes back on: the one its entry kept, or this
+   * server on its network, or that network's default.
+   */
+  recoveryServer = async (
+    entry: RecoveryEntry,
+    chain: ChainNameEnum,
+  ): Promise<{ server: ServerType; selectServer: SelectServerEnum }> => {
+    if (entry.server.kind === 'kept') {
+      const kept = await SettingsFileImpl.serverOf({
+        chain,
+        server: entry.server.server,
+        selectServer: entry.server.selectServer,
       });
-      return;
-    }
-    // A saved seed phrase carries no network. A birthday past this
-    // network's tip means it was made on another one: say so instead of
-    // handing zingolib a height its server has not reached.
-    if (server.kind === 'remote' && this.state.netInfo.isConnected) {
-      const { height } = await probeUri(server.uri);
-      const tip = Number(height);
-      if (tip > 0 && wallet.birthday > tip) {
-        showConfirm({
-          title: translate('loadingapp.saved-wallet-net-title') as string,
-          message: (translate('loadingapp.saved-wallet-net-body') as string)
-            .replace('{birthday}', formatInteger(wallet.birthday))
-            .replace('{tip}', formatInteger(tip))
-            .replace('{net}', netName(server.chainName)),
-          buttons: [
-            {
-              text: translate('loadingapp.saved-wallet-net-server') as string,
-              onPress: () => this.openServer(),
-            },
-            { text: translate('cancel') as string, style: 'cancel' },
-          ],
-        });
-        return;
+      if (kept.server.chainName === chain) {
+        return kept;
       }
     }
-    const answer = await askGate({ translate: this.state.translate });
-    if (answer.kind === 'declined') {
-      return;
-    }
-    await this.doRestore(
-      wallet.seed || wallet.ufvk || '',
-      wallet.birthday,
-      origin,
-    );
+    return chain === this.state.server.chainName
+      ? { server: this.state.server, selectServer: this.state.selectServer }
+      : {
+          server: this.defaultServerForChain(chain),
+          selectServer: SelectServerEnum.auto,
+        };
   };
 
   /**
    * Imports every wallet a previous install left in the Keychain, each on
-   * its own network with its name and colour, then opens the first. No name
-   * step: the names come from the entries.
+   * its own network with its name, colour and server, then opens the first.
+   * A single-wallet entry is a Mainnet wallet. No name step: the names come
+   * from the entries.
    */
   importAllRecovery = async () => {
     const entries = this.state.recoveryEntries;
     if (entries.length === 0) {
+      return;
+    }
+    const answer = await askGate({ translate: this.state.translate });
+    if (answer.kind === 'declined') {
       return;
     }
     this.setState({ actionButtonsDisabled: true });
@@ -1684,11 +1653,8 @@ export class LoadingAppClass extends Component<
     const failed: string[] = [];
     for (const entry of entries) {
       const chain = (entry.chain ||
-        this.state.server.chainName) as ChainNameEnum;
-      const sameChain = chain === this.state.server.chainName;
-      const server = sameChain
-        ? this.state.server
-        : this.defaultServerForChain(chain);
+        ChainNameEnum.mainChainName) as ChainNameEnum;
+      const { server, selectServer } = await this.recoveryServer(entry, chain);
       const before = await walletsOnDevice();
       const known = new Set(
         before.ok ? before.value.wallets.map(w => w.id) : [],
@@ -1727,11 +1693,7 @@ export class LoadingAppClass extends Component<
         seedBackedUpAt: 0,
         viewOnlyNoticeDismissed: false,
       });
-      await SettingsFileImpl.writeWalletServer(
-        added.id,
-        server,
-        sameChain ? this.state.selectServer : SelectServerEnum.auto,
-      );
+      await SettingsFileImpl.writeWalletServer(added.id, server, selectServer);
       await createUpdateRecoveryWalletInfo(await fetchWallet(!entry.seed));
       await retireImportedEntry(entry);
       opened.push({ id: added.id, server });

@@ -9,7 +9,6 @@ import {
   ChainNameEnum,
   LanguageEnum,
   LaunchingModeEnum,
-  Route,
   SelectServerEnum,
 } from '@app/AppState';
 import { remoteServer } from '@app/AppState/types/ServerType';
@@ -84,24 +83,34 @@ describe('LoadingApp start gate', () => {
     const app = bootApp();
     app.state = {
       ...app.state,
-      recoveryWallet: {
-        seed: 'abandon '.repeat(24).trim(),
-        ufvk: '',
-        birthday: 1,
-      },
+      recoveryEntries: [
+        {
+          seed: 'abandon '.repeat(24).trim(),
+          ufvk: '',
+          birthday: 1,
+          walletId: '',
+          name: '',
+          chain: '',
+          category: 0,
+          order: 0,
+          server: { kind: 'none' },
+        },
+      ],
     };
-    const restore = jest.spyOn(app, 'doRestore').mockResolvedValue(undefined);
+    jest.spyOn(app, 'setState').mockImplementation(() => {});
+    const restore = jest.mocked(RPCModule.restoreWalletFromSeed);
+    restore.mockRejectedValue(new Error('stop here'));
     (askGate as jest.Mock).mockResolvedValueOnce({
       kind: 'declined',
       failure: { errorKey: 'biometrics-failure-declined' },
     });
 
-    await app.importRecoveryWallet(Route.Welcome);
+    await app.importRecoveryWallet();
 
     expect(askGate).toHaveBeenCalledTimes(1);
     expect(restore).not.toHaveBeenCalled();
 
-    await app.importRecoveryWallet(Route.Welcome);
+    await app.importRecoveryWallet();
 
     expect(restore).toHaveBeenCalledTimes(1);
   });

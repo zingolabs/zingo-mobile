@@ -83,6 +83,7 @@ test('Tests that several saved wallets show one card that imports them all, with
     birthday: 1994579,
     chain: 'main',
     category: 2,
+    server: { kind: 'none' } as const,
   });
   render(
     <ContextAppLoadingProvider
