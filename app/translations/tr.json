@@ -159,23 +159,12 @@
     "welcome": "Hoş geldiniz",
     "tagline": "Zcash için özel bir cüzdan.",
     "creating-title": "Cüzdanınız oluşturuluyor",
-    "previous-install-title": "Önceki kurulumdan cüzdan",
-    "saved-wallet-title": "Bu cihazda kayıtlı cüzdan",
-    "previous-install-body": "Zingo bu cihazda kayıtlı bir kurtarma ifadesi buldu.",
-    "previous-installs-title": "Önceki kurulumdan cüzdanlar",
-    "previous-installs-body": "Önceki kurulumdan {n} cüzdanı içe aktar.",
-    "import-all": "{n} cüzdanı içe aktar",
     "net-testnet": "Testnet",
     "net-regtest": "Regtest",
     "connected-to": "{host} sunucusuna bağlı",
     "no-internet": "İnternet bağlantısı yok",
     "back-online": "Yeniden çevrimiçi",
     "offline-line": "Şimdi bir cüzdan oluşturabilir veya içe aktarabilirsiniz; çevrimiçi olduğunuzda eşitlenir.",
-    "card-words": "24 kelime",
-    "card-key": "Görüntüleme anahtarı",
-    "card-birthday": "Doğum günü · blok {height}",
-    "import-this": "Bu cüzdanı içe aktar",
-    "view-seed": "Tohumu ve doğum gününü gör",
     "actualserver": "Mevcut sunucu:",
     "createnewwallet": "Yeni cüzdan oluştur",
     "opencurrentwallet": "Mevcut Cüzdanı Aç",
@@ -1242,12 +1231,6 @@
     "keep-editing": "Düzenlemeye devam et",
     "from-key": "Ağ, görüntüleme anahtarından gelir."
   },
-  "seedsheet": {
-    "title": "Tohum ifadesi",
-    "title-key": "Görüntüleme anahtarı",
-    "birthday": "Cüzdan doğum günü",
-    "done": "Bitti"
-  },
   "import": {
     "back-acc": "Geri",
     "scan-hint": "Kamerayı bir kurtarma ifadesinin veya görüntüleme anahtarının QR koduna doğrultun.",
@@ -1276,7 +1259,7 @@
     "importing-title": "Cüzdanınız içe aktarılıyor",
     "screen-title": "Cüzdanı içe aktar",
     "chooser-sub": "Nereden geri yükleneceğini seçin",
-    "chooser-previous": "Önceki cüzdan yedeği",
+    "chooser-previous": "Önceki cüzdan yedekleri",
     "chooser-previous-sub": "{store} içinde kayıtlı",
     "chooser-or": "veya",
     "chooser-seed": "Tohum ifadesi veya görüntüleme anahtarı girin",
@@ -1623,5 +1606,20 @@
     "name-later": "Daha sonra Cüzdanlar'dan değiştirebilirsin.",
     "create-go": "Cüzdan oluştur",
     "import-go": "Cüzdanı içe aktar"
+  },
+  "found": {
+    "title": "Önceki Zingo verileri bulundu",
+    "body": "Bu cihazda önceki bir Zingo kurulumundan kaydedilmiş cüzdanlar var. İçe aktarılsın mı?",
+    "review": "İncele",
+    "not-now": "Şimdi değil",
+    "sheet": "Bulunan cüzdanlar",
+    "note": "Bunu yalnızca siz görebilirsiniz. Tohumlar ve anahtarlar bu cihazdan asla çıkmaz.",
+    "row-birthday": "{network} · Doğum günü {height}",
+    "import-all": "Tümünü içe aktar",
+    "import-n": "{n} cüzdanı içe aktar",
+    "importing": "Cüzdanlarınız içe aktarılıyor",
+    "imported": "{n} cüzdan içe aktarıldı. Yeniden taramalar arka planda sürüyor.",
+    "imported-one": "1 cüzdan içe aktarıldı. Yeniden tarama arka planda sürüyor.",
+    "imported-name": "{name} (İçe aktarıldı)"
   }
 }

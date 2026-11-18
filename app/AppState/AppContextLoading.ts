@@ -10,7 +10,6 @@ import { SelectServerEnum } from './enums/SelectServerEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
-import type { WalletType } from '@app/wallet/types';
 import type { WalletErrorInfo } from '@app/wallet/types';
 import { ServerStatus } from './types/ServerStatus';
 import ServerUrisType from './types/ServerUrisType';
@@ -55,10 +54,12 @@ export interface OnboardingContext {
   updating: boolean;
   busy: boolean;
   walletExists: boolean;
-  recoveryWallet: WalletType | null;
   recoveryEntries: RecoveryEntry[];
-  /** Imports every wallet of the Keychain, with their names, and opens the first. */
-  importAllRecovery: () => void;
+  /** Imports the chosen wallets of a previous install and opens the first. */
+  importAllRecovery: (entries: RecoveryEntry[]) => void;
+  /** The card of a previous install's wallets, hidden until the next launch. */
+  foundDismissed: boolean;
+  dismissFound: () => void;
   // The saved phrase outlived an uninstall.
   freshInstall: boolean;
   walletError: WalletErrorInfo | null;
@@ -75,8 +76,6 @@ export interface OnboardingContext {
   serverLists: Record<string, ServerUrisType[]>;
   serverBackGuard: BackGuard;
   // `origin` is the screen the import started from; a failure returns there.
-  importRecoveryWallet: (origin: 'Welcome' | 'ImportChooser') => void;
-  viewRecoveryWallet: () => void;
   openServer: (chain?: ChainNameEnum) => void;
   closeServer: () => void;
   /** What back does on the onboarding step in front: Android's back, iOS's edge swipe. */

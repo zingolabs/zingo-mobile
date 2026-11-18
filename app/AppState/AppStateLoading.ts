@@ -22,8 +22,8 @@ export default interface AppStateLoading {
   biometricGate: BiometricGateOutcome;
   startingApp: boolean;
   firstLaunchingMessage: LaunchingModeEnum;
-  hasRecoveryWalletInfoSaved: boolean;
-  recoveryWallet: WalletType | null;
+  /** The card of a previous install's wallets, hidden until the next launch. */
+  foundDismissed: boolean;
   /** Every wallet a previous install left in the Keychain, in their order. */
   recoveryEntries: RecoveryEntry[];
   walletError: WalletErrorInfo | null;

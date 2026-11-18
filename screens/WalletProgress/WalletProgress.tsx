@@ -8,7 +8,7 @@ import ProgressState, { ProgressStateKind } from '@ui/widgets/ProgressState';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 
-export type WalletProgressKind = 'import' | 'create';
+export type WalletProgressKind = 'import' | 'importAll' | 'create';
 
 type WalletProgressProps = {
   kind: WalletProgressKind;
@@ -73,7 +73,9 @@ const WalletProgress: React.FunctionComponent<WalletProgressProps> = ({
         translate(
           kind === 'import'
             ? 'import.importing-title'
-            : 'loadingapp.creating-title',
+            : kind === 'importAll'
+              ? 'found.importing'
+              : 'loadingapp.creating-title',
         ) as string
       }
     />

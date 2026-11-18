@@ -29,10 +29,7 @@ import NetInfo, {
 } from '@react-native-community/netinfo/src/index';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import {
-  BottomSheetModal,
-  BottomSheetModalProvider,
-} from '@gorhom/bottom-sheet';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
 import { showConfirm } from '@app/services/showConfirm';
@@ -127,7 +124,6 @@ import {
 } from '@app/services/recoveryWalletInfo';
 
 // no lazy load because slowing down screens.
-import SeedSheet from '@ui/widgets/SeedSheet';
 import { walletErrorKind } from './walletErrorKind';
 import { sanitizePaths } from '@app/utils/sanitizePaths';
 import { duration as motionDuration } from '@app/theme/motion';
@@ -325,7 +321,6 @@ export default function LoadingApp(props: LoadingAppProps) {
                 walletId,
                 arrival: 'boot',
                 next: 'home',
-                notice: '',
               },
             }),
           )
@@ -353,10 +348,7 @@ export default function LoadingApp(props: LoadingAppProps) {
 type LoadingAppClassProps = {
   session: LoadingSession;
   openWallet: (
-    params: Omit<
-      LoadedAppNavigationState,
-      'walletId' | 'arrival' | 'next' | 'notice'
-    >,
+    params: Omit<LoadedAppNavigationState, 'walletId' | 'arrival' | 'next'>,
   ) => void;
   openOnboarding: (start: 'Welcome' | 'OpenError') => void;
   openBoot: () => void;
@@ -385,7 +377,6 @@ export class LoadingAppClass extends Component<
 > {
   appstate?: NativeEventSubscription;
   unsubscribeNetInfo?: NetInfoSubscription;
-  seedSheetRef = React.createRef<BottomSheetModal>();
   retryStartedAt = 0;
 
   constructor(props: LoadingAppClassProps) {
@@ -429,8 +420,7 @@ export class LoadingAppClass extends Component<
       startingApp:
         props.session.kind === 'boot' ? props.session.startingApp : true,
       firstLaunchingMessage: props.firstLaunchingMessage,
-      hasRecoveryWalletInfoSaved: false,
-      recoveryWallet: null,
+      foundDismissed: false,
       recoveryEntries: [],
       walletError: null,
       retrying: false,
@@ -498,8 +488,8 @@ export class LoadingAppClass extends Component<
 
     // The start gate guards the wallet file. Without one there is nothing
     // behind it: viewing or importing the recovery info stored in the
-    // Keychain/Keystore runs its own gate (viewRecoveryWallet,
-    // importRecoveryWallet), so the rest of the app opens without one. Asking
+    // Keychain/Keystore runs its own gate (importAllRecovery), so the rest
+    // of the app opens without one. Asking
     // anyway only puts the fail-open notice on the Welcome, over Create New
     // Wallet, on any device without a screen lock.
     const exists = await rpcWalletExists();
@@ -544,19 +534,7 @@ export class LoadingAppClass extends Component<
     this.setState({ actionButtonsDisabled: true });
 
     // has the device the Wallet Keys stored?
-    const entries = await recoveryEntriesOnDevice();
-    const recovery = entries.length > 0 ? entries[0] : null;
-    this.setState({
-      hasRecoveryWalletInfoSaved: entries.length > 0,
-      recoveryEntries: entries,
-      recoveryWallet: recovery
-        ? {
-            seed: recovery.seed,
-            ufvk: recovery.ufvk,
-            birthday: recovery.birthday,
-          }
-        : null,
-    });
+    this.setState({ recoveryEntries: await recoveryEntriesOnDevice() });
 
     // Boot-time server selection. `auto` refetches the live list and activates
     // the best server on every launch; `list` validates that the user's server
@@ -1011,6 +989,7 @@ export class LoadingAppClass extends Component<
     newWallet: boolean,
     firstLaunchingMessage: LaunchingModeEnum,
     walletChainName: ChainNameEnum,
+    notice: string = '',
   ) => {
     // Leaving the error screen after a retry worked: its badge shrinks and
     // the server dot turns green first.
@@ -1026,6 +1005,7 @@ export class LoadingAppClass extends Component<
             newWallet,
             firstLaunchingMessage,
             walletChainName,
+            notice,
           ),
         ERROR_RESOLVE_MS,
       );
@@ -1040,6 +1020,7 @@ export class LoadingAppClass extends Component<
       newWallet,
       firstLaunchingMessage,
       walletChainName,
+      notice,
     });
   };
 
@@ -1213,9 +1194,10 @@ export class LoadingAppClass extends Component<
   getwalletToRestore = async () => {
     this.setState({ wallet: {} as WalletType });
     navigateOnboarding({
-      screen: this.state.recoveryWallet
-        ? Route.ImportChooser
-        : Route.ImportWallet,
+      screen:
+        this.state.recoveryEntries.length > 0
+          ? Route.ImportChooser
+          : Route.ImportWallet,
     });
   };
 
@@ -1603,8 +1585,8 @@ export class LoadingAppClass extends Component<
     });
   };
 
-  /** The card of one saved wallet imports it as the card of several does. */
-  importRecoveryWallet = async () => this.importAllRecovery();
+  /** Hides the card of a previous install's wallets until the next launch. */
+  dismissFound = () => this.setState({ foundDismissed: true });
 
   /**
    * The server a saved wallet comes back on: the one its entry kept, or this
@@ -1635,11 +1617,10 @@ export class LoadingAppClass extends Component<
   /**
    * Imports every wallet a previous install left in the Keychain, each on
    * its own network with its name, colour and server, then opens the first.
-   * A single-wallet entry is a Mainnet wallet. No name step: the names come
-   * from the entries.
+   * A single-wallet entry is a Mainnet wallet. No name step: each keeps its
+   * entry's name, or a default one, marked as imported.
    */
-  importAllRecovery = async () => {
-    const entries = this.state.recoveryEntries;
+  importAllRecovery = async (entries: RecoveryEntry[]) => {
     if (entries.length === 0) {
       return;
     }
@@ -1648,7 +1629,10 @@ export class LoadingAppClass extends Component<
       return;
     }
     this.setState({ actionButtonsDisabled: true });
-    navigateOnboarding({ screen: Route.Progress, params: { kind: 'import' } });
+    navigateOnboarding({
+      screen: Route.Progress,
+      params: { kind: 'importAll' },
+    });
     const opened: { id: string; server: ServerType }[] = [];
     const failed: string[] = [];
     for (const entry of entries) {
@@ -1687,7 +1671,10 @@ export class LoadingAppClass extends Component<
               .map(w => w.meta.name)
           : [];
       await updateWalletMeta(added.id, {
-        name: entry.name || defaultWalletName(this.state.translate, others),
+        name: (this.state.translate('found.imported-name') as string).replace(
+          '{name}',
+          entry.name || defaultWalletName(this.state.translate, others),
+        ),
         ...(entry.category ? { category: entry.category } : {}),
         seedBackedUp: true,
         seedBackedUpAt: 0,
@@ -1739,15 +1726,13 @@ export class LoadingAppClass extends Component<
       true,
       LaunchingModeEnum.opening,
       open.walletChainName,
+      opened.length === 1
+        ? (this.state.translate('found.imported-one') as string)
+        : (this.state.translate('found.imported') as string).replace(
+            '{n}',
+            String(opened.length),
+          ),
     );
-  };
-
-  viewRecoveryWallet = async () => {
-    const answer = await askGate({ translate: this.state.translate });
-    if (answer.kind === 'declined') {
-      return;
-    }
-    this.seedSheetRef.current?.present();
   };
 
   openCurrentWallet = () => {
@@ -1781,7 +1766,6 @@ export class LoadingAppClass extends Component<
       walletExists,
       firstLaunchingMessage,
       biometricGate,
-      translate,
     } = this.state;
 
     const context = {
@@ -1815,8 +1799,9 @@ export class LoadingAppClass extends Component<
         walletExists && firstLaunchingMessage === LaunchingModeEnum.updating,
       busy: actionButtonsDisabled,
       walletExists,
-      recoveryWallet: this.state.recoveryWallet,
       recoveryEntries: this.state.recoveryEntries,
+      foundDismissed: this.state.foundDismissed,
+      dismissFound: this.dismissFound,
       importAllRecovery: this.importAllRecovery,
       freshInstall: firstLaunchingMessage === LaunchingModeEnum.installing,
       walletError: this.state.walletError,
@@ -1828,8 +1813,6 @@ export class LoadingAppClass extends Component<
       serverLatencies: this.state.serverLatencies,
       serverLists: this.state.serverLists,
       serverBackGuard: this.serverBackGuard,
-      importRecoveryWallet: this.importRecoveryWallet,
-      viewRecoveryWallet: this.viewRecoveryWallet,
       openServer: this.openServer,
       closeServer: this.closeServer,
       stepBack: this.onHardwareBack,
@@ -1857,11 +1840,6 @@ export class LoadingAppClass extends Component<
               <BottomSheetBackHandler />
               <ConfirmBottomSheet />
               <LoadingNavigator />
-              <SeedSheet
-                ref={this.seedSheetRef}
-                wallet={this.state.recoveryWallet}
-                translate={translate}
-              />
             </BottomSheetModalProvider>
           </GestureHandlerRootView>
         </ContextAppLoadingProvider>

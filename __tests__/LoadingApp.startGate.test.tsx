@@ -105,12 +105,12 @@ describe('LoadingApp start gate', () => {
       failure: { errorKey: 'biometrics-failure-declined' },
     });
 
-    await app.importRecoveryWallet();
+    await app.importAllRecovery(app.state.recoveryEntries);
 
     expect(askGate).toHaveBeenCalledTimes(1);
     expect(restore).not.toHaveBeenCalled();
 
-    await app.importRecoveryWallet();
+    await app.importAllRecovery(app.state.recoveryEntries);
 
     expect(restore).toHaveBeenCalledTimes(1);
   });

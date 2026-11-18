@@ -15,6 +15,7 @@ export const Route = {
   Welcome: 'Welcome',
   ImportChooser: 'ImportChooser',
   ImportWallet: 'ImportWallet',
+  FoundWallets: 'FoundWallets',
   Progress: 'Progress',
   NameWallet: 'NameWallet',
   OpenError: 'OpenError',

@@ -45,11 +45,12 @@ export type OnboardingParamList = {
   [Route.Welcome]: undefined;
   [Route.ImportChooser]: undefined;
   [Route.ImportWallet]: undefined;
+  [Route.FoundWallets]: undefined;
   // `chain`: the network the screen opens on, when the wallet's network is
   // not the server's.
   [Route.Server]: { chain?: ChainNameEnum } | undefined;
   [Route.ServerList]: { chain: ChainNameEnum };
-  [Route.Progress]: { kind: 'import' | 'create' };
+  [Route.Progress]: { kind: 'import' | 'importAll' | 'create' };
   // `from`: what the first wallet is made from, for its mark and its button.
   [Route.NameWallet]: { from: 'create' | 'seed' | 'key' };
   [Route.OpenError]: undefined;

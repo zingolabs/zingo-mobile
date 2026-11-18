@@ -46,7 +46,6 @@ export const defaultAppContextLoading: AppContextLoading = {
   updating: false,
   busy: false,
   walletExists: false,
-  recoveryWallet: null,
   freshInstall: false,
   walletError: null,
   errorResolved: false,
@@ -57,8 +56,6 @@ export const defaultAppContextLoading: AppContextLoading = {
   serverLatencies: {},
   serverLists: {},
   serverBackGuard: { current: null },
-  importRecoveryWallet: () => {},
-  viewRecoveryWallet: () => {},
   openServer: () => {},
   closeServer: () => {},
   stepBack: () => false,
@@ -77,6 +74,8 @@ export const defaultAppContextLoading: AppContextLoading = {
   doRestore: async () => {},
   recoveryEntries: [],
   importAllRecovery: () => {},
+  foundDismissed: false,
+  dismissFound: () => {},
   nameNewWallet: () => {},
 };
 

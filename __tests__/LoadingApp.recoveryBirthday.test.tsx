@@ -28,12 +28,8 @@ jest.mock('@app/services/serverPicking', () => ({
   probeUri: jest.fn(async () => ({ latency: 40, height: '3000000' })),
 }));
 
-// A mainnet server whose tip is block 3,000,000, and a phrase saved on the
-// device with the given birthday.
-const appWithSaved = (
-  birthday: number,
-  saved: { seed?: string; ufvk?: string } = { seed: 'abandon ability able' },
-) => {
+// The start menu on a mainnet server.
+const appWithSaved = () => {
   const app = new LoadingAppClass({
     session: { kind: 'boot', startingApp: true, newWallet: false },
     openWallet: jest.fn(),
@@ -54,7 +50,6 @@ const appWithSaved = (
   app.state = {
     ...app.state,
     netInfo: { ...app.state.netInfo, isConnected: true },
-    recoveryWallet: { ...saved, birthday },
   };
   const doRestore = jest.spyOn(app, 'doRestore').mockResolvedValue(undefined);
   return { app, doRestore };
@@ -78,16 +73,15 @@ const entry = (over: Partial<RecoveryEntry>): RecoveryEntry => ({
 });
 
 const restoredWith = async (app: LoadingAppClass, saved: RecoveryEntry) => {
-  app.state = { ...app.state, recoveryEntries: [saved] };
   jest.spyOn(app, 'setState').mockImplementation(() => {});
   const restore = jest.mocked(RPCModule.restoreWalletFromSeed);
   restore.mockRejectedValue(new Error('stop here'));
-  await app.importAllRecovery();
+  await app.importAllRecovery([saved]);
   return restore.mock.calls[0];
 };
 
 test('Tests that a single-wallet entry restores on Mainnet when the start menu is on Testnet. Those entries predate networks and were all Mainnet.', async () => {
-  const { app } = appWithSaved(2900000);
+  const { app } = appWithSaved();
   app.state = {
     ...app.state,
     server: remoteServer(
@@ -105,7 +99,7 @@ test('Tests that a single-wallet entry restores on Mainnet when the start menu i
 });
 
 test('Tests that a wallet entry restores on its own network with the server it kept', async () => {
-  const { app } = appWithSaved(2900000);
+  const { app } = appWithSaved();
 
   const call = await restoredWith(
     app,
@@ -140,7 +134,7 @@ test.each([
   async (_case, birthday) => {
     jest.useFakeTimers();
     try {
-      const { app } = appWithSaved(birthday);
+      const { app } = appWithSaved();
       jest.mocked(app.doRestore).mockRestore();
       jest.spyOn(app, 'setState').mockImplementation(() => {});
       const restore = jest.mocked(RPCModule.restoreWalletFromSeed);

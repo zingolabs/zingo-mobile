@@ -159,23 +159,12 @@
     "welcome": "Welcome to",
     "tagline": "A private wallet for your Zcash.",
     "creating-title": "Creating your wallet",
-    "previous-install-title": "Wallet from a previous install",
-    "saved-wallet-title": "Wallet saved on this device",
-    "previous-install-body": "Zingo found a recovery phrase saved on this device.",
-    "previous-installs-title": "Wallets from a previous install",
-    "previous-installs-body": "Import {n} wallets from a previous install.",
-    "import-all": "Import {n} wallets",
     "net-testnet": "Testnet",
     "net-regtest": "Regtest",
     "connected-to": "Connected to {host}",
     "no-internet": "No internet connection",
     "back-online": "Back online",
     "offline-line": "You can create or import a wallet now, it syncs when you're back online.",
-    "card-words": "24 words",
-    "card-key": "Viewing key",
-    "card-birthday": "Birthday · block {height}",
-    "import-this": "Import this wallet",
-    "view-seed": "View seed & birthday",
     "actualserver": "Actual server:",
     "createnewwallet": "Create new wallet",
     "opencurrentwallet": "Open Current Wallet",
@@ -1242,12 +1231,6 @@
     "keep-editing": "Keep editing",
     "from-key": "The network comes from the viewing key."
   },
-  "seedsheet": {
-    "title": "Seed phrase",
-    "title-key": "Viewing key",
-    "birthday": "Wallet birthday",
-    "done": "Done"
-  },
   "import": {
     "back-acc": "Back",
     "scan-hint": "Point the camera at a seed phrase or viewing key QR code.",
@@ -1276,7 +1259,7 @@
     "importing-title": "Importing your wallet",
     "screen-title": "Import wallet",
     "chooser-sub": "Choose what to restore from",
-    "chooser-previous": "Previous wallet backup",
+    "chooser-previous": "Previous wallet backups",
     "chooser-previous-sub": "Saved in the {store}",
     "chooser-or": "or",
     "chooser-seed": "Enter a seed phrase or viewing key",
@@ -1623,5 +1606,20 @@
     "name-later": "You can change it later from Wallets.",
     "create-go": "Create wallet",
     "import-go": "Import wallet"
+  },
+  "found": {
+    "title": "Previous Zingo data found",
+    "body": "This device has wallets saved from an earlier Zingo installation. Import them?",
+    "review": "Review",
+    "not-now": "Not now",
+    "sheet": "Found wallets",
+    "note": "Only you can see this. Seeds and keys never leave this device.",
+    "row-birthday": "{network} · Birthday {height}",
+    "import-all": "Import all",
+    "import-n": "Import {n}",
+    "importing": "Importing your wallets",
+    "imported": "{n} wallets imported. Rescans run in the background.",
+    "imported-one": "1 wallet imported. The rescan runs in the background.",
+    "imported-name": "{name} (Imported)"
   }
 }

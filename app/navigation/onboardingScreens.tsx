@@ -9,6 +9,7 @@ import type { OnboardingScreenProps } from './OnboardingNavigator';
 
 import StartMenu from '@screens/StartMenu';
 import ImportChooser from '@screens/ImportChooser';
+import FoundWallets from '@screens/FoundWallets';
 import ImportUfvk from '@screens/ImportUfvk';
 import WalletProgress from '@screens/WalletProgress';
 import WalletError from '@screens/WalletError';
@@ -24,13 +25,10 @@ import { walletsOnDevice } from '@app/walletBackend/utils/walletStore';
 export function WelcomeScreen() {
   const {
     busy,
-    recoveryWallet,
     recoveryEntries,
-    importAllRecovery,
-    freshInstall,
+    foundDismissed,
+    dismissFound,
     walletExists,
-    importRecoveryWallet,
-    viewRecoveryWallet,
     openServer,
     openCurrentWallet,
     createNewWallet,
@@ -39,12 +37,9 @@ export function WelcomeScreen() {
   return (
     <StartMenu
       actionButtonsDisabled={busy}
-      recoveryWallet={recoveryWallet}
-      recoveryEntries={recoveryEntries}
-      importAllRecovery={importAllRecovery}
-      freshInstall={freshInstall}
-      importRecoveryWallet={() => importRecoveryWallet(Route.Welcome)}
-      viewRecoveryWallet={viewRecoveryWallet}
+      found={recoveryEntries.length > 0 && !foundDismissed}
+      reviewFound={() => navigateOnboarding({ screen: Route.FoundWallets })}
+      dismissFound={dismissFound}
       customServer={() => openServer()}
       walletExists={walletExists}
       openCurrentWallet={openCurrentWallet}
@@ -61,12 +56,26 @@ export function ProgressScreen({
 }
 
 export function ImportChooserScreen() {
-  const { busy, importRecoveryWallet } = useContext(ContextAppLoading);
+  const { busy } = useContext(ContextAppLoading);
   return (
     <ImportChooser
       busy={busy}
-      onPrevious={() => importRecoveryWallet(Route.ImportChooser)}
+      onPrevious={() => navigateOnboarding({ screen: Route.FoundWallets })}
       onSeed={() => navigateOnboarding({ screen: Route.ImportWallet })}
+      onBack={goBack}
+    />
+  );
+}
+
+export function FoundWalletsScreen() {
+  const { translate, busy, recoveryEntries, importAllRecovery } =
+    useContext(ContextAppLoading);
+  return (
+    <FoundWallets
+      translate={translate}
+      entries={recoveryEntries}
+      busy={busy}
+      onImport={importAllRecovery}
       onBack={goBack}
     />
   );

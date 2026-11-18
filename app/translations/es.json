@@ -159,23 +159,12 @@
     "welcome": "Bienvenido a",
     "tagline": "Un monedero privado para tu Zcash.",
     "creating-title": "Creando tu monedero",
-    "previous-install-title": "Monedero de una instalación anterior",
-    "saved-wallet-title": "Monedero guardado en este dispositivo",
-    "previous-install-body": "Zingo encontró una frase de recuperación guardada en este dispositivo.",
-    "previous-installs-title": "Billeteras de una instalación anterior",
-    "previous-installs-body": "Importa {n} billeteras de una instalación anterior.",
-    "import-all": "Importar {n} billeteras",
     "net-testnet": "Testnet",
     "net-regtest": "Regtest",
     "connected-to": "Conectado a {host}",
     "no-internet": "Sin conexión a internet",
     "back-online": "Conexión recuperada",
     "offline-line": "Puedes crear o importar un monedero ahora; se sincronizará cuando vuelvas a tener conexión.",
-    "card-words": "24 palabras",
-    "card-key": "Clave de visualización",
-    "card-birthday": "Cumpleaños · bloque {height}",
-    "import-this": "Importar este monedero",
-    "view-seed": "Ver semilla y cumpleaños",
     "actualserver": "Servidor Activo:",
     "createnewwallet": "Crear nuevo monedero",
     "opencurrentwallet": "Abrir Monedero Activo",
@@ -1242,12 +1231,6 @@
     "keep-editing": "Seguir editando",
     "from-key": "La red viene de la clave de visualización."
   },
-  "seedsheet": {
-    "title": "Semilla",
-    "title-key": "Clave de visualización",
-    "birthday": "Cumpleaños del monedero",
-    "done": "Hecho"
-  },
   "import": {
     "back-acc": "Atrás",
     "scan-hint": "Apunta la cámara al código QR de una frase semilla o de una clave de visualización.",
@@ -1276,7 +1259,7 @@
     "importing-title": "Importando tu monedero",
     "screen-title": "Importar monedero",
     "chooser-sub": "Elige desde dónde restaurar",
-    "chooser-previous": "Copia del monedero anterior",
+    "chooser-previous": "Copias de billeteras anteriores",
     "chooser-previous-sub": "Guardada en el {store}",
     "chooser-or": "o",
     "chooser-seed": "Introducir una semilla o clave de visualización",
@@ -1623,5 +1606,20 @@
     "name-later": "Puedes cambiarlo luego desde Billeteras.",
     "create-go": "Crear billetera",
     "import-go": "Importar billetera"
+  },
+  "found": {
+    "title": "Datos de una instalación anterior de Zingo",
+    "body": "Este dispositivo tiene billeteras guardadas de una instalación anterior de Zingo. ¿Importarlas?",
+    "review": "Revisar",
+    "not-now": "Ahora no",
+    "sheet": "Billeteras encontradas",
+    "note": "Solo tú puedes verlo. Las semillas y las claves nunca salen de este dispositivo.",
+    "row-birthday": "{network} · Cumpleaños {height}",
+    "import-all": "Importar todas",
+    "import-n": "Importar {n}",
+    "importing": "Importando tus billeteras",
+    "imported": "{n} billeteras importadas. Los reescaneos siguen en segundo plano.",
+    "imported-one": "1 billetera importada. El reescaneo sigue en segundo plano.",
+    "imported-name": "{name} (Importada)"
   }
 }
