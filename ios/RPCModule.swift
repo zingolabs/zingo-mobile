@@ -579,11 +579,14 @@ class RPCModule: NSObject {
     }
   }
 
-  private func legacyServer() -> [String: Any]? {
+  private func legacySettings() -> [String: Any]? {
     guard let path = try? getFileName("settings.json"),
-          let data = FileManager.default.contents(atPath: path),
-          let settings = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else { return nil }
-    return settings["server"] as? [String: Any]
+          let data = FileManager.default.contents(atPath: path) else { return nil }
+    return (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+  }
+
+  private func legacyServer() -> [String: Any]? {
+    legacySettings()?["server"] as? [String: Any]
   }
 
   /// Moves a root wallet file into its folder, as legacy base64 text when it does not read, since the folder's own read converts it.
@@ -615,18 +618,23 @@ class RPCModule: NSObject {
     try adoptLegacy(Constants.WalletBackupFileName.rawValue, name: "Wallet Backup", active: false)
   }
 
-  /// The active wallet's server uri and chain as its meta records them, the legacy settings.json server when the meta has none.
+  /// The active wallet's server uri and chain as its meta records them, the legacy settings.json ones when the meta has none; an empty uri when either says offline.
   func activeServer() throws -> (uri: String, chain: String)? {
     try prepareWallets()
     let documents = try getDocumentsDirectory()
-    let legacy = legacyServer()
+    let settings = legacySettings()
+    let legacy = settings?["server"] as? [String: Any]
     let id = WalletStore.active(documents)
     let meta = WalletStore.list(documents).first { $0.id == id }?.meta
     guard let server = (meta?["server"] as? [String: Any]) ?? legacy else { return nil }
     let chain = [server["chainName"], meta?["chain"], legacy?["chainName"]]
       .compactMap { $0 as? String }
       .first { !$0.isEmpty } ?? ""
-    return (server["uri"] as? String ?? "", chain)
+    let select = [meta?["selectServer"], settings?["selectServer"]]
+      .compactMap { $0 as? String }
+      .first { !$0.isEmpty } ?? ""
+    let uri = select == "offline" ? "" : (server["uri"] as? String ?? "")
+    return (uri, chain)
   }
 
   func activeWalletId() throws -> String? {

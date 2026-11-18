@@ -254,11 +254,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         completePendingSwap()
     }
 
-    private fun legacyServer(): JSONObject? = try {
-        JSONObject(File(filesDir, "settings.json").readText()).optJSONObject("server")
+    private fun legacySettings(): JSONObject? = try {
+        JSONObject(File(filesDir, "settings.json").readText())
     } catch (e: Exception) {
         null
     }
+
+    private fun legacyServer(): JSONObject? = legacySettings()?.optJSONObject("server")
 
     /** Moves a root wallet file into its folder, made plain first because a backup's encrypted bytes decrypt only under the legacy name. */
     private fun adoptLegacy(fileName: String, name: String, active: Boolean) {
@@ -291,17 +293,21 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-    /** The active wallet's server uri and chain as its meta records them, the legacy settings.json server when the meta has none. */
+    /** The active wallet's server uri and chain as its meta records them, the legacy settings.json ones when the meta has none; an empty uri when either says offline. */
     fun activeServer(): Pair<String, String>? {
         prepareWallets()
-        val legacy = legacyServer()
+        val settings = legacySettings()
+        val legacy = settings?.optJSONObject("server")
         val id = WalletStore.active(filesDir)
         val meta = WalletStore.list(filesDir).firstOrNull { it.id == id }?.meta
         val server = meta?.optJSONObject("server") ?: legacy ?: return null
         val chain = server.optString("chainName")
             .ifEmpty { meta?.optString("chain") ?: "" }
             .ifEmpty { legacy?.optString("chainName") ?: "" }
-        return Pair(server.optString("uri"), chain)
+        val select = (meta?.optString("selectServer") ?: "")
+            .ifEmpty { settings?.optString("selectServer") ?: "" }
+        val uri = if (select == "offline") "" else server.optString("uri")
+        return Pair(uri, chain)
     }
 
     fun hasActiveWallet(): Boolean {
