@@ -26,6 +26,10 @@ jest.mock('@app/services/gateController', () => ({
 jest.mock('@app/services/serverPicking', () => ({
   ...jest.requireActual('@app/services/serverPicking'),
   probeUri: jest.fn(async () => ({ latency: 40, height: '3000000' })),
+  pickAutomatic: jest.fn(async () => ({
+    server: { uri: 'https://best.testnet:443', chainName: 'test' },
+    tier: 'recommended',
+  })),
 }));
 
 // The start menu on a mainnet server.
@@ -68,7 +72,6 @@ const entry = (over: Partial<RecoveryEntry>): RecoveryEntry => ({
   chain: '',
   category: 0,
   order: 0,
-  server: { kind: 'none' },
   ...over,
 });
 
@@ -98,7 +101,7 @@ test('Tests that a single-wallet entry restores on Mainnet when the start menu i
   );
 });
 
-test('Tests that a wallet entry restores on its own network with the server it kept', async () => {
+test('Tests that a Testnet entry restores on Testnet with the best server that answers', async () => {
   const { app } = appWithSaved();
 
   const call = await restoredWith(
@@ -107,20 +110,12 @@ test('Tests that a wallet entry restores on its own network with the server it k
       walletId: 'w1',
       name: 'Savings',
       chain: ChainNameEnum.testChainName,
-      server: {
-        kind: 'kept',
-        server: {
-          uri: 'https://kept.testnet:443',
-          chainName: ChainNameEnum.testChainName,
-        },
-        selectServer: SelectServerEnum.custom,
-      },
     }),
   );
 
   expect(call).toEqual(
     expect.arrayContaining([
-      'https://kept.testnet:443',
+      'https://best.testnet:443',
       ChainNameEnum.testChainName,
     ]),
   );

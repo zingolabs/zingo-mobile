@@ -12,7 +12,6 @@ const entry = (walletId: string, over: Partial<RecoveryEntry> = {}) => ({
   chain: 'main',
   category: 1,
   order: 0,
-  server: { kind: 'none' } as const,
   ...over,
 });
 

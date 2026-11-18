@@ -93,7 +93,6 @@ describe('LoadingApp start gate', () => {
           chain: '',
           category: 0,
           order: 0,
-          server: { kind: 'none' },
         },
       ],
     };

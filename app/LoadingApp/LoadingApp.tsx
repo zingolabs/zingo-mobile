@@ -1129,7 +1129,7 @@ export class LoadingAppClass extends Component<
     }
   };
 
-  /** Names the wallet just made, as given or "Wallet n", before its recovery entry records it. */
+  /** Names the wallet just made, as given or "Wallet n", and gives it the server picked for it, before its recovery entry records them. */
   nameMadeWallet = async (name: string) => {
     const listed = await walletsOnDevice();
     if (!listed.ok || listed.value.active.kind === 'none') {
@@ -1142,6 +1142,11 @@ export class LoadingAppClass extends Component<
     await updateWalletMeta(id, {
       name: name || defaultWalletName(this.state.translate, others),
     });
+    await SettingsFileImpl.writeWalletServer(
+      id,
+      this.state.server,
+      this.state.selectServer,
+    );
   };
 
   createNewWallet = async (name: string = ''): Promise<void> => {
@@ -1701,10 +1706,11 @@ export class LoadingAppClass extends Component<
     let diskFull = false;
     for (const entry of entries) {
       const chain = entryChain(entry);
-      const { server, selectServer } = await entryServer(entry, chain, {
-        server: this.state.server,
-        selectServer: this.state.selectServer,
-      });
+      const { server, selectServer } = await entryServer(
+        chain,
+        this.state.translate,
+        !!this.state.netInfo.isConnected,
+      );
       const before = await walletsOnDevice();
       const known = new Set(
         before.ok ? before.value.wallets.map(w => w.id) : [],

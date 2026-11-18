@@ -71,7 +71,7 @@ test('Tests that a wallet without flags reads the defaults when its meta has non
   expect(settings.viewOnlyNoticeDismissed).toBe(false);
 });
 
-test('Tests that a server choice lands in the meta and in the file when a wallet is active.', async () => {
+test('Tests that a server choice lands in the meta alone when a wallet is active.', async () => {
   await SettingsFileImpl.writeServer(
     remoteServer('https://testnet.example:9067', ChainNameEnum.testChainName),
     SelectServerEnum.list,
@@ -82,7 +82,7 @@ test('Tests that a server choice lands in the meta and in the file when a wallet
     chainName: 'test',
   });
   expect(mockMeta.selectServer).toBe('list');
-  expect(file().selectServer).toBe('list');
+  expect(file().selectServer).not.toBe('list');
 });
 
 test("Tests that the wallet's server wins over the file's when both exist.", async () => {

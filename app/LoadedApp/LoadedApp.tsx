@@ -2161,10 +2161,11 @@ export class LoadedAppClass extends Component<
     let message = '';
     for (const entry of entries) {
       const chain = entryChain(entry);
-      const choice = await entryServer(entry, chain, {
-        server: this.state.server,
-        selectServer: this.state.selectServer,
-      });
+      const choice = await entryServer(
+        chain,
+        this.state.translate,
+        !!this.state.netInfo.isConnected,
+      );
       const listed = await walletsOnDevice();
       const names = listed.ok ? listed.value.wallets.map(w => w.meta.name) : [];
       const name = entry.name || defaultWalletName(this.state.translate, names);
