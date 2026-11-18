@@ -55,7 +55,6 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation, route }) => {
     setServerOption,
     translate,
     netInfo,
-    readOnly,
     addLastSnackbar,
     walletId,
     wallets,
