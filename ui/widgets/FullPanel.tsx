@@ -353,7 +353,7 @@ export default function FullPanel({
                     ]}
                   >
                     {/** Inside the scrolled content: an icon measured across the scroll view lands off by the scroll offset on iOS. */}
-                    <TooltipHost>{children}</TooltipHost>
+                    <TooltipHost center={center}>{children}</TooltipHost>
                   </Animated.View>
                 </KeyboardAwareScrollView>
                 {fades}
