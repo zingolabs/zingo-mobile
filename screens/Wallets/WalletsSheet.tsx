@@ -9,7 +9,12 @@ import React, {
 import { View } from 'react-native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useSharedValue } from 'react-native-reanimated';
-import { ChainNameEnum, Route, SelectServerEnum } from '@app/AppState';
+import {
+  ChainNameEnum,
+  CurrencyNameEnum,
+  Route,
+  SelectServerEnum,
+} from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { space4, space8, space12, space20, useTheme } from '@app/theme';
 import { navigateWallet } from '@app/navigation/navigate';
@@ -113,7 +118,9 @@ export default function WalletsSheet() {
       return type;
     }
     const unit =
-      wallet.meta.chain === ChainNameEnum.mainChainName ? 'ZEC' : 'TAZ';
+      wallet.meta.chain === ChainNameEnum.mainChainName
+        ? CurrencyNameEnum.ZEC
+        : CurrencyNameEnum.TAZ;
     const sub = t('wallets.row-sub')
       .replace('{balance}', privacy ? MASK : formatZecAmount(saved.total))
       .replace('{unit}', unit)
