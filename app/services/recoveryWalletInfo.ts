@@ -281,3 +281,11 @@ export const forgetRecoveryEntry = async (walletId: string): Promise<void> => {
     await removeEntry(serviceFor(walletId));
   }
 };
+
+/**
+ * Drops an entry a previous install left, once its wallet is imported again
+ * under a new id and has its own entry: the bare service for the
+ * single-wallet entry, the wallet's own otherwise.
+ */
+export const retireImportedEntry = async (entry: RecoveryEntry) =>
+  removeEntry(entry.walletId ? serviceFor(entry.walletId) : service);

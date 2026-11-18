@@ -4,6 +4,7 @@ import type { WalletType } from '@app/wallet/types';
 import { GateFailure } from './types/GateFailure';
 import type { WalletErrorInfo } from '@app/wallet/types';
 import { ServerStatus } from './types/ServerStatus';
+import type { RecoveryEntry } from '@app/services/recoveryWalletInfo';
 import ServerUrisType from './types/ServerUrisType';
 
 /** The launch gate's outcome, carried whole so the locked screen renders the reason it was locked for. */
@@ -23,6 +24,8 @@ export default interface AppStateLoading {
   firstLaunchingMessage: LaunchingModeEnum;
   hasRecoveryWalletInfoSaved: boolean;
   recoveryWallet: WalletType | null;
+  /** Every wallet a previous install left in the Keychain, in their order. */
+  recoveryEntries: RecoveryEntry[];
   walletError: WalletErrorInfo | null;
   retrying: boolean;
   errorShake: number;

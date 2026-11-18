@@ -14,6 +14,7 @@ import type { WalletType } from '@app/wallet/types';
 import type { WalletErrorInfo } from '@app/wallet/types';
 import { ServerStatus } from './types/ServerStatus';
 import ServerUrisType from './types/ServerUrisType';
+import type { RecoveryEntry } from '@app/services/recoveryWalletInfo';
 import type { BiometricGateOutcome } from './AppStateLoading';
 
 // Asks the Server screen whether leaving it needs a confirmation first.
@@ -55,6 +56,9 @@ export interface OnboardingContext {
   busy: boolean;
   walletExists: boolean;
   recoveryWallet: WalletType | null;
+  recoveryEntries: RecoveryEntry[];
+  /** Imports every wallet of the Keychain, with their names, and opens the first. */
+  importAllRecovery: () => void;
   // The saved phrase outlived an uninstall.
   freshInstall: boolean;
   walletError: WalletErrorInfo | null;

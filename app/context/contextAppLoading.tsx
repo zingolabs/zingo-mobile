@@ -75,6 +75,8 @@ export const defaultAppContextLoading: AppContextLoading = {
   serverUnreachable: () => {},
   serversFor: () => [],
   doRestore: async () => {},
+  recoveryEntries: [],
+  importAllRecovery: () => {},
   nameNewWallet: () => {},
 };
 

@@ -25,6 +25,8 @@ export function WelcomeScreen() {
   const {
     busy,
     recoveryWallet,
+    recoveryEntries,
+    importAllRecovery,
     freshInstall,
     walletExists,
     importRecoveryWallet,
@@ -38,6 +40,8 @@ export function WelcomeScreen() {
     <StartMenu
       actionButtonsDisabled={busy}
       recoveryWallet={recoveryWallet}
+      recoveryEntries={recoveryEntries}
+      importAllRecovery={importAllRecovery}
       freshInstall={freshInstall}
       importRecoveryWallet={() => importRecoveryWallet(Route.Welcome)}
       viewRecoveryWallet={viewRecoveryWallet}

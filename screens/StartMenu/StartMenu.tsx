@@ -27,6 +27,8 @@ import { formatInteger } from '@app/utils/formatAmount';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import Card from '@ui/widgets/Card';
+import Avatar, { AvatarCategory } from '@ui/widgets/Avatar';
+import type { RecoveryEntry } from '@app/services/recoveryWalletInfo';
 import Tag from '@ui/widgets/Tag';
 import ServerIcon from '@ui/widgets/ServerIcon';
 import { duration, ease } from '@app/theme/motion';
@@ -87,6 +89,9 @@ const pillSwap = () =>
 type StartMenuProps = {
   actionButtonsDisabled: boolean;
   recoveryWallet: WalletType | null;
+  /** Several wallets a previous install left: one card imports them all. */
+  recoveryEntries: RecoveryEntry[];
+  importAllRecovery: () => void;
   // The saved phrase outlived an uninstall: only then is it "from a previous install".
   freshInstall: boolean;
   importRecoveryWallet: () => void;
@@ -101,6 +106,8 @@ type StartMenuProps = {
 const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   actionButtonsDisabled,
   recoveryWallet,
+  recoveryEntries,
+  importAllRecovery,
   freshInstall,
   importRecoveryWallet,
   viewRecoveryWallet,
@@ -344,7 +351,83 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           )}
         </View>
 
-        {recoveryWallet && (
+        {recoveryEntries.length > 1 && (
+          <Animated.View
+            entering={tagEnter()}
+            style={{ marginTop: gap(space24), marginHorizontal: space24 }}
+          >
+            <Card>
+              <View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: space8,
+                  }}
+                >
+                  <TriangleAlert size={iconSizeSm} color={colors.fgDefault} />
+                  <Text variant="bodyStrong">
+                    {translate('loadingapp.previous-installs-title') as string}
+                  </Text>
+                </View>
+                <Text
+                  variant="caption"
+                  tone="muted"
+                  style={{ marginTop: space4 }}
+                >
+                  {(
+                    translate('loadingapp.previous-installs-body') as string
+                  ).replace('{n}', String(recoveryEntries.length))}
+                </Text>
+              </View>
+              <View style={{ gap: space8 }}>
+                {recoveryEntries.map((entry, i) => (
+                  <View
+                    key={entry.walletId || `entry-${i}`}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: space8,
+                    }}
+                  >
+                    <Avatar
+                      kind="contact"
+                      size="sm"
+                      name={entry.name || '?'}
+                      category={(entry.category || 1) as AvatarCategory}
+                    />
+                    <Text
+                      variant="bodySmall"
+                      numberOfLines={1}
+                      style={{ flexShrink: 1 }}
+                    >
+                      {entry.name ||
+                        (translate(
+                          entry.seed
+                            ? 'loadingapp.card-words'
+                            : 'loadingapp.card-key',
+                        ) as string)}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+              <View>
+                <Button
+                  variant="primary"
+                  size="small"
+                  testID="loadingapp.importall"
+                  title={(translate('loadingapp.import-all') as string).replace(
+                    '{n}',
+                    String(recoveryEntries.length),
+                  )}
+                  busy={busyFor('loadingapp.importall')}
+                  onPress={press('loadingapp.importall', importAllRecovery)}
+                />
+              </View>
+            </Card>
+          </Animated.View>
+        )}
+        {recoveryEntries.length <= 1 && recoveryWallet && (
           <Animated.View
             entering={tagEnter()}
             style={{ marginTop: gap(space24), marginHorizontal: space24 }}

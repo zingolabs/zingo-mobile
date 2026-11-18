@@ -85,6 +85,7 @@ import { staticAlternatives, staticServers } from '@app/uris/serverChoice';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import {
   fetchWallet,
+  loadWallet,
   readOpenWalletId,
   updateWalletMeta,
   walletsOnDevice,
@@ -123,6 +124,7 @@ import { defaultTo, isEqual } from 'lodash';
 import {
   createUpdateRecoveryWalletInfo,
   recoveryEntriesOnDevice,
+  retireImportedEntry,
 } from '@app/services/recoveryWalletInfo';
 
 // no lazy load because slowing down screens.
@@ -430,6 +432,7 @@ export class LoadingAppClass extends Component<
       firstLaunchingMessage: props.firstLaunchingMessage,
       hasRecoveryWalletInfoSaved: false,
       recoveryWallet: null,
+      recoveryEntries: [],
       walletError: null,
       retrying: false,
       errorShake: 0,
@@ -546,6 +549,7 @@ export class LoadingAppClass extends Component<
     const recovery = entries.length > 0 ? entries[0] : null;
     this.setState({
       hasRecoveryWalletInfoSaved: entries.length > 0,
+      recoveryEntries: entries,
       recoveryWallet: recovery
         ? {
             seed: recovery.seed,
@@ -1664,6 +1668,118 @@ export class LoadingAppClass extends Component<
     );
   };
 
+  /**
+   * Imports every wallet a previous install left in the Keychain, each on
+   * its own network with its name and colour, then opens the first. No name
+   * step: the names come from the entries.
+   */
+  importAllRecovery = async () => {
+    const entries = this.state.recoveryEntries;
+    if (entries.length === 0) {
+      return;
+    }
+    this.setState({ actionButtonsDisabled: true });
+    navigateOnboarding({ screen: Route.Progress, params: { kind: 'import' } });
+    const opened: { id: string; server: ServerType }[] = [];
+    const failed: string[] = [];
+    for (const entry of entries) {
+      const chain = (entry.chain ||
+        this.state.server.chainName) as ChainNameEnum;
+      const sameChain = chain === this.state.server.chainName;
+      const server = sameChain
+        ? this.state.server
+        : this.defaultServerForChain(chain);
+      const before = await walletsOnDevice();
+      const known = new Set(
+        before.ok ? before.value.wallets.map(w => w.id) : [],
+      );
+      const text = (entry.seed || entry.ufvk || '').toLowerCase();
+      const restore = entry.seed
+        ? restoreWalletFromSeed
+        : restoreWalletFromUfvk;
+      const result = await restore(
+        text,
+        String(entry.birthday || 0),
+        nativeUri(server),
+        chain,
+        DEFAULT_PERFORMANCE_LEVEL,
+        GlobalConst.minConfirmations.toString(),
+      );
+      const after = result.ok ? await walletsOnDevice() : null;
+      const added =
+        after && after.ok
+          ? after.value.wallets.find(w => !known.has(w.id))
+          : undefined;
+      if (!added) {
+        failed.push(entry.name || text.slice(0, 8));
+        continue;
+      }
+      const others =
+        after && after.ok
+          ? after.value.wallets
+              .filter(w => w.id !== added.id)
+              .map(w => w.meta.name)
+          : [];
+      await updateWalletMeta(added.id, {
+        name: entry.name || defaultWalletName(this.state.translate, others),
+        ...(entry.category ? { category: entry.category } : {}),
+        seedBackedUp: true,
+        seedBackedUpAt: 0,
+        viewOnlyNoticeDismissed: false,
+      });
+      await SettingsFileImpl.writeWalletServer(
+        added.id,
+        server,
+        sameChain ? this.state.selectServer : SelectServerEnum.auto,
+      );
+      await createUpdateRecoveryWalletInfo(await fetchWallet(!entry.seed));
+      await retireImportedEntry(entry);
+      opened.push({ id: added.id, server });
+    }
+    if (failed.length > 0) {
+      createAlert(
+        this.setBackgroundError,
+        this.addLastSnackbar,
+        this.state.translate('loadingapp.readingwallet-label') as string,
+        failed.join(', '),
+        false,
+        this.state.translate,
+        sendEmail,
+        this.state.zingolibVersion,
+      );
+    }
+    if (opened.length === 0) {
+      this.setState({ actionButtonsDisabled: false });
+      returnTo(Route.Welcome);
+      return;
+    }
+    const first = opened[0];
+    const open = await finishWalletOpen(
+      await loadWallet(
+        first.id,
+        nativeUri(first.server),
+        first.server.chainName,
+        DEFAULT_PERFORMANCE_LEVEL,
+        GlobalConst.minConfirmations.toString(),
+      ),
+      first.server.chainName,
+    );
+    this.setState({ actionButtonsDisabled: false });
+    if (open.kind === 'failed') {
+      await this.walletLoadFailed(open.error.message);
+      return;
+    }
+    this.navigateToLoadedApp(
+      open.readOnly,
+      open.orchardPool,
+      open.saplingPool,
+      open.transparentPool,
+      true,
+      LaunchingModeEnum.opening,
+      open.walletChainName,
+    );
+  };
+
   viewRecoveryWallet = async () => {
     const answer = await askGate({ translate: this.state.translate });
     if (answer.kind === 'declined') {
@@ -1738,6 +1854,8 @@ export class LoadingAppClass extends Component<
       busy: actionButtonsDisabled,
       walletExists,
       recoveryWallet: this.state.recoveryWallet,
+      recoveryEntries: this.state.recoveryEntries,
+      importAllRecovery: this.importAllRecovery,
       freshInstall: firstLaunchingMessage === LaunchingModeEnum.installing,
       walletError: this.state.walletError,
       errorResolved: this.state.errorResolved,
