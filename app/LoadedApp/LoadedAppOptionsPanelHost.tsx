@@ -191,7 +191,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       id: MenuItemEnum.Messages,
       testID: MENU_TEST_IDS[MenuItemEnum.Messages],
       label: translate('messages.title') as string,
-      icon: <MessagesArt width={28} height={28} />,
+      icon: <MessagesArt width={30} height={30} />,
       onPress: () => dispatch(MenuItemEnum.Messages),
     });
 
