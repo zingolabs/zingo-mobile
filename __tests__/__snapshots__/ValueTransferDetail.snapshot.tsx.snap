@@ -465,6 +465,21 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                  ZEC
               </Text>
             </Text>
+            <Text
+              maxFontSizeMultiplier={2}
+              style={
+                {
+                  "color": "#888888",
+                  "fontSize": 13,
+                  "fontWeight": "400",
+                  "lineHeight": 18,
+                  "marginTop": 4,
+                  "textAlign": "center",
+                }
+              }
+            >
+              $51.76
+            </Text>
           </View>
           <View
             style={
@@ -1478,6 +1493,21 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
               >
                  ZEC
               </Text>
+            </Text>
+            <Text
+              maxFontSizeMultiplier={2}
+              style={
+                {
+                  "color": "#888888",
+                  "fontSize": 13,
+                  "fontWeight": "400",
+                  "lineHeight": 18,
+                  "marginTop": 4,
+                  "textAlign": "center",
+                }
+              }
+            >
+              $4.11
             </Text>
           </View>
           <View

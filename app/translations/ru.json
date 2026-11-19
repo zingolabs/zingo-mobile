@@ -1158,7 +1158,6 @@
     "op-return-copied": "OP_RETURN скопирован в буфер обмена",
     "tx-explorer": "Открыть в обозревателе блоков",
     "try-again": "Попробовать снова",
-    "today-price": "{usd} по сегодняшнему курсу",
     "in-mempool": "В мемпуле",
     "state-prepared": "Подготовлена",
     "state-sending": "Отправляется",
