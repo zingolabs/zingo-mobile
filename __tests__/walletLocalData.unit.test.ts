@@ -10,12 +10,7 @@ jest.mock('@app/services/AddressBookFileImpl', () => ({
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RPCModule from '@app/RPCModule';
-import {
-  adoptWalletOnFile,
-  forgetWallet,
-  forgetWalletOnFile,
-} from '@app/services/WalletLocalData';
-import { WalletLifecycleService } from '@app/walletBackend/modules/WalletLifecycleService';
+import { adoptWalletOnFile, forgetWallet } from '@app/services/WalletLocalData';
 
 const bridge = RPCModule as unknown as Record<string, jest.Mock>;
 const storage = AsyncStorage as unknown as Record<string, jest.Mock>;
@@ -56,11 +51,6 @@ const onDevice = (...wallets: Wallet[]) =>
     }),
   );
 
-const service = () =>
-  new WalletLifecycleService({
-    stopSyncProcess: jest.fn(async () => {}),
-  } as never);
-
 beforeEach(() => {
   jest.clearAllMocks();
   disk.clear();
@@ -76,10 +66,6 @@ beforeEach(() => {
   onDevice({ id: ID_1 });
   bridge.updateWalletMetaProcess.mockResolvedValue('{}');
   bridge.walletExists.mockResolvedValue('true');
-  bridge.walletBackupExists.mockResolvedValue('true');
-  bridge.deleteExistingWallet.mockResolvedValue('true');
-  bridge.replaceWalletWithBackup.mockResolvedValue('true');
-  bridge.restoreExistingWalletBackup.mockResolvedValue('true');
 });
 
 test('Tests that forgetting a wallet clears its swaps, pin and hidden notice and nothing else when another wallet has data', async () => {
@@ -87,17 +73,6 @@ test('Tests that forgetting a wallet clears its swaps, pin and hidden notice and
   seed(ID_2);
 
   await forgetWallet(ID_2);
-
-  expect(keysOf(ID_2)).toEqual([]);
-  expect(keysOf(ID_1)).toHaveLength(3);
-});
-
-test('Tests that forgetting the wallet on file clears the active wallet’s data when one is active', async () => {
-  onDevice({ id: ID_2 }, { id: ID_1 });
-  seed(ID_1);
-  seed(ID_2);
-
-  await forgetWalletOnFile();
 
   expect(keysOf(ID_2)).toEqual([]);
   expect(keysOf(ID_1)).toHaveLength(3);
@@ -184,44 +159,6 @@ test('Tests that nothing is swept when the wallets on the device cannot be liste
 
   expect(keysOf(ID_GONE)).toHaveLength(3);
   expect(keysOf(FP_A)).toHaveLength(3);
-});
-
-test('Tests that changing the wallet clears its data before the file goes', async () => {
-  seed(ID_1);
-
-  const result = await service().changeWallet();
-
-  expect(result.kind).toBe('done');
-  expect(keysOf(ID_1)).toEqual([]);
-  expect(bridge.deleteExistingWallet).toHaveBeenCalledTimes(1);
-});
-
-test('Tests that changing the wallet keeps the file when its data cannot be cleared', async () => {
-  seed(ID_1);
-  storage.removeItem.mockRejectedValue(new Error('disk'));
-
-  const result = await service().changeWallet();
-
-  expect(result.kind).toBe('error');
-  expect(bridge.deleteExistingWallet).not.toHaveBeenCalled();
-});
-
-test('Tests that restoring the backup clears the wallet it replaces when replace is set', async () => {
-  seed(ID_1);
-
-  const result = await service().restoreBackup(true);
-
-  expect(result.kind).toBe('done');
-  expect(keysOf(ID_1)).toEqual([]);
-});
-
-test('Tests that restoring the backup keeps the wallet it swaps out when replace is not set', async () => {
-  seed(ID_1);
-
-  const result = await service().restoreBackup(false);
-
-  expect(result.kind).toBe('done');
-  expect(keysOf(ID_1)).toHaveLength(3);
 });
 
 test('Tests that forgetting a wallet removes the address book tags of the addresses its swaps made when its swaps go. A purchase made its destination and a sale its refund address.', async () => {

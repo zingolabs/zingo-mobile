@@ -20,7 +20,7 @@ import WalletSeedIcon from '../../assets/img/options/wallet-seed.svg';
 import SyncRescanReportIcon from '../../assets/img/options/sync-rescan-report.svg';
 import FundsPoolsIcon from '../../assets/img/options/funds-pools.svg';
 import FinancialInsightIcon from '../../assets/img/options/financial-insight.svg';
-import SwitchWalletIcon from '../../assets/img/options/switch-wallet.svg';
+import MessagesArt from '../../assets/img/options/messages.svg';
 import { themeTokens } from '@app/theme';
 
 const SOCIAL_X_URL = 'https://x.com/ZingoLabs';
@@ -35,7 +35,7 @@ const MENU_TEST_IDS: Partial<Record<MenuItemEnum, string>> = {
   [MenuItemEnum.SyncReport]: 'menu.syncreport',
   [MenuItemEnum.FundPools]: 'menu.fundpools',
   [MenuItemEnum.Insight]: 'menu.insight',
-  [MenuItemEnum.ChangeWallet]: 'menu.changewallet',
+  [MenuItemEnum.Messages]: 'menu.messages',
   [MenuItemEnum.Server]: 'menu.server',
 };
 
@@ -45,7 +45,7 @@ type PanelItem =
   | MenuItemEnum.SyncReport
   | MenuItemEnum.FundPools
   | MenuItemEnum.Insight
-  | MenuItemEnum.ChangeWallet
+  | MenuItemEnum.Messages
   | MenuItemEnum.Server
   | MenuItemEnum.Settings;
 
@@ -67,8 +67,8 @@ const walletScreen = (
       return { screen: Route.Pools };
     case MenuItemEnum.Insight:
       return { screen: Route.Insight };
-    case MenuItemEnum.ChangeWallet:
-      return { screen: Route.WalletSeed, params: { action: 'change' } };
+    case MenuItemEnum.Messages:
+      return { screen: Route.Messages };
     case MenuItemEnum.Server:
       return { screen: Route.Server };
     case MenuItemEnum.Settings:
@@ -187,15 +187,12 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       onPress: () => dispatch(MenuItemEnum.Insight),
     });
 
-    // Change wallet is a local operation (switch the loaded wallet, opened via
-    // init_from_b64 which works Offline), so it needs neither connectivity nor
-    // an online server.
     list.push({
-      id: MenuItemEnum.ChangeWallet,
-      testID: MENU_TEST_IDS[MenuItemEnum.ChangeWallet],
-      label: translate('loadedapp.changewallet') as string,
-      icon: <SwitchWalletIcon width={30} height={30} />,
-      onPress: () => dispatch(MenuItemEnum.ChangeWallet),
+      id: MenuItemEnum.Messages,
+      testID: MENU_TEST_IDS[MenuItemEnum.Messages],
+      label: translate('messages.title') as string,
+      icon: <MessagesArt width={30} height={30} />,
+      onPress: () => dispatch(MenuItemEnum.Messages),
     });
 
     // Server — always visible, always last; its dot says how Zingo connects.

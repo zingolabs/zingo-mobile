@@ -219,6 +219,21 @@ export const getRecoveryWalletInfo = async (): Promise<WalletType> => {
   return {} as WalletType;
 };
 
+/** The entry a wallet on the device saved, by its id. */
+export const recoveryEntryFor = async (
+  walletId: string,
+): Promise<{ kind: 'none' } | { kind: 'entry'; entry: RecoveryEntry }> => {
+  try {
+    const entry = parseEntry(walletId, await readEntry(serviceFor(walletId)));
+    return entry.seed || entry.ufvk
+      ? { kind: 'entry', entry }
+      : { kind: 'none' };
+  } catch (error) {
+    console.log('Error parsing recovery keys:', error);
+    return { kind: 'none' };
+  }
+};
+
 /** Whether the open wallet has its entry on the device. */
 export const hasRecoveryWalletInfo = async (): Promise<boolean> => {
   const entry = await activeWalletEntry();
@@ -236,11 +251,16 @@ export const hasRecoveryWalletInfo = async (): Promise<boolean> => {
 };
 
 /**
- * Every entry on the device with keys in it, in the order the wallets were
- * added; the single-wallet entry, when one is left, comes first with no id
- * and no name.
+ * Every entry with keys in it that a previous install left: its wallet is no
+ * longer on the device, and the single-wallet entry only while no migrated
+ * wallet holds it. In the order the wallets were added, the
+ * single-wallet entry first, with no id and no name.
  */
 export const recoveryEntriesOnDevice = async (): Promise<RecoveryEntry[]> => {
+  const onDevice = await walletsOnDevice();
+  const wallets = onDevice.ok ? onDevice.value.wallets : [];
+  const present = new Set(wallets.map(w => w.id));
+  const migrated = wallets.some(w => !!w.meta.migratedFrom);
   let services: string[] = [];
   try {
     services = await Keychain.getAllGenericPasswordServices();
@@ -252,7 +272,7 @@ export const recoveryEntriesOnDevice = async (): Promise<RecoveryEntry[]> => {
     const walletId = svc.startsWith(WALLET_SERVICE_PREFIX)
       ? svc.slice(WALLET_SERVICE_PREFIX.length)
       : '';
-    if (!walletId && svc !== service) {
+    if ((!walletId && (svc !== service || migrated)) || present.has(walletId)) {
       continue;
     }
     try {
@@ -281,3 +301,11 @@ export const forgetRecoveryEntry = async (walletId: string): Promise<void> => {
     await removeEntry(serviceFor(walletId));
   }
 };
+
+/**
+ * Drops an entry a previous install left, once its wallet is imported again
+ * under a new id and has its own entry: the bare service for the
+ * single-wallet entry, the wallet's own otherwise.
+ */
+export const retireImportedEntry = async (entry: RecoveryEntry) =>
+  removeEntry(entry.walletId ? serviceFor(entry.walletId) : service);

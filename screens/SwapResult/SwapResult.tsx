@@ -63,8 +63,9 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
     [navigation],
   );
 
+  /** Not read yet: the screen stays clear, so the one under it shows until the panel rises. */
   if (!record) {
-    return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
+    return <></>;
   }
 
   const isOutbound = record.direction === SwapDirectionEnum.Outbound;

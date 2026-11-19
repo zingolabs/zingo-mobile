@@ -10,7 +10,6 @@ import { NativeModules } from 'react-native';
 interface RPCModuleAPI {
   // Wallet lifecycle
   walletExists(): Promise<string>;
-  walletBackupExists(): Promise<string>;
   createNewWallet(
     serverUri: string,
     birthday: string,
@@ -57,15 +56,12 @@ interface RPCModuleAPI {
   deleteWalletProcess(walletId: string): Promise<string | boolean>;
   // {free, largest} in bytes: the storage left and the largest wallet file.
   diskSpaceInfo(): Promise<string>;
-  restoreExistingWalletBackup(): Promise<string | boolean>;
-  replaceWalletWithBackup(): Promise<string | boolean>;
   // Android only (2.0.21 double-wrap incident): per-file classification of
   // the wallet files, and the unwrap repair. Absent on iOS.
   walletFileDiagnosisInfo(): Promise<string>;
   repairDoubleWrappedWalletProcess(): Promise<string>;
   walletFileRecoveryInfo(): Promise<string>;
   walletChainInfo(): Promise<string>;
-  deleteExistingWallet(): Promise<string>;
   // The app's own JSON files in its private folder; see appFiles.
   appFileExists(name: string): Promise<boolean>;
   readAppFile(name: string): Promise<string>;

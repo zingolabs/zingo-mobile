@@ -28,6 +28,10 @@ export type WalletMeta = {
   seedBackedUp?: boolean;
   seedBackedUpAt?: number;
   viewOnlyNoticeDismissed?: boolean;
+  /** The last attempt to open the wallet failed. */
+  openFailed?: boolean;
+  /** Imported from what a previous install left in the Keychain. */
+  fromPrevious?: boolean;
 };
 
 /** The meta fields a patch may set; the store owns the rest. */
@@ -152,6 +156,28 @@ export async function diskSpace(): Promise<FfiResult<DiskSpace>> {
 /** Whether the storage holds twice the largest wallet, and never less than MIN_FREE_BYTES. */
 export function hasRoomForWallet(space: DiskSpace): boolean {
   return space.free >= Math.max(2 * space.largest, MIN_FREE_BYTES);
+}
+
+/** Records whether a wallet's last open failed, writing only when that changes. */
+export async function recordOpenFailed(
+  wallet: WalletEntry,
+  failed: boolean,
+): Promise<void> {
+  if (!!wallet.meta.openFailed === failed) {
+    return;
+  }
+  const written = await updateWalletMeta(wallet.id, { openFailed: failed });
+  if (!written.ok) {
+    console.log(`recordOpenFailed: ${written.error.message}`);
+  }
+}
+
+/** Clears the failed-open mark of the wallet that just opened. */
+export async function recordActiveOpened(): Promise<void> {
+  const entry = await activeWalletEntry();
+  if (entry.kind === 'wallet') {
+    await recordOpenFailed(entry.wallet, false);
+  }
 }
 
 /** Records the kind on the active wallet's meta when it has none, as a wallet migrated from the single-wallet layout. */

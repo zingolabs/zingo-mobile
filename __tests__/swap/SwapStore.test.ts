@@ -121,6 +121,15 @@ describe('SwapStore binding', () => {
     await SwapStore.unbind();
     expect(await SwapStore.readAll()).toEqual([]);
   });
+
+  it("Tests that the snapshot holds the bound wallet's records after a change and empties when the wallet is unbound. A screen draws its first frame from it.", async () => {
+    await SwapStore.bindToWallet('wallet-aaa');
+    await SwapStore.upsert(makeRecord('rec-a'));
+    expect(SwapStore.snapshot().map(r => r.recordId)).toEqual(['rec-a']);
+
+    await SwapStore.unbind();
+    expect(SwapStore.snapshot()).toEqual([]);
+  });
 });
 
 describe('SwapStore mutations', () => {

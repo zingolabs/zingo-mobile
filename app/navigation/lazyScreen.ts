@@ -26,8 +26,9 @@ const settled = <M>(module: M) =>
 
 /**
  * A screen loaded on first use that can be loaded ahead with `preload`. Once
- * loaded it draws on its first frame: Suspense never shows its empty
- * fallback during the transition that opens it.
+ * loaded it draws on its first frame. Opened before it loaded, it waits in a
+ * boundary of its own: only its place stays empty, and the screens under it
+ * stay drawn instead of the whole app blanking.
  */
 export function lazyScreen<M extends ScreenModule>(load: () => Promise<M>) {
   let loaded: M | undefined;
@@ -42,7 +43,13 @@ export function lazyScreen<M extends ScreenModule>(load: () => Promise<M>) {
     );
     return loading;
   };
-  const Screen = React.lazy(() => (loaded ? settled(loaded) : preload()));
+  const Lazy = React.lazy(() => (loaded ? settled(loaded) : preload()));
+  const Screen = (props: React.ComponentProps<M['default']>) =>
+    React.createElement(
+      React.Suspense,
+      { fallback: null },
+      React.createElement(Lazy, props),
+    );
   return Object.assign(Screen, { preload });
 }
 

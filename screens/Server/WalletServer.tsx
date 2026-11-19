@@ -37,23 +37,66 @@ import { AXIS_PT, axisEnter, axisExit } from '@ui/widgets/OnboardingStage';
 import ServerList from '@screens/ServerList';
 import Server from './Server';
 import Header from '@ui/widgets/Header';
+import SettingsFileImpl from '@app/services/SettingsFileImpl';
+import {
+  setAddWalletDraft,
+  useAddWalletDraft,
+} from '@app/services/addWalletDraft';
 
-// The Server screen inside the wallet: a choice reconnects the open wallet,
-// and a server on another network goes to the recovery screen.
+// The Server screen inside the wallet, for one wallet: a choice reconnects
+// the open wallet, or is kept in another wallet's meta for when it opens. The
+// network is the wallet's and does not change.
 type WalletServerProps = NativeStackScreenProps<AppDrawerParamList, 'Server'>;
 
-const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
+const WalletServer: React.FC<WalletServerProps> = ({ navigation, route }) => {
   const { colors } = useTheme();
+  const context = useContext(ContextAppLoaded);
   const {
     setServerOption,
     translate,
-    server,
-    selectServer,
     netInfo,
-    walletChainName,
-    readOnly,
     addLastSnackbar,
-  } = useContext(ContextAppLoaded);
+    walletId,
+    wallets,
+    refreshWallets,
+  } = context;
+  /** The wallet being added, whose server lives in its draft until it exists. */
+  const forDraft = !!route.params && 'draft' in route.params;
+  const draft = useAddWalletDraft();
+  /** The wallet this screen sets the server of; another than the open one is only stored. */
+  const paramsId =
+    route.params && 'walletId' in route.params ? route.params.walletId : '';
+  const target = wallets.find(w => w.id === (paramsId || walletId));
+  const isOpen = !forDraft && (!target || target.id === walletId);
+  const [stored, setStored] = useState<{
+    server: ServerType;
+    selectServer: SelectServerEnum;
+  } | null>(null);
+  useEffect(() => {
+    if (!isOpen && target) {
+      SettingsFileImpl.serverOf(target.meta).then(setStored);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, target?.id]);
+  const server = forDraft
+    ? draft.server
+    : isOpen
+      ? context.server
+      : (stored?.server ?? context.server);
+  const selectServer = forDraft
+    ? draft.selectServer
+    : isOpen
+      ? context.selectServer
+      : (stored?.selectServer ?? context.selectServer);
+  const walletChainName = forDraft
+    ? draft.keyChain.kind === 'key'
+      ? draft.keyChain.chain
+      : draft.server.chainName
+    : isOpen
+      ? context.walletChainName
+      : ((target?.meta.chain as ChainNameEnum) ?? context.walletChainName);
+  /** A wallet's network never changes; one being added picks it, unless its viewing key set it. */
+  const networkLocked = !forDraft || draft.keyChain.kind === 'key';
   const online = !!netInfo.isConnected;
   const [status, setStatus] = useState<ServerStatus>('wait');
   const [blockHeight, setBlockHeight] = useState('');
@@ -84,19 +127,19 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
     [],
   );
 
-  const probeCurrent = useCallback(async (target: ServerType) => {
-    if (target.kind === 'offline') {
+  const probeCurrent = useCallback(async (probed: ServerType) => {
+    if (probed.kind === 'offline') {
       setStatus('ok');
       return;
     }
     setStatus('wait');
-    const probe = await probeUri(target.uri);
+    const probe = await probeUri(probed.uri);
     if (!mounted.current) {
       return;
     }
     setStatus(probe.latency === null ? 'bad' : 'ok');
     setBlockHeight(probe.height);
-    setLatencies(l => ({ ...l, [target.uri]: probe.latency }));
+    setLatencies(l => ({ ...l, [probed.uri]: probe.latency }));
   }, []);
 
   useEffect(() => {
@@ -130,32 +173,42 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
     [lists, translate, online],
   );
 
-  // Reconnects the wallet to `target`; true once it uses it.
+  // Reconnects the open wallet to `next`, or keeps it for another; true once it holds.
   const apply = async (
-    target: ServerType,
+    next: ServerType,
     mode: SelectServerEnum,
   ): Promise<boolean> => {
     setBusy(true);
     setStatus('wait');
-    const sameChain =
-      target.kind === 'offline' || target.chainName === walletChainName;
-    const result = await setServerOption(target, mode, true, sameChain);
+    if (forDraft) {
+      setAddWalletDraft({ server: next, selectServer: mode });
+      setBusy(false);
+      probeCurrent(next);
+      return true;
+    }
+    if (!isOpen && target) {
+      const kept = await SettingsFileImpl.writeWalletServer(
+        target.id,
+        next,
+        mode,
+      );
+      if (!mounted.current) {
+        return kept;
+      }
+      setBusy(false);
+      if (kept) {
+        setStored({ server: next, selectServer: mode });
+        refreshWallets();
+      } else {
+        probeCurrent(server);
+      }
+      return kept;
+    }
+    const result = await setServerOption(next, mode, true);
     if (!mounted.current) {
       return result.kind === 'ok';
     }
     setBusy(false);
-    if (result.kind === 'chain-changed') {
-      setLeaving('away');
-      if (readOnly) {
-        navigation.navigate(Route.ViewingKey, {
-          entry: { kind: 'push' },
-          switchTo: target.chainName,
-        });
-      } else {
-        navigation.navigate(Route.WalletSeed, { action: 'server' });
-      }
-      return false;
-    }
     if (result.kind === 'error') {
       probeCurrent(server);
     }
@@ -268,6 +321,13 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
             <Server
               placement="belowHeader"
               translate={translate}
+              initialChain={walletChainName}
+              networkLocked={networkLocked}
+              networkNote={
+                forDraft && draft.keyChain.kind === 'key'
+                  ? (translate('server.from-key') as string)
+                  : undefined
+              }
               server={server}
               selectServer={selectServer}
               status={status}

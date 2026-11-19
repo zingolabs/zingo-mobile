@@ -4,13 +4,15 @@ import {
   AppState,
   NativeEventSubscription,
   Platform,
+  View,
 } from 'react-native';
 import { useTheme } from '@app/theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
-import { isEqual } from 'lodash';
+import { defaultTo, isEqual } from 'lodash';
 import { LoadingSession, useSession } from '@app/navigation/session';
-import { navigateWallet } from '@app/navigation/navigate';
+import { isOnTop, navigateWallet, popRoutes } from '@app/navigation/navigate';
+import { walletErrorKind } from '@app/LoadingApp/walletErrorKind';
 import { LoadedAppNavigationState } from '@app/types';
 import NetInfo, {
   NetInfoSubscription,
@@ -27,6 +29,14 @@ import {
   doSave,
   isWalletAddress,
   loadExistingWallet,
+  loadWallet,
+  deleteWallet,
+  createNewWallet,
+  restoreWalletFromSeed,
+  restoreWalletFromUfvk,
+  recordOpenFailed,
+  updateWalletMeta,
+  walletsOnDevice,
   parseAddress,
   cancelOldPrivateMigration,
 } from '@app/walletBackend';
@@ -74,7 +84,11 @@ import {
   formatInteger,
   toAmountInput,
 } from '@app/utils/formatAmount';
-import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
+import {
+  getZingoVersion,
+  substituteCurrency,
+  substituteZingoName,
+} from '@app/utils/ZingoAppData';
 import { AppTheme } from '@app/theme';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
@@ -87,7 +101,6 @@ import selectingServer from '@app/services/selectingServer';
 import BackgroundFileImpl from '@app/services/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '@app/services/createAlert';
-import { sendEmail } from '@app/services/sendEmail';
 import Toast from 'react-native-toast-message';
 import { FullWindowOverlay } from 'react-native-screens';
 import { ACTION_SNACKBAR_MS, toastConfig } from '@ui/widgets/toastConfig';
@@ -108,6 +121,7 @@ import AddTagModalHost from './components/AddTagModalHost';
 import { showAddTag } from '@app/services/showAddTag';
 import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
+import WalletsSheet from '@screens/Wallets';
 import FadeInOnMount from '@ui/widgets/FadeInOnMount';
 import { showConfirm } from '@app/services/showConfirm';
 import { WalletNavigator } from '@app/navigation/WalletNavigator';
@@ -140,6 +154,36 @@ import { RootParamList } from '@app/types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { publishReport } from '@app/services/reportDiagnostics';
+import { finishWalletOpen, WalletOpen } from '@app/services/openWallet';
+import { showWallets } from '@app/services/showWallets';
+import { askDiskRetry, isDiskFull } from '@app/services/diskFull';
+import { entryChain, entryServer } from '@app/services/recoveryImport';
+import {
+  RecoveryEntry,
+  recoveryEntryFor,
+  retireImportedEntry,
+} from '@app/services/recoveryWalletInfo';
+import { defaultWalletName } from '@screens/AddWallet/draftParts';
+import { AddWalletDraft } from '@app/services/addWalletDraft';
+import { isViewingKey } from '@app/utils/seedPhrase';
+import type {
+  AddWalletResult,
+  ImportFoundFailed,
+  ImportFoundResult,
+  WalletSwitchOutcome,
+  NewWalletSource,
+} from '@app/AppState/AppContextLoaded';
+import { forgetWallet } from '@app/services/WalletLocalData';
+import type { FfiResult } from '@app/walletBackend';
+import { writeSavedBalance } from '@app/services/savedBalance';
+import {
+  leaveHandoff,
+  PendingHandoff,
+  takeHandoff,
+  WalletHandoff,
+} from '@app/services/walletHandoff';
+import { avatarCategoryOf } from '@ui/widgets/Avatar';
+import type { WalletEntry } from '@app/walletBackend';
 
 const en = require('@app/translations/en.json');
 const es = require('@app/translations/es.json');
@@ -171,6 +215,14 @@ type LoadedAppProps = NativeStackScreenProps<RootParamList, 'Wallet'> & {
 // The wallet fades in over the loading screen as it opens.
 const HOME_FADE_MS = 300;
 
+const FILL = { flex: 1 } as const;
+
+/** How long Home waits faded for a wallet opened in place before it shows what it has. */
+const OPENING_MAX_MS = 15 * 1000;
+
+/** How long a switch waits for the open wallet's sync to stop before it saves. */
+const SWITCH_STOP_WAIT_MS = 5 * 1000;
+
 /** iOS gives a backgrounded app a few seconds; the save still has to fit. */
 const BACKGROUND_STOP_WAIT_MS = 3 * 1000;
 
@@ -182,27 +234,49 @@ const SERVER_DEFAULT_0: ServerType = remoteServer(
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme();
   const { setSession, pendingLink, clearLink } = useSession();
-  const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
-  const [privacy, setPrivacy] = useState<boolean>(false);
-  const [backgroundSyncInfo, setBackgroundSyncInfo] = useState<BackgroundType>({
-    batches: 0,
-    message: '',
-    date: 0,
-    dateEnd: 0,
-  });
-  const [addressBook, setAddressBook] = useState<AddressBookFileClass[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [biometrics, setBiometrics] = useState<boolean>(true);
-  const [seedBackedUp, setSeedBackedUp] = useState<boolean>(true);
-  const [seedBackedUpAt, setSeedBackedUpAt] = useState<number>(0);
-  const [viewOnlyNoticeDismissed, setViewOnlyNoticeDismissed] =
-    useState<boolean>(false);
-  const [selectServer, setSelectServer] = useState<SelectServerEnum>(
-    SelectServerEnum.auto,
+  const [handoff] = useState(() => takeHandoff(props.wallet.walletId));
+  const carried = <T,>(
+    pick: (c: WalletHandoff['settings']) => T,
+    fallback: T,
+  ) => (handoff.kind === 'handoff' ? pick(handoff.handoff.settings) : fallback);
+  const [language, setLanguage] = useState<LanguageEnum>(() =>
+    carried(c => c.language, LanguageEnum.en),
   );
-  const [blockExplorer, setBlockExplorer] = useState<BlockExplorerEnum>(
-    BlockExplorerEnum.Zcashexplorer,
+  const [server, setServer] = useState<ServerType>(() =>
+    carried(c => c.server, SERVER_DEFAULT_0),
+  );
+  const [privacy, setPrivacy] = useState<boolean>(() =>
+    carried(c => c.privacy, false),
+  );
+  const [backgroundSyncInfo, setBackgroundSyncInfo] = useState<BackgroundType>(
+    () =>
+      carried(c => c.backgroundSyncInfo, {
+        batches: 0,
+        message: '',
+        date: 0,
+        dateEnd: 0,
+      }),
+  );
+  const [addressBook, setAddressBook] = useState<AddressBookFileClass[]>(() =>
+    carried(c => c.addressBook, []),
+  );
+  const [loading, setLoading] = useState<boolean>(handoff.kind === 'none');
+  const [biometrics, setBiometrics] = useState<boolean>(() =>
+    carried(c => c.biometrics, true),
+  );
+  const [seedBackedUp, setSeedBackedUp] = useState<boolean>(() =>
+    carried(c => c.seedBackedUp, true),
+  );
+  const [seedBackedUpAt, setSeedBackedUpAt] = useState<number>(() =>
+    carried(c => c.seedBackedUpAt, 0),
+  );
+  const [viewOnlyNoticeDismissed, setViewOnlyNoticeDismissed] =
+    useState<boolean>(() => carried(c => c.viewOnlyNoticeDismissed, false));
+  const [selectServer, setSelectServer] = useState<SelectServerEnum>(() =>
+    carried(c => c.selectServer, SelectServerEnum.auto),
+  );
+  const [blockExplorer, setBlockExplorer] = useState<BlockExplorerEnum>(() =>
+    carried(c => c.blockExplorer, BlockExplorerEnum.Zcashexplorer),
   );
   const file = useMemo(
     () => ({
@@ -218,8 +292,11 @@ export default function LoadedApp(props: LoadedAppProps) {
     const instance = new I18n(file);
     /** A key missing in a locale shows the English text, never `[missing … translation]`. */
     instance.enableFallback = true;
+    if (handoff.kind === 'handoff') {
+      instance.locale = handoff.handoff.settings.language;
+    }
     return instance;
-  }, [file]);
+  }, [file, handoff]);
 
   // `translate` carries `language` in its memo deps so its identity changes
   // when the user switches language. Memoized children that include
@@ -234,8 +311,14 @@ export default function LoadedApp(props: LoadedAppProps) {
   // `language` is what forces this memo to rebuild and gives `translate` a
   // fresh identity that downstream useMemo/useCallback deps can observe.
   const translate: (key: string) => TranslateType = useMemo(
-    () => (key: string) => substituteZingoName(i18n.t(key) as TranslateType),
-    [i18n, language], // eslint-disable-line react-hooks/exhaustive-deps
+    () => (key: string) =>
+      substituteCurrency(
+        substituteZingoName(i18n.t(key) as TranslateType),
+        props.wallet.walletChainName === ChainNameEnum.mainChainName
+          ? CurrencyNameEnum.ZEC
+          : CurrencyNameEnum.TAZ,
+      ),
+    [i18n, language, props.wallet.walletChainName], // eslint-disable-line react-hooks/exhaustive-deps
   );
   const {
     readOnly,
@@ -250,6 +333,9 @@ export default function LoadedApp(props: LoadedAppProps) {
   } = props.wallet;
 
   useEffect(() => {
+    if (handoff.kind === 'handoff') {
+      return;
+    }
     (async () => {
       // fallback if no available language fits
       const fallback = { languageTag: LanguageEnum.en, isRTL: false };
@@ -500,7 +586,11 @@ export default function LoadedApp(props: LoadedAppProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (loading) {
+  if (loading && props.wallet.arrival === 'switch') {
+    // Picked in Wallets: Home stayed while it opened, so no launch screen
+    // now, only the canvas the new Home fades in over.
+    return <View style={[FILL, { backgroundColor: theme.colors.bgCanvas }]} />;
+  } else if (loading) {
     return (
       <Launching
         translate={translate}
@@ -513,6 +603,11 @@ export default function LoadedApp(props: LoadedAppProps) {
       <LoadedAppClass
         {...props}
         leaveWallet={setSession}
+        openWallet={params => setSession({ kind: 'wallet', params })}
+        walletId={props.wallet.walletId}
+        handoff={handoff}
+        arrivalNext={props.wallet.next}
+        arrivalNotice={props.wallet.notice}
         pendingLink={pendingLink}
         clearLink={clearLink}
         theme={theme}
@@ -549,6 +644,14 @@ export default function LoadedApp(props: LoadedAppProps) {
 
 type LoadedAppClassProps = {
   leaveWallet: (session: LoadingSession) => void;
+  /** Hands the wallet section to another open wallet, which remounts it. */
+  openWallet: (params: LoadedAppNavigationState) => void;
+  walletId: string;
+  /** What the wallet replaced in place handed over: its figures, shown faded while this one opens. */
+  handoff: PendingHandoff;
+  /** A wallet just added opens on its seed backup when asked, and with its note. */
+  arrivalNext: LoadedAppNavigationState['next'];
+  arrivalNotice: string;
   // A `zcash:` link waiting for Send, from the session.
   pendingLink: string | undefined;
   clearLink: () => void;
@@ -590,14 +693,19 @@ export class LoadedAppClass extends Component<
   unsubscribeNetInfo: NetInfoSubscription;
   constructor(props: LoadedAppClassProps) {
     super(props);
+    const shown: WalletHandoff['figures'] =
+      props.handoff.kind === 'handoff'
+        ? props.handoff.handoff.figures
+        : { kind: 'none' };
 
     this.state = {
       //context
       netInfo: {} as NetInfoType,
-      totalBalance: null,
+      totalBalance: shown.kind === 'shown' ? shown.totalBalance : null,
       addresses: null,
-      valueTransfers: null,
-      valueTransfersTotal: null,
+      valueTransfers: shown.kind === 'shown' ? shown.valueTransfers : null,
+      valueTransfersTotal:
+        shown.kind === 'shown' ? shown.valueTransfersTotal : null,
       messages: null,
       messagesTotal: null,
       sendPageState: new SendPageStateClass(new ToAddrClass(0)),
@@ -651,10 +759,13 @@ export class LoadedAppClass extends Component<
       setLanguageOption: this.setLanguageOption,
       setBiometricsOption: this.setBiometricsOption,
       setBlockExplorerOption: this.setBlockExplorerOption,
-      changeWallet: this.onClickOKChangeWallet,
-      restoreBackup: this.onClickOKRestoreBackup,
-      applyPendingServer: this.onClickOKServerWallet,
-      cancelPendingServer: this.cancelPendingServer,
+      switchWallet: this.switchWallet,
+      restoreInPlace: this.restoreInPlace,
+      deleteWallet: this.deleteWallet,
+      addWallet: this.addWallet,
+      enterAdded: this.enterAdded,
+      importFound: this.importFound,
+      refreshWallets: this.refreshWallets,
       somePending: false,
       addressBook: props.addressBook,
       launchAddTagModal: this.launchAddTagModal,
@@ -688,7 +799,12 @@ export class LoadedAppClass extends Component<
         Platform.OS === GlobalConst.platformOSios
           ? AppStateStatusEnum.active
           : AppState.currentState,
-      pendingServer: { kind: 'none' },
+      walletId: props.walletId,
+      switching:
+        props.handoff.kind === 'handoff'
+          ? { kind: 'opening', wallet: props.handoff.handoff.opening }
+          : { kind: 'none' },
+      wallets: [],
       scrollToTop: false,
       scrollToBottom: false,
     };
@@ -722,6 +838,14 @@ export class LoadedAppClass extends Component<
 
   componentDidMount = async () => {
     this.publishReportState();
+    await this.refreshWallets();
+    this.arrive();
+    if (this.state.switching.kind === 'opening') {
+      this.openingTimer = setTimeout(
+        () => this.setState({ switching: { kind: 'none' } }),
+        OPENING_MAX_MS,
+      );
+    }
     const netInfoState = await NetInfo.fetch();
     this.setState({
       netInfo: {
@@ -995,7 +1119,24 @@ export class LoadedAppClass extends Component<
     }
   };
 
+  /** What a wallet opened in place still waits for before its own figures replace the faded ones. */
+  awaiting = { balance: true, transfers: true };
+  openingTimer: ReturnType<typeof setTimeout> | undefined = undefined;
+
+  /** Ends the opening once the balance and the history of this wallet arrived. */
+  arrived = (part: 'balance' | 'transfers') => {
+    if (this.state.switching.kind !== 'opening' || !this.awaiting[part]) {
+      return;
+    }
+    this.awaiting = { ...this.awaiting, [part]: false };
+    if (!this.awaiting.balance && !this.awaiting.transfers) {
+      clearTimeout(this.openingTimer);
+      this.setState({ switching: { kind: 'none' } });
+    }
+  };
+
   componentWillUnmount = async () => {
+    clearTimeout(this.openingTimer);
     publishReport({ session: { kind: 'closed' } });
     await this.rpc.clearTimers();
     this.rpc.stopMixnetPolling();
@@ -1107,10 +1248,19 @@ export class LoadedAppClass extends Component<
   };
 
   setTotalBalance = (totalBalance: TotalBalanceClass) => {
-    if (!isEqual(this.state.totalBalance, totalBalance)) {
+    const opening = this.state.switching.kind === 'opening';
+    if (opening || !isEqual(this.state.totalBalance, totalBalance)) {
       //const start = Date.now();
       this.setState({ totalBalance });
+      writeSavedBalance(
+        this.state.walletId,
+        totalBalance.totalIronwoodBalance +
+          totalBalance.totalOrchardBalance +
+          totalBalance.totalSaplingBalance +
+          totalBalance.totalTransparentBalance,
+      ).catch(e => console.log(`saved balance not written: ${e}`));
     }
+    this.arrived('balance');
   };
 
   setSyncingStatus = (syncingStatus: RPCSyncStatusType) => {
@@ -1142,7 +1292,9 @@ export class LoadedAppClass extends Component<
     valueTransfers: ValueTransferType[],
     valueTransfersTotal: number,
   ) => {
+    const opening = this.state.switching.kind === 'opening';
     if (
+      opening ||
       !isEqual(this.state.valueTransfers, valueTransfers) ||
       this.state.valueTransfersTotal !== valueTransfersTotal
     ) {
@@ -1161,7 +1313,8 @@ export class LoadedAppClass extends Component<
               ).length
           : 0;
       // if a ValueTransfer go from 3 confirmations to > 3 -> Show a message about a ValueTransfer is confirmed
-      this.state.valueTransfers &&
+      !opening &&
+        this.state.valueTransfers &&
         this.state.valueTransfersTotal !== null &&
         this.state.valueTransfersTotal > 0 &&
         this.state.valueTransfers
@@ -1323,6 +1476,7 @@ export class LoadedAppClass extends Component<
       //  Date.now() - start,
       //);
     }
+    this.arrived('transfers');
   };
 
   setMessagesList = (messages: ValueTransferType[], messagesTotal: number) => {
@@ -1481,7 +1635,6 @@ export class LoadedAppClass extends Component<
     value: ServerType,
     selectServer: SelectServerEnum,
     toast: boolean,
-    sameServerChainName: boolean,
   ): Promise<SetServerResult> => {
     // The server is changing — stop the ongoing sync tasks before touching
     // anything else.
@@ -1489,29 +1642,7 @@ export class LoadedAppClass extends Component<
     this.setSyncingStatus({} as RPCSyncStatusType);
     this.keepAwake(false);
 
-    // Caller pre-detected a chain change (`sameServerChainName === false`).
-    // We can't open the existing wallet against a different chain; stash
-    // the desired server in state so the recovery screen can pick it up,
-    // restore the previous server, and signal `chain-changed` so the
-    // caller navigates to Seed/Ufvk recovery. We deliberately do NOT
-    // navigate from here — navigation policy lives in the caller now.
-    if (!sameServerChainName) {
-      const oldSettings = await SettingsFileImpl.readSettings();
-      await changeServer(nativeUri(oldSettings.server));
-      this.setState({
-        pendingServer: { kind: 'pending', server: value, selectServer },
-        server: oldSettings.server,
-        selectServer: oldSettings.selectServer,
-      });
-      if (toast) {
-        this.addLastSnackbar(
-          `${this.state.translate('loadedapp.readingwallet-error')} ${nativeUri(value)}`,
-        );
-      }
-      return { kind: 'chain-changed' };
-    }
-
-    // Same chain — try to open the wallet on the new server.
+    // The wallet's network never changes: open it on the new server.
     const result = await loadExistingWallet(
       nativeUri(value),
       value.chainName,
@@ -1725,168 +1856,511 @@ export class LoadedAppClass extends Component<
     this.props.leaveWallet(session);
   };
 
-  onClickOKChangeWallet = async () => {
-    const changed = await this.rpc.changeWallet();
-
-    if (changed.kind === 'error') {
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        this.state.translate('loadedapp.changingwallet-label') as string,
-        this.state.translate(changed.errorKey) as string,
-        false,
-        this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
+  /** What a wallet just added does once open: its note, and its seed backup when asked. */
+  arrive = () => {
+    if (this.props.arrivalNotice) {
+      setTimeout(
+        () => this.addLastSnackbar(this.props.arrivalNotice),
+        HOME_FADE_MS,
       );
-      return;
     }
-
-    this.keepAwake(false);
-    this.navigateToLoadingApp({
-      kind: 'boot',
-      startingApp: false,
-      newWallet: false,
-    });
-  };
-
-  // Runs from a confirm button, where a throw would vanish: every failure
-  // ends in the alert.
-  onClickOKRestoreBackup = async () => {
-    try {
-      await this.restoreBackupAndRestart();
-    } catch (e) {
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        this.state.translate('loadedapp.restoringwallet-label') as string,
-        `${this.state.translate('rpc.restorebackup-error') as string} ${e}`,
-        false,
-        this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
+    if (this.props.arrivalNext === 'wallets') {
+      setTimeout(showWallets, HOME_FADE_MS);
+    }
+    if (this.props.arrivalNext === 'backup') {
+      setTimeout(
+        () =>
+          navigateWallet({
+            screen: Route.SeedBackup,
+            params: { entry: { kind: 'push' } },
+          }),
+        HOME_FADE_MS,
       );
     }
   };
 
-  restoreBackupAndRestart = async () => {
-    // Only mainnet wallets are backed up: any other wallet is replaced by
-    // the backup instead of swapping places with it.
-    const restored = await this.rpc.restoreBackup(
-      this.state.walletChainName !== ChainNameEnum.mainChainName,
-    );
-
-    if (restored.kind === 'error') {
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        this.state.translate('loadedapp.restoringwallet-label') as string,
-        this.state.translate(restored.errorKey) as string,
-        false,
-        this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
-      );
+  /** Reads the wallets on the device; one without a category gets the one its id gives, kept in its meta. */
+  refreshWallets = async (): Promise<void> => {
+    const result = await walletsOnDevice();
+    if (!result.ok) {
       return;
     }
+    const wallets: WalletEntry[] = [];
+    for (const wallet of result.value.wallets) {
+      if (wallet.meta.category) {
+        wallets.push(wallet);
+        continue;
+      }
+      const category = avatarCategoryOf(wallet.id);
+      await updateWalletMeta(wallet.id, { category });
+      wallets.push({ ...wallet, meta: { ...wallet.meta, category } });
+    }
+    this.setState({ wallets });
+  };
 
-    // The swapped-in wallet is a restore, which counts as backed up. The
-    // previous wallet's flag must not carry over.
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUp, true);
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUpAt, 0);
-    await SettingsFileImpl.writeSettings(
-      SettingsNameEnum.viewOnlyNoticeDismissed,
-      false,
-    );
-    // Only mainnet wallets were ever backed up, so another network's server
-    // could not open it: the restart picks the best mainnet server instead.
-    const { server } = this.state;
+  /**
+   * Opens another wallet in place: Home stays, faded, while it opens, then
+   * the wallet section remounts on it. One that does not open hands back to
+   * the wallet that was open.
+   */
+  switchWallet = async (entry: WalletEntry): Promise<WalletSwitchOutcome> => {
     if (
-      server.kind !== 'offline' &&
-      server.chainName !== ChainNameEnum.mainChainName
+      this.state.switching.kind === 'opening' ||
+      entry.id === this.state.walletId
     ) {
-      const mainnet = serverUris(this.state.translate).find(
-        s => s.chainName === ChainNameEnum.mainChainName && s.default,
-      );
-      if (mainnet) {
-        await SettingsFileImpl.writeServer(
-          remoteServer(mainnet.uri, mainnet.chainName),
-          SelectServerEnum.auto,
-        );
-      }
+      return { kind: 'failed' };
     }
+    this.setState({ switching: { kind: 'opening', wallet: entry } });
+    await this.rpc.stopSyncProcess(SWITCH_STOP_WAIT_MS);
+    await doSave();
+    await this.rpc.clearTimers();
     this.keepAwake(false);
-    this.navigateToLoadingApp({
-      kind: 'boot',
-      startingApp: false,
-      newWallet: true,
+
+    const opened = await this.openInPlace(entry);
+    if (opened.kind === 'opened') {
+      return { kind: 'opened' };
+    }
+    await loadWallet(
+      this.state.walletId,
+      nativeUri(this.state.server),
+      this.state.server.chainName,
+      DEFAULT_PERFORMANCE_LEVEL,
+      GlobalConst.minConfirmations.toString(),
+    );
+    this.rpc.walletReopened();
+    await this.rpc.configure();
+    this.setState({ switching: { kind: 'none' } });
+    const details = Utils.humanizeChainTokens(
+      opened.error.message,
+      this.state.translate,
+    );
+    if (walletErrorKind(details) === 'open') {
+      await recordOpenFailed(entry, true);
+    }
+    await this.refreshWallets();
+    if (!isOnTop(Route.WalletOpenError)) {
+      navigateWallet({
+        screen: Route.WalletOpenError,
+        params: { walletId: entry.id, details },
+      });
+    }
+    return { kind: 'failed' };
+  };
+
+  /**
+   * Restores a wallet that won't open from the phrase its entry saved: the
+   * new one takes its name, colour and place, the broken one leaves the
+   * device, and the new one opens.
+   */
+  restoreInPlace = async (entry: WalletEntry): Promise<void> => {
+    const found = await recoveryEntryFor(entry.id);
+    if (found.kind === 'none') {
+      this.addLastSnackbar(this.state.translate('wallets.no-entry') as string);
+      return;
+    }
+    this.setState({ switching: { kind: 'opening', wallet: entry } });
+    const choice = await SettingsFileImpl.serverOf(entry.meta);
+    const result = await this.addWallet(
+      {
+        kind: 'restore',
+        text: found.entry.seed || found.entry.ufvk || '',
+        birthday: found.entry.birthday,
+      },
+      entry.meta.name,
+      { ...choice, keyChain: { kind: 'none' } },
+    );
+    if (result.kind === 'diskFull') {
+      this.setState({ switching: { kind: 'none' } });
+      askDiskRetry(this.state.translate, () => this.restoreInPlace(entry));
+      return;
+    }
+    if (result.kind === 'failed') {
+      this.setState({ switching: { kind: 'none' } });
+      this.addLastSnackbar(
+        (this.state.translate('add.error') as string).replace(
+          '{error}',
+          result.message,
+        ),
+      );
+      return;
+    }
+    await updateWalletMeta(result.params.walletId, {
+      order: entry.meta.order,
+      ...(entry.meta.fromPrevious ? { fromPrevious: true } : {}),
+      ...(entry.meta.category ? { category: entry.meta.category } : {}),
+    });
+    await forgetWallet(entry.id).then(() => deleteWallet(entry.id));
+    await this.enterAdded(
+      result.params,
+      'home',
+      (this.state.translate('wallets.restored-place') as string).replace(
+        '{name}',
+        entry.meta.name,
+      ),
+    );
+  };
+
+  /** Opens a wallet with its own server and hands the wallet section to it; a failure is the caller's. */
+  openInPlace = async (entry: WalletEntry): Promise<WalletOpen> => {
+    const { server } = await SettingsFileImpl.serverOf(entry.meta);
+    const opened = await finishWalletOpen(
+      await loadWallet(
+        entry.id,
+        nativeUri(server),
+        server.chainName,
+        DEFAULT_PERFORMANCE_LEVEL,
+        GlobalConst.minConfirmations.toString(),
+      ),
+      server.chainName,
+    );
+    if (opened.kind === 'opened') {
+      await this.leaveHandoffFor(entry, true);
+      this.props.openWallet({
+        walletId: entry.id,
+        arrival: 'switch',
+        next: 'home',
+        notice: '',
+        readOnly: opened.readOnly,
+        orchardPool: opened.orchardPool,
+        saplingPool: opened.saplingPool,
+        transparentPool: opened.transparentPool,
+        newWallet: false,
+        firstLaunchingMessage: LaunchingModeEnum.opening,
+        walletChainName: opened.walletChainName,
+      });
+    }
+    return opened;
+  };
+
+  /**
+   * Adds a wallet beside the others, from a new seed or a restore, with the
+   * network and server picked for it, and opens it. Its name, server and
+   * seed backup state go to its meta. A wallet that cannot be added leaves the
+   * open one as it was.
+   */
+  addWallet = async (
+    source: NewWalletSource,
+    name: string,
+    draft: AddWalletDraft,
+  ): Promise<AddWalletResult> => {
+    await this.rpc.stopSyncProcess(SWITCH_STOP_WAIT_MS);
+    await doSave();
+    await this.rpc.clearTimers();
+    this.keepAwake(false);
+
+    const before = new Set(this.state.wallets.map(w => w.id));
+    const chain =
+      draft.keyChain.kind === 'key'
+        ? draft.keyChain.chain
+        : draft.server.chainName;
+    const server =
+      draft.server.kind === 'offline' ? offlineServer(chain) : draft.server;
+    const args = [
+      nativeUri(server),
+      chain,
+      DEFAULT_PERFORMANCE_LEVEL,
+      GlobalConst.minConfirmations.toString(),
+    ] as const;
+    const text = source.kind === 'restore' ? source.text.toLowerCase() : '';
+    const birthday =
+      source.kind === 'restore' ? String(defaultTo(source.birthday, 0)) : '0';
+    const result =
+      source.kind === 'create'
+        ? await createNewWallet(args[0], birthday, args[1], args[2], args[3])
+        : isViewingKey(text)
+          ? await restoreWalletFromUfvk(text, birthday, ...args)
+          : await restoreWalletFromSeed(text, birthday, ...args);
+
+    const listed = result.ok ? await walletsOnDevice() : null;
+    const added =
+      listed && listed.ok
+        ? listed.value.wallets.find(w => !before.has(w.id))
+        : undefined;
+    const opened =
+      added !== undefined
+        ? await this.prepareAdded(added, source, name, server, draft, result)
+        : null;
+    if (added !== undefined && opened && opened.kind === 'opened') {
+      return {
+        kind: 'added',
+        name: name || added.meta.name,
+        params: {
+          walletId: added.id,
+          arrival: 'switch',
+          next: 'home',
+          notice: '',
+          readOnly: opened.readOnly,
+          orchardPool: opened.orchardPool,
+          saplingPool: opened.saplingPool,
+          transparentPool: opened.transparentPool,
+          newWallet: true,
+          firstLaunchingMessage: LaunchingModeEnum.opening,
+          walletChainName: opened.walletChainName,
+        },
+      };
+    }
+
+    const diskFull = isDiskFull(result);
+    const message = !result.ok
+      ? result.error.message
+      : opened && opened.kind === 'failed'
+        ? opened.error.message
+        : '';
+    await loadWallet(
+      this.state.walletId,
+      nativeUri(this.state.server),
+      this.state.server.chainName,
+      DEFAULT_PERFORMANCE_LEVEL,
+      GlobalConst.minConfirmations.toString(),
+    );
+    this.rpc.walletReopened();
+    await this.rpc.configure();
+    await this.refreshWallets();
+    if (diskFull) {
+      return { kind: 'diskFull' };
+    }
+    return {
+      kind: 'failed',
+      message: Utils.humanizeChainTokens(message, this.state.translate),
+    };
+  };
+
+  /** A wallet just added: its name, server and backup state in its meta, then what opening it needs. */
+  prepareAdded = async (
+    added: WalletEntry,
+    source: NewWalletSource,
+    name: string,
+    server: ServerType,
+    draft: AddWalletDraft,
+    result: FfiResult<string>,
+  ): Promise<WalletOpen> => {
+    await updateWalletMeta(added.id, {
+      ...(name ? { name } : {}),
+      seedBackedUp: source.kind !== 'create',
+      seedBackedUpAt: 0,
+      viewOnlyNoticeDismissed: false,
+    });
+    await SettingsFileImpl.writeWalletServer(
+      added.id,
+      server,
+      draft.selectServer,
+    );
+    return finishWalletOpen(result, server.chainName);
+  };
+
+  /**
+   * Imports the chosen wallets of a previous install beside the others, each
+   * on its own network and server with its name, then opens the last one. Fails only when none could be added.
+   */
+  importFound = async (
+    entries: RecoveryEntry[],
+  ): Promise<ImportFoundResult> => {
+    const added: LoadedAppNavigationState[] = [];
+    let lastOpen = false;
+    let diskFull = false;
+    let message = '';
+    for (const entry of entries) {
+      const chain = entryChain(entry);
+      const choice = await entryServer(
+        chain,
+        this.state.translate,
+        !!this.state.netInfo.isConnected,
+      );
+      const listed = await walletsOnDevice();
+      const names = listed.ok ? listed.value.wallets.map(w => w.meta.name) : [];
+      const name = entry.name || defaultWalletName(this.state.translate, names);
+      const result = await this.addWallet(
+        {
+          kind: 'restore',
+          text: entry.seed || entry.ufvk || '',
+          birthday: entry.birthday,
+        },
+        name,
+        { ...choice, keyChain: { kind: 'none' } },
+      );
+      lastOpen = result.kind === 'added';
+      if (result.kind === 'diskFull') {
+        diskFull = true;
+        break;
+      }
+      if (result.kind === 'failed') {
+        message = result.message;
+        continue;
+      }
+      await updateWalletMeta(result.params.walletId, {
+        fromPrevious: true,
+        ...(entry.category ? { category: entry.category } : {}),
+      });
+      await retireImportedEntry(entry);
+      added.push(result.params);
+    }
+    const last = added[added.length - 1];
+    if (!last) {
+      return diskFull ? { kind: 'diskFull' } : { kind: 'failed', message };
+    }
+    const opened = lastOpen
+      ? { kind: 'reopened' as const, params: last }
+      : await this.reopenAdded(last);
+    if (opened.kind === 'failed') {
+      return opened;
+    }
+    await this.enterAdded(
+      opened.params,
+      'home',
+      added.length === 1
+        ? (this.state.translate('found.imported-one') as string)
+        : (this.state.translate('found.imported') as string).replace(
+            '{n}',
+            String(added.length),
+          ),
+    );
+    return { kind: 'imported' };
+  };
+
+  /** Opens again a wallet added earlier in an import, after a later one failed and left the first wallet open. */
+  reopenAdded = async (
+    last: LoadedAppNavigationState,
+  ): Promise<
+    { kind: 'reopened'; params: LoadedAppNavigationState } | ImportFoundFailed
+  > => {
+    const listed = await walletsOnDevice();
+    const entry = listed.ok
+      ? listed.value.wallets.find(w => w.id === last.walletId)
+      : undefined;
+    if (!entry) {
+      return { kind: 'failed', message: '' };
+    }
+    await this.rpc.stopSyncProcess(SWITCH_STOP_WAIT_MS);
+    await doSave();
+    await this.rpc.clearTimers();
+    const { server } = await SettingsFileImpl.serverOf(entry.meta);
+    const opened = await finishWalletOpen(
+      await loadWallet(
+        entry.id,
+        nativeUri(server),
+        server.chainName,
+        DEFAULT_PERFORMANCE_LEVEL,
+        GlobalConst.minConfirmations.toString(),
+      ),
+      server.chainName,
+    );
+    return opened.kind === 'opened'
+      ? {
+          kind: 'reopened',
+          params: {
+            ...last,
+            readOnly: opened.readOnly,
+            orchardPool: opened.orchardPool,
+            saplingPool: opened.saplingPool,
+            transparentPool: opened.transparentPool,
+            walletChainName: opened.walletChainName,
+          },
+        }
+      : { kind: 'failed', message: opened.error.message };
+  };
+
+  /** Opens the wallet just added on the screen the add flow started from, with what it shows on arrival. */
+  enterAdded = async (
+    params: LoadedAppNavigationState,
+    next: 'home' | 'backup',
+    notice: string,
+  ) => {
+    const listed = await walletsOnDevice();
+    const added = listed.ok
+      ? listed.value.wallets.find(w => w.id === params.walletId)
+      : undefined;
+    if (added) {
+      await this.leaveHandoffFor(added, false);
+    }
+    popRoutes([
+      Route.AddWallet,
+      Route.NewWallet,
+      Route.RestoreWallet,
+      Route.FoundWallets,
+    ]);
+    this.props.openWallet({ ...params, next, notice });
+  };
+
+  /** Leaves what the next wallet section takes from this one: the app's settings, the next wallet's, and these figures when they belong on screen. */
+  leaveHandoffFor = async (entry: WalletEntry, keepFigures: boolean) => {
+    const settings = await SettingsFileImpl.readSettings();
+    const { totalBalance, valueTransfers, valueTransfersTotal } = this.state;
+    leaveHandoff({
+      walletId: entry.id,
+      opening: entry,
+      settings: {
+        language: this.state.language,
+        privacy: this.state.privacy,
+        biometrics: this.state.biometrics,
+        blockExplorer: this.state.blockExplorer,
+        addressBook: this.state.addressBook,
+        backgroundSyncInfo: this.state.backgroundSyncInfo,
+        server: settings.server,
+        selectServer: settings.selectServer,
+        seedBackedUp: settings.seedBackedUp === true,
+        seedBackedUpAt: settings.seedBackedUpAt || 0,
+        viewOnlyNoticeDismissed: settings.viewOnlyNoticeDismissed === true,
+      },
+      figures:
+        keepFigures && totalBalance && valueTransfers
+          ? {
+              kind: 'shown',
+              totalBalance,
+              valueTransfers,
+              valueTransfersTotal: valueTransfersTotal ?? 0,
+            }
+          : { kind: 'none' },
     });
   };
 
-  // The server change was dropped on the seed or key screen: the tasks
-  // restart against the server still in use.
-  cancelPendingServer = async () => {
-    await this.rpc.clearTimers();
-    await this.rpc.configure();
-  };
-
-  onClickOKServerWallet = async () => {
-    const { pendingServer } = this.state;
-    if (pendingServer.kind === 'pending') {
-      // No `await` here so Promise.race can actually enforce the 15s cap.
-      // With `await` the RPC call resolves before the race starts and the
-      // timer becomes a no-op (a failing server then blocks ~minutes).
-      const resultServerPromise = changeServer(nativeUri(pendingServer.server));
-      const timeoutServerPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => {
-          reject(new Error('Promise changeserver Timeout 15 seconds'));
-        }, 15 * 1000);
-      });
-
-      const resultServer = await Promise.race([
-        resultServerPromise,
-        timeoutServerPromise,
-      ]);
-
-      if (!resultServer.ok) {
-        this.addLastSnackbar(
-          `${this.state.translate('loadedapp.changeservernew-error')} ${resultServer.error.message}`,
-        );
-        return;
+  /**
+   * Deletes a wallet with what the app keeps beside it. The open one closes
+   * first and the first wallet left opens in its place; with none left the
+   * app goes back to the welcome.
+   */
+  deleteWallet = async (entry: WalletEntry): Promise<void> => {
+    const open = entry.id === this.state.walletId;
+    if (open) {
+      await this.rpc.stopSyncProcess(SWITCH_STOP_WAIT_MS);
+      await this.rpc.clearTimers();
+      this.keepAwake(false);
+    }
+    const deleted = await forgetWallet(entry.id)
+      .then(() => deleteWallet(entry.id))
+      .catch((e): FfiResult<boolean> => ({
+        ok: false,
+        error: { code: 'Unknown', message: String(e) },
+      }));
+    if (!deleted.ok || !deleted.value) {
+      if (open) {
+        await this.rpc.configure();
       }
-
-      await SettingsFileImpl.writeServer(
-        pendingServer.server,
-        pendingServer.selectServer,
+      this.addLastSnackbar(
+        this.state.translate('rpc.deletewallet-error') as string,
       );
-      this.setState({
-        server: pendingServer.server,
-        selectServer: pendingServer.selectServer,
-        pendingServer: { kind: 'none' },
-      });
-      // Propagate to WalletBackend's shared config so sub-services pick up
-      // the new URI without needing the instance to be recreated.
-      this.rpc.setServer(pendingServer.server);
-
-      await this.rpc.fetchInfoAndServerHeight();
-
-      const changed = await this.rpc.changeWallet();
-
-      if (changed.kind === 'error') {
-        createAlert(
-          this.setBackgroundError,
-          this.addLastSnackbar,
-          this.state.translate('loadedapp.changingwallet-label') as string,
-          this.state.translate(changed.errorKey) as string,
-          false,
-          this.state.translate,
-          sendEmail,
-          this.state.zingolibVersion,
-        );
-        //return;
-      }
-
-      // no need to restart the tasks because is about to restart the app.
+      return;
+    }
+    this.addLastSnackbar(
+      (this.state.translate('wallets.deleted') as string).replace(
+        '{name}',
+        entry.meta.name,
+      ),
+    );
+    const left = this.state.wallets.filter(w => w.id !== entry.id);
+    if (!open) {
+      await this.refreshWallets();
+      return;
+    }
+    if (left.length === 0) {
+      this.navigateToLoadingApp({ kind: 'onboarding', start: 'Welcome' });
+      return;
+    }
+    this.setState({
+      wallets: left,
+      switching: { kind: 'opening', wallet: left[0] },
+    });
+    const opened = await this.openInPlace(left[0]);
+    if (opened.kind === 'failed') {
       this.navigateToLoadingApp({
         kind: 'boot',
         startingApp: false,
@@ -2051,10 +2525,16 @@ export class LoadedAppClass extends Component<
       setLanguageOption: this.setLanguageOption,
       setBiometricsOption: this.setBiometricsOption,
       setBlockExplorerOption: this.setBlockExplorerOption,
-      changeWallet: this.onClickOKChangeWallet,
-      restoreBackup: this.onClickOKRestoreBackup,
-      applyPendingServer: this.onClickOKServerWallet,
-      cancelPendingServer: this.cancelPendingServer,
+      walletId: this.state.walletId,
+      switchWallet: this.switchWallet,
+      restoreInPlace: this.restoreInPlace,
+      deleteWallet: this.deleteWallet,
+      addWallet: this.addWallet,
+      enterAdded: this.enterAdded,
+      importFound: this.importFound,
+      switching: this.state.switching,
+      wallets: this.state.wallets,
+      refreshWallets: this.refreshWallets,
     };
 
     return (
@@ -2067,8 +2547,13 @@ export class LoadedAppClass extends Component<
               <BottomSheetModalProvider>
                 <BottomSheetBackHandler />
                 <ConfirmBottomSheet />
+                <WalletsSheet />
                 <OptionsPanelProvider>
-                  <FadeInOnMount duration={HOME_FADE_MS}>
+                  <FadeInOnMount
+                    duration={
+                      this.props.handoff.kind === 'handoff' ? 0 : HOME_FADE_MS
+                    }
+                  >
                     {/* The tooltip layer for screens outside any sheet or panel. */}
                     <TooltipHost>
                       <WalletNavigator />

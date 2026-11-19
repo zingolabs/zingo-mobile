@@ -4,8 +4,6 @@ import android.util.Base64
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKeys
 import androidx.test.platform.app.InstrumentationRegistry
-import com.facebook.react.bridge.Promise
-import com.facebook.react.bridge.WritableMap
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -26,22 +24,6 @@ class WalletFileRepairTest {
     private val rpcModule = RPCModule(MainApplication.getAppReactContext())
 
     // Captures the single resolve the restore path settles with.
-    private class CapturingPromise : Promise {
-        val resolved = mutableListOf<Any?>()
-        override fun resolve(value: Any?) { resolved.add(value) }
-        override fun reject(code: String, message: String?) {}
-        override fun reject(code: String, throwable: Throwable?) {}
-        override fun reject(code: String, message: String?, throwable: Throwable?) {}
-        override fun reject(throwable: Throwable) {}
-        override fun reject(throwable: Throwable, userInfo: WritableMap) {}
-        override fun reject(code: String, userInfo: WritableMap) {}
-        override fun reject(code: String, throwable: Throwable?, userInfo: WritableMap) {}
-        override fun reject(code: String, message: String?, userInfo: WritableMap) {}
-        override fun reject(code: String?, message: String?, throwable: Throwable?, userInfo: WritableMap?) {}
-        @Deprecated("Deprecated in the React Native Promise interface")
-        override fun reject(message: String) {}
-    }
-
     // A real offline zingolib wallet: the recovery writes run the full
     // parse.
     private lateinit var plainWallet: ByteArray
@@ -129,20 +111,20 @@ class WalletFileRepairTest {
     }
 
     @Test
-    fun restoreBackupSucceedsWhenMainIsUndecryptable() {
+    fun theBackupMovesInReadableWhenMainIsUndecryptable() {
         // A healthy legacy encrypted backup, as a fleet device would hold.
         File(context.filesDir, backupName).writeBytes(plainWallet)
         wrapAgain(File(context.filesDir, backupName))
         walletFile().delete()
         walletFile().writeBytes(undecryptableBytes)
 
-        val promise = CapturingPromise()
-        rpcModule.restoreExistingWalletBackup(promise)
+        rpcModule.prepareWallets()
 
-        assertThat(promise.resolved).containsExactly(true)
-        assertThat(File(rpcModule.activeWalletDir(), WalletStore.WALLET).readBytes()).isEqualTo(plainWallet)
-        assertThat(WalletStore.list(context.filesDir).map { it.meta.getString("name") })
+        val wallets = WalletStore.list(context.filesDir)
+        assertThat(wallets.map { it.meta.getString("name") })
             .containsExactly("Wallet 1", "Wallet Backup").inOrder()
+        assertThat(File(WalletStore.dir(context.filesDir, wallets[1].id), WalletStore.WALLET).readBytes())
+            .isEqualTo(plainWallet)
     }
 
     @Test

@@ -72,9 +72,12 @@ object WalletStore {
             ""
         }
 
-    /** The wallet the app opens, when its folder is committed. */
-    fun active(base: File): String? =
+    /** The wallet the pointer names, when its folder is committed. */
+    private fun pointed(base: File): String? =
         pointer(base).takeIf { it.isNotEmpty() && File(dir(base, it), META).exists() }
+
+    /** The wallet the app opens: the one the pointer names, or the first wallet when it names none, as after the open one is deleted. */
+    fun active(base: File): String? = pointed(base) ?: list(base).firstOrNull()?.id
 
     fun setActive(base: File, id: String?) {
         val file = File(root(base), ACTIVE)
@@ -188,7 +191,7 @@ object WalletStore {
             ?: allocate(base).also { id ->
                 writeMeta(base, id, newMeta(base, id, name, chain, serverUri).put("migratedFrom", digest))
             }
-        if (active && active(base) == null) setActive(base, id)
+        if (active && pointed(base) == null) setActive(base, id)
         val folder = dir(base, id)
         for (suffix in WORKING_SIDECARS) {
             File(base, "$legacy$suffix").takeIf { it.exists() }?.renameTo(File(folder, "$WALLET$suffix"))

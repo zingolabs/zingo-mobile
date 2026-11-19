@@ -18,6 +18,7 @@ import {
   deleteWallet,
   hasRoomForWallet,
   MIN_FREE_BYTES,
+  recordOpenFailed,
   walletsOnDevice,
 } from '@app/walletBackend/utils/walletStore';
 
@@ -87,4 +88,20 @@ test('Tests that the free space never goes under the floor when the wallets are 
   expect(hasRoomForWallet({ free: MIN_FREE_BYTES - 1, largest: 1 })).toBe(
     false,
   );
+});
+
+test('Tests that a failed open is written once when the mark changes and skipped when it already holds.', async () => {
+  bridge.updateWalletMetaProcess.mockResolvedValue(JSON.stringify(meta('w1')));
+  const wallet = { id: 'w1', hasFile: true, meta: meta('w1') };
+
+  await recordOpenFailed(wallet, true);
+  await recordOpenFailed(
+    { ...wallet, meta: { ...wallet.meta, openFailed: true } },
+    true,
+  );
+  await recordOpenFailed(wallet, false);
+
+  expect(bridge.updateWalletMetaProcess.mock.calls).toEqual([
+    ['w1', '{"openFailed":true}'],
+  ]);
 });

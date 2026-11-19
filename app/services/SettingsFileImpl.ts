@@ -82,6 +82,45 @@ const decodeServer = (
   };
 };
 
+/** The listed default server of a network, the first listed one when it has none. */
+const defaultWireFor = (chain: ChainNameEnum | undefined): ServerWire => {
+  const found = serverUris(() => {}).find(
+    s => s.chainName === chain && s.default && !s.obsolete,
+  );
+  return found ? { uri: found.uri, chainName: found.chainName } : defaultWire();
+};
+
+/** The wallet's own server, its network's default in Automatic when it has none, and that default too when the list marks its server obsolete and the user did not set it as custom. */
+const walletServer = (meta: WalletMetaPatch): ServerSettings => {
+  const fallback = defaultWireFor(meta.chain);
+  const server: ServerWire = meta.server
+    ? {
+        uri: meta.server.uri,
+        chainName: meta.server.chainName || meta.chain || fallback.chainName,
+      }
+    : fallback;
+  const mode = (
+    meta.server
+      ? defaultTo(meta.selectServer, SelectServerEnum.auto)
+      : SelectServerEnum.auto
+  ) as SelectServerWire;
+  const replacement = serverUris(() => {}).find(
+    s => s.default && !s.obsolete && s.chainName === server.chainName,
+  );
+  if (
+    mode !== SelectServerEnum.custom &&
+    mode !== 'offline' &&
+    replacement &&
+    listed(server, s => s.obsolete)
+  ) {
+    return decodeServer(
+      { uri: replacement.uri, chainName: replacement.chainName },
+      SelectServerEnum.auto,
+    );
+  }
+  return decodeServer(server, mode);
+};
+
 export default class SettingsFileImpl {
   // Writes run one at a time. Every write is a read-modify-write of the
   // same file, so two of them in flight both rebuild it from the contents
@@ -110,21 +149,25 @@ export default class SettingsFileImpl {
   }
 
   /**
-   * The server goes to the active wallet's meta and to the file, the default
-   * of the next wallet; the wallet flags go to the meta alone, or to the
-   * file while no wallet is active, for the next read to move them.
+   * The server and the wallet flags go to the active wallet's meta. With no
+   * wallet active the server is not kept, and the flags go to the file for
+   * the next read to move them.
    */
   private static async writePatch(patch: Partial<SettingsWire>): Promise<void> {
     const walletPart = pick(patch, WALLET_FIELDS);
     if (!isEmpty(walletPart)) {
       const entry = await activeWalletEntry();
-      if (entry.kind === 'wallet') {
-        const written = await updateWalletMeta(entry.wallet.id, walletPart);
-        if (written.ok) {
-          patch = omit(patch, WALLET_FLAGS);
-        } else {
+      const written =
+        entry.kind === 'wallet'
+          ? await updateWalletMeta(entry.wallet.id, walletPart)
+          : undefined;
+      if (written?.ok) {
+        patch = omit(patch, WALLET_FIELDS);
+      } else {
+        if (written) {
           console.log('settings write meta:', written.error.message);
         }
+        patch = omit(patch, ['server', 'selectServer']);
       }
     }
     if (isEmpty(patch)) {
@@ -157,7 +200,7 @@ export default class SettingsFileImpl {
     const entry = await activeWalletEntry();
     const meta =
       entry.kind === 'wallet'
-        ? await this.adoptFileFlags(entry.wallet.id, entry.wallet.meta, file)
+        ? await this.adoptFileSettings(entry.wallet.id, entry.wallet.meta, file)
         : {};
     const flags = {
       ...DEFAULT_FLAGS,
@@ -165,46 +208,50 @@ export default class SettingsFileImpl {
       ...pick(meta, WALLET_FLAGS),
     };
     const rest = { ...omit(file, ['server', 'selectServer']), ...flags };
-    if (!file.server) {
+    if (entry.kind !== 'wallet') {
       return rest as SettingsFileClass;
     }
-    const server: ServerWire = meta.server
-      ? {
-          uri: meta.server.uri,
-          chainName:
-            meta.server.chainName || meta.chain || file.server.chainName,
-        }
-      : file.server;
-    const selectServer = defaultTo(
-      meta.selectServer,
-      file.selectServer,
-    ) as SelectServerWire;
-    return {
-      ...rest,
-      ...decodeServer(server, selectServer),
-    } as SettingsFileClass;
+    return { ...rest, ...walletServer(meta) } as SettingsFileClass;
   }
 
-  /** Moves the flags a file still holds into the wallet's meta, once, then drops them from the file. */
-  private static async adoptFileFlags(
+  /** Keeps a server choice in a wallet's meta, for a wallet that is not the open one. */
+  static async writeWalletServer(
+    walletId: string,
+    server: ServerType,
+    selectServer: SelectServerEnum,
+  ): Promise<boolean> {
+    const written = await updateWalletMeta(
+      walletId,
+      encodeServer(server, selectServer),
+    );
+    return written.ok;
+  }
+
+  /** A wallet's server and its remote mode, read from its meta before it opens. */
+  static async serverOf(meta: WalletMetaPatch): Promise<ServerSettings> {
+    return walletServer(meta);
+  }
+
+  /** Moves the server and flags a single-wallet file still holds into the wallet's meta, once, then drops them from the file. */
+  private static async adoptFileSettings(
     walletId: string,
     meta: WalletMeta,
     file: SettingsWire,
   ): Promise<WalletMetaPatch> {
-    const inFile = pick(file, WALLET_FLAGS);
+    const inFile = pick(file, WALLET_FIELDS);
     if (isEmpty(inFile)) {
       return meta;
     }
-    const missing = omit(inFile, Object.keys(pick(meta, WALLET_FLAGS)));
+    const missing = omit(inFile, Object.keys(pick(meta, WALLET_FIELDS)));
     const written = isEmpty(missing)
       ? ({ ok: true, value: meta } as const)
       : await updateWalletMeta(walletId, missing);
     if (!written.ok) {
       console.log('settings move flags:', written.error.message);
-      return { ...meta, ...missing };
+      return { ...meta, ...missing } as WalletMetaPatch;
     }
     await this.rewrite(
-      settings => omit(settings, WALLET_FLAGS) as SettingsWire,
+      settings => omit(settings, WALLET_FIELDS) as SettingsWire,
     );
     return written.value;
   }

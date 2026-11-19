@@ -10,10 +10,10 @@ import { SelectServerEnum } from './enums/SelectServerEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
-import type { WalletType } from '@app/wallet/types';
 import type { WalletErrorInfo } from '@app/wallet/types';
 import { ServerStatus } from './types/ServerStatus';
 import ServerUrisType from './types/ServerUrisType';
+import type { RecoveryEntry } from '@app/services/recoveryWalletInfo';
 import type { BiometricGateOutcome } from './AppStateLoading';
 
 // Asks the Server screen whether leaving it needs a confirmation first.
@@ -54,10 +54,17 @@ export interface OnboardingContext {
   updating: boolean;
   busy: boolean;
   walletExists: boolean;
-  recoveryWallet: WalletType | null;
+  recoveryEntries: RecoveryEntry[];
+  /** Imports the chosen wallets of a previous install and opens the first. */
+  importAllRecovery: (entries: RecoveryEntry[]) => void;
+  /** The card of a previous install's wallets, hidden until the next launch. */
+  foundDismissed: boolean;
+  dismissFound: () => void;
   // The saved phrase outlived an uninstall.
   freshInstall: boolean;
   walletError: WalletErrorInfo | null;
+  /** From the error screen: opens another wallet on the device, on the Wallets sheet. */
+  openOtherWallet: () => void;
   // A retry worked: the error badge shrinks before the wallet opens.
   errorResolved: boolean;
   retrying: boolean;
@@ -71,8 +78,6 @@ export interface OnboardingContext {
   serverLists: Record<string, ServerUrisType[]>;
   serverBackGuard: BackGuard;
   // `origin` is the screen the import started from; a failure returns there.
-  importRecoveryWallet: (origin: 'Welcome' | 'ImportChooser') => void;
-  viewRecoveryWallet: () => void;
   openServer: (chain?: ChainNameEnum) => void;
   closeServer: () => void;
   /** What back does on the onboarding step in front: Android's back, iOS's edge swipe. */
@@ -82,8 +87,6 @@ export interface OnboardingContext {
   getwalletToRestore: () => void;
   retryOpenWallet: () => void;
   // The hold-to-delete sheet, then the import or the create.
-  deleteThenImport: () => void;
-  deleteThenCreate: () => void;
   switchToWalletChain: (chain: ChainNameEnum) => void;
   chooseAutomatic: (chain: ChainNameEnum) => Promise<void>;
   pickServer: (server: ServerUrisType) => Promise<void>;
@@ -93,4 +96,6 @@ export interface OnboardingContext {
   serverUnreachable: () => void;
   serversFor: (chain: ChainNameEnum) => ServerUrisType[];
   doRestore: (seedUfvk: string, birthday: number) => Promise<void>;
+  /** The name step's go: the first wallet made, or imported, with its name. */
+  nameNewWallet: (from: 'create' | 'seed' | 'key', name: string) => void;
 }
