@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import { Route, SelectServerEnum } from '@app/AppState';
 import { ContextAppLoading } from '@app/context';
@@ -9,11 +9,15 @@ import type { OnboardingScreenProps } from './OnboardingNavigator';
 
 import StartMenu from '@screens/StartMenu';
 import ImportChooser from '@screens/ImportChooser';
+import FoundWallets from '@screens/FoundWallets';
 import ImportUfvk from '@screens/ImportUfvk';
 import WalletProgress from '@screens/WalletProgress';
 import WalletError from '@screens/WalletError';
 import Server from '@screens/Server';
 import ServerList from '@screens/ServerList';
+import NameWallet from '@screens/NameWallet';
+import { defaultWalletName } from '@screens/AddWallet/draftParts';
+import { walletsOnDevice } from '@app/walletBackend/utils/walletStore';
 
 // The onboarding routes: each one dresses its screen from the loading
 // context and the route's params.
@@ -21,11 +25,10 @@ import ServerList from '@screens/ServerList';
 export function WelcomeScreen() {
   const {
     busy,
-    recoveryWallet,
-    freshInstall,
+    recoveryEntries,
+    foundDismissed,
+    dismissFound,
     walletExists,
-    importRecoveryWallet,
-    viewRecoveryWallet,
     openServer,
     openCurrentWallet,
     createNewWallet,
@@ -34,10 +37,9 @@ export function WelcomeScreen() {
   return (
     <StartMenu
       actionButtonsDisabled={busy}
-      recoveryWallet={recoveryWallet}
-      freshInstall={freshInstall}
-      importRecoveryWallet={() => importRecoveryWallet(Route.Welcome)}
-      viewRecoveryWallet={viewRecoveryWallet}
+      found={recoveryEntries.length > 0 && !foundDismissed}
+      reviewFound={() => navigateOnboarding({ screen: Route.FoundWallets })}
+      dismissFound={dismissFound}
       customServer={() => openServer()}
       walletExists={walletExists}
       openCurrentWallet={openCurrentWallet}
@@ -54,12 +56,26 @@ export function ProgressScreen({
 }
 
 export function ImportChooserScreen() {
-  const { busy, importRecoveryWallet } = useContext(ContextAppLoading);
+  const { busy } = useContext(ContextAppLoading);
   return (
     <ImportChooser
       busy={busy}
-      onPrevious={() => importRecoveryWallet(Route.ImportChooser)}
+      onPrevious={() => navigateOnboarding({ screen: Route.FoundWallets })}
       onSeed={() => navigateOnboarding({ screen: Route.ImportWallet })}
+      onBack={goBack}
+    />
+  );
+}
+
+export function FoundWalletsScreen() {
+  const { translate, busy, recoveryEntries, importAllRecovery } =
+    useContext(ContextAppLoading);
+  return (
+    <FoundWallets
+      translate={translate}
+      entries={recoveryEntries}
+      busy={busy}
+      onImport={importAllRecovery}
       onBack={goBack}
     />
   );
@@ -67,13 +83,17 @@ export function ImportChooserScreen() {
 
 export function OpenErrorScreen() {
   const {
+    translate,
+    netInfo,
+    server,
     walletError,
+    openOtherWallet,
     errorResolved,
     retrying,
     errorShake,
     retryOpenWallet,
-    deleteThenImport,
-    deleteThenCreate,
+    getwalletToRestore,
+    createNewWallet,
     openServer,
     switchToWalletChain,
   } = useContext(ContextAppLoading);
@@ -82,6 +102,18 @@ export function OpenErrorScreen() {
   }
   return (
     <WalletError
+      translate={translate}
+      online={!!netInfo.isConnected}
+      server={server}
+      failed={
+        walletError.others
+          ? {
+              kind: 'oneOfMany',
+              name: walletError.name,
+              onOpenOther: openOtherWallet,
+            }
+          : { kind: 'only' }
+      }
       kind={walletError.kind}
       details={walletError.details}
       walletChain={walletError.walletChain}
@@ -89,8 +121,8 @@ export function OpenErrorScreen() {
       busy={retrying}
       shake={errorShake}
       onRetry={retryOpenWallet}
-      onImport={deleteThenImport}
-      onCreate={deleteThenCreate}
+      onImport={getwalletToRestore}
+      onCreate={createNewWallet}
       onServer={() => openServer(walletError.walletChain)}
       onSwitchChain={switchToWalletChain}
     />
@@ -183,5 +215,28 @@ export function ImportWalletScreen() {
   const { busy, doRestore } = useContext(ContextAppLoading);
   return (
     <ImportUfvk busy={busy} onClickOK={doRestore} onClickCancel={goBack} />
+  );
+}
+
+export function NameWalletScreen({
+  route,
+}: OnboardingScreenProps<OnboardingParamList, 'NameWallet'>) {
+  const { translate, busy, nameNewWallet } = useContext(ContextAppLoading);
+  const [names, setNames] = useState<string[]>([]);
+  useEffect(() => {
+    walletsOnDevice().then(listed =>
+      setNames(listed.ok ? listed.value.wallets.map(w => w.meta.name) : []),
+    );
+  }, []);
+  const { from } = route.params;
+  return (
+    <NameWallet
+      from={from}
+      translate={translate}
+      placeholder={defaultWalletName(translate, names)}
+      busy={busy}
+      onBack={goBack}
+      onGo={name => nameNewWallet(from, name)}
+    />
   );
 }

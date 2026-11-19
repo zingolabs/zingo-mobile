@@ -8,8 +8,10 @@ import { ScreenSafeArea } from './screenLayout';
 import {
   ImportChooserScreen,
   ImportWalletScreen,
+  FoundWalletsScreen,
   OpenErrorScreen,
   ProgressScreen,
+  NameWalletScreen,
   ServerListScreen,
   ServerScreen,
   WelcomeScreen,
@@ -52,6 +54,7 @@ function OnboardingSection() {
     <Onboarding.Navigator initialRouteName={start}>
       <Onboarding.Screen name={Route.Welcome} component={WelcomeScreen} />
       <Onboarding.Screen name={Route.Progress} component={ProgressScreen} />
+      <Onboarding.Screen name={Route.NameWallet} component={NameWalletScreen} />
       <Onboarding.Screen
         name={Route.ImportChooser}
         component={ImportChooserScreen}
@@ -62,6 +65,10 @@ function OnboardingSection() {
       <Onboarding.Screen
         name={Route.ImportWallet}
         component={ImportWalletScreen}
+      />
+      <Onboarding.Screen
+        name={Route.FoundWallets}
+        component={FoundWalletsScreen}
       />
     </Onboarding.Navigator>
   );

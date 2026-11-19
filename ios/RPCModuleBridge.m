@@ -12,12 +12,6 @@
 RCT_EXTERN_METHOD(walletExists: 
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(walletBackupExists:
-    (RCTPromiseResolveBlock)resolve 
-                  reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(deleteExistingWallet:
-    (RCTPromiseResolveBlock)resolve 
-                  reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(createNewWallet:
     (NSString)serveruri
                   birthday:(NSString)birthday
@@ -51,10 +45,27 @@ RCT_EXTERN_METHOD(loadExistingWallet:
                   minconfirmations:(NSString)minconfirmations
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(restoreExistingWalletBackup:
+RCT_EXTERN_METHOD(loadWalletProcess:
+    (NSString)walletId
+                  serveruri:(NSString)serveruri
+                  chainhint:(NSString)chainhint
+                  performancelevel:(NSString)performancelevel
+                  minconfirmations:(NSString)minconfirmations
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(walletsInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(replaceWalletWithBackup:
+RCT_EXTERN_METHOD(updateWalletMetaProcess:
+    (NSString)walletId
+                  patch:(NSString)patch
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(deleteWalletProcess:
+    (NSString)walletId
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(diskSpaceInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(walletChainInfo:

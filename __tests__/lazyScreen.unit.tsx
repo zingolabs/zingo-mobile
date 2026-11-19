@@ -19,7 +19,7 @@ describe('lazyScreen', () => {
     expect(screen.getByText('hello')).toBeTruthy();
   });
 
-  test('Tests that a screen not preloaded waits on the fallback and starts loading when it renders', () => {
+  test('Tests that the screens around one not preloaded stay drawn while it loads. Without its own boundary the whole app blanked for a frame.', async () => {
     const spy = jest.fn();
     const Screen = lazyScreen(() => {
       spy();
@@ -27,11 +27,14 @@ describe('lazyScreen', () => {
     });
     render(
       <Suspense fallback={<Text>fallback</Text>}>
+        <Text>home</Text>
         <Screen />
       </Suspense>,
     );
-    expect(screen.getByText('fallback')).toBeTruthy();
+    expect(screen.queryByText('fallback')).toBeNull();
+    expect(screen.getByText('home')).toBeTruthy();
     expect(spy).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(screen.getByText('hello')).toBeTruthy());
   });
 
   test('Tests that every screen loads once when preloadScreens runs', async () => {

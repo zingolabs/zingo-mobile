@@ -24,7 +24,7 @@ import { useOptionsPanel } from '@app/context/optionsPanel';
 
 // Mirror the panel host's fade duration so the header dissolves in lockstep
 // with the panel that's appearing over it.
-/** The bar with the menu, the mixnet and Messages: its row and the space under it. */
+/** The bar with the wallet switcher, the mixnet and the menu: its row and the space under it. */
 const BAR_ROW = 57;
 const BAR_BOTTOM = 10;
 /**
@@ -35,6 +35,10 @@ const BAR_BOTTOM = 10;
 export const PANEL_TOP = 59;
 
 const HEADER_FADE_MS = 320;
+/** The menu's box and its distance from the top; the switcher centres on it. */
+const MENU_TOP = 16;
+const MENU_SIDE = 25;
+const SWITCHER_LEFT = 12;
 import {
   NetInfoType,
   Route,
@@ -50,9 +54,11 @@ import MixnetIcon from '@ui/primitives/Icons/MixnetIcon';
 import { viewPhase } from '@app/walletBackend/transforms/mixnetView';
 import BalanceRow from './components/BalanceRow';
 import PriceRow from './components/PriceRow';
-import { MessagesIcon } from '@ui/primitives/Icons/MessagesIcon';
 import { MenuMorphIcon } from '@ui/widgets/MenuMorphIcon';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
+import { AvatarCategory } from '@ui/widgets/Avatar';
+import { showWallets } from '@app/services/showWallets';
+import WalletSwitcher, { SWITCHER_HEIGHT } from './components/WalletSwitcher';
 
 type HeaderProps = {
   // general
@@ -90,8 +96,6 @@ type HeaderProps = {
   setBackgroundError?: (title: string, error: string) => void;
   // first funds received legend for the Seed screen
   receivedLegend?: boolean;
-  // show messages icon next to settings
-  showMessagesIcon?: boolean;
   // optional layout reporting (used by History for bottom-sheet snap points)
   onUsdRowLayout?: (height: number) => void;
   // optional layout reporting for the pull-down PriceRow snap point
@@ -119,7 +123,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   titleElement,
   right,
   noUfvkIcon,
-  showMessagesIcon,
   onUsdRowLayout,
   onPriceRowLayout,
   noPriceRow,
@@ -136,7 +139,15 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     server,
     mixnetView,
     seedBackedUp,
+    wallets,
+    walletId,
+    switching,
   } = context;
+  /** The wallet being opened takes the switcher at once, while Home still shows the last one. */
+  const shownWallet =
+    switching.kind === 'opening'
+      ? switching.wallet
+      : wallets.find(w => w.id === walletId);
 
   const translate = translateProp ?? context.translate;
   const netInfo = netInfoProp ?? context.netInfo;
@@ -225,29 +236,30 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             },
           ]}
         >
-          {/* The mixnet icon alone in the middle of the bar, level with the menu. */}
+          {/* The mixnet icon alone in the middle of the bar, centred on the menu's line as the switcher is. */}
           <View
             style={{
               height: BAR_ROW,
               alignItems: 'center',
-              justifyContent: 'center',
-              paddingTop: 12,
+              paddingTop: MENU_TOP,
             }}
           >
-            {mixnetPhase !== 'absent' && (
-              <Pressable
-                kind="icon"
-                testID="header.mixnet-status"
-                hitSlop={slopFor(22)}
-                accessibilityRole="button"
-                accessibilityLabel={
-                  translate('settings.nym-diagnostics') as string
-                }
-                onPress={() => navigation.navigate(Route.MixnetDoctor)}
-              >
-                <MixnetIcon phase={mixnetPhase} />
-              </Pressable>
-            )}
+            <View style={{ height: MENU_SIDE, justifyContent: 'center' }}>
+              {mixnetPhase !== 'absent' && (
+                <Pressable
+                  kind="icon"
+                  testID="header.mixnet-status"
+                  hitSlop={slopFor(22)}
+                  accessibilityRole="button"
+                  accessibilityLabel={
+                    translate('settings.nym-diagnostics') as string
+                  }
+                  onPress={() => navigation.navigate(Route.MixnetDoctor)}
+                >
+                  <MixnetIcon phase={mixnetPhase} />
+                </Pressable>
+              )}
+            </View>
           </View>
 
           <BalanceRow
@@ -271,6 +283,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               percentage={percentageOutputsScanned}
               syncInProgress={syncInProgress}
               translate={translate}
+              opening={
+                switching.kind === 'opening' ? switching.wallet.meta.name : ''
+              }
             />
           )}
 
@@ -285,19 +300,125 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           )}
         </Animated.View>
 
-        <View
-          style={{
-            paddingLeft: 20,
-            paddingTop: 16,
-            paddingRight: 11.5,
-            paddingBottom: 11.5,
-            position: 'absolute',
-            left: 0,
-            top: 0,
-          }}
-        >
-          <View style={{ alignItems: 'center', flexDirection: 'row', gap: 14 }}>
-            {!noDrawMenu && (
+        {noDrawMenu ? (
+          <>
+            {/* A menu screen: the snowflake at the left, the logo at the right. */}
+            <View
+              style={{
+                paddingLeft: 20,
+                paddingTop: 16,
+                paddingRight: 11.5,
+                paddingBottom: 11.5,
+                position: 'absolute',
+                left: 0,
+                top: 0,
+              }}
+            >
+              <View
+                style={{ alignItems: 'center', flexDirection: 'row', gap: 14 }}
+              >
+                {readOnly && !noUfvkIcon && (
+                  <Animated.View style={headerAnimatedStyle}>
+                    <Pressable
+                      kind="icon"
+                      hitSlop={slopFor(24)}
+                      testID="header.snowflake"
+                      accessibilityRole="button"
+                      accessibilityLabel={
+                        translate('viewingkey.title') as string
+                      }
+                      onPress={ufvkShowModal}
+                    >
+                      <Animated.View ref={snowflake} style={snowStyle}>
+                        <SnowflakeIcon
+                          size={iconSize}
+                          color={colors.fgViewOnly}
+                        />
+                      </Animated.View>
+                    </Pressable>
+                  </Animated.View>
+                )}
+              </View>
+            </View>
+            <Animated.View
+              style={[
+                headerAnimatedStyle,
+                {
+                  padding: 13,
+                  position: 'absolute',
+                  right: 0,
+                  top: 0,
+                },
+              ]}
+            >
+              <Image
+                source={getZingoLogo()}
+                style={{
+                  width: 30,
+                  height: 30,
+                  resizeMode: 'contain',
+                  borderRadius: 6,
+                }}
+              />
+            </Animated.View>
+          </>
+        ) : (
+          <>
+            {/* The open wallet at the left, centred on the menu's line opposite. */}
+            {!!shownWallet && (
+              <Animated.View
+                style={[
+                  headerAnimatedStyle,
+                  {
+                    position: 'absolute',
+                    left: SWITCHER_LEFT,
+                    top: MENU_TOP + MENU_SIDE / 2 - SWITCHER_HEIGHT / 2,
+                  },
+                ]}
+              >
+                <WalletSwitcher
+                  name={shownWallet.meta.name}
+                  category={(shownWallet.meta.category ?? 1) as AvatarCategory}
+                  accessibilityLabel={(
+                    translate('wallets.switch-acc') as string
+                  ).replace('{name}', shownWallet.meta.name)}
+                  onPress={showWallets}
+                />
+              </Animated.View>
+            )}
+
+            {/* The menu at the right, with the view-only snowflake before it. */}
+            <View
+              style={{
+                position: 'absolute',
+                right: 0,
+                top: 0,
+                paddingRight: 20,
+                paddingTop: MENU_TOP,
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 14,
+              }}
+            >
+              {readOnly && !noUfvkIcon && (
+                <Animated.View style={headerAnimatedStyle}>
+                  <Pressable
+                    kind="icon"
+                    hitSlop={slopFor(24)}
+                    testID="header.snowflake"
+                    accessibilityRole="button"
+                    accessibilityLabel={translate('viewingkey.title') as string}
+                    onPress={ufvkShowModal}
+                  >
+                    <Animated.View ref={snowflake} style={snowStyle}>
+                      <SnowflakeIcon
+                        size={iconSize}
+                        color={colors.fgViewOnly}
+                      />
+                    </Animated.View>
+                  </Pressable>
+                </Animated.View>
+              )}
               <Pressable
                 kind="icon"
                 hitSlop={slopFor(24)}
@@ -326,72 +447,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   />
                 )}
               </Pressable>
-            )}
-            {readOnly && !noUfvkIcon && (
-              <Animated.View style={headerAnimatedStyle}>
-                <Pressable
-                  kind="icon"
-                  hitSlop={slopFor(24)}
-                  testID="header.snowflake"
-                  accessibilityRole="button"
-                  accessibilityLabel={translate('viewingkey.title') as string}
-                  onPress={ufvkShowModal}
-                >
-                  <Animated.View ref={snowflake} style={snowStyle}>
-                    <SnowflakeIcon size={iconSize} color={colors.fgViewOnly} />
-                  </Animated.View>
-                </Pressable>
-              </Animated.View>
-            )}
-          </View>
-        </View>
-
-        <Animated.View
-          style={[
-            headerAnimatedStyle,
-            {
-              padding: 13,
-              position: 'absolute',
-              right: 0,
-              top: 0,
-            },
-          ]}
-        >
-          {/* Settings used to sit here too; it now lives in the Options
-              panel's header, its single door. With only messages left,
-              the corner falls back to the logo when there is nothing to
-              show. */}
-          {!noDrawMenu && showMessagesIcon ? (
-            <View
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}
-            >
-              {/* Level with the menu icon opposite: that one centres at 28.5
-                  from the top (16 of padding, half of its 25 box), this
-                  corner pads 13, so an 11 half-box lands at 24 without the
-                  4.5 below. The nudge rides on the icon alone, leaving the
-                  logo this corner falls back to where it already sat. */}
-              <Pressable
-                kind="icon"
-                hitSlop={slopFor(24)}
-                style={{ marginRight: 5, marginTop: 4.5 }}
-                testID="header.messages"
-                onPress={() => navigation.navigate(Route.Messages)}
-              >
-                <MessagesIcon size={iconSize} color={colors.fgMuted} />
-              </Pressable>
             </View>
-          ) : (
-            <Image
-              source={getZingoLogo()}
-              style={{
-                width: 30,
-                height: 30,
-                resizeMode: 'contain',
-                borderRadius: 6,
-              }}
-            />
-          )}
-        </Animated.View>
+          </>
+        )}
       </View>
 
       {hasTitle && (

@@ -9,6 +9,7 @@ import {
   space12,
   space16,
   space20,
+  space24,
   space32,
   useTheme,
 } from '@app/theme';
@@ -27,7 +28,13 @@ import {
   checkUfvk,
   getLatestBlockServerInfo,
 } from '@app/walletBackend';
-import { ChainNameEnum, GlobalConst } from '@app/AppState';
+import {
+  ChainNameEnum,
+  GlobalConst,
+  NetInfoType,
+  ServerType,
+  TranslateType,
+} from '@app/AppState';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import {
   isViewingKey,
@@ -40,7 +47,7 @@ import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { useCompact } from '@app/hooks/useCompact';
-import { EDGE_FADE, useScrollEdges } from '@ui/widgets/ScrollEdges';
+import { EDGE_FADE, FooterFade, useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { dismissOnDrag } from '@ui/primitives/keyboardDismiss';
 
 // Positions from the 402 x 874 design.
@@ -48,10 +55,32 @@ const FIELD_WIDTH = 270;
 /** The note's bottom, above the button's. */
 const NOTE_ABOVE_BUTTON = 65;
 
+/** A viewing key's own network, once the field holds a valid one. */
+export type KeyNetwork =
+  { kind: 'none' } | { kind: 'key'; chain: ChainNameEnum };
+
 type ImportUfvkProps = {
   busy: boolean;
   onClickCancel: () => void;
   onClickOK: (keyText: string, birthday: number) => void;
+  /** Inside the wallet: what the form reads instead of the onboarding's context. */
+  env?: {
+    translate: (key: string) => TranslateType;
+    netInfo: NetInfoType;
+    server: ServerType;
+    addLastSnackbar: (message: string) => void;
+  };
+  title?: string;
+  goLabel?: string;
+  right?: React.ComponentProps<typeof TitleBar>['right'];
+  /** Under the birthday: the Name of a wallet being added. */
+  extra?: React.ReactNode;
+  /** A viewing key brings its network: reported here instead of checked against the server's. */
+  onKeyNetwork?: (network: KeyNetwork) => void;
+  /** Off until the wallet's server is set, whatever the field holds. */
+  goDisabled?: boolean;
+  /** A warning over the button, in place of the rescan note. */
+  goNote?: React.ReactNode;
 };
 // Waits for typing to pause before decoding the key.
 const KEY_CHECK_DELAY_MS = 300;
@@ -63,9 +92,17 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   busy,
   onClickCancel,
   onClickOK,
+  env,
+  title,
+  goLabel,
+  right,
+  extra,
+  onKeyNetwork,
+  goDisabled,
+  goNote,
 }) => {
   const context = useContext(ContextAppLoading);
-  const { translate, netInfo, server, addLastSnackbar } = context;
+  const { translate, netInfo, server, addLastSnackbar } = env ?? context;
   const { colors } = useTheme();
   const { gap } = useCompact();
   const bottomPad = useBottomActionPad();
@@ -93,6 +130,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   const check: UfvkCheck =
     keyCheck.key === typedKey ? keyCheck.check : { kind: 'unknown' };
   const keyChainMismatch =
+    !onKeyNetwork &&
     check.kind === 'ufvk' &&
     server.chainName !== ChainNameEnum.noneChainName &&
     check.chainName !== server.chainName;
@@ -141,6 +179,13 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
       clearTimeout(timer);
     };
   }, [typedKey]);
+
+  const keyChain = check.kind === 'ufvk' ? check.chainName : '';
+  useEffect(() => {
+    onKeyNetwork?.(
+      keyChain ? { kind: 'key', chain: keyChain } : { kind: 'none' },
+    );
+  }, [keyChain, onKeyNetwork]);
 
   useEffect(() => {
     setKeyPaused(false);
@@ -252,12 +297,13 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
     keyboardHeight === 0
       ? bottomPad + NOTE_ABOVE_BUTTON + noteH
       : buttonBottom + BUTTON_HEIGHT + space12;
-  const { edges, fades } = useScrollEdges({ bottomInset: covered });
+  const { edges, fades, below } = useScrollEdges({ sides: 'top' });
 
   return (
     <View style={{ flex: 1 }}>
       <TitleBar
-        title={translate('import.screen-title') as string}
+        title={title ?? (translate('import.screen-title') as string)}
+        right={right}
         left={{
           icon: ChevronLeft,
           onPress: onClickCancel,
@@ -337,7 +383,12 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           onBirthday={fillBirthday}
         />
 
-        <View style={{ marginTop: gap(space32), alignItems: 'center' }}>
+        <View
+          style={{
+            marginTop: gap(space32),
+            alignItems: 'center',
+          }}
+        >
           <InfoTooltip
             testID="import.birthdayinfo"
             label={translate('import.birthday') as string}
@@ -375,6 +426,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             />
           </View>
         </View>
+        {!!extra && <View style={{ marginTop: space24 }}>{extra}</View>}
       </KeyboardAwareScrollView>
       {fades}
       <View
@@ -387,9 +439,11 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           height: covered,
           backgroundColor: colors.bgCanvas,
         }}
-      />
+      >
+        <FooterFade shown={below} color={colors.bgCanvas} />
+      </View>
 
-      {keyboardHeight === 0 && (
+      {keyboardHeight === 0 && !goNote && (
         <View
           pointerEvents="none"
           onLayout={e => setNoteH(e.nativeEvent.layout.height)}
@@ -416,12 +470,13 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           bottom: buttonBottom,
         }}
       >
+        {goNote}
         <View>
           <Button
             variant="primary"
             testID="import.button.ok"
-            title={translate('import.submit') as string}
-            disabled={!keyReady}
+            title={goLabel ?? (translate('import.submit') as string)}
+            disabled={!keyReady || !!goDisabled}
             busy={busy}
             onPress={() => {
               okButton();

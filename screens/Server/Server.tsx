@@ -58,6 +58,10 @@ export type ServerProps = {
   translate: (key: string) => TranslateType;
   // The network the screen opens on; the server's own by default.
   initialChain?: ChainNameEnum;
+  /** The network is the wallet's for its whole life: the segments stay put. */
+  networkLocked?: boolean;
+  /** Why the network is set, over the servers: a viewing key carries its own. */
+  networkNote?: string;
   server: ServerType;
   selectServer: SelectServerEnum;
   status: ServerStatus;
@@ -206,6 +210,8 @@ const LOCKED_OPACITY = 0.4;
 const Server: React.FunctionComponent<ServerProps> = ({
   translate,
   initialChain,
+  networkLocked,
+  networkNote,
   server,
   selectServer,
   status,
@@ -253,6 +259,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
   const custom = useCustomServer({
     translate,
     online,
+    networkLocked,
     savedUri: chain =>
       server.kind === 'remote' &&
       selectServer === SelectServerEnum.custom &&
@@ -372,6 +379,13 @@ const Server: React.FunctionComponent<ServerProps> = ({
     }
     setCustomOpen(null);
     setTab(chain);
+    if (
+      !offline &&
+      chain !== ChainNameEnum.regtestChainName &&
+      chain !== server.chainName
+    ) {
+      onAuto(chain);
+    }
   };
 
   const switchTo = (chain: ChainNameEnum) => {
@@ -585,7 +599,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
         }))}
         value={tab}
         onChange={changeTab}
-        disabled={locked}
+        disabled={locked || networkLocked}
         style={[
           {
             position: 'absolute',
@@ -627,6 +641,19 @@ const Server: React.FunctionComponent<ServerProps> = ({
             style={[lockStyle, bodyFade]}
             pointerEvents={offline ? 'none' : 'auto'}
           >
+            {!!networkNote && (
+              <Text
+                variant="caption"
+                tone="muted"
+                style={{
+                  marginHorizontal: CARD_SIDE,
+                  marginTop: space8,
+                  marginBottom: space8,
+                }}
+              >
+                {networkNote}
+              </Text>
+            )}
             {body}
           </Animated.View>
           <Animated.View

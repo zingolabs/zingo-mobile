@@ -798,11 +798,11 @@ class WalletFileProtectionTests: XCTestCase {
     }
 }
 
-/// The per-file diagnosis behind the recovery dialog, and the migration
-/// from the legacy base64 text format to raw wallet bytes.
+/// The diagnosis behind the recovery dialog, and the migration from the
+/// legacy base64 text format to raw wallet bytes.
 class WalletFileDiagnosisTests: XCTestCase {
     private func mainEntry(_ rpc: RPCModule) -> [String: Any]? {
-        rpc.walletFileDiagnosis().first { $0["name"] as? String == Constants.WalletFileName.rawValue }
+        rpc.walletFileDiagnosis().first { $0["name"] as? String == WalletStore.walletName }
     }
 
     private func mainPath(_ rpc: RPCModule) throws -> String {
@@ -811,6 +811,13 @@ class WalletFileDiagnosisTests: XCTestCase {
             withIntermediateDirectories: true
         )
         return try rpc.getFileName(Constants.WalletFileName.rawValue)
+    }
+
+    override func setUp() {
+        super.setUp()
+        if let documents = try? RPCModule().getDocumentsDirectory() {
+            try? FileManager.default.removeItem(atPath: WalletStore.root(documents))
+        }
     }
 
     override func tearDown() {
@@ -902,8 +909,9 @@ class WalletFileDiagnosisTests: XCTestCase {
     }
 }
 
-/// The wallet and backup swap recovered from every interruption window,
-/// and the delete purge of sidecar copies.
+/// The legacy wallet and backup swap recovered from every interruption
+/// window, the save refused while no wallet file is open, and the delete of
+/// the active wallet's folder.
 class WalletSwapRecoveryTests: XCTestCase {
     let walletA = "walletA"
     let walletB = "walletB"
@@ -914,38 +922,64 @@ class WalletSwapRecoveryTests: XCTestCase {
         let fm = FileManager.default
         for name in [Constants.WalletFileName.rawValue,
                      Constants.WalletBackupFileName.rawValue,
-                     Constants.WalletTempSwapFileName.rawValue,
-                     "\(Constants.WalletFileName.rawValue).broken"] {
+                     Constants.WalletTempSwapFileName.rawValue] {
             if let path = try? rpc.getFileName(name) {
                 try? fm.removeItem(atPath: path)
             }
         }
-        RPCModule.walletFileClosed = false
+        if let documents = try? rpc.getDocumentsDirectory() {
+            try? fm.removeItem(atPath: WalletStore.root(documents))
+        }
+        RPCModule.openWalletId = nil
+        RPCModule.pendingMeta = nil
         super.tearDown()
     }
 
-    func testAClosedWalletFileRefusesTheSave() throws {
-        let rpc = RPCModule()
-        let files = try paths(rpc)
-        clear(files)
-        try walletA.write(toFile: files.main, atomically: true, encoding: .utf8)
-
-        RPCModule.walletFileClosed = true
-        try rpc.saveWalletInternal()
-
-        XCTAssertEqual(try read(files.main), walletA)
+    /// An active wallet folder holding `content`, as a committed create leaves it.
+    private func activeWallet(_ rpc: RPCModule, _ content: String) throws -> String {
+        let documents = try rpc.getDocumentsDirectory()
+        let id = try WalletStore.allocate(documents)
+        try content.write(toFile: WalletStore.walletPath(documents, id), atomically: true, encoding: .utf8)
+        try WalletStore.writeMeta(documents, id, WalletStore.newMeta(documents, id, name: "Wallet 1", chain: "main", serverUri: ""))
+        try WalletStore.setActive(documents, id)
+        return id
     }
 
-    func testDeleteClosesTheWalletFile() throws {
+    func testASaveWithNoWalletFileOpenIsRefused() throws {
         let rpc = RPCModule()
-        let files = try paths(rpc)
-        clear(files)
-        RPCModule.walletFileClosed = false
-        try walletA.write(toFile: files.main, atomically: true, encoding: .utf8)
+        let id = try activeWallet(rpc, walletA)
+        let path = WalletStore.walletPath(try rpc.getDocumentsDirectory(), id)
 
-        try rpc.fnDeleteExistingWallet()
+        RPCModule.openWalletId = nil
+        try rpc.saveWalletInternal()
 
-        XCTAssertTrue(RPCModule.walletFileClosed)
+        XCTAssertEqual(try read(path), walletA)
+    }
+
+    func testDeleteClosesTheWalletFileAndRemovesItsFolder() throws {
+        let rpc = RPCModule()
+        let id = try activeWallet(rpc, walletA)
+        let documents = try rpc.getDocumentsDirectory()
+        RPCModule.openWalletId = id
+        try walletA.write(toFile: "\(WalletStore.walletPath(documents, id)).broken", atomically: true, encoding: .utf8)
+
+        XCTAssertTrue(try rpc.fnDeleteWallet(walletId: id))
+
+        XCTAssertNil(RPCModule.openWalletId)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: WalletStore.dir(documents, id)))
+        XCTAssertNil(WalletStore.active(documents))
+    }
+
+    func testDeleteKeepsTheOtherWallets() throws {
+        let rpc = RPCModule()
+        let documents = try rpc.getDocumentsDirectory()
+        let first = try activeWallet(rpc, walletA)
+        let second = try activeWallet(rpc, walletB)
+
+        XCTAssertTrue(try rpc.fnDeleteWallet(walletId: second))
+
+        XCTAssertTrue(FileManager.default.fileExists(atPath: WalletStore.dir(documents, first)))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: WalletStore.dir(documents, second)))
     }
 
     private func paths(_ rpc: RPCModule) throws -> (main: String, backup: String, temp: String) {
@@ -1047,38 +1081,202 @@ class WalletSwapRecoveryTests: XCTestCase {
         XCTAssertEqual(try read(files.backup), walletB)
         XCTAssertEqual(try read(files.temp), walletA)
     }
+}
 
-    func testDeleteKeepsAnUnresolvedSwapTemp() throws {
-        let rpc = RPCModule()
-        let files = try paths(rpc)
-        clear(files)
-        try walletA.write(toFile: files.temp, atomically: true, encoding: .utf8)
-        try walletC.write(toFile: files.main, atomically: true, encoding: .utf8)
-        try walletB.write(toFile: files.backup, atomically: true, encoding: .utf8)
+/// The folder layout under a scratch directory: commits, crash sweeps,
+/// deletes and the move of the legacy files into folders.
+class WalletStoreTests: XCTestCase {
+    private var base = ""
 
-        try rpc.fnDeleteExistingWallet()
-
-        XCTAssertFalse(FileManager.default.fileExists(atPath: files.main))
-        XCTAssertEqual(try read(files.temp), walletA)
-        XCTAssertEqual(try read(files.backup), walletB)
+    override func setUpWithError() throws {
+        base = (NSTemporaryDirectory() as NSString).appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(atPath: base, withIntermediateDirectories: true)
     }
 
-    func testDeleteRemovesTheBrokenCopyAndTheSwapTemp() throws {
-        let rpc = RPCModule()
-        let files = try paths(rpc)
-        clear(files)
-        let brokenPath = try rpc.getFileName("\(Constants.WalletFileName.rawValue).broken")
-        try? FileManager.default.removeItem(atPath: brokenPath)
-        try walletA.write(toFile: files.main, atomically: true, encoding: .utf8)
-        try walletA.write(toFile: brokenPath, atomically: true, encoding: .utf8)
-        try walletA.write(toFile: files.temp, atomically: true, encoding: .utf8)
+    override func tearDown() {
+        try? FileManager.default.removeItem(atPath: base)
+        super.tearDown()
+    }
 
-        try rpc.fnDeleteExistingWallet()
+    private func committed(_ name: String) throws -> String {
+        let id = try WalletStore.allocate(base)
+        try Data(name.utf8).write(to: URL(fileURLWithPath: WalletStore.walletPath(base, id)))
+        try WalletStore.writeMeta(base, id, WalletStore.newMeta(base, id, name: name, chain: "main", serverUri: nil))
+        return id
+    }
 
-        let fm = FileManager.default
-        XCTAssertFalse(fm.fileExists(atPath: files.main))
-        XCTAssertFalse(fm.fileExists(atPath: brokenPath))
-        XCTAssertFalse(fm.fileExists(atPath: files.temp))
-        clear(files)
+    private func legacy(_ name: String, _ content: String) throws {
+        try content.write(toFile: "\(base)/\(name)", atomically: true, encoding: .utf8)
+    }
+
+    func testAWalletIsListedOnceItsMetaIsWritten() throws {
+        let id = try WalletStore.allocate(base)
+        try Data("w".utf8).write(to: URL(fileURLWithPath: WalletStore.walletPath(base, id)))
+        XCTAssertTrue(WalletStore.list(base).isEmpty)
+
+        try WalletStore.writeMeta(base, id, WalletStore.newMeta(base, id, name: "Wallet 1", chain: "main", serverUri: nil))
+
+        XCTAssertEqual(WalletStore.list(base).map(\.id), [id])
+    }
+
+    func testTheSweepDropsAFolderWhoseMetaNeverLanded() throws {
+        let kept = try committed("Wallet 1")
+        let unfinished = try WalletStore.allocate(base)
+
+        WalletStore.sweep(base, keep: nil)
+
+        XCTAssertTrue(FileManager.default.fileExists(atPath: WalletStore.dir(base, kept)))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: WalletStore.dir(base, unfinished)))
+    }
+
+    func testTheSweepKeepsTheFolderOfTheWalletBeingCreated() throws {
+        let creating = try WalletStore.allocate(base)
+
+        WalletStore.sweep(base, keep: creating)
+
+        XCTAssertTrue(FileManager.default.fileExists(atPath: WalletStore.dir(base, creating)))
+    }
+
+    func testTheSweepKeepsAMetaWhoseWalletFileIsMissing() throws {
+        let id = try committed("Wallet 1")
+        try FileManager.default.removeItem(atPath: WalletStore.walletPath(base, id))
+
+        WalletStore.sweep(base, keep: nil)
+
+        XCTAssertEqual(WalletStore.list(base).map(\.hasFile), [false])
+    }
+
+    func testTheSweepEndsADeleteACrashInterrupted() throws {
+        let id = try committed("Wallet 1")
+        try FileManager.default.moveItem(atPath: WalletStore.dir(base, id), toPath: WalletStore.dir(base, "\(id).deleting"))
+
+        WalletStore.sweep(base, keep: nil)
+
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: WalletStore.root(base)), [])
+    }
+
+    func testDeletingTheActiveWalletClearsThePointer() throws {
+        let id = try committed("Wallet 1")
+        try WalletStore.setActive(base, id)
+
+        XCTAssertTrue(try WalletStore.delete(base, id))
+
+        XCTAssertNil(WalletStore.active(base))
+    }
+
+    func testTheDefaultNameTakesTheLowestFreeNumber() throws {
+        _ = try committed("Wallet 1")
+        _ = try committed("Wallet 3")
+
+        XCTAssertEqual(WalletStore.defaultName(base), "Wallet 2")
+    }
+
+    func testALegacyWalletAndBackupMoveIntoFoldersWithTheWalletActive() throws {
+        try legacy("wallet.dat.txt", "main")
+        try legacy("wallet.backup.dat.txt", "backup")
+
+        let main = try WalletStore.adoptLegacy(base, legacy: "wallet.dat.txt", name: "Wallet 1", active: true, chain: "main", serverUri: "https://zec.example")
+        let backup = try WalletStore.adoptLegacy(base, legacy: "wallet.backup.dat.txt", name: "Wallet Backup", active: false, chain: "main", serverUri: nil)
+
+        XCTAssertEqual(WalletStore.active(base), main)
+        XCTAssertEqual(WalletStore.list(base).compactMap { $0.meta["name"] as? String }, ["Wallet 1", "Wallet Backup"])
+        XCTAssertEqual(try String(contentsOfFile: WalletStore.walletPath(base, try XCTUnwrap(backup)), encoding: .utf8), "backup")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: "\(base)/wallet.dat.txt"))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: "\(base)/wallet.backup.dat.txt"))
+    }
+
+    func testAMigrationResumesIntoTheSameFolderWhenACrashLeftTheFileBehind() throws {
+        try legacy("wallet.dat.txt", "main")
+        let id = try WalletStore.allocate(base)
+        var meta = WalletStore.newMeta(base, id, name: "Wallet 1", chain: "main", serverUri: nil)
+        meta["migratedFrom"] = WalletStore.digest(Data("main".utf8))
+        try WalletStore.writeMeta(base, id, meta)
+        try WalletStore.setActive(base, id)
+
+        let resumed = try WalletStore.adoptLegacy(base, legacy: "wallet.dat.txt", name: "Wallet 1", active: true, chain: "main", serverUri: nil)
+
+        XCTAssertEqual(resumed, id)
+        XCTAssertEqual(WalletStore.list(base).count, 1)
+        XCTAssertEqual(try String(contentsOfFile: WalletStore.walletPath(base, id), encoding: .utf8), "main")
+    }
+
+    func testNothingMovesWhenNoLegacyFileExists() throws {
+        XCTAssertNil(try WalletStore.adoptLegacy(base, legacy: "wallet.dat.txt", name: "Wallet 1", active: true, chain: "main", serverUri: nil))
+    }
+
+    func testAPatchSetsAndRemovesFieldsButNeverTheStoresOwn() throws {
+        let id = try committed("Wallet 1")
+        var meta = WalletStore.list(base)[0].meta
+        meta["migratedFrom"] = "abc"
+        meta["category"] = 2
+
+        let patched = WalletStore.patchMeta(meta, [
+            "name": "Savings", "category": NSNull(), "id": "other", "v": 9, "migratedFrom": "def",
+        ])
+
+        XCTAssertEqual(patched["name"] as? String, "Savings")
+        XCTAssertNil(patched["category"])
+        XCTAssertEqual(patched["id"] as? String, id)
+        XCTAssertEqual(patched["v"] as? Int, 1)
+        XCTAssertEqual(patched["migratedFrom"] as? String, "abc")
+    }
+
+    func testANewWalletsMetaCarriesItsKindWhenGiven() throws {
+        let id = try WalletStore.allocate(base)
+
+        XCTAssertEqual(WalletStore.newMeta(base, id, name: "Wallet 1", chain: "main", serverUri: nil, kind: "ufvk")["kind"] as? String, "ufvk")
+        XCTAssertNil(WalletStore.newMeta(base, id, name: "Wallet 1", chain: "main", serverUri: nil)["kind"])
+    }
+
+    func testTheInfoListsTheWalletsInOrderWithTheActiveOne() throws {
+        let first = try committed("Wallet 1")
+        let second = try committed("Wallet 2")
+        try WalletStore.setActive(base, second)
+
+        let info = WalletStore.info(base)
+        let wallets = info["wallets"] as? [[String: Any]] ?? []
+
+        XCTAssertEqual(info["active"] as? String, second)
+        XCTAssertEqual(wallets.map { $0["id"] as? String }, [first, second])
+        XCTAssertEqual((wallets[1]["meta"] as? [String: Any])?["name"] as? String, "Wallet 2")
+        XCTAssertNotNil(try JSONSerialization.data(withJSONObject: info))
+    }
+
+    func testTheInfoReportsNoActiveWalletAsNullWhenThereIsNone() throws {
+        XCTAssertTrue(WalletStore.info(base)["active"] is NSNull)
+    }
+
+    func testTheFirstWalletIsTheActiveOneWhenThePointerNamesNone() throws {
+        let first = try committed("Wallet 1")
+        let second = try committed("Wallet 2")
+        try WalletStore.setActive(base, second)
+
+        _ = try WalletStore.delete(base, second)
+
+        XCTAssertEqual(WalletStore.active(base), first)
+    }
+
+    func testTheLargestWalletIsTheBiggestFileOnDisk() throws {
+        _ = try committed("Wallet 1")
+        let big = try committed("Wallet 2")
+        try Data(count: 500).write(to: URL(fileURLWithPath: WalletStore.walletPath(base, big)))
+
+        XCTAssertEqual(WalletStore.largestWallet(base), 500)
+    }
+
+    func testAFullStorageIsToldApartFromOtherWriteFailures() {
+        let posix = NSError(domain: NSPOSIXErrorDomain, code: Int(ENOSPC))
+        let wrapped = NSError(domain: NSCocoaErrorDomain, code: NSFileWriteUnknownError, userInfo: [NSUnderlyingErrorKey: posix])
+
+        XCTAssertTrue(WalletStore.isDiskFull(NSError(domain: NSCocoaErrorDomain, code: NSFileWriteOutOfSpaceError)))
+        XCTAssertTrue(WalletStore.isDiskFull(wrapped))
+        XCTAssertFalse(WalletStore.isDiskFull(NSError(domain: NSCocoaErrorDomain, code: NSFileWriteNoPermissionError)))
+    }
+
+    func testAFullStorageRejectsAsDiskFull() {
+        guard case .rejected(let code, _, _) = FfiOutcome.of({ throw StorageError.diskFull("full") }) else {
+            return XCTFail("a full storage resolved")
+        }
+        XCTAssertEqual(code, "DiskFull")
     }
 }

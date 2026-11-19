@@ -11,19 +11,19 @@ import {
   chipMinHeight,
   iconSizeSm,
   radiusPill,
+  radiusXs,
   space4,
   space8,
   space12,
   space16,
   space20,
   space24,
+  touchTarget,
   useTheme,
 } from '@app/theme';
 
 import { ContextAppLoading } from '@app/context';
-import { WalletType } from '@app/AppState';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
-import { formatInteger } from '@app/utils/formatAmount';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import Card from '@ui/widgets/Card';
@@ -33,7 +33,8 @@ import { duration, ease } from '@app/theme/motion';
 import Pressable from '@ui/primitives/Pressable';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { WifiIcon } from '@ui/primitives/Icons/WifiIcon';
-import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
+import { DatabaseIcon } from '@ui/primitives/Icons/DatabaseIcon';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { useCompact } from '@app/hooks/useCompact';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
@@ -46,6 +47,9 @@ const BACK_ONLINE_MS = duration.fresh;
 // Exception E, the brand: the wordmark, used once, not text.
 const BRAND_SIZE = 49;
 const BRAND_LINE = 59;
+// The found card's icon tile, and the room its title leaves for the close button.
+const FOUND_TILE = 24;
+const FOUND_X_ROOM = 28;
 
 // The launch sequence, about 1.1 s: "Welcome to" rises, "Zingo" settles,
 // the tagline fades, the actions arrive last.
@@ -86,11 +90,10 @@ const pillSwap = () =>
 
 type StartMenuProps = {
   actionButtonsDisabled: boolean;
-  recoveryWallet: WalletType | null;
-  // The saved phrase outlived an uninstall: only then is it "from a previous install".
-  freshInstall: boolean;
-  importRecoveryWallet: () => void;
-  viewRecoveryWallet: () => void;
+  /** Wallets a previous install left in the Keychain, and the card is not dismissed. */
+  found: boolean;
+  reviewFound: () => void;
+  dismissFound: () => void;
   customServer: () => void;
   walletExists: boolean;
   openCurrentWallet: () => void;
@@ -100,10 +103,9 @@ type StartMenuProps = {
 
 const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   actionButtonsDisabled,
-  recoveryWallet,
-  freshInstall,
-  importRecoveryWallet,
-  viewRecoveryWallet,
+  found,
+  reviewFound,
+  dismissFound,
   customServer,
   walletExists,
   openCurrentWallet,
@@ -327,7 +329,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
               {translate('loadingapp.tagline') as string}
             </Text>
           </Animated.View>
-          {noInternet && !recoveryWallet && (
+          {noInternet && !found && (
             <Animated.View
               entering={lateEnter()}
               exiting={offlineExit()}
@@ -344,7 +346,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           )}
         </View>
 
-        {recoveryWallet && (
+        {found && (
           <Animated.View
             entering={tagEnter()}
             style={{ marginTop: gap(space24), marginHorizontal: space24 }}
@@ -356,58 +358,57 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                     flexDirection: 'row',
                     alignItems: 'center',
                     gap: space8,
+                    paddingRight: FOUND_X_ROOM,
                   }}
                 >
-                  <TriangleAlert size={iconSizeSm} color={colors.fgDefault} />
+                  <View
+                    style={{
+                      width: FOUND_TILE,
+                      height: FOUND_TILE,
+                      borderRadius: radiusXs,
+                      backgroundColor: colors.bgAccentSubtle,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <DatabaseIcon size={iconSizeSm} color={colors.fgAccent} />
+                  </View>
                   <Text variant="bodyStrong">
-                    {
-                      translate(
-                        freshInstall
-                          ? 'loadingapp.previous-install-title'
-                          : 'loadingapp.saved-wallet-title',
-                      ) as string
-                    }
+                    {translate('found.title') as string}
                   </Text>
                 </View>
-                <Text
-                  variant="caption"
-                  tone="muted"
-                  style={{ marginTop: space4 }}
-                >
-                  {translate('loadingapp.previous-install-body') as string}
+                <Text variant="bodySmall" tone="muted">
+                  {translate('found.body') as string}
                 </Text>
-              </View>
-              <Text variant="caption">
-                {`${
-                  translate(
-                    recoveryWallet.seed
-                      ? 'loadingapp.card-words'
-                      : 'loadingapp.card-key',
-                  ) as string
-                } · ${(translate('loadingapp.card-birthday') as string).replace(
-                  '{height}',
-                  formatInteger(recoveryWallet.birthday),
-                )}`}
-              </Text>
-              <View>
-                <Button
-                  variant="primary"
-                  size="small"
-                  testID="loadingapp.importthis"
-                  title={translate('loadingapp.import-this') as string}
-                  busy={busyFor('loadingapp.importthis')}
-                  onPress={press('loadingapp.importthis', importRecoveryWallet)}
-                />
-              </View>
-              <View style={{ alignItems: 'center' }}>
-                {link(
-                  translate('loadingapp.view-seed') as string,
-                  viewRecoveryWallet,
-                  'loadingapp.viewseed',
-                  true,
-                )}
+                <View style={{ marginTop: space4, alignItems: 'flex-start' }}>
+                  {link(
+                    translate('found.review') as string,
+                    reviewFound,
+                    'loadingapp.foundreview',
+                    true,
+                  )}
+                </View>
               </View>
             </Card>
+            <Pressable
+              kind="icon"
+              testID="loadingapp.foundnotnow"
+              accessibilityRole="button"
+              accessibilityLabel={translate('found.not-now') as string}
+              disabled={actionButtonsDisabled}
+              onPress={dismissFound}
+              style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                width: touchTarget,
+                height: touchTarget,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <XIcon size={iconSizeSm} color={colors.fgMuted} />
+            </Pressable>
           </Animated.View>
         )}
         <View style={{ flexGrow: 1, minHeight: space16 }} />

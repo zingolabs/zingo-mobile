@@ -1,4 +1,5 @@
 import swapStorage from './swapStorage';
+import { isTerminalStatus } from './enums/SwapStatusEnum';
 
 import { SwapRecordType } from './types/SwapRecordType';
 import { swapAddressOf } from './shieldedPurchase';
@@ -64,7 +65,7 @@ function tryParseRecordsArray(raw: string): SwapRecordType[] | null {
  * swap-tracking metadata rather than seeds or keys.
  *
  * Storage layout — one key per wallet, holding a single JSON array:
- *   - One `swapStorage` entry under `storageKeyFor(fingerprint)` holding
+ *   - One `swapStorage` entry under `storageKeyFor(walletId)` holding
  *     the whole `SwapRecord[]`. Writes are full-array overwrites.
  *
  * Why one key (vs one per record + an index):
@@ -96,14 +97,14 @@ function tryParseRecordsArray(raw: string): SwapRecordType[] | null {
  */
 /**
  * Storage key for the current wallet's swap bucket. The suffix is the
- * wallet's UFVK-derived fingerprint (see `walletFingerprint.ts`). Different
+ * wallet's id, the name of its folder on the device. Different
  * wallets on the same device write to different keys; that is the privacy
  * boundary.
  */
 export const SWAP_RECORDS_KEY_PREFIX = 'swap:records:';
 
-function storageKeyFor(fingerprint: string): string {
-  return SWAP_RECORDS_KEY_PREFIX + fingerprint;
+function storageKeyFor(walletId: string): string {
+  return SWAP_RECORDS_KEY_PREFIX + walletId;
 }
 
 /**
@@ -112,7 +113,7 @@ function storageKeyFor(fingerprint: string): string {
  * read-paths return empty and write-paths no-op so the activity list never
  * surfaces records from a wallet that is not the current one.
  */
-let currentWalletFingerprint: string | null = null;
+let currentWalletId: string | null = null;
 
 /**
  * Callback fired after every mutation that successfully reaches storage.
@@ -131,6 +132,14 @@ export class SwapStore {
    *  both register here so a single upsert (from a poller tick, a fresh
    *  commit, etc.) fans out to every consumer. */
   private static listeners: Set<SwapStoreChangeListener> = new Set();
+
+  /** The list the last read or change produced, for a screen's first frame. */
+  private static latest: SwapRecordType[] = [];
+
+  /** The records as last read or changed: what a screen draws before its own read answers. */
+  static snapshot(): SwapRecordType[] {
+    return SwapStore.latest;
+  }
 
   /**
    * Register a listener for record mutations. The returned function removes
@@ -151,6 +160,7 @@ export class SwapStore {
 
   private static notify(records: SwapRecordType[]): void {
     const shown = live(records);
+    SwapStore.latest = shown;
     for (const listener of SwapStore.listeners) {
       try {
         listener(shown);
@@ -178,7 +188,11 @@ export class SwapStore {
 
   /** Read all records. Returns an empty array on first install or storage error. */
   static async readAll(): Promise<SwapRecordType[]> {
-    return this.enqueue(async () => live(await this._readRaw()));
+    return this.enqueue(async () => {
+      const shown = live(await this._readRaw());
+      SwapStore.latest = shown;
+      return shown;
+    });
   }
 
   /**
@@ -302,7 +316,7 @@ export class SwapStore {
   }
 
   /**
-   * Bind the store to the wallet identified by `fingerprint`. Must be called
+   * Bind the store to the wallet identified by `walletId`. Must be called
    * before any read/write path returns useful data — until then `readAll`
    * yields `[]` and writes are no-ops (the activity list shows nothing
    * rather than risking exposure of records from a different wallet).
@@ -314,9 +328,9 @@ export class SwapStore {
    * that notification: the swap service still starts, and the next read or
    * write reaches the bucket.
    */
-  static async bindToWallet(fingerprint: string): Promise<void> {
+  static async bindToWallet(walletId: string): Promise<void> {
     return this.enqueue(async () => {
-      currentWalletFingerprint = fingerprint;
+      currentWalletId = walletId;
       const fresh = await this._readRaw().catch(() => undefined);
       if (fresh) {
         SwapStore.notify(fresh);
@@ -339,15 +353,15 @@ export class SwapStore {
    */
   static async unbind(): Promise<void> {
     return this.enqueue(async () => {
-      currentWalletFingerprint = null;
+      currentWalletId = null;
       SwapStore.notify([]);
     });
   }
 
   /** The shielded addresses a wallet's swaps made, removed swaps included. */
-  static async madeAddressesFor(fingerprint: string): Promise<string[]> {
+  static async madeAddressesFor(walletId: string): Promise<string[]> {
     return this.enqueue(async () => {
-      const raw = await swapStorage.getItem(storageKeyFor(fingerprint));
+      const raw = await swapStorage.getItem(storageKeyFor(walletId));
       const records = raw === null ? [] : (tryParseRecordsArray(raw) ?? []);
       return records.flatMap(r => {
         const made = swapAddressOf(r);
@@ -356,17 +370,28 @@ export class SwapStore {
     });
   }
 
+  /** Whether a wallet has a swap still running: one not removed and not final. */
+  static async inFlightFor(walletId: string): Promise<boolean> {
+    return this.enqueue(async () => {
+      const raw = await swapStorage.getItem(storageKeyFor(walletId));
+      const records = raw === null ? [] : (tryParseRecordsArray(raw) ?? []);
+      return records.some(
+        r => r.removedAtMs === undefined && !isTerminalStatus(r.status),
+      );
+    });
+  }
+
   /**
    * Wipe the records for a specific wallet's bucket. Called through
    * `WalletLocalData` on every path that deletes or replaces the wallet
    * file, so its swap records do not outlive it.
    */
-  static async clearForWallet(fingerprint: string): Promise<void> {
+  static async clearForWallet(walletId: string): Promise<void> {
     return this.enqueue(async () => {
       // Overwrite to `[]` (and best-effort remove) so future binds see a
       // clean empty bucket even if the platform rejects the removal.
-      await markKeyAsCleared(storageKeyFor(fingerprint), '[]');
-      if (fingerprint === currentWalletFingerprint) {
+      await markKeyAsCleared(storageKeyFor(walletId), '[]');
+      if (walletId === currentWalletId) {
         SwapStore.notify([]);
       }
     });
@@ -375,11 +400,11 @@ export class SwapStore {
   /**
    * Wipe the current wallet's records. No-op if no wallet is bound (we
    * cannot know which bucket to target). Callers that hold an explicit
-   * fingerprint should prefer `clearForWallet`.
+   * wallet id should prefer `clearForWallet`.
    */
   static async clear(): Promise<void> {
-    if (!currentWalletFingerprint) return;
-    return this.clearForWallet(currentWalletFingerprint);
+    if (!currentWalletId) return;
+    return this.clearForWallet(currentWalletId);
   }
 
   /**
@@ -388,8 +413,8 @@ export class SwapStore {
    * the queue — only call from within an `enqueue` callback.
    */
   private static async _readRaw(): Promise<SwapRecordType[]> {
-    if (!currentWalletFingerprint) return [];
-    const key = storageKeyFor(currentWalletFingerprint);
+    if (!currentWalletId) return [];
+    const key = storageKeyFor(currentWalletId);
     const raw = await swapStorage.getItem(key);
     if (raw === null) return [];
     const parsed = tryParseRecordsArray(raw);
@@ -412,12 +437,12 @@ export class SwapStore {
 
   /** Bypasses the queue — only call from within an `enqueue` callback. */
   private static async _writeRaw(records: SwapRecordType[]): Promise<void> {
-    if (!currentWalletFingerprint) {
+    if (!currentWalletId) {
       console.log('SwapStore: write skipped — no wallet bound');
       return;
     }
     await swapStorage.setItem(
-      storageKeyFor(currentWalletFingerprint),
+      storageKeyFor(currentWalletId),
       JSON.stringify(records),
     );
   }

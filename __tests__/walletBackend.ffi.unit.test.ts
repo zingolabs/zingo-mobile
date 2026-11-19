@@ -18,6 +18,16 @@ describe('toFfiError maps every rejection shape to a typed FfiError', () => {
     });
   });
 
+  it('keeps the bridges own DiskFull code', () => {
+    const rejection = Object.assign(new Error('the storage is full'), {
+      code: 'DiskFull',
+    });
+    expect(toFfiError(rejection)).toEqual({
+      code: 'DiskFull',
+      message: 'the storage is full',
+    });
+  });
+
   it('maps an unrecognized code to Unknown without losing the message', () => {
     const rejection = Object.assign(new Error('boom'), { code: 'Bogus' });
     expect(toFfiError(rejection)).toEqual({ code: 'Unknown', message: 'boom' });
