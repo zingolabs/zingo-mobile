@@ -23,7 +23,12 @@ import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
 import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
 import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
-import { DeleteMark, EditMark, playMark } from '@ui/widgets/RowActionMarks';
+import {
+  DeleteMark,
+  EditMark,
+  MARK_RESET_MS,
+  playMark,
+} from '@ui/widgets/RowActionMarks';
 import { themeTokens } from '@app/theme';
 
 export const ROW_LINE = themeTokens.borderSubtle;
@@ -35,7 +40,6 @@ const SWIPE_INK = themeTokens.fgOnAccent;
 const FLASH = themeTokens.bgAccentSubtle;
 
 /** An action is ready again once its motion is over and as long again has passed. */
-const ACTION_RESET_MS = duration.action * 2;
 const SEND_AT = 72;
 const ACTIONS_H = 92;
 const CIRCLE = 52;
@@ -276,14 +280,14 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
           easing: ease.out,
         });
         onSend();
-        later(ACTION_RESET_MS, () => {
+        later(MARK_RESET_MS, () => {
           fly.value = 0;
           busy.current = false;
         });
         return;
       case 'swap':
         onSwap();
-        later(ACTION_RESET_MS, () => {
+        later(MARK_RESET_MS, () => {
           busy.current = false;
         });
         return;
@@ -303,7 +307,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
       case 'edit':
         playMark(pen, 'edit');
         onEdit();
-        later(ACTION_RESET_MS, () => {
+        later(MARK_RESET_MS, () => {
           pen.value = 0;
           busy.current = false;
         });
@@ -311,7 +315,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
       case 'delete':
         playMark(lid, 'delete');
         onDelete();
-        later(ACTION_RESET_MS, () => {
+        later(MARK_RESET_MS, () => {
           lid.value = 0;
           busy.current = false;
         });
@@ -347,7 +351,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
         onSwipeableOpenStartDrag={onSwipe}
         onSwipeableWillOpen={() => {
           onSend();
-          later(ACTION_RESET_MS, () => swipeable.current?.close());
+          later(MARK_RESET_MS, () => swipeable.current?.close());
         }}
       >
         <View style={{ backgroundColor: colors.bgSurface }}>

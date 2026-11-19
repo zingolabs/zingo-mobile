@@ -55,7 +55,7 @@ import Avatar, { AvatarCategory } from '@ui/widgets/Avatar';
 import DeleteWalletSheet from '@ui/widgets/DeleteWalletSheet';
 import { MASK } from '@ui/widgets/PrivateAmount';
 import RadioRow, { RadioList } from '@ui/widgets/RadioRow';
-import { DeleteMark, EditMark, playMark } from '@ui/widgets/RowActionMarks';
+import { DeleteMark, EditMark, flashMark } from '@ui/widgets/RowActionMarks';
 import TitleBar from '@ui/widgets/TitleBar';
 import DetailRows from '@screens/Swap/components/DetailRows';
 
@@ -467,8 +467,7 @@ function WalletRow({
             editLabel,
             `wallets.row.${wallet.id}.edit`,
             () => {
-              pen.value = 0;
-              playMark(pen, 'edit');
+              flashMark(pen, 'edit');
               onEdit();
             },
             <EditMark progress={pen} color={editColor} />,
@@ -478,8 +477,7 @@ function WalletRow({
             deleteLabel,
             `wallets.row.${wallet.id}.delete`,
             () => {
-              lid.value = 0;
-              playMark(lid, 'delete');
+              flashMark(lid, 'delete');
               onDelete();
             },
             <DeleteMark progress={lid} color={deleteColor} />,

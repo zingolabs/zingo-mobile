@@ -5,6 +5,8 @@ import Animated, {
   ReduceMotion,
   SharedValue,
   useAnimatedStyle,
+  withDelay,
+  withSequence,
   withTiming,
 } from 'react-native-reanimated';
 import { radiusPill } from '@app/theme';
@@ -15,6 +17,28 @@ import { TrashCan, TrashLid } from '@ui/primitives/Icons/TrashIcon';
 const MARK = 20;
 
 /** Runs a mark once from rest: the pencil on the standard curve, the lid on the spring. */
+/** How long a played mark stays drawn before it snaps back. */
+export const MARK_RESET_MS = duration.action * 2;
+
+/** Runs a mark once from rest and snaps it back after MARK_RESET_MS, for a row that keeps no timers of its own. */
+export function flashMark(
+  progress: SharedValue<number>,
+  kind: 'edit' | 'delete',
+): void {
+  progress.value = 0;
+  progress.value = withSequence(
+    withTiming(1, {
+      duration: duration.action,
+      easing: kind === 'delete' ? ease.spring : ease.standard,
+      reduceMotion: ReduceMotion.System,
+    }),
+    withDelay(
+      MARK_RESET_MS - duration.action,
+      withTiming(0, { duration: 0, reduceMotion: ReduceMotion.System }),
+    ),
+  );
+}
+
 export function playMark(
   progress: SharedValue<number>,
   kind: 'edit' | 'delete',
