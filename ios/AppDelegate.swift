@@ -394,7 +394,8 @@ extension AppDelegate {
 
         var exists: String = "false"
         do {
-            exists = try rpcmodule.fileExists(Constants.WalletFileName.rawValue)
+            try rpcmodule.prepareWallets()
+            exists = try rpcmodule.activeWalletId() == nil ? "false" : "true"
         } catch {
             NSLog("BGTask syncingProcessBackgroundTask - Wallet exists error: \(error.localizedDescription)")
         }
@@ -624,36 +625,30 @@ extension AppDelegate {
         return json
     }
 
-    /// Reads settings.json and loads the wallet file when a server URI is
-    /// configured, reporting which of the three outcomes happened so the
-    /// caller can tell "loaded" from "offline" from "could not load".
+    /// Loads the active wallet with the server its meta records, reporting
+    /// which of the three outcomes happened so the caller can tell "loaded"
+    /// from "offline" from "could not load".
     ///
     /// A failed load used to report the same "proceed" as a successful one,
     /// on the reasoning that the sync would surface its own error. It does,
     /// but that error is `LightclientNotInitialized`, which names the symptom
-    /// and hides the cause: an unreadable settings.json on a locked device
-    /// reads exactly like a wallet that loaded fine and then failed to sync.
+    /// and hides the cause: an unreadable file on a locked device reads
+    /// exactly like a wallet that loaded fine and then failed to sync.
     private func loadWalletFile() -> BackgroundWalletLoad {
-        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-        guard let documentsDirectory = paths.first else {
-            NSLog("Error: Unable to find documents directory")
-            return .failed("unable to find the documents directory")
+        let rpcmodule = RPCModule()
+        let server: (uri: String, chain: String)?
+        do {
+            server = try rpcmodule.activeServer()
+        } catch {
+            NSLog("Error: Unable to read the active wallet's server. error: \(error.localizedDescription)")
+            return .failed(error.localizedDescription)
         }
-
-        let fileName = "\(documentsDirectory)/settings.json"
-        guard let content = try? String(contentsOfFile: fileName, encoding: .utf8) else {
-            NSLog("Error: Unable to read file at path \(fileName)")
-            return .failed("unable to read settings.json")
+        guard let server else {
+            NSLog("Error: the active wallet has no server")
+            return .failed("the active wallet has no server")
         }
-
-        guard let contentData = content.data(using: .utf8),
-              let jsonObject = try? JSONSerialization.jsonObject(with: contentData, options: []) as? [String: Any],
-              let server = jsonObject["server"] as? [String: Any],
-              let serveruri = server["uri"] as? String,
-              let chainhint = server["chainName"] as? String else {
-            NSLog("Error: Unable to parse JSON object from file at path \(fileName)")
-            return .failed("unable to parse settings.json")
-        }
+        let serveruri = server.uri
+        let chainhint = server.chain
 
         if serveruri.isEmpty {
             NSLog("Offline mode detected (empty serveruri) - skipping wallet load")
@@ -661,7 +656,6 @@ extension AppDelegate {
         }
 
         NSLog("Opening the wallet file - No App active - serveruri: \(serveruri) chain: \(chainhint)")
-        let rpcmodule = RPCModule()
         do {
           _ = try rpcmodule.fnLoadExistingWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: "3")
         } catch {

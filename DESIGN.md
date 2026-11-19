@@ -504,7 +504,7 @@ One variant per role. Weight overrides are limited to the cases listed here.
 | Value typed in a field | `bodyStrong` (`address` for an address or a key) |
 | Chip label | `bodySmall` 600: `fgMuted`, `fgAccent` when selected |
 | Tag | `caption` 600 in the tone's colour |
-| Avatar initial | `bodyStrong` 700 (md), `subtitle` (lg); the own wallet's avatar is the wallet icon in `fgViewOnly` |
+| Avatar initial | `bodySmall` 700 (sm), `bodyStrong` 700 (md), `subtitle` (lg); a single own wallet's avatar is the wallet icon in `fgViewOnly`, and with several each wallet shows its initial on its category |
 | Row title, notice title, what happened in a detail hero | `bodyStrong` 15/21 |
 | Body text, empty state | `body` 15/21 (empty state in `fgMuted`) |
 | Label over a field or a card | `bodySmall` 600, `fgMuted` |
@@ -659,9 +659,9 @@ bars, rows and fields), 24 (`iconSize`, navigation and standalone). Logos
 - Close is one `XIcon` at 20 in `fgMuted`.
 - A status icon takes its role's colour (`fgDanger` for a failure).
 
-**Avatars.** Contacts and the own wallet use `Avatar`: md 36, lg 48, the
-category's 12 % tint behind the initial, the chain badge in the corner when it
-matters.
+**Avatars.** Contacts and the own wallets use `Avatar`: sm 28 (the Header's
+wallet switcher), md 36, lg 48, the category's 12 % tint behind the initial,
+the chain badge in the corner when it matters.
 
 ## Components
 
@@ -680,7 +680,7 @@ Use the shared component; never build a second one that looks the same.
 | A delete | `dangerText` "Delete" on the screen; the confirmation sheet titled "Delete", with its own message, a filled `danger` "Delete" and Cancel under it. Every delete says "Delete", on the screen and in the sheet, the same word in every language. The Address Book's red bin opens the same sheet |
 | Leaving a sheet | Two kinds, one way out each. A sheet you pick from or fill in (lists, pickers, filters, forms: New address, Add tag, a contact) has a `TitleBar` with the X, no handle and no Cancel; closing it any way (the X, a swipe, the scrim) leaves it empty for next time. A sheet that asks a question (confirmations, Delete, Shield, Authorize, Delete wallet, the seed sheet, "I sent it") has the handle and ends with Cancel, no X. Confirm and the swap review keep the back arrow with Cancel: the arrow steps back, Cancel leaves the flow |
 | An on/off setting | `Switch` (exception D), the only toggle in the app |
-| A checkbox | `Checkbox`: box 16 × 16 (`iconSizeSm`), radius 4 as `radiusXs` (`radiusSm` 8 would read as a radio at that size), border 1.5 in `borderMuted` when off; `bgAccent` with the tick in `fgOnAccent` when on. The label next to it is part of the tap area, at least 44 high |
+| A checkbox | `Checkbox`: box 16 × 16 (`iconSizeSm`), radius 4 as `radiusXs` (`radiusSm` 8 would read as a radio at that size), border 1.5 in `borderMuted` when off; `bgAccent` with the tick in `fgOnAccent` when on. The label next to it is part of the tap area, at least 44 high. A label can be a node, for a row with its own icon and two lines |
 | An amount to type | `AmountCard` (exception C) |
 | A short status | `Tag` (read, not tapped) |
 | A person or the wallet | `Avatar` |

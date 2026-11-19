@@ -10,7 +10,6 @@ import { NativeModules } from 'react-native';
 interface RPCModuleAPI {
   // Wallet lifecycle
   walletExists(): Promise<string>;
-  walletBackupExists(): Promise<string>;
   createNewWallet(
     serverUri: string,
     birthday: string,
@@ -40,15 +39,29 @@ interface RPCModuleAPI {
     performanceLevel: string,
     minConfirmations: string,
   ): Promise<string>;
-  restoreExistingWalletBackup(): Promise<string | boolean>;
-  replaceWalletWithBackup(): Promise<string | boolean>;
+  // The wallets by id. walletsInfo resolves {active, wallets: [{id, hasFile,
+  // meta}]}; a meta patch sets its fields, removes the null ones and
+  // resolves the meta written; a load makes the wallet the active one only
+  // when it opens. Android resolves deleteWalletProcess as a boolean, iOS
+  // as "true"/"false".
+  walletsInfo(): Promise<string>;
+  updateWalletMetaProcess(walletId: string, patch: string): Promise<string>;
+  loadWalletProcess(
+    walletId: string,
+    serverUri: string,
+    chainHint: string,
+    performanceLevel: string,
+    minConfirmations: string,
+  ): Promise<string>;
+  deleteWalletProcess(walletId: string): Promise<string | boolean>;
+  // {free, largest} in bytes: the storage left and the largest wallet file.
+  diskSpaceInfo(): Promise<string>;
   // Android only (2.0.21 double-wrap incident): per-file classification of
   // the wallet files, and the unwrap repair. Absent on iOS.
   walletFileDiagnosisInfo(): Promise<string>;
   repairDoubleWrappedWalletProcess(): Promise<string>;
   walletFileRecoveryInfo(): Promise<string>;
   walletChainInfo(): Promise<string>;
-  deleteExistingWallet(): Promise<string>;
   // The app's own JSON files in its private folder; see appFiles.
   appFileExists(name: string): Promise<boolean>;
   readAppFile(name: string): Promise<string>;

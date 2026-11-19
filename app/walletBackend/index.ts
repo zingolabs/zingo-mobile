@@ -44,7 +44,6 @@ export {
   removeTransaction,
   reserveRefundAddress,
   deriveRefundAddress,
-  deleteExistingWallet,
   resolvedTrue,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,
@@ -54,7 +53,6 @@ export {
   shieldConfirm,
   shieldPreview,
   shieldPropose,
-  walletBackupExists,
   walletExists,
   readWalletChain,
 } from './utils/walletUtils';
@@ -64,6 +62,29 @@ export type {
   UfvkCheck,
   ZecPriceOutcome,
 } from './utils/walletUtils';
+export {
+  activeWalletEntry,
+  deleteWallet,
+  diskSpace,
+  hasRoomForWallet,
+  loadWallet,
+  MIN_FREE_BYTES,
+  readOpenWalletId,
+  recordActiveOpened,
+  recordOpenFailed,
+  recordWalletKind,
+  updateWalletMeta,
+  walletsOnDevice,
+} from './utils/walletStore';
+export type {
+  ActiveWallet,
+  DiskSpace,
+  WalletEntry,
+  WalletKind,
+  WalletMeta,
+  WalletMetaPatch,
+  WalletsOnDevice,
+} from './utils/walletStore';
 export {
   hasRepairableWalletFile,
   repairDoubleWrappedWallet,

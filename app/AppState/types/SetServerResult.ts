@@ -5,13 +5,8 @@
  *   file and React state are now in sync with the new URI / selectServer
  *   mode. The caller can navigate forward as normal.
  *
- * - `chain-changed`: the new server runs on a different chain than the
- *   open wallet, so the existing seed/UFVK can't be used as-is. The old
- *   server has been restored and `newServer` / `newSelectServer` were
- *   stashed in state so the recovery screen (Seed or Ufvk with
- *   `action: server`) can finish the migration. The caller MUST navigate
- *   to that recovery screen — `setServerOption` no longer does it
- *   internally so the navigation policy lives entirely in the call site.
+ * The new server is always on the wallet's own network: a wallet's network
+ * never changes.
  *
  * - `error`: a transient failure (RPC/network/JSON parse). The old server
  *   has been restored; the user stays where they are. The caller should
@@ -22,6 +17,4 @@
  *   reports.
  */
 export type SetServerResult =
-  | { kind: 'ok' }
-  | { kind: 'chain-changed' }
-  | { kind: 'error'; message: string };
+  { kind: 'ok' } | { kind: 'error'; message: string };

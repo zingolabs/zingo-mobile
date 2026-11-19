@@ -1020,7 +1020,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
             addLastSnackbar={addLastSnackbar /* context */}
             setShieldingAmount={setShieldingAmount}
             setBackgroundError={setBackgroundError /* context */}
-            showMessagesIcon={true}
           />
         </View>
       </View>

@@ -39,20 +39,34 @@ const nativeRpc = RPCModule as unknown as Record<string, jest.Mock>;
 const keychain = Keychain as jest.Mocked<typeof Keychain>;
 const wallet = { seed: 'abandon ability able', birthday: 1994579 };
 
+beforeEach(() => {
+  nativeRpc.walletsInfo.mockResolvedValue(
+    JSON.stringify({
+      active: 'w1',
+      wallets: [
+        {
+          id: 'w1',
+          hasFile: true,
+          meta: { v: 1, id: 'w1', order: 1, createdAt: 0, name: 'Wallet 1' },
+        },
+      ],
+    }),
+  );
+});
+
 afterEach(() => {
   jest.clearAllMocks();
 });
 
 test('Tests that the recovery info is saved when it is written and reads back', async () => {
-  const { GlobalConst } = jest.requireActual('@app/AppState');
-  keychain.getGenericPassword.mockImplementation(
-    async () =>
-      ({
-        username: GlobalConst.keyKeyChain,
-        password: JSON.stringify(wallet),
-        service: GlobalConst.serviceKeyChain,
-      }) as never,
+  let written = { username: '', password: '', service: '' };
+  keychain.setGenericPassword.mockImplementation(
+    async (username, password, options) => {
+      written = { username, password, service: String(options?.service) };
+      return false;
+    },
   );
+  keychain.getGenericPassword.mockImplementation(async () => written as never);
   expect(await saveRecoveryWalletInfo(wallet)).toEqual({ kind: 'saved' });
 });
 

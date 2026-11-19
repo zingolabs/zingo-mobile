@@ -31,6 +31,8 @@ class DoubleWrapReproTest {
 
     private fun walletFile() = File(context.filesDir, fileName)
 
+    private fun storedWallet() = File(rpcModule.activeWalletDir(), WalletStore.WALLET)
+
     private fun encryptedFile(file: File = walletFile()): EncryptedFile {
         val alias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
         return EncryptedFile.Builder(file, context, alias, EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB).build()
@@ -51,7 +53,7 @@ class DoubleWrapReproTest {
     }
 
     // Tink 1.5.0 wording for the transient path the reported devices hit.
-    private val transientKeystoreFailure: (String) -> String = {
+    private val transientKeystoreFailure: (File) -> String = {
         throw IOException("Keystore temporarily unavailable")
     }
 
@@ -67,6 +69,8 @@ class DoubleWrapReproTest {
         for (suffix in listOf("", ".write.tmp", ".migrating", ".prerepair", ".broken")) {
             File(context.filesDir, "$fileName$suffix").delete()
         }
+        WalletStore.root(context.filesDir).deleteRecursively()
+        RPCModule.openWalletId = null
         uniffi.zingo.initLogging()
         uniffi.zingo.initFromSeed(seed = Seeds.HOSPITAL, birthday = 2000000u, connection = testConnection("", chainHint))
         plainWallet = uniffi.zingo.saveWalletBytes()!!
@@ -84,7 +88,7 @@ class DoubleWrapReproTest {
     @Test
     fun theFirstLoadMigratesTheEncryptedFileToPlainBytes() {
         assertThat(loadError()).isNull()
-        assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
+        assertThat(storedWallet().readBytes()).isEqualTo(plainWallet)
     }
 
     @Test
@@ -93,7 +97,7 @@ class DoubleWrapReproTest {
         walletFile().writeBytes(plainWallet)
         rpcModule.legacyDecrypt = transientKeystoreFailure
         assertThat(loadError()).isNull()
-        assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
+        assertThat(storedWallet().readBytes()).isEqualTo(plainWallet)
     }
 
     @Test
@@ -101,11 +105,11 @@ class DoubleWrapReproTest {
         val fileBefore = walletFile().readBytes()
         rpcModule.legacyDecrypt = transientKeystoreFailure
         assertThat(loadError()).contains("seed")
-        assertThat(walletFile().readBytes()).isEqualTo(fileBefore)
+        assertThat(storedWallet().readBytes()).isEqualTo(fileBefore)
 
         rpcModule.legacyDecrypt = defaultLegacyDecrypt
         assertThat(loadError()).isNull()
-        assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
+        assertThat(storedWallet().readBytes()).isEqualTo(plainWallet)
     }
 
     @Test
@@ -113,15 +117,15 @@ class DoubleWrapReproTest {
         val fileBefore = walletFile().readBytes()
         rpcModule.legacyDecrypt = transientKeystoreFailure
         repeat(3) { assertThat(loadError()).isNotNull() }
-        assertThat(walletFile().readBytes()).isEqualTo(fileBefore)
+        assertThat(storedWallet().readBytes()).isEqualTo(fileBefore)
     }
 
     @Test
     fun aDoubleWrappedFileIsUnwrappedAndMigratedOnLoad() {
         wrapAgain()
         assertThat(loadError()).isNull()
-        assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
-        assertThat(File(context.filesDir, "$fileName.prerepair").exists()).isTrue()
+        assertThat(storedWallet().readBytes()).isEqualTo(plainWallet)
+        assertThat(File(rpcModule.activeWalletDir(), "$fileName.prerepair").exists()).isTrue()
     }
 
     @Test
@@ -129,7 +133,7 @@ class DoubleWrapReproTest {
         walletFile().delete()
         File(context.filesDir, "$fileName.migrating").writeBytes(plainWallet)
         assertThat(loadError()).isNull()
-        assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
+        assertThat(storedWallet().readBytes()).isEqualTo(plainWallet)
         assertThat(File(context.filesDir, "$fileName.migrating").exists()).isFalse()
     }
 
@@ -165,6 +169,6 @@ class DoubleWrapReproTest {
 
         assertThat(loadError()).isNotNull()
 
-        assertThat(File(context.filesDir, "$fileName.migrating").readBytes()).isEqualTo(plainWallet)
+        assertThat(File(rpcModule.activeWalletDir(), "$fileName.migrating").readBytes()).isEqualTo(plainWallet)
     }
 }

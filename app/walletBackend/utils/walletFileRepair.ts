@@ -1,4 +1,3 @@
-import { Platform } from 'react-native';
 import RPCModule from '@app/RPCModule';
 import { callFfi } from '@app/walletBackend/ffi';
 import { ErrorKeyed } from '@app/AppState/types/Result';
@@ -7,11 +6,8 @@ import { ErrorKeyed } from '@app/AppState/types/Result';
 // wallet files for the recovery dialog, and Android additionally repairs
 // the 2.0.21 double-wrap incident by peeling the extra envelope layers.
 
-// Mirror of the Constants.kt and Constants.swift wallet file name. The
-// optional chain tolerates partial react-native test mocks at module
-// load.
-export const WALLET_FILE_NAME =
-  Platform?.OS === 'ios' ? 'wallet.dat.txt' : 'wallet.dat';
+/** Mirror of WalletStore's wallet file name on both platforms. */
+export const WALLET_FILE_NAME = 'wallet.dat';
 
 export type WalletFileState =
   | 'missing'

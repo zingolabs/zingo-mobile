@@ -38,7 +38,6 @@ import {
   resolveTriggerGate,
 } from '@app/services/gateController';
 import { getRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
-import { showConfirm } from '@app/services/showConfirm';
 import { fetchWallet } from '@app/walletBackend';
 import { copySensitive } from '@app/utils/sensitiveClipboard';
 import { EyeIcon } from '@ui/primitives/Icons/EyeIcon';
@@ -99,9 +98,7 @@ const Slide: React.FunctionComponent<{
   );
 };
 
-// The wallet's viewing key: a QR and its ends, hidden until Show. With
-// `switchTo`, the last look at it before the wallet moves to a server on
-// that network.
+// The wallet's viewing key: a QR and its ends, hidden until Show.
 type ViewingKeyProps = NativeStackScreenProps<AppDrawerParamList, 'ViewingKey'>;
 
 const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
@@ -109,21 +106,12 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
   route,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const {
-    translate,
-    biometrics,
-    addLastSnackbar,
-    applyPendingServer: onConfirm,
-    cancelPendingServer: onCancel,
-  } = context;
+  const { translate, biometrics, addLastSnackbar } = context;
   const { colors } = useTheme();
   const { edges, fades } = useScrollEdges();
   const { gap } = useCompact();
   const bottomPad = useBottomActionPad();
-  const { entry, switchTo } = route.params;
-  const net = switchTo
-    ? (translate(`settings.value-chainname-${switchTo}`) as string)
-    : '';
+  const { entry } = route.params;
 
   const [open, setOpen] = useState(true);
   const [key, setKey] = useState('');
@@ -138,12 +126,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
   }, []);
 
   const gone = useCallback(() => navigation.goBack(), [navigation]);
-  const close = useCallback(async () => {
-    if (switchTo) {
-      await onCancel();
-    }
-    setOpen(false);
-  }, [switchTo, onCancel]);
+  const close = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -152,22 +135,6 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
     });
     return () => sub.remove();
   }, [close]);
-
-  const confirmSwitch = () =>
-    showConfirm({
-      title: translate('walletseed.confirm-title') as string,
-      message: translate('viewingkey.switch-warning') as string,
-      buttons: [
-        {
-          text: translate('confirm') as string,
-          onPress: async () => {
-            await onConfirm();
-            setOpen(false);
-          },
-        },
-        { text: translate('cancel') as string, style: 'cancel' },
-      ],
-    });
 
   // The key starts hidden; showing or copying it passes the device gate once.
   const unlock = async (): Promise<boolean> => {
@@ -213,14 +180,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
   const page = (
     <View testID="viewingkey" style={{ flex: 1, paddingTop: 4 }}>
       <Header
-        title={
-          switchTo
-            ? (translate('viewingkey.switch-title') as string).replace(
-                '{net}',
-                net,
-              )
-            : (translate('viewingkey.title') as string)
-        }
+        title={translate('viewingkey.title') as string}
         closeScreen={close}
         backTestID="viewingkey.back"
         backAccessibilityLabel={translate('walletseed.back-acc') as string}
@@ -241,12 +201,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
           tone="muted"
           style={{ textAlign: 'center', marginHorizontal: SIDE }}
         >
-          {switchTo
-            ? (translate('viewingkey.switch-sub') as string).replace(
-                '{net}',
-                net,
-              )
-            : (translate('viewingkey.sub') as string)}
+          {translate('viewingkey.sub') as string}
         </Text>
 
         <View style={{ marginTop: gap(space24) }}>
@@ -310,13 +265,8 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
         <Button
           testID="viewingkey.done"
           variant="primary"
-          disabled={!!switchTo && !key}
-          onPress={switchTo ? confirmSwitch : close}
-          title={
-            translate(
-              switchTo ? 'viewingkey.switch' : 'seedbackup.done',
-            ) as string
-          }
+          onPress={close}
+          title={translate('seedbackup.done') as string}
         />
       </View>
     </View>

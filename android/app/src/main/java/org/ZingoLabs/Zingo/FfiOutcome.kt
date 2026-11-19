@@ -43,10 +43,13 @@ sealed class FfiOutcome {
          * subclass of the sealed ZingolibException exactly after its Rust
          * variant, so a variant added in Rust is covered here without
          * enumeration. The derivation is total: anything outside the
-         * typed family is "Unknown".
+         * typed family is "Unknown", except a full storage, "DiskFull".
          */
-        fun codeOf(error: Exception): String =
-            if (error is uniffi.zingo.ZingolibException) error.javaClass.simpleName else "Unknown"
+        fun codeOf(error: Exception): String = when (error) {
+            is uniffi.zingo.ZingolibException -> error.javaClass.simpleName
+            is DiskFullException -> "DiskFull"
+            else -> "Unknown"
+        }
 
         fun of(call: String, ffi: () -> Any?): FfiOutcome = try {
             Resolved(ffi())

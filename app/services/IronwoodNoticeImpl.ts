@@ -1,9 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { readCurrentWalletFingerprint } from '@app/swap';
+import { readOpenWalletId } from '@app/walletBackend/utils/walletStore';
 
 /**
  * Whether the Ironwood notice on Home was hidden, one per wallet, under the
- * wallet's fingerprint like the pinned Receive address. It keeps the Orchard
+ * wallet's id like the pinned Receive address. It keeps the Orchard
  * balance at the moment of the X: more than that in Orchard brings the
  * notice back.
  */
@@ -12,14 +12,11 @@ export const IRONWOOD_HIDDEN_KEY_PREFIX = 'ironwood:hidden:';
 export type IronwoodNoticeHide =
   { kind: 'shown' } | { kind: 'hidden'; orchard: number };
 
-const keyFor = (fingerprint: string) =>
-  IRONWOOD_HIDDEN_KEY_PREFIX + fingerprint;
+const keyFor = (walletId: string) => IRONWOOD_HIDDEN_KEY_PREFIX + walletId;
 
 export async function readIronwoodNoticeHide(): Promise<IronwoodNoticeHide> {
-  const fingerprint = await readCurrentWalletFingerprint();
-  const stored = fingerprint
-    ? await AsyncStorage.getItem(keyFor(fingerprint))
-    : null;
+  const walletId = await readOpenWalletId();
+  const stored = walletId ? await AsyncStorage.getItem(keyFor(walletId)) : null;
   const orchard = Number(stored);
   return stored !== null && Number.isFinite(orchard)
     ? { kind: 'hidden', orchard }
@@ -29,13 +26,13 @@ export async function readIronwoodNoticeHide(): Promise<IronwoodNoticeHide> {
 export async function writeIronwoodNoticeHide(
   hide: IronwoodNoticeHide,
 ): Promise<void> {
-  const fingerprint = await readCurrentWalletFingerprint();
-  if (!fingerprint) {
+  const walletId = await readOpenWalletId();
+  if (!walletId) {
     return;
   }
   if (hide.kind === 'hidden') {
-    await AsyncStorage.setItem(keyFor(fingerprint), String(hide.orchard));
+    await AsyncStorage.setItem(keyFor(walletId), String(hide.orchard));
   } else {
-    await AsyncStorage.removeItem(keyFor(fingerprint));
+    await AsyncStorage.removeItem(keyFor(walletId));
   }
 }

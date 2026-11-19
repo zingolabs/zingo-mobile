@@ -616,7 +616,42 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         "right": 0,
       }
     }
-  />
+  >
+    <View
+      pointerEvents="none"
+      style={
+        [
+          {
+            "height": 24,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": -24,
+          },
+          {},
+        ]
+      }
+    >
+      <View
+        colors={
+          [
+            "#01140100",
+            "#011401",
+          ]
+        }
+        pointerEvents="none"
+        style={
+          {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          }
+        }
+      />
+    </View>
+  </View>
   <View
     onLayout={[Function]}
     pointerEvents="none"

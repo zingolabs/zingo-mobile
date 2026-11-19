@@ -7,64 +7,59 @@ import {
 } from '@app/context';
 import StartMenu from '@screens/StartMenu';
 
-const mount = (freshInstall: boolean) => {
-  const noop = jest.fn();
-  return render(
-    <ContextAppLoadingProvider
-      value={{ ...defaultAppContextLoading, translate: (key: string) => key }}
-    >
-      <StartMenu
-        actionButtonsDisabled={false}
-        recoveryWallet={{ seed: 'abandon ability', birthday: 1994579 }}
-        freshInstall={freshInstall}
-        importRecoveryWallet={noop}
-        viewRecoveryWallet={noop}
-        customServer={noop}
-        walletExists={false}
-        openCurrentWallet={noop}
-        createNewWallet={noop}
-        getwalletToRestore={noop}
-      />
-    </ContextAppLoadingProvider>,
-  );
-};
+const tree = (props: {
+  busy?: boolean;
+  found?: boolean;
+  reviewFound?: () => void;
+  dismissFound?: () => void;
+}) => (
+  <ContextAppLoadingProvider
+    value={{
+      ...defaultAppContextLoading,
+      netInfo: { ...defaultAppContextLoading.netInfo, isConnected: true },
+      translate: (key: string) => key,
+    }}
+  >
+    <StartMenu
+      actionButtonsDisabled={props.busy ?? false}
+      found={props.found ?? true}
+      reviewFound={props.reviewFound ?? jest.fn()}
+      dismissFound={props.dismissFound ?? jest.fn()}
+      customServer={jest.fn()}
+      walletExists={false}
+      openCurrentWallet={jest.fn()}
+      createNewWallet={jest.fn()}
+      getwalletToRestore={jest.fn()}
+    />
+  </ContextAppLoadingProvider>
+);
 
-test('Tests that the saved wallet card speaks of a previous install when the app was just installed', () => {
-  mount(true);
-  expect(
-    screen.getByText('loadingapp.previous-install-title'),
-  ).toBeOnTheScreen();
-  expect(screen.queryByText('loadingapp.saved-wallet-title')).toBeNull();
+test('Tests that the found card opens the review when a previous install left wallets', () => {
+  const reviewFound = jest.fn();
+  render(tree({ reviewFound }));
+  expect(screen.getByText('found.title')).toBeOnTheScreen();
+  fireEvent.press(screen.getByTestId('loadingapp.foundreview'));
+  expect(reviewFound).toHaveBeenCalled();
 });
 
-test('Tests that the saved wallet card speaks of a wallet saved on the device when the app was already in use', () => {
-  mount(false);
-  expect(screen.getByText('loadingapp.saved-wallet-title')).toBeOnTheScreen();
-  expect(screen.queryByText('loadingapp.previous-install-title')).toBeNull();
+test('Tests that Not now dismisses the found card when it is tapped', () => {
+  const dismissFound = jest.fn();
+  render(tree({ dismissFound }));
+  fireEvent.press(screen.getByTestId('loadingapp.foundnotnow'));
+  expect(dismissFound).toHaveBeenCalled();
+});
+
+test('Tests that the found card is absent when no previous install left wallets', () => {
+  render(tree({ found: false }));
+  expect(screen.queryByText('found.title')).toBeNull();
 });
 
 test('Tests that only the pressed button shows its spinner when the work starts', () => {
-  const tree = (busy: boolean) => (
-    <ContextAppLoadingProvider
-      value={{ ...defaultAppContextLoading, translate: (key: string) => key }}
-    >
-      <StartMenu
-        actionButtonsDisabled={busy}
-        recoveryWallet={{ seed: 'abandon ability', birthday: 1994579 }}
-        freshInstall={false}
-        importRecoveryWallet={jest.fn()}
-        viewRecoveryWallet={jest.fn()}
-        customServer={jest.fn()}
-        walletExists={false}
-        openCurrentWallet={jest.fn()}
-        createNewWallet={jest.fn()}
-        getwalletToRestore={jest.fn()}
-      />
-    </ContextAppLoadingProvider>
-  );
-  render(tree(false));
-  fireEvent.press(screen.getByTestId('loadingapp.importthis'));
-  screen.rerender(tree(true));
-  expect(screen.getByTestId('loadingapp.importthis.spinner')).toBeOnTheScreen();
-  expect(screen.queryByTestId('loadingapp.createnewwallet.spinner')).toBeNull();
+  render(tree({}));
+  fireEvent.press(screen.getByTestId('loadingapp.createnewwallet'));
+  screen.rerender(tree({ busy: true }));
+  expect(
+    screen.getByTestId('loadingapp.createnewwallet.spinner'),
+  ).toBeOnTheScreen();
+  expect(screen.queryByTestId('loadingapp.foundreview.spinner')).toBeNull();
 });

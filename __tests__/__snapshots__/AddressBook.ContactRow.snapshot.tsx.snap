@@ -559,25 +559,34 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
                 testID="addressbook.row.u1alice.edit"
               >
                 <View
-                  style={{}}
-                />
-                <View
                   style={
-                    [
-                      {
-                        "backgroundColor": "#c3c3c3",
-                        "borderRadius": 1,
-                        "bottom": 15,
-                        "height": 2,
-                        "left": 15,
-                        "position": "absolute",
-                        "transformOrigin": "left",
-                        "width": 10,
-                      },
-                      {},
-                    ]
+                    {
+                      "height": 20,
+                      "width": 20,
+                    }
                   }
-                />
+                >
+                  <View
+                    style={{}}
+                  />
+                  <View
+                    style={
+                      [
+                        {
+                          "backgroundColor": "#c3c3c3",
+                          "borderRadius": 999,
+                          "bottom": -1,
+                          "height": 2,
+                          "left": -1,
+                          "position": "absolute",
+                          "transformOrigin": "left",
+                          "width": 10,
+                        },
+                        {},
+                      ]
+                    }
+                  />
+                </View>
               </View>
               <Text
                 maxFontSizeMultiplier={2}

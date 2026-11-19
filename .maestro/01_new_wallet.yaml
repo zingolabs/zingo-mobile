@@ -10,34 +10,35 @@ appId: org.ZingoLabs.Zingo
       id: "header.checkicon"
     timeout: 300000
 
-# Changing wallets shows the open wallet's seed first, then asks for
-# confirmation, then returns to the start menu.
+# Adding a wallet keeps the first one: the switcher opens Wallets, Add
+# wallet makes a new seed, and Later opens the new wallet on Home.
 - tapOn:
-    id: "header.drawmenu"
+    id: "header.wallets"
 - tapOn:
-    id: "menu.changewallet"
+    id: "wallets.add"
+- tapOn:
+    id: "addwallet.create"
+- tapOn:
+    id: "newwallet.go"
 - extendedWaitUntil:
     visible:
-      id: "walletseed.go"
+      id: "addwallet.later"
     timeout: 120000
-
-# The button is disabled until the seed loads from the keychain, and a
-# tap before then does nothing.
-- retry:
-    maxRetries: 3
-    commands:
-      - tapOn:
-          id: "walletseed.go"
-      - extendedWaitUntil:
-          visible:
-            text: "Confirm"
-          timeout: 10000
 - tapOn:
-    text: "Confirm"
-
-- runFlow:
-    file: common/new_wallet_from_start_menu.yaml
+    id: "addwallet.later"
 - extendedWaitUntil:
     visible:
       id: "header.checkicon"
     timeout: 300000
+
+# Both wallets are listed, the new one open.
+- tapOn:
+    id: "header.wallets"
+- extendedWaitUntil:
+    visible:
+      id: "wallets.list"
+    timeout: 10000
+- assertVisible:
+    text: "Wallet 1"
+- assertVisible:
+    text: "Wallet 2"
