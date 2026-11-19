@@ -16,6 +16,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
+import { useOpeningFade } from '@app/hooks/useOpeningFade';
 import Pressable from '@ui/primitives/Pressable';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import {
@@ -311,6 +312,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
   const currentSnapIdRef = useRef<SnapId>('balance');
   useDismissSheetsOnBlur();
   const sheetSlideStyle = useOptionsPanelSheetSlide();
+  const openingFade = useOpeningFade();
   const scrollViewRef =
     useRef<RecyclerListView<RecyclerListViewProps, RecyclerListViewState>>(
       null,
@@ -903,7 +905,6 @@ const History: React.FunctionComponent<HistoryProps> = () => {
             addLastSnackbar={addLastSnackbar /* context */}
             setShieldingAmount={setShieldingAmount}
             setBackgroundError={setBackgroundError /* context */}
-            showMessagesIcon={true}
             onUsdRowLayout={setUsdRowH}
             noPriceRow
           />
@@ -1004,7 +1005,10 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                 )}
                 {valueTransfersSliced && valueTransfersSliced.length > 0 ? (
                   <>
-                    <View style={{ flex: 1 }} onLayout={edges.onLayout}>
+                    <Animated.View
+                      style={[{ flex: 1 }, openingFade]}
+                      onLayout={edges.onLayout}
+                    >
                       <RecyclerListView
                         ref={scrollViewRef}
                         renderAheadOffset={500}
@@ -1069,19 +1073,22 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                           ) : null
                         }
                       />
-                    </View>
+                    </Animated.View>
                     {fades}
                   </>
                 ) : noHistory ? (
-                  <View
+                  <Animated.View
                     testID="history.empty"
-                    style={{
-                      flex: 1,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      paddingHorizontal: space20,
-                      paddingBottom: 116,
-                    }}
+                    style={[
+                      {
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        paddingHorizontal: space20,
+                        paddingBottom: 116,
+                      },
+                      openingFade,
+                    ]}
                   >
                     <EmptySprout />
                     <Text
@@ -1114,7 +1121,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                       onPress={() => navigation.navigate(Route.Receive)}
                       style={{ marginTop: space24 }}
                     />
-                  </View>
+                  </Animated.View>
                 ) : (
                   <View
                     style={{

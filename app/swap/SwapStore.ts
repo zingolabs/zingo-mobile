@@ -1,4 +1,5 @@
 import swapStorage from './swapStorage';
+import { isTerminalStatus } from './enums/SwapStatusEnum';
 
 import { SwapRecordType } from './types/SwapRecordType';
 import { swapAddressOf } from './shieldedPurchase';
@@ -132,6 +133,14 @@ export class SwapStore {
    *  commit, etc.) fans out to every consumer. */
   private static listeners: Set<SwapStoreChangeListener> = new Set();
 
+  /** The list the last read or change produced, for a screen's first frame. */
+  private static latest: SwapRecordType[] = [];
+
+  /** The records as last read or changed: what a screen draws before its own read answers. */
+  static snapshot(): SwapRecordType[] {
+    return SwapStore.latest;
+  }
+
   /**
    * Register a listener for record mutations. The returned function removes
    * the listener on call — typical pattern is to register in a React effect
@@ -151,6 +160,7 @@ export class SwapStore {
 
   private static notify(records: SwapRecordType[]): void {
     const shown = live(records);
+    SwapStore.latest = shown;
     for (const listener of SwapStore.listeners) {
       try {
         listener(shown);
@@ -178,7 +188,11 @@ export class SwapStore {
 
   /** Read all records. Returns an empty array on first install or storage error. */
   static async readAll(): Promise<SwapRecordType[]> {
-    return this.enqueue(async () => live(await this._readRaw()));
+    return this.enqueue(async () => {
+      const shown = live(await this._readRaw());
+      SwapStore.latest = shown;
+      return shown;
+    });
   }
 
   /**
@@ -353,6 +367,17 @@ export class SwapStore {
         const made = swapAddressOf(r);
         return made ? [made] : [];
       });
+    });
+  }
+
+  /** Whether a wallet has a swap still running: one not removed and not final. */
+  static async inFlightFor(walletId: string): Promise<boolean> {
+    return this.enqueue(async () => {
+      const raw = await swapStorage.getItem(storageKeyFor(walletId));
+      const records = raw === null ? [] : (tryParseRecordsArray(raw) ?? []);
+      return records.some(
+        r => r.removedAtMs === undefined && !isTerminalStatus(r.status),
+      );
     });
   }
 

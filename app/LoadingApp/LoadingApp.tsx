@@ -21,7 +21,6 @@ import {
   focusedStackRouteNames,
   goBack,
   navigateOnboarding,
-  restartOnboarding,
   returnTo,
 } from '@app/navigation/navigate';
 import NetInfo, {
@@ -30,18 +29,13 @@ import NetInfo, {
 } from '@react-native-community/netinfo/src/index';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import {
-  BottomSheetModal,
-  BottomSheetModalProvider,
-} from '@gorhom/bottom-sheet';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
 import { showConfirm } from '@app/services/showConfirm';
-import { viewingKeyChain } from '@app/utils/seedPhrase';
 
 import {
   createNewWallet,
-  deleteExistingWallet,
   getVersionInfo,
   readWalletKind,
   hasRepairableWalletFile,
@@ -49,7 +43,6 @@ import {
   readWalletChain,
   repairDoubleWrappedWallet,
   repairSucceeded,
-  resolvedTrue,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,
   walletExists as rpcWalletExists,
@@ -86,7 +79,21 @@ import {
 import { serverUris } from '@app/uris';
 import { staticAlternatives, staticServers } from '@app/uris/serverChoice';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
-import { fetchWallet, recordWalletKind } from '@app/walletBackend';
+import {
+  activeWalletEntry,
+  fetchWallet,
+  loadWallet,
+  readOpenWalletId,
+  recordOpenFailed,
+  updateWalletMeta,
+  walletsOnDevice,
+} from '@app/walletBackend';
+import type { WalletErrorKind } from '@app/wallet/types';
+import { finishWalletOpen } from '@app/services/openWallet';
+import { entryChain, entryServer } from '@app/services/recoveryImport';
+import { askDiskRetry, isDiskFull } from '@app/services/diskFull';
+import { defaultWalletName } from '@screens/AddWallet/draftParts';
+import { isViewingKey } from '@app/utils/seedPhrase';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoadingProvider } from '@app/context';
 import BackgroundFileImpl from '@app/services/BackgroundFileImpl';
@@ -94,7 +101,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '@app/services/createAlert';
 import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
 import Utils from '@app/utils';
-import { formatInteger } from '@app/utils/formatAmount';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '@ui/widgets/toastConfig';
 import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
@@ -114,17 +120,15 @@ import {
   probeUri,
   recommendedServers,
 } from '@app/services/serverPicking';
-import { defaultTo, isEqual } from 'lodash';
+import { defaultTo, isEqual, sortBy } from 'lodash';
 import {
   createUpdateRecoveryWalletInfo,
-  getRecoveryWalletInfo,
-  hasRecoveryWalletInfo,
+  recoveryEntriesOnDevice,
+  RecoveryEntry,
+  retireImportedEntry,
 } from '@app/services/recoveryWalletInfo';
 
 // no lazy load because slowing down screens.
-import SeedSheet from '@ui/widgets/SeedSheet';
-import DeleteWalletSheet from '@ui/widgets/DeleteWalletSheet';
-import { DeleteWalletContext } from '@app/wallet/types';
 import { walletErrorKind } from './walletErrorKind';
 import { sanitizePaths } from '@app/utils/sanitizePaths';
 import { duration as motionDuration } from '@app/theme/motion';
@@ -138,7 +142,6 @@ import {
   OnboardingRoute,
 } from '@app/types';
 import { publishReport, reportState } from '@app/services/reportDiagnostics';
-import { forgetWalletOnFile } from '@app/services/WalletLocalData';
 
 const en = require('@app/translations/en.json');
 const es = require('@app/translations/es.json');
@@ -314,7 +317,18 @@ export default function LoadingApp(props: LoadingAppProps) {
     return (
       <LoadingAppClass
         {...props}
-        openWallet={params => setSession({ kind: 'wallet', params })}
+        openWallet={params =>
+          readOpenWalletId().then(walletId =>
+            setSession({
+              kind: 'wallet',
+              params: {
+                ...params,
+                walletId,
+                arrival: 'boot',
+              },
+            }),
+          )
+        }
         openOnboarding={start => setSession({ kind: 'onboarding', start })}
         openBoot={() =>
           setSession({ kind: 'boot', startingApp: true, newWallet: false })
@@ -337,7 +351,9 @@ export default function LoadingApp(props: LoadingAppProps) {
 
 type LoadingAppClassProps = {
   session: LoadingSession;
-  openWallet: (params: LoadedAppNavigationState) => void;
+  openWallet: (
+    params: Omit<LoadedAppNavigationState, 'walletId' | 'arrival'>,
+  ) => void;
   openOnboarding: (start: 'Welcome' | 'OpenError') => void;
   openBoot: () => void;
   openLock: (gate: GateDeclined) => void;
@@ -365,10 +381,6 @@ export class LoadingAppClass extends Component<
 > {
   appstate?: NativeEventSubscription;
   unsubscribeNetInfo?: NetInfoSubscription;
-  seedSheetRef = React.createRef<BottomSheetModal>();
-  deleteSheetRef = React.createRef<BottomSheetModal>();
-  // Runs once the hold completes; set with the sheet's context.
-  afterDelete: () => void = () => {};
   retryStartedAt = 0;
 
   constructor(props: LoadingAppClassProps) {
@@ -412,12 +424,11 @@ export class LoadingAppClass extends Component<
       startingApp:
         props.session.kind === 'boot' ? props.session.startingApp : true,
       firstLaunchingMessage: props.firstLaunchingMessage,
-      hasRecoveryWalletInfoSaved: false,
-      recoveryWallet: null,
+      foundDismissed: false,
+      recoveryEntries: [],
       walletError: null,
       retrying: false,
       errorShake: 0,
-      deleteContext: 'import',
       serverStatus: 'ok',
       serverBlockHeight: '',
       serverLatencies: {},
@@ -481,8 +492,8 @@ export class LoadingAppClass extends Component<
 
     // The start gate guards the wallet file. Without one there is nothing
     // behind it: viewing or importing the recovery info stored in the
-    // Keychain/Keystore runs its own gate (viewRecoveryWallet,
-    // importRecoveryWallet), so the rest of the app opens without one. Asking
+    // Keychain/Keystore runs its own gate (importAllRecovery), so the rest
+    // of the app opens without one. Asking
     // anyway only puts the fail-open notice on the Welcome, over Create New
     // Wallet, on any device without a screen lock.
     const exists = await rpcWalletExists();
@@ -527,13 +538,7 @@ export class LoadingAppClass extends Component<
     this.setState({ actionButtonsDisabled: true });
 
     // has the device the Wallet Keys stored?
-    const has = await hasRecoveryWalletInfo();
-    const recovery = has ? await getRecoveryWalletInfo() : null;
-    this.setState({
-      hasRecoveryWalletInfoSaved: has,
-      recoveryWallet:
-        recovery && (recovery.seed || recovery.ufvk) ? recovery : null,
-    });
+    this.setState({ recoveryEntries: await recoveryEntriesOnDevice() });
 
     // Boot-time server selection. `auto` refetches the live list and activates
     // the best server on every launch; `list` validates that the user's server
@@ -818,7 +823,13 @@ export class LoadingAppClass extends Component<
   showChainError = async (walletChain: ChainNameEnum) => {
     const details = await this.chainDetails(walletChain);
     this.setState({
-      walletError: { kind: 'chain', details, walletChain },
+      walletError: {
+        kind: 'chain',
+        details,
+        walletChain,
+        others: false,
+        name: '',
+      },
       errorResolved: false,
       retrying: false,
       actionButtonsDisabled: false,
@@ -853,75 +864,41 @@ export class LoadingAppClass extends Component<
       GlobalConst.minConfirmations.toString(),
     );
 
-    let error = false;
-    let errorText = '';
-    if (result.ok && result.value) {
-      try {
-        // here result can have an `error` field for watch-only which is actually OK.
-        const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(
-          result.value,
-        );
-        if (resultJson.error) {
-          error = true;
-          errorText = resultJson.error;
-        } else {
-          const kind = await readWalletKind();
-          if (!kind.ok) {
-            error = true;
-            errorText = kind.error.message;
-          } else {
-            const { readOnly, orchardPool, saplingPool, transparentPool } =
-              kind.value;
-            await recordWalletKind(readOnly ? 'ufvk' : 'seed');
-            // store this wallet's recovery info in the Keychain/Keystore; if
-            // it can't be read, whatever the device holds is removed.
-            await createUpdateRecoveryWalletInfo(await fetchWallet(readOnly));
-            this.setState({
-              readOnly,
-              orchardPool,
-              saplingPool,
-              transparentPool,
-              actionButtonsDisabled: false,
-            });
-            // if the App is restoring another wallet backup...
-            // needs to recalculate the Address Book.
-            const newWallet =
-              this.props.session.kind === 'boot' &&
-              this.props.session.newWallet;
-            this.navigateToLoadedApp(
-              readOnly,
-              orchardPool,
-              saplingPool,
-              transparentPool,
-              newWallet,
-              this.state.firstLaunchingMessage,
-              // The wallet's own chain, surfaced by the native result (reliable
-              // even Offline). The server's chain is only a pre-rebuild fallback.
-              (resultJson.chain_name as ChainNameEnum) ||
-                this.state.server.chainName,
-            );
-          }
-        }
-      } catch (e: unknown) {
-        error = true;
-        errorText = e instanceof Error ? e.message : String(e);
-      }
-    } else {
-      if (!result.ok && result.error.code === 'WalletChainMismatch') {
-        const chain = await readWalletChain();
-        if (chain.ok) {
-          await this.showChainError(chain.value);
-          return;
-        }
-      }
-      error = true;
-      errorText = result.ok ? result.value : result.error.message;
-    }
-    if (error) {
-      await this.walletLoadFailed(
-        Utils.humanizeChainTokens(errorText, this.state.translate),
+    const opened = await finishWalletOpen(result, this.state.server.chainName);
+    if (opened.kind === 'opened') {
+      const { readOnly, orchardPool, saplingPool, transparentPool } = opened;
+      this.setState({
+        readOnly,
+        orchardPool,
+        saplingPool,
+        transparentPool,
+        actionButtonsDisabled: false,
+      });
+      // if the App is restoring another wallet backup...
+      // needs to recalculate the Address Book.
+      const newWallet =
+        this.props.session.kind === 'boot' && this.props.session.newWallet;
+      this.navigateToLoadedApp(
+        readOnly,
+        orchardPool,
+        saplingPool,
+        transparentPool,
+        newWallet,
+        this.state.firstLaunchingMessage,
+        opened.walletChainName,
       );
+      return;
     }
+    if (opened.error.code === 'WalletChainMismatch') {
+      const chain = await readWalletChain();
+      if (chain.ok) {
+        await this.showChainError(chain.value);
+        return;
+      }
+    }
+    await this.walletLoadFailed(
+      Utils.humanizeChainTokens(opened.error.message, this.state.translate),
+    );
   };
 
   // A repairable file is repaired and reloaded once; anything else lands on
@@ -965,7 +942,8 @@ export class LoadingAppClass extends Component<
   showWalletError = (details: string) => {
     const kind = walletErrorKind(details);
     const again = currentRoute() === Route.OpenError;
-    const apply = () => {
+    const apply = async () => {
+      const failed = await this.failedWallet(kind);
       if (again) {
         this.addLastSnackbar(
           this.state.translate(
@@ -976,7 +954,7 @@ export class LoadingAppClass extends Component<
         );
       }
       this.setState(state => ({
-        walletError: { kind, details },
+        walletError: { kind, details, ...failed },
         errorResolved: false,
         retrying: false,
         errorShake: again ? state.errorShake + 1 : state.errorShake,
@@ -987,6 +965,67 @@ export class LoadingAppClass extends Component<
     const elapsed = Date.now() - this.retryStartedAt;
     const wait = this.state.retrying ? Math.max(0, RETRY_MIN_MS - elapsed) : 0;
     setTimeout(apply, wait);
+  };
+
+  /** The wallet that failed to open, marked when its file is at fault, and whether others are here. */
+  failedWallet = async (
+    kind: WalletErrorKind,
+  ): Promise<{ others: boolean; name: string }> => {
+    const active = await activeWalletEntry();
+    const listed = await walletsOnDevice();
+    if (active.kind === 'wallet' && kind === 'open') {
+      await recordOpenFailed(active.wallet, true);
+    }
+    return {
+      others: listed.ok && listed.value.wallets.length > 1,
+      name: active.kind === 'wallet' ? active.wallet.meta.name : '',
+    };
+  };
+
+  /** Opens the first other wallet that opens, on the Wallets sheet. */
+  openOtherWallet = async () => {
+    this.setState({ actionButtonsDisabled: true });
+    const active = await activeWalletEntry();
+    const listed = await walletsOnDevice();
+    const others = sortBy(
+      (listed.ok ? listed.value.wallets : []).filter(
+        w => active.kind !== 'wallet' || w.id !== active.wallet.id,
+      ),
+      w => (w.meta.openFailed ? 1 : 0),
+    );
+    for (const wallet of others) {
+      const { server } = await SettingsFileImpl.serverOf(wallet.meta);
+      const open = await finishWalletOpen(
+        await loadWallet(
+          wallet.id,
+          nativeUri(server),
+          server.chainName,
+          DEFAULT_PERFORMANCE_LEVEL,
+          GlobalConst.minConfirmations.toString(),
+        ),
+        server.chainName,
+      );
+      if (open.kind === 'opened') {
+        this.setState({ actionButtonsDisabled: false });
+        this.navigateToLoadedApp(
+          open.readOnly,
+          open.orchardPool,
+          open.saplingPool,
+          open.transparentPool,
+          false,
+          LaunchingModeEnum.opening,
+          open.walletChainName,
+          '',
+          'wallets',
+        );
+        return;
+      }
+      await recordOpenFailed(wallet, true);
+    }
+    this.setState(state => ({
+      actionButtonsDisabled: false,
+      errorShake: state.errorShake + 1,
+    }));
   };
 
   retryOpenWallet = async () => {
@@ -1008,52 +1047,6 @@ export class LoadingAppClass extends Component<
     await this.loadExistingWalletOnBoot();
   };
 
-  // The sheet's hold runs `next` after the wallet file is gone; replacing a
-  // Keychain phrase has nothing to delete first.
-  confirmDelete = (context: DeleteWalletContext, next: () => void) => {
-    this.afterDelete = async () => {
-      if (context !== 'replace') {
-        // No wallet is open here, so the data goes by the pointer to the
-        // wallet on file; if it cannot, the file stays too.
-        const forgotten = await forgetWalletOnFile().then(
-          () => true,
-          e => {
-            console.log(`confirmDelete: forgetting the wallet failed: ${e}`);
-            return false;
-          },
-        );
-        const deleted = forgotten && resolvedTrue(await deleteExistingWallet());
-        if (!deleted) {
-          this.addLastSnackbar(
-            this.state.translate('rpc.deletewallet-error') as string,
-          );
-          return;
-        }
-        this.setState({ walletExists: false, walletError: null });
-        restartOnboarding();
-      }
-      next();
-    };
-    this.setState({ deleteContext: context }, () =>
-      this.deleteSheetRef.current?.present(),
-    );
-  };
-
-  deleteThenImport = () =>
-    this.confirmDelete('import', this.getwalletToRestore);
-
-  deleteThenCreate = () => this.confirmDelete('create', this.createNewWallet);
-
-  createNewWalletChecked = () => {
-    if (this.state.walletExists) {
-      this.confirmDelete('create', this.createNewWallet);
-    } else if (this.state.recoveryWallet) {
-      this.confirmDelete('replace', this.createNewWallet);
-    } else {
-      this.createNewWallet();
-    }
-  };
-
   fetchBackgroundSyncInfo = async () => {
     const backgroundSyncInfoJson: BackgroundType =
       await BackgroundFileImpl.readBackground();
@@ -1068,6 +1061,8 @@ export class LoadingAppClass extends Component<
     newWallet: boolean,
     firstLaunchingMessage: LaunchingModeEnum,
     walletChainName: ChainNameEnum,
+    notice: string = '',
+    next: LoadedAppNavigationState['next'] = 'home',
   ) => {
     // Leaving the error screen after a retry worked: its badge shrinks and
     // the server dot turns green first.
@@ -1083,6 +1078,8 @@ export class LoadingAppClass extends Component<
             newWallet,
             firstLaunchingMessage,
             walletChainName,
+            notice,
+            next,
           ),
         ERROR_RESOLVE_MS,
       );
@@ -1097,10 +1094,62 @@ export class LoadingAppClass extends Component<
       newWallet,
       firstLaunchingMessage,
       walletChainName,
+      notice,
+      next,
     });
   };
 
-  createNewWallet = async (): Promise<void> => {
+  /** What Import read, kept while the name step asks for the wallet's name. */
+  pendingImport = { text: '', birthday: 0 };
+
+  toNameCreate = () =>
+    navigateOnboarding({
+      screen: Route.NameWallet,
+      params: { from: 'create' },
+    });
+
+  toNameImport = async (text: string, birthday: number) => {
+    this.pendingImport = { text, birthday };
+    navigateOnboarding({
+      screen: Route.NameWallet,
+      params: { from: isViewingKey(text.toLowerCase()) ? 'key' : 'seed' },
+    });
+  };
+
+  nameNewWallet = (from: 'create' | 'seed' | 'key', name: string) => {
+    if (from === 'create') {
+      this.createNewWallet(name);
+    } else {
+      this.doRestore(
+        this.pendingImport.text,
+        this.pendingImport.birthday,
+        Route.ImportWallet,
+        name,
+      );
+    }
+  };
+
+  /** Names the wallet just made, as given or "Wallet n", and gives it the server picked for it, before its recovery entry records them. */
+  nameMadeWallet = async (name: string) => {
+    const listed = await walletsOnDevice();
+    if (!listed.ok || listed.value.active.kind === 'none') {
+      return;
+    }
+    const id = listed.value.active.id;
+    const others = listed.value.wallets
+      .filter(w => w.id !== id)
+      .map(w => w.meta.name);
+    await updateWalletMeta(id, {
+      name: name || defaultWalletName(this.state.translate, others),
+    });
+    await SettingsFileImpl.writeWalletServer(
+      id,
+      this.state.server,
+      this.state.selectServer,
+    );
+  };
+
+  createNewWallet = async (name: string = ''): Promise<void> => {
     const offline = this.state.server.kind === 'offline';
     // Block only when the device is genuinely offline AND not in explicit
     // Offline mode. Offline mode is a deliberate no-server flow: the wallet is
@@ -1178,6 +1227,7 @@ export class LoadingAppClass extends Component<
         seed: seedJSON.seed_phrase || '',
         birthday: seedJSON.birthday || 0,
       };
+      await this.nameMadeWallet(name);
       // storing the seed & birthday in KeyChain/KeyStore
       await createUpdateRecoveryWalletInfo(wallet);
       await SettingsFileImpl.writeSettings(
@@ -1204,6 +1254,11 @@ export class LoadingAppClass extends Component<
         LaunchingModeEnum.opening,
         this.state.server.chainName,
       );
+    } else if (isDiskFull(seed)) {
+      clearTimeout(showProgress);
+      this.setState({ actionButtonsDisabled: false });
+      goBack();
+      askDiskRetry(this.state.translate, () => this.createNewWallet(name));
     } else {
       clearTimeout(showProgress);
       this.setState({ actionButtonsDisabled: false });
@@ -1224,9 +1279,10 @@ export class LoadingAppClass extends Component<
   getwalletToRestore = async () => {
     this.setState({ wallet: {} as WalletType });
     navigateOnboarding({
-      screen: this.state.recoveryWallet
-        ? Route.ImportChooser
-        : Route.ImportWallet,
+      screen:
+        this.state.recoveryEntries.length > 0
+          ? Route.ImportChooser
+          : Route.ImportWallet,
     });
   };
 
@@ -1235,6 +1291,7 @@ export class LoadingAppClass extends Component<
     seedUfvk: string,
     birthday: number,
     origin: OnboardingRoute = Route.ImportWallet,
+    name: string = '',
   ) => {
     if (!seedUfvk) {
       // no reporting button, no needed.
@@ -1334,6 +1391,7 @@ export class LoadingAppClass extends Component<
     let error = false;
     let errorText = '';
     if (result.ok && result.value) {
+      await this.nameMadeWallet(name);
       try {
         // here result can have an `error` field for watch-only which is actually OK.
         const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(
@@ -1392,6 +1450,15 @@ export class LoadingAppClass extends Component<
     } else {
       error = true;
       errorText = result.ok ? result.value : result.error.message;
+    }
+    if (error && isDiskFull(result)) {
+      clearTimeout(showImporting);
+      this.setState({ actionButtonsDisabled: false });
+      returnTo(origin);
+      askDiskRetry(this.state.translate, () =>
+        this.doRestore(seedUfvk, birthday, origin, name),
+      );
+      return;
     }
     if (error) {
       clearTimeout(showImporting);
@@ -1612,76 +1679,140 @@ export class LoadingAppClass extends Component<
     });
   };
 
-  // Importing the stored recovery info asks first, as viewing it does: the
-  // start gate does not cover it when there is no wallet file.
-  importRecoveryWallet = async (origin: OnboardingRoute) => {
-    const wallet = this.state.recoveryWallet;
-    if (!wallet) {
-      return;
-    }
-    const { server, translate } = this.state;
-    const netName = (chain: ChainNameEnum) =>
-      translate(`settings.value-chainname-${chain}`) as string;
-    // A saved viewing key names its network in its prefix: one for another
-    // network offers a server of its own, not an "invalid key" to fix.
-    const keyChain = wallet.ufvk ? viewingKeyChain(wallet.ufvk) : null;
-    if (keyChain && server.kind === 'remote' && keyChain !== server.chainName) {
-      showConfirm({
-        title: translate('loadingapp.saved-wallet-net-title') as string,
-        message: (translate('loadingapp.saved-key-net-body') as string)
-          .replace(/\{keynet\}/g, netName(keyChain))
-          .replace('{net}', netName(server.chainName)),
-        buttons: [
-          {
-            text: translate('loadingapp.saved-wallet-net-server') as string,
-            onPress: () => this.openServer(keyChain),
-          },
-          { text: translate('cancel') as string, style: 'cancel' },
-        ],
-      });
-      return;
-    }
-    // A saved seed phrase carries no network. A birthday past this
-    // network's tip means it was made on another one: say so instead of
-    // handing zingolib a height its server has not reached.
-    if (server.kind === 'remote' && this.state.netInfo.isConnected) {
-      const { height } = await probeUri(server.uri);
-      const tip = Number(height);
-      if (tip > 0 && wallet.birthday > tip) {
-        showConfirm({
-          title: translate('loadingapp.saved-wallet-net-title') as string,
-          message: (translate('loadingapp.saved-wallet-net-body') as string)
-            .replace('{birthday}', formatInteger(wallet.birthday))
-            .replace('{tip}', formatInteger(tip))
-            .replace('{net}', netName(server.chainName)),
-          buttons: [
-            {
-              text: translate('loadingapp.saved-wallet-net-server') as string,
-              onPress: () => this.openServer(),
-            },
-            { text: translate('cancel') as string, style: 'cancel' },
-          ],
-        });
-        return;
-      }
-    }
-    const answer = await askGate({ translate: this.state.translate });
-    if (answer.kind === 'declined') {
-      return;
-    }
-    await this.doRestore(
-      wallet.seed || wallet.ufvk || '',
-      wallet.birthday,
-      origin,
-    );
-  };
+  /** Hides the card of a previous install's wallets until the next launch. */
+  dismissFound = () => this.setState({ foundDismissed: true });
 
-  viewRecoveryWallet = async () => {
+  /**
+   * Imports every wallet a previous install left in the Keychain, each on
+   * its own network with its name, colour and server, then opens the first.
+   * A single-wallet entry is a Mainnet wallet. No name step: each keeps its
+   * entry's name, or a default one.
+   */
+  importAllRecovery = async (entries: RecoveryEntry[]) => {
+    if (entries.length === 0) {
+      return;
+    }
     const answer = await askGate({ translate: this.state.translate });
     if (answer.kind === 'declined') {
       return;
     }
-    this.seedSheetRef.current?.present();
+    this.setState({ actionButtonsDisabled: true });
+    navigateOnboarding({
+      screen: Route.Progress,
+      params: { kind: 'importAll' },
+    });
+    const opened: { id: string; server: ServerType }[] = [];
+    const failed: string[] = [];
+    let diskFull = false;
+    for (const entry of entries) {
+      const chain = entryChain(entry);
+      const { server, selectServer } = await entryServer(
+        chain,
+        this.state.translate,
+        !!this.state.netInfo.isConnected,
+      );
+      const before = await walletsOnDevice();
+      const known = new Set(
+        before.ok ? before.value.wallets.map(w => w.id) : [],
+      );
+      const text = (entry.seed || entry.ufvk || '').toLowerCase();
+      const restore = entry.seed
+        ? restoreWalletFromSeed
+        : restoreWalletFromUfvk;
+      const result = await restore(
+        text,
+        String(entry.birthday || 0),
+        nativeUri(server),
+        chain,
+        DEFAULT_PERFORMANCE_LEVEL,
+        GlobalConst.minConfirmations.toString(),
+      );
+      const after = result.ok ? await walletsOnDevice() : null;
+      const added =
+        after && after.ok
+          ? after.value.wallets.find(w => !known.has(w.id))
+          : undefined;
+      if (isDiskFull(result)) {
+        diskFull = true;
+        break;
+      }
+      if (!added) {
+        failed.push(entry.name || text.slice(0, 8));
+        continue;
+      }
+      const others =
+        after && after.ok
+          ? after.value.wallets
+              .filter(w => w.id !== added.id)
+              .map(w => w.meta.name)
+          : [];
+      await updateWalletMeta(added.id, {
+        name: entry.name || defaultWalletName(this.state.translate, others),
+        fromPrevious: true,
+        ...(entry.category ? { category: entry.category } : {}),
+        seedBackedUp: true,
+        seedBackedUpAt: 0,
+        viewOnlyNoticeDismissed: false,
+      });
+      await SettingsFileImpl.writeWalletServer(added.id, server, selectServer);
+      await createUpdateRecoveryWalletInfo(await fetchWallet(!entry.seed));
+      await retireImportedEntry(entry);
+      opened.push({ id: added.id, server });
+    }
+    if (failed.length > 0) {
+      createAlert(
+        this.setBackgroundError,
+        this.addLastSnackbar,
+        this.state.translate('loadingapp.readingwallet-label') as string,
+        failed.join(', '),
+        false,
+        this.state.translate,
+        sendEmail,
+        this.state.zingolibVersion,
+      );
+    }
+    if (opened.length === 0 && diskFull) {
+      this.setState({ actionButtonsDisabled: false });
+      returnTo(Route.FoundWallets);
+      askDiskRetry(this.state.translate, () => this.importAllRecovery(entries));
+      return;
+    }
+    if (opened.length === 0) {
+      this.setState({ actionButtonsDisabled: false });
+      returnTo(Route.Welcome);
+      return;
+    }
+    const first = opened[0];
+    const open = await finishWalletOpen(
+      await loadWallet(
+        first.id,
+        nativeUri(first.server),
+        first.server.chainName,
+        DEFAULT_PERFORMANCE_LEVEL,
+        GlobalConst.minConfirmations.toString(),
+      ),
+      first.server.chainName,
+    );
+    this.setState({ actionButtonsDisabled: false });
+    if (open.kind === 'failed') {
+      await this.walletLoadFailed(open.error.message);
+      return;
+    }
+    this.navigateToLoadedApp(
+      open.readOnly,
+      open.orchardPool,
+      open.saplingPool,
+      open.transparentPool,
+      true,
+      LaunchingModeEnum.opening,
+      open.walletChainName,
+      opened.length === 1
+        ? (this.state.translate('found.imported-one') as string)
+        : (this.state.translate('found.imported') as string).replace(
+            '{n}',
+            String(opened.length),
+          ),
+    );
   };
 
   openCurrentWallet = () => {
@@ -1715,7 +1846,6 @@ export class LoadingAppClass extends Component<
       walletExists,
       firstLaunchingMessage,
       biometricGate,
-      translate,
     } = this.state;
 
     const context = {
@@ -1749,7 +1879,11 @@ export class LoadingAppClass extends Component<
         walletExists && firstLaunchingMessage === LaunchingModeEnum.updating,
       busy: actionButtonsDisabled,
       walletExists,
-      recoveryWallet: this.state.recoveryWallet,
+      recoveryEntries: this.state.recoveryEntries,
+      foundDismissed: this.state.foundDismissed,
+      dismissFound: this.dismissFound,
+      importAllRecovery: this.importAllRecovery,
+      openOtherWallet: this.openOtherWallet,
       freshInstall: firstLaunchingMessage === LaunchingModeEnum.installing,
       walletError: this.state.walletError,
       errorResolved: this.state.errorResolved,
@@ -1760,17 +1894,13 @@ export class LoadingAppClass extends Component<
       serverLatencies: this.state.serverLatencies,
       serverLists: this.state.serverLists,
       serverBackGuard: this.serverBackGuard,
-      importRecoveryWallet: this.importRecoveryWallet,
-      viewRecoveryWallet: this.viewRecoveryWallet,
       openServer: this.openServer,
       closeServer: this.closeServer,
       stepBack: this.onHardwareBack,
       openCurrentWallet: this.openCurrentWallet,
-      createNewWallet: this.createNewWalletChecked,
+      createNewWallet: this.toNameCreate,
       getwalletToRestore: this.getwalletToRestore,
       retryOpenWallet: this.retryOpenWallet,
-      deleteThenImport: this.deleteThenImport,
-      deleteThenCreate: this.deleteThenCreate,
       switchToWalletChain: this.switchToWalletChain,
       chooseAutomatic: this.chooseAutomatic,
       pickServer: this.pickServer,
@@ -1779,7 +1909,8 @@ export class LoadingAppClass extends Component<
       probeServers: this.probeServers,
       serverUnreachable: this.serverUnreachable,
       serversFor: this.serversFor,
-      doRestore: this.doRestore,
+      doRestore: this.toNameImport,
+      nameNewWallet: this.nameNewWallet,
     };
 
     return (
@@ -1790,23 +1921,6 @@ export class LoadingAppClass extends Component<
               <BottomSheetBackHandler />
               <ConfirmBottomSheet />
               <LoadingNavigator />
-              <SeedSheet
-                ref={this.seedSheetRef}
-                wallet={this.state.recoveryWallet}
-                translate={translate}
-              />
-              <DeleteWalletSheet
-                ref={this.deleteSheetRef}
-                context={this.state.deleteContext}
-                translate={translate}
-                onConfirmed={() => this.afterDelete()}
-                onReleasedEarly={() =>
-                  this.addLastSnackbar(
-                    translate('deletesheet.keep-holding') as string,
-                    SnackbarDurationEnum.short,
-                  )
-                }
-              />
             </BottomSheetModalProvider>
           </GestureHandlerRootView>
         </ContextAppLoadingProvider>

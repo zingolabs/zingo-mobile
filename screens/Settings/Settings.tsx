@@ -41,9 +41,8 @@ import {
   GlobalConst,
   Route,
   BlockExplorerEnum,
-  ChainNameEnum,
 } from '@app/AppState';
-import { fetchWallet, walletBackupExists } from '@app/walletBackend';
+import { fetchWallet } from '@app/walletBackend';
 import {
   DeviceSecurityProbe,
   probeDeviceSecurity,
@@ -65,7 +64,6 @@ import {
   usePreventRemove,
 } from '@react-navigation/native';
 import { createAlert } from '@app/services/createAlert';
-import { showConfirm } from '@app/services/showConfirm';
 import { sendEmail } from '@app/services/sendEmail';
 import SaveSheet from '@ui/widgets/SaveSheet';
 import Switch from '@ui/primitives/Switch';
@@ -92,7 +90,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
     setLanguageOption,
     setBiometricsOption,
     setBlockExplorerOption,
-    restoreBackup,
     translate,
     language: languageContext,
     privacy: privacyContext,
@@ -101,8 +98,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
     mixnetView,
     blockExplorer: blockExplorerContext,
     readOnly,
-    server,
-    walletChainName,
     setPrivacyOption,
     setBackgroundError,
     zingolibVersion,
@@ -154,14 +149,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   const [disabledButton, setDisabledButton] = useState<boolean>(false);
   const [showDeveloperOptions, setShowDeveloperOptions] =
     useState<boolean>(false);
-  const [hasWalletBackup, setHasWalletBackup] = useState<boolean>(false);
-  // Backups only ever held mainnet wallets, and only a mainnet wallet is
-  // backed up: any other wallet is replaced by the backup and lost.
-  const openNet =
-    walletChainName !== ChainNameEnum.noneChainName
-      ? walletChainName
-      : server.chainName;
-  const backupReplaces = openNet !== ChainNameEnum.mainChainName;
   // Assumed stored until checked, so the warning doesn't flash on open.
   const [recoveryInfoStored, setRecoveryInfoStored] = useState<boolean>(true);
   const [savingRecoveryInfo, setSavingRecoveryInfo] = useState<boolean>(false);
@@ -218,24 +205,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
       cancelled = true;
     };
   }, []);
-
-  // Older builds kept a backup of the previous mainnet wallet on every
-  // wallet change. Swapping it back in stays here for whoever has one.
-  useEffect(() => {
-    if (!showDeveloperOptions) {
-      return;
-    }
-    let cancelled = false;
-    (async () => {
-      const exists = await walletBackupExists();
-      if (!cancelled) {
-        setHasWalletBackup(exists);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [showDeveloperOptions]);
 
   const probedRef = useRef<boolean>(false);
   useEffect(() => {
@@ -807,61 +776,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                         onPress={() => {
                           reportError(lastError);
                         }}
-                      />
-                    </View>
-                  </>
-                )}
-                {hasWalletBackup && (
-                  <>
-                    <Text
-                      variant="bodyStrong"
-                      style={{ marginTop: space16, marginBottom: space8 }}
-                    >
-                      {translate('loadedapp.restorebackupwallet') as string}
-                    </Text>
-
-                    <View>
-                      <Button
-                        testID="settings.restorebackupwallet"
-                        variant="text"
-                        title={translate('settings.restorebackup') as string}
-                        onPress={() =>
-                          showConfirm({
-                            title: translate(
-                              'loadedapp.restorebackupwallet',
-                            ) as string,
-                            message: backupReplaces
-                              ? (
-                                  translate(
-                                    readOnly
-                                      ? 'settings.restorebackup-replace-vo'
-                                      : 'settings.restorebackup-replace',
-                                  ) as string
-                                ).replace(
-                                  '{net}',
-                                  translate(
-                                    `settings.value-chainname-${openNet}`,
-                                  ) as string,
-                                )
-                              : (translate(
-                                  'settings.restorebackup-warning',
-                                ) as string),
-                            buttons: [
-                              {
-                                text: translate(
-                                  backupReplaces
-                                    ? 'settings.restorebackup-switch'
-                                    : 'confirm',
-                                ) as string,
-                                onPress: restoreBackup,
-                              },
-                              {
-                                text: translate('cancel') as string,
-                                style: 'cancel',
-                              },
-                            ],
-                          })
-                        }
                       />
                     </View>
                   </>

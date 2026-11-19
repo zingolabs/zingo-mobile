@@ -963,7 +963,7 @@ class WalletSwapRecoveryTests: XCTestCase {
         RPCModule.openWalletId = id
         try walletA.write(toFile: "\(WalletStore.walletPath(documents, id)).broken", atomically: true, encoding: .utf8)
 
-        XCTAssertTrue(try rpc.fnDeleteExistingWallet())
+        XCTAssertTrue(try rpc.fnDeleteWallet(walletId: id))
 
         XCTAssertNil(RPCModule.openWalletId)
         XCTAssertFalse(FileManager.default.fileExists(atPath: WalletStore.dir(documents, id)))
@@ -976,7 +976,7 @@ class WalletSwapRecoveryTests: XCTestCase {
         let first = try activeWallet(rpc, walletA)
         let second = try activeWallet(rpc, walletB)
 
-        XCTAssertTrue(try rpc.fnDeleteExistingWallet())
+        XCTAssertTrue(try rpc.fnDeleteWallet(walletId: second))
 
         XCTAssertTrue(FileManager.default.fileExists(atPath: WalletStore.dir(documents, first)))
         XCTAssertFalse(FileManager.default.fileExists(atPath: WalletStore.dir(documents, second)))
@@ -1242,10 +1242,18 @@ class WalletStoreTests: XCTestCase {
         XCTAssertNotNil(try JSONSerialization.data(withJSONObject: info))
     }
 
-    func testTheInfoReportsNoActiveWalletAsNull() throws {
-        _ = try committed("Wallet 1")
-
+    func testTheInfoReportsNoActiveWalletAsNullWhenThereIsNone() throws {
         XCTAssertTrue(WalletStore.info(base)["active"] is NSNull)
+    }
+
+    func testTheFirstWalletIsTheActiveOneWhenThePointerNamesNone() throws {
+        let first = try committed("Wallet 1")
+        let second = try committed("Wallet 2")
+        try WalletStore.setActive(base, second)
+
+        _ = try WalletStore.delete(base, second)
+
+        XCTAssertEqual(WalletStore.active(base), first)
     }
 
     func testTheLargestWalletIsTheBiggestFileOnDisk() throws {

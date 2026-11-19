@@ -39,6 +39,7 @@ const line = (props: Partial<React.ComponentProps<typeof SyncLine>>) =>
       percentage={100}
       syncInProgress={false}
       translate={keyTranslate}
+      opening=""
       {...props}
     />,
   );
@@ -162,4 +163,13 @@ describe('SyncLine', () => {
       /header.sync-mobile-data/,
     );
   });
+});
+
+test('Tests that the line names the wallet being opened when a switch is under way', () => {
+  const screen = line({ opening: 'Savings' });
+
+  expect(screen.getByTestId('header.sync-opening')).toBeTruthy();
+  expect(screen.getByTestId('header.syncline')).toHaveTextContent(
+    /wallets.opening/,
+  );
 });

@@ -105,5 +105,20 @@ export const focusedStackRouteNames = (): string[] => {
   }
 };
 
+/** Pops the run of `names` off the top of the focused stack. */
+export const popRoutes = (names: string[]): void => {
+  const stack = focusedStackRouteNames();
+  let count = 0;
+  while (
+    count < stack.length - 1 &&
+    names.includes(stack[stack.length - 1 - count])
+  ) {
+    count++;
+  }
+  if (count > 0) {
+    navigationRef.dispatch(StackActions.pop(count));
+  }
+};
+
 export const currentRoute = (): string | undefined =>
   navigationRef.isReady() ? navigationRef.getCurrentRoute()?.name : undefined;

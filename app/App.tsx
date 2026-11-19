@@ -60,7 +60,13 @@ const AppShell: React.FunctionComponent = () => {
                   removed from the tree, so it unmounts. */}
                 {session.kind === 'wallet' ? (
                   <Root.Screen name={Route.Wallet}>
-                    {props => <LoadedApp {...props} wallet={session.params} />}
+                    {props => (
+                      <LoadedApp
+                        key={session.params.walletId}
+                        {...props}
+                        wallet={session.params}
+                      />
+                    )}
                   </Root.Screen>
                 ) : (
                   <Root.Screen name={Route.Loading}>

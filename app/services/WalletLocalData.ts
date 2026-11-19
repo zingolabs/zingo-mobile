@@ -10,15 +10,18 @@ import {
   WalletEntry,
 } from '@app/walletBackend/utils/walletStore';
 import { RECEIVE_PIN_KEY_PREFIX } from './ReceivePinImpl';
+import { forgetRecoveryEntry } from './recoveryWalletInfo';
 import AddressBookFileImpl from './AddressBookFileImpl';
 import { IRONWOOD_HIDDEN_KEY_PREFIX } from './IronwoodNoticeImpl';
+import { SAVED_BALANCE_KEY_PREFIX } from './savedBalance';
 
 /**
  * What the app keeps beside each wallet, keyed by the wallet's id: its swap
- * records, its pinned Receive address and whether it hid the Ironwood
- * notice. The address book is shared by every wallet, and only the tags of
+ * records, its pinned Receive address, whether it hid the Ironwood notice
+ * and the balance it showed last. The address book is shared by every wallet, and only the tags of
  * the addresses its swaps made go with it. They leave with the wallet, or
- * they outlive a wallet the user removed.
+ * they outlive a wallet the user removed. Its Keychain entry goes too,
+ * unless it is the last wallet: a later restore reads that one.
  *
  * Single-wallet builds keyed them by the wallet's fingerprint. A wallet
  * migrated from that layout takes the data of its fingerprint on its first
@@ -28,6 +31,7 @@ const WALLET_SCOPED_PREFIXES = [
   SWAP_RECORDS_KEY_PREFIX,
   RECEIVE_PIN_KEY_PREFIX,
   IRONWOOD_HIDDEN_KEY_PREFIX,
+  SAVED_BALANCE_KEY_PREFIX,
 ];
 
 /** The pointer single-wallet builds kept to the fingerprint on file. */
@@ -43,6 +47,7 @@ async function forget(owner: string): Promise<void> {
   await SwapStore.clearForWallet(owner);
   await AsyncStorage.removeItem(RECEIVE_PIN_KEY_PREFIX + owner);
   await AsyncStorage.removeItem(IRONWOOD_HIDDEN_KEY_PREFIX + owner);
+  await AsyncStorage.removeItem(SAVED_BALANCE_KEY_PREFIX + owner);
 }
 
 /**
@@ -52,14 +57,7 @@ async function forget(owner: string): Promise<void> {
 export async function forgetWallet(walletId: string): Promise<void> {
   if (walletId) {
     await forget(walletId);
-  }
-}
-
-/** Before the active wallet is deleted or replaced, as forgetWallet. */
-export async function forgetWalletOnFile(): Promise<void> {
-  const result = await walletsOnDevice();
-  if (result.ok && result.value.active.kind === 'wallet') {
-    await forget(result.value.active.id);
+    await forgetRecoveryEntry(walletId);
   }
 }
 

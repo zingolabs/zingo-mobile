@@ -118,7 +118,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   }
 
   const privacyKey = poolCrossingKey(proposalPools);
-  const unit = info.currencyName || 'ZEC';
+  const unit = info.currencyName;
   const rows: DetailRow[] = [
     {
       label: t('send.confirm-privacy-level'),
