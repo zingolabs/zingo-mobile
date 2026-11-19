@@ -42,11 +42,19 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
             {
               "alignItems": "center",
               "height": 57,
-              "justifyContent": "center",
-              "paddingTop": 12,
+              "paddingTop": 16,
             }
           }
-        />
+        >
+          <View
+            style={
+              {
+                "height": 25,
+                "justifyContent": "center",
+              }
+            }
+          />
+        </View>
       </View>
       <View
         style={
@@ -1008,11 +1016,19 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
             {
               "alignItems": "center",
               "height": 57,
-              "justifyContent": "center",
-              "paddingTop": 12,
+              "paddingTop": 16,
             }
           }
-        />
+        >
+          <View
+            style={
+              {
+                "height": 25,
+                "justifyContent": "center",
+              }
+            }
+          />
+        </View>
       </View>
       <View
         style={

@@ -46,11 +46,19 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
               {
                 "alignItems": "center",
                 "height": 57,
-                "justifyContent": "center",
-                "paddingTop": 12,
+                "paddingTop": 16,
               }
             }
-          />
+          >
+            <View
+              style={
+                {
+                  "height": 25,
+                  "justifyContent": "center",
+                }
+              }
+            />
+          </View>
           <View
             style={
               {
@@ -1760,11 +1768,19 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
               {
                 "alignItems": "center",
                 "height": 57,
-                "justifyContent": "center",
-                "paddingTop": 12,
+                "paddingTop": 16,
               }
             }
-          />
+          >
+            <View
+              style={
+                {
+                  "height": 25,
+                  "justifyContent": "center",
+                }
+              }
+            />
+          </View>
           <View
             style={
               {

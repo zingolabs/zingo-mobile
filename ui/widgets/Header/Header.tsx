@@ -236,29 +236,30 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             },
           ]}
         >
-          {/* The mixnet icon alone in the middle of the bar, level with the menu. */}
+          {/* The mixnet icon alone in the middle of the bar, centred on the menu's line as the switcher is. */}
           <View
             style={{
               height: BAR_ROW,
               alignItems: 'center',
-              justifyContent: 'center',
-              paddingTop: 12,
+              paddingTop: MENU_TOP,
             }}
           >
-            {mixnetPhase !== 'absent' && (
-              <Pressable
-                kind="icon"
-                testID="header.mixnet-status"
-                hitSlop={slopFor(22)}
-                accessibilityRole="button"
-                accessibilityLabel={
-                  translate('settings.nym-diagnostics') as string
-                }
-                onPress={() => navigation.navigate(Route.MixnetDoctor)}
-              >
-                <MixnetIcon phase={mixnetPhase} />
-              </Pressable>
-            )}
+            <View style={{ height: MENU_SIDE, justifyContent: 'center' }}>
+              {mixnetPhase !== 'absent' && (
+                <Pressable
+                  kind="icon"
+                  testID="header.mixnet-status"
+                  hitSlop={slopFor(22)}
+                  accessibilityRole="button"
+                  accessibilityLabel={
+                    translate('settings.nym-diagnostics') as string
+                  }
+                  onPress={() => navigation.navigate(Route.MixnetDoctor)}
+                >
+                  <MixnetIcon phase={mixnetPhase} />
+                </Pressable>
+              )}
+            </View>
           </View>
 
           <BalanceRow

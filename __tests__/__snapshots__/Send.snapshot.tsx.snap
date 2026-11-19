@@ -44,11 +44,19 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
               {
                 "alignItems": "center",
                 "height": 57,
-                "justifyContent": "center",
-                "paddingTop": 12,
+                "paddingTop": 16,
               }
             }
-          />
+          >
+            <View
+              style={
+                {
+                  "height": 25,
+                  "justifyContent": "center",
+                }
+              }
+            />
+          </View>
         </View>
         <View
           style={
@@ -1156,11 +1164,19 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
               {
                 "alignItems": "center",
                 "height": 57,
-                "justifyContent": "center",
-                "paddingTop": 12,
+                "paddingTop": 16,
               }
             }
-          />
+          >
+            <View
+              style={
+                {
+                  "height": 25,
+                  "justifyContent": "center",
+                }
+              }
+            />
+          </View>
         </View>
         <View
           style={
