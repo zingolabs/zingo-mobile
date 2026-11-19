@@ -17,7 +17,6 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useOpeningFade } from '@app/hooks/useOpeningFade';
-import { duration } from '@app/theme/motion';
 import Pressable from '@ui/primitives/Pressable';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import {
@@ -229,24 +228,8 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       setBackingUp(false);
     }
   }, [focused]);
-  // A backup finished while the flow was open: the card stays a moment once
-  // History is back, so its pill can turn green before it leaves.
-  const [seedLeaving, setSeedLeaving] = useState<boolean>(false);
-  const seedWasPending = useRef<boolean>(!seedBackedUp);
-  useEffect(() => {
-    if (!seedBackedUp) {
-      seedWasPending.current = true;
-      return;
-    }
-    if (!focused || !seedWasPending.current) {
-      return;
-    }
-    seedWasPending.current = false;
-    setSeedLeaving(true);
-    const timer = setTimeout(() => setSeedLeaving(false), duration.noticeLeave);
-    return () => clearTimeout(timer);
-  }, [seedBackedUp, focused]);
-  const showSeedNotice = !readOnly && (!seedBackedUp || seedLeaving);
+  /** The backup flow ends on its own done screen, so a finished backup takes the card away at once. */
+  const showSeedNotice = !readOnly && !seedBackedUp;
 
   const showPrice = fiatQuote(zecPrice, server, info.chainName).kind !== 'none';
 
@@ -296,7 +279,6 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       node: (
         <SeedBackupNotice
           covered={backingUp && !focused}
-          backedUp={seedBackedUp}
           onBackUp={from => {
             setBackingUp(true);
             navigation.navigate(Route.SeedBackup, {

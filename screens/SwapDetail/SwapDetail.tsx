@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import { formatZecAmount } from '@app/utils/formatZecAmount';
 import { formatUsd } from '@app/utils/formatAmount';
+import { inputUsd, settledFeesUsd } from '@app/swap/settledCost';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Linking, View } from 'react-native';
 import Pressable from '@ui/primitives/Pressable';
@@ -148,6 +149,10 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
     return unit > 0 && Number.isFinite(v) ? `≈ ${formatUsd(v)}` : '';
   };
 
+  /** What was sent was worth this: at settlement once the swap completed, at the quote before. */
+  const sentValue = inputUsd(record);
+  const sentUsd = sentValue > 0 ? `≈ ${formatUsd(sentValue)}` : '';
+
   const title = t(done ? 'history.swapped-pair' : 'history.swap-pair')
     .replace('{from}', sellSym)
     .replace('{to}', getSym);
@@ -185,20 +190,23 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
               : outcome === 'failed'
                 ? ('muted' as const)
                 : ('default' as const),
-            line: `−${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}${usd(got, record.fiatValueBasis.receiveUsdUnitPrice) ? ` · ${usd(got, record.fiatValueBasis.receiveUsdUnitPrice)}` : ''}`,
+            line: `−${formatAmountForDisplay(record.sellAmountHumanDecimal)} ${sellSym}${sentUsd ? ` · ${sentUsd}` : ''}`,
           };
   const pill = swapStatePill(record.status, t);
 
+  /** The fees charged once the swap completed; the quote's estimate before. */
   const feesUsd =
-    record.totalFeesInReceiveAsset &&
-    record.fiatValueBasis.receiveUsdUnitPrice > 0
-      ? usd(
-          record.totalFeesInReceiveAsset,
-          record.fiatValueBasis.receiveUsdUnitPrice,
-        ).replace('≈ ', '')
-      : record.totalFeesInReceiveAsset
-        ? `${formatAmountForDisplay(record.totalFeesInReceiveAsset)} ${getSym}`
-        : '';
+    done && record.settledCost
+      ? formatUsd(settledFeesUsd(record, record.settledCost))
+      : record.totalFeesInReceiveAsset &&
+          record.fiatValueBasis.receiveUsdUnitPrice > 0
+        ? usd(
+            record.totalFeesInReceiveAsset,
+            record.fiatValueBasis.receiveUsdUnitPrice,
+          ).replace('≈ ', '')
+        : record.totalFeesInReceiveAsset
+          ? `${formatAmountForDisplay(record.totalFeesInReceiveAsset)} ${getSym}`
+          : '';
   const reason = record.refundInfo?.refundReason ?? record.failureReason;
   /** The swap's address outside the wallet: where a sale went, or a buy's refund. */
   const outside = sell
