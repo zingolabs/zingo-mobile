@@ -341,7 +341,7 @@
       },
       {
         "value": "ZecBlockPrivate",
-        "text": "ZecBlock Gizli (Mainnet)"
+        "text": "ZecBlock Gizli"
       },
       {
         "value": "ShieldedScan",
@@ -391,7 +391,7 @@
     "value-blockexplorer-Zcashexplorer": "Zcashexplorer",
     "value-blockexplorer-ZecBlock": "ZecBlock",
     "value-blockexplorer-Zexplorer": "Zexplorer",
-    "value-blockexplorer-ZecBlockPrivate": "ZecBlock Gizli (Mainnet)",
+    "value-blockexplorer-ZecBlockPrivate": "ZecBlock Gizli",
     "value-blockexplorer-ShieldedScan": "ShieldedScan",
     "value-blockexplorer-None": "Yok",
     "security-title": "Biyometrik/PIN",

@@ -341,7 +341,7 @@
       },
       {
         "value": "ZecBlockPrivate",
-        "text": "ZecBlock Privado (Mainnet)"
+        "text": "ZecBlock Privado"
       },
       {
         "value": "ShieldedScan",
@@ -391,7 +391,7 @@
     "value-blockexplorer-Zcashexplorer": "Zcashexplorer",
     "value-blockexplorer-ZecBlock": "ZecBlock",
     "value-blockexplorer-Zexplorer": "Zexplorer",
-    "value-blockexplorer-ZecBlockPrivate": "ZecBlock Privado (Mainnet)",
+    "value-blockexplorer-ZecBlockPrivate": "ZecBlock Privado",
     "value-blockexplorer-ShieldedScan": "ShieldedScan",
     "value-blockexplorer-None": "Ninguno",
     "security-title": "Biometría/PIN",

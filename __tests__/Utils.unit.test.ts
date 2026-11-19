@@ -160,14 +160,14 @@ describe('Utils.getBlockExplorerTxIDURL', () => {
     ).toBe('https://private.zecblock.com/#tx=abc123');
   });
 
-  test('Tests that the private ZecBlock gives no link on Testnet, which it does not index', () => {
+  test("Tests that the private ZecBlock links Testnet through ZecBlock's regular explorer, since it indexes Mainnet only", () => {
     expect(
       Utils.getBlockExplorerTxIDURL(
         txid,
         ChainNameEnum.testChainName,
         BlockExplorerEnum.ZecBlockPrivate,
       ),
-    ).toBe('');
+    ).toBe('https://testnet.zecblock.com/tx/abc123');
   });
 
   test.each([

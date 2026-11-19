@@ -177,9 +177,10 @@ export default class Utils {
       }
     } else if (blockExplorer === BlockExplorerEnum.ZecBlockPrivate) {
       // The txid rides in the fragment, which the browser never sends: the
-      // lookup stays in the page. It indexes Mainnet only.
+      // lookup stays in the page. It indexes Mainnet only; Testnet takes
+      // ZecBlock's regular explorer.
       return chainName === ChainNameEnum.testChainName
-        ? ''
+        ? `https://testnet.zecblock.com/tx/${txid}`
         : `https://private.zecblock.com/#tx=${txid}`;
     } else if (blockExplorer === BlockExplorerEnum.ShieldedScan) {
       if (chainName === ChainNameEnum.testChainName) {
