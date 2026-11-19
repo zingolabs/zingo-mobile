@@ -1450,8 +1450,7 @@
   "seednotice": {
     "title": "Seed phrase",
     "body-pending": "If you lose your phone, this is the only way to recover your funds.",
-    "button": "Back up",
-    "done": "backed up"
+    "button": "Back up"
   },
   "shield": {
     "title": "Shield transparent funds",

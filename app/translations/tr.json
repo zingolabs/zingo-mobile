@@ -1450,8 +1450,7 @@
   "seednotice": {
     "title": "Kurtarma ifadesi",
     "body-pending": "Telefonunuzu kaybederseniz fonlarınızı kurtarmanın tek yolu budur.",
-    "button": "Yedekle",
-    "done": "yedeklendi"
+    "button": "Yedekle"
   },
   "shield": {
     "title": "Şeffaf fonları korumaya al",

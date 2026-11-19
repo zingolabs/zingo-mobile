@@ -11,20 +11,17 @@ import { ContextAppLoaded } from '@app/context';
 import { CardRect } from '@app/types';
 import Button from '@ui/primitives/Button';
 import Banner from '@ui/widgets/Banner';
-import Tag from '@ui/widgets/Tag';
 
 type SeedBackupNoticeProps = {
   // The flow is open over the card: its contents step aside for the container transform.
   covered: boolean;
   /** The backup is done: the tag turns green before the card leaves the stack. */
-  backedUp?: boolean;
   onBackUp: (from: CardRect) => void;
 };
 
 // The seed phrase notice on History. Back up opens the flow from this card.
 const SeedBackupNotice: React.FunctionComponent<SeedBackupNoticeProps> = ({
   covered,
-  backedUp,
   onBackUp,
 }) => {
   const { translate } = useContext(ContextAppLoaded);
@@ -49,13 +46,6 @@ const SeedBackupNotice: React.FunctionComponent<SeedBackupNoticeProps> = ({
       testID="seedbackup.notice"
       tone="seed"
       title={translate('seednotice.title') as string}
-      // Only the green pill a finished backup shows before the notice leaves:
-      // the tile and the text already say it is not backed up.
-      tag={
-        backedUp ? (
-          <Tag tone="accent">{translate('seednotice.done') as string}</Tag>
-        ) : undefined
-      }
       contentStyle={contents}
       actionBeside
       action={
