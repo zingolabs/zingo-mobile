@@ -4,6 +4,7 @@ import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
 import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
 import { TrackingStatusEnum } from '@app/swap/enums/TrackingStatusEnum';
 import { FiatValueBasisType } from './FiatValueBasisType';
+import type { SettledCostType } from './SettledCostType';
 import { ProviderDataType } from './ProviderDataType';
 import { RefundInfoType } from './RefundInfoType';
 import { SwapAssetType } from './SwapAssetType';
@@ -256,6 +257,13 @@ export type SwapRecordType = {
 
   // Fiat-value snapshot at quote time
   fiatValueBasis: FiatValueBasisType;
+  /**
+   * What the swap cost once it completed, from `/track`: the fees charged and
+   * the USD values of the input and the output. The detail shows these over
+   * the quote's estimates. Absent while in flight and on swaps that have not
+   * been tracked since it was kept.
+   */
+  settledCost?: SettledCostType;
 
   /** Set when the user removed a swap that had made an address of the wallet:
    *  the record stays as a marker, without its swap ID, so the address still
