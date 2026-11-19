@@ -31,13 +31,6 @@ export enum PoolEnum {
   TransparentPool = 'Transparent',
 }
 
-export enum PoolToShieldEnum {
-  noPoolToShield = '',
-  allPoolToShield = 'all',
-  transparentPoolToShield = 'transparent',
-  saplingPoolToShield = 'sapling',
-}
-
 export enum FilterEnum {
   all = 'all',
   contacts = 'contacts',

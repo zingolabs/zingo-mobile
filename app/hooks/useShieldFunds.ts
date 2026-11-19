@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import { showConfirm } from '@app/services/showConfirm';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
 import {
-  PoolToShieldEnum,
   Route,
   ServerType,
   SnackbarDurationEnum,
@@ -45,21 +43,17 @@ type UseShieldFundsInput = {
 type UseShieldFundsResult = {
   showShieldButton: boolean;
   shieldingFee: number;
-  onPressShieldFunds: () => void;
-  /** Shields at once, for a caller that asked in its own sheet. */
+  /** Shields at once; every caller asks first in ShieldSheet. */
   shieldNow: () => Promise<void>;
-  calculatePoolsToShield: () => string;
-  calculateDisableButtonToShield: () => boolean;
 };
 
 /**
  * Orchestrates the transparent-pool shielding flow.
  *
  * Runs a shield proposal on mount / when balance changes to pre-calculate the
- * fee and shieldable amount. Exposes `onPressShieldFunds` which shows a
- * confirmation alert then executes the shield transaction via RPC, navigates
- * to the Computing screen while work is in progress, and returns to History on
- * success.
+ * fee and shieldable amount. Exposes `shieldNow`, which the caller runs
+ * once ShieldSheet is confirmed: it executes the shield transaction, shows
+ * the Computing screen while it runs, and returns to History on success.
  *
  * `showShieldButton` is true only when there is a positive unshielded balance,
  * no pending transactions, the wallet is not read-only, and the server is
@@ -193,34 +187,9 @@ export function useShieldFunds({
     setShieldingAmount,
   ]);
 
-  const calculatePoolsToShield = useCallback(
-    (): string => PoolToShieldEnum.transparentPoolToShield,
-    [],
-  );
-
-  const calculateDisableButtonToShield = useCallback(
-    (): boolean => (somePending ? 0 : shieldingAmount) <= 0,
-    [somePending, shieldingAmount],
-  );
-
-  const onPressShieldFunds = useCallback(() => {
-    const pools = calculatePoolsToShield();
-    showConfirm({
-      title: translate(`history.shield-title-${pools}`) as string,
-      message: translate(`history.shield-alert-${pools}`) as string,
-      buttons: [
-        { text: translate('confirm') as string, onPress: handleShieldFunds },
-        { text: translate('cancel') as string, style: 'cancel' },
-      ],
-    });
-  }, [translate, calculatePoolsToShield, handleShieldFunds]);
-
   return {
     showShieldButton,
     shieldingFee,
-    onPressShieldFunds,
     shieldNow: handleShieldFunds,
-    calculatePoolsToShield,
-    calculateDisableButtonToShield,
   };
 }
