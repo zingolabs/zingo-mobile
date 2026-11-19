@@ -14,7 +14,6 @@ import {
   GlobalConst,
 } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
-import { fiatQuote } from '@app/price/fiatQuote';
 import Utils from '@app/utils';
 import { formatUsd } from '@app/utils/formatAmount';
 import { FileTextIcon } from '@ui/primitives/Icons/FileTextIcon';
@@ -65,7 +64,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     readOnly,
     server,
     setSendPageState,
-    zecPrice,
     addressBook,
   } = context;
   const { colors } = useTheme();
@@ -85,13 +83,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     swipeableRef.current?.close();
   }, [vt.txid]);
 
-  const quote = fiatQuote(zecPrice, server, server.chainName);
-  const price =
-    vt.zecPrice && vt.zecPrice > 0
-      ? vt.zecPrice
-      : quote.kind === 'quote'
-        ? quote.price
-        : 0;
+  /** Dollars only at the price the transfer kept: today's would read as what it was worth then. */
+  const price = vt.zecPrice && vt.zecPrice > 0 ? vt.zecPrice : 0;
   /** The Zcash contact the row's address belongs to. */
   const contact = vt.address
     ? addressBook.find(
