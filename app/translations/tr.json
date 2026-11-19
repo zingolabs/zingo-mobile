@@ -340,6 +340,14 @@
         "text": "ZExplorer.App"
       },
       {
+        "value": "ZecBlockPrivate",
+        "text": "ZecBlock Gizli (Mainnet)"
+      },
+      {
+        "value": "ShieldedScan",
+        "text": "ShieldedScan.xyz"
+      },
+      {
         "value": "None",
         "text": "None"
       }
@@ -383,6 +391,8 @@
     "value-blockexplorer-Zcashexplorer": "Zcashexplorer",
     "value-blockexplorer-ZecBlock": "ZecBlock",
     "value-blockexplorer-Zexplorer": "Zexplorer",
+    "value-blockexplorer-ZecBlockPrivate": "ZecBlock Gizli (Mainnet)",
+    "value-blockexplorer-ShieldedScan": "ShieldedScan",
     "value-blockexplorer-None": "Yok",
     "security-title": "Biyometrik/PIN",
     "security-device-locked-hint": "Bu cihazda biyometri yok. Bu seçenek, yapılandırılmışsa cihaz şifresini kullanır; aksi takdirde etkisi olmaz.",

@@ -340,6 +340,14 @@
         "text": "ZExplorer.App"
       },
       {
+        "value": "ZecBlockPrivate",
+        "text": "ZecBlock Приватный (Mainnet)"
+      },
+      {
+        "value": "ShieldedScan",
+        "text": "ShieldedScan.xyz"
+      },
+      {
         "value": "None",
         "text": "None"
       }
@@ -383,6 +391,8 @@
     "value-blockexplorer-Zcashexplorer": "Zcashexplorer",
     "value-blockexplorer-ZecBlock": "ZecBlock",
     "value-blockexplorer-Zexplorer": "Zexplorer",
+    "value-blockexplorer-ZecBlockPrivate": "ZecBlock Приватный (Mainnet)",
+    "value-blockexplorer-ShieldedScan": "ShieldedScan",
     "value-blockexplorer-None": "Нет",
     "security-title": "Биометрия/PIN",
     "security-device-locked-hint": "На устройстве не настроена биометрия. Этот параметр будет использовать код устройства, если он задан; иначе он не действует.",

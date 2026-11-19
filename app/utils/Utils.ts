@@ -175,6 +175,18 @@ export default class Utils {
       } else {
         return `https://zexplorer.app/mainnet/tx/${txid}`;
       }
+    } else if (blockExplorer === BlockExplorerEnum.ZecBlockPrivate) {
+      // The txid rides in the fragment, which the browser never sends: the
+      // lookup stays in the page. It indexes Mainnet only.
+      return chainName === ChainNameEnum.testChainName
+        ? ''
+        : `https://private.zecblock.com/#tx=${txid}`;
+    } else if (blockExplorer === BlockExplorerEnum.ShieldedScan) {
+      if (chainName === ChainNameEnum.testChainName) {
+        return `https://testnet.shieldedscan.xyz/tx/${txid}`;
+      } else {
+        return `https://shieldedscan.xyz/tx/${txid}`;
+      }
     } else {
       // BlockExplorerEnum.None (or any unknown value) → no explorer link.
       return '';

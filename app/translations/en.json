@@ -340,6 +340,14 @@
         "text": "ZExplorer.App"
       },
       {
+        "value": "ZecBlockPrivate",
+        "text": "ZecBlock Private (Mainnet)"
+      },
+      {
+        "value": "ShieldedScan",
+        "text": "ShieldedScan.xyz"
+      },
+      {
         "value": "None",
         "text": "None"
       }
@@ -383,6 +391,8 @@
     "value-blockexplorer-Zcashexplorer": "Zcashexplorer",
     "value-blockexplorer-ZecBlock": "ZecBlock",
     "value-blockexplorer-Zexplorer": "Zexplorer",
+    "value-blockexplorer-ZecBlockPrivate": "ZecBlock Private (Mainnet)",
+    "value-blockexplorer-ShieldedScan": "ShieldedScan",
     "value-blockexplorer-None": "None",
     "security-title": "Biometric/PIN",
     "security-device-locked-hint": "No biometrics on this device. This option uses the device passcode if configured; otherwise it has no effect.",

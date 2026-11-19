@@ -342,12 +342,7 @@ export default function LoadedApp(props: LoadedAppProps) {
           biometrics,
         );
       }
-      if (
-        settings.blockExplorer === BlockExplorerEnum.ZecBlock ||
-        settings.blockExplorer === BlockExplorerEnum.Zcashexplorer ||
-        settings.blockExplorer === BlockExplorerEnum.Zexplorer ||
-        settings.blockExplorer === BlockExplorerEnum.None
-      ) {
+      if (Object.values(BlockExplorerEnum).includes(settings.blockExplorer)) {
         setBlockExplorer(settings.blockExplorer);
       } else {
         await SettingsFileImpl.writeSettings(

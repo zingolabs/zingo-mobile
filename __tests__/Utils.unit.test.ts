@@ -150,6 +150,39 @@ describe('Utils.splitZecAmountIntoBigSmall', () => {
 describe('Utils.getBlockExplorerTxIDURL', () => {
   const txid = 'abc123';
 
+  test('Tests that the private ZecBlock link carries the txid in the fragment on Mainnet. The browser never sends a fragment, so the lookup stays in the page.', () => {
+    expect(
+      Utils.getBlockExplorerTxIDURL(
+        txid,
+        ChainNameEnum.mainChainName,
+        BlockExplorerEnum.ZecBlockPrivate,
+      ),
+    ).toBe('https://private.zecblock.com/#tx=abc123');
+  });
+
+  test('Tests that the private ZecBlock gives no link on Testnet, which it does not index', () => {
+    expect(
+      Utils.getBlockExplorerTxIDURL(
+        txid,
+        ChainNameEnum.testChainName,
+        BlockExplorerEnum.ZecBlockPrivate,
+      ),
+    ).toBe('');
+  });
+
+  test.each([
+    [ChainNameEnum.mainChainName, 'https://shieldedscan.xyz/tx/abc123'],
+    [ChainNameEnum.testChainName, 'https://testnet.shieldedscan.xyz/tx/abc123'],
+  ])('Tests that ShieldedScan links the transaction on %s', (chain, url) => {
+    expect(
+      Utils.getBlockExplorerTxIDURL(
+        txid,
+        chain,
+        BlockExplorerEnum.ShieldedScan,
+      ),
+    ).toBe(url);
+  });
+
   test('Zcashexplorer mainnet', () => {
     expect(
       Utils.getBlockExplorerTxIDURL(
