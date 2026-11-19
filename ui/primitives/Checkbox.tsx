@@ -70,8 +70,8 @@ const Tick: React.FunctionComponent<{ color: string }> = ({ color }) => {
 type CheckboxProps = {
   checked: boolean;
   onChange: (checked: boolean) => void;
-  /** Beside the box, and part of its tap area. */
-  label: string;
+  /** Beside the box, and part of its tap area: a string takes the label style, a node is drawn as given. */
+  label: string | React.ReactElement;
   disabled?: boolean;
   testID?: string;
 };
@@ -126,9 +126,13 @@ const Checkbox: React.FunctionComponent<CheckboxProps> = ({
           {checked && <Tick color={colors.fgOnAccent} />}
         </Animated.View>
       </View>
-      <Text variant="bodySmall" tone="muted" style={{ flex: 1 }}>
-        {label}
-      </Text>
+      {typeof label === 'string' ? (
+        <Text variant="bodySmall" tone="muted" style={{ flex: 1 }}>
+          {label}
+        </Text>
+      ) : (
+        <View style={{ flex: 1 }}>{label}</View>
+      )}
     </Pressable>
   );
 };

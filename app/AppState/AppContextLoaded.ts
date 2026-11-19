@@ -28,6 +28,29 @@ import type {
   SendPermit,
 } from '@app/walletBackend/transforms/sendPermit';
 import { SetServerResult } from './types/SetServerResult';
+import type { WalletEntry } from '@app/walletBackend/utils/walletStore';
+import type { AddWalletDraft } from '@app/services/addWalletDraft';
+import type { RecoveryEntry } from '@app/services/recoveryWalletInfo';
+import type { LoadedAppNavigationState } from '@app/types/NavigationTypes';
+
+/** What a wallet being added is made from. */
+export type NewWalletSource =
+  { kind: 'create' } | { kind: 'restore'; text: string; birthday: number };
+
+export type AddWalletResult =
+  | { kind: 'added'; name: string; params: LoadedAppNavigationState }
+  | { kind: 'diskFull' }
+  | { kind: 'failed'; message: string };
+
+export type ImportFoundFailed = { kind: 'failed'; message: string };
+
+export type ImportFoundResult =
+  { kind: 'imported' } | { kind: 'diskFull' } | ImportFoundFailed;
+
+export type WalletSwitchOutcome = { kind: 'opened' } | { kind: 'failed' };
+
+export type WalletSwitch =
+  { kind: 'none' } | { kind: 'opening'; wallet: WalletEntry };
 
 export default interface AppContextLoaded {
   netInfo: NetInfoType;
@@ -117,7 +140,6 @@ export default interface AppContextLoaded {
     value: ServerType,
     selectServer: SelectServerEnum,
     toast: boolean,
-    sameServerChainName: boolean,
   ) => Promise<SetServerResult>;
   switchServerForRetry: (server: ServerType) => Promise<void>;
   clearToAddr: () => void;
@@ -128,10 +150,34 @@ export default interface AppContextLoaded {
   setBlockExplorerOption: (value: BlockExplorerEnum) => Promise<void>;
   // The seed and viewing key screens confirm these; each leaves the wallet
   // section or its server.
-  changeWallet: () => Promise<void>;
-  restoreBackup: () => Promise<void>;
-  applyPendingServer: () => Promise<void>;
-  cancelPendingServer: () => Promise<void>;
+  /** The open wallet's id. */
+  walletId: string;
+  /** Opens another wallet in place, Home staying until it is open. */
+  switchWallet: (entry: WalletEntry) => Promise<WalletSwitchOutcome>;
+  /** A wallet that won't open, restored from its saved phrase in its place, with its name. */
+  restoreInPlace: (entry: WalletEntry) => Promise<void>;
+  /** The wallet being opened in place, named on Home's sync line. */
+  switching: WalletSwitch;
+  /** The wallets on the device, in the order they were added. */
+  wallets: WalletEntry[];
+  /** Adds a wallet beside the others; the open one stays as it was when it fails. */
+  addWallet: (
+    source: NewWalletSource,
+    name: string,
+    draft: AddWalletDraft,
+  ) => Promise<AddWalletResult>;
+  /** Opens a wallet just added: Home, or its seed backup first, with a note. */
+  enterAdded: (
+    params: LoadedAppNavigationState,
+    next: 'home' | 'backup',
+    notice: string,
+  ) => Promise<void>;
+  /** Imports wallets a previous install left in the Keychain and opens the last one. */
+  importFound: (entries: RecoveryEntry[]) => Promise<ImportFoundResult>;
+  /** Deletes a wallet; the open one hands over to the first wallet left. */
+  deleteWallet: (entry: WalletEntry) => Promise<void>;
+  /** Reads the wallets again, after one is renamed or deleted. */
+  refreshWallets: () => Promise<void>;
 
   // some ValueTransfer is pending?
   somePending: boolean;

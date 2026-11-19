@@ -9,15 +9,12 @@ import {
   ChainNameEnum,
   LanguageEnum,
   LaunchingModeEnum,
-  Route,
   SelectServerEnum,
 } from '@app/AppState';
 import { remoteServer } from '@app/AppState/types/ServerType';
 import RPCModule from '@app/RPCModule';
-import {
-  ConfirmOptions,
-  registerConfirmListener,
-} from '@app/services/showConfirm';
+import { registerConfirmListener } from '@app/services/showConfirm';
+import type { RecoveryEntry } from '@app/services/recoveryWalletInfo';
 
 jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
@@ -29,14 +26,14 @@ jest.mock('@app/services/gateController', () => ({
 jest.mock('@app/services/serverPicking', () => ({
   ...jest.requireActual('@app/services/serverPicking'),
   probeUri: jest.fn(async () => ({ latency: 40, height: '3000000' })),
+  pickAutomatic: jest.fn(async () => ({
+    server: { uri: 'https://best.testnet:443', chainName: 'test' },
+    tier: 'recommended',
+  })),
 }));
 
-// A mainnet server whose tip is block 3,000,000, and a phrase saved on the
-// device with the given birthday.
-const appWithSaved = (
-  birthday: number,
-  saved: { seed?: string; ufvk?: string } = { seed: 'abandon ability able' },
-) => {
+// The start menu on a mainnet server.
+const appWithSaved = () => {
   const app = new LoadingAppClass({
     session: { kind: 'boot', startingApp: true, newWallet: false },
     openWallet: jest.fn(),
@@ -57,7 +54,6 @@ const appWithSaved = (
   app.state = {
     ...app.state,
     netInfo: { ...app.state.netInfo, isConnected: true },
-    recoveryWallet: { ...saved, birthday },
   };
   const doRestore = jest.spyOn(app, 'doRestore').mockResolvedValue(undefined);
   return { app, doRestore };
@@ -68,52 +64,60 @@ afterEach(() => {
   registerConfirmListener(null);
 });
 
-test('Tests that a saved phrase born past the network tip warns instead of restoring', async () => {
-  const confirms: ConfirmOptions[] = [];
-  registerConfirmListener(options => confirms.push(options));
-  const { app, doRestore } = appWithSaved(3700000);
-
-  await app.importRecoveryWallet(Route.Welcome);
-
-  expect(doRestore).not.toHaveBeenCalled();
-  expect(confirms[0].title).toBe('loadingapp.saved-wallet-net-title');
+const entry = (over: Partial<RecoveryEntry>): RecoveryEntry => ({
+  seed: 'abandon ability able',
+  birthday: 2900000,
+  walletId: '',
+  name: '',
+  chain: '',
+  category: 0,
+  order: 0,
+  ...over,
 });
 
-test('Tests that a saved phrase born before the network tip restores', async () => {
-  const { app, doRestore } = appWithSaved(2900000);
+const restoredWith = async (app: LoadingAppClass, saved: RecoveryEntry) => {
+  jest.spyOn(app, 'setState').mockImplementation(() => {});
+  const restore = jest.mocked(RPCModule.restoreWalletFromSeed);
+  restore.mockRejectedValue(new Error('stop here'));
+  await app.importAllRecovery([saved]);
+  return restore.mock.calls[0];
+};
 
-  await app.importRecoveryWallet(Route.Welcome);
+test('Tests that a single-wallet entry restores on Mainnet when the start menu is on Testnet. Those entries predate networks and were all Mainnet.', async () => {
+  const { app } = appWithSaved();
+  app.state = {
+    ...app.state,
+    server: remoteServer(
+      'https://testnet.example:443',
+      ChainNameEnum.testChainName,
+    ),
+  };
 
-  expect(doRestore).toHaveBeenCalledWith(
-    'abandon ability able',
-    2900000,
-    expect.anything(),
+  const call = await restoredWith(app, entry({}));
+
+  expect(call).toEqual(expect.arrayContaining([ChainNameEnum.mainChainName]));
+  expect(call).not.toEqual(
+    expect.arrayContaining(['https://testnet.example:443']),
   );
 });
 
-test('Tests that a saved viewing key of another network offers a server of its network instead of restoring', async () => {
-  const confirms: ConfirmOptions[] = [];
-  registerConfirmListener(options => confirms.push(options));
-  const { app, doRestore } = appWithSaved(2900000, { ufvk: 'uviewtest1qqqq' });
-  const openServer = jest.spyOn(app, 'openServer').mockImplementation(() => {});
+test('Tests that a Testnet entry restores on Testnet with the best server that answers', async () => {
+  const { app } = appWithSaved();
 
-  await app.importRecoveryWallet(Route.Welcome);
+  const call = await restoredWith(
+    app,
+    entry({
+      walletId: 'w1',
+      name: 'Savings',
+      chain: ChainNameEnum.testChainName,
+    }),
+  );
 
-  expect(doRestore).not.toHaveBeenCalled();
-  expect(confirms[0].message).toBe('loadingapp.saved-key-net-body');
-  confirms[0].buttons[0].onPress?.();
-  expect(openServer).toHaveBeenCalledWith(ChainNameEnum.testChainName);
-});
-
-test('Tests that a saved viewing key of the server network restores', async () => {
-  const { app, doRestore } = appWithSaved(2900000, { ufvk: 'uview1qqqq' });
-
-  await app.importRecoveryWallet(Route.Welcome);
-
-  expect(doRestore).toHaveBeenCalledWith(
-    'uview1qqqq',
-    2900000,
-    expect.anything(),
+  expect(call).toEqual(
+    expect.arrayContaining([
+      'https://best.testnet:443',
+      ChainNameEnum.testChainName,
+    ]),
   );
 });
 
@@ -125,7 +129,7 @@ test.each([
   async (_case, birthday) => {
     jest.useFakeTimers();
     try {
-      const { app } = appWithSaved(birthday);
+      const { app } = appWithSaved();
       jest.mocked(app.doRestore).mockRestore();
       jest.spyOn(app, 'setState').mockImplementation(() => {});
       const restore = jest.mocked(RPCModule.restoreWalletFromSeed);

@@ -5,11 +5,8 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { ChainNameEnum, Route } from '@app/AppState';
-import {
-  ConfirmOptions,
-  registerConfirmListener,
-} from '@app/services/showConfirm';
+import { Route } from '@app/AppState';
+import { registerConfirmListener } from '@app/services/showConfirm';
 
 import ViewingKey from '@screens/ViewingKey';
 import ViewOnlyNotice from '@screens/History/components/ViewOnlyNotice';
@@ -35,29 +32,20 @@ const context = {
   biometrics: false,
 };
 
-const onConfirm = jest.fn(async () => {});
-const onCancel = jest.fn(async () => {});
-
 afterEach(() => {
   jest.clearAllMocks();
   registerConfirmListener(null);
 });
 
-const renderKey = (switchTo?: ChainNameEnum) =>
+const renderKey = () =>
   render(
-    <ContextAppLoadedProvider
-      value={{
-        ...context,
-        applyPendingServer: onConfirm,
-        cancelPendingServer: onCancel,
-      }}
-    >
+    <ContextAppLoadedProvider value={context}>
       <ViewingKey
         navigation={mockNavigation}
         route={{
           key: 'k',
           name: Route.ViewingKey,
-          params: { entry: { kind: 'push' }, switchTo },
+          params: { entry: { kind: 'push' } },
         }}
       />
     </ContextAppLoadedProvider>,
@@ -89,13 +77,7 @@ test('Tests that Copy takes the whole key while it is still hidden.', async () =
 test('Tests that the view-only card offers the viewing key and closes with its X.', () => {
   const onDismiss = jest.fn();
   render(
-    <ContextAppLoadedProvider
-      value={{
-        ...context,
-        applyPendingServer: onConfirm,
-        cancelPendingServer: onCancel,
-      }}
-    >
+    <ContextAppLoadedProvider value={context}>
       <ViewOnlyNotice onViewKey={jest.fn()} onDismiss={onDismiss} />
     </ContextAppLoadedProvider>,
   );
@@ -103,32 +85,4 @@ test('Tests that the view-only card offers the viewing key and closes with its X
   expect(screen.getByText('viewonly.button')).toBeTruthy();
   fireEvent.press(screen.getByTestId('viewonly.dismiss'));
   expect(onDismiss).toHaveBeenCalledTimes(1);
-});
-
-test('Tests that Switch moves the wallet to the other network only after the confirm.', async () => {
-  const confirms: ConfirmOptions[] = [];
-  registerConfirmListener(options => confirms.push(options));
-  renderKey(ChainNameEnum.testChainName);
-  await act(async () => {});
-  expect(screen.getByText('viewingkey.switch-title')).toBeTruthy();
-  expect(screen.getByText('viewingkey.switch')).toBeTruthy();
-
-  fireEvent.press(screen.getByTestId('viewingkey.done'));
-  expect(confirms[0].message).toBe('viewingkey.switch-warning');
-  expect(onConfirm).not.toHaveBeenCalled();
-  await act(async () => {
-    await confirms[0].buttons[0].onPress?.();
-  });
-  expect(onConfirm).toHaveBeenCalledTimes(1);
-  expect(onCancel).not.toHaveBeenCalled();
-});
-
-test('Tests that Back leaves the network change without moving the wallet.', async () => {
-  renderKey(ChainNameEnum.testChainName);
-  await act(async () => {});
-  await act(async () => {
-    fireEvent.press(screen.getByTestId('viewingkey.back'));
-  });
-  expect(onCancel).toHaveBeenCalledTimes(1);
-  expect(onConfirm).not.toHaveBeenCalled();
 });

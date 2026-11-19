@@ -61,6 +61,8 @@ enum FfiOutcome {
     } catch let error as ZingolibError {
       let (code, message) = FfiOutcome.classify(error)
       return .rejected(code: code, message: message, error: error)
+    } catch StorageError.diskFull(let message) {
+      return .rejected(code: "DiskFull", message: message, error: StorageError.diskFull(message))
     } catch {
       return .rejected(code: "Unknown", message: String(describing: error), error: error)
     }
@@ -128,6 +130,11 @@ enum WalletFileFormat {
   }
 }
 
+/// A write refused because the storage is full, rejected to JS under its own code.
+enum StorageError: Error {
+  case diskFull(String)
+}
+
 /// The wallets on disk, one folder per wallet under `wallets/`, where the meta is the commit point.
 enum WalletStore {
   static let walletName = "wallet.dat"
@@ -136,6 +143,8 @@ enum WalletStore {
   private static let activeName = "active.json"
   private static let deleting = ".deleting"
   private static let version = 1
+  /// Meta fields only the store writes.
+  private static let ownFields: Set<String> = ["v", "id", "createdAt", "migratedFrom"]
 
   struct Wallet {
     let id: String
@@ -196,10 +205,15 @@ enum WalletStore {
     readJSON("\(root(base))/\(activeName)")?["id"] as? String ?? ""
   }
 
-  /// The wallet the app opens, when its folder is committed.
-  static func active(_ base: String) -> String? {
+  /// The wallet the pointer names, when its folder is committed.
+  private static func pointed(_ base: String) -> String? {
     let id = pointer(base)
     return !id.isEmpty && isCommitted(base, id) ? id : nil
+  }
+
+  /// The wallet the app opens: the one the pointer names, or the first wallet when it names none, as after the open one is deleted.
+  static func active(_ base: String) -> String? {
+    pointed(base) ?? list(base).first?.id
   }
 
   static func setActive(_ base: String, _ id: String?) throws {
@@ -222,7 +236,9 @@ enum WalletStore {
   }
 
   /// The meta of a new wallet, ordered after every wallet on disk.
-  static func newMeta(_ base: String, _ id: String, name: String, chain: String?, serverUri: String?) -> [String: Any] {
+  static func newMeta(
+    _ base: String, _ id: String, name: String, chain: String?, serverUri: String?, kind: String? = nil
+  ) -> [String: Any] {
     var meta: [String: Any] = [
       "v": version,
       "id": id,
@@ -232,7 +248,45 @@ enum WalletStore {
     ]
     if let chain, !chain.isEmpty { meta["chain"] = chain }
     if let serverUri { meta["server"] = ["uri": serverUri] }
+    if let kind { meta["kind"] = kind }
     return meta
+  }
+
+  /// The meta with the patch's fields set, a null field removed, and the store's own fields untouched.
+  static func patchMeta(_ meta: [String: Any], _ patch: [String: Any]) -> [String: Any] {
+    var patched = meta
+    for (key, value) in patch where !ownFields.contains(key) {
+      if value is NSNull { patched.removeValue(forKey: key) } else { patched[key] = value }
+    }
+    return patched
+  }
+
+  /// The wallets and the active one, as the bridge reports them.
+  static func info(_ base: String) -> [String: Any] {
+    [
+      "active": active(base) ?? NSNull(),
+      "wallets": list(base).map { ["id": $0.id, "hasFile": $0.hasFile, "meta": $0.meta] as [String: Any] },
+    ]
+  }
+
+  /// The size of the largest wallet file, the yardstick of the free-space check.
+  static func largestWallet(_ base: String) -> Int64 {
+    list(base)
+      .compactMap { (try? FileManager.default.attributesOfItem(atPath: walletPath(base, $0.id)))?[.size] as? NSNumber }
+      .map { $0.int64Value }
+      .max() ?? 0
+  }
+
+  /// Whether a failure, or the error beneath it, is the storage running out of space.
+  static func isDiskFull(_ error: Error) -> Bool {
+    var current: NSError? = error as NSError
+    for _ in 0..<8 {
+      guard let nsError = current else { return false }
+      if nsError.domain == NSCocoaErrorDomain && nsError.code == NSFileWriteOutOfSpaceError { return true }
+      if nsError.domain == NSPOSIXErrorDomain && nsError.code == Int(ENOSPC) { return true }
+      current = nsError.userInfo[NSUnderlyingErrorKey] as? NSError
+    }
+    return false
   }
 
   /// "Wallet n" with the lowest n no wallet uses.
@@ -293,7 +347,7 @@ enum WalletStore {
       meta["migratedFrom"] = sum
       try writeMeta(base, id, meta)
     }
-    if active && self.active(base) == nil { try setActive(base, id) }
+    if active && pointed(base) == nil { try setActive(base, id) }
     let broken = "\(legacyPath).broken"
     if fm.fileExists(atPath: broken) {
       try? fm.moveItem(atPath: broken, toPath: "\(dir(base, id))/\(legacy).broken")
@@ -525,11 +579,14 @@ class RPCModule: NSObject {
     }
   }
 
-  private func legacyServer() -> [String: Any]? {
+  private func legacySettings() -> [String: Any]? {
     guard let path = try? getFileName("settings.json"),
-          let data = FileManager.default.contents(atPath: path),
-          let settings = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else { return nil }
-    return settings["server"] as? [String: Any]
+          let data = FileManager.default.contents(atPath: path) else { return nil }
+    return (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+  }
+
+  private func legacyServer() -> [String: Any]? {
+    legacySettings()?["server"] as? [String: Any]
   }
 
   /// Moves a root wallet file into its folder, as legacy base64 text when it does not read, since the folder's own read converts it.
@@ -561,6 +618,25 @@ class RPCModule: NSObject {
     try adoptLegacy(Constants.WalletBackupFileName.rawValue, name: "Wallet Backup", active: false)
   }
 
+  /// The active wallet's server uri and chain as its meta records them, the legacy settings.json ones when the meta has none; an empty uri when either says offline.
+  func activeServer() throws -> (uri: String, chain: String)? {
+    try prepareWallets()
+    let documents = try getDocumentsDirectory()
+    let settings = legacySettings()
+    let legacy = settings?["server"] as? [String: Any]
+    let id = WalletStore.active(documents)
+    let meta = WalletStore.list(documents).first { $0.id == id }?.meta
+    guard let server = (meta?["server"] as? [String: Any]) ?? legacy else { return nil }
+    let chain = [server["chainName"], meta?["chain"], legacy?["chainName"]]
+      .compactMap { $0 as? String }
+      .first { !$0.isEmpty } ?? ""
+    let select = [meta?["selectServer"], settings?["selectServer"]]
+      .compactMap { $0 as? String }
+      .first { !$0.isEmpty } ?? ""
+    let uri = select == "offline" ? "" : (server["uri"] as? String ?? "")
+    return (uri, chain)
+  }
+
   func activeWalletId() throws -> String? {
     WalletStore.active(try getDocumentsDirectory())
   }
@@ -572,12 +648,6 @@ class RPCModule: NSObject {
       return try getFileName(Constants.WalletFileName.rawValue)
     }
     return WalletStore.walletPath(documents, id)
-  }
-
-  private func otherWallet() throws -> String? {
-    let documents = try getDocumentsDirectory()
-    let active = WalletStore.active(documents)
-    return WalletStore.list(documents).first { $0.id != active }?.id
   }
 
   @objc(walletExists:reject:)
@@ -644,15 +714,6 @@ class RPCModule: NSObject {
     }
   }
 
-  /// Whether a wallet besides the active one is on disk, which takes the legacy backup's place.
-  @objc(walletBackupExists:reject:)
-  func walletBackupExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    FfiOutcome.of {
-      try self.prepareWallets()
-      return try self.otherWallet() == nil ? "false" : "true"
-    }.settle(resolve: resolve, reject: reject)
-  }
-
   // The background sync state is written from BGAppRefreshTask paths in
   // AppDelegate while the device may be locked. It stays at the iOS
   // default protection class (`completeUntilFirstUserAuthentication`
@@ -696,35 +757,6 @@ class RPCModule: NSObject {
 
   func readWalletBytes() throws -> Data {
     try readWalletFileBytes(atPath: activeWalletPath())
-  }
-
-  func fnDeleteExistingWallet() throws -> Bool {
-    RPCModule.walletFileHold.lock()
-    defer { RPCModule.walletFileHold.unlock() }
-    RPCModule.openWalletId = nil
-    RPCModule.pendingMeta = nil
-    let documents = try getDocumentsDirectory()
-    guard let id = WalletStore.active(documents) else { return false }
-    do {
-      return try WalletStore.delete(documents, id)
-    } catch {
-      throw FileError.deleteFileError("Error: [Native] deleting wallet error: \(error.localizedDescription)")
-    }
-  }
-
-  @objc(deleteExistingWallet:reject:)
-  func deleteExistingWallet(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    do {
-      let deleted = try self.fnDeleteExistingWallet()
-      DispatchQueue.main.async {
-        resolve(deleted ? "true" : "false")
-      }
-    } catch {
-      NSLog("Error: [Native] deleting wallet \(error.localizedDescription)")
-      DispatchQueue.main.async {
-        resolve("false")
-      }
-    }
   }
 
   // The FFI contract is structural (zingo-mobile#1151; audit Issue Q):
@@ -773,6 +805,11 @@ class RPCModule: NSObject {
         RPCModule.pendingMeta = nil
       }
     } catch {
+      if WalletStore.isDiskFull(error) {
+        let err = "Error: [Native] Couldn't save the wallet. The storage is full."
+        NSLog(err)
+        throw StorageError.diskFull(err)
+      }
       throw saveFailure(error.localizedDescription)
     }
   }
@@ -798,15 +835,21 @@ class RPCModule: NSObject {
   }
 
   /// Opens a folder for the wallet just initialized, committed by its first save as the active wallet.
-  private func openNewWallet(serveruri: String, chainhint: String) throws {
+  private func openNewWallet(serveruri: String, chainhint: String, kind: String) throws {
     let documents = try getDocumentsDirectory()
     let id = try WalletStore.allocate(documents)
     RPCModule.walletFileHold.lock()
     RPCModule.pendingMeta = WalletStore.newMeta(
-      documents, id, name: WalletStore.defaultName(documents), chain: chainhint, serverUri: serveruri)
+      documents, id, name: WalletStore.defaultName(documents), chain: chainhint, serverUri: serveruri, kind: kind)
     RPCModule.openWalletId = id
     RPCModule.walletFileHold.unlock()
-    try saveWalletInternal()
+    do {
+      try saveWalletInternal()
+    } catch let error as StorageError {
+      closeWalletFile()
+      try? FileManager.default.removeItem(atPath: WalletStore.dir(documents, id))
+      throw error
+    }
   }
 
   func fnCreateNewWallet(
@@ -822,7 +865,7 @@ class RPCModule: NSObject {
     // chain tip; online it is ignored (pass "0").
     let seed = try initNew(connection: connection(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations), birthday: UInt32(birthday) ?? 0)
     let seedStr = String(seed)
-    try openNewWallet(serveruri: serveruri, chainhint: chainhint)
+    try openNewWallet(serveruri: serveruri, chainhint: chainhint, kind: "seed")
     return seedStr
   }
 
@@ -853,7 +896,7 @@ class RPCModule: NSObject {
     // initFromSeed throws on failure, so reaching the save implies the wallet exists.
     let seed = try initFromSeed(seed: restoreSeed, birthday: UInt32(birthday) ?? 0, connection: connection(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations))
     let seedStr = String(seed)
-    try openNewWallet(serveruri: serveruri, chainhint: chainhint)
+    try openNewWallet(serveruri: serveruri, chainhint: chainhint, kind: "seed")
     return seedStr
   }
 
@@ -885,7 +928,7 @@ class RPCModule: NSObject {
     // initFromUfvk throws on failure, so reaching the save implies the wallet exists.
     let ufvk = try initFromUfvk(ufvk: restoreUfvk, birthday: UInt32(birthday) ?? 0, connection: connection(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations))
     let ufvkStr = String(ufvk)
-    try openNewWallet(serveruri: serveruri, chainhint: chainhint)
+    try openNewWallet(serveruri: serveruri, chainhint: chainhint, kind: "ufvk")
     return ufvkStr
   }
 
@@ -915,13 +958,136 @@ class RPCModule: NSObject {
     guard let id = try activeWalletId() else {
       throw FileError.readWalletError("Error: [Native] no wallet is active")
     }
+    return try fnLoadWallet(
+      walletId: id, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel,
+      minconfirmations: minconfirmations)
+  }
+
+  /// Opens the wallet `walletId` and makes it the active one; a failure leaves the active wallet as it was.
+  func fnLoadWallet(
+    walletId id: String,
+    serveruri: String,
+    chainhint: String,
+    performancelevel: String,
+    minconfirmations: String
+  ) throws -> String {
+    try prepareWallets()
+    let documents = try getDocumentsDirectory()
+    guard WalletStore.list(documents).contains(where: { $0.id == id }) else {
+      throw FileError.readWalletError("Error: [Native] no wallet \(id)")
+    }
     closeWalletFile()
-    let walletBytes = try readWalletFileBytes(atPath: WalletStore.walletPath(try getDocumentsDirectory(), id))
+    let walletBytes = try readWalletFileBytes(atPath: WalletStore.walletPath(documents, id))
     let seed = try initFromBytes(walletBytes: walletBytes, connection: connection(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations))
     RPCModule.walletFileHold.lock()
+    defer { RPCModule.walletFileHold.unlock() }
     RPCModule.openWalletId = id
-    RPCModule.walletFileHold.unlock()
+    if WalletStore.active(documents) != id { try WalletStore.setActive(documents, id) }
     return String(seed)
+  }
+
+  @objc(loadWalletProcess:serveruri:chainhint:performancelevel:minconfirmations:resolve:reject:)
+  func loadWalletProcess(
+    _ walletId: String,
+    serveruri: String,
+    chainhint: String,
+    performancelevel: String,
+    minconfirmations: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    DispatchQueue.global(qos: .userInitiated).async {
+      FfiOutcome.of {
+        try self.fnLoadWallet(
+          walletId: walletId, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel,
+          minconfirmations: minconfirmations)
+      }.settle(resolve: resolve, reject: reject)
+    }
+  }
+
+  static func jsonText(_ object: Any) throws -> String {
+    let data = try JSONSerialization.data(withJSONObject: object)
+    guard let text = String(data: data, encoding: .utf8) else {
+      throw FileError.readWalletError("Error: [Native] the wallets do not encode as JSON text")
+    }
+    return text
+  }
+
+  /// The wallets on disk with their metas, and the active one.
+  @objc(walletsInfo:reject:)
+  func walletsInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    FfiOutcome.of {
+      try self.prepareWallets()
+      return try RPCModule.jsonText(WalletStore.info(try self.getDocumentsDirectory()))
+    }.settle(resolve: resolve, reject: reject)
+  }
+
+  func fnUpdateWalletMeta(walletId id: String, patch: String) throws -> String {
+    guard let fields = (try JSONSerialization.jsonObject(with: Data(patch.utf8))) as? [String: Any] else {
+      throw FileError.writeFileError("Error: [Native] the meta patch is not a JSON object")
+    }
+    let documents = try getDocumentsDirectory()
+    RPCModule.walletFileHold.lock()
+    defer { RPCModule.walletFileHold.unlock() }
+    if RPCModule.openWalletId == id, let pending = RPCModule.pendingMeta {
+      let patched = WalletStore.patchMeta(pending, fields)
+      RPCModule.pendingMeta = patched
+      return try RPCModule.jsonText(patched)
+    }
+    guard let wallet = WalletStore.list(documents).first(where: { $0.id == id }) else {
+      throw FileError.readWalletError("Error: [Native] no wallet \(id)")
+    }
+    let patched = WalletStore.patchMeta(wallet.meta, fields)
+    try WalletStore.writeMeta(documents, id, patched)
+    return try RPCModule.jsonText(patched)
+  }
+
+  /// Sets the patch's fields on a wallet's meta, a null field removed, and resolves the meta written.
+  @objc(updateWalletMetaProcess:patch:resolve:reject:)
+  func updateWalletMetaProcess(
+    _ walletId: String,
+    patch: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    FfiOutcome.of {
+      try self.fnUpdateWalletMeta(walletId: walletId, patch: patch)
+    }.settle(resolve: resolve, reject: reject)
+  }
+
+  func fnDeleteWallet(walletId id: String) throws -> Bool {
+    RPCModule.walletFileHold.lock()
+    defer { RPCModule.walletFileHold.unlock() }
+    if RPCModule.openWalletId == id {
+      RPCModule.openWalletId = nil
+      RPCModule.pendingMeta = nil
+    }
+    return try WalletStore.delete(try getDocumentsDirectory(), id)
+  }
+
+  /// Deletes the wallet `walletId`, closing it first when it is the open one.
+  @objc(deleteWalletProcess:resolve:reject:)
+  func deleteWalletProcess(
+    _ walletId: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    FfiOutcome.of {
+      try self.fnDeleteWallet(walletId: walletId) ? "true" : "false"
+    }.settle(resolve: resolve, reject: reject)
+  }
+
+  /// The free bytes of the wallets' storage and the size of the largest wallet, for the free-space check.
+  @objc(diskSpaceInfo:reject:)
+  func diskSpaceInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    FfiOutcome.of {
+      let documents = try self.getDocumentsDirectory()
+      let values = try URL(fileURLWithPath: documents).resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
+      return try RPCModule.jsonText([
+        "free": values.volumeAvailableCapacityForImportantUsage ?? 0,
+        "largest": WalletStore.largestWallet(documents),
+      ])
+    }.settle(resolve: resolve, reject: reject)
   }
 
   @objc(loadExistingWallet:chainhint:performancelevel:minconfirmations:resolve:reject:)
@@ -935,33 +1101,6 @@ class RPCModule: NSObject {
   ) {
     FfiOutcome.of {
       try self.fnLoadExistingWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
-    }.settle(resolve: resolve, reject: reject)
-  }
-
-  /// Makes the other wallet the active one, the legacy backup restore on the folder layout.
-  @objc(restoreExistingWalletBackup:reject:)
-  func restoreExistingWalletBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    FfiOutcome.of {
-      try self.prepareWallets()
-      guard let other = try self.otherWallet() else { return "false" }
-      self.closeWalletFile()
-      try WalletStore.setActive(try self.getDocumentsDirectory(), other)
-      return "true"
-    }.settle(resolve: resolve, reject: reject)
-  }
-
-  /// Makes the other wallet the active one and deletes the active one, the legacy backup replace on the folder layout.
-  @objc(replaceWalletWithBackup:reject:)
-  func replaceWalletWithBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    FfiOutcome.of {
-      try self.prepareWallets()
-      guard let other = try self.otherWallet() else { return "false" }
-      let documents = try self.getDocumentsDirectory()
-      let replaced = WalletStore.active(documents)
-      self.closeWalletFile()
-      try WalletStore.setActive(documents, other)
-      if let replaced { _ = try WalletStore.delete(documents, replaced) }
-      return "true"
     }.settle(resolve: resolve, reject: reject)
   }
 

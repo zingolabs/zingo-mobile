@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Pressable from '@ui/primitives/Pressable';
 import { View } from 'react-native';
+import { useOpeningFade } from '@app/hooks/useOpeningFade';
 import Animated, {
   Easing,
   EntryExitAnimationFunction,
@@ -104,6 +105,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     const navigation = useNavigation<WalletNavigation>();
     const { colors } = useTheme();
     const reducedMotion = useReducedMotion();
+    const openingFade = useOpeningFade();
     const { visible: balanceVisible, reveal: revealBalance } =
       useTimedReveal(privacy);
     const balanceReveal = { hidden: !balanceVisible, reveal: revealBalance };
@@ -161,16 +163,19 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
           </View>
         )}
         {!noBalance && (
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'baseline',
-              justifyContent: 'center',
-              columnGap: 8,
-              marginTop: 4,
-              // Without the fiat row the balance keeps the same air below as above.
-              marginBottom: showFiat ? 0 : BALANCE_BOTTOM_GAP,
-            }}
+          <Animated.View
+            style={[
+              {
+                flexDirection: 'row',
+                alignItems: 'baseline',
+                justifyContent: 'center',
+                columnGap: 8,
+                marginTop: 4,
+                // Without the fiat row the balance keeps the same air below as above.
+                marginBottom: showFiat ? 0 : BALANCE_BOTTOM_GAP,
+              },
+              openingFade,
+            ]}
           >
             <Pressable
               kind="link"
@@ -219,7 +224,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                 </View>
               </Pressable>
             )}
-          </View>
+          </Animated.View>
         )}
 
         {receivedLegend &&
@@ -260,7 +265,10 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
             onLayout={e => onUsdRowLayout?.(e.nativeEvent.layout.height)}
             accessible
             accessibilityLabel={fiatLabel}
-            style={{ flexDirection: 'row', alignItems: 'center' }}
+            style={[
+              { flexDirection: 'row', alignItems: 'center' },
+              openingFade,
+            ]}
           >
             <CurrencyAmount
               style={{

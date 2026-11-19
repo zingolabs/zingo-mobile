@@ -24,3 +24,4 @@ export const getSupportedBiometryType = jest.fn();
 export const hasGenericPassword = jest.fn();
 export const canImplyAuthentication = jest.fn();
 export const isPasscodeAuthAvailable = jest.fn();
+export const getAllGenericPasswordServices = jest.fn(async () => []);

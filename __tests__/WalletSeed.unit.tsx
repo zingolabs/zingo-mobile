@@ -6,8 +6,6 @@ import {
   defaultAppContextLoaded,
 } from '@app/context';
 import { Route } from '@app/AppState';
-import { WalletSeedAction } from '@app/types';
-import { showConfirm } from '@app/services/showConfirm';
 import { copySensitive } from '@app/utils/sensitiveClipboard';
 
 import WalletSeed from '@screens/WalletSeed';
@@ -36,8 +34,6 @@ jest.mock('@app/walletBackend', () => ({
 const renderScreen = (
   seedBackedUp: boolean,
   seedBackedUpAt = 0,
-  action?: WalletSeedAction,
-  onConfirm = jest.fn(async () => {}),
   readOnly = false,
 ) =>
   render(
@@ -50,8 +46,6 @@ const renderScreen = (
         seedBackedUpAt,
         readOnly,
         birthday: 3512840,
-        changeWallet: onConfirm,
-        applyPendingServer: onConfirm,
       }}
     >
       <WalletSeed
@@ -59,7 +53,7 @@ const renderScreen = (
         route={{
           key: 'k',
           name: Route.WalletSeed,
-          params: action ? { action } : undefined,
+          params: undefined,
         }}
       />
     </ContextAppLoadedProvider>,
@@ -97,38 +91,9 @@ test('Tests that the viewing key shows its first and last characters only.', asy
   ).toBeTruthy();
 });
 
-test.each([
-  ['change', 'loadedapp.changewallet', 'walletseed.go-change'],
-  ['server', 'walletseed.title-server', 'walletseed.go-server'],
-] as const)(
-  'Tests that the %s action shows its title and button instead of the backup status.',
-  async (action, title, go) => {
-    renderScreen(false, 0, action);
-    await act(async () => {});
-    expect(screen.getByText(title)).toBeTruthy();
-    expect(screen.getByText(go)).toBeTruthy();
-    expect(screen.getByTestId('walletseed.leaving')).toBeTruthy();
-    expect(screen.queryByTestId('walletseed.no')).toBeNull();
-  },
-);
-
-test('Tests that the action runs only after the warning is confirmed.', async () => {
-  const onConfirm = jest.fn(async () => {});
-  renderScreen(true, 0, 'change', onConfirm);
-  await act(async () => {});
-  fireEvent.press(screen.getByTestId('walletseed.go'));
-  expect(onConfirm).not.toHaveBeenCalled();
-  const { buttons } = (showConfirm as jest.Mock).mock.calls[0][0];
-  await act(async () => {
-    await buttons[0].onPress();
-  });
-  expect(onConfirm).toHaveBeenCalledTimes(1);
-});
-
 test('Tests that a view-only wallet shows its hidden viewing key in place of the words and copies it with the birthday.', async () => {
-  renderScreen(true, 0, 'change', undefined, true);
+  renderScreen(true, 0, true);
   await act(async () => {});
-  expect(screen.getByText('walletseed.sub-change-vo')).toBeTruthy();
   expect(screen.queryByTestId('walletseed.words')).toBeNull();
   expect(screen.queryByTestId('walletseed.vk')).toBeNull();
   expect(screen.getByTestId('walletseed.vkcard.key').props.children).toBe(
@@ -141,42 +106,4 @@ test('Tests that a view-only wallet shows its hidden viewing key in place of the
 seedbackup.birthday: 3512840`,
     expect.any(Function),
   );
-
-  fireEvent.press(screen.getByTestId('walletseed.go'));
-  expect((showConfirm as jest.Mock).mock.calls.at(-1)[0].message).toBe(
-    'walletseed.change-warning-vo',
-  );
-});
-
-test('Tests that leaving without the back arrow cancels a pending server change when the swipe removes the screen.', () => {
-  const cancelPendingServer = jest.fn(async () => {});
-  const listeners: Record<string, () => void> = {};
-  (mockNavigation.addListener as jest.Mock).mockImplementation(
-    (event: string, cb: () => void) => {
-      listeners[event] = cb;
-      return () => {};
-    },
-  );
-  render(
-    <ContextAppLoadedProvider
-      value={{
-        ...defaultAppContextLoaded,
-        translate: (k: string) => k,
-        biometrics: false,
-        cancelPendingServer,
-      }}
-    >
-      <WalletSeed
-        navigation={mockNavigation}
-        route={{
-          key: 'k',
-          name: Route.WalletSeed,
-          params: { action: 'server' },
-        }}
-      />
-    </ContextAppLoadedProvider>,
-  );
-  listeners.beforeRemove();
-  expect(cancelPendingServer).toHaveBeenCalledTimes(1);
-  (mockNavigation.addListener as jest.Mock).mockReset();
 });

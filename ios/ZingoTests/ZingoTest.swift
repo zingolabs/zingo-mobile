@@ -963,7 +963,7 @@ class WalletSwapRecoveryTests: XCTestCase {
         RPCModule.openWalletId = id
         try walletA.write(toFile: "\(WalletStore.walletPath(documents, id)).broken", atomically: true, encoding: .utf8)
 
-        XCTAssertTrue(try rpc.fnDeleteExistingWallet())
+        XCTAssertTrue(try rpc.fnDeleteWallet(walletId: id))
 
         XCTAssertNil(RPCModule.openWalletId)
         XCTAssertFalse(FileManager.default.fileExists(atPath: WalletStore.dir(documents, id)))
@@ -976,7 +976,7 @@ class WalletSwapRecoveryTests: XCTestCase {
         let first = try activeWallet(rpc, walletA)
         let second = try activeWallet(rpc, walletB)
 
-        XCTAssertTrue(try rpc.fnDeleteExistingWallet())
+        XCTAssertTrue(try rpc.fnDeleteWallet(walletId: second))
 
         XCTAssertTrue(FileManager.default.fileExists(atPath: WalletStore.dir(documents, first)))
         XCTAssertFalse(FileManager.default.fileExists(atPath: WalletStore.dir(documents, second)))
@@ -1202,5 +1202,81 @@ class WalletStoreTests: XCTestCase {
 
     func testNothingMovesWhenNoLegacyFileExists() throws {
         XCTAssertNil(try WalletStore.adoptLegacy(base, legacy: "wallet.dat.txt", name: "Wallet 1", active: true, chain: "main", serverUri: nil))
+    }
+
+    func testAPatchSetsAndRemovesFieldsButNeverTheStoresOwn() throws {
+        let id = try committed("Wallet 1")
+        var meta = WalletStore.list(base)[0].meta
+        meta["migratedFrom"] = "abc"
+        meta["category"] = 2
+
+        let patched = WalletStore.patchMeta(meta, [
+            "name": "Savings", "category": NSNull(), "id": "other", "v": 9, "migratedFrom": "def",
+        ])
+
+        XCTAssertEqual(patched["name"] as? String, "Savings")
+        XCTAssertNil(patched["category"])
+        XCTAssertEqual(patched["id"] as? String, id)
+        XCTAssertEqual(patched["v"] as? Int, 1)
+        XCTAssertEqual(patched["migratedFrom"] as? String, "abc")
+    }
+
+    func testANewWalletsMetaCarriesItsKindWhenGiven() throws {
+        let id = try WalletStore.allocate(base)
+
+        XCTAssertEqual(WalletStore.newMeta(base, id, name: "Wallet 1", chain: "main", serverUri: nil, kind: "ufvk")["kind"] as? String, "ufvk")
+        XCTAssertNil(WalletStore.newMeta(base, id, name: "Wallet 1", chain: "main", serverUri: nil)["kind"])
+    }
+
+    func testTheInfoListsTheWalletsInOrderWithTheActiveOne() throws {
+        let first = try committed("Wallet 1")
+        let second = try committed("Wallet 2")
+        try WalletStore.setActive(base, second)
+
+        let info = WalletStore.info(base)
+        let wallets = info["wallets"] as? [[String: Any]] ?? []
+
+        XCTAssertEqual(info["active"] as? String, second)
+        XCTAssertEqual(wallets.map { $0["id"] as? String }, [first, second])
+        XCTAssertEqual((wallets[1]["meta"] as? [String: Any])?["name"] as? String, "Wallet 2")
+        XCTAssertNotNil(try JSONSerialization.data(withJSONObject: info))
+    }
+
+    func testTheInfoReportsNoActiveWalletAsNullWhenThereIsNone() throws {
+        XCTAssertTrue(WalletStore.info(base)["active"] is NSNull)
+    }
+
+    func testTheFirstWalletIsTheActiveOneWhenThePointerNamesNone() throws {
+        let first = try committed("Wallet 1")
+        let second = try committed("Wallet 2")
+        try WalletStore.setActive(base, second)
+
+        _ = try WalletStore.delete(base, second)
+
+        XCTAssertEqual(WalletStore.active(base), first)
+    }
+
+    func testTheLargestWalletIsTheBiggestFileOnDisk() throws {
+        _ = try committed("Wallet 1")
+        let big = try committed("Wallet 2")
+        try Data(count: 500).write(to: URL(fileURLWithPath: WalletStore.walletPath(base, big)))
+
+        XCTAssertEqual(WalletStore.largestWallet(base), 500)
+    }
+
+    func testAFullStorageIsToldApartFromOtherWriteFailures() {
+        let posix = NSError(domain: NSPOSIXErrorDomain, code: Int(ENOSPC))
+        let wrapped = NSError(domain: NSCocoaErrorDomain, code: NSFileWriteUnknownError, userInfo: [NSUnderlyingErrorKey: posix])
+
+        XCTAssertTrue(WalletStore.isDiskFull(NSError(domain: NSCocoaErrorDomain, code: NSFileWriteOutOfSpaceError)))
+        XCTAssertTrue(WalletStore.isDiskFull(wrapped))
+        XCTAssertFalse(WalletStore.isDiskFull(NSError(domain: NSCocoaErrorDomain, code: NSFileWriteNoPermissionError)))
+    }
+
+    func testAFullStorageRejectsAsDiskFull() {
+        guard case .rejected(let code, _, _) = FfiOutcome.of({ throw StorageError.diskFull("full") }) else {
+            return XCTFail("a full storage resolved")
+        }
+        XCTAssertEqual(code, "DiskFull")
     }
 }

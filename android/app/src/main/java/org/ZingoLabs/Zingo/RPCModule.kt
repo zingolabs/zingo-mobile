@@ -254,11 +254,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         completePendingSwap()
     }
 
-    private fun legacyServer(): JSONObject? = try {
-        JSONObject(File(filesDir, "settings.json").readText()).optJSONObject("server")
+    private fun legacySettings(): JSONObject? = try {
+        JSONObject(File(filesDir, "settings.json").readText())
     } catch (e: Exception) {
         null
     }
+
+    private fun legacyServer(): JSONObject? = legacySettings()?.optJSONObject("server")
 
     /** Moves a root wallet file into its folder, made plain first because a backup's encrypted bytes decrypt only under the legacy name. */
     private fun adoptLegacy(fileName: String, name: String, active: Boolean) {
@@ -291,14 +293,26 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    /** The active wallet's server uri and chain as its meta records them, the legacy settings.json ones when the meta has none; an empty uri when either says offline. */
+    fun activeServer(): Pair<String, String>? {
+        prepareWallets()
+        val settings = legacySettings()
+        val legacy = settings?.optJSONObject("server")
+        val id = WalletStore.active(filesDir)
+        val meta = WalletStore.list(filesDir).firstOrNull { it.id == id }?.meta
+        val server = meta?.optJSONObject("server") ?: legacy ?: return null
+        val chain = server.optString("chainName")
+            .ifEmpty { meta?.optString("chain") ?: "" }
+            .ifEmpty { legacy?.optString("chainName") ?: "" }
+        val select = (meta?.optString("selectServer") ?: "")
+            .ifEmpty { settings?.optString("selectServer") ?: "" }
+        val uri = if (select == "offline") "" else server.optString("uri")
+        return Pair(uri, chain)
+    }
+
     fun hasActiveWallet(): Boolean {
         prepareWallets()
         return WalletStore.active(filesDir) != null
-    }
-
-    private fun otherWallet(): String? {
-        val active = WalletStore.active(filesDir)
-        return WalletStore.list(filesDir).firstOrNull { it.id != active }?.id
     }
 
     internal fun activeWalletDir(): File =
@@ -346,20 +360,20 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-    /** Whether a wallet besides the active one is on disk, which takes the legacy backup's place. */
-    @ReactMethod
-    fun walletBackupExists(promise: Promise) {
-        FfiOutcome.of("wallet_backup_exists") {
-            prepareWallets()
-            otherWallet() != null
-        }.settle(promise)
-    }
-
     // The FFI contract is structural (zingo-mobile#1151; audit Issue Q):
     // null means no save was needed, bytes are the wallet export, and
     // failure throws. The export lands on disk verbatim, so the file is
     // byte-identical to a desktop zingolib wallet.
-    fun saveWalletFile(): Boolean {
+    fun saveWalletFile(): Boolean =
+        try {
+            saveOpenWallet()
+        } catch (e: DiskFullException) {
+            Log.e("MAIN", "[Native] The storage is full. Couldn't save the wallet. $e")
+            false
+        }
+
+    /** Saves the open wallet, a full storage thrown as DiskFullException and every other failure contained as false. */
+    internal fun saveOpenWallet(): Boolean {
         return try {
             uniffi.zingo.initLogging()
 
@@ -390,6 +404,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 }
             }
         } catch (e: Exception) {
+            if (WalletStore.isDiskFull(e)) throw DiskFullException(e)
             Log.e("MAIN", "[Native] Unexpected error. Couldn't save the wallet. $e")
             false
         }
@@ -598,13 +613,19 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         uniffi.zingo.IndexerConnection(indexer = indexerChoice(serveruri), chainHint = chainhint, sync = syncSettings(performancelevel, minconfirmations))
 
     /** Opens a folder for the wallet just initialized, committed by its first save as the active wallet. */
-    private fun openNewWallet(serveruri: String, chainhint: String) {
+    private fun openNewWallet(serveruri: String, chainhint: String, kind: String) {
         val id = WalletStore.allocate(filesDir)
         PlainWalletFile.locked {
-            pendingMeta = WalletStore.newMeta(filesDir, id, WalletStore.defaultName(filesDir), chainhint, serveruri)
+            pendingMeta = WalletStore.newMeta(filesDir, id, WalletStore.defaultName(filesDir), chainhint, serveruri, kind)
             openWalletId = id
         }
-        saveWalletFile()
+        try {
+            saveOpenWallet()
+        } catch (e: DiskFullException) {
+            closeWalletFile()
+            WalletStore.dir(filesDir, id).deleteRecursively()
+            throw e
+        }
     }
 
     @ReactMethod
@@ -618,7 +639,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             // `birthday` in place of the chain tip; online it is ignored
             // (pass "0").
             val resp = uniffi.zingo.initNew(connection = connection(serveruri, chainhint, performancelevel, minconfirmations), birthday = birthday.toUInt())
-            openNewWallet(serveruri, chainhint)
+            openNewWallet(serveruri, chainhint, "seed")
             resp
         }
     }
@@ -630,7 +651,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             closeWalletFile()
 
             val resp = uniffi.zingo.initFromSeed(seed = seed, birthday = birthday.toUInt(), connection = connection(serveruri, chainhint, performancelevel, minconfirmations))
-            openNewWallet(serveruri, chainhint)
+            openNewWallet(serveruri, chainhint, "seed")
             resp
         }
     }
@@ -642,7 +663,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             closeWalletFile()
 
             val resp = uniffi.zingo.initFromUfvk(ufvk = ufvk, birthday = birthday.toUInt(), connection = connection(serveruri, chainhint, performancelevel, minconfirmations))
-            openNewWallet(serveruri, chainhint)
+            openNewWallet(serveruri, chainhint, "ufvk")
             resp
         }
     }
@@ -657,74 +678,96 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // Throws on failure; callers own the error channel (a rejected promise
     // here, the worker's catch in BackgroundSyncWorker).
     fun loadExistingWalletNative(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String): String {
+        prepareWallets()
+        val id = WalletStore.active(filesDir) ?: throw FileNotFoundException("Error: no wallet is active")
+        return loadWalletNative(id, serveruri, chainhint, performancelevel, minconfirmations)
+    }
+
+    /** Opens the wallet `id` and makes it the active one; a failure leaves the active wallet as it was. */
+    internal fun loadWalletNative(id: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String): String {
         uniffi.zingo.initLogging()
 
         prepareWallets()
-        val id = WalletStore.active(filesDir) ?: throw FileNotFoundException("Error: no wallet is active")
+        if (WalletStore.list(filesDir).none { it.id == id }) throw FileNotFoundException("Error: no wallet $id")
         closeWalletFile()
         val walletBytes = readWalletBytes(WalletStore.dir(filesDir, id), WalletStore.WALLET)
         Log.i("MAIN", "file size: ${walletBytes.size} bytes")
 
         val resp = uniffi.zingo.initFromBytes(walletBytes = walletBytes, connection = connection(serveruri, chainhint, performancelevel, minconfirmations))
-        openWalletId = id
+        PlainWalletFile.locked {
+            openWalletId = id
+            if (WalletStore.active(filesDir) != id) WalletStore.setActive(filesDir, id)
+        }
         return resp
     }
 
-    /** Makes the other wallet the active one, the legacy backup restore on the folder layout. */
     @ReactMethod
-    fun restoreExistingWalletBackup(promise: Promise) {
-        FfiOutcome.of("restore_wallet_backup") {
+    fun loadWalletProcess(id: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
+        FfiOutcome.settling(promise, "init_from_bytes") {
+            loadWalletNative(id, serveruri, chainhint, performancelevel, minconfirmations)
+        }
+    }
+
+    /** The wallets on disk with their metas, and the active one. */
+    @ReactMethod
+    fun walletsInfo(promise: Promise) {
+        FfiOutcome.of("wallets") {
             prepareWallets()
-            val other = otherWallet()
-            if (other == null) {
-                false
-            } else {
-                closeWalletFile()
-                WalletStore.setActive(filesDir, other)
-                true
+            WalletStore.info(filesDir).toString()
+        }.settle(promise)
+    }
+
+    /** Sets the patch's fields on a wallet's meta, a null field removed, and resolves the meta written. */
+    @ReactMethod
+    fun updateWalletMetaProcess(id: String, patch: String, promise: Promise) {
+        FfiOutcome.of("update_wallet_meta") {
+            PlainWalletFile.locked {
+                val fields = JSONObject(patch)
+                val pending = pendingMeta
+                if (openWalletId == id && pending != null) {
+                    WalletStore.patchMeta(pending, fields).also { pendingMeta = it }.toString()
+                } else {
+                    val wallet = WalletStore.list(filesDir).firstOrNull { it.id == id }
+                        ?: throw FileNotFoundException("Error: no wallet $id")
+                    WalletStore.patchMeta(wallet.meta, fields).also { WalletStore.writeMeta(filesDir, id, it) }.toString()
+                }
             }
         }.settle(promise)
     }
 
-    /** Makes the other wallet the active one and deletes the active one, the legacy backup replace on the folder layout. */
+    /** Deletes the wallet `id`, closing it first when it is the open one. */
     @ReactMethod
-    fun replaceWalletWithBackup(promise: Promise) {
-        FfiOutcome.of("replace_wallet_with_backup") {
-            prepareWallets()
-            val other = otherWallet()
-            if (other == null) {
-                false
-            } else {
-                val replaced = WalletStore.active(filesDir)
-                closeWalletFile()
-                WalletStore.setActive(filesDir, other)
-                if (replaced != null) WalletStore.delete(filesDir, replaced)
-                true
-            }
-        }.settle(promise)
-    }
-
-    @ReactMethod
-    fun deleteExistingWallet(promise: Promise) {
+    fun deleteWalletProcess(id: String, promise: Promise) {
         FfiOutcome.of("delete_wallet") {
             PlainWalletFile.locked {
-                val id = WalletStore.active(filesDir)
-                closeWalletFile()
-                id != null && WalletStore.delete(filesDir, id)
+                if (openWalletId == id) closeWalletFile()
+                WalletStore.delete(filesDir, id)
             }
         }.settle(promise)
     }
 
-    // saveWalletFile still contains its own failures
+    /** The free bytes of the wallets' storage and the size of the largest wallet, for the free-space check. */
+    @ReactMethod
+    fun diskSpaceInfo(promise: Promise) {
+        FfiOutcome.of("disk_space") {
+            JSONObject()
+                .put("free", filesDir.usableSpace)
+                .put("largest", WalletStore.largestWallet(filesDir))
+                .toString()
+        }.settle(promise)
+    }
+
+    // saveOpenWallet still contains its own failures
     // as a resolved false (the init flows depend on a save failure not
     // failing the whole init), so this shell resolves that boolean
-    // verbatim; only an escaping exception rejects. No outcome is ever
+    // verbatim; only an escaping exception rejects, a full storage as
+    // DiskFull. No outcome is ever
     // re-encoded as prose in the success channel (zingo-mobile#1151).
     @ReactMethod
     fun doSave(promise: Promise) {
         FfiOutcome.settling(promise, "save_wallet_bytes") {
             uniffi.zingo.initLogging()
-            saveWalletFile()
+            saveOpenWallet()
         }
     }
 

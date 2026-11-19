@@ -1,5 +1,6 @@
 package org.ZingoLabs.Zingo
 
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
@@ -21,6 +22,9 @@ object WalletStore {
     private val WORKING_SIDECARS = listOf(".migrating", ".write.tmp")
     /** Evidence copies that decrypt only under their legacy name. */
     private val EVIDENCE_SIDECARS = listOf(".prerepair", ".broken")
+
+    /** Meta fields only the store writes. */
+    private val OWN_FIELDS = setOf("v", "id", "createdAt", "migratedFrom")
 
     class Wallet(val id: String, val meta: JSONObject, val hasFile: Boolean)
 
@@ -68,9 +72,12 @@ object WalletStore {
             ""
         }
 
-    /** The wallet the app opens, when its folder is committed. */
-    fun active(base: File): String? =
+    /** The wallet the pointer names, when its folder is committed. */
+    private fun pointed(base: File): String? =
         pointer(base).takeIf { it.isNotEmpty() && File(dir(base, it), META).exists() }
+
+    /** The wallet the app opens: the one the pointer names, or the first wallet when it names none, as after the open one is deleted. */
+    fun active(base: File): String? = pointed(base) ?: list(base).firstOrNull()?.id
 
     fun setActive(base: File, id: String?) {
         val file = File(root(base), ACTIVE)
@@ -91,7 +98,7 @@ object WalletStore {
     }
 
     /** The meta of a new wallet, ordered after every wallet on disk. */
-    fun newMeta(base: File, id: String, name: String, chain: String?, serverUri: String?): JSONObject {
+    fun newMeta(base: File, id: String, name: String, chain: String?, serverUri: String?, kind: String? = null): JSONObject {
         val order = (list(base).maxOfOrNull { it.meta.optInt("order") } ?: 0) + 1
         val meta = JSONObject()
             .put("v", VERSION)
@@ -101,8 +108,39 @@ object WalletStore {
             .put("name", name)
         if (!chain.isNullOrEmpty()) meta.put("chain", chain)
         if (serverUri != null) meta.put("server", JSONObject().put("uri", serverUri))
+        if (kind != null) meta.put("kind", kind)
         return meta
     }
+
+    /** The meta with the patch's fields set, a null field removed, and the store's own fields untouched. */
+    fun patchMeta(meta: JSONObject, patch: JSONObject): JSONObject {
+        val patched = JSONObject(meta.toString())
+        for (key in patch.keys()) {
+            if (key in OWN_FIELDS) continue
+            if (patch.isNull(key)) patched.remove(key) else patched.put(key, patch.get(key))
+        }
+        return patched
+    }
+
+    /** The wallets and the active one, as the bridge reports them. */
+    fun info(base: File): JSONObject {
+        val wallets = JSONArray()
+        for (wallet in list(base)) {
+            wallets.put(JSONObject().put("id", wallet.id).put("hasFile", wallet.hasFile).put("meta", wallet.meta))
+        }
+        return JSONObject().put("active", active(base) ?: JSONObject.NULL).put("wallets", wallets)
+    }
+
+    /** The size of the largest wallet file, the yardstick of the free-space check. */
+    fun largestWallet(base: File): Long =
+        list(base).maxOfOrNull { File(dir(base, it.id), WALLET).length() } ?: 0L
+
+    /** Whether a failure, or any of its causes, is the storage running out of space. */
+    fun isDiskFull(error: Throwable): Boolean =
+        generateSequence(error) { it.cause }.take(8).any { cause ->
+            val message = cause.message ?: ""
+            message.contains("ENOSPC") || message.contains("No space left on device")
+        }
 
     /** "Wallet n" with the lowest n no wallet uses. */
     fun defaultName(base: File): String {
@@ -153,7 +191,7 @@ object WalletStore {
             ?: allocate(base).also { id ->
                 writeMeta(base, id, newMeta(base, id, name, chain, serverUri).put("migratedFrom", digest))
             }
-        if (active && active(base) == null) setActive(base, id)
+        if (active && pointed(base) == null) setActive(base, id)
         val folder = dir(base, id)
         for (suffix in WORKING_SIDECARS) {
             File(base, "$legacy$suffix").takeIf { it.exists() }?.renameTo(File(folder, "$WALLET$suffix"))
@@ -167,3 +205,6 @@ object WalletStore {
         return id
     }
 }
+
+/** A write refused because the storage is full, rejected to JS under its own code. */
+class DiskFullException(cause: Throwable) : IOException(cause.message, cause)

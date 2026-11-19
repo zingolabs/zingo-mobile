@@ -45,7 +45,7 @@ class WalletDeleteTest {
 
     private fun deleteWallet(): Any? {
         val promise = CapturingPromise()
-        rpcModule.deleteExistingWallet(promise)
+        rpcModule.deleteWalletProcess(WalletStore.active(context.filesDir) ?: "", promise)
         return promise.resolved.single()
     }
 
@@ -129,7 +129,8 @@ class WalletDeleteTest {
     }
 
     @Test
-    fun deletingTheActiveWalletKeepsTheOtherWallets() {
+    fun deletingTheActiveWalletLeavesTheFirstOneActive() {
+        // deleteWallet() deletes the active one: the second, just made active.
         val first = folder()
         val second = anActiveWallet()
 
@@ -137,6 +138,7 @@ class WalletDeleteTest {
 
         assertThat(first.exists()).isTrue()
         assertThat(second.exists()).isFalse()
-        assertThat(walletExists()).isEqualTo(false)
+        assertThat(walletExists()).isEqualTo(true)
+        assertThat(WalletStore.active(context.filesDir)).isEqualTo(first.name)
     }
 }

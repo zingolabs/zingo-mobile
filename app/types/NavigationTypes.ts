@@ -45,11 +45,14 @@ export type OnboardingParamList = {
   [Route.Welcome]: undefined;
   [Route.ImportChooser]: undefined;
   [Route.ImportWallet]: undefined;
+  [Route.FoundWallets]: undefined;
   // `chain`: the network the screen opens on, when the wallet's network is
   // not the server's.
   [Route.Server]: { chain?: ChainNameEnum } | undefined;
   [Route.ServerList]: { chain: ChainNameEnum };
-  [Route.Progress]: { kind: 'import' | 'create' };
+  [Route.Progress]: { kind: 'import' | 'importAll' | 'create' };
+  // `from`: what the first wallet is made from, for its mark and its button.
+  [Route.NameWallet]: { from: 'create' | 'seed' | 'key' };
   [Route.OpenError]: undefined;
 };
 
@@ -64,6 +67,14 @@ export type HomeTabParamList = {
 
 // What the loading section hands the wallet section when a wallet opens.
 export type LoadedAppNavigationState = {
+  /** The open wallet: a new id remounts the wallet section, as a switch does. */
+  walletId: string;
+  /** Opened at launch, or picked in Wallets while another was open. */
+  arrival: 'boot' | 'switch';
+  /** Where the wallet goes once open: Home, straight to backing up its new seed, or the Wallets sheet. */
+  next: 'home' | 'backup' | 'wallets';
+  /** A note to show once it is open: the toast of a wallet just added. */
+  notice: string;
   readOnly: boolean;
   orchardPool: boolean;
   saplingPool: boolean;
@@ -77,8 +88,6 @@ export type LoadedAppNavigationState = {
 
 // A card's rect in window coordinates.
 export type CardRect = { x: number; y: number; width: number; height: number };
-
-export type WalletSeedAction = 'change' | 'server';
 
 // How the viewing key screen opens: a circle out of the header snowflake,
 // the view-only card growing, or pushed from the menu.
@@ -105,7 +114,9 @@ export type AppDrawerParamList = {
   [Route.Swap]: { prefill?: SwapPrefillType } | undefined;
   [Route.Messages]: undefined;
   [Route.Settings]: undefined;
-  [Route.Server]: undefined;
+  // `walletId`: the wallet whose server changes; none is the open one.
+  // `draft`: the wallet being added, which has no id yet.
+  [Route.Server]: { walletId: string } | { draft: true } | undefined;
   [Route.About]: undefined;
   [Route.MixnetDoctor]: undefined;
   [Route.Insight]: undefined;
@@ -114,12 +125,20 @@ export type AppDrawerParamList = {
   [Route.Pools]: undefined;
   [Route.MeetIronwood]: undefined;
   [Route.SeedBackup]: { entry: SeedBackupEntry };
+  [Route.AddWallet]: undefined;
+  [Route.NewWallet]: undefined;
+  // `mode`: what the user said they restore from; the field takes either.
+  [Route.RestoreWallet]: { mode: 'seed' | 'key' };
+  [Route.FoundWallets]: undefined;
+  /** A wallet that failed to open in place, with why. */
+  [Route.WalletOpenError]: { walletId: string; details: string };
   // Absent for the plain view; set when the seed is shown before leaving
   // this wallet or its server.
-  [Route.WalletSeed]: { action: WalletSeedAction } | undefined;
+  /** Another wallet's saved phrase, by its id, when it won't open; the open wallet's otherwise. */
+  [Route.WalletSeed]: { walletId: string } | undefined;
   // `switchTo`: shown before a view-only wallet moves to a server on that
   // network.
-  [Route.ViewingKey]: { entry: ViewingKeyEntry; switchTo?: ChainNameEnum };
+  [Route.ViewingKey]: { entry: ViewingKeyEntry };
   [Route.MigrationStrategy]: undefined;
   [Route.MigrationTransactions]: undefined;
   // The immediate drain broadcasts here; `transactions` is the previewed plan,

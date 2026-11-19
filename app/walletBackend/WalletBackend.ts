@@ -7,7 +7,6 @@ import {
   SwapDepositArgs,
   TransactionService,
 } from './modules/TransactionService';
-import { WalletLifecycleService } from './modules/WalletLifecycleService';
 
 // Wires the sub-services together and exposes one API to LoadedApp.
 export default class WalletBackend {
@@ -15,7 +14,6 @@ export default class WalletBackend {
   private dataService: DataService;
   private syncCoordinator: SyncCoordinator;
   private transactionService: TransactionService;
-  private walletLifecycle: WalletLifecycleService;
   private mixnetCoordinator: MixnetCoordinator;
   // Whether the mixnet is currently armed for a connected session. Not a
   // one-shot latch: the transport follows connectivity in both directions.
@@ -38,7 +36,6 @@ export default class WalletBackend {
       config,
       this.syncCoordinator,
     );
-    this.walletLifecycle = new WalletLifecycleService(this.syncCoordinator);
   }
 
   // The go-online / go-offline moment: the mixnet's lifetime follows the
@@ -138,13 +135,6 @@ export default class WalletBackend {
   }
   stopMixnetPolling() {
     this.mixnetCoordinator.stop();
-  }
-
-  async changeWallet() {
-    return this.walletLifecycle.changeWallet();
-  }
-  async restoreBackup(replace: boolean) {
-    return this.walletLifecycle.restoreBackup(replace);
   }
 
   async getWalletVersion() {

@@ -158,11 +158,6 @@ export async function loadExistingWallet(
   );
 }
 
-// Removes the wallet file from the device; the keys stay in the Keychain.
-export async function deleteExistingWallet(): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.deleteExistingWallet());
-}
-
 /**
  * Whether a native save resolution reports success. The bridges are
  * trimodal (zingo-mobile#1151): Android resolves boolean true/false, iOS
@@ -514,13 +509,6 @@ export async function isWalletAddress(address: string): Promise<boolean> {
   } catch {
     return false;
   }
-}
-
-// True iff a wallet backup file exists on disk. zingolib reports the answer
-// as the string "true"/"false"; we collapse it to a real boolean here so
-// callers don't have to repeat the GlobalConst.false comparison.
-export async function walletBackupExists(): Promise<boolean> {
-  return resolvedTrue(await callFfi(RPCModule.walletBackupExists()));
 }
 
 // Returns the latest block height the given server reports; the success
