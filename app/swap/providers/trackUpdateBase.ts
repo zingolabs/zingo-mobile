@@ -5,6 +5,7 @@ import {
 import { SwapRecordType } from '@app/swap/types/SwapRecordType';
 import { TrackResponseType } from '@app/swap/types/TrackResponseType';
 import { mapSwapStatus, mapTrackingStatus } from './statusMapping';
+import { settledCostFrom } from '@app/swap/settledCost';
 import { hasDepositEvidence } from '@app/swap/depositEvidence';
 
 /**
@@ -50,8 +51,10 @@ import { hasDepositEvidence } from '@app/swap/depositEvidence';
  *   4. A payout of zero is no longer taken for the realised amount. Records
  *      stamped 3 may hold the zero a provider reported while the swap was
  *      still in flight.
+ *   5. What a completed swap cost: the fees charged and the USD values of
+ *      its input and output. Records stamped 4 show the quote's estimates.
  */
-export const TRACK_CAPTURE_VERSION = 4;
+export const TRACK_CAPTURE_VERSION = 5;
 
 export function applyDefaultTrackUpdate(
   record: SwapRecordType,
@@ -183,6 +186,11 @@ export function applyDefaultTrackUpdate(
       ? record.realizedSlippageBps
       : finiteOr(response.realizedSlippageBps, record.realizedSlippageBps);
 
+  const settledCost =
+    nextStatus === SwapStatusEnum.Completed
+      ? (settledCostFrom(response) ?? record.settledCost)
+      : record.settledCost;
+
   const reachedTerminalNow =
     !isTerminalStatus(record.status) && isTerminalStatus(nextStatus);
 
@@ -195,6 +203,7 @@ export function applyDefaultTrackUpdate(
     trackCaptureVersion: TRACK_CAPTURE_VERSION,
     slippageToleranceBps,
     realizedSlippageBps,
+    settledCost,
     intermediateLegs,
     actualReceiveAmount,
     providerExplorerUrl,
