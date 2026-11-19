@@ -68,18 +68,16 @@ const Fade: React.FunctionComponent<{
  * Spread `edges` on the scroll view and render `fades` right after it, in the
  * same parent: they take their place from the scroll view's layout. A scroll
  * view with its own `onScroll` or the rest calls these from its own.
- * `bottomInset` lifts the bottom fade above a footer laid over the scroll;
- * `surface` names what the scroll sits on where the context does not yet.
+ * A footer laid over the scroll draws the bottom fade itself with
+ * `FooterFade` from `below`, with `sides: 'top'` here. `surface` names what the scroll sits on where the context does not yet.
  * `sides: 'top'` leaves the bottom to what already covers it (the tab bar's
  * gradient). `scrolledTo` reports the offset of a list whose events are not a
  * scroll view's.
  */
 export function useScrollEdges({
-  bottomInset = 0,
   surface: on,
   sides = 'both',
 }: {
-  bottomInset?: number;
   surface?: SurfaceKind;
   sides?: 'both' | 'top';
 } = {}): {
@@ -149,7 +147,7 @@ export function useScrollEdges({
           shown={below}
           side="bottom"
           color={color}
-          top={box.y + box.height - bottomInset - EDGE_FADE}
+          top={box.y + box.height - EDGE_FADE}
           left={box.x}
           width={box.width}
         />

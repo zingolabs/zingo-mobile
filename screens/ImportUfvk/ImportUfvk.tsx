@@ -47,7 +47,7 @@ import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { useCompact } from '@app/hooks/useCompact';
-import { EDGE_FADE, useScrollEdges } from '@ui/widgets/ScrollEdges';
+import { EDGE_FADE, FooterFade, useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { dismissOnDrag } from '@ui/primitives/keyboardDismiss';
 
 // Positions from the 402 x 874 design.
@@ -297,7 +297,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
     keyboardHeight === 0
       ? bottomPad + NOTE_ABOVE_BUTTON + noteH
       : buttonBottom + BUTTON_HEIGHT + space12;
-  const { edges, fades } = useScrollEdges({ bottomInset: covered });
+  const { edges, fades, below } = useScrollEdges({ sides: 'top' });
 
   return (
     <View style={{ flex: 1 }}>
@@ -439,7 +439,9 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           height: covered,
           backgroundColor: colors.bgCanvas,
         }}
-      />
+      >
+        <FooterFade shown={below} color={colors.bgCanvas} />
+      </View>
 
       {keyboardHeight === 0 && !goNote && (
         <View
