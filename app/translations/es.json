@@ -1428,8 +1428,7 @@
   "seednotice": {
     "title": "Frase semilla",
     "body-pending": "Si pierdes el teléfono, es la única forma de recuperar tus fondos.",
-    "button": "Respaldar",
-    "done": "copia hecha"
+    "button": "Respaldar"
   },
   "shield": {
     "title": "Proteger fondos transparentes",

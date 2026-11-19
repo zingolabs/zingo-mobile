@@ -1428,8 +1428,7 @@
   "seednotice": {
     "title": "Frase semente",
     "body-pending": "Se você perder o celular, esta é a única forma de recuperar seus fundos.",
-    "button": "Fazer backup",
-    "done": "backup feito"
+    "button": "Fazer backup"
   },
   "shield": {
     "title": "Proteger fundos transparentes",
