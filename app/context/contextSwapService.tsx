@@ -237,7 +237,10 @@ export function useSwapService(): SwapService | null {
  * lists past swaps off mainnet and offline, where the service is `null`.
  */
 export function useSwapRecords(): SwapRecordType[] {
-  const [records, setRecords] = useState<SwapRecordType[]>([]);
+  /** Starts from the store's last list, so a screen opened from History has its record on the first frame. */
+  const [records, setRecords] = useState<SwapRecordType[]>(() =>
+    SwapStore.snapshot(),
+  );
 
   useEffect(() => {
     let cancelled = false;

@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import { View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { space12, space8, useTheme } from '@app/theme';
+import { space12, space8 } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import { Route } from '@app/AppState';
 import { ContextAppLoaded, useSwapService } from '@app/context';
@@ -61,7 +61,6 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   const { recordId, broadcastError } = route.params;
   const { translate, sendSwapDeposit, resumeSwapDeposit, valueTransfers } =
     useContext(ContextAppLoaded);
-  const { colors } = useTheme();
   const swapService = useSwapService();
   const record = useSwapRecord(recordId);
 
@@ -201,8 +200,9 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   const leave = useCallback(() => leaveFlow(navigation), [navigation]);
   const removeSwap = useRemoveSwap(leave);
 
+  /** Not read yet: the screen stays clear, so the one under it shows until the panel rises. */
   if (!record) {
-    return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
+    return <></>;
   }
 
   if (isOutbound) {
