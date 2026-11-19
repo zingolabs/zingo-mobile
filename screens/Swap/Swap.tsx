@@ -539,7 +539,6 @@ const Swap: React.FunctionComponent<SwapProps> = ({
           addLastSnackbar={addLastSnackbar}
           setShieldingAmount={setShieldingAmount}
           setBackgroundError={setBackgroundError}
-          showMessagesIcon={true}
         />
         <Animated.View
           pointerEvents="box-none"

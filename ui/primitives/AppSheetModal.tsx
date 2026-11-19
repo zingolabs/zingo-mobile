@@ -427,21 +427,25 @@ export function SheetScrollView({
   const [chrome, setChrome] = useState<number>(0);
   const { edges, fades } = useScrollEdges({ surface: 'surface' });
   const scroll = useRef<BottomSheetScrollViewMethods>(null);
+  const inner = useRef<View>(null);
   const offset = useRef<number>(0);
 
-  /** Scrolls the focused field into view, 16 above the list's end. */
+  /** Scrolls the focused field into view, 16 above the list's end, when the field is in this list. */
   const reveal = useCallback(() => {
     const input = TextInput.State.currentlyFocusedInput();
-    const inner = scroll.current?.getInnerViewNode();
-    if (!input || !inner) {
+    if (!input || !inner.current) {
       return;
     }
-    input.measureLayout(inner, (_x, y, _w, h) => {
-      const end = y + h + space16;
-      if (end > offset.current + frame.current) {
-        scroll.current?.scrollTo({ y: end - frame.current, animated: true });
-      }
-    });
+    input.measureLayout(
+      inner.current,
+      (_x, y, _w, h) => {
+        const end = y + h + space16;
+        if (end > offset.current + frame.current) {
+          scroll.current?.scrollTo({ y: end - frame.current, animated: true });
+        }
+      },
+      () => {},
+    );
   }, []);
 
   useEffect(() => {
@@ -473,6 +477,7 @@ export function SheetScrollView({
     <>
       <BottomSheetScrollView
         ref={scroll}
+        innerViewRef={inner as React.RefObject<View>}
         testID={testID}
         onScroll={e => {
           offset.current = e.nativeEvent.contentOffset.y;

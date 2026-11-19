@@ -34,7 +34,6 @@ import { transferStatus } from '@app/utils/transferStatus';
 import { removeTransaction } from '@app/walletBackend';
 import { createAlert } from '@app/services/createAlert';
 import { showConfirm } from '@app/services/showConfirm';
-import { fiatQuote } from '@app/price/fiatQuote';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import FullPanel from '@ui/widgets/FullPanel';
@@ -77,7 +76,6 @@ const ValueTransferDetail: React.FunctionComponent<
     setBackgroundError,
     netInfo,
     blockExplorer,
-    zecPrice,
     setSendPageState,
     launchAddTagModal,
     readOnly,
@@ -144,11 +142,9 @@ const ValueTransferDetail: React.FunctionComponent<
 
   const status = transferStatus(vt, t);
 
-  const quote = fiatQuote(zecPrice, server, info.chainName);
-  const todayUsd =
-    quote.kind === 'quote' && server.chainName === ChainNameEnum.mainChainName
-      ? formatUsd(vt.amount * quote.price)
-      : '';
+  /** Dollars only at the price the transfer kept: today's would read as what it was worth then. */
+  const keptUsd =
+    vt.zecPrice && vt.zecPrice > 0 ? formatUsd(vt.amount * vt.zecPrice) : '';
   /** Money in or out of the wallet only, as History's rows sign it; moves within it carry none. */
   const sign = received ? '+' : sent ? '−' : '';
 
@@ -339,16 +335,13 @@ const ValueTransferDetail: React.FunctionComponent<
               {` ${info.currencyName}`}
             </Text>
           </Text>
-          {!!todayUsd && (
+          {!!keptUsd && (
             <Text
               variant="bodySmall"
               tone="muted"
               style={{ marginTop: 4, textAlign: 'center' }}
             >
-              {t('history.today-price').replace(
-                '{usd}',
-                amounts.show(todayUsd),
-              )}
+              {amounts.show(keptUsd)}
             </Text>
           )}
         </Pressable>

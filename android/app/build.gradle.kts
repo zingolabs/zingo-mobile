@@ -433,6 +433,8 @@ dependencies {
 
     // JVM unit tests for pure logic (no device or emulator)
     testImplementation("junit:junit:4.13.2")
+    // android.jar ships org.json as stubs, and WalletStore's meta needs the real one under JVM tests.
+    testImplementation("org.json:json:20240303")
 
     // The instrumented sources use the JUnit 4 API, and the androidx.test
     // runner executes them.

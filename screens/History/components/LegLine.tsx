@@ -9,7 +9,6 @@ import Pressable from '@ui/primitives/Pressable';
 import { Route } from '@app/AppState';
 import type { ValueTransferType } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
-import { fiatQuote } from '@app/price/fiatQuote';
 import Utils from '@app/utils';
 import { legRowText } from '@screens/History/historyRowText';
 import HistoryRowBody from './HistoryRowBody';
@@ -30,18 +29,12 @@ function LegLine({
   slot: number;
 }) {
   const navigation = useNavigation<WalletNavigation>();
-  const { translate, language, info, zecPrice, server } =
-    useContext(ContextAppLoaded);
+  const { translate, language, info } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const t = (key: string) => (translate(key) as string).trim();
   const unfold = useUnfold();
-  const quote = fiatQuote(zecPrice, server, server.chainName);
-  const price =
-    vt.zecPrice && vt.zecPrice > 0
-      ? vt.zecPrice
-      : quote.kind === 'quote'
-        ? quote.price
-        : 0;
+  /** Dollars only at the price the leg kept: today's would read as what it was worth then. */
+  const price = vt.zecPrice && vt.zecPrice > 0 ? vt.zecPrice : 0;
   const text = legRowText({
     vt,
     time: Utils.formatDate(vt.time * 1000, 'h:mm aaa', language),

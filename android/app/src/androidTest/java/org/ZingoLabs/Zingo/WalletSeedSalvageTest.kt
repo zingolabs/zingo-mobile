@@ -30,6 +30,7 @@ class WalletSeedSalvageTest {
     fun aRealOfflineWallet() {
         walletFile().delete()
         brokenFile().delete()
+        WalletStore.root(context.filesDir).deleteRecursively()
         uniffi.zingo.initLogging()
         uniffi.zingo.initFromSeed(seed = Seeds.HOSPITAL, birthday = 2000000u, connection = testConnection("", "main"))
         plainWallet = uniffi.zingo.saveWalletBytes()!!

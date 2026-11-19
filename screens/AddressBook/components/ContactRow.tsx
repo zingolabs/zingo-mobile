@@ -21,10 +21,14 @@ import Text from '@ui/primitives/Text';
 import AddressRowHead from './AddressRowHead';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
-import { PencilIcon } from '@ui/primitives/Icons/PencilIcon';
 import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
 import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
-import { TrashCan, TrashLid } from '@ui/primitives/Icons/TrashIcon';
+import {
+  DeleteMark,
+  EditMark,
+  MARK_RESET_MS,
+  playMark,
+} from '@ui/widgets/RowActionMarks';
 import { themeTokens } from '@app/theme';
 
 export const ROW_LINE = themeTokens.borderSubtle;
@@ -36,7 +40,6 @@ const SWIPE_INK = themeTokens.fgOnAccent;
 const FLASH = themeTokens.bgAccentSubtle;
 
 /** An action is ready again once its motion is over and as long again has passed. */
-const ACTION_RESET_MS = duration.action * 2;
 const SEND_AT = 72;
 const ACTIONS_H = 92;
 const CIRCLE = 52;
@@ -220,25 +223,6 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
   const copyStyle = useAnimatedStyle(() => ({
     transform: [{ scale: copyScale.value }],
   }));
-  const penStyle = useAnimatedStyle(() => {
-    const tilt = pen.value < 0.15 ? pen.value / 0.15 : (1 - pen.value) / 0.85;
-    return {
-      transform: [
-        { translateX: 10 * pen.value },
-        { rotate: `${-6 * tilt}deg` },
-      ],
-    };
-  });
-  const penLineStyle = useAnimatedStyle(() => ({
-    transform: [{ scaleX: pen.value }],
-  }));
-  const lidStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: -1 * lid.value },
-      { translateY: -2.5 * lid.value },
-      { rotate: `${-24 * lid.value}deg` },
-    ],
-  }));
   const flyStyle = useAnimatedStyle(() => ({
     opacity: 1 - fly.value,
     transform: [
@@ -296,14 +280,14 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
           easing: ease.out,
         });
         onSend();
-        later(ACTION_RESET_MS, () => {
+        later(MARK_RESET_MS, () => {
           fly.value = 0;
           busy.current = false;
         });
         return;
       case 'swap':
         onSwap();
-        later(ACTION_RESET_MS, () => {
+        later(MARK_RESET_MS, () => {
           busy.current = false;
         });
         return;
@@ -321,20 +305,17 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
         });
         return;
       case 'edit':
-        pen.value = withTiming(1, motion(duration.action));
+        playMark(pen, 'edit');
         onEdit();
-        later(ACTION_RESET_MS, () => {
+        later(MARK_RESET_MS, () => {
           pen.value = 0;
           busy.current = false;
         });
         return;
       case 'delete':
-        lid.value = withTiming(1, {
-          ...motion(duration.action),
-          easing: ease.spring,
-        });
+        playMark(lid, 'delete');
         onDelete();
-        later(ACTION_RESET_MS, () => {
+        later(MARK_RESET_MS, () => {
           lid.value = 0;
           busy.current = false;
         });
@@ -370,7 +351,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
         onSwipeableOpenStartDrag={onSwipe}
         onSwipeableWillOpen={() => {
           onSend();
-          later(ACTION_RESET_MS, () => swipeable.current?.close());
+          later(MARK_RESET_MS, () => swipeable.current?.close());
         }}
       >
         <View style={{ backgroundColor: colors.bgSurface }}>
@@ -446,24 +427,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
                   label={translate('addressbook.edit') as string}
                   onPress={() => press('edit')}
                 >
-                  <Animated.View style={penStyle}>
-                    <PencilIcon size={20} color={INK_CODE} />
-                  </Animated.View>
-                  <Animated.View
-                    style={[
-                      {
-                        position: 'absolute',
-                        left: 15,
-                        bottom: 15,
-                        width: 10,
-                        height: 2,
-                        borderRadius: 1,
-                        backgroundColor: INK_CODE,
-                        transformOrigin: 'left',
-                      },
-                      penLineStyle,
-                    ]}
-                  />
+                  <EditMark progress={pen} color={INK_CODE} />
                 </Action>
               )}
               <Action
@@ -472,22 +436,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
                 red
                 onPress={() => press('delete')}
               >
-                <View style={{ width: 20, height: 20 }}>
-                  <TrashCan
-                    size={20}
-                    color={RED}
-                    style={StyleSheet.absoluteFill}
-                  />
-                  <Animated.View
-                    style={[
-                      StyleSheet.absoluteFill,
-                      { transformOrigin: '13% 25%' },
-                      lidStyle,
-                    ]}
-                  >
-                    <TrashLid size={20} color={RED} />
-                  </Animated.View>
-                </View>
+                <DeleteMark progress={lid} color={RED} />
               </Action>
             </Animated.View>
           </Animated.View>

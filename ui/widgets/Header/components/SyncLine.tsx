@@ -32,7 +32,13 @@ import { CARD_MARGIN_TOP } from './PriceRow';
 import { CloudDownloadIcon } from '@ui/primitives/Icons/CloudDownloadIcon';
 
 type SyncState =
-  'noInternet' | 'offline' | 'starting' | 'syncing' | 'behind' | 'synced';
+  | 'opening'
+  | 'noInternet'
+  | 'offline'
+  | 'starting'
+  | 'syncing'
+  | 'behind'
+  | 'synced';
 
 const MINUTE_MS = 60 * 1000;
 
@@ -53,6 +59,38 @@ const hostOf = (server: ServerType): string =>
   server.kind === 'remote'
     ? server.uri.replace(/^[a-z]+:\/\//i, '').replace(/[:/].*$/, '')
     : '';
+
+/** The dot of a wallet being opened, beating in the syncing yellow. */
+function OpeningDot({ color }: { color: string }) {
+  const beat = useSharedValue(1);
+  useEffect(() => {
+    beat.value = withRepeat(
+      withTiming(0.25, {
+        duration: 900,
+        easing: Easing.inOut(Easing.ease),
+        reduceMotion: ReduceMotion.System,
+      }),
+      -1,
+      true,
+    );
+    return () => cancelAnimation(beat);
+  }, [beat]);
+  const style = useAnimatedStyle(() => ({ opacity: beat.value }));
+  return (
+    <Animated.View
+      testID="header.sync-opening"
+      style={[
+        {
+          width: 7,
+          height: 7,
+          borderRadius: radiusPill,
+          backgroundColor: color,
+        },
+        style,
+      ]}
+    />
+  );
+}
 
 /** A 12 pt ring turning while the first connection is made. */
 function Spinner({ track, arc }: { track: string; arc: string }) {
@@ -101,6 +139,7 @@ export default function SyncLine({
   percentage,
   syncInProgress,
   translate,
+  opening,
 }: {
   server: ServerType;
   netInfo: NetInfoType;
@@ -108,6 +147,8 @@ export default function SyncLine({
   percentage: number;
   syncInProgress: boolean;
   translate: (key: string) => TranslateType;
+  /** The wallet being opened in place, '' when none is. */
+  opening: string;
 }) {
   const navigation = useNavigation<WalletNavigation>();
   const { colors } = useTheme();
@@ -117,17 +158,19 @@ export default function SyncLine({
   const maxWidth = useWindowDimensions().width - 2 * space20;
   const nowMs = useNowMs();
 
-  const state: SyncState = !netInfo.isConnected
-    ? 'noInternet'
-    : server.kind === 'offline'
-      ? 'offline'
-      : percentage === 0
-        ? 'starting'
-        : syncInProgress
-          ? 'syncing'
-          : isFallingBehind(freshness, nowMs)
-            ? 'behind'
-            : 'synced';
+  const state: SyncState = opening
+    ? 'opening'
+    : !netInfo.isConnected
+      ? 'noInternet'
+      : server.kind === 'offline'
+        ? 'offline'
+        : percentage === 0
+          ? 'starting'
+          : syncInProgress
+            ? 'syncing'
+            : isFallingBehind(freshness, nowMs)
+              ? 'behind'
+              : 'synced';
   const metered =
     !!netInfo.isConnected &&
     (netInfo.type === NetInfoStateType.cellular ||
@@ -163,6 +206,14 @@ export default function SyncLine({
   let words: React.ReactNode;
   let label: string;
   switch (state) {
+    case 'opening':
+      lead = <OpeningDot color={colors.fgSyncing} />;
+      words = strong(
+        t('wallets.opening').replace('{name}', opening),
+        colors.fgSyncing,
+      );
+      label = t('wallets.opening').replace('{name}', opening);
+      break;
     case 'noInternet':
       lead = <CloudDownloadIcon size={iconSizeSm} color={colors.fgWarning} />;
       words = aged(strong(t('header.sync-no-internet'), colors.fgWarning));

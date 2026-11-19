@@ -30,6 +30,10 @@ const mount = (
       value={{ ...defaultAppContextLoading, translate: mockTranslate }}
     >
       <WalletError
+        translate={mockTranslate}
+        online={false}
+        server={defaultAppContextLoading.server}
+        failed={{ kind: 'only' }}
         kind="open"
         details="failed to read wallet file"
         busy={false}
@@ -62,6 +66,14 @@ test('Tests that each action reaches its handler when the screen is idle', () =>
   expect(h.onServer).toHaveBeenCalledTimes(1);
 });
 
+test('Tests that the screen names the wallet and offers another one when other wallets are on the device', () => {
+  const onOpenOther = jest.fn();
+  mount({ failed: { kind: 'oneOfMany', name: 'Savings', onOpenOther } });
+  expect(screen.queryByTestId('walleterror.import')).toBeNull();
+  fireEvent.press(screen.getByTestId('walleterror.other'));
+  expect(onOpenOther).toHaveBeenCalledTimes(1);
+});
+
 test('Tests that the button shows a spinner and ignores presses while a retry is running', () => {
   const h = handlers();
   mount({ busy: true }, h);
@@ -88,6 +100,13 @@ const mountChain = (h = handlers()) => {
       }}
     >
       <WalletError
+        translate={translate}
+        online={false}
+        server={remoteServer(
+          'https://testnet.zec.rocks:443',
+          ChainNameEnum.testChainName,
+        )}
+        failed={{ kind: 'only' }}
         kind="chain"
         walletChain={ChainNameEnum.mainChainName}
         details="Wallet chain: main"
@@ -114,13 +133,13 @@ test('Tests that a wallet on another network names both networks and offers to s
   expect(h.onRetry).not.toHaveBeenCalled();
 });
 
-test('Tests that More options holds Import and Create behind a warning that they replace the wallet', () => {
+test('Tests that More options holds Import and Create behind a note that they add a wallet beside this one', () => {
   const confirms: ConfirmOptions[] = [];
   registerConfirmListener(options => confirms.push(options));
   const h = mountChain();
   fireEvent.press(screen.getByTestId('walleterror.more'));
-  expect(confirms[0].messageTone).toBe('danger');
-  expect(confirms[0].message).toContain('replace the Mainnet wallet');
+  expect(confirms[0].messageTone).toBeUndefined();
+  expect(confirms[0].message).toContain('beside the Mainnet one');
   confirms[0].buttons[0].onPress?.();
   confirms[0].buttons[1].onPress?.();
   expect(h.onImport).toHaveBeenCalledTimes(1);

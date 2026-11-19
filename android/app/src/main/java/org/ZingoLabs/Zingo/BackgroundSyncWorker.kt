@@ -30,8 +30,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlin.time.toJavaDuration
-import org.ZingoLabs.Zingo.Constants.*
-import java.io.FileInputStream
+import java.io.FileNotFoundException
 
 class BackgroundSyncWorker(private val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
     private val rpcModule = RPCModule(MainApplication.getAppReactContext())
@@ -80,8 +79,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             return Result.failure()
         }
 
-        // checking if the wallet file exists
-        val exists: Boolean = rpcModule.fileExists(WalletFileName.value)
+        val exists: Boolean = rpcModule.hasActiveWallet()
 
         if (exists) {
             try {
@@ -222,14 +220,6 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
         return Result.success()
     }
 
-    /**
-     * Reads settings.json and loads the wallet file when a server URI is
-     * configured. Returns `true` to signal the caller may proceed with sync, or
-     * `false` only when the user is explicitly in offline mode (empty server
-     * URI) and sync must be skipped. On any other unexpected condition the
-     * function returns `true` so the downstream sync path surfaces its own
-     * error rather than masquerading as offline mode.
-     */
     private fun skipOffline(timeStampStrStart: String): Result {
         Log.i("SCHEDULED_TASK_RUN", "Offline mode, sync skipped")
         val timeStampStrOffline = (Date().time / 1000).toString()
@@ -264,30 +254,23 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
         }
     }
 
+    /** Loads the active wallet with its own server, false when that server is offline mode; a failure throws. */
     private fun loadWalletFile(): Boolean {
-        var shouldSync = true
-        context.openFileInput("settings.json")?.use { file: FileInputStream ->
-            val settingsBytes = file.readBytes()
-            file.close()
-            val settingsString = settingsBytes.toString(Charsets.UTF_8)
-            val jsonObject = JSONObject(settingsString)
-            val serveruri = jsonObject.getJSONObject("server").getString("uri")
-            val chainhint = jsonObject.getJSONObject("server").getString("chainName")
-            if (serveruri.isEmpty()) {
-                Log.i(
-                    "SCHEDULED_TASK_RUN",
-                    "Offline mode detected (empty serveruri) - skipping wallet load"
-                )
-                shouldSync = false
-                return@use
-            }
+        val (serveruri, chainhint) = rpcModule.activeServer()
+            ?: throw FileNotFoundException("Error: the active wallet has no server")
+        if (serveruri.isEmpty()) {
             Log.i(
                 "SCHEDULED_TASK_RUN",
-                "Opening the wallet file - No App active - serveruri: $serveruri chain: $chainhint"
+                "Offline mode detected (empty serveruri) - skipping wallet load"
             )
-            rpcModule.loadExistingWalletNative(serveruri, chainhint, "Medium", "3")
+            return false
         }
-        return shouldSync
+        Log.i(
+            "SCHEDULED_TASK_RUN",
+            "Opening the wallet file - No App active - serveruri: $serveruri chain: $chainhint"
+        )
+        rpcModule.loadExistingWalletNative(serveruri, chainhint, "Medium", "3")
+        return true
     }
 
 }

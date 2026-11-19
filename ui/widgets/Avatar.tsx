@@ -30,7 +30,7 @@ type AvatarProps =
       category: AvatarCategory;
       /** The ticker of the contact's chain (ZEC, BTC…), drawn as a badge. */
       chain?: string;
-      size?: 'md' | 'lg';
+      size?: AvatarSize;
     }
   | { kind: 'wallet'; size?: 'md' | 'lg' }
   /** No contact to show: what the transaction does, as an icon. */
@@ -39,10 +39,14 @@ type AvatarProps =
       icon: React.ComponentType<{ size?: number; color?: string }>;
       /** A transaction that failed: the icon in red on a red tint. */
       danger?: boolean;
-      size?: 'md' | 'lg';
+      size?: AvatarSize;
     };
 
-const SIDE = { md: 36, lg: 48 };
+/** sm is the Header's wallet switcher; md a list row; lg a sheet's hero. */
+export type AvatarSize = 'sm' | 'md' | 'lg';
+
+const SIDE = { sm: 28, md: 36, lg: 48 };
+const INITIAL = { sm: 'bodySmall', md: 'bodyStrong', lg: 'subtitle' } as const;
 const RING = 2;
 
 /** A round mark for a contact or the own wallet, the same on every screen. */
@@ -122,7 +126,7 @@ const Avatar: React.FunctionComponent<AvatarProps> = props => {
         }}
       >
         <Text
-          variant={props.size === 'lg' ? 'subtitle' : 'bodyStrong'}
+          variant={INITIAL[props.size ?? 'md']}
           color={fg}
           style={{ fontWeight: '700' }}
         >
