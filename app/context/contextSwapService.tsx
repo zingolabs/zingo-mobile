@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 
 import { ChainNameEnum, ReceiverEnum, ValueTransferType } from '@app/AppState';
-import { createNewUnifiedAddress } from '@app/walletBackend';
+import { createNewUnifiedAddress, readOpenWalletId } from '@app/walletBackend';
 import type { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddressType';
 import { resetPinnedAddress } from '@app/hooks/usePinnedAddress';
 import { resetIronwoodNoticeHide } from '@app/hooks/useIronwoodNoticeHide';
@@ -18,7 +18,6 @@ import {
   SwapService,
   SwapStore,
   createSwapService,
-  readCurrentWalletFingerprint,
   swapRecordToValueTransfer,
 } from '@app/swap';
 import type { SwapRecordType } from '@app/swap';
@@ -82,18 +81,16 @@ export function SwapServiceProvider({
 
     (async () => {
       try {
-        const fingerprint = await readCurrentWalletFingerprint();
+        const walletId = await readOpenWalletId();
         if (cancelled) {
           return;
         }
-        if (!fingerprint) {
-          console.error(
-            'SwapServiceProvider: the wallet yielded an empty fingerprint',
-          );
+        if (!walletId) {
+          console.error('SwapServiceProvider: no wallet is open');
           return;
         }
-        await adoptWalletOnFile(fingerprint);
-        await SwapStore.bindToWallet(fingerprint);
+        await adoptWalletOnFile(walletId);
+        await SwapStore.bindToWallet(walletId);
         if (cancelled || chainName !== ChainNameEnum.mainChainName) {
           return;
         }
@@ -240,7 +237,10 @@ export function useSwapService(): SwapService | null {
  * lists past swaps off mainnet and offline, where the service is `null`.
  */
 export function useSwapRecords(): SwapRecordType[] {
-  const [records, setRecords] = useState<SwapRecordType[]>([]);
+  /** Starts from the store's last list, so a screen opened from History has its record on the first frame. */
+  const [records, setRecords] = useState<SwapRecordType[]>(() =>
+    SwapStore.snapshot(),
+  );
 
   useEffect(() => {
     let cancelled = false;

@@ -15,8 +15,11 @@ export const Route = {
   Welcome: 'Welcome',
   ImportChooser: 'ImportChooser',
   ImportWallet: 'ImportWallet',
+  FoundWallets: 'FoundWallets',
   Progress: 'Progress',
+  NameWallet: 'NameWallet',
   OpenError: 'OpenError',
+  WalletOpenError: 'WalletOpenError',
   Server: 'Server',
   ServerList: 'ServerList',
 
@@ -47,6 +50,9 @@ export const Route = {
   MigrationStrategy: 'MigrationStrategy',
   MigrationTransactions: 'MigrationTransactions',
   MigrationSending: 'MigrationSending',
+  AddWallet: 'AddWallet',
+  NewWallet: 'NewWallet',
+  RestoreWallet: 'RestoreWallet',
 
   // Drawer with params
   AddressBook: 'AddressBook',

@@ -205,10 +205,15 @@ enum WalletStore {
     readJSON("\(root(base))/\(activeName)")?["id"] as? String ?? ""
   }
 
-  /// The wallet the app opens, when its folder is committed.
-  static func active(_ base: String) -> String? {
+  /// The wallet the pointer names, when its folder is committed.
+  private static func pointed(_ base: String) -> String? {
     let id = pointer(base)
     return !id.isEmpty && isCommitted(base, id) ? id : nil
+  }
+
+  /// The wallet the app opens: the one the pointer names, or the first wallet when it names none, as after the open one is deleted.
+  static func active(_ base: String) -> String? {
+    pointed(base) ?? list(base).first?.id
   }
 
   static func setActive(_ base: String, _ id: String?) throws {
@@ -342,7 +347,7 @@ enum WalletStore {
       meta["migratedFrom"] = sum
       try writeMeta(base, id, meta)
     }
-    if active && self.active(base) == nil { try setActive(base, id) }
+    if active && pointed(base) == nil { try setActive(base, id) }
     let broken = "\(legacyPath).broken"
     if fm.fileExists(atPath: broken) {
       try? fm.moveItem(atPath: broken, toPath: "\(dir(base, id))/\(legacy).broken")
@@ -574,11 +579,14 @@ class RPCModule: NSObject {
     }
   }
 
-  private func legacyServer() -> [String: Any]? {
+  private func legacySettings() -> [String: Any]? {
     guard let path = try? getFileName("settings.json"),
-          let data = FileManager.default.contents(atPath: path),
-          let settings = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else { return nil }
-    return settings["server"] as? [String: Any]
+          let data = FileManager.default.contents(atPath: path) else { return nil }
+    return (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+  }
+
+  private func legacyServer() -> [String: Any]? {
+    legacySettings()?["server"] as? [String: Any]
   }
 
   /// Moves a root wallet file into its folder, as legacy base64 text when it does not read, since the folder's own read converts it.
@@ -610,6 +618,25 @@ class RPCModule: NSObject {
     try adoptLegacy(Constants.WalletBackupFileName.rawValue, name: "Wallet Backup", active: false)
   }
 
+  /// The active wallet's server uri and chain as its meta records them, the legacy settings.json ones when the meta has none; an empty uri when either says offline.
+  func activeServer() throws -> (uri: String, chain: String)? {
+    try prepareWallets()
+    let documents = try getDocumentsDirectory()
+    let settings = legacySettings()
+    let legacy = settings?["server"] as? [String: Any]
+    let id = WalletStore.active(documents)
+    let meta = WalletStore.list(documents).first { $0.id == id }?.meta
+    guard let server = (meta?["server"] as? [String: Any]) ?? legacy else { return nil }
+    let chain = [server["chainName"], meta?["chain"], legacy?["chainName"]]
+      .compactMap { $0 as? String }
+      .first { !$0.isEmpty } ?? ""
+    let select = [meta?["selectServer"], settings?["selectServer"]]
+      .compactMap { $0 as? String }
+      .first { !$0.isEmpty } ?? ""
+    let uri = select == "offline" ? "" : (server["uri"] as? String ?? "")
+    return (uri, chain)
+  }
+
   func activeWalletId() throws -> String? {
     WalletStore.active(try getDocumentsDirectory())
   }
@@ -621,12 +648,6 @@ class RPCModule: NSObject {
       return try getFileName(Constants.WalletFileName.rawValue)
     }
     return WalletStore.walletPath(documents, id)
-  }
-
-  private func otherWallet() throws -> String? {
-    let documents = try getDocumentsDirectory()
-    let active = WalletStore.active(documents)
-    return WalletStore.list(documents).first { $0.id != active }?.id
   }
 
   @objc(walletExists:reject:)
@@ -693,15 +714,6 @@ class RPCModule: NSObject {
     }
   }
 
-  /// Whether a wallet besides the active one is on disk, which takes the legacy backup's place.
-  @objc(walletBackupExists:reject:)
-  func walletBackupExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    FfiOutcome.of {
-      try self.prepareWallets()
-      return try self.otherWallet() == nil ? "false" : "true"
-    }.settle(resolve: resolve, reject: reject)
-  }
-
   // The background sync state is written from BGAppRefreshTask paths in
   // AppDelegate while the device may be locked. It stays at the iOS
   // default protection class (`completeUntilFirstUserAuthentication`
@@ -745,35 +757,6 @@ class RPCModule: NSObject {
 
   func readWalletBytes() throws -> Data {
     try readWalletFileBytes(atPath: activeWalletPath())
-  }
-
-  func fnDeleteExistingWallet() throws -> Bool {
-    RPCModule.walletFileHold.lock()
-    defer { RPCModule.walletFileHold.unlock() }
-    RPCModule.openWalletId = nil
-    RPCModule.pendingMeta = nil
-    let documents = try getDocumentsDirectory()
-    guard let id = WalletStore.active(documents) else { return false }
-    do {
-      return try WalletStore.delete(documents, id)
-    } catch {
-      throw FileError.deleteFileError("Error: [Native] deleting wallet error: \(error.localizedDescription)")
-    }
-  }
-
-  @objc(deleteExistingWallet:reject:)
-  func deleteExistingWallet(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    do {
-      let deleted = try self.fnDeleteExistingWallet()
-      DispatchQueue.main.async {
-        resolve(deleted ? "true" : "false")
-      }
-    } catch {
-      NSLog("Error: [Native] deleting wallet \(error.localizedDescription)")
-      DispatchQueue.main.async {
-        resolve("false")
-      }
-    }
   }
 
   // The FFI contract is structural (zingo-mobile#1151; audit Issue Q):
@@ -1118,33 +1101,6 @@ class RPCModule: NSObject {
   ) {
     FfiOutcome.of {
       try self.fnLoadExistingWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
-    }.settle(resolve: resolve, reject: reject)
-  }
-
-  /// Makes the other wallet the active one, the legacy backup restore on the folder layout.
-  @objc(restoreExistingWalletBackup:reject:)
-  func restoreExistingWalletBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    FfiOutcome.of {
-      try self.prepareWallets()
-      guard let other = try self.otherWallet() else { return "false" }
-      self.closeWalletFile()
-      try WalletStore.setActive(try self.getDocumentsDirectory(), other)
-      return "true"
-    }.settle(resolve: resolve, reject: reject)
-  }
-
-  /// Makes the other wallet the active one and deletes the active one, the legacy backup replace on the folder layout.
-  @objc(replaceWalletWithBackup:reject:)
-  func replaceWalletWithBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    FfiOutcome.of {
-      try self.prepareWallets()
-      guard let other = try self.otherWallet() else { return "false" }
-      let documents = try self.getDocumentsDirectory()
-      let replaced = WalletStore.active(documents)
-      self.closeWalletFile()
-      try WalletStore.setActive(documents, other)
-      if let replaced { _ = try WalletStore.delete(documents, replaced) }
-      return "true"
     }.settle(resolve: resolve, reject: reject)
   }
 

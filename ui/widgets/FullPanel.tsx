@@ -34,7 +34,7 @@ import TooltipHost from '@ui/widgets/TooltipHost';
 import Header, { PANEL_TOP } from '@ui/widgets/Header/Header';
 import SheetRim from '@ui/primitives/SheetRim';
 import { SurfaceContext } from '@ui/primitives/Surface';
-import { useScrollEdges } from '@ui/widgets/ScrollEdges';
+import { FooterFade, useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { dismissOnDrag } from '@ui/primitives/keyboardDismiss';
@@ -127,9 +127,9 @@ export default function FullPanel({
   const [headerH, setHeaderH] = useState<number>(0);
   const [contentH, setContentH] = useState<number>(0);
   const [footerH, setFooterH] = useState<number>(0);
-  const { edges, fades } = useScrollEdges({
-    bottomInset: footer ? footerH : 0,
+  const { edges, fades, below } = useScrollEdges({
     surface: 'surface',
+    sides: footer ? 'top' : 'both',
   });
   const fitted = fit && headerH > 0 && contentH > 0;
   const fitHeight = Math.max(headerH, radiusSheet) + contentH;
@@ -234,7 +234,6 @@ export default function FullPanel({
             noBalance={true}
             noSyncingStatus={true}
             noPrivacy={true}
-            showMessagesIcon={true}
           />
         </View>
         {fit && (
@@ -354,7 +353,7 @@ export default function FullPanel({
                     ]}
                   >
                     {/** Inside the scrolled content: an icon measured across the scroll view lands off by the scroll offset on iOS. */}
-                    <TooltipHost>{children}</TooltipHost>
+                    <TooltipHost center={center}>{children}</TooltipHost>
                   </Animated.View>
                 </KeyboardAwareScrollView>
                 {fades}
@@ -375,6 +374,7 @@ export default function FullPanel({
                 backgroundColor: colors.bgSurface,
               }}
             >
+              <FooterFade shown={below} color={colors.bgSurface} />
               {footer}
             </View>
           )}

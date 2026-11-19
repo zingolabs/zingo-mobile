@@ -104,6 +104,14 @@ appId: org.ZingoLabs.Zingo
 - tapOn:
     id: "import.button.ok"
     retryTapIfNoChange: true
+# The name step: left empty, the wallet takes the name it offers.
+- extendedWaitUntil:
+    visible:
+      id: "namewallet.go"
+    timeout: 30000
+- tapOn:
+    id: "namewallet.go"
+    retryTapIfNoChange: true
 - extendedWaitUntil:
     visible:
       id: "header.drawmenu"

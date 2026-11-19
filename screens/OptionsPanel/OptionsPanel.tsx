@@ -52,7 +52,7 @@ export type OptionsPanelProps = {
   onLinkCopied?: (url: string) => void;
   /** Triggered by the triple-chevron close button at top-left. */
   onClose: () => void;
-  /** Settings button at top-right, the one way into the Settings screen. */
+  /** Settings button at top-left, the one way into the Settings screen. */
   onSettings?: () => void;
 };
 
@@ -142,15 +142,10 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
           paddingBottom: 8,
         }}
       >
-        {tripleChevron}
-        <View
-          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-        >
-          <Text variant="subtitle">{title}</Text>
-        </View>
-        {/* The Settings door. Balances the chevron column, so the title
-            stays centred whether or not the button is there. */}
-        <View style={{ width: 27, alignItems: 'flex-end' }}>
+        {/* The Settings door, mirrored to the left: the chevrons sit where
+            the Header's menu morphs, at the right. It balances the chevron
+            column, so the title stays centred whether or not it is there. */}
+        <View style={{ width: 33, alignItems: 'flex-start' }}>
           {onSettings && (
             <Pressable
               kind="icon"
@@ -162,6 +157,12 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
             </Pressable>
           )}
         </View>
+        <View
+          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+        >
+          <Text variant="subtitle">{title}</Text>
+        </View>
+        {tripleChevron}
       </View>
 
       {/* Grid of actions — 4 columns */}

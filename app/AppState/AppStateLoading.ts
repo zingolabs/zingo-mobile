@@ -3,8 +3,8 @@ import { LaunchingModeEnum } from './enums/LaunchingModeEnum';
 import type { WalletType } from '@app/wallet/types';
 import { GateFailure } from './types/GateFailure';
 import type { WalletErrorInfo } from '@app/wallet/types';
-import type { DeleteWalletContext } from '@app/wallet/types';
 import { ServerStatus } from './types/ServerStatus';
+import type { RecoveryEntry } from '@app/services/recoveryWalletInfo';
 import ServerUrisType from './types/ServerUrisType';
 
 /** The launch gate's outcome, carried whole so the locked screen renders the reason it was locked for. */
@@ -22,12 +22,13 @@ export default interface AppStateLoading {
   biometricGate: BiometricGateOutcome;
   startingApp: boolean;
   firstLaunchingMessage: LaunchingModeEnum;
-  hasRecoveryWalletInfoSaved: boolean;
-  recoveryWallet: WalletType | null;
+  /** The card of a previous install's wallets, hidden until the next launch. */
+  foundDismissed: boolean;
+  /** Every wallet a previous install left in the Keychain, in their order. */
+  recoveryEntries: RecoveryEntry[];
   walletError: WalletErrorInfo | null;
   retrying: boolean;
   errorShake: number;
-  deleteContext: DeleteWalletContext;
   serverStatus: ServerStatus;
   serverBlockHeight: string;
   // uri → latency in ms, null when the server did not answer the probe.

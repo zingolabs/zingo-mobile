@@ -68,24 +68,24 @@ const Fade: React.FunctionComponent<{
  * Spread `edges` on the scroll view and render `fades` right after it, in the
  * same parent: they take their place from the scroll view's layout. A scroll
  * view with its own `onScroll` or the rest calls these from its own.
- * `bottomInset` lifts the bottom fade above a footer laid over the scroll;
- * `surface` names what the scroll sits on where the context does not yet.
+ * A footer laid over the scroll draws the bottom fade itself with
+ * `FooterFade` from `below`, with `sides: 'top'` here. `surface` names what the scroll sits on where the context does not yet.
  * `sides: 'top'` leaves the bottom to what already covers it (the tab bar's
  * gradient). `scrolledTo` reports the offset of a list whose events are not a
  * scroll view's.
  */
 export function useScrollEdges({
-  bottomInset = 0,
   surface: on,
   sides = 'both',
 }: {
-  bottomInset?: number;
   surface?: SurfaceKind;
   sides?: 'both' | 'top';
 } = {}): {
   edges: ScrollEdgeProps;
   fades: React.ReactNode;
   scrolledTo: (y: number) => void;
+  /** Content runs on below the visible part. */
+  below: boolean;
 } {
   const { colors } = useTheme();
   const context = useContext(SurfaceContext);
@@ -147,7 +147,7 @@ export function useScrollEdges({
           shown={below}
           side="bottom"
           color={color}
-          top={box.y + box.height - bottomInset - EDGE_FADE}
+          top={box.y + box.height - EDGE_FADE}
           left={box.x}
           width={box.width}
         />
@@ -155,9 +155,44 @@ export function useScrollEdges({
     </>
   );
 
-  return { edges, fades, scrolledTo };
+  return { edges, fades, scrolledTo, below };
+}
+
+/**
+ * The bottom fade drawn from a footer laid over the scroll, as its first
+ * child: it sits on the footer's top edge wherever the footer lands.
+ */
+export function FooterFade({
+  shown,
+  color,
+}: {
+  shown: boolean;
+  color: string;
+}) {
+  const style = useAnimatedStyle(() => ({
+    opacity: withTiming(shown ? 1 : 0, {
+      duration: duration.fast,
+      reduceMotion: ReduceMotion.System,
+    }),
+  }));
+  return (
+    <Animated.View pointerEvents="none" style={[styles.footerFade, style]}>
+      <LinearGradient
+        colors={[clear(color), color]}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
+    </Animated.View>
+  );
 }
 
 const styles = StyleSheet.create({
   fade: { position: 'absolute', height: EDGE_FADE },
+  footerFade: {
+    position: 'absolute',
+    top: -EDGE_FADE,
+    left: 0,
+    right: 0,
+    height: EDGE_FADE,
+  },
 });

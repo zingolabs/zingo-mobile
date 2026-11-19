@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { View, ViewStyle } from 'react-native';
 import Pressable from '@ui/primitives/Pressable';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { radiusMd, space12, useTheme, iconSizeSm } from '@app/theme';
@@ -9,6 +9,7 @@ import Text from '@ui/primitives/Text';
 import { useInsetFill } from '@ui/primitives/Surface';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
+import { ChevronRight } from '@ui/primitives/Icons/Chevron';
 import { COPIED_MS } from './CopyPill';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
 
@@ -35,7 +36,42 @@ export type DetailRow = {
   badge?: string;
   /** The value struck through: an address nobody should pay anymore. */
   strike?: boolean;
+  /** The row opens what the value names, with a chevron after it. */
+  onPress?: () => void;
+  testID?: string;
 };
+
+/** A row that opens something when it has somewhere to go, a plain line otherwise. */
+function RowShell({
+  onPress,
+  testID,
+  label,
+  style,
+  children,
+}: {
+  onPress?: () => void;
+  testID?: string;
+  label: string;
+  style: ViewStyle;
+  children: React.ReactNode;
+}) {
+  return onPress ? (
+    <Pressable
+      kind="row"
+      testID={testID}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      style={style}
+    >
+      {children}
+    </Pressable>
+  ) : (
+    <View testID={testID} style={style}>
+      {children}
+    </View>
+  );
+}
 
 /** A detail's facts, label on the left and value on the right. */
 export default function DetailRows({ rows }: { rows: DetailRow[] }) {
@@ -86,8 +122,11 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
             {row.block}
           </View>
         ) : (
-          <View
+          <RowShell
             key={row.label}
+            onPress={row.onPress}
+            testID={row.testID}
+            label={`${row.label}: ${row.value}`}
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
@@ -174,8 +213,11 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
                   )}
                 </Pressable>
               )}
+              {!!row.onPress && (
+                <ChevronRight size={iconSizeSm} color={colors.fgMuted} />
+              )}
             </View>
-          </View>
+          </RowShell>
         ),
       )}
     </View>

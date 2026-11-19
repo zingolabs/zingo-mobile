@@ -14,12 +14,12 @@ type FadeInOnMountProps = {
   children: React.ReactNode;
 };
 
-// Fades its children in once, as they mount.
+// Fades its children in once, as they mount; a zero duration shows them at once.
 const FadeInOnMount: React.FunctionComponent<FadeInOnMountProps> = ({
   duration,
   children,
 }) => {
-  const opacity = useSharedValue(0);
+  const opacity = useSharedValue(duration > 0 ? 0 : 1);
   useEffect(() => {
     opacity.value = withTiming(1, {
       duration,
