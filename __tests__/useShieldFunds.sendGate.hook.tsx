@@ -13,11 +13,16 @@ jest.mock('@app/navigation/navigate', () => ({
   isOnTop: () => true,
 }));
 
+jest.mock('@app/services/showConfirm', () => ({
+  showConfirm: jest.fn(),
+}));
+
 import { act, renderHook } from '@testing-library/react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import type { TranslateType } from '@app/AppState';
 import { useShieldFunds } from '@app/hooks/useShieldFunds';
+import { showConfirm } from '@app/services/showConfirm';
 import {
   shieldConfirm,
   shieldPreview,
@@ -33,6 +38,7 @@ import { mockOnline } from '../__mocks__/dataMocks/mockOnline';
 
 const confirmMock = shieldConfirm as jest.Mock;
 const proposeMock = shieldPropose as jest.Mock;
+const showConfirmMock = showConfirm as jest.Mock;
 const translate = (key: string): TranslateType => key;
 
 type HookInput = Parameters<typeof useShieldFunds>[0];
@@ -63,7 +69,16 @@ const hookInput = (
   };
 };
 
-// Opens ShieldSheet on `opened`, moves the app state to `confirmed`, and shields: the sheet runs the latest shieldNow.
+// Presses the shield button and returns the confirm dialog's Confirm handler.
+const openConfirmDialog = (onPressShieldFunds: () => void) => {
+  act(() => {
+    onPressShieldFunds();
+  });
+  const [{ buttons }] = showConfirmMock.mock.calls[0];
+  return buttons[0].onPress as () => Promise<void>;
+};
+
+// Opens the dialog on `opened`, moves the app state to `confirmed`, and confirms.
 const confirmAfter = async (
   opened: SendPermitInputs,
   confirmed: SendPermitInputs,
@@ -74,9 +89,10 @@ const confirmAfter = async (
       useShieldFunds(hookInput(inputs, addLastSnackbar)),
     { initialProps: { inputs: opened } },
   );
+  const confirm = openConfirmDialog(result.current.onPressShieldFunds);
   rerender({ inputs: confirmed });
   await act(async () => {
-    await result.current.shieldNow();
+    await confirm();
   });
 };
 
@@ -145,8 +161,9 @@ describe('useShieldFunds propose and preview', () => {
     const { result } = renderHook(() =>
       useShieldFunds(hookInput(online, jest.fn())),
     );
+    const confirm = openConfirmDialog(result.current.onPressShieldFunds);
     await act(async () => {
-      await result.current.shieldNow();
+      await confirm();
     });
 
     expect(confirmMock).not.toHaveBeenCalled();

@@ -1,6 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useContext, useRef } from 'react';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import React, { useCallback, useContext } from 'react';
 import DetailRows from '@screens/Swap/components/DetailRows';
 import { View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -27,7 +26,6 @@ import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
-import ShieldSheet from '@screens/History/components/ShieldSheet';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
 import { swapOutcome } from '@screens/Swap/swapProgress';
 
@@ -50,11 +48,10 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
 }) => {
   const { recordId } = route.params;
   const context = useContext(ContextAppLoaded);
-  const { translate, info, totalBalance, addressBook, mixnetView } = context;
+  const { translate, info, totalBalance, addressBook } = context;
   const { colors } = useTheme();
   const record = useSwapRecord(recordId);
   const shield = useShieldFunds(context);
-  const shieldSheetRef = useRef<BottomSheetModal>(null);
 
   const home = useCallback(() => leaveFlow(navigation), [navigation]);
   const swapAgain = useCallback(
@@ -191,7 +188,10 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
                 testID="swap.result.shield"
                 variant="primary"
                 title={translate('swap.result-shield-now') as string}
-                onPress={() => shieldSheetRef.current?.present()}
+                onPress={() => {
+                  home();
+                  shield.onPressShieldFunds();
+                }}
               />
             ) : (
               <Button
@@ -221,16 +221,6 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
         )}
         {shieldAfter &&
           shieldNote(translate('swap.result-shield-note-received') as string)}
-        <ShieldSheet
-          ref={shieldSheetRef}
-          amount={context.shieldingAmount}
-          fee={shield.shieldingFee}
-          mixnetView={mixnetView}
-          onShield={async () => {
-            home();
-            await shield.shieldNow();
-          }}
-        />
       </SwapFlowScreen>
     );
   }
