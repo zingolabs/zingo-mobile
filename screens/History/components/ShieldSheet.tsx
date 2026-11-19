@@ -18,7 +18,7 @@ import Button from '@ui/primitives/Button';
 import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
 
 type ShieldSheetProps = {
-  /** What the proposal will move, in ZEC. */
+  /** What lands in the shielded pool, in ZEC: the proposal's amount, the fee already taken out. */
   amount: number;
   fee: number;
   mixnetView: MixnetView;
@@ -80,7 +80,7 @@ const ShieldSheet = forwardRef<BottomSheetModal, ShieldSheetProps>(
             <DetailRows
               rows={[
                 { label: t('shield.from'), value: t('shield.transparent') },
-                { label: t('shield.amount'), value: zec(amount) },
+                { label: t('shield.amount'), value: zec(amount + fee) },
                 { label: t('shield.fee'), value: zec(fee) },
                 {
                   /** After NU6.3, shielding lands in Ironwood. */
@@ -89,7 +89,7 @@ const ShieldSheet = forwardRef<BottomSheetModal, ShieldSheetProps>(
                       ? 'shield.you-get-ironwood'
                       : 'shield.you-get',
                   ),
-                  value: zec(Math.max(0, amount - fee)),
+                  value: zec(amount),
                   strong: true,
                 },
               ]}

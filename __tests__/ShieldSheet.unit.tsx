@@ -14,6 +14,7 @@ import {
   MixnetView,
 } from '@app/walletBackend/transforms/mixnetView';
 import ShieldSheet from '@screens/History/components/ShieldSheet';
+import { CurrencyNameEnum } from '@app/AppState';
 import {
   mixnetConnecting,
   mixnetLost,
@@ -63,6 +64,31 @@ function renderSheet(mixnetView: MixnetView, onShield = jest.fn()) {
 }
 
 describe('ShieldSheet', () => {
+  test('Tests that the fee is taken out once when the amount already comes without it. The transparent balance moved is the amount plus the fee.', () => {
+    const screen = render(
+      <ContextAppLoadedProvider
+        value={{
+          ...defaultAppContextLoaded,
+          translate: keyTranslate,
+          info: {
+            ...defaultAppContextLoaded.info,
+            currencyName: CurrencyNameEnum.ZEC,
+          },
+        }}
+      >
+        <ShieldSheet
+          amount={0.5}
+          fee={0.0001}
+          mixnetView={mixnetReady}
+          onShield={jest.fn()}
+        />
+      </ContextAppLoadedProvider>,
+    );
+    expect(screen.getByText(/0[.,]5001 ZEC/)).toBeTruthy();
+    expect(screen.getByText(/^0[.,]5 ZEC$/)).toBeTruthy();
+    expect(screen.queryByText(/0[.,]4999/)).toBeNull();
+  });
+
   test.each([
     ['off', mixnetOff],
     ['connecting', mixnetConnecting],
