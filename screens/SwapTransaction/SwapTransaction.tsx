@@ -37,9 +37,6 @@ import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import DetailHero from '@screens/Swap/components/DetailHero';
 import DetailRows from '@screens/Swap/components/DetailRows';
 import type { DetailRow } from '@screens/Swap/components/DetailRows';
-import ShieldNote, {
-  leftTransparentFunds,
-} from '@screens/Swap/components/ShieldNote';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
 import { legName, legRole, legsOf } from '@screens/Swap/swapLegs';
 
@@ -258,11 +255,6 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
       {role.warn && (
         <View style={{ marginTop: space12 }}>
           <Banner tone="warning" title={t('swap.tx-dont-send')} />
-        </View>
-      )}
-      {leftTransparentFunds(leg) && (
-        <View style={{ marginTop: space12 }}>
-          <ShieldNote text={t('swap.shield-note')} />
         </View>
       )}
     </SwapFlowScreen>
