@@ -17,7 +17,7 @@ import {
   depositAfterDeshieldError,
   holdDeshield,
 } from '@app/swap/depositAfterDeshield';
-import { toFfiError } from '@app/walletBackend/ffi';
+import { FfiError, toFfiError } from '@app/walletBackend/ffi';
 import { SyncCoordinator } from './SyncCoordinator';
 import { withSyncStopped } from '@app/walletBackend/utils/syncBracket';
 import { Buffer } from 'buffer';
@@ -31,6 +31,8 @@ export type SwapDepositArgs = {
   viaSourceAddress?: boolean;
   shieldedMemoAddress?: string;
 };
+
+const inBand = (message: string): FfiError => ({ code: 'Unknown', message });
 
 export class TransactionService {
   config: WalletBackendConfig;
@@ -65,7 +67,7 @@ export class TransactionService {
       this.setInSend(true);
       this.config.keepAwake(true);
 
-      let sendError: string = '';
+      let rejection: FfiError | undefined;
       let sendTxids: string = '';
       /** A proposal is stored and `confirm`, which always consumes it, has not run. */
       let stored = false;
@@ -83,27 +85,27 @@ export class TransactionService {
           stored = true;
           if (!proposeStr) {
             console.log('Internal Error propose');
-            sendError = 'Error: Internal RPC Error: propose';
+            rejection = inBand('Error: Internal RPC Error: propose');
           }
-          if (!sendError) {
+          if (!rejection) {
             const proposeJSON: RPCSendProposeType =
               await JSON.parse(proposeStr);
             if (proposeJSON.error) {
               console.log(`Error propose ${proposeJSON.error}`);
-              sendError = proposeJSON.error;
+              rejection = inBand(proposeJSON.error);
             }
-            if (!sendError) {
+            if (!rejection) {
               stored = false;
               const sendStr: string = await RPCModule.confirmProcess();
               if (!sendStr) {
                 console.log('Internal Error confirm');
-                sendError = 'Error: Internal RPC Error: confirm';
+                rejection = inBand('Error: Internal RPC Error: confirm');
               }
-              if (!sendError) {
+              if (!rejection) {
                 const sendJSON: RPCSendType = await JSON.parse(sendStr);
                 if (sendJSON.error) {
                   console.log(`Error confirm ${sendJSON.error}`);
-                  sendError = sendJSON.error;
+                  rejection = inBand(sendJSON.error);
                 } else if (sendJSON.txids && sendJSON.txids.length > 0) {
                   sendTxids = sendJSON.txids.join(', ');
                 }
@@ -113,7 +115,10 @@ export class TransactionService {
         });
       } catch (error) {
         console.log(`Critical Error send ${error}`);
-        sendError = `Error: send ${error}`;
+        rejection = {
+          code: toFfiError(error).code,
+          message: `Error: send ${error}`,
+        };
       }
       // Left stored, the proposal would hold continuous sync paused (#3104).
       if (stored) {
@@ -129,8 +134,8 @@ export class TransactionService {
         resolve(sendTxids);
         return;
       }
-      if (sendError) {
-        reject(sendError);
+      if (rejection) {
+        reject(rejection);
         return;
       }
     });

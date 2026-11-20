@@ -1,3 +1,4 @@
+import type { FfiError } from '@app/walletBackend/ffi';
 import {
   SendFailureClass,
   classifySendFailure,
@@ -19,39 +20,48 @@ const INTERNAL_PROPOSE = 'Error: Internal RPC Error: propose';
 const INTERNAL_CONFIRM = 'Error: Internal RPC Error: confirm';
 const CONNECTION_REFUSED = 'Error: connection refused';
 
+/** A rejection the bridge answered as data, with no variant behind it. */
+const inBand = (message: string): FfiError => ({ code: 'Unknown', message });
+
 describe('classifySendFailure covers each real error family', () => {
   it.each([
     '18: bad-txns-sapling-duplicate-nullifier',
     '18: bad-txns-sprout-duplicate-nullifier',
     '18: bad-txns-orchard-duplicate-nullifier',
   ])('classifies %s as duplicateNullifier', marker => {
-    expect(classifySendFailure(`Error: send ${marker}`).kind).toBe(
+    expect(classifySendFailure(inBand(`Error: send ${marker}`)).kind).toBe(
       'duplicateNullifier',
     );
   });
 
   it('classifies the dust reject as dust', () => {
-    expect(classifySendFailure('Error: send 64: dust').kind).toBe('dust');
+    expect(classifySendFailure(inBand('Error: send 64: dust')).kind).toBe(
+      'dust',
+    );
   });
 
   it('classifies both fail-closed refusal texts as mixnetRefusal', () => {
-    expect(classifySendFailure(BOOTSTRAPPING_REFUSAL).kind).toBe(
+    expect(classifySendFailure(inBand(BOOTSTRAPPING_REFUSAL)).kind).toBe(
       'mixnetRefusal',
     );
-    expect(classifySendFailure(DIED_REFUSAL).kind).toBe('mixnetRefusal');
+    expect(classifySendFailure(inBand(DIED_REFUSAL)).kind).toBe(
+      'mixnetRefusal',
+    );
   });
 
   it('classifies both fabricated no-payload errors as internalRpcFailure', () => {
-    expect(classifySendFailure(INTERNAL_PROPOSE).kind).toBe(
+    expect(classifySendFailure(inBand(INTERNAL_PROPOSE)).kind).toBe(
       'internalRpcFailure',
     );
-    expect(classifySendFailure(INTERNAL_CONFIRM).kind).toBe(
+    expect(classifySendFailure(inBand(INTERNAL_CONFIRM)).kind).toBe(
       'internalRpcFailure',
     );
   });
 
   it('presumes an unrecognized error is a serverSuspect', () => {
-    expect(classifySendFailure(CONNECTION_REFUSED).kind).toBe('serverSuspect');
+    expect(classifySendFailure(inBand(CONNECTION_REFUSED)).kind).toBe(
+      'serverSuspect',
+    );
   });
 });
 
@@ -67,19 +77,19 @@ describe('classifySendFailure covers each real error family', () => {
  */
 describe('regression: states the legacy undefined collapsed', () => {
   it('a bootstrapping refusal was undefined (kindless, retried); now mixnetRefusal, never retried', () => {
-    const failure = classifySendFailure(BOOTSTRAPPING_REFUSAL);
+    const failure = classifySendFailure(inBand(BOOTSTRAPPING_REFUSAL));
     expect(failure.kind).toBe('mixnetRefusal');
     expect(retryOnAnotherServer(failure)).toBe(false);
   });
 
   it('a died refusal was undefined (kindless, retried); now mixnetRefusal, never retried', () => {
-    const failure = classifySendFailure(DIED_REFUSAL);
+    const failure = classifySendFailure(inBand(DIED_REFUSAL));
     expect(failure.kind).toBe('mixnetRefusal');
     expect(retryOnAnotherServer(failure)).toBe(false);
   });
 
   it('an internal propose failure was undefined (kindless); now its own kind, historical routing kept', () => {
-    const failure = classifySendFailure(INTERNAL_PROPOSE);
+    const failure = classifySendFailure(inBand(INTERNAL_PROPOSE));
     expect(failure.kind).toBe('internalRpcFailure');
     // Routing deliberately preserved from the legacy bucket; the point of
     // the arm is that the state is now visible and separately revisable.
@@ -87,13 +97,13 @@ describe('regression: states the legacy undefined collapsed', () => {
   });
 
   it('an internal confirm failure was undefined (kindless); now its own kind, historical routing kept', () => {
-    const failure = classifySendFailure(INTERNAL_CONFIRM);
+    const failure = classifySendFailure(inBand(INTERNAL_CONFIRM));
     expect(failure.kind).toBe('internalRpcFailure');
     expect(retryOnAnotherServer(failure)).toBe(true);
   });
 
   it('a genuine server fault keeps the historical presumption and its retry', () => {
-    const failure = classifySendFailure(CONNECTION_REFUSED);
+    const failure = classifySendFailure(inBand(CONNECTION_REFUSED));
     expect(failure.kind).toBe('serverSuspect');
     expect(retryOnAnotherServer(failure)).toBe(true);
   });
@@ -101,7 +111,7 @@ describe('regression: states the legacy undefined collapsed', () => {
   it('the collapsed states are now pairwise distinct', () => {
     const kinds = new Set(
       [BOOTSTRAPPING_REFUSAL, INTERNAL_PROPOSE, CONNECTION_REFUSED].map(
-        error => classifySendFailure(error).kind,
+        error => classifySendFailure(inBand(error)).kind,
       ),
     );
     expect(kinds.size).toBe(3);
@@ -125,56 +135,56 @@ describe('retryOnAnotherServer is exhaustive over the enumeration', () => {
 
 describe('sendFailureText', () => {
   it('carries a catalog key for the wallet verdicts', () => {
-    expect(sendFailureText(classifySendFailure('64: dust'))).toEqual({
+    expect(sendFailureText(classifySendFailure(inBand('64: dust')))).toEqual({
       kind: 'error',
       errorKey: 'send.dust-error',
     });
     expect(
       sendFailureText(
-        classifySendFailure('18: bad-txns-orchard-duplicate-nullifier'),
+        classifySendFailure(inBand('18: bad-txns-orchard-duplicate-nullifier')),
       ),
     ).toEqual({ kind: 'error', errorKey: 'send.duplicate-nullifier-error' });
   });
 
   it('carries a mixnet refusal verbatim, untranslated', () => {
-    expect(sendFailureText(classifySendFailure(DIED_REFUSAL))).toEqual({
+    expect(sendFailureText(classifySendFailure(inBand(DIED_REFUSAL)))).toEqual({
       kind: 'verbatim',
       text: DIED_REFUSAL,
     });
   });
 
   it('carries internal and server-suspect errors verbatim', () => {
-    expect(sendFailureText(classifySendFailure(INTERNAL_CONFIRM))).toEqual({
+    expect(
+      sendFailureText(classifySendFailure(inBand(INTERNAL_CONFIRM))),
+    ).toEqual({
       kind: 'verbatim',
       text: INTERNAL_CONFIRM,
     });
-    expect(sendFailureText(classifySendFailure(CONNECTION_REFUSED))).toEqual({
+    expect(
+      sendFailureText(classifySendFailure(inBand(CONNECTION_REFUSED))),
+    ).toEqual({
       kind: 'verbatim',
       text: CONNECTION_REFUSED,
     });
   });
 });
 
-/**
- * The classification seam is mobile-owned (#1229): our own
- * `ZingolibError::Mixnet` display prefix marks a mixnet refusal, so a
- * zingolib rewording of the refusal prose cannot silently revert refusals
- * to the switch-server-and-retry dance. The zingolib phrase stays as a
- * secondary marker for texts wrapped under other variants by old builds.
- */
-describe('the mobile-owned refusal marker (#1229)', () => {
-  it('classifies our own mixnet prefix as a refusal, whatever zingolib says inside', () => {
-    const reworded =
-      'Error: mixnet: the tunnel is not ready to carry this operation';
-    const failure = classifySendFailure(reworded);
+describe('the Mixnet variant', () => {
+  test('Tests that a rejection is a refusal, never retried, when the bridge codes it Mixnet and its message carries no known phrase.', () => {
+    const failure = classifySendFailure({
+      code: 'Mixnet',
+      message: 'Error: send the tunnel is not ready to carry this operation',
+    });
     expect(failure.kind).toBe('mixnetRefusal');
     expect(retryOnAnotherServer(failure)).toBe(false);
   });
 
-  it('the excluded-indexer exhaustion is a deliberate serverSuspect: switching servers changes eligibility', () => {
-    const exhaustion =
-      "Error: indexer: no eligible Broadcast Indexer remains after excluding the synchronization endpoint's host";
-    const failure = classifySendFailure(exhaustion);
+  test('Tests that the excluded-indexer exhaustion is a serverSuspect, retried, when the bridge codes it Indexer. Switching servers changes eligibility.', () => {
+    const failure = classifySendFailure({
+      code: 'Indexer',
+      message:
+        "Error: indexer: no eligible Broadcast Indexer remains after excluding the synchronization endpoint's host",
+    });
     expect(failure.kind).toBe('serverSuspect');
     expect(retryOnAnotherServer(failure)).toBe(true);
   });

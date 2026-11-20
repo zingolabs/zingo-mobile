@@ -29,7 +29,10 @@ beforeEach(() => {
 test('Tests that a send declines its stored proposal when the proposal answers an error, so sync resumes', async () => {
   bridge.sendProcess.mockResolvedValue(JSON.stringify({ error: 'no funds' }));
 
-  await expect(send()).rejects.toBe('no funds');
+  await expect(send()).rejects.toEqual({
+    code: 'Unknown',
+    message: 'no funds',
+  });
 
   expect(bridge.confirmProcess).not.toHaveBeenCalled();
   expect(bridge.declineProcess).toHaveBeenCalledTimes(1);
@@ -40,7 +43,10 @@ test('Tests that a send declines nothing when confirm ran, because confirm consu
 
   await expect(send()).resolves.toBe('tx');
   bridge.confirmProcess.mockRejectedValueOnce(new Error('broadcast failed'));
-  await expect(send()).rejects.toMatch('broadcast failed');
+  await expect(send()).rejects.toMatchObject({
+    code: 'Unknown',
+    message: expect.stringContaining('broadcast failed'),
+  });
 
   expect(bridge.declineProcess).not.toHaveBeenCalled();
 });
@@ -48,7 +54,25 @@ test('Tests that a send declines nothing when confirm ran, because confirm consu
 test('Tests that a send declines nothing when the proposal itself was refused', async () => {
   bridge.sendProcess.mockRejectedValue(new Error('refused'));
 
-  await expect(send()).rejects.toMatch('refused');
+  await expect(send()).rejects.toMatchObject({
+    code: 'Unknown',
+    message: expect.stringContaining('refused'),
+  });
+
+  expect(bridge.declineProcess).not.toHaveBeenCalled();
+});
+
+test('Tests that a send rejects under the Mixnet variant when the bridge refuses the proposal with that variant.', async () => {
+  bridge.sendProcess.mockRejectedValue(
+    Object.assign(new Error('the Nym mixnet is bootstrapping'), {
+      code: 'Mixnet',
+    }),
+  );
+
+  await expect(send()).rejects.toMatchObject({
+    code: 'Mixnet',
+    message: expect.stringContaining('the Nym mixnet is bootstrapping'),
+  });
 
   expect(bridge.declineProcess).not.toHaveBeenCalled();
 });

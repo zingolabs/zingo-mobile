@@ -26,6 +26,7 @@ import {
 } from '@app/swap';
 import type { DepositInstructionsType } from '@app/swap';
 import { reserveRefundAddress } from '@app/walletBackend';
+import { toFfiError } from '@app/walletBackend/ffi';
 import { sendGateOpen } from '@app/walletBackend/transforms/mixnetView';
 import { deliver } from '@app/navigation/results';
 import { useAuthorizeDeposit } from './useAuthorizeDeposit';
@@ -245,7 +246,7 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
         broadcastError:
           e instanceof DepositAfterDeshieldError && e.kind === 'pending'
             ? (translate('swap.deposit-other-held') as string)
-            : `${e}`,
+            : toFfiError(e).message,
       });
     }
   }, [

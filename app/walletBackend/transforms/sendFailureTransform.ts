@@ -1,4 +1,5 @@
 import { ErrorKeyed, errorKeyed } from '@app/AppState/types/Result';
+import type { FfiError } from '@app/walletBackend/ffi';
 import type { SendRefusalKey } from './sendPermit';
 
 /**
@@ -37,40 +38,24 @@ const DUPLICATE_NULLIFIER_MARKERS = [
   '18: bad-txns-orchard-duplicate-nullifier',
 ] as const;
 
-/**
- * The display prefix of `ZingolibError::Mixnet`, which zingolib's own test
- * pins where the Binding Layer mints it.
- */
-const OWNED_MIXNET_MARKER = 'Error: mixnet:';
-
-/**
- * Both fail-closed refusal texts (bootstrapping and died) carry this phrase;
- * no server or consensus error does. Secondary to
- * [`OWNED_MIXNET_MARKER`]: it still catches refusal texts that older
- * builds wrapped under other variants, but it is zingolib's prose and a
- * rewording there silently defeats it — which is why the owned marker
- * exists.
- */
+/** Both fail-closed refusal texts carry this phrase, and builds before the `Mixnet` variant wrapped them under other variants. */
 const MIXNET_REFUSAL_MARKER = 'Nym mixnet';
 
 /** The TransactionService's fabricated no-payload errors carry this phrase. */
 const INTERNAL_RPC_MARKER = 'Internal RPC Error';
 
-/**
- * Classify a send failure string from the backend. Pure and total: every
- * error lands in exactly one arm.
- */
-export function classifySendFailure(error: string): SendFailureClass {
+/** Classifies a send rejection by its variant and its message; every rejection lands in exactly one arm. */
+export function classifySendFailure({
+  code,
+  message: error,
+}: FfiError): SendFailureClass {
   if (DUPLICATE_NULLIFIER_MARKERS.some(marker => error.includes(marker))) {
     return { kind: 'duplicateNullifier', error };
   }
   if (error.includes('64: dust')) {
     return { kind: 'dust', error };
   }
-  if (
-    error.includes(OWNED_MIXNET_MARKER) ||
-    error.includes(MIXNET_REFUSAL_MARKER)
-  ) {
+  if (code === 'Mixnet' || error.includes(MIXNET_REFUSAL_MARKER)) {
     return { kind: 'mixnetRefusal', error };
   }
   if (error.includes(INTERNAL_RPC_MARKER)) {
