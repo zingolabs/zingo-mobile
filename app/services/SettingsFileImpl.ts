@@ -90,8 +90,24 @@ const defaultWireFor = (chain: ChainNameEnum | undefined): ServerWire => {
   return found ? { uri: found.uri, chainName: found.chainName } : defaultWire();
 };
 
+/** Whether a migration gave the wallet a listed server of another network, its chain unrecorded beside the uri. */
+const misplaced = (meta: WalletMetaPatch): boolean => {
+  const chains = serverUris(() => {})
+    .filter(s => s.uri === meta.server?.uri)
+    .map(s => s.chainName);
+  return (
+    !meta.server?.chainName &&
+    !!meta.chain &&
+    chains.length > 0 &&
+    !chains.includes(meta.chain)
+  );
+};
+
 /** The wallet's own server, its network's default in Automatic when it has none, and that default too when the list marks its server obsolete and the user did not set it as custom. */
-const walletServer = (meta: WalletMetaPatch): ServerSettings => {
+const walletServer = (stored: WalletMetaPatch): ServerSettings => {
+  const meta: WalletMetaPatch = misplaced(stored)
+    ? omit(stored, ['server', 'selectServer'])
+    : stored;
   const fallback = defaultWireFor(meta.chain);
   const server: ServerWire = meta.server
     ? {
