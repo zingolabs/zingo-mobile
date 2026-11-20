@@ -134,6 +134,11 @@ export async function loadWallet(
   );
 }
 
+/** Stops a nightly sync in progress and answers the id of the wallet the native client holds, empty when it holds none. */
+export async function claimClient(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.claimClient());
+}
+
 /** Deletes the wallet's folder, closing it first when it is the open one. */
 export async function deleteWallet(
   walletId: string,

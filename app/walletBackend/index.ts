@@ -64,6 +64,7 @@ export type {
 } from './utils/walletUtils';
 export {
   activeWalletEntry,
+  claimClient,
   deleteWallet,
   diskSpace,
   hasRoomForWallet,

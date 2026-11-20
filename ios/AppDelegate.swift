@@ -20,16 +20,27 @@ struct SyncCaughtUp: Decodable {
     let percent: Double?
 }
 
-/// What `loadWalletFile` found when preparing a background sync.
-private enum BackgroundWalletLoad {
-    /// The wallet file is open and the lightclient is initialized.
-    case loaded
-    /// The user is in offline mode (empty server URI); nothing to sync.
+/// How one wallet's turn in the nightly sync ended.
+private enum BackgroundTurn {
+    case synced
     case offline
-    /// The wallet could not be loaded, carrying what went wrong so the
-    /// background report names the cause instead of the symptom.
-    case failed(String)
+    case foreground
+    case cancelled
+    case failed(String, String)
+
+    /// The report this turn leaves when it is the active wallet's, nil when the night ends as Finished OK.
+    var report: (message: String, error: String?)? {
+        switch self {
+        case .synced, .cancelled: return nil
+        case .offline: return ("Sync skipped - Offline mode.", nil)
+        case .foreground: return ("App in Foreground, Background task KO.", nil)
+        case .failed(let message, let error): return (message: message, error: error)
+        }
+    }
 }
+
+/// The app took the client back: the nightly sync makes no further call on it.
+private struct Reclaimed: Error {}
 
 private struct BackgroundTaskResult: Encodable {
     let batches: String
@@ -66,6 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   private var bgTask: BGProcessingTask? = nil
   private var timeStampStrStart: String? = nil
   private var syncWorkItem: DispatchWorkItem?
+  private var activeReport: (message: String, error: String?)? = nil
   
   func application(
     _ application: UIApplication,
@@ -208,21 +220,29 @@ extension AppDelegate {
     
     // The engine would keep scanning after the task completes; end it so the
     // save holds the whole session and nothing runs on behind the app.
-    private func stopSyncAndWait() {
+    private func stopSyncAndWait() throws {
         do {
-            _ = try stopSync()
+            _ = try onClient { try stopSync() }
             let deadline = Date().addingTimeInterval(30)
             while Date() < deadline {
-                let poll = try pollSync()
+                let poll = try onClient { try pollSync() }
                 if !poll.lowercased().hasPrefix("sync task is not complete") {
                     return
                 }
                 _ = DispatchSemaphore(value: 0).wait(timeout: .now() + 0.2)
             }
             NSLog("BGTask stopSyncAndWait - timed out")
+        } catch let reclaimed as Reclaimed {
+            throw reclaimed
         } catch {
             NSLog("BGTask stopSyncAndWait - error: \(error.localizedDescription)")
         }
+    }
+
+    /// Runs `call` on the client unless the app took it back.
+    private func onClient<T>(_ call: () throws -> T) throws -> T {
+        guard let value = try BackgroundSync.step(call) else { throw Reclaimed() }
+        return value
     }
 
     private func startBackgroundTask(_ task: BGProcessingTask) {
@@ -231,33 +251,23 @@ extension AppDelegate {
             // stop the sync process, can't wait to check if the process is over.
             // have no time here
             self.syncWorkItem?.cancel()
-            _ = try? stopSync()
-            
             let rpcmodule = RPCModule()
-
-            // save the wallet
-            do {
-              try rpcmodule.saveWalletInternal()
-              NSLog("BGTask startBackgroundTask - expirationHandler Save Wallet")
-            } catch {
-              NSLog("BGTask startBackgroundTask - expirationHandler Save Wallet error: \(error.localizedDescription)")
+            _ = BackgroundSync.step { () -> Void in
+              _ = try? stopSync()
+              do {
+                try rpcmodule.saveWalletInternal()
+                NSLog("BGTask startBackgroundTask - expirationHandler Save Wallet")
+              } catch {
+                NSLog("BGTask startBackgroundTask - expirationHandler Save Wallet error: \(error.localizedDescription)")
+              }
+              if RPCModule.openWalletId != (try? rpcmodule.activeWalletId()) {
+                rpcmodule.closeWalletFile()
+              }
             }
 
-            // save the background file
-            let timeStamp = Date().timeIntervalSince1970
-            let timeStampStr = String(format: "%.0f", timeStamp)
-            let jsonBackground = self.buildBackgroundJSON(message: "Finished OK.", dateEnd: timeStampStr)
-            do {
-              try rpcmodule.saveBackgroundFile(jsonBackground)
-              NSLog("BGTask startBackgroundTask - expirationHandler Save background JSON \(jsonBackground)")
-            } catch {
-              NSLog("BGTask startBackgroundTask - expirationHandler Save background JSON \(jsonBackground) error: \(error.localizedDescription)")
-            }
-          
-            if let task = self.bgTask {
-              task.setTaskCompleted(success: false)
-            }
-            self.bgTask = nil
+            let report = self.activeReport ?? (message: "Finished OK.", error: nil)
+            self.saveReport(message: report.message, error: report.error)
+            self.completeTask(success: false)
             NSLog("BGTask startBackgroundTask - expirationHandler THE END")
         }
 
@@ -359,255 +369,190 @@ extension AppDelegate {
         let rpcmodule = RPCModule()
 
         NSLog("BGTask syncingProcessBackgroundTask")
-      
-        // save the background file
+
         let timeStampStart = Date().timeIntervalSince1970
         self.timeStampStrStart = String(format: "%.0f", timeStampStart)
-        let jsonBackgroundStart = self.buildBackgroundJSON(message: "Starting OK.", dateEnd: "0")
-        do {
-          try rpcmodule.saveBackgroundFile(jsonBackgroundStart)
-          NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundStart)")
-        } catch {
-          NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundStart) error: \(error.localizedDescription)")
-        }
-      
+        self.activeReport = nil
+        saveReport(message: "Starting OK.", dateEnd: "0")
+
         if isAppInForeground() {
-          NSLog("BGTask syncingProcessBackgroundTask - App in Foreground - cancel background task")
-
-          // save the background file
-          let timeStampError = Date().timeIntervalSince1970
-          let timeStampStrError = String(format: "%.0f", timeStampError)
-          let jsonBackgroundError = self.buildBackgroundJSON(message: "App in Foreground, Background task KO.", dateEnd: timeStampStrError)
-          do {
-            try rpcmodule.saveBackgroundFile(jsonBackgroundError)
-            NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
-          } catch {
-            NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError) error: \(error.localizedDescription)")
-          }
-          
-          if let task = self.bgTask {
-            task.setTaskCompleted(success: false)
-          }
-          bgTask = nil
-          return
-        }
-
-        var exists: String = "false"
-        do {
-            try rpcmodule.prepareWallets()
-            exists = try rpcmodule.activeWalletId() == nil ? "false" : "true"
-        } catch {
-            NSLog("BGTask syncingProcessBackgroundTask - Wallet exists error: \(error.localizedDescription)")
-        }
-      
-        if exists == "true" {
-            // load the wallet file
-            let walletLoad = self.loadWalletFile()
-
-            if case .failed(let reason) = walletLoad {
-                NSLog("BGTask syncingProcessBackgroundTask - Load wallet KO: \(reason)")
-
-                // save the background file
-                let timeStampLoadError = Date().timeIntervalSince1970
-                let timeStampStrLoadError = String(format: "%.0f", timeStampLoadError)
-                let jsonBackgroundLoadError = self.buildBackgroundJSON(message: "Load wallet process KO.", dateEnd: timeStampStrLoadError, error: "Load wallet process KO. \(reason)")
-                do {
-                  try rpcmodule.saveBackgroundFile(jsonBackgroundLoadError)
-                  NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundLoadError)")
-                } catch {
-                  NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundLoadError) error: \(error.localizedDescription)")
-                }
-
-                if let task = self.bgTask {
-                  task.setTaskCompleted(success: false)
-                }
-                bgTask = nil
-                return
-            }
-
-            // Nothing to sync without an indexer: recorded as skipped, not as
-            // an error.
-            let skipOffline = {
-                NSLog("BGTask syncingProcessBackgroundTask - Offline mode, sync skipped")
-                let timeStampOffline = Date().timeIntervalSince1970
-                let timeStampStrOffline = String(format: "%.0f", timeStampOffline)
-                let jsonBackgroundOffline = self.buildBackgroundJSON(message: "Sync skipped - Offline mode.", dateEnd: timeStampStrOffline)
-                do {
-                  try rpcmodule.saveBackgroundFile(jsonBackgroundOffline)
-                  NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundOffline)")
-                } catch {
-                  NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundOffline) error: \(error.localizedDescription)")
-                }
-                if let task = self.bgTask {
-                  task.setTaskCompleted(success: true)
-                }
-                self.bgTask = nil
-            }
-
-            if case .offline = walletLoad {
-                skipOffline()
-                return
-            }
-
-            // run the sync process.
-            do {
-              let syncing = try runSync()
-              let syncingStr = String(syncing)
-              NSLog("BGTask syncingProcessBackgroundTask - sync LAUNCH \(syncingStr)")
-            } catch ZingolibError.Offline(_) {
-              // The wallet opened without an indexer: the same as Offline mode.
-              skipOffline()
-              return
-            } catch {
-              NSLog("BGTask syncingProcessBackgroundTask - run Sync error: \(error.localizedDescription)")
-
-              // save the background file
-              let timeStampError = Date().timeIntervalSince1970
-              let timeStampStrError = String(format: "%.0f", timeStampError)
-              let jsonBackgroundError = self.buildBackgroundJSON(message: "Run sync process KO.", dateEnd: timeStampStrError, error: "Run sync process KO. \(error.localizedDescription)")
-              do {
-                try rpcmodule.saveBackgroundFile(jsonBackgroundError)
-                NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
-              } catch {
-                NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError) error: \(error.localizedDescription)")
-              }
-              
-              if let task = self.bgTask {
-                task.setTaskCompleted(success: false)
-              }
-              bgTask = nil
-              return
-            }
-
-            var syncStatus: SyncCaughtUp?
-            while true {
-                if syncWorkItem?.isCancelled == true {
-                    NSLog("BGTask syncingProcessBackgroundTask - sync cancelled by expiration handler")
-                    return
-                }
-                var syncStatusJson: String = ""
-                do {
-                  // The session is continuous: it never ends on its own, so
-                  // one that has ended stopped on a failure, which pollSync
-                  // throws.
-                  let poll = try pollSync()
-                  if !poll.lowercased().hasPrefix("sync task is not complete") {
-                    NSLog("BGTask syncingProcessBackgroundTask - sync ENDED \(poll)")
-                    break
-                  }
-                  syncStatusJson = try syncCaughtUp()
-                } catch {
-                  NSLog("BGTask syncingProcessBackgroundTask - sync STATUS error: \(error.localizedDescription)")
-
-                  // save the background file
-                  let timeStampError = Date().timeIntervalSince1970
-                  let timeStampStrError = String(format: "%.0f", timeStampError)
-                  let jsonBackgroundError = self.buildBackgroundJSON(message: "Status sync process KO.", dateEnd: timeStampStrError, error: "Status sync process KO. \(error.localizedDescription)")
-                  do {
-                    try rpcmodule.saveBackgroundFile(jsonBackgroundError)
-                    NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
-                  } catch {
-                    NSLog("BGTask syncingProcessBackgroundTask - Save background JSON error: \(error.localizedDescription)")
-                  }
-                  
-                  if let task = self.bgTask {
-                    task.setTaskCompleted(success: false)
-                  }
-                  bgTask = nil
-                  return
-                }
-
-                do {
-                  guard let data = syncStatusJson.data(using: .utf8) else {
-                    NSLog("BGTask syncingProcessBackgroundTask - failed to encode syncStatusJson")
-                    if let task = self.bgTask {
-                      task.setTaskCompleted(success: false)
-                    }
-                    bgTask = nil
-                    return
-                  }
-                  syncStatus = try JSONDecoder().decode(SyncCaughtUp.self, from: data)
-
-                  let percent = syncStatus?.percent ?? 0
-
-                  if syncStatus?.caught_up == true {
-                      NSLog("BGTask syncingProcessBackgroundTask - sync CAUGHT UP %: \(percent)")
-                      break
-                  } else {
-                      NSLog("BGTask syncingProcessBackgroundTask - sync STATUS %: \(percent)")
-                  }
-                } catch {
-                  NSLog("BGTask syncingProcessBackgroundTask - sync STATUS parsing error: \(error)")
-                  // save the background file
-                  let timeStampError = Date().timeIntervalSince1970
-                  let timeStampStrError = String(format: "%.0f", timeStampError)
-                  let jsonBackgroundError = self.buildBackgroundJSON(message: "Status sync parsing process KO.", dateEnd: timeStampStrError, error: "Status sync parsing process KO. \(error.localizedDescription)")
-                  do {
-                    try rpcmodule.saveBackgroundFile(jsonBackgroundError)
-                    NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
-                  } catch {
-                    NSLog("BGTask syncingProcessBackgroundTask - Save background JSON error: \(error.localizedDescription)")
-                  }
-                  
-                  if let task = self.bgTask {
-                    task.setTaskCompleted(success: false)
-                  }
-                  bgTask = nil
-                  return
-                }
-
-                //Thread.sleep(forTimeInterval: 5)
-                _ = DispatchSemaphore(value: 0).wait(timeout: .now() + 5)
-            }
-
-        } else {
-            // no wallet file
-            NSLog("BGTask syncingProcessBackgroundTask - No exists wallet file END")
-
-            // save the background file
-            let timeStampError = Date().timeIntervalSince1970
-            let timeStampStrError = String(format: "%.0f", timeStampError)
-            let jsonBackgroundError = self.buildBackgroundJSON(message: "No active wallet KO.", dateEnd: timeStampStrError)
-            do {
-              try rpcmodule.saveBackgroundFile(jsonBackgroundError)
-              NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
-            } catch {
-              NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError) error: \(error.localizedDescription)")
-            }
-            
-            if let task = self.bgTask {
-              task.setTaskCompleted(success: false)
-            }
-            bgTask = nil
+            NSLog("BGTask syncingProcessBackgroundTask - App in Foreground - cancel background task")
+            saveReport(message: "App in Foreground, Background task KO.")
+            completeTask(success: false)
             return
         }
 
-        stopSyncAndWait()
-        NSLog("BGTask syncingProcessBackgroundTask - syncing task STOPPED")
-
-        // save the wallet
+        let documents: String
+        let active: String?
         do {
-          try rpcmodule.saveWalletInternal()
-          NSLog("BGTask syncingProcessBackgroundTask - Save Wallet")
+            try rpcmodule.prepareWallets()
+            documents = try rpcmodule.getDocumentsDirectory()
+            active = try rpcmodule.activeWalletId()
         } catch {
-          NSLog("BGTask syncingProcessBackgroundTask - Save Wallet error: \(error.localizedDescription)")
+            NSLog("BGTask syncingProcessBackgroundTask - Wallet exists error: \(error.localizedDescription)")
+            saveReport(message: "No active wallet KO.")
+            completeTask(success: false)
+            return
         }
-        
-        // save the background file
-        let timeStampEnd = Date().timeIntervalSince1970
-        let timeStampStrEnd = String(format: "%.0f", timeStampEnd)
-        let jsonBackgroundEnd = self.buildBackgroundJSON(message: "Finished OK.", dateEnd: timeStampStrEnd)
-        do {
-          try rpcmodule.saveBackgroundFile(jsonBackgroundEnd)
-          NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundEnd)")
-        } catch {
-          NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundEnd) error: \(error.localizedDescription)")
+        guard let active else {
+            NSLog("BGTask syncingProcessBackgroundTask - No exists wallet file END")
+            saveReport(message: "No active wallet KO.")
+            completeTask(success: false)
+            return
         }
 
-        if let task = self.bgTask {
-          task.setTaskCompleted(success: true)
+        var activeTurn = BackgroundTurn.synced
+        BackgroundSync.begin()
+        defer { BackgroundSync.end() }
+        for id in WalletStore.syncOrder(documents) {
+            let turn = syncWallet(id, isActive: id == active)
+            if id == active {
+                activeTurn = turn
+                self.activeReport = turn.report
+            }
+            if case .cancelled = turn {
+                return
+            }
+            if case .foreground = turn {
+                activeTurn = turn
+                break
+            }
         }
+        do {
+            try onClient { () -> Void in
+                if RPCModule.openWalletId != active {
+                    rpcmodule.closeWalletFile()
+                }
+            }
+        } catch {
+            activeTurn = .foreground
+        }
+
+        let report = activeTurn.report ?? (message: "Finished OK.", error: nil)
+        saveReport(message: report.message, error: report.error)
+        switch activeTurn {
+        case .failed, .foreground:
+            completeTask(success: false)
+        default:
+            completeTask(success: true)
+        }
+    }
+
+    /// Syncs the wallet `id` until it catches up, then saves it.
+    private func syncWallet(_ id: String, isActive: Bool) -> BackgroundTurn {
+        do {
+            return try syncOnClient(id, isActive: isActive)
+        } catch {
+            NSLog("BGTask syncWallet - the app took the client back, sync abandoned")
+            return .foreground
+        }
+    }
+
+    /// Runs the wallet's turn, every call on the client through the gate; throws once the app took the client back.
+    private func syncOnClient(_ id: String, isActive: Bool) throws -> BackgroundTurn {
+        let rpcmodule = RPCModule()
+        if syncWorkItem?.isCancelled == true {
+            return .cancelled
+        }
+        do {
+            guard let server = try (isActive ? rpcmodule.activeServer() : rpcmodule.walletServer(id)) else {
+                return .failed("Load wallet process KO.", "Load wallet process KO. the wallet \(id) has no server")
+            }
+            if server.uri.isEmpty {
+                NSLog("BGTask syncWallet - Offline mode, sync skipped for wallet \(id)")
+                return .offline
+            }
+            NSLog("BGTask syncWallet - Opening the wallet \(id) - serveruri: \(server.uri) chain: \(server.chain)")
+            _ = try onClient {
+                try rpcmodule.fnLoadWallet(
+                    walletId: id, serveruri: server.uri, chainhint: server.chain, performancelevel: "Medium",
+                    minconfirmations: "3", activate: false)
+            }
+        } catch let reclaimed as Reclaimed {
+            throw reclaimed
+        } catch {
+            NSLog("BGTask syncWallet - Load wallet \(id) error: \(error.localizedDescription)")
+            return .failed("Load wallet process KO.", "Load wallet process KO. \(error.localizedDescription)")
+        }
+
+        do {
+            let syncing = try onClient { try runSync() }
+            NSLog("BGTask syncWallet - sync LAUNCH \(id) \(String(syncing))")
+        } catch let reclaimed as Reclaimed {
+            throw reclaimed
+        } catch ZingolibError.Offline(_) {
+            return .offline
+        } catch {
+            NSLog("BGTask syncWallet - run Sync \(id) error: \(error.localizedDescription)")
+            return .failed("Run sync process KO.", "Run sync process KO. \(error.localizedDescription)")
+        }
+
+        while true {
+            if syncWorkItem?.isCancelled == true {
+                NSLog("BGTask syncWallet - sync cancelled by expiration handler")
+                return .cancelled
+            }
+            let syncStatusJson: String
+            do {
+                // The session is continuous: it never ends on its own, so
+                // one that has ended stopped on a failure, which pollSync
+                // throws.
+                let poll = try onClient { try pollSync() }
+                if !poll.lowercased().hasPrefix("sync task is not complete") {
+                    NSLog("BGTask syncWallet - sync ENDED \(id) \(poll)")
+                    break
+                }
+                syncStatusJson = try onClient { try syncCaughtUp() }
+            } catch let reclaimed as Reclaimed {
+                throw reclaimed
+            } catch {
+                NSLog("BGTask syncWallet - sync STATUS \(id) error: \(error.localizedDescription)")
+                try stopSyncAndWait()
+                return .failed("Status sync process KO.", "Status sync process KO. \(error.localizedDescription)")
+            }
+            do {
+                let status = try JSONDecoder().decode(SyncCaughtUp.self, from: Data(syncStatusJson.utf8))
+                let percent = status.percent ?? 0
+                if status.caught_up {
+                    NSLog("BGTask syncWallet - sync CAUGHT UP \(id) %: \(percent)")
+                    break
+                }
+                NSLog("BGTask syncWallet - sync STATUS \(id) %: \(percent)")
+            } catch {
+                NSLog("BGTask syncWallet - sync STATUS parsing \(id) error: \(error)")
+                try stopSyncAndWait()
+                return .failed("Status sync parsing process KO.", "Status sync parsing process KO. \(error.localizedDescription)")
+            }
+            _ = DispatchSemaphore(value: 0).wait(timeout: .now() + 5)
+        }
+
+        try stopSyncAndWait()
+        do {
+            try onClient { try rpcmodule.saveWalletInternal() }
+            NSLog("BGTask syncWallet - Save Wallet \(id)")
+        } catch let reclaimed as Reclaimed {
+            throw reclaimed
+        } catch {
+            NSLog("BGTask syncWallet - Save Wallet \(id) error: \(error.localizedDescription)")
+        }
+        return .synced
+    }
+
+    private func completeTask(success: Bool) {
+        bgTask?.setTaskCompleted(success: success)
         bgTask = nil
+    }
+
+    /// Writes the night's result to the background JSON file.
+    private func saveReport(message: String, dateEnd: String? = nil, error: String? = nil) {
+        let end = dateEnd ?? String(format: "%.0f", Date().timeIntervalSince1970)
+        let json = buildBackgroundJSON(message: message, dateEnd: end, error: error)
+        do {
+            try RPCModule().saveBackgroundFile(json)
+            NSLog("BGTask saveReport - Save background JSON \(json)")
+        } catch {
+            NSLog("BGTask saveReport - Save background JSON \(json) error: \(error.localizedDescription)")
+        }
     }
 
     private func buildBackgroundJSON(message: String, dateEnd: String, error: String? = nil) -> String {
@@ -625,47 +570,9 @@ extension AppDelegate {
         return json
     }
 
-    /// Loads the active wallet with the server its meta records, reporting
-    /// which of the three outcomes happened so the caller can tell "loaded"
-    /// from "offline" from "could not load".
-    ///
-    /// A failed load used to report the same "proceed" as a successful one,
-    /// on the reasoning that the sync would surface its own error. It does,
-    /// but that error is `LightclientNotInitialized`, which names the symptom
-    /// and hides the cause: an unreadable file on a locked device reads
-    /// exactly like a wallet that loaded fine and then failed to sync.
-    private func loadWalletFile() -> BackgroundWalletLoad {
-        let rpcmodule = RPCModule()
-        let server: (uri: String, chain: String)?
-        do {
-            server = try rpcmodule.activeServer()
-        } catch {
-            NSLog("Error: Unable to read the active wallet's server. error: \(error.localizedDescription)")
-            return .failed(error.localizedDescription)
-        }
-        guard let server else {
-            NSLog("Error: the active wallet has no server")
-            return .failed("the active wallet has no server")
-        }
-        let serveruri = server.uri
-        let chainhint = server.chain
-
-        if serveruri.isEmpty {
-            NSLog("Offline mode detected (empty serveruri) - skipping wallet load")
-            return .offline
-        }
-
-        NSLog("Opening the wallet file - No App active - serveruri: \(serveruri) chain: \(chainhint)")
-        do {
-          _ = try rpcmodule.fnLoadExistingWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: "3")
-        } catch {
-          NSLog("Error: Unable to load the wallet. error: \(error.localizedDescription)")
-          return .failed(error.localizedDescription)
-        }
-        return .loaded
-    }
-
     func cancelExecutingTask() {
+        syncWorkItem?.cancel()
+        DispatchQueue.global(qos: .userInitiated).async { BackgroundSync.cancel() }
         if let task = self.bgTask {
           NSLog("BGTask cancelling task")
           task.setTaskCompleted(success: false)

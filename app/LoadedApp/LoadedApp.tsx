@@ -32,6 +32,7 @@ import {
 import WalletBackend from '@app/walletBackend';
 import {
   changeServer,
+  claimClient,
   doSave,
   isWalletAddress,
   loadExistingWallet,
@@ -1110,6 +1111,9 @@ export class LoadedAppClass extends Component<
     // needs this because when the App go from back to fore
     // it have to re-launch all the tasks.
     await this.rpc.clearTimers();
+    if (!(await this.reclaimClient())) {
+      return;
+    }
     await this.rpc.configure();
     if (
       this.state.backgroundError &&
@@ -1122,6 +1126,31 @@ export class LoadedAppClass extends Component<
       });
       this.setBackgroundError('', '');
     }
+  };
+
+  /** Takes the client back from the nightly sync and reopens this wallet when it holds another one; false when it does not open and the app boots again. */
+  reclaimClient = async (): Promise<boolean> => {
+    const held = await claimClient();
+    if (held.ok && held.value === this.state.walletId) {
+      return true;
+    }
+    const opened = await loadWallet(
+      this.state.walletId,
+      nativeUri(this.state.server),
+      this.state.server.chainName,
+      DEFAULT_PERFORMANCE_LEVEL,
+      GlobalConst.minConfirmations.toString(),
+    );
+    if (!opened.ok) {
+      this.navigateToLoadingApp({
+        kind: 'boot',
+        startingApp: false,
+        newWallet: false,
+      });
+      return false;
+    }
+    this.rpc.walletReopened();
+    return true;
   };
 
   /** What a wallet opened in place still waits for before its own figures replace the faded ones. */

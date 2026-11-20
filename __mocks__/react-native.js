@@ -6,6 +6,7 @@ jest.mock('react-native', () => {
     probeServerInfo: jest.fn(() => '{}'),
     getLatestBlockWalletInfo: jest.fn(() => '{}'),
     walletExists: jest.fn(() => 'false'),
+    claimClient: jest.fn(() => ''),
     walletChainInfo: jest.fn(() => 'main'),
     walletsInfo: jest.fn(() => '{ "active": null, "wallets": [] }'),
     updateWalletMetaProcess: jest.fn(() => '{}'),
