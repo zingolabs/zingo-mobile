@@ -4,6 +4,7 @@ import {
   AppState,
   NativeEventSubscription,
   Platform,
+  StyleSheet,
   View,
 } from 'react-native';
 import { useTheme } from '@app/theme';
@@ -11,7 +12,12 @@ import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { defaultTo, isEqual } from 'lodash';
 import { LoadingSession, useSession } from '@app/navigation/session';
-import { isOnTop, navigateWallet, popRoutes } from '@app/navigation/navigate';
+import {
+  isOnTop,
+  navigateWallet,
+  popRoutes,
+  resetWalletRoutes,
+} from '@app/navigation/navigate';
 import { walletErrorKind } from '@app/LoadingApp/walletErrorKind';
 import { LoadedAppNavigationState } from '@app/types';
 import NetInfo, {
@@ -598,7 +604,11 @@ export default function LoadedApp(props: LoadedAppProps) {
       <LoadedAppClass
         {...props}
         leaveWallet={setSession}
-        openWallet={params => setSession({ kind: 'wallet', params })}
+        openWallet={params => {
+          /** The same render remounts the section, so the old screens never draw Home. */
+          resetWalletRoutes();
+          setSession({ kind: 'wallet', params });
+        }}
         walletId={props.wallet.walletId}
         handoff={handoff}
         arrivalNext={props.wallet.next}
@@ -2554,6 +2564,13 @@ export class LoadedAppClass extends Component<
                       <WalletNavigator />
                     </TooltipHost>
                   </FadeInOnMount>
+                  {/* While another wallet opens, the screens still show the last one's figures: nothing on them answers a touch. */}
+                  {this.state.switching.kind === 'opening' && (
+                    <View
+                      testID="wallets.opening-shield"
+                      style={StyleSheet.absoluteFill}
+                    />
+                  )}
                 </OptionsPanelProvider>
                 <AddTagModalHost />
               </BottomSheetModalProvider>

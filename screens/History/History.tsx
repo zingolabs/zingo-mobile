@@ -239,7 +239,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       key: 'transparent',
       node: (
         <TransparentNotice
-          amount={shieldingAmount}
+          amount={shieldingAmount + shieldingFee}
           onShield={() => shieldSheetRef.current?.present()}
         />
       ),

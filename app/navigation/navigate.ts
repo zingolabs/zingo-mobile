@@ -29,6 +29,18 @@ export const navigateWallet = (
   navigationRef.navigate(Route.Wallet, target);
 };
 
+/**
+ * Drops the screens the wallet section kept in the root route. A section
+ * mounted after this starts on Home, not where the wallet it replaces was.
+ */
+export const resetWalletRoutes = (): void => {
+  if (navigationRef.isReady()) {
+    navigationRef.dispatch(
+      CommonActions.reset({ index: 0, routes: [{ name: Route.Wallet }] }),
+    );
+  }
+};
+
 /** Whether `name` is the screen on top: what settles late leaves alone a user who walked away from it. */
 export const isOnTop = (name: string): boolean =>
   navigationRef.isReady() && navigationRef.getCurrentRoute()?.name === name;
