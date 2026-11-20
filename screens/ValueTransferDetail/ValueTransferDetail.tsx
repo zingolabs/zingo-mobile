@@ -41,9 +41,6 @@ import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import SaveContactButton from '@ui/widgets/SaveContactButton';
 import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
 import DetailRows from '@screens/Swap/components/DetailRows';
-import ShieldNote, {
-  leftTransparentFunds,
-} from '@screens/Swap/components/ShieldNote';
 import type { DetailRow } from '@screens/Swap/components/DetailRows';
 import { transferIcon } from '@screens/History/transferIcon';
 import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
@@ -374,12 +371,6 @@ const ValueTransferDetail: React.FunctionComponent<
             />
           )
         ))}
-
-      {leftTransparentFunds(vt) && (
-        <View style={{ marginTop: 12 }}>
-          <ShieldNote text={t('swap.shield-note')} />
-        </View>
-      )}
 
       {(!!memo || !!memoUA) && (
         <View

@@ -903,8 +903,6 @@
     "delete-expired-body": "The swap with no deposit will be deleted from this device.",
     "delete-failed-body": "The failed swap will be deleted from this device.",
     "get-new-quote": "Get a new quote",
-    "shield": "Shield",
-    "shield-note": "It's in your transparent balance, not private yet.",
     "cancel": "Cancel",
     "detail-of": "of",
     "detail-came-back": "came back",
