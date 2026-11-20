@@ -903,8 +903,6 @@
     "delete-expired-body": "O swap sem depósito será excluído deste dispositivo.",
     "delete-failed-body": "O swap falhado será excluído deste dispositivo.",
     "get-new-quote": "Pedir uma nova cotação",
-    "shield": "Blindar",
-    "shield-note": "Está no seu saldo transparente, ainda não é privado.",
     "cancel": "Cancelar",
     "detail-of": "de",
     "detail-came-back": "voltaram",

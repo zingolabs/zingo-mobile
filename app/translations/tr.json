@@ -903,8 +903,6 @@
     "delete-expired-body": "Yatırımı olmayan takas bu cihazdan silinecek.",
     "delete-failed-body": "Başarısız takas bu cihazdan silinecek.",
     "get-new-quote": "Yeni teklif al",
-    "shield": "Koru",
-    "shield-note": "Şeffaf bakiyenizde, henüz gizli değil.",
     "cancel": "İptal",
     "detail-of": "/",
     "detail-came-back": "geri döndü",
