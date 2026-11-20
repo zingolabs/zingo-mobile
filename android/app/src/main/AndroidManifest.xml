@@ -8,6 +8,11 @@
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
 
+    <!-- Portrait-only and NetInfo's Wi-Fi permission imply both features as
+         required, which hides the app on Play from devices without them. -->
+    <uses-feature android:name="android.hardware.screen.portrait" android:required="false" />
+    <uses-feature android:name="android.hardware.wifi" android:required="false" />
+
     <!-- allowBackup="false": wallet files rest as plain zingolib bytes, and
          backup exclusion is their only guard against a stale device backup
          restoring an old wallet over a newer one. It must never flip to true. -->
