@@ -134,6 +134,11 @@ export async function loadWallet(
   );
 }
 
+/** The id of the wallet the native client holds, empty when it holds none. */
+export async function clientWalletId(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.openWalletId());
+}
+
 /** Deletes the wallet's folder, closing it first when it is the open one. */
 export async function deleteWallet(
   walletId: string,
