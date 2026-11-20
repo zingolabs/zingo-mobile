@@ -328,6 +328,9 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           />
         </View>
       </View>
+      <View
+        onLayout={[Function]}
+      />
       <Text
         style={
           [

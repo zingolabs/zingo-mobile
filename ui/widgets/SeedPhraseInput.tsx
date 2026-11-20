@@ -68,6 +68,8 @@ type SeedPhraseInputProps = {
   pulse?: number;
   // The birthday a pasted phrase carried after its words, as Zingo copies it.
   onBirthday?: (height: number) => void;
+  /** Reports the height of the hint and the suggestions below the typed word. */
+  onSuggestionsHeight?: (height: number) => void;
 };
 
 const PULSE_MS = 700;
@@ -108,6 +110,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
   onKeyBlur,
   pulse,
   onBirthday,
+  onSuggestionsHeight,
 }) => {
   const { colors } = useTheme();
   const [draft, setDraft] = useState('');
@@ -564,64 +567,68 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
             </Animated.View>
           )}
         </RNPressable>
-        {!!draftHint && (
-          <Text
-            testID={testID ? `${testID}.hint` : undefined}
-            variant="bodySmall"
-            tone="muted"
-            style={{ marginTop: space12 }}
-          >
-            {draftHint}
-          </Text>
-        )}
-        {suggestions.length > 0 && !invalidDraft && (
-          <Animated.View
-            entering={suggestionsEnter()}
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              gap: 8,
-              marginTop: 14,
-            }}
-          >
-            {suggestions.map((s, i) => (
-              <Pressable
-                kind="button"
-                key={s}
-                onPress={() => acceptWord(s, nativeRef.current)}
-                accessibilityRole="button"
-                style={{
-                  height: CHIP_HEIGHT,
-                  borderRadius: radiusPill,
-                  paddingHorizontal: 11,
-                  justifyContent: 'center',
-                  borderWidth: 1,
-                  borderColor:
-                    i === 0 ? colors.borderAccent : colors.bottomSheetBorder,
-                  backgroundColor:
-                    i === 0 ? colors.bgAccentSubtle : colors.bgCanvas,
-                }}
-              >
-                <RNText
+        <View
+          onLayout={e => onSuggestionsHeight?.(e.nativeEvent.layout.height)}
+        >
+          {!!draftHint && (
+            <Text
+              testID={testID ? `${testID}.hint` : undefined}
+              variant="bodySmall"
+              tone="muted"
+              style={{ marginTop: space12 }}
+            >
+              {draftHint}
+            </Text>
+          )}
+          {suggestions.length > 0 && !invalidDraft && (
+            <Animated.View
+              entering={suggestionsEnter()}
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                gap: 8,
+                marginTop: 14,
+              }}
+            >
+              {suggestions.map((s, i) => (
+                <Pressable
+                  kind="button"
+                  key={s}
+                  onPress={() => acceptWord(s, nativeRef.current)}
+                  accessibilityRole="button"
                   style={{
-                    color: i === 0 ? colors.fgAccent : colors.fgMuted,
-                    fontSize: textVariants.bodySmall.fontSize,
+                    height: CHIP_HEIGHT,
+                    borderRadius: radiusPill,
+                    paddingHorizontal: 11,
+                    justifyContent: 'center',
+                    borderWidth: 1,
+                    borderColor:
+                      i === 0 ? colors.borderAccent : colors.bottomSheetBorder,
+                    backgroundColor:
+                      i === 0 ? colors.bgAccentSubtle : colors.bgCanvas,
                   }}
                 >
                   <RNText
                     style={{
-                      color: i === 0 ? colors.fgAccent : colors.fgDefault,
-                      fontWeight: '600',
+                      color: i === 0 ? colors.fgAccent : colors.fgMuted,
+                      fontSize: textVariants.bodySmall.fontSize,
                     }}
                   >
-                    {draft.toLowerCase()}
+                    <RNText
+                      style={{
+                        color: i === 0 ? colors.fgAccent : colors.fgDefault,
+                        fontWeight: '600',
+                      }}
+                    >
+                      {draft.toLowerCase()}
+                    </RNText>
+                    {s.slice(draft.length)}
                   </RNText>
-                  {s.slice(draft.length)}
-                </RNText>
-              </Pressable>
-            ))}
-          </Animated.View>
-        )}
+                </Pressable>
+              ))}
+            </Animated.View>
+          )}
+        </View>
         <Animated.Text
           style={[
             {

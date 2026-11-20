@@ -118,6 +118,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   const [pulse, setPulse] = useState(0);
   const keyboardHeight = useKeyboardHeight();
   const [noteH, setNoteH] = useState<number>(0);
+  const [suggestionsH, setSuggestionsH] = useState<number>(0);
 
   const status = seedStatus(seedufvkText);
   const typedKey = status.kind === 'ufvk' ? status.key : '';
@@ -318,7 +319,9 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
         {...edges}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode={dismissOnDrag}
-        bottomOffset={BUTTON_HEIGHT + space12 + space16 + EDGE_FADE}
+        bottomOffset={
+          BUTTON_HEIGHT + space12 + space16 + EDGE_FADE + suggestionsH
+        }
         bounces={false}
         onScrollBeginDrag={() => setTipOpen(false)}
         style={{ flex: 1 }}
@@ -381,6 +384,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           onKeyBlur={() => setKeyPaused(true)}
           pulse={pulse}
           onBirthday={fillBirthday}
+          onSuggestionsHeight={setSuggestionsH}
         />
 
         <View
