@@ -135,6 +135,43 @@ enum StorageError: Error {
   case diskFull(String)
 }
 
+/// The gate between the nightly sync and the app: once the app takes the client back, the sync makes no further call on it.
+enum BackgroundSync {
+  private static let lock = NSLock()
+  private static var running = false
+  private static var cancelled = false
+
+  static func begin() {
+    lock.lock()
+    defer { lock.unlock() }
+    running = true
+    cancelled = false
+  }
+
+  static func end() {
+    lock.lock()
+    defer { lock.unlock() }
+    running = false
+  }
+
+  /// Runs `call` on the client unless the app took it back, nil when it did.
+  static func step<T>(_ call: () throws -> T) rethrows -> T? {
+    lock.lock()
+    defer { lock.unlock() }
+    return cancelled ? nil : try call()
+  }
+
+  /// Takes the client back from a nightly sync in progress, after its current call, and stops its engine.
+  static func cancel() {
+    lock.lock()
+    defer { lock.unlock() }
+    if running && !cancelled {
+      cancelled = true
+      _ = try? stopSync()
+    }
+  }
+}
+
 /// The wallets on disk, one folder per wallet under `wallets/`, where the meta is the commit point.
 enum WalletStore {
   static let walletName = "wallet.dat"
@@ -685,10 +722,11 @@ class RPCModule: NSObject {
     return WalletStore.walletPath(documents, id)
   }
 
-  /// The id of the wallet the client holds, empty when it holds none.
-  @objc(openWalletId:reject:)
-  func openWalletId(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  /// Takes the client back from a nightly sync in progress and answers the id of the wallet it holds, empty when it holds none.
+  @objc(claimClient:reject:)
+  func claimClient(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     FfiOutcome.of {
+      BackgroundSync.cancel()
       RPCModule.walletFileHold.lock()
       defer { RPCModule.walletFileHold.unlock() }
       return RPCModule.openWalletId ?? ""
@@ -925,6 +963,7 @@ class RPCModule: NSObject {
     reject: @escaping RCTPromiseRejectBlock
   ) {
     FfiOutcome.of {
+      BackgroundSync.cancel()
       try self.fnCreateNewWallet(serveruri: serveruri, birthday: birthday, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
     }.settle(resolve: resolve, reject: reject)
   }
@@ -957,6 +996,7 @@ class RPCModule: NSObject {
     reject: @escaping RCTPromiseRejectBlock
   ) {
     FfiOutcome.of {
+      BackgroundSync.cancel()
       try self.fnRestoreWalletFromSeed(restoreSeed: restoreSeed, birthday: birthday, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
     }.settle(resolve: resolve, reject: reject)
   }
@@ -989,6 +1029,7 @@ class RPCModule: NSObject {
     reject: @escaping RCTPromiseRejectBlock
   ) {
     FfiOutcome.of {
+      BackgroundSync.cancel()
       try self.fnRestoreWalletFromUfvk(restoreUfvk: restoreUfvk, birthday: birthday, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
     }.settle(resolve: resolve, reject: reject)
   }
@@ -1044,6 +1085,7 @@ class RPCModule: NSObject {
   ) {
     DispatchQueue.global(qos: .userInitiated).async {
       FfiOutcome.of {
+        BackgroundSync.cancel()
         try self.fnLoadWallet(
           walletId: walletId, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel,
           minconfirmations: minconfirmations)
@@ -1146,6 +1188,7 @@ class RPCModule: NSObject {
     reject: @escaping RCTPromiseRejectBlock
   ) {
     FfiOutcome.of {
+      BackgroundSync.cancel()
       try self.fnLoadExistingWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
     }.settle(resolve: resolve, reject: reject)
   }

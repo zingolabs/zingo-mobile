@@ -31,6 +31,8 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlin.time.toJavaDuration
 import java.io.FileNotFoundException
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 class BackgroundSyncWorker(private val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
     private val rpcModule = RPCModule(MainApplication.getAppReactContext())
@@ -58,6 +60,13 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
         class Failed(val message: String, val error: String) : Turn()
     }
 
+    /** The app took the client back: the turn ends without another call. */
+    private class Reclaimed : Exception()
+
+    /** Runs `call` on the client unless the app took it back. */
+    private fun <T : Any> onClient(call: () -> T): T =
+        if (isStopped) throw Reclaimed() else BackgroundSync.step(call) ?: throw Reclaimed()
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun doWork(): Result {
 
@@ -83,17 +92,22 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
         val filesDir = context.filesDir
         val active = WalletStore.active(filesDir)
         var activeTurn: Turn = Turn.Synced
-        for (id in WalletStore.syncOrder(filesDir)) {
-            if (System.currentTimeMillis() >= deadline) {
-                Log.w("SCHEDULED_TASK_RUN", "sync window over before wallet $id")
-                break
+        BackgroundSync.begin()
+        try {
+            for (id in WalletStore.syncOrder(filesDir)) {
+                if (System.currentTimeMillis() >= deadline) {
+                    Log.w("SCHEDULED_TASK_RUN", "sync window over before wallet $id")
+                    break
+                }
+                val turn = syncWallet(id, id == active, deadline)
+                if (id == active) activeTurn = turn
             }
-            val turn = syncWallet(id, id == active, deadline)
-            if (id == active) activeTurn = turn
-            if (turn is Turn.Foreground) break
-        }
-        if (RPCModule.openWalletId != active && !isAppInForeground(context)) {
-            rpcModule.closeWalletFile()
+            onClient { if (RPCModule.openWalletId != active) rpcModule.closeWalletFile() }
+        } catch (e: Reclaimed) {
+            Log.i("SCHEDULED_TASK_RUN", "The app took the client back, sync abandoned")
+            activeTurn = Turn.Foreground
+        } finally {
+            BackgroundSync.end()
         }
 
         return when (val turn = activeTurn) {
@@ -118,7 +132,6 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
 
     /** Syncs the wallet `id` until it catches up or the window ends, then saves it. */
     private fun syncWallet(id: String, isActive: Boolean, deadline: Long): Turn {
-        if (isAppInForeground(context)) return Turn.Foreground
         try {
             val server = (if (isActive) rpcModule.activeServer() else rpcModule.walletServer(id))
                 ?: throw FileNotFoundException("Error: the wallet $id has no server")
@@ -128,9 +141,11 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                 return Turn.Offline
             }
             Log.i("SCHEDULED_TASK_RUN", "Opening the wallet $id - serveruri: $serveruri chain: $chainhint")
-            rpcModule.loadWalletNative(id, serveruri, chainhint, "Medium", "3", activate = false)
-            val syncing = uniffi.zingo.runSync()
+            onClient { rpcModule.loadWalletNative(id, serveruri, chainhint, "Medium", "3", activate = false) }
+            val syncing = onClient { uniffi.zingo.runSync() }
             Log.i("SCHEDULED_TASK_RUN", "sync LAUNCH $id: $syncing")
+        } catch (e: Reclaimed) {
+            throw e
         } catch (t: uniffi.zingo.ZingolibException.Offline) {
             return Turn.Offline
         } catch (t: Throwable) {
@@ -143,15 +158,11 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                 Log.w("SCHEDULED_TASK_RUN", "sync window over for wallet $id")
                 break
             }
-            if (isAppInForeground(context)) {
-                if (RPCModule.openWalletId == id) stopAndSave(id)
-                return Turn.Foreground
-            }
             val syncStatusJson = try {
                 // The session is continuous: it never ends on its own,
                 // so one that has ended stopped on a failure, which
                 // pollSync throws.
-                val poll = uniffi.zingo.pollSync()
+                val poll = onClient { uniffi.zingo.pollSync() }
                 if (!poll.lowercase().startsWith("sync task is not complete")) {
                     Log.i("SCHEDULED_TASK_RUN", "sync ENDED $id: $poll")
                     break
@@ -159,7 +170,9 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                 // syncCaughtUp reads only the engine's published status;
                 // statusSync would read a stale wallet as complete before
                 // the engine publishes.
-                uniffi.zingo.syncCaughtUp()
+                onClient { uniffi.zingo.syncCaughtUp() }
+            } catch (e: Reclaimed) {
+                throw e
             } catch (t: Throwable) {
                 Log.i("SCHEDULED_TASK_RUN", "Sync STATUS error for wallet $id: $t")
                 stopSyncAndWait()
@@ -181,15 +194,10 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             Thread.sleep(5000)
         }
 
-        stopAndSave(id)
-        return Turn.Synced
-    }
-
-    /** Ends the wallet's sync and saves what it reached. */
-    private fun stopAndSave(id: String) {
         stopSyncAndWait()
-        rpcModule.saveWalletFile()
+        onClient { rpcModule.saveWalletFile() }
         Log.i("SCHEDULED_TASK_RUN", "wallet $id SAVED")
+        return Turn.Synced
     }
 
     /** Writes the night's result to the background JSON file. */
@@ -209,16 +217,18 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
     // save holds the whole session and nothing runs on behind the app.
     private fun stopSyncAndWait() {
         try {
-            uniffi.zingo.stopSync()
+            onClient { uniffi.zingo.stopSync() }
             val deadline = System.currentTimeMillis() + 30 * 1000
             while (System.currentTimeMillis() < deadline) {
-                val poll = uniffi.zingo.pollSync()
+                val poll = onClient { uniffi.zingo.pollSync() }
                 if (!poll.lowercase().startsWith("sync task is not complete")) {
                     return
                 }
                 Thread.sleep(200)
             }
             Log.w("SCHEDULED_TASK_RUN", "sync STOP timed out")
+        } catch (e: Reclaimed) {
+            throw e
         } catch (t: Throwable) {
             Log.i("SCHEDULED_TASK_RUN", "sync STOP error: $t")
         }
@@ -227,6 +237,31 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
     private companion object {
         /** WorkManager stops a worker at 10 minutes; the last save lands before that. */
         const val SYNC_WINDOW_MS = 8 * 60 * 1000L + 30 * 1000L
+    }
+}
+
+/** The gate between the nightly sync and the app: once the app takes the client back, the sync makes no further call on it. */
+object BackgroundSync {
+    private val lock = ReentrantLock()
+    private var running = false
+    private var cancelled = false
+
+    fun begin() = lock.withLock {
+        running = true
+        cancelled = false
+    }
+
+    fun end() = lock.withLock { running = false }
+
+    /** Runs `call` on the client unless the app took it back, null when it did. */
+    fun <T : Any> step(call: () -> T): T? = lock.withLock { if (cancelled) null else call() }
+
+    /** Takes the client back from a nightly sync in progress, after its current call, and stops its engine. */
+    fun cancel() = lock.withLock {
+        if (running && !cancelled) {
+            cancelled = true
+            runCatching { uniffi.zingo.stopSync() }
+        }
     }
 }
 
@@ -304,6 +339,7 @@ class BSCompanion {
 
         fun cancelExecutingTask() {
             val context = MainApplication.getAppContext() as Context
+            Thread { BackgroundSync.cancel() }.start()
 
             Log.i("SCHEDULING_TASK", "Cancel background Task")
             WorkManager.getInstance(context)

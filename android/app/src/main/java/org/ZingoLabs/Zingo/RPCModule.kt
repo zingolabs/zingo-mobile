@@ -346,12 +346,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }.settle(promise)
     }
 
-    /** The id of the wallet the client holds, empty when it holds none. */
+    /** Takes the client back from a nightly sync in progress and answers the id of the wallet it holds, empty when it holds none. */
     @ReactMethod
-    fun openWalletId(promise: Promise) {
-        FfiOutcome.of("open_wallet_id") {
+    fun claimClient(promise: Promise) {
+        FfiOutcome.settling(promise, "claim_client") {
+            BackgroundSync.cancel()
             openWalletId ?: ""
-        }.settle(promise)
+        }
     }
 
     @ReactMethod
@@ -653,6 +654,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun createNewWallet(serveruri: String, birthday: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
         FfiOutcome.settling(promise, "init_new") {
+            BackgroundSync.cancel()
             uniffi.zingo.initLogging()
             closeWalletFile()
 
@@ -669,6 +671,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun restoreWalletFromSeed(seed: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
         FfiOutcome.settling(promise, "init_from_seed") {
+            BackgroundSync.cancel()
             uniffi.zingo.initLogging()
             closeWalletFile()
 
@@ -681,6 +684,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun restoreWalletFromUfvk(ufvk: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
         FfiOutcome.settling(promise, "init_from_ufvk") {
+            BackgroundSync.cancel()
             uniffi.zingo.initLogging()
             closeWalletFile()
 
@@ -693,6 +697,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun loadExistingWallet(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
         FfiOutcome.settling(promise, "init_from_bytes") {
+            BackgroundSync.cancel()
             loadExistingWalletNative(serveruri, chainhint, performancelevel, minconfirmations)
         }
     }
@@ -726,6 +731,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun loadWalletProcess(id: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
         FfiOutcome.settling(promise, "init_from_bytes") {
+            BackgroundSync.cancel()
             loadWalletNative(id, serveruri, chainhint, performancelevel, minconfirmations)
         }
     }

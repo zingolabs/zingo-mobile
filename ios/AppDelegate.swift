@@ -39,6 +39,9 @@ private enum BackgroundTurn {
     }
 }
 
+/// The app took the client back: the nightly sync makes no further call on it.
+private struct Reclaimed: Error {}
+
 private struct BackgroundTaskResult: Encodable {
     let batches: String
     let message: String
@@ -217,21 +220,29 @@ extension AppDelegate {
     
     // The engine would keep scanning after the task completes; end it so the
     // save holds the whole session and nothing runs on behind the app.
-    private func stopSyncAndWait() {
+    private func stopSyncAndWait() throws {
         do {
-            _ = try stopSync()
+            _ = try onClient { try stopSync() }
             let deadline = Date().addingTimeInterval(30)
             while Date() < deadline {
-                let poll = try pollSync()
+                let poll = try onClient { try pollSync() }
                 if !poll.lowercased().hasPrefix("sync task is not complete") {
                     return
                 }
                 _ = DispatchSemaphore(value: 0).wait(timeout: .now() + 0.2)
             }
             NSLog("BGTask stopSyncAndWait - timed out")
+        } catch let reclaimed as Reclaimed {
+            throw reclaimed
         } catch {
             NSLog("BGTask stopSyncAndWait - error: \(error.localizedDescription)")
         }
+    }
+
+    /// Runs `call` on the client unless the app took it back.
+    private func onClient<T>(_ call: () throws -> T) throws -> T {
+        guard let value = try BackgroundSync.step(call) else { throw Reclaimed() }
+        return value
     }
 
     private func startBackgroundTask(_ task: BGProcessingTask) {
@@ -240,19 +251,18 @@ extension AppDelegate {
             // stop the sync process, can't wait to check if the process is over.
             // have no time here
             self.syncWorkItem?.cancel()
-            _ = try? stopSync()
-            
             let rpcmodule = RPCModule()
-
-            // save the wallet
-            do {
-              try rpcmodule.saveWalletInternal()
-              NSLog("BGTask startBackgroundTask - expirationHandler Save Wallet")
-            } catch {
-              NSLog("BGTask startBackgroundTask - expirationHandler Save Wallet error: \(error.localizedDescription)")
-            }
-            if RPCModule.openWalletId != (try? rpcmodule.activeWalletId()) {
-              rpcmodule.closeWalletFile()
+            _ = BackgroundSync.step {
+              _ = try? stopSync()
+              do {
+                try rpcmodule.saveWalletInternal()
+                NSLog("BGTask startBackgroundTask - expirationHandler Save Wallet")
+              } catch {
+                NSLog("BGTask startBackgroundTask - expirationHandler Save Wallet error: \(error.localizedDescription)")
+              }
+              if RPCModule.openWalletId != (try? rpcmodule.activeWalletId()) {
+                rpcmodule.closeWalletFile()
+              }
             }
 
             let report = self.activeReport ?? (message: "Finished OK.", error: nil)
@@ -392,6 +402,8 @@ extension AppDelegate {
         }
 
         var activeTurn = BackgroundTurn.synced
+        BackgroundSync.begin()
+        defer { BackgroundSync.end() }
         for id in WalletStore.syncOrder(documents) {
             let turn = syncWallet(id, isActive: id == active)
             if id == active {
@@ -402,11 +414,12 @@ extension AppDelegate {
                 return
             }
             if case .foreground = turn {
+                activeTurn = turn
                 break
             }
         }
-        if RPCModule.openWalletId != active && !isAppInForeground() {
-            rpcmodule.closeWalletFile()
+        if (try? onClient({ if RPCModule.openWalletId != active { rpcmodule.closeWalletFile() } })) == nil {
+            activeTurn = .foreground
         }
 
         let report = activeTurn.report ?? (message: "Finished OK.", error: nil)
@@ -421,12 +434,19 @@ extension AppDelegate {
 
     /// Syncs the wallet `id` until it catches up, then saves it.
     private func syncWallet(_ id: String, isActive: Bool) -> BackgroundTurn {
+        do {
+            return try syncOnClient(id, isActive: isActive)
+        } catch {
+            NSLog("BGTask syncWallet - the app took the client back, sync abandoned")
+            return .foreground
+        }
+    }
+
+    /// Runs the wallet's turn, every call on the client through the gate; throws once the app took the client back.
+    private func syncOnClient(_ id: String, isActive: Bool) throws -> BackgroundTurn {
         let rpcmodule = RPCModule()
         if syncWorkItem?.isCancelled == true {
             return .cancelled
-        }
-        if isAppInForeground() {
-            return .foreground
         }
         do {
             guard let server = try (isActive ? rpcmodule.activeServer() : rpcmodule.walletServer(id)) else {
@@ -437,17 +457,23 @@ extension AppDelegate {
                 return .offline
             }
             NSLog("BGTask syncWallet - Opening the wallet \(id) - serveruri: \(server.uri) chain: \(server.chain)")
-            _ = try rpcmodule.fnLoadWallet(
-                walletId: id, serveruri: server.uri, chainhint: server.chain, performancelevel: "Medium",
-                minconfirmations: "3", activate: false)
+            _ = try onClient {
+                try rpcmodule.fnLoadWallet(
+                    walletId: id, serveruri: server.uri, chainhint: server.chain, performancelevel: "Medium",
+                    minconfirmations: "3", activate: false)
+            }
+        } catch let reclaimed as Reclaimed {
+            throw reclaimed
         } catch {
             NSLog("BGTask syncWallet - Load wallet \(id) error: \(error.localizedDescription)")
             return .failed("Load wallet process KO.", "Load wallet process KO. \(error.localizedDescription)")
         }
 
         do {
-            let syncing = try runSync()
+            let syncing = try onClient { try runSync() }
             NSLog("BGTask syncWallet - sync LAUNCH \(id) \(String(syncing))")
+        } catch let reclaimed as Reclaimed {
+            throw reclaimed
         } catch ZingolibError.Offline(_) {
             return .offline
         } catch {
@@ -460,26 +486,22 @@ extension AppDelegate {
                 NSLog("BGTask syncWallet - sync cancelled by expiration handler")
                 return .cancelled
             }
-            if isAppInForeground() {
-                if RPCModule.openWalletId == id {
-                    stopAndSave(id)
-                }
-                return .foreground
-            }
             let syncStatusJson: String
             do {
                 // The session is continuous: it never ends on its own, so
                 // one that has ended stopped on a failure, which pollSync
                 // throws.
-                let poll = try pollSync()
+                let poll = try onClient { try pollSync() }
                 if !poll.lowercased().hasPrefix("sync task is not complete") {
                     NSLog("BGTask syncWallet - sync ENDED \(id) \(poll)")
                     break
                 }
-                syncStatusJson = try syncCaughtUp()
+                syncStatusJson = try onClient { try syncCaughtUp() }
+            } catch let reclaimed as Reclaimed {
+                throw reclaimed
             } catch {
                 NSLog("BGTask syncWallet - sync STATUS \(id) error: \(error.localizedDescription)")
-                stopSyncAndWait()
+                try stopSyncAndWait()
                 return .failed("Status sync process KO.", "Status sync process KO. \(error.localizedDescription)")
             }
             do {
@@ -492,25 +514,22 @@ extension AppDelegate {
                 NSLog("BGTask syncWallet - sync STATUS \(id) %: \(percent)")
             } catch {
                 NSLog("BGTask syncWallet - sync STATUS parsing \(id) error: \(error)")
-                stopSyncAndWait()
+                try stopSyncAndWait()
                 return .failed("Status sync parsing process KO.", "Status sync parsing process KO. \(error.localizedDescription)")
             }
             _ = DispatchSemaphore(value: 0).wait(timeout: .now() + 5)
         }
 
-        stopAndSave(id)
-        return .synced
-    }
-
-    /// Ends the wallet's sync and saves what it reached.
-    private func stopAndSave(_ id: String) {
-        stopSyncAndWait()
+        try stopSyncAndWait()
         do {
-            try RPCModule().saveWalletInternal()
-            NSLog("BGTask stopAndSave - Save Wallet \(id)")
+            try onClient { try rpcmodule.saveWalletInternal() }
+            NSLog("BGTask syncWallet - Save Wallet \(id)")
+        } catch let reclaimed as Reclaimed {
+            throw reclaimed
         } catch {
-            NSLog("BGTask stopAndSave - Save Wallet \(id) error: \(error.localizedDescription)")
+            NSLog("BGTask syncWallet - Save Wallet \(id) error: \(error.localizedDescription)")
         }
+        return .synced
     }
 
     private func completeTask(success: Bool) {
@@ -546,6 +565,8 @@ extension AppDelegate {
     }
 
     func cancelExecutingTask() {
+        syncWorkItem?.cancel()
+        DispatchQueue.global(qos: .userInitiated).async { BackgroundSync.cancel() }
         if let task = self.bgTask {
           NSLog("BGTask cancelling task")
           task.setTaskCompleted(success: false)

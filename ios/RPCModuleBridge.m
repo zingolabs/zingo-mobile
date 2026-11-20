@@ -12,7 +12,7 @@
 RCT_EXTERN_METHOD(walletExists: 
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(openWalletId:
+RCT_EXTERN_METHOD(claimClient:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(createNewWallet:
