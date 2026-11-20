@@ -133,9 +133,14 @@ without losing meaning, the "so" was decorative. Delete it.
 
 ### Documentation in code
 
-Every item doc-comment (Rust `///`, KDoc, Swift doc-comment) is one sentence
-and references no ADR, issue, or other document. Module headers (Rust `//!`,
-file- or class-level blocks) are NOT exempt.
+A doc-comment (Rust `///` and `//!`, KDoc, Swift doc-comment, JSDoc) holds
+only a terse bulleted list of side effects, doc-tests, or both. Each bullet
+names one side effect of the item: a write to disk, a network call, a lock it
+takes, a mutation of shared state, a spawned task, a panic. A doc-test is an
+example the toolchain compiles and runs. A doc-comment holds no summary line,
+no parameter or return description, and references no ADR, issue, or other
+document. An item with no side effect and no doc-test carries no doc-comment.
+Module headers (Rust `//!`, file- or class-level blocks) are NOT exempt.
 
 ### TypeScript / React
 
