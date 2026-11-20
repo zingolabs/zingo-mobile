@@ -165,6 +165,18 @@ class WalletStoreTest {
     }
 
     @Test
+    fun `Tests that a legacy wallet takes the lowest free name when its own is in use`() {
+        val open = committed("Wallet 1")
+        WalletStore.setActive(base, open)
+        File(base, "wallet.dat").writeBytes(plainWallet(3))
+
+        val id = WalletStore.adoptLegacy(base, "wallet.dat", "Wallet 1", true, "main", null)!!
+
+        assertEquals("Wallet 2", WalletStore.list(base).single { it.id == id }.meta.getString("name"))
+        assertEquals(open, WalletStore.active(base))
+    }
+
+    @Test
     fun `Tests that a migration resumes into the same folder when a crash left the file behind`() {
         File(base, "wallet.dat").writeBytes(plainWallet())
         val digest = PlainWalletFile.digest(base, "wallet.dat").joinToString("") { "%02x".format(it) }
