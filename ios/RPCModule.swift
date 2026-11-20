@@ -604,7 +604,7 @@ class RPCModule: NSObject {
       chain = try readWalletChain(walletBytes: try readWalletFileBytes(atPath: "\(documents)/\(fileName)"))
     } catch {
       NSLog("[Native] \(fileName) moves unread: \(error.localizedDescription)")
-      chain = fileName == Constants.WalletBackupFileName.rawValue ? "main" : server?["chainName"] as? String
+      chain = server?["chainName"] as? String
     }
     let uri = (server?["chainName"] as? String) == chain ? server?["uri"] as? String : nil
     _ = try WalletStore.adoptLegacy(
