@@ -13,6 +13,7 @@ export default function TransparentNotice({
   amount,
   onShield,
 }: {
+  /** The transparent balance, the fee still in it. */
   amount: number;
   onShield: () => void;
 }) {
