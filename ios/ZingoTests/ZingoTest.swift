@@ -1185,6 +1185,17 @@ class WalletStoreTests: XCTestCase {
         XCTAssertFalse(FileManager.default.fileExists(atPath: "\(base)/wallet.backup.dat.txt"))
     }
 
+    func testALegacyWalletTakesTheLowestFreeNameWhenItsOwnIsInUse() throws {
+        let open = try committed("Wallet 1")
+        try WalletStore.setActive(base, open)
+        try legacy("wallet.dat.txt", "main")
+
+        let id = try XCTUnwrap(try WalletStore.adoptLegacy(base, legacy: "wallet.dat.txt", name: "Wallet 1", active: true, chain: "main", serverUri: nil))
+
+        XCTAssertEqual(WalletStore.list(base).first(where: { $0.id == id })?.meta["name"] as? String, "Wallet 2")
+        XCTAssertEqual(WalletStore.active(base), open)
+    }
+
     func testAMigrationResumesIntoTheSameFolderWhenACrashLeftTheFileBehind() throws {
         try legacy("wallet.dat.txt", "main")
         let id = try WalletStore.allocate(base)

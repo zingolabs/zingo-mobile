@@ -150,6 +150,10 @@ object WalletStore {
         return "Wallet $n"
     }
 
+    /** The name itself when no wallet uses it, otherwise the lowest free "Wallet n". */
+    fun freeName(base: File, name: String): String =
+        if (list(base).any { it.meta.optString("name") == name }) defaultName(base) else name
+
     /** Ends the deletes and drops the creates a crash interrupted, except the folder `keep`. */
     fun sweep(base: File, keep: String?) {
         for (child in root(base).listFiles() ?: return) {
@@ -189,7 +193,7 @@ object WalletStore {
         val digest = PlainWalletFile.digest(base, legacy).joinToString("") { "%02x".format(it) }
         val id = list(base).firstOrNull { !it.hasFile && it.meta.optString("migratedFrom") == digest }?.id
             ?: allocate(base).also { id ->
-                writeMeta(base, id, newMeta(base, id, name, chain, serverUri).put("migratedFrom", digest))
+                writeMeta(base, id, newMeta(base, id, freeName(base, name), chain, serverUri).put("migratedFrom", digest))
             }
         if (active && pointed(base) == null) setActive(base, id)
         val folder = dir(base, id)

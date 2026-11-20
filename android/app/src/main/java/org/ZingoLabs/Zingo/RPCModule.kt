@@ -280,7 +280,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             Log.w("MAIN", "[Native] $fileName moves unread: $e")
             server?.optString("chainName")
         }
-        WalletStore.adoptLegacy(filesDir, fileName, name, active, chain, server?.optString("uri"))
+        val uri = server?.takeIf { it.optString("chainName") == chain }?.optString("uri")
+        WalletStore.adoptLegacy(filesDir, fileName, name, active, chain, uri)
     }
 
     /** Brings the files dir to the folder layout and ends what a crash interrupted. */
