@@ -297,6 +297,11 @@ enum WalletStore {
     return "Wallet \(n)"
   }
 
+  /// The name itself when no wallet uses it, otherwise the lowest free "Wallet n".
+  static func freeName(_ base: String, _ name: String) -> String {
+    list(base).contains(where: { $0.meta["name"] as? String == name }) ? defaultName(base) : name
+  }
+
   /// Ends the deletes and drops the creates a crash interrupted, except the folder `keep`.
   static func sweep(_ base: String, keep: String?) {
     let fm = FileManager.default
@@ -343,7 +348,7 @@ enum WalletStore {
       id = resumed.id
     } else {
       id = try allocate(base)
-      var meta = newMeta(base, id, name: name, chain: chain, serverUri: serverUri)
+      var meta = newMeta(base, id, name: freeName(base, name), chain: chain, serverUri: serverUri)
       meta["migratedFrom"] = sum
       try writeMeta(base, id, meta)
     }
