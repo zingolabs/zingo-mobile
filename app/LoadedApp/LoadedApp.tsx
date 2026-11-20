@@ -2578,7 +2578,8 @@ export class LoadedAppClass extends Component<
           </SwapServiceProvider>
         </ContextAppLoadedProvider>
         {Platform.OS === GlobalConst.platformOSios ? (
-          <FullWindowOverlay>
+          /** Modal by default, the overlay hides the app below it from VoiceOver. */
+          <FullWindowOverlay unstable_accessibilityContainerViewIsModal={false}>
             <Toast config={toastConfig} />
           </FullWindowOverlay>
         ) : (
