@@ -4,8 +4,6 @@ import android.util.Base64
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKeys
 import androidx.test.platform.app.InstrumentationRegistry
-import com.facebook.react.bridge.Promise
-import com.facebook.react.bridge.WritableMap
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -15,7 +13,7 @@ import java.io.File
  * Diagnosis and repair against the real Keystore under the Step 1 plain
  * format: raw plain bytes diagnose healthy, a legacy envelope diagnoses
  * `encryptedLegacy`, the double wrap repairs back to plain bytes, and a
- * restore over an undecryptable main keeps the raw evidence aside.
+ * readable legacy backup survives an undecryptable main.
  */
 @OfflineDeviceTest
 class WalletFileRepairTest {
@@ -26,22 +24,6 @@ class WalletFileRepairTest {
     private val rpcModule = RPCModule(MainApplication.getAppReactContext())
 
     // Captures the single resolve the restore path settles with.
-    private class CapturingPromise : Promise {
-        val resolved = mutableListOf<Any?>()
-        override fun resolve(value: Any?) { resolved.add(value) }
-        override fun reject(code: String, message: String?) {}
-        override fun reject(code: String, throwable: Throwable?) {}
-        override fun reject(code: String, message: String?, throwable: Throwable?) {}
-        override fun reject(throwable: Throwable) {}
-        override fun reject(throwable: Throwable, userInfo: WritableMap) {}
-        override fun reject(code: String, userInfo: WritableMap) {}
-        override fun reject(code: String, throwable: Throwable?, userInfo: WritableMap) {}
-        override fun reject(code: String, message: String?, userInfo: WritableMap) {}
-        override fun reject(code: String?, message: String?, throwable: Throwable?, userInfo: WritableMap?) {}
-        @Deprecated("Deprecated in the React Native Promise interface")
-        override fun reject(message: String) {}
-    }
-
     // A real offline zingolib wallet: the recovery writes run the full
     // parse.
     private lateinit var plainWallet: ByteArray
@@ -68,7 +50,7 @@ class WalletFileRepairTest {
     }
 
     private fun state(name: String): String =
-        rpcModule.diagnoseWalletFile(name).getString("state")
+        rpcModule.diagnoseWalletFile(context.filesDir, name).getString("state")
 
     @Before
     fun freshPlainWallet() {
@@ -77,6 +59,7 @@ class WalletFileRepairTest {
         }
         File(context.filesDir, backupName).delete()
         File(context.filesDir, swapName).delete()
+        WalletStore.root(context.filesDir).deleteRecursively()
         uniffi.zingo.initLogging()
         uniffi.zingo.initFromSeed(seed = Seeds.HOSPITAL, birthday = 2000000u, connection = testConnection("", "main"))
         plainWallet = uniffi.zingo.saveWalletBytes()!!
@@ -95,12 +78,12 @@ class WalletFileRepairTest {
         wrapAgain()
         wrapAgain()
 
-        val before = rpcModule.diagnoseWalletFile(fileName)
+        val before = rpcModule.diagnoseWalletFile(context.filesDir, fileName)
         assertThat(before.getString("state")).isEqualTo("doubleWrapped")
         assertThat(before.getBoolean("repairable")).isTrue()
         assertThat(before.getInt("depth")).isEqualTo(1)
 
-        assertThat(rpcModule.repairDoubleWrappedFile(fileName)).isEqualTo("repaired")
+        assertThat(rpcModule.repairDoubleWrappedFile(context.filesDir, fileName)).isEqualTo("repaired")
 
         assertThat(state(fileName)).isEqualTo("plainWallet")
         assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
@@ -110,8 +93,8 @@ class WalletFileRepairTest {
     @Test
     fun tripleWrappedWalletIsRepaired() {
         repeat(3) { wrapAgain() }
-        assertThat(rpcModule.diagnoseWalletFile(fileName).getInt("depth")).isEqualTo(2)
-        assertThat(rpcModule.repairDoubleWrappedFile(fileName)).isEqualTo("repaired")
+        assertThat(rpcModule.diagnoseWalletFile(context.filesDir, fileName).getInt("depth")).isEqualTo(2)
+        assertThat(rpcModule.repairDoubleWrappedFile(context.filesDir, fileName)).isEqualTo("repaired")
         assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
     }
 
@@ -119,45 +102,46 @@ class WalletFileRepairTest {
     fun envelopesBeyondTheDepthLimitAreNotRepaired() {
         // Five envelopes leave four to unwrap, one past MAX_UNWRAP_DEPTH.
         repeat(5) { wrapAgain() }
-        val diagnosis = rpcModule.diagnoseWalletFile(fileName)
+        val diagnosis = rpcModule.diagnoseWalletFile(context.filesDir, fileName)
         assertThat(diagnosis.getString("state")).isEqualTo("doubleWrapped")
         assertThat(diagnosis.getBoolean("repairable")).isFalse()
         assertThat(diagnosis.getJSONArray("unwrapErrors").toString())
             .contains("still an envelope")
-        assertThat(rpcModule.repairDoubleWrappedFile(fileName)).isEqualTo("failed")
+        assertThat(rpcModule.repairDoubleWrappedFile(context.filesDir, fileName)).isEqualTo("failed")
     }
 
     @Test
-    fun restoreBackupSucceedsWhenMainIsUndecryptable() {
+    fun theBackupMovesInReadableWhenMainIsUndecryptable() {
         // A healthy legacy encrypted backup, as a fleet device would hold.
         File(context.filesDir, backupName).writeBytes(plainWallet)
         wrapAgain(File(context.filesDir, backupName))
         walletFile().delete()
         walletFile().writeBytes(undecryptableBytes)
 
-        val promise = CapturingPromise()
-        rpcModule.restoreExistingWalletBackup(promise)
+        rpcModule.prepareWallets()
 
-        assertThat(promise.resolved).containsExactly(true)
-        assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
-        assertThat(File(context.filesDir, "$fileName.broken").exists()).isTrue()
+        val wallets = WalletStore.list(context.filesDir)
+        assertThat(wallets.map { it.meta.getString("name") })
+            .containsExactly("Wallet 1", "Wallet Backup").inOrder()
+        assertThat(File(WalletStore.dir(context.filesDir, wallets[1].id), WalletStore.WALLET).readBytes())
+            .isEqualTo(plainWallet)
     }
 
     @Test
     fun diagnosisCarriesTheSupportReportFields() {
-        val healthy = rpcModule.diagnoseWalletFile(fileName)
+        val healthy = rpcModule.diagnoseWalletFile(context.filesDir, fileName)
         assertThat(healthy.getLong("mtime")).isGreaterThan(0L)
         assertThat(healthy.getString("head")).isNotEmpty()
 
         wrapAgain()
         wrapAgain()
-        val doubleWrapped = rpcModule.diagnoseWalletFile(fileName)
+        val doubleWrapped = rpcModule.diagnoseWalletFile(context.filesDir, fileName)
         assertThat(doubleWrapped.getJSONArray("unwrapErrors").length()).isEqualTo(0)
 
         val garbageName = "$fileName.garbagediag"
         try {
             File(context.filesDir, garbageName).writeBytes(undecryptableBytes)
-            val undecryptable = rpcModule.diagnoseWalletFile(garbageName)
+            val undecryptable = rpcModule.diagnoseWalletFile(context.filesDir, garbageName)
             assertThat(undecryptable.getString("state")).isEqualTo("undecryptable")
             assertThat(undecryptable.getString("readError")).isNotEmpty()
         } finally {
@@ -167,7 +151,7 @@ class WalletFileRepairTest {
 
     @Test
     fun repairSkipsAHealthyPlainWallet() {
-        assertThat(rpcModule.repairDoubleWrappedFile(fileName)).isEqualTo("skipped")
+        assertThat(rpcModule.repairDoubleWrappedFile(context.filesDir, fileName)).isEqualTo("skipped")
         assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
     }
 
@@ -175,7 +159,7 @@ class WalletFileRepairTest {
     fun anUndecryptableFileStaysUntouched() {
         walletFile().delete()
         walletFile().writeBytes(undecryptableBytes)
-        assertThat(rpcModule.repairDoubleWrappedFile(fileName)).isEqualTo("skipped")
+        assertThat(rpcModule.repairDoubleWrappedFile(context.filesDir, fileName)).isEqualTo("skipped")
         assertThat(walletFile().readBytes()).isEqualTo(undecryptableBytes)
         assertThat(state(fileName)).isEqualTo("undecryptable")
     }

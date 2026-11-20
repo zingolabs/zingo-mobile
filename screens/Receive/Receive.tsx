@@ -199,7 +199,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
           noPrivacy={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
-          showMessagesIcon={true}
         />
       </View>
       <Animated.View

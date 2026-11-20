@@ -29,6 +29,7 @@ const meta: Meta<typeof SyncLine> = {
     netInfo: mobileData,
     percentage: 100,
     syncInProgress: false,
+    opening: '',
   },
 };
 

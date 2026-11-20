@@ -71,6 +71,8 @@ const ZEC_EXPLORER_NAME: Record<BlockExplorerEnum, string> = {
   [BlockExplorerEnum.Zcashexplorer]: 'ZcashExplorer',
   [BlockExplorerEnum.ZecBlock]: 'ZecBlock',
   [BlockExplorerEnum.Zexplorer]: 'ZExplorer',
+  [BlockExplorerEnum.ZecBlockPrivate]: 'ZecBlock Private',
+  [BlockExplorerEnum.ShieldedScan]: 'ShieldedScan',
   [BlockExplorerEnum.None]: '',
 };
 

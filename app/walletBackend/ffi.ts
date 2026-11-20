@@ -6,9 +6,11 @@
  * stay pure — one native call, one mapped return, no side effects.
  */
 
-// The stable rejection codes: exactly the ZingolibError variant names the
-// native bridges emit. Anything unrecognized maps to 'Unknown'.
+// The stable rejection codes: the ZingolibError variant names the native
+// bridges emit, plus their own DiskFull for a save the storage refused.
+// Anything unrecognized maps to 'Unknown'.
 const FFI_ERROR_CODES = [
+  'DiskFull',
   'LightclientNotInitialized',
   'LightclientLockPoisoned',
   'Panic',

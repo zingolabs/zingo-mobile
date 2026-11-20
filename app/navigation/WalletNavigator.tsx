@@ -22,6 +22,13 @@ import Send from '@screens/Send';
 import Receive from '@screens/Receive';
 import Swap from '@screens/Swap';
 import Settings from '@screens/Settings';
+import {
+  AddWallet,
+  FoundWalletsInApp,
+  NewWallet,
+  RestoreWallet,
+} from '@screens/AddWallet';
+import WalletOpenError from '@screens/Wallets/WalletOpenError';
 import WalletServer from '@screens/Server/WalletServer';
 import { MessageList } from '@screens/Messages';
 import { AddressList } from '@screens/AddressList';
@@ -202,6 +209,31 @@ export function WalletNavigator() {
         <Stack.Screen
           name={Route.AddressBook}
           component={AddressBook}
+          options={MENU}
+        />
+        <Stack.Screen
+          name={Route.AddWallet}
+          component={AddWallet}
+          options={MENU}
+        />
+        <Stack.Screen
+          name={Route.NewWallet}
+          component={NewWallet}
+          options={MENU}
+        />
+        <Stack.Screen
+          name={Route.RestoreWallet}
+          component={RestoreWallet}
+          options={MENU}
+        />
+        <Stack.Screen
+          name={Route.FoundWallets}
+          component={FoundWalletsInApp}
+          options={MENU}
+        />
+        <Stack.Screen
+          name={Route.WalletOpenError}
+          component={WalletOpenError}
           options={MENU}
         />
         <Stack.Screen

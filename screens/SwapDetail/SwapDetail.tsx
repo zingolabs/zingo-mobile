@@ -57,7 +57,9 @@ import DepositSlip, {
 import DetailHero from '@screens/Swap/components/DetailHero';
 import DetailRows from '@screens/Swap/components/DetailRows';
 import type { DetailRow } from '@screens/Swap/components/DetailRows';
-import ShieldNote from '@screens/Swap/components/ShieldNote';
+import ShieldNote, {
+  leftTransparentFunds,
+} from '@screens/Swap/components/ShieldNote';
 import SaveContactSheet from '@screens/Swap/components/SaveContactSheet';
 import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import SaveContactButton from '@ui/widgets/SaveContactButton';
@@ -126,8 +128,9 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
 
   const removeSwap = useRemoveSwap(close);
 
+  /** Not read yet: the screen stays clear, so the one under it shows until the panel rises. */
   if (!record) {
-    return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
+    return <></>;
   }
 
   const sell = record.direction === SwapDirectionEnum.Outbound;
@@ -386,9 +389,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
   const awaitingDeposit =
     !isTerminalStatus(record.status) && !hasDepositEvidence;
   const legs = legsOf(records, valueTransfers ?? [], recordId);
-  const receivedTransparent = legs.some(
-    l => l.kind === ValueTransferKindEnum.Received,
-  );
+  const receivedTransparent = legs.some(leftTransparentFunds);
 
   /** Didn't finish well: the Track section lists every link, SwapKit's first. */
   const troubled =

@@ -1,16 +1,15 @@
 package org.ZingoLabs.Zingo
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.facebook.react.bridge.Promise
-import com.facebook.react.bridge.WritableMap
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
 import java.io.File
 
 /**
- * The wallet and retained-wallet swap recovered from every interruption
- * window, with real zingolib wallets on both sides.
+ * The legacy wallet and backup swap recovered from every interruption
+ * window, and the backup restore and replace on the folder layout, with
+ * real zingolib wallets on both sides.
  *
  * Run: ./gradlew :app:connectedProdDebugAndroidTest \
  *   -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.WalletSwapRecoveryTest
@@ -26,23 +25,9 @@ class WalletSwapRecoveryTest {
     private lateinit var walletA: ByteArray
     private lateinit var walletB: ByteArray
 
-    private class CapturingPromise : Promise {
-        val resolved = mutableListOf<Any?>()
-        override fun resolve(value: Any?) { resolved.add(value) }
-        override fun reject(code: String, message: String?) {}
-        override fun reject(code: String, throwable: Throwable?) {}
-        override fun reject(code: String, message: String?, throwable: Throwable?) {}
-        override fun reject(throwable: Throwable) {}
-        override fun reject(throwable: Throwable, userInfo: WritableMap) {}
-        override fun reject(code: String, userInfo: WritableMap) {}
-        override fun reject(code: String, throwable: Throwable?, userInfo: WritableMap) {}
-        override fun reject(code: String, message: String?, userInfo: WritableMap) {}
-        override fun reject(code: String?, message: String?, throwable: Throwable?, userInfo: WritableMap?) {}
-        @Deprecated("Deprecated in the React Native Promise interface")
-        override fun reject(message: String) {}
-    }
-
     private fun file(name: String) = File(context.filesDir, name)
+
+    private fun activeWallet() = File(rpcModule.activeWalletDir(), WalletStore.WALLET).readBytes()
 
     private fun offlineWallet(birthday: UInt): ByteArray {
         uniffi.zingo.initFromSeed(seed = Seeds.HOSPITAL, birthday = birthday, connection = testConnection("", "main"))
@@ -56,7 +41,8 @@ class WalletSwapRecoveryTest {
             for (suffix in suffixes) file("$name$suffix").delete()
         }
         file(swapName).delete()
-        RPCModule.walletFileClosed = false
+        WalletStore.root(context.filesDir).deleteRecursively()
+        RPCModule.openWalletId = null
         uniffi.zingo.initLogging()
         walletA = offlineWallet(2000000u)
         walletB = offlineWallet(2100000u)
@@ -115,30 +101,15 @@ class WalletSwapRecoveryTest {
     }
 
     @Test
-    fun theRestoreSwapExchangesMainAndBackup() {
+    fun theMigratedBackupIsListedBesideTheActiveMainWallet() {
         file(mainName).writeBytes(walletA)
         file(backupName).writeBytes(walletB)
 
-        val promise = CapturingPromise()
-        rpcModule.restoreExistingWalletBackup(promise)
+        rpcModule.prepareWallets()
 
-        assertThat(promise.resolved).containsExactly(true)
-        assertThat(file(mainName).readBytes()).isEqualTo(walletB)
-        assertThat(file(backupName).readBytes()).isEqualTo(walletA)
-        assertThat(file(swapName).exists()).isFalse()
-    }
-
-    @Test
-    fun theReplaceTakesTheBackupAndDropsTheBackupFile() {
-        file(mainName).writeBytes(walletA)
-        file(backupName).writeBytes(walletB)
-
-        val promise = CapturingPromise()
-        rpcModule.replaceWalletWithBackup(promise)
-
-        assertThat(promise.resolved).containsExactly(true)
-        assertThat(file(mainName).readBytes()).isEqualTo(walletB)
+        assertThat(activeWallet()).isEqualTo(walletA)
+        assertThat(WalletStore.list(context.filesDir)).hasSize(2)
+        assertThat(file(mainName).exists()).isFalse()
         assertThat(file(backupName).exists()).isFalse()
-        assertThat(file(swapName).exists()).isFalse()
     }
 }

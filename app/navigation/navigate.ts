@@ -29,6 +29,18 @@ export const navigateWallet = (
   navigationRef.navigate(Route.Wallet, target);
 };
 
+/**
+ * Drops the screens the wallet section kept in the root route. A section
+ * mounted after this starts on Home, not where the wallet it replaces was.
+ */
+export const resetWalletRoutes = (): void => {
+  if (navigationRef.isReady()) {
+    navigationRef.dispatch(
+      CommonActions.reset({ index: 0, routes: [{ name: Route.Wallet }] }),
+    );
+  }
+};
+
 /** Whether `name` is the screen on top: what settles late leaves alone a user who walked away from it. */
 export const isOnTop = (name: string): boolean =>
   navigationRef.isReady() && navigationRef.getCurrentRoute()?.name === name;
@@ -102,6 +114,21 @@ export const focusedStackRouteNames = (): string[] => {
       return state.routes.map(route => route.name);
     }
     state = focused.state as NavigationState;
+  }
+};
+
+/** Pops the run of `names` off the top of the focused stack. */
+export const popRoutes = (names: string[]): void => {
+  const stack = focusedStackRouteNames();
+  let count = 0;
+  while (
+    count < stack.length - 1 &&
+    names.includes(stack[stack.length - 1 - count])
+  ) {
+    count++;
+  }
+  if (count > 0) {
+    navigationRef.dispatch(StackActions.pop(count));
   }
 };
 

@@ -29,6 +29,7 @@ const STEPS_WITH_BACK: string[] = [
   Route.ServerList,
   Route.ImportChooser,
   Route.ImportWallet,
+  Route.NameWallet,
 ];
 
 // The stage draws every transition itself, so a screen has no options.

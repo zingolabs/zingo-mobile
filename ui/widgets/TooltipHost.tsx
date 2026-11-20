@@ -38,8 +38,11 @@ export const TooltipHostContext = createContext<TooltipHostValue | null>(null);
  */
 export default function TooltipHost({
   children,
+  center = false,
 }: {
   children: React.ReactNode;
+  /** Centres the content vertically in the room the host fills. */
+  center?: boolean;
 }) {
   const hostRef = useRef<View>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -86,7 +89,9 @@ export default function TooltipHost({
       <View
         ref={hostRef}
         collapsable={false}
-        style={{ flexGrow: 1 }}
+        style={
+          center ? { flexGrow: 1, justifyContent: 'center' } : { flexGrow: 1 }
+        }
         onTouchMove={spec ? dismiss : undefined}
         onLayout={e =>
           setSize({

@@ -46,7 +46,6 @@ export const defaultAppContextLoading: AppContextLoading = {
   updating: false,
   busy: false,
   walletExists: false,
-  recoveryWallet: null,
   freshInstall: false,
   walletError: null,
   errorResolved: false,
@@ -57,8 +56,6 @@ export const defaultAppContextLoading: AppContextLoading = {
   serverLatencies: {},
   serverLists: {},
   serverBackGuard: { current: null },
-  importRecoveryWallet: () => {},
-  viewRecoveryWallet: () => {},
   openServer: () => {},
   closeServer: () => {},
   stepBack: () => false,
@@ -66,8 +63,6 @@ export const defaultAppContextLoading: AppContextLoading = {
   createNewWallet: () => {},
   getwalletToRestore: () => {},
   retryOpenWallet: () => {},
-  deleteThenImport: () => {},
-  deleteThenCreate: () => {},
   switchToWalletChain: () => {},
   chooseAutomatic: async () => {},
   pickServer: async () => {},
@@ -77,6 +72,12 @@ export const defaultAppContextLoading: AppContextLoading = {
   serverUnreachable: () => {},
   serversFor: () => [],
   doRestore: async () => {},
+  recoveryEntries: [],
+  importAllRecovery: () => {},
+  foundDismissed: false,
+  dismissFound: () => {},
+  openOtherWallet: () => {},
+  nameNewWallet: () => {},
 };
 
 export const ContextAppLoading = React.createContext(defaultAppContextLoading);

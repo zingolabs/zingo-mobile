@@ -80,3 +80,17 @@ export function substituteZingoName<T>(value: T): T {
   }
   return JSON.parse(serialized.replaceAll('{app}', getZingoName())) as T;
 }
+
+/** Substitutes the `{currency}` placeholder with the open wallet's currency in any translation result. */
+export function substituteCurrency<T>(value: T, currency: string): T {
+  if (typeof value === 'string') {
+    return value.includes('{currency}')
+      ? (value.replaceAll('{currency}', currency) as unknown as T)
+      : value;
+  }
+  const serialized = JSON.stringify(value);
+  if (!serialized || !serialized.includes('{currency}')) {
+    return value;
+  }
+  return JSON.parse(serialized.replaceAll('{currency}', currency)) as T;
+}

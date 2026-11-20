@@ -23,7 +23,6 @@ import {
   isWalletAddress,
   parseZecQuote,
   resolvedTrue,
-  walletBackupExists,
   walletExists,
 } from '@app/walletBackend/utils/walletUtils';
 
@@ -55,17 +54,17 @@ describe('resolvedTrue collapses the native "true"/"false" protocol', () => {
 });
 
 describe('the existence probes contain rejections as false', () => {
-  it.each([
-    ['walletExists', 'walletExists', walletExists],
-    ['walletBackupExists', 'walletBackupExists', walletBackupExists],
-  ])('%s', async (_name, member, probe) => {
-    bridge[member].mockResolvedValueOnce('true');
-    await expect(probe()).resolves.toBe(true);
-    bridge[member].mockResolvedValueOnce('false');
-    await expect(probe()).resolves.toBe(false);
-    bridge[member].mockReturnValueOnce(typedRejection('Save', 'boom'));
-    await expect(probe()).resolves.toBe(false);
-  });
+  it.each([['walletExists', 'walletExists', walletExists]])(
+    '%s',
+    async (_name, member, probe) => {
+      bridge[member].mockResolvedValueOnce('true');
+      await expect(probe()).resolves.toBe(true);
+      bridge[member].mockResolvedValueOnce('false');
+      await expect(probe()).resolves.toBe(false);
+      bridge[member].mockReturnValueOnce(typedRejection('Save', 'boom'));
+      await expect(probe()).resolves.toBe(false);
+    },
+  );
 });
 
 describe('parseZecQuote reads only a positive, finite price as a quote', () => {

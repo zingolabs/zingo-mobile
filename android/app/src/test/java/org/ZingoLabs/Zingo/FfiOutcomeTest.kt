@@ -148,4 +148,13 @@ class FfiOutcomeTest {
             FfiOutcome.of("get_version") { throw failure },
         )
     }
+
+    @Test
+    fun `Tests that a full storage rejects as DiskFull`() {
+        val failure = DiskFullException(java.io.IOException("write failed: ENOSPC (No space left on device)"))
+        assertEquals(
+            FfiOutcome.Rejected("DiskFull", "save_wallet_bytes", failure),
+            FfiOutcome.of("save_wallet_bytes") { throw failure },
+        )
+    }
 }

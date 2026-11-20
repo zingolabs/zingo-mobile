@@ -18,7 +18,8 @@ export interface SendJsonToTypeType {
 // What a hold-to-delete confirms: removing the wallet file before an import
 // or a create, or overwriting the phrase a previous install left in the
 // Keychain.
-export type DeleteWalletContext = 'import' | 'create' | 'replace';
+/** A wallet of the device, picked in Wallets: its own sub, a warning when a swap is in flight. */
+export type DeleteWalletContext = { sub: string; warning: string };
 
 export interface TransactionType {
   type?: TransactionTypeEnum; // like kind
@@ -89,6 +90,9 @@ export type WalletErrorKind = 'open' | 'server' | 'chain';
 export type WalletErrorInfo = {
   kind: WalletErrorKind;
   details: string;
+  /** Other wallets are on the device, so the failed one is named. */
+  others: boolean;
+  name: string;
   // The wallet's own network, for the 'chain' kind.
   walletChain?: ChainNameEnum;
 };

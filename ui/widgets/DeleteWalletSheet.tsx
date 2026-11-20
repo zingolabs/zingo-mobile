@@ -30,6 +30,7 @@ import AppSheetModal, { SheetFooter } from '@ui/primitives/AppSheetModal';
 import Button, { BUTTON_HEIGHT } from '@ui/primitives/Button';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import { useCompact } from '@app/hooks/useCompact';
+import Banner from '@ui/widgets/Banner';
 
 type DeleteWalletSheetProps = {
   context: DeleteWalletContext;
@@ -124,13 +125,7 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
       transform: [{ scale: pulse.value }],
     }));
 
-    const sub = translate(
-      context === 'import'
-        ? 'deletesheet.import-sub'
-        : context === 'create'
-          ? 'deletesheet.create-sub'
-          : 'deletesheet.replace-sub',
-    ) as string;
+    const { sub, warning } = context;
 
     return (
       <AppSheetModal ref={ref} onDismiss={reset}>
@@ -159,13 +154,7 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
             variant="bodyStrong"
             style={{ marginTop: space16, textAlign: 'center' }}
           >
-            {
-              translate(
-                context === 'replace'
-                  ? 'deletesheet.replace-title'
-                  : 'deletesheet.title',
-              ) as string
-            }
+            {translate('deletesheet.title') as string}
           </Text>
           <Text
             variant="caption"
@@ -174,6 +163,11 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
           >
             {sub}
           </Text>
+          {!!warning && (
+            <View style={{ alignSelf: 'stretch', marginTop: gap(space16) }}>
+              <Banner tone="warning" title={warning} />
+            </View>
+          )}
           <Animated.View style={[{ alignSelf: 'stretch' }, holdStyle]}>
             <Pressable
               testID="deletesheet.hold"
@@ -207,13 +201,7 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
                 ]}
               />
               <Text variant="button">
-                {
-                  translate(
-                    context === 'replace'
-                      ? 'deletesheet.hold-replace'
-                      : 'deletesheet.hold',
-                  ) as string
-                }
+                {translate('deletesheet.hold') as string}
               </Text>
             </Pressable>
           </Animated.View>

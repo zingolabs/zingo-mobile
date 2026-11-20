@@ -24,7 +24,6 @@ import {
   ValueTransferKindEnum,
 } from '@app/AppState';
 import { ContextAppLoaded, useSwapRecords } from '@app/context';
-import { fiatQuote } from '@app/price/fiatQuote';
 import Utils from '@app/utils';
 import { transferStatus } from '@app/utils/transferStatus';
 import Text from '@ui/primitives/Text';
@@ -38,7 +37,9 @@ import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import DetailHero from '@screens/Swap/components/DetailHero';
 import DetailRows from '@screens/Swap/components/DetailRows';
 import type { DetailRow } from '@screens/Swap/components/DetailRows';
-import ShieldNote from '@screens/Swap/components/ShieldNote';
+import ShieldNote, {
+  leftTransparentFunds,
+} from '@screens/Swap/components/ShieldNote';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
 import { legName, legRole, legsOf } from '@screens/Swap/swapLegs';
 
@@ -63,8 +64,6 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
     language,
     valueTransfers,
     info,
-    zecPrice,
-    server,
     walletChainName,
     blockExplorer,
     addLastSnackbar,
@@ -87,13 +86,8 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
   }
 
   const received = leg.kind === ValueTransferKindEnum.Received;
-  const quote = fiatQuote(zecPrice, server, server.chainName);
-  const price =
-    leg.zecPrice && leg.zecPrice > 0
-      ? leg.zecPrice
-      : quote.kind === 'quote'
-        ? quote.price
-        : 0;
+  /** Dollars only at the price the leg kept: today's would read as what it was worth then. */
+  const price = leg.zecPrice && leg.zecPrice > 0 ? leg.zecPrice : 0;
   const role = legRole(leg, record, t);
   const { memo } = Utils.splitMemo(leg.memos);
   const opReturn = (leg.opReturnData ?? []).join('\n');
@@ -266,7 +260,7 @@ const SwapTransaction: React.FunctionComponent<SwapTransactionProps> = ({
           <Banner tone="warning" title={t('swap.tx-dont-send')} />
         </View>
       )}
-      {received && (
+      {leftTransparentFunds(leg) && (
         <View style={{ marginTop: space12 }}>
           <ShieldNote text={t('swap.shield-note')} />
         </View>
