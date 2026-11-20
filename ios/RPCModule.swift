@@ -964,7 +964,7 @@ class RPCModule: NSObject {
   ) {
     FfiOutcome.of {
       BackgroundSync.cancel()
-      try self.fnCreateNewWallet(serveruri: serveruri, birthday: birthday, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
+      return try self.fnCreateNewWallet(serveruri: serveruri, birthday: birthday, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
     }.settle(resolve: resolve, reject: reject)
   }
 
@@ -997,7 +997,7 @@ class RPCModule: NSObject {
   ) {
     FfiOutcome.of {
       BackgroundSync.cancel()
-      try self.fnRestoreWalletFromSeed(restoreSeed: restoreSeed, birthday: birthday, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
+      return try self.fnRestoreWalletFromSeed(restoreSeed: restoreSeed, birthday: birthday, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
     }.settle(resolve: resolve, reject: reject)
   }
 
@@ -1030,7 +1030,7 @@ class RPCModule: NSObject {
   ) {
     FfiOutcome.of {
       BackgroundSync.cancel()
-      try self.fnRestoreWalletFromUfvk(restoreUfvk: restoreUfvk, birthday: birthday, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
+      return try self.fnRestoreWalletFromUfvk(restoreUfvk: restoreUfvk, birthday: birthday, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
     }.settle(resolve: resolve, reject: reject)
   }
 
@@ -1086,7 +1086,7 @@ class RPCModule: NSObject {
     DispatchQueue.global(qos: .userInitiated).async {
       FfiOutcome.of {
         BackgroundSync.cancel()
-        try self.fnLoadWallet(
+        return try self.fnLoadWallet(
           walletId: walletId, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel,
           minconfirmations: minconfirmations)
       }.settle(resolve: resolve, reject: reject)
@@ -1189,7 +1189,7 @@ class RPCModule: NSObject {
   ) {
     FfiOutcome.of {
       BackgroundSync.cancel()
-      try self.fnLoadExistingWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
+      return try self.fnLoadExistingWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
     }.settle(resolve: resolve, reject: reject)
   }
 
