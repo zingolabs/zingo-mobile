@@ -252,7 +252,7 @@ extension AppDelegate {
             // have no time here
             self.syncWorkItem?.cancel()
             let rpcmodule = RPCModule()
-            _ = BackgroundSync.step {
+            _ = BackgroundSync.step { () -> Void in
               _ = try? stopSync()
               do {
                 try rpcmodule.saveWalletInternal()
@@ -418,7 +418,13 @@ extension AppDelegate {
                 break
             }
         }
-        if (try? onClient({ if RPCModule.openWalletId != active { rpcmodule.closeWalletFile() } })) == nil {
+        do {
+            try onClient { () -> Void in
+                if RPCModule.openWalletId != active {
+                    rpcmodule.closeWalletFile()
+                }
+            }
+        } catch {
             activeTurn = .foreground
         }
 
