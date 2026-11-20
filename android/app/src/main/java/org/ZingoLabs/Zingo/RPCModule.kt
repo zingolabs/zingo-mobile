@@ -311,6 +311,19 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         return Pair(uri, chain)
     }
 
+    /** The server uri and chain of the wallet `id` as its meta records them, the legacy settings.json ones on its network when the meta has none; an empty uri when either says offline. */
+    fun walletServer(id: String): Pair<String, String>? {
+        val meta = WalletStore.list(filesDir).firstOrNull { it.id == id }?.meta ?: return null
+        val chain = meta.optString("chain")
+        val settings = legacySettings()
+        val legacy = settings?.optJSONObject("server")?.takeIf { it.optString("chainName") == chain }
+        val server = meta.optJSONObject("server") ?: legacy ?: return null
+        val select = meta.optString("selectServer")
+            .ifEmpty { if (legacy != null) settings?.optString("selectServer") ?: "" else "" }
+        val uri = if (select == "offline") "" else server.optString("uri")
+        return Pair(uri, server.optString("chainName").ifEmpty { chain })
+    }
+
     fun hasActiveWallet(): Boolean {
         prepareWallets()
         return WalletStore.active(filesDir) != null
@@ -319,7 +332,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     internal fun activeWalletDir(): File =
         WalletStore.active(filesDir)?.let { WalletStore.dir(filesDir, it) } ?: filesDir
 
-    private fun closeWalletFile() {
+    internal fun closeWalletFile() {
         PlainWalletFile.locked {
             openWalletId = null
             pendingMeta = null
@@ -330,6 +343,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun walletExists(promise: Promise) {
         FfiOutcome.of("wallet_exists") {
             hasActiveWallet()
+        }.settle(promise)
+    }
+
+    /** The id of the wallet the client holds, empty when it holds none. */
+    @ReactMethod
+    fun openWalletId(promise: Promise) {
+        FfiOutcome.of("open_wallet_id") {
+            openWalletId ?: ""
         }.settle(promise)
     }
 
@@ -684,8 +705,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         return loadWalletNative(id, serveruri, chainhint, performancelevel, minconfirmations)
     }
 
-    /** Opens the wallet `id` and makes it the active one; a failure leaves the active wallet as it was. */
-    internal fun loadWalletNative(id: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String): String {
+    /** Opens the wallet `id`, and makes it the active one when `activate` asks; a failure leaves the active wallet as it was. */
+    internal fun loadWalletNative(id: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, activate: Boolean = true): String {
         uniffi.zingo.initLogging()
 
         prepareWallets()
@@ -697,7 +718,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val resp = uniffi.zingo.initFromBytes(walletBytes = walletBytes, connection = connection(serveruri, chainhint, performancelevel, minconfirmations))
         PlainWalletFile.locked {
             openWalletId = id
-            if (WalletStore.active(filesDir) != id) WalletStore.setActive(filesDir, id)
+            if (activate && WalletStore.active(filesDir) != id) WalletStore.setActive(filesDir, id)
         }
         return resp
     }

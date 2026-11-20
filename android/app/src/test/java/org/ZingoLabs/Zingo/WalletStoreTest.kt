@@ -296,4 +296,33 @@ class WalletStoreTest {
         assertTrue(WalletStore.isDiskFull(java.io.IOException("No space left on device")))
         assertFalse(WalletStore.isDiskFull(java.io.IOException("Permission denied")))
     }
+    private fun onChain(id: String, chain: String, extra: JSONObject = JSONObject()) {
+        val meta = WalletStore.list(base).single { it.id == id }.meta.put("chain", chain)
+        for (key in extra.keys()) meta.put(key, extra.get(key))
+        WalletStore.writeMeta(base, id, meta)
+    }
+
+    @Test
+    fun `Tests that the nightly sync visits the active wallet first and then the others by network`() {
+        val regtest = committed("Wallet 1")
+        val test = committed("Wallet 2")
+        val active = committed("Wallet 3")
+        val main = committed("Wallet 4")
+        onChain(regtest, "regtest")
+        onChain(test, "test")
+        onChain(active, "test")
+        WalletStore.setActive(base, active)
+
+        assertEquals(listOf(active, main, test, regtest), WalletStore.syncOrder(base))
+    }
+
+    @Test
+    fun `Tests that the nightly sync leaves out a wallet when it does not open`() {
+        val active = committed("Wallet 1")
+        val broken = committed("Wallet 2")
+        onChain(broken, "main", JSONObject().put("openFailed", true))
+        WalletStore.setActive(base, active)
+
+        assertEquals(listOf(active), WalletStore.syncOrder(base))
+    }
 }

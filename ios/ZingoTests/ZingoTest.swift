@@ -1164,6 +1164,35 @@ class WalletStoreTests: XCTestCase {
         XCTAssertNil(WalletStore.active(base))
     }
 
+    private func onChain(_ id: String, _ chain: String, _ extra: [String: Any] = [:]) throws {
+        var meta = try XCTUnwrap(WalletStore.list(base).first { $0.id == id }).meta
+        meta["chain"] = chain
+        meta.merge(extra) { _, new in new }
+        try WalletStore.writeMeta(base, id, meta)
+    }
+
+    func testTheNightlySyncVisitsTheActiveWalletFirstAndThenTheOthersByNetwork() throws {
+        let regtest = try committed("Wallet 1")
+        let test = try committed("Wallet 2")
+        let active = try committed("Wallet 3")
+        let main = try committed("Wallet 4")
+        try onChain(regtest, "regtest")
+        try onChain(test, "test")
+        try onChain(active, "test")
+        try WalletStore.setActive(base, active)
+
+        XCTAssertEqual(WalletStore.syncOrder(base), [active, main, test, regtest])
+    }
+
+    func testTheNightlySyncLeavesOutAWalletWhenItDoesNotOpen() throws {
+        let active = try committed("Wallet 1")
+        let broken = try committed("Wallet 2")
+        try onChain(broken, "main", ["openFailed": true])
+        try WalletStore.setActive(base, active)
+
+        XCTAssertEqual(WalletStore.syncOrder(base), [active])
+    }
+
     func testTheDefaultNameTakesTheLowestFreeNumber() throws {
         _ = try committed("Wallet 1")
         _ = try committed("Wallet 3")

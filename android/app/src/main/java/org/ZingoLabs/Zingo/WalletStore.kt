@@ -24,6 +24,7 @@ object WalletStore {
     private val EVIDENCE_SIDECARS = listOf(".prerepair", ".broken")
 
     /** Meta fields only the store writes. */
+    private val CHAINS = listOf("main", "test", "regtest")
     private val OWN_FIELDS = setOf("v", "id", "createdAt", "migratedFrom")
 
     class Wallet(val id: String, val meta: JSONObject, val hasFile: Boolean)
@@ -141,6 +142,15 @@ object WalletStore {
             val message = cause.message ?: ""
             message.contains("ENOSPC") || message.contains("No space left on device")
         }
+
+    /** The wallets a nightly sync visits: the active one, then the others that open by network, Mainnet, Testnet and Regtest. */
+    fun syncOrder(base: File): List<String> {
+        val active = active(base)
+        val rest = list(base)
+            .filter { it.id != active && it.hasFile && !it.meta.optBoolean("openFailed") }
+            .sortedBy { CHAINS.indexOf(it.meta.optString("chain")).let { rank -> if (rank < 0) CHAINS.size else rank } }
+        return listOfNotNull(active) + rest.map { it.id }
+    }
 
     /** "Wallet n" with the lowest n no wallet uses. */
     fun defaultName(base: File): String {

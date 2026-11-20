@@ -143,6 +143,7 @@ enum WalletStore {
   private static let activeName = "active.json"
   private static let deleting = ".deleting"
   private static let version = 1
+  private static let chains = ["main", "test", "regtest"]
   /// Meta fields only the store writes.
   private static let ownFields: Set<String> = ["v", "id", "createdAt", "migratedFrom"]
 
@@ -290,6 +291,18 @@ enum WalletStore {
   }
 
   /// "Wallet n" with the lowest n no wallet uses.
+  /// The wallets a nightly sync visits: the active one, then the others that open by network, Mainnet, Testnet and Regtest.
+  static func syncOrder(_ base: String) -> [String] {
+    let current = active(base)
+    let rank = { (wallet: Wallet) in chains.firstIndex(of: wallet.meta["chain"] as? String ?? "") ?? chains.count }
+    let rest = list(base)
+      .filter { $0.id != current && $0.hasFile && ($0.meta["openFailed"] as? Bool) != true }
+      .enumerated()
+      .sorted { (rank($0.element), $0.offset) < (rank($1.element), $1.offset) }
+      .map { $0.element.id }
+    return (current.map { [$0] } ?? []) + rest
+  }
+
   static func defaultName(_ base: String) -> String {
     let names = Set(list(base).compactMap { $0.meta["name"] as? String })
     var n = 1
@@ -643,6 +656,22 @@ class RPCModule: NSObject {
     return (uri, chain)
   }
 
+  /// The server uri and chain of the wallet `id` as its meta records them, the legacy settings.json ones on its network when the meta has none; an empty uri when either says offline.
+  func walletServer(_ id: String) throws -> (uri: String, chain: String)? {
+    let documents = try getDocumentsDirectory()
+    guard let meta = WalletStore.list(documents).first(where: { $0.id == id })?.meta else { return nil }
+    let chain = meta["chain"] as? String ?? ""
+    let settings = legacySettings()
+    let legacy = (settings?["server"] as? [String: Any]).flatMap { ($0["chainName"] as? String) == chain ? $0 : nil }
+    guard let server = (meta["server"] as? [String: Any]) ?? legacy else { return nil }
+    let select = [meta["selectServer"], legacy == nil ? nil : settings?["selectServer"]]
+      .compactMap { $0 as? String }
+      .first { !$0.isEmpty } ?? ""
+    let uri = select == "offline" ? "" : (server["uri"] as? String ?? "")
+    let serverChain = server["chainName"] as? String ?? ""
+    return (uri, serverChain.isEmpty ? chain : serverChain)
+  }
+
   func activeWalletId() throws -> String? {
     WalletStore.active(try getDocumentsDirectory())
   }
@@ -654,6 +683,16 @@ class RPCModule: NSObject {
       return try getFileName(Constants.WalletFileName.rawValue)
     }
     return WalletStore.walletPath(documents, id)
+  }
+
+  /// The id of the wallet the client holds, empty when it holds none.
+  @objc(openWalletId:reject:)
+  func openWalletId(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    FfiOutcome.of {
+      RPCModule.walletFileHold.lock()
+      defer { RPCModule.walletFileHold.unlock() }
+      return RPCModule.openWalletId ?? ""
+    }.settle(resolve: resolve, reject: reject)
   }
 
   @objc(walletExists:reject:)
@@ -969,13 +1008,14 @@ class RPCModule: NSObject {
       minconfirmations: minconfirmations)
   }
 
-  /// Opens the wallet `walletId` and makes it the active one; a failure leaves the active wallet as it was.
+  /// Opens the wallet `walletId`, and makes it the active one when `activate` asks; a failure leaves the active wallet as it was.
   func fnLoadWallet(
     walletId id: String,
     serveruri: String,
     chainhint: String,
     performancelevel: String,
-    minconfirmations: String
+    minconfirmations: String,
+    activate: Bool = true
   ) throws -> String {
     try prepareWallets()
     let documents = try getDocumentsDirectory()
@@ -988,7 +1028,7 @@ class RPCModule: NSObject {
     RPCModule.walletFileHold.lock()
     defer { RPCModule.walletFileHold.unlock() }
     RPCModule.openWalletId = id
-    if WalletStore.active(documents) != id { try WalletStore.setActive(documents, id) }
+    if activate && WalletStore.active(documents) != id { try WalletStore.setActive(documents, id) }
     return String(seed)
   }
 
