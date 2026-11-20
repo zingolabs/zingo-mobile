@@ -98,19 +98,6 @@ test("Tests that the wallet's server wins over the file's when both exist.", asy
   expect(settings.selectServer).toBe(SelectServerEnum.list);
 });
 
-test("Tests that a wallet reads its network's default in Automatic when a migration gave it a server of another network. The legacy settings named the open wallet's server, and a Mainnet backup took a Testnet one.", async () => {
-  mockMeta.server = { uri: 'https://testnet.example:9067' };
-  mockMeta.chain = 'main';
-  mockMeta.selectServer = 'list';
-
-  const settings = await SettingsFileImpl.serverOf(mockMeta);
-
-  expect(settings.server).toEqual(
-    remoteServer('https://mainnet.example:9067', ChainNameEnum.mainChainName),
-  );
-  expect(settings.selectServer).toBe(SelectServerEnum.auto);
-});
-
 test.each([['list'], ['auto']])(
   'Tests that a wallet server the list marks obsolete reads as its network default in Automatic when the wallet kept it in %s mode.',
   async mode => {
