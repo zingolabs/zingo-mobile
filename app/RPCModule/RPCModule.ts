@@ -10,7 +10,7 @@ import { NativeModules } from 'react-native';
 interface RPCModuleAPI {
   // Wallet lifecycle
   walletExists(): Promise<string>;
-  openWalletId(): Promise<string>;
+  claimClient(): Promise<string>;
   createNewWallet(
     serverUri: string,
     birthday: string,

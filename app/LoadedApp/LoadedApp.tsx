@@ -32,7 +32,7 @@ import {
 import WalletBackend from '@app/walletBackend';
 import {
   changeServer,
-  clientWalletId,
+  claimClient,
   doSave,
   isWalletAddress,
   loadExistingWallet,
@@ -1128,9 +1128,9 @@ export class LoadedAppClass extends Component<
     }
   };
 
-  /** Reopens this wallet when the nightly sync left the client on another one; false when it does not open and the app boots again. */
+  /** Takes the client back from the nightly sync and reopens this wallet when it holds another one; false when it does not open and the app boots again. */
   reclaimClient = async (): Promise<boolean> => {
-    const held = await clientWalletId();
+    const held = await claimClient();
     if (held.ok && held.value === this.state.walletId) {
       return true;
     }
