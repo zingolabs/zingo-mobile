@@ -4,6 +4,7 @@ import {
   AppState,
   NativeEventSubscription,
   Platform,
+  StyleSheet,
   View,
 } from 'react-native';
 import { useTheme } from '@app/theme';
@@ -2568,6 +2569,13 @@ export class LoadedAppClass extends Component<
                       <WalletNavigator />
                     </TooltipHost>
                   </FadeInOnMount>
+                  {/* While another wallet opens, the screens still show the last one's figures: nothing on them answers a touch. */}
+                  {this.state.switching.kind === 'opening' && (
+                    <View
+                      testID="wallets.opening-shield"
+                      style={StyleSheet.absoluteFill}
+                    />
+                  )}
                 </OptionsPanelProvider>
                 <AddTagModalHost />
               </BottomSheetModalProvider>
