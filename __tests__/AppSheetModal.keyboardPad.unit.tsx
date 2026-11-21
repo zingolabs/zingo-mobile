@@ -1,7 +1,8 @@
 import React from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import 'react-native';
 import { render, screen } from '@testing-library/react-native';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
+import RegText from '@ui/primitives/RegText';
 import { space16 } from '@app/theme';
 
 const mockKeyboard = { height: 336 };
@@ -37,38 +38,44 @@ jest.mock('@gorhom/bottom-sheet', () => {
 });
 
 /** The bottom pads the sheet's body draws, outermost first. */
-const pads = () =>
-  screen.UNSAFE_root.findAll(
+const pads = () => {
+  const { StyleSheet, View } = require('react-native');
+  return screen.UNSAFE_root.findAll(
     node =>
       node.type === View &&
       StyleSheet.flatten(node.props.style)?.paddingBottom !== undefined,
   ).map(node => StyleSheet.flatten(node.props.style).paddingBottom);
+};
 
-describe('AppSheetModal keyboard pad', () => {
-  const os = Platform.OS;
-  afterEach(() => {
-    Platform.OS = os;
-  });
+/** Renders on iOS, the platform back as it was afterwards. */
+const onIOS = (sheet: React.ReactElement) => {
+  const { Platform } = require('react-native');
+  const prior = Platform.OS;
+  Platform.OS = 'ios';
+  try {
+    render(sheet);
+    return pads();
+  } finally {
+    Platform.OS = prior;
+  }
+};
 
-  test('Tests that a fixed sheet keeps its list above the keyboard on iOS when the keyboard is open. Gorhom takes the keyboard out of the content already, and a second pad of its height left the list no room.', () => {
-    Platform.OS = 'ios';
-    render(
-      <AppSheetModal snapPoints={['88%']}>
-        <Text>list</Text>
-      </AppSheetModal>,
-    );
+test('Tests that a fixed sheet keeps its list above the keyboard on iOS when the keyboard is open. Gorhom takes the keyboard out of the content already, and a second pad of its height left the list no room.', () => {
+  const drawn = onIOS(
+    <AppSheetModal snapPoints={['88%']}>
+      <RegText>list</RegText>
+    </AppSheetModal>,
+  );
 
-    expect(pads()[0]).toBe(space16);
-  });
+  expect(drawn[0]).toBe(space16);
+});
 
-  test('Tests that a sheet sized by its content still pads the keyboard on iOS when the keyboard is open', () => {
-    Platform.OS = 'ios';
-    render(
-      <AppSheetModal>
-        <Text>form</Text>
-      </AppSheetModal>,
-    );
+test('Tests that a sheet sized by its content still pads the keyboard on iOS when the keyboard is open', () => {
+  const drawn = onIOS(
+    <AppSheetModal>
+      <RegText>form</RegText>
+    </AppSheetModal>,
+  );
 
-    expect(pads()[0]).toBe(mockKeyboard.height + space16);
-  });
+  expect(drawn[0]).toBe(mockKeyboard.height + space16);
 });
