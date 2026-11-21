@@ -68,6 +68,7 @@ const AddWallet: React.FC<AddWalletProps> = ({ navigation }) => {
         }}
       />
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         {...edges}
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingHorizontal: space20, paddingTop: 8 }}

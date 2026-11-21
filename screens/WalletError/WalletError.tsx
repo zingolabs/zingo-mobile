@@ -459,6 +459,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
       </Animated.View>
 
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         {...edges}
         style={{
           position: 'absolute',

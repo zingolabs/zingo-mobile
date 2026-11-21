@@ -268,6 +268,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
           <XIcon size={iconSizeMd} color={colors.fgMuted} />
         </Pressable>
         <ScrollView
+          keyboardShouldPersistTaps="handled"
           {...edges}
           style={{ flex: 1 }}
           contentContainerStyle={{

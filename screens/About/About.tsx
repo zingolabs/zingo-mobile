@@ -65,6 +65,7 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
       </View>
       <AppSheet ref={aboutSheetRef} snapPoints={aboutSnapPoints}>
         <BottomSheetScrollView
+          keyboardShouldPersistTaps="handled"
           {...edges}
           testID="about.scroll-view"
           bounces={false}

@@ -167,6 +167,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
 
       {/* Grid of actions — 4 columns */}
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         {...edges}
         contentContainerStyle={{
           paddingTop: 28,

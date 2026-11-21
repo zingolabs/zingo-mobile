@@ -303,6 +303,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
         noUfvkIcon={true}
       />
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         {...edges}
         testID="insight.scroll-view"
         contentContainerStyle={{

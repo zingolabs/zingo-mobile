@@ -288,6 +288,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
        * design while everything fits.
        */}
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         {...edges}
         style={{ flex: 1 }}
         contentContainerStyle={{ flexGrow: 1 }}

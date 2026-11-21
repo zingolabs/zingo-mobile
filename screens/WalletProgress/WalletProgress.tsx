@@ -38,6 +38,7 @@ export function ProgressScreen({
   return (
     <>
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         {...edges}
         onLayout={e => {
           edges.onLayout(e);

@@ -254,6 +254,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
         noUfvkIcon={true}
       />
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         {...edges}
         testID="pools.scroll-view"
         contentContainerStyle={{

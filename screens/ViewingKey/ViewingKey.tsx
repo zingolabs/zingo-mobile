@@ -192,6 +192,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
       />
       {/** The content scrolls above the footer, never under it. */}
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         {...edges}
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: space16 }}

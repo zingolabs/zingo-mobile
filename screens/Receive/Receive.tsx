@@ -213,6 +213,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
             header={receiveHeader}
           >
             <ScrollView
+              keyboardShouldPersistTaps="handled"
               onScroll={e => {
                 onTabScroll(e);
                 edges.onScroll(e);

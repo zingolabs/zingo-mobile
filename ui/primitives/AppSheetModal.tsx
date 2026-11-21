@@ -407,7 +407,7 @@ export function SheetScrollView({
   children,
   style,
   contentContainerStyle,
-  keyboardShouldPersistTaps,
+  keyboardShouldPersistTaps = 'handled',
   testID,
 }: {
   children: React.ReactNode;
@@ -529,6 +529,7 @@ export function SheetFlatList<T>(
   return (
     <>
       <BottomSheetFlatList
+        keyboardShouldPersistTaps="handled"
         {...props}
         {...edges}
         keyboardDismissMode={dismissOnDrag}
