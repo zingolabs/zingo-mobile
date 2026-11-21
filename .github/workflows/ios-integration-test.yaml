@@ -22,26 +22,26 @@ env:
   # runners and x86_64 on the Intel larger-runner pool; the
   # XCFrameworks' simulator slices are fat arm64+x86_64 binaries
   # either way.
-  SIMULATOR_DESTINATION: platform=iOS Simulator,name=iPhone 16,OS=18.5
+  SIMULATOR_DESTINATION: platform=iOS Simulator,name=iPhone 17,OS=27.2
 
 jobs:
   build-for-testing:
     continue-on-error: ${{ inputs.advisory }}
     # The CI_IOS_RUNNER repository variable sets the runner label. The
-    # fallback warp-macos-15-arm64-12x is WarpBuild's 12-vCPU M4 Pro
-    # machine; the stock macos-15 label has three cores. The xcodebuild
-    # destination pins no arch (see the build-for-testing step).
-    runs-on: ${{ vars.CI_IOS_RUNNER || 'warp-macos-15-arm64-12x' }}
+    # fallback warp-macos-26-arm64-12x is WarpBuild's 12-vCPU M4 Pro
+    # machine with Xcode 27; the stock macos-26 label has three cores. The
+    # xcodebuild destination pins no arch (see the build-for-testing step).
+    runs-on: ${{ vars.CI_IOS_RUNNER || 'warp-macos-26-arm64-12x' }}
     steps:
       # The Xcode of the release machine, which zingolib's iOS workflow pins
       # as well, so the app links under the same linker. Xcode 16.4 accepted
       # an app link that holds two Rust personality routines, which the
       # linker of Xcode 26 refuses, so a bundle that fails a release build
       # passed here. A floating choice would let a 16.x runner pass it again.
-      - name: Xcode 26.3
+      - name: Xcode 27.2
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '26.3'
+          xcode-version: '27.2'
 
       - name: First launch
         run: |

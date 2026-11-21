@@ -96,14 +96,14 @@ jobs:
 
   maestro-ios:
     name: Maestro — iOS
-    runs-on: macos-15
+    runs-on: xcode-27
 
     steps:
       # Pinned to the Xcode of the release machine.
-      - name: Xcode 26.3
+      - name: Xcode 27.2
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '26.3'
+          xcode-version: '27.2'
 
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -146,26 +146,24 @@ jobs:
           xcodebuild -version
           echo "--- Available iOS runtimes ---"
           xcrun simctl list runtimes | grep -i ios || true
-          echo "--- iPhone 16 devices ---"
-          xcrun simctl list devices "iPhone 16" || true
+          echo "--- iPhone 17 devices ---"
+          xcrun simctl list devices "iPhone 17" || true
           echo "--- Devicetypes containing 'iPhone' ---"
           xcrun simctl list devicetypes | grep -i iphone | head -20 || true
 
       - name: Boot iOS simulator
         run: |
-          # macos-15 now ships 5 iPhone 16 devices (one per iOS runtime:
-          # 18.5, 18.6, 26.0, 26.1, 26.2). `simctl boot "iPhone 16"`
-          # selects the highest-iOS match (iOS 26.2). Pick the iPhone 16
-          # from iOS 18.5 explicitly by UDID, and shut down anything else
+          # The runner ships one iPhone 17 per iOS runtime. Pick the
+          # iPhone 17 from iOS 27.2 by UDID, and shut down anything else
           # booted on the runner first so Maestro can't pick a stale device.
           xcrun simctl shutdown all || true
-          UDID=$(xcrun simctl list devices "iPhone 16" --json | \
-            jq -r '.devices["com.apple.CoreSimulator.SimRuntime.iOS-18-5"][] | select(.name=="iPhone 16") | .udid')
+          UDID=$(xcrun simctl list devices "iPhone 17" --json | \
+            jq -r '.devices["com.apple.CoreSimulator.SimRuntime.iOS-27-2"][] | select(.name=="iPhone 17") | .udid')
           if [ -z "$UDID" ]; then
-            echo "::error::No iPhone 16 device found for iOS 18.5 runtime"
+            echo "::error::No iPhone 17 device found for iOS 27.2 runtime"
             exit 1
           fi
-          echo "Booting iPhone 16 (iOS 18.5) — UDID=$UDID"
+          echo "Booting iPhone 17 (iOS 27.2) — UDID=$UDID"
           echo "SIM_UDID=$UDID" >> $GITHUB_ENV
           xcrun simctl boot "$UDID" || true
           xcrun simctl bootstatus "$UDID" -b
@@ -206,9 +204,9 @@ jobs:
       - name: Install app on simulator
         run: |
           # Use the explicit UDID exported above instead of "booted" —
-          # there may be other iPhone 16 devices on the runner (across
+          # there may be other iPhone 17 devices on the runner (across
           # different iOS runtimes) and we want this app on exactly the
-          # iOS 18.5 one it was built for.
+          # iOS 27.2 one it was built for.
           APP=ios/build/DerivedData/Build/Products/Release-iphonesimulator/Zingo.app
           xcrun simctl install "$SIM_UDID" "$APP"
 
@@ -231,8 +229,8 @@ jobs:
           exit 1
 
       - name: Run Maestro tests
-        # GitHub macOS-15 runners now ship many extra iOS runtimes; first-time
-        # boot of the iOS 18.5 sim runs data migration plugins (~55s) and the
+        # GitHub macOS runners ship many extra iOS runtimes; first-time
+        # boot of the iOS sim runs data migration plugins (~55s) and the
         # XCTest driver install often eats the rest of the 3 min budget.
         # Bumping to 5 min absorbs the worst-case cold-runner timing.
         # Pass --device explicitly so Maestro never auto-picks the wrong
