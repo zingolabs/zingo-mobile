@@ -8,17 +8,25 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
     private var privacyWindow: UIWindow?
+    private var launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    private var started = false
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = scene as? UIWindowScene else { return }
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let window = UIWindow(windowScene: windowScene)
         self.window = window
-        appDelegate.window = window
-        appDelegate.reactNativeFactory?.startReactNative(
+        (UIApplication.shared.delegate as! AppDelegate).window = window
+        launchOptions = SceneDelegate.launchOptions(from: connectionOptions)
+    }
+
+    /// Starts React Native the first time the scene comes to the foreground, never during a background launch.
+    private func startReactNative() {
+        guard !started, let window else { return }
+        started = true
+        (UIApplication.shared.delegate as? AppDelegate)?.reactNativeFactory?.startReactNative(
             withModuleName: "Zingo",
             in: window,
-            launchOptions: SceneDelegate.launchOptions(from: connectionOptions)
+            launchOptions: launchOptions
         )
     }
 
@@ -52,6 +60,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillEnterForeground(_ scene: UIScene) {
         hidePrivacyOverlay()
         (UIApplication.shared.delegate as? AppDelegate)?.handleForeground()
+        startReactNative()
     }
 
     // iOS captures the app-switcher snapshot between willResignActive and
