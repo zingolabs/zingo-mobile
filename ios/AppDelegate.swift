@@ -575,6 +575,7 @@ extension AppDelegate {
         DispatchQueue.global(qos: .userInitiated).async { BackgroundSync.cancel() }
         if let task = self.bgTask {
           NSLog("BGTask cancelling task")
+          saveReport(message: "App in Foreground, Background task KO.")
           task.setTaskCompleted(success: false)
           bgTask = nil
         }
