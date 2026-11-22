@@ -151,6 +151,7 @@ class AppErrorBoundary extends Component<React.PropsWithChildren, State> {
           ) : null}
         </View>
         <ScrollView
+          keyboardShouldPersistTaps="handled"
           style={styles.detailsBox}
           contentContainerStyle={styles.detailsContent}
         >

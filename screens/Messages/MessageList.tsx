@@ -195,6 +195,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
       testID="messages"
     >
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         ref={scrollViewRef}
         onScroll={e => {
           edges.onScroll(e);

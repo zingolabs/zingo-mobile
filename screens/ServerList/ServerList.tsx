@@ -53,6 +53,7 @@ const ServerList: React.FunctionComponent<ServerListProps> = ({
   return (
     <View style={{ flex: 1 }} onLayout={onLayout}>
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         {...edges}
         style={{
           position: 'absolute',

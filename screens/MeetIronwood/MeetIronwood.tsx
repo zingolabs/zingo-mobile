@@ -720,6 +720,7 @@ const PagerPage: React.FunctionComponent<PagerPageProps> = ({
   return (
     <Animated.View style={[{ width }, style]}>
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         {...edges}
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingHorizontal: 30, paddingBottom: 12 }}

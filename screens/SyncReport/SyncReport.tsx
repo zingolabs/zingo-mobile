@@ -476,6 +476,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
       />
 
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         {...edges}
         testID="syncreport.scroll-view"
         onTouchStart={() => tip && setTip(false)}

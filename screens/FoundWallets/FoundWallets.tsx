@@ -80,6 +80,7 @@ export default function FoundWallets({
         }}
       />
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         {...edges}
         style={{ flex: 1 }}
         contentContainerStyle={{

@@ -239,6 +239,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
     return (
       <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <ScrollView
+          keyboardShouldPersistTaps="handled"
           {...edges}
           contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
         >
@@ -290,6 +291,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         {...edges}
         contentContainerStyle={{
           paddingHorizontal: 24,

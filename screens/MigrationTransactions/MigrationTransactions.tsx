@@ -201,6 +201,7 @@ const MigrationTransactions: React.FunctionComponent<
     return (
       <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <ScrollView
+          keyboardShouldPersistTaps="handled"
           {...edges}
           contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
         >
@@ -257,6 +258,7 @@ const MigrationTransactions: React.FunctionComponent<
     return (
       <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <ScrollView
+          keyboardShouldPersistTaps="handled"
           {...edges}
           contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
         >
@@ -320,6 +322,7 @@ const MigrationTransactions: React.FunctionComponent<
     return (
       <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <ScrollView
+          keyboardShouldPersistTaps="handled"
           {...edges}
           contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
         >
@@ -382,6 +385,7 @@ const MigrationTransactions: React.FunctionComponent<
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         {...edges}
         style={{ flex: 1 }}
         contentContainerStyle={{

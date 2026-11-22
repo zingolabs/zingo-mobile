@@ -46,6 +46,7 @@ import {
   KeyboardEvents,
 } from 'react-native-keyboard-controller';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
+import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { SurfaceContext } from './Surface';
 import TooltipHost from '@ui/widgets/TooltipHost';
 import { duration, ease } from '@app/theme/motion';
@@ -246,7 +247,11 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
     const [bodyHeight, setBodyHeight] = useState<number>(0);
     const [headerHeight, setHeaderHeight] = useState<number>(0);
     const [footerHeight, setFooterHeight] = useState<number>(0);
-    const bottomPad = useBottomActionPad();
+    const actionPad = useBottomActionPad();
+    const keyboard = useKeyboardHeight();
+    /** On iOS gorhom takes the keyboard out of a fixed sheet's content already: the body adds only the gap above it. */
+    const bottomPad =
+      fixed && Platform.OS === 'ios' && keyboard > 0 ? space16 : actionPad;
     const presence = useContext(SheetPresence);
     const wasOpen = useRef(false);
     /** Reports opening and closing once each, not every snap in between. */
@@ -407,7 +412,7 @@ export function SheetScrollView({
   children,
   style,
   contentContainerStyle,
-  keyboardShouldPersistTaps,
+  keyboardShouldPersistTaps = 'handled',
   testID,
 }: {
   children: React.ReactNode;
@@ -529,6 +534,7 @@ export function SheetFlatList<T>(
   return (
     <>
       <BottomSheetFlatList
+        keyboardShouldPersistTaps="handled"
         {...props}
         {...edges}
         keyboardDismissMode={dismissOnDrag}

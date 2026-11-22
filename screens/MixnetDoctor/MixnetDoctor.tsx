@@ -277,7 +277,11 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
         backTestID="mixnetdoctor.back"
         backAccessibilityLabel={translate('mixnetdoctor.back-acc') as string}
       />
-      <ScrollView {...edges} contentContainerStyle={{ padding: 20 }}>
+      <ScrollView
+        {...edges}
+        contentContainerStyle={{ padding: 20 }}
+        keyboardShouldPersistTaps="handled"
+      >
         <View
           style={{
             backgroundColor: colors.bgSurface,

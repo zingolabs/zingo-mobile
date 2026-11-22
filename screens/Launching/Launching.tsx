@@ -49,6 +49,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
       }}
     >
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         {...edges}
         style={{ flex: 1 }}
         contentContainerStyle={{

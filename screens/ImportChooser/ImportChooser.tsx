@@ -47,7 +47,11 @@ const ImportChooser: React.FunctionComponent<ImportChooserProps> = ({
           disabled: busy,
         }}
       />
-      <ScrollView {...edges} style={{ flex: 1 }}>
+      <ScrollView
+        {...edges}
+        style={{ flex: 1 }}
+        keyboardShouldPersistTaps="handled"
+      >
         <Text
           variant="caption"
           tone="muted"
