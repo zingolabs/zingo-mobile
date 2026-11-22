@@ -46,6 +46,19 @@ export const BIOMETRIC_BLANKING_EVENT = 'biometric-blanking';
 // enough that the shutter still asks after any real absence.
 export const AUTH_FRESHNESS_MS = 15 * 1000;
 
+// A short trip out of the app, to copy an address or read a message, comes
+// back without the shutter.
+export const FOREGROUND_GRACE_MS = 60 * 1000;
+
+/** Whether a return from the background lands inside the grace, a clock moved back counting as outside. */
+export const withinForegroundGrace = (
+  leftAt: number | undefined,
+  now: number,
+): boolean =>
+  leftAt !== undefined &&
+  now - leftAt >= 0 &&
+  now - leftAt <= FOREGROUND_GRACE_MS;
+
 // A real frame normally lands in one tick; the budget only bounds a lagging
 // cold start so the paint can never hold the gate.
 const PAINT_BUDGET_MS = 1000;
@@ -244,6 +257,28 @@ export const enactGateAnswer = (
     case 'passed':
       return true;
   }
+};
+
+/** Asks the gate for an action when the switch is on, saying why when it stops one, and reports whether the action goes on. */
+export const authorizeAction = async ({
+  enabled,
+  translate,
+  notify,
+}: GateControllerProps & {
+  enabled: boolean;
+  notify: (message: string) => void;
+}): Promise<boolean> => {
+  if (!enabled) {
+    return true;
+  }
+  return enactGateAnswer(
+    await askGate({ translate }),
+    {
+      lock: () => notify(translate('biometrics-error') as string),
+      notice: notify,
+    },
+    translate,
+  );
 };
 
 /** Wraps an async action so calls arriving during a flight are dropped. */

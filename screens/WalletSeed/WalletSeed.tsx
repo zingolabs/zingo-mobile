@@ -32,7 +32,7 @@ import { ContextAppLoaded } from '@app/context';
 import { Route, SnackbarDurationEnum } from '@app/AppState';
 import Header from '@ui/widgets/Header';
 import { AppDrawerParamList } from '@app/types';
-import { useBiometricGate } from '@app/hooks/useBiometricGate';
+import { useAuthorize } from '@app/hooks/useAuthorize';
 import { useSecureScreen } from '@app/hooks/useSecureScreen';
 import { useScreenCapture } from '@app/hooks/useScreenCapture';
 import {
@@ -75,7 +75,6 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
   const context = useContext(ContextAppLoaded);
   const {
     translate,
-    biometrics,
     addLastSnackbar,
     seedBackedUp: openBackedUp,
     seedBackedUpAt: openBackedUpAt,
@@ -96,13 +95,17 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
   const bottomPad = useBottomActionPad();
   const focused = useIsFocused();
   const secured = useSecureScreen();
-  const gate = useBiometricGate({
-    needsAuth: biometrics,
-    translate,
-    addLastSnackbar,
-    onCancel: () => leave(),
-  });
-  const passed = gate.kind === 'passed';
+  const authorize = useAuthorize();
+  /** One pass per visit opens the phrase and both copies. */
+  const [unlocked, setUnlocked] = useState(false);
+  const unlock = async (): Promise<boolean> => {
+    if (unlocked) {
+      return true;
+    }
+    const proceed = await authorize();
+    setUnlocked(proceed);
+    return proceed;
+  };
 
   const [words, setWords] = useState<string[]>([]);
   const [birthday, setBirthday] = useState(0);
@@ -114,9 +117,6 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
   const shotGone = useCallback(() => setShot('none'), []);
 
   useEffect(() => {
-    if (!passed) {
-      return;
-    }
     (async () => {
       if (saved) {
         const found = await recoveryEntryFor(saved.id);
@@ -141,7 +141,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
       setBirthday(wallet?.birthday || walletBirthday);
       setVk((await fetchWallet(true))?.ufvk || '');
     })();
-  }, [passed, walletBirthday, readOnly, saved]);
+  }, [walletBirthday, readOnly, saved]);
 
   useEffect(() => {
     if (focused) {
@@ -150,7 +150,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
     }
   }, [focused]);
 
-  const captured = useScreenCapture(passed && focused, () =>
+  const captured = useScreenCapture(focused, () =>
     setShot(s => (s === 'none' ? 'on' : s)),
   );
 
@@ -171,7 +171,10 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
     navigation.navigate(Route.SeedBackup, { entry: { kind } });
   };
 
-  const copyWords = () => {
+  const copyWords = async () => {
+    if (!(await unlock())) {
+      return;
+    }
     copySensitive(
       `${readOnly ? vk : words.join(' ')}\n${translate('seedbackup.birthday') as string}: ${birthday}`,
       () =>
@@ -186,12 +189,22 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
     );
   };
 
-  const copyVk = () => {
+  const copyVk = async () => {
+    if (!(await unlock())) {
+      return;
+    }
     copySensitive(vk, () => {});
     addLastSnackbar(
       translate('walletseed.vk-copied') as string,
       SnackbarDurationEnum.short,
     );
+  };
+
+  const toggleHidden = async () => {
+    if (hidden && !(await unlock())) {
+      return;
+    }
+    setHidden(h => !h);
   };
 
   const leave = () => navigation.goBack();
@@ -226,7 +239,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
       ? `${vk.slice(0, VK_HEAD)}…${vk.slice(-VK_TAIL)}`
       : vk;
 
-  if (!passed || !secured) {
+  if (!secured) {
     return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
   }
 
@@ -395,7 +408,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
             <CopyShowButtons
               testID="walletseed"
               hidden={hidden}
-              onToggleHide={() => setHidden(h => !h)}
+              onToggleHide={toggleHidden}
               onCopy={copyWords}
             />
           </View>

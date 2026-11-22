@@ -47,7 +47,7 @@ import {
   DeviceSecurityProbe,
   probeDeviceSecurity,
 } from '@app/services/gateController';
-import { useBiometricGate } from '@app/hooks/useBiometricGate';
+import { useAuthorize } from '@app/hooks/useAuthorize';
 import SelectBottomSheet from '@ui/widgets/SelectBottomSheet';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
@@ -128,16 +128,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   const { gap } = useCompact();
   const bottomPad = useBottomActionPad();
 
-  // The requirement is read once, at mount: this screen's own save
-  // flips the switch, and that must not re-gate the open screen.
-  const [needsAuth] = useState<boolean>(biometricsContext);
-  const screenGate = useBiometricGate({
-    needsAuth,
-    translate,
-    addLastSnackbar,
-    onCancel: () => navigation.goBack(),
-  });
-  const authPassed = screenGate.kind === 'passed';
+  const authorize = useAuthorize();
 
   const [language, setLanguage] = useState<LanguageEnum>(languageContext);
   const [privacy, setPrivacy] = useState<boolean>(privacyContext);
@@ -208,9 +199,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
 
   const probedRef = useRef<boolean>(false);
   useEffect(() => {
-    // Probe once, after the gate first settles: the enrolled-lock answer
-    // cannot change while the user stays in this app.
-    if (!authPassed || probedRef.current) {
+    // Probe once: the enrolled-lock answer cannot change while the user
+    // stays in this app.
+    if (probedRef.current) {
       return;
     }
     probedRef.current = true;
@@ -225,7 +216,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
     return () => {
       cancelled = true;
     };
-  }, [authPassed]);
+  }, []);
 
   useEffect(() => {
     if (
@@ -324,6 +315,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
     }
     if (!language) {
       addLastSnackbar(translate('settings.islanguage') as string);
+      return false;
+    }
+    /** Turning the device lock off is the one setting that asks for it. */
+    if (biometricsContext && !biometrics && !(await authorize())) {
       return false;
     }
 
@@ -460,10 +455,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
     borderTopWidth: first ? 0 : 1,
     borderTopColor: colors.borderSubtle,
   });
-
-  if (!authPassed) {
-    return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
-  }
 
   return (
     <KeyboardAvoidingView

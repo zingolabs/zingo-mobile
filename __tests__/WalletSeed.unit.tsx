@@ -1,6 +1,12 @@
 import 'react-native';
 import React from 'react';
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react-native';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
@@ -20,6 +26,10 @@ jest.mock('@app/services/recoveryWalletInfo', () => ({
   })),
 }));
 
+const mockAuthorize = jest.fn(async () => true);
+jest.mock('@app/hooks/useAuthorize', () => ({
+  useAuthorize: () => mockAuthorize,
+}));
 jest.mock('@app/services/showConfirm', () => ({ showConfirm: jest.fn() }));
 jest.mock('@app/utils/sensitiveClipboard', () => ({
   copySensitive: jest.fn(),
@@ -60,7 +70,7 @@ const renderScreen = (
   );
 
 beforeEach(() => {
-  (mockNavigation.navigate as jest.Mock).mockClear();
+  jest.clearAllMocks();
 });
 
 test('Tests that Back up pushes the backup flow when the seed is not backed up.', async () => {
@@ -101,9 +111,35 @@ test('Tests that a view-only wallet shows its hidden viewing key in place of the
   );
 
   fireEvent.press(screen.getByTestId('walletseed.copy'));
-  expect(copySensitive).toHaveBeenCalledWith(
-    `${UFVK}
+  await waitFor(() =>
+    expect(copySensitive).toHaveBeenCalledWith(
+      `${UFVK}
 seedbackup.birthday: 3512840`,
-    expect.any(Function),
+      expect.any(Function),
+    ),
   );
+});
+
+test('Tests that the screen opens without asking and the phrase is not copied when the device lock is declined at Copy.', async () => {
+  mockAuthorize.mockResolvedValueOnce(false);
+  renderScreen(false);
+  await act(async () => {});
+  expect(mockAuthorize).not.toHaveBeenCalled();
+
+  fireEvent.press(screen.getByTestId('walletseed.copy'));
+
+  await waitFor(() => expect(mockAuthorize).toHaveBeenCalledTimes(1));
+  expect(copySensitive).not.toHaveBeenCalled();
+});
+
+test('Tests that one pass at Show also covers Copy when both are pressed in one visit.', async () => {
+  renderScreen(false);
+  await act(async () => {});
+
+  fireEvent.press(screen.getByTestId('walletseed.hide'));
+  await waitFor(() => expect(mockAuthorize).toHaveBeenCalledTimes(1));
+  fireEvent.press(screen.getByTestId('walletseed.copy'));
+
+  await waitFor(() => expect(copySensitive).toHaveBeenCalledTimes(1));
+  expect(mockAuthorize).toHaveBeenCalledTimes(1);
 });

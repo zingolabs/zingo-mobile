@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { View } from 'react-native';
 
 import Text from '@ui/primitives/Text';
@@ -10,7 +10,7 @@ import Banner from '@ui/widgets/Banner';
 import { ArrowUpIcon } from '@ui/primitives/Icons/ArrowUpIcon';
 import { space16, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import { useBiometricGate } from '@app/hooks/useBiometricGate';
+import { useAuthorize } from '@app/hooks/useAuthorize';
 import DetailRows, { DetailRow } from '@screens/Swap/components/DetailRows';
 import NymNote from '@screens/Swap/components/NymNote';
 import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
@@ -59,9 +59,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     translate,
     zecPrice,
     defaultUnifiedAddress,
-    addLastSnackbar,
     server,
-    biometrics,
     addressBook,
   } = context;
   const { colors } = useTheme();
@@ -69,19 +67,9 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   const quote = fiatQuote(zecPrice, server, server.chainName);
   const permit = sendPermit(context);
 
-  // Audit Issue D — the biometric gate lives at the
-  // Confirm screen entry. Mirrors Seed / Ufvk / Settings / Rescan via
-  // the shared hook. Trade-off vs. the previous bio-on-press model: a
-  // brief window after auth where the Confirm button can be pressed
-  // without re-authenticating. Native stack remounts the screen on each
-  // navigation, so leaving and coming back forces a fresh prompt.
-  const screenGate = useBiometricGate({
-    needsAuth: biometrics,
-    translate,
-    addLastSnackbar,
-    onCancel: () => navigation.goBack(),
-  });
-  const authPassed = screenGate.kind === 'passed';
+  const authorize = useAuthorize();
+  /** One press sends once, however long the device lock takes to answer. */
+  const sending = useRef(false);
 
   const { calculatedFee, proposalPools, sendAllAmount, sendPageState } =
     route.params;
@@ -112,10 +100,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   useEffect(() => {
     deliver('send.propose', '');
   }, []);
-
-  if (!authPassed) {
-    return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
-  }
 
   const privacyKey = poolCrossingKey(proposalPools);
   const unit = info.currencyName;
@@ -180,7 +164,15 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                   ? t('send.confirm-nym-all')
                   : t('send.confirm-nym')
               }
-              onPress={() => {
+              onPress={async () => {
+                if (sending.current) {
+                  return;
+                }
+                sending.current = true;
+                if (!(await authorize())) {
+                  sending.current = false;
+                  return;
+                }
                 // The review leaves the stack: back from the sending screen
                 // never reopens a send that has gone.
                 navigation.replace(Route.Computing, {

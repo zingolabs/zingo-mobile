@@ -37,10 +37,7 @@ import { AppDrawerParamList, CardRect } from '@app/types';
 import { useSecureScreen } from '@app/hooks/useSecureScreen';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { useScreenCapture } from '@app/hooks/useScreenCapture';
-import {
-  enactGateAnswer,
-  resolveTriggerGate,
-} from '@app/services/gateController';
+import { useAuthorize } from '@app/hooks/useAuthorize';
 import {
   getRecoveryWalletInfo,
   hasRecoveryWalletInfo,
@@ -176,11 +173,11 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
   const context = useContext(ContextAppLoaded);
   const {
     translate,
-    biometrics,
     addLastSnackbar,
     setSeedBackedUp,
     birthday: walletBirthday,
   } = context;
+  const authorize = useAuthorize();
   const { colors } = useTheme();
   const root = useRef<View>(null);
   const [screen, setScreen] = useState<CardRect>({
@@ -316,14 +313,7 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
   // Passes the device gate, then reads the phrase: the stored copy first,
   // the wallet when the keychain has none.
   const unlock = async (): Promise<string[]> => {
-    const answer = await resolveTriggerGate(undefined, biometrics, {
-      translate,
-    });
-    const proceed = enactGateAnswer(
-      answer,
-      { lock: () => {}, notice: m => addLastSnackbar(m) },
-      translate,
-    );
+    const proceed = await authorize();
     if (!proceed) {
       return [];
     }

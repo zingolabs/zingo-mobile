@@ -12,7 +12,10 @@ import {
   SelectServerEnum,
 } from '@app/AppState';
 import { remoteServer } from '@app/AppState/types/ServerType';
-import { askGate, resolveTriggerGate } from '@app/services/gateController';
+import {
+  authorizeAction,
+  resolveTriggerGate,
+} from '@app/services/gateController';
 import RPCModule from '@app/RPCModule';
 import { hasRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
 
@@ -23,7 +26,7 @@ jest.mock('@app/RPCModule', () =>
 jest.mock('@app/services/gateController', () => ({
   ...jest.requireActual('@app/services/gateController'),
   resolveTriggerGate: jest.fn(async () => ({ kind: 'passed' })),
-  askGate: jest.fn(async () => ({ kind: 'passed' })),
+  authorizeAction: jest.fn(async () => true),
 }));
 
 jest.mock('@app/services/recoveryWalletInfo', () => ({
@@ -99,14 +102,14 @@ describe('LoadingApp start gate', () => {
     jest.spyOn(app, 'setState').mockImplementation(() => {});
     const restore = jest.mocked(RPCModule.restoreWalletFromSeed);
     restore.mockRejectedValue(new Error('stop here'));
-    (askGate as jest.Mock).mockResolvedValueOnce({
-      kind: 'declined',
-      failure: { errorKey: 'biometrics-failure-declined' },
-    });
+    (authorizeAction as jest.Mock).mockResolvedValueOnce(false);
 
     await app.importAllRecovery(app.state.recoveryEntries);
 
-    expect(askGate).toHaveBeenCalledTimes(1);
+    expect(authorizeAction).toHaveBeenCalledTimes(1);
+    expect(authorizeAction).toHaveBeenCalledWith(
+      expect.objectContaining({ enabled: app.state.biometrics }),
+    );
     expect(restore).not.toHaveBeenCalled();
 
     await app.importAllRecovery(app.state.recoveryEntries);

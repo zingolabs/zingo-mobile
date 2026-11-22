@@ -37,10 +37,12 @@ and deserve the same rigor as the transaction path.
 
 ## Gates hold at the destination, not the doorway
 
-- Enforce a biometric or security gate in the sensitive screen's entry
-  layer itself, never only at the call sites that happen to navigate to
-  it today — a new navigation path must not be able to bypass the gate
-  by construction (Issues D, L).
+- Enforce a biometric or security gate inside the sensitive screen, at
+  the action that reveals a secret, spends funds or cannot be undone,
+  never only at the call sites that happen to navigate to it today. A
+  new navigation path must not be able to bypass the gate by
+  construction (Issues D, L). Every such action asks through
+  `useAuthorize`, which honours the biometrics switch.
 - On Android, reject obscured touches on sensitive flows
   (`filterTouchesWhenObscured`, and `HIDE_OVERLAY_WINDOWS` where
   available) so an overlay cannot deceive the user into tapping

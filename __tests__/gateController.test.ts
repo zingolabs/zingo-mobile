@@ -347,6 +347,54 @@ test('an empty-handed trigger asks only when enabled', async () => {
   expect(native.authenticate).toHaveBeenCalledTimes(1);
 });
 
+test('Tests that an action goes on without asking when the switch is off', async () => {
+  const { controller, native } = load();
+  const notify = jest.fn();
+
+  await expect(
+    controller.authorizeAction({ enabled: false, translate, notify }),
+  ).resolves.toBe(true);
+  expect(native.canAuthenticate).not.toHaveBeenCalled();
+  expect(notify).not.toHaveBeenCalled();
+});
+
+test('Tests that an action stops and says why when the device lock is declined', async () => {
+  const { controller, native } = load();
+  secured(native);
+  native.authenticate.mockResolvedValue({ outcome: 'declined', code: '10' });
+  const notify = jest.fn();
+
+  await expect(
+    controller.authorizeAction({ enabled: true, translate, notify }),
+  ).resolves.toBe(false);
+  expect(notify).toHaveBeenCalledWith('biometrics-error');
+});
+
+test('Tests that an action goes on with the reason when the device lock cannot run', async () => {
+  const { controller, native } = load();
+  native.canAuthenticate.mockResolvedValue({ available: false, code: 'none' });
+  const notify = jest.fn();
+
+  await expect(
+    controller.authorizeAction({ enabled: true, translate, notify }),
+  ).resolves.toBe(true);
+  expect(notify).toHaveBeenCalledTimes(1);
+  expect(notify).not.toHaveBeenCalledWith('biometrics-error');
+});
+
+test('Tests that a return from the background skips the shutter only inside the grace', () => {
+  const { controller } = load();
+  const { withinForegroundGrace, FOREGROUND_GRACE_MS } = controller;
+  const left = 1_000_000;
+
+  expect(withinForegroundGrace(undefined, left)).toBe(false);
+  expect(withinForegroundGrace(left, left + FOREGROUND_GRACE_MS)).toBe(true);
+  expect(withinForegroundGrace(left, left + FOREGROUND_GRACE_MS + 1)).toBe(
+    false,
+  );
+  expect(withinForegroundGrace(left, left - 1)).toBe(false);
+});
+
 test('resetGateController clears the freshness memory', async () => {
   const { controller, native } = load();
   secured(native);
