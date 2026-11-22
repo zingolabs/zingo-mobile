@@ -28,7 +28,7 @@ import type { DepositInstructionsType } from '@app/swap';
 import { reserveRefundAddress } from '@app/walletBackend';
 import { sendGateOpen } from '@app/walletBackend/transforms/mixnetView';
 import { deliver } from '@app/navigation/results';
-import { useAuthorizeDeposit } from './useAuthorizeDeposit';
+import { useAuthorize } from '@app/hooks/useAuthorize';
 import Utils from '@app/utils';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
@@ -102,7 +102,7 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
 
   // Spending from this wallet asks for the device lock when Confirm is
   // pressed. A deposit paid from the other wallet takes nothing here.
-  const authorizeDeposit = useAuthorizeDeposit();
+  const authorize = useAuthorize();
 
   const [committing, setCommitting] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
@@ -266,7 +266,7 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
   ]);
 
   const onConfirm = async () => {
-    if (isOutbound && !(await authorizeDeposit())) {
+    if (isOutbound && !(await authorize())) {
       return;
     }
     commit();

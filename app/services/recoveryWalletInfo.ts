@@ -14,9 +14,10 @@ import {
 const service = GlobalConst.serviceKeyChain;
 
 // SILENT_SECURE profile — encryption-at-rest only, no prompt. Rationale:
-//   - The recovery seed/UFVK is gated at the SCREEN level (WalletSeed.tsx /
-//     ViewingKey.tsx ask the gate controller when the user enables
-//     the biometrics switch). That is the user-visible authorisation.
+//   - The recovery seed/UFVK is gated in the screens that reveal it
+//     (WalletSeed.tsx / ViewingKey.tsx / SeedBackup.tsx ask at Show or
+//     Copy when the biometrics switch is on). That is the user-visible
+//     authorisation.
 //   - Stacking a second bio gate at the keychain item caused
 //     startup-save failures on Android (the gate auth window expired
 //     before the post-wallet-load save ran, so the AES_GCM auth-required

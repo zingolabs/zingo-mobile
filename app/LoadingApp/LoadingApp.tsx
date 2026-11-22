@@ -108,6 +108,7 @@ import Launching from '@screens/Launching';
 import {
   GateAnswer,
   askGate,
+  authorizeAction,
   dropWhileInFlight,
   enactGateAnswer,
   resolveTriggerGate,
@@ -1687,8 +1688,13 @@ export class LoadingAppClass extends Component<
     if (entries.length === 0) {
       return;
     }
-    const answer = await askGate({ translate: this.state.translate });
-    if (answer.kind === 'declined') {
+    if (
+      !(await authorizeAction({
+        enabled: this.state.biometrics,
+        translate: this.state.translate,
+        notify: this.addLastSnackbar,
+      }))
+    ) {
       return;
     }
     this.setState({ actionButtonsDisabled: true });

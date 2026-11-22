@@ -34,7 +34,7 @@ import { SwapStore } from '@app/swap';
 import { formatZecAmount } from '@app/utils/formatZecAmount';
 import type { WalletEntry } from '@app/walletBackend';
 import { updateWalletMeta } from '@app/walletBackend';
-import { askGate } from '@app/services/gateController';
+import { useAuthorize } from '@app/hooks/useAuthorize';
 import {
   recoveryEntriesOnDevice,
   recoveryEntryFor,
@@ -92,6 +92,7 @@ export default function WalletsSheet() {
     restoreInPlace,
   } = useContext(ContextAppLoaded);
   const t = useCallback((key: string) => translate(key) as string, [translate]);
+  const authorize = useAuthorize();
   const { colors } = useTheme();
   const listRef = useRef<BottomSheetModal>(null);
   const settingsRef = useRef<BottomSheetModal>(null);
@@ -359,8 +360,7 @@ export default function WalletsSheet() {
           if (!broken) {
             return;
           }
-          const answer = await askGate({ translate });
-          if (answer.kind === 'declined') {
+          if (!(await authorize())) {
             return;
           }
           brokenRef.current?.dismiss();
@@ -373,8 +373,8 @@ export default function WalletsSheet() {
         ref={deleteRef}
         context={deleting?.context ?? { sub: '', warning: '' }}
         translate={translate}
-        onConfirmed={() => {
-          if (deleting) {
+        onConfirmed={async () => {
+          if (deleting && (await authorize())) {
             closeList();
             deleteWallet(deleting.wallet);
           }

@@ -5,7 +5,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ContextAppLoaded } from '@app/context';
 import { AppDrawerParamList } from '@app/types';
 import { useTheme } from '@app/theme';
-import { askGate } from '@app/services/gateController';
+import { useAuthorize } from '@app/hooks/useAuthorize';
 import { askDiskRetry } from '@app/services/diskFull';
 import {
   RecoveryEntry,
@@ -31,6 +31,7 @@ export default function FoundWalletsInApp({
   const { translate, importFound, addLastSnackbar } =
     useContext(ContextAppLoaded);
   const { colors } = useTheme();
+  const authorize = useAuthorize();
   const [phase, setPhase] = useState<Phase>({ kind: 'reading' });
 
   useEffect(() => {
@@ -40,8 +41,7 @@ export default function FoundWalletsInApp({
   }, []);
 
   const run = async (chosen: RecoveryEntry[]) => {
-    const answer = await askGate({ translate });
-    if (answer.kind === 'declined') {
+    if (!(await authorize())) {
       return;
     }
     setPhase({ kind: 'working' });

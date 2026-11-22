@@ -38,7 +38,7 @@ import DepositSentSheet from '@screens/Swap/components/DepositSentSheet';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
 import { useRemoveSwap } from '@screens/Swap/useRemoveSwap';
-import { useAuthorizeDeposit } from '@screens/SwapReview/useAuthorizeDeposit';
+import { useAuthorize } from '@app/hooks/useAuthorize';
 
 type SwapDepositProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -68,7 +68,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   const [retryError, setRetryError] = useState<string>(broadcastError ?? '');
   const [retrying, setRetrying] = useState<boolean>(false);
   const sentSheetRef = useRef<BottomSheetModal>(null);
-  const authorizeDeposit = useAuthorizeDeposit();
+  const authorize = useAuthorize();
 
   useEffect(() => {
     const timer = setInterval(() => setNowMs(Date.now()), 30_000);
@@ -192,7 +192,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
     valueTransfers,
   ]);
   const onRetry = async () => {
-    if (!(await authorizeDeposit())) {
+    if (!(await authorize())) {
       return;
     }
     retry();

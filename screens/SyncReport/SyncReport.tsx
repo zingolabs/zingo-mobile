@@ -37,10 +37,6 @@ import { ContextAppLoaded } from '@app/context';
 import { useSyncStatus } from '@app/hooks/useSyncStatus';
 import { createAlert } from '@app/services/createAlert';
 import { sendEmail } from '@app/services/sendEmail';
-import {
-  enactGateAnswer,
-  resolveTriggerGate,
-} from '@app/services/gateController';
 import { showConfirm } from '@app/services/showConfirm';
 import Utils from '@app/utils';
 import { formatInteger } from '@app/utils/formatAmount';
@@ -157,7 +153,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     netInfo,
     info,
     server,
-    biometrics,
     zingolibVersion,
     setBackgroundError,
     addLastSnackbar,
@@ -232,21 +227,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const rescan = async () => {
     if (!netInfo.isConnected || server.kind === 'offline') {
       addLastSnackbar(translate('loadedapp.connection-error') as string);
-      return;
-    }
-    const answer = await resolveTriggerGate(undefined, biometrics, {
-      translate,
-    });
-    const proceed = enactGateAnswer(
-      answer,
-      {
-        lock: () =>
-          addLastSnackbar(translate('biometrics-failure-declined') as string),
-        notice: message => addLastSnackbar(message),
-      },
-      translate,
-    );
-    if (!proceed) {
       return;
     }
     await doRescan();

@@ -16,10 +16,15 @@ jest.mock('@gorhom/bottom-sheet', () => {
   };
 });
 
+const mockAuthorize = jest.fn(async () => true);
+jest.mock('@app/hooks/useAuthorize', () => ({
+  useAuthorize: () => mockAuthorize,
+}));
+
 import 'react-native';
 import React from 'react';
 
-import { fireEvent, render } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import { useResult } from '@app/navigation/results';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Confirm from '@screens/Confirm';
@@ -113,7 +118,11 @@ describe('Confirm send permit', () => {
 });
 
 describe('Confirm leaving for the sending screen', () => {
-  test('Tests that confirming replaces the review with the sending screen before the send starts, when the permit is granted.', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('Tests that confirming replaces the review with the sending screen before the send starts, when the permit is granted.', async () => {
     const order: string[] = [];
     (mockNavigation.replace as jest.Mock).mockImplementation(() =>
       order.push('replace'),
@@ -131,9 +140,33 @@ describe('Confirm leaving for the sending screen', () => {
 
     fireEvent.press(view.getByTestId('send.confirm.button'));
 
-    expect(mockNavigation.replace).toHaveBeenCalledWith(Route.Computing, {
-      subject: expect.objectContaining({ who: expect.any(String) }),
-    });
+    await waitFor(() =>
+      expect(mockNavigation.replace).toHaveBeenCalledWith(Route.Computing, {
+        subject: expect.objectContaining({ who: expect.any(String) }),
+      }),
+    );
+    expect(mockAuthorize).toHaveBeenCalledTimes(1);
     expect(order).toEqual(['replace', 'confirm']);
+  });
+
+  test('Tests that the review stays and nothing is sent when the device lock is declined at the confirm press.', async () => {
+    mockAuthorize.mockResolvedValueOnce(false);
+    const sent = jest.fn();
+    const Listener = () => {
+      useResult('send.confirm', sent);
+      return null;
+    };
+    const view = render(
+      <>
+        <Listener />
+        {confirmUi(online)}
+      </>,
+    );
+
+    fireEvent.press(view.getByTestId('send.confirm.button'));
+
+    await waitFor(() => expect(mockAuthorize).toHaveBeenCalledTimes(1));
+    expect(mockNavigation.replace).not.toHaveBeenCalled();
+    expect(sent).not.toHaveBeenCalled();
   });
 });

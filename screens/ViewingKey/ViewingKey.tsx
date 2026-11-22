@@ -33,10 +33,7 @@ import { ContextAppLoaded } from '@app/context';
 import { SnackbarDurationEnum } from '@app/AppState';
 import Header from '@ui/widgets/Header';
 import { AppDrawerParamList } from '@app/types';
-import {
-  enactGateAnswer,
-  resolveTriggerGate,
-} from '@app/services/gateController';
+import { useAuthorize } from '@app/hooks/useAuthorize';
 import { getRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
 import { fetchWallet } from '@app/walletBackend';
 import { copySensitive } from '@app/utils/sensitiveClipboard';
@@ -116,6 +113,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
   const [open, setOpen] = useState(true);
   const [key, setKey] = useState('');
   const [hidden, setHidden] = useState(true);
+  const authorize = useAuthorize();
   const [unlocked, setUnlocked] = useState(!biometrics);
 
   useEffect(() => {
@@ -141,14 +139,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
     if (unlocked) {
       return true;
     }
-    const answer = await resolveTriggerGate(undefined, biometrics, {
-      translate,
-    });
-    const proceed = enactGateAnswer(
-      answer,
-      { lock: () => {}, notice: m => addLastSnackbar(m) },
-      translate,
-    );
+    const proceed = await authorize();
     setUnlocked(proceed);
     return proceed;
   };

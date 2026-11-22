@@ -119,6 +119,7 @@ import {
   GateAnswer,
   enactGateAnswer,
   resolveTriggerGate,
+  withinForegroundGrace,
 } from '@app/services/gateController';
 import ShowAddressAlertAsync from '@app/services/showAddressAlertAsync';
 
@@ -894,6 +895,12 @@ export class LoadedAppClass extends Component<
       async nextAppState => {
         // let's catch the prior value
         const priorAppState = this.state.appStateStatus;
+        if (
+          nextAppState === AppStateStatusEnum.background &&
+          this.leftAt === undefined
+        ) {
+          this.leftAt = Date.now();
+        }
         if (Platform.OS === GlobalConst.platformOSios) {
           if (
             (priorAppState === AppStateStatusEnum.inactive &&
@@ -1078,13 +1085,18 @@ export class LoadedAppClass extends Component<
 
   foregroundGateBusy = false;
 
+  /** When the app last went to the background, cleared on its return. */
+  leftAt: number | undefined;
+
   // (PIN or TouchID or FaceID). Only a decline locks; a gate that cannot
   // run fails open with a notice (ADR 0007), because blocking would trap
   // the user out of the wallet.
   runForegroundGate = async () => {
+    const leftAt = this.leftAt;
+    this.leftAt = undefined;
     const foregroundGate: GateAnswer = await resolveTriggerGate(
       undefined,
-      this.state.biometrics,
+      this.state.biometrics && !withinForegroundGrace(leftAt, Date.now()),
       { translate: this.state.translate },
     );
     const proceed = enactGateAnswer(

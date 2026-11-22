@@ -120,9 +120,8 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     };
   }, [isOpen, server, netInfo.isConnected]);
 
-  // Audit Issue D — bio gates moved into the destination screens
-  // themselves (WalletSeed.tsx, ViewingKey.tsx, SyncReport.tsx, Settings.tsx) so
-  // every navigation path is funnelled through the same check.
+  // Audit Issue D: the gates live in the destination screens, at the
+  // action that reveals or spends, so no navigation path skips them.
   const dispatch = useMemo(
     () => (item: PanelItem) => {
       sink();

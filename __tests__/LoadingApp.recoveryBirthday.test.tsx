@@ -21,7 +21,7 @@ jest.mock('@app/RPCModule', () =>
 );
 jest.mock('@app/services/gateController', () => ({
   ...jest.requireActual('@app/services/gateController'),
-  askGate: jest.fn(async () => ({ kind: 'passed' })),
+  authorizeAction: jest.fn(async () => true),
 }));
 jest.mock('@app/services/serverPicking', () => ({
   ...jest.requireActual('@app/services/serverPicking'),
