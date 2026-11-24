@@ -225,7 +225,6 @@
     "tryingnewserver-error": "After 15 seconds the new server doesn't respond.",
     "readingwallet": "Reading successfully the wallet with the server:",
     "restorewallet-title": "Advanced Option",
-    "selectingserverbest": "In this moment this is the most optimized server:",
     "incoming-funds": "Incoming funds\n",
     "valuetransfer-confirmed": "Transaction confirmed\n",
     "payment-made": "Payment made\n",
@@ -448,6 +447,11 @@
     "sync-syncing": "Syncing {n}%",
     "sync-mobile-data": "Mobile data",
     "sync-open-report": "Open the Sync report",
+    "sync-server-slow": "{host} is slow",
+    "sync-server-down": "{host} is not answering",
+    "sync-server-unusable": "{host} is not syncing",
+    "sync-server-back": "{host} works again",
+    "sync-open-health": "Open the server status",
     "sync-behind": "Falling behind"
   },
   "info": {
@@ -1174,6 +1178,28 @@
     "title": "Delete the wallet on this device?",
     "hold": "Hold to delete",
     "keep-holding": "Keep holding to delete"
+  },
+  "server-health": {
+    "title": "Server status",
+    "slow": "Slow",
+    "down": "Not answering",
+    "unusable": "Not syncing",
+    "slow-sub": "Answers take over 2 seconds.",
+    "down-sub": "It did not answer the last checks.",
+    "unusable-sub": "It answers, but the wallet does not move past its block.",
+    "manual": "Manual",
+    "details": "Technical details",
+    "send": "Send status",
+    "send-subject": "Server status",
+    "switch": "Switch to {host} ({ms} ms)",
+    "measuring": "Looking for another server…",
+    "none": "No other up-to-date server answered just now.",
+    "other": "Choose another server",
+    "wait-send": "Wait for the transaction on its way to finish.",
+    "back-title": "{host} works again",
+    "back-message": "Go back to the default server, or stay on {host}?",
+    "back-return": "Go back to {host}",
+    "back-stay": "Stay on {host}"
   },
   "server": {
     "title": "Server",

@@ -126,6 +126,7 @@ import AddTagModalHost from './components/AddTagModalHost';
 import { showAddTag } from '@app/services/showAddTag';
 import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
+import ServerHealthSheet from '@ui/widgets/ServerHealthSheet';
 import WalletsSheet from '@screens/Wallets';
 import FadeInOnMount from '@ui/widgets/FadeInOnMount';
 import { showConfirm } from '@app/services/showConfirm';
@@ -2604,6 +2605,7 @@ export class LoadedAppClass extends Component<
                 <BottomSheetBackHandler />
                 <ConfirmBottomSheet />
                 <WalletsSheet />
+                <ServerHealthSheet />
                 <OptionsPanelProvider>
                   <FadeInOnMount
                     duration={

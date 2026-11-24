@@ -225,7 +225,6 @@
     "tryingnewserver-error": "Após 15 segundos o novo servidor não responde.",
     "readingwallet": "Lendo com sucesso a carteira atual com o servidor:",
     "restorewallet-title": "Opção Avançada",
-    "selectingserverbest": "Neste momento ele é o servidor mais otimizado:",
     "incoming-funds": "Fundos recebidos\n",
     "valuetransfer-confirmed": "Transação confirmada\n",
     "payment-made": "Pagamento efetuado\n",
@@ -448,6 +447,11 @@
     "sync-syncing": "Sincronizando {n}%",
     "sync-mobile-data": "Dados móveis",
     "sync-open-report": "Abrir o relatório de sincronização",
+    "sync-server-slow": "{host} está lento",
+    "sync-server-down": "{host} não responde",
+    "sync-server-unusable": "{host} não sincroniza",
+    "sync-server-back": "{host} voltou a funcionar",
+    "sync-open-health": "Abrir o estado do servidor",
     "sync-behind": "Ficando para trás"
   },
   "info": {
@@ -1174,6 +1178,28 @@
     "title": "Excluir a carteira deste dispositivo?",
     "hold": "Segure para excluir",
     "keep-holding": "Continue segurando para excluir"
+  },
+  "server-health": {
+    "title": "Estado do servidor",
+    "slow": "Lento",
+    "down": "Sem resposta",
+    "unusable": "Não sincroniza",
+    "slow-sub": "As respostas passam de 2 segundos.",
+    "down-sub": "Não respondeu às últimas verificações.",
+    "unusable-sub": "Responde, mas a carteira não avança de bloco.",
+    "manual": "Manual",
+    "details": "Detalhes técnicos",
+    "send": "Enviar estado",
+    "send-subject": "Estado do servidor",
+    "switch": "Mudar para {host} ({ms} ms)",
+    "measuring": "Procurando outro servidor…",
+    "none": "Nenhum outro servidor atualizado respondeu agora.",
+    "other": "Escolher outro servidor",
+    "wait-send": "Aguarde a transação em andamento terminar.",
+    "back-title": "{host} voltou a funcionar",
+    "back-message": "Voltar ao servidor padrão ou continuar em {host}?",
+    "back-return": "Voltar para {host}",
+    "back-stay": "Continuar em {host}"
   },
   "server": {
     "title": "Servidor",

@@ -225,7 +225,6 @@
     "tryingnewserver-error": "Después de 15 segundos el nuevo Servidor no responde.",
     "readingwallet": "Leyendo satisfactoriamente el monedero activo usando el Servidor:",
     "restorewallet-title": "Opción Avanzada",
-    "selectingserverbest": "En este momento este es el servidor más optimizado:",
     "incoming-funds": "Fondos entrantes\n",
     "valuetransfer-confirmed": "Transacción confirmada\n",
     "payment-made": "Pago realizado\n",
@@ -448,6 +447,11 @@
     "sync-syncing": "Sincronizando {n}%",
     "sync-mobile-data": "Datos móviles",
     "sync-open-report": "Abrir el informe de sincronización",
+    "sync-server-slow": "{host} va lento",
+    "sync-server-down": "{host} sin respuesta",
+    "sync-server-unusable": "{host} no sincroniza",
+    "sync-server-back": "{host} vuelve a funcionar",
+    "sync-open-health": "Abrir el estado del servidor",
     "sync-behind": "Se está quedando atrás"
   },
   "info": {
@@ -1174,6 +1178,28 @@
     "title": "¿Borrar el monedero de este dispositivo?",
     "hold": "Mantén pulsado para borrar",
     "keep-holding": "Sigue pulsando para borrar"
+  },
+  "server-health": {
+    "title": "Estado del servidor",
+    "slow": "Lento",
+    "down": "Sin respuesta",
+    "unusable": "No sincroniza",
+    "slow-sub": "Las respuestas superan los 2 segundos.",
+    "down-sub": "No responde a las últimas comprobaciones.",
+    "unusable-sub": "Responde, pero el monedero no avanza de bloque.",
+    "manual": "Manual",
+    "details": "Detalles técnicos",
+    "send": "Enviar estado",
+    "send-subject": "Estado del servidor",
+    "switch": "Cambiar a {host} ({ms} ms)",
+    "measuring": "Buscando otro servidor…",
+    "none": "Ningún otro servidor al día respondió ahora mismo.",
+    "other": "Elegir otro servidor",
+    "wait-send": "Espera a que termine la transacción en curso.",
+    "back-title": "{host} vuelve a funcionar",
+    "back-message": "¿Vuelves al servidor predeterminado o sigues en {host}?",
+    "back-return": "Volver a {host}",
+    "back-stay": "Seguir en {host}"
   },
   "server": {
     "title": "Servidor",
