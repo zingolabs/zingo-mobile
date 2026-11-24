@@ -28,8 +28,8 @@ import { ServerStatus } from '@app/AppState/types/ServerStatus';
 import { AppDrawerParamList } from '@app/types';
 import { serverUris } from '@app/uris';
 import {
+  defaultServer,
   otherServersFor,
-  pickAutomatic,
   probeUri,
   recommendedServers,
 } from '@app/services/serverPicking';
@@ -218,21 +218,14 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation, route }) => {
   const chooseAutomatic = async (chain: ChainNameEnum) => {
     setBusy(true);
     setStatus('wait');
-    const pick = await pickAutomatic(translate, chain, online);
-    if (!mounted.current) {
-      return;
-    }
-    if (!pick) {
+    const automatic = defaultServer(translate, chain);
+    if (!automatic) {
       setBusy(false);
       addLastSnackbar(translate('loadedapp.connection-error') as string);
       probeCurrent(server);
       return;
     }
-    // No server answered: Automatic still settles on the chain's default.
-    if (pick.tier === 'default') {
-      addLastSnackbar(translate('loadedapp.connection-error') as string);
-    }
-    await apply(remoteServer(pick.server.uri, chain), SelectServerEnum.auto);
+    await apply(remoteServer(automatic.uri, chain), SelectServerEnum.auto);
   };
 
   const close = () => setLeaving('back');

@@ -225,7 +225,6 @@
     "tryingnewserver-error": "Após 15 segundos o novo servidor não responde.",
     "readingwallet": "Lendo com sucesso a carteira atual com o servidor:",
     "restorewallet-title": "Opção Avançada",
-    "selectingserversame": "Seu servidor atual já é o mais otimizado.",
     "selectingserverbest": "Neste momento ele é o servidor mais otimizado:",
     "incoming-funds": "Fundos recebidos\n",
     "valuetransfer-confirmed": "Transação confirmada\n",

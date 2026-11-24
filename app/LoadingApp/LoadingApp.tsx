@@ -77,7 +77,6 @@ import {
   BlockExplorerEnum,
 } from '@app/AppState';
 import { serverUris } from '@app/uris';
-import { staticAlternatives, staticServers } from '@app/uris/serverChoice';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import {
   activeWalletEntry,
@@ -114,14 +113,13 @@ import {
   resolveTriggerGate,
   retireSentinelEntries,
 } from '@app/services/gateController';
-import selectingServer from '@app/services/selectingServer';
 import {
   otherServersFor,
-  pickAutomatic,
+  keepListedServer,
   probeUri,
   recommendedServers,
 } from '@app/services/serverPicking';
-import { defaultTo, isEqual, sortBy } from 'lodash';
+import { defaultTo, sortBy } from 'lodash';
 import {
   createUpdateRecoveryWalletInfo,
   recoveryEntriesOnDevice,
@@ -536,19 +534,7 @@ export class LoadingAppClass extends Component<
     // has the device the Wallet Keys stored?
     this.setState({ recoveryEntries: await recoveryEntriesOnDevice() });
 
-    // Boot-time server selection. `auto` refetches the live list and activates
-    // the best server on every launch; `list` validates that the user's server
-    // is still listed (else promotes to auto). `custom`/`offline` are respected.
-    if (this.state.selectServer === SelectServerEnum.auto) {
-      // Boot-time selection is silent — the app just picks the best server on
-      // launch without announcing it.
-      const someServerIsWorking = await this.selectServerOnBoot(
-        !!netInfoState.isConnected,
-      );
-      console.log('some server is working?', someServerIsWorking);
-    } else if (this.state.selectServer === SelectServerEnum.list) {
-      await this.selectServerOnBoot(!!netInfoState.isConnected);
-    }
+    await this.selectServerOnBoot(!!netInfoState.isConnected);
 
     // Second, open the wallet when there is one.
     await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
@@ -668,122 +654,24 @@ export class LoadingAppClass extends Component<
     return found ? remoteServer(found.uri, found.chainName) : SERVER_DEFAULT_0;
   };
 
-  // Boot-time server selection driven by the persisted mode:
-  //  - auto: refetch the live list every launch and activate the best server;
-  //          if the registry is unreachable fall back to the static latency
-  //          probe (staying in auto).
-  //  - list: keep the user's server if it is still in the live list; if it has
-  //          vanished, switch to the best server and promote the mode to auto.
-  //  - custom / offline: respected, never touched here.
-  selectServerOnBoot = async (isConnected: boolean): Promise<boolean> => {
-    const mode = this.state.selectServer;
-    const current = this.state.server;
-    if (current.kind === 'offline') {
-      return true;
+  /**
+   * Sets the boot server: Automatic takes the chain's default without testing
+   * it, and a list server that is gone, obsolete or silent gives way to
+   * Automatic. Custom and Offline keep theirs.
+   */
+  selectServerOnBoot = async (isConnected: boolean): Promise<void> => {
+    const { selectServer: mode, server } = this.state;
+    if (
+      server.kind === 'offline' ||
+      (mode !== SelectServerEnum.auto && mode !== SelectServerEnum.list) ||
+      (mode === SelectServerEnum.list &&
+        (await keepListedServer(this.state.translate, server, isConnected)))
+    ) {
+      return;
     }
-    const chainName = current.chainName;
-
-    if (mode === SelectServerEnum.auto) {
-      // Recommended, then the registry, then the static list, then the
-      // chain's default; true when some server answered.
-      const pick = await pickAutomatic(
-        this.state.translate,
-        chainName,
-        isConnected,
-      );
-      const best = pick
-        ? remoteServer(pick.server.uri, pick.server.chainName)
-        : this.defaultServerForChain(chainName);
-      this.setState({ server: best });
-      await SettingsFileImpl.writeServer(best, mode);
-      return !!pick && pick.tier !== 'default';
-    }
-
-    if (mode === SelectServerEnum.list) {
-      // Can't validate offline or with an unreachable registry: respect the
-      // stored server and stay in list mode.
-      if (!isConnected) {
-        return true;
-      }
-      const list = [
-        ...recommendedServers(this.state.translate, chainName),
-        ...(await otherServersFor(this.state.translate, chainName, true)),
-      ];
-      if (list.length === 0) {
-        return true;
-      }
-      const stillListed = list.some(
-        (s: ServerUrisType) => s.uri === current.uri,
-      );
-      if (stillListed) {
-        return true;
-      }
-      // The chosen server dropped off the list → activate the best one and
-      // promote the mode to auto (it is no longer a manual list choice).
-      const best = remoteServer(list[0].uri, list[0].chainName);
-      this.setState({ server: best, selectServer: SelectServerEnum.auto });
-      await SettingsFileImpl.writeServer(best, SelectServerEnum.auto);
-      return true;
-    }
-
-    // custom / offline: respected.
-    return true;
-  };
-
-  selectTheBestServer = async (
-    aDifferentOne: boolean,
-    targetMode: SelectServerEnum = SelectServerEnum.list,
-    // Boot selection passes `silent` so it never announces the pick; mid-session
-    // recovery leaves it false so the user is told the server was switched.
-    silent: boolean = false,
-  ): Promise<boolean> => {
-    // avoiding obsolete ones
-    let someServerIsWorking: boolean = true;
-    const actualServer = this.state.server;
-    if (actualServer.kind === 'offline') {
-      return false;
-    }
-    // stay on the active wallet's chain — the static list now also
-    // carries a testnet default, and picking it for a mainnet wallet
-    // (or vice versa) would swap chains under the wallet.
-    const list = serverUris(this.state.translate);
-    const server = await selectingServer(
-      aDifferentOne
-        ? staticAlternatives(list, actualServer)
-        : staticServers(list, actualServer.chainName),
-    );
-    let fasterServer = actualServer;
-    if (server && server.latency) {
-      fasterServer = remoteServer(server.uri, server.chainName);
-    } else {
-      // likely here there is a internet/wifi conection problem
-      // all of the servers return an error because they are unreachable probably.
-      // the 15 seconds timout was fired.
-      someServerIsWorking = false;
-    }
-    console.log(fasterServer);
-    this.setState({
-      server: fasterServer,
-      selectServer: targetMode,
-    });
-    await SettingsFileImpl.writeServer(fasterServer, targetMode);
-    // message with the result (never at boot)
-    if (!silent && someServerIsWorking) {
-      if (isEqual(actualServer, fasterServer)) {
-        this.addLastSnackbar(
-          this.state.translate('loadedapp.selectingserversame') as string,
-          SnackbarDurationEnum.long,
-        );
-      } else {
-        this.addLastSnackbar(
-          (this.state.translate('loadedapp.selectingserverbest') as string) +
-            ' ' +
-            fasterServer.uri,
-          SnackbarDurationEnum.long,
-        );
-      }
-    }
-    return someServerIsWorking;
+    const automatic = this.defaultServerForChain(server.chainName);
+    this.setState({ server: automatic, selectServer: SelectServerEnum.auto });
+    await SettingsFileImpl.writeServer(automatic, SelectServerEnum.auto);
   };
 
   // The wallet file's network when it differs from the server's; null when
@@ -1039,7 +927,6 @@ export class LoadingAppClass extends Component<
       this.defaultServerForChain(chain),
       SelectServerEnum.auto,
     );
-    await this.selectServerOnBoot(!!this.state.netInfo.isConnected);
     await this.loadExistingWalletOnBoot();
   };
 
@@ -1577,15 +1464,13 @@ export class LoadingAppClass extends Component<
     );
   };
 
-  // Automatic seeds the chain's default and lets the boot picker replace it
-  // with the fastest recommended server, or the best live one.
+  /** Sets Automatic, which is the chain's default server. */
   chooseAutomatic = async (chain: ChainNameEnum) => {
     this.setState({ actionButtonsDisabled: true, serverStatus: 'wait' });
     await this.applyServer(
       this.defaultServerForChain(chain),
       SelectServerEnum.auto,
     );
-    await this.selectServerOnBoot(!!this.state.netInfo.isConnected);
     this.setState({ actionButtonsDisabled: false });
     await this.probeCurrentServer();
   };
@@ -1707,11 +1592,7 @@ export class LoadingAppClass extends Component<
     let diskFull = false;
     for (const entry of entries) {
       const chain = entryChain(entry);
-      const { server, selectServer } = await entryServer(
-        chain,
-        this.state.translate,
-        !!this.state.netInfo.isConnected,
-      );
+      const { server, selectServer } = entryServer(chain);
       const before = await walletsOnDevice();
       const known = new Set(
         before.ok ? before.value.wallets.map(w => w.id) : [],

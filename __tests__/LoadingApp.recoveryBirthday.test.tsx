@@ -26,10 +26,6 @@ jest.mock('@app/services/gateController', () => ({
 jest.mock('@app/services/serverPicking', () => ({
   ...jest.requireActual('@app/services/serverPicking'),
   probeUri: jest.fn(async () => ({ latency: 40, height: '3000000' })),
-  pickAutomatic: jest.fn(async () => ({
-    server: { uri: 'https://best.testnet:443', chainName: 'test' },
-    tier: 'recommended',
-  })),
 }));
 
 // The start menu on a mainnet server.
@@ -101,7 +97,7 @@ test('Tests that a single-wallet entry restores on Mainnet when the start menu i
   );
 });
 
-test('Tests that a Testnet entry restores on Testnet with the best server that answers', async () => {
+test('Tests that a Testnet entry restores on Testnet with its default server', async () => {
   const { app } = appWithSaved();
 
   const call = await restoredWith(
@@ -115,7 +111,7 @@ test('Tests that a Testnet entry restores on Testnet with the best server that a
 
   expect(call).toEqual(
     expect.arrayContaining([
-      'https://best.testnet:443',
+      'https://testnet.zec.rocks:443',
       ChainNameEnum.testChainName,
     ]),
   );
