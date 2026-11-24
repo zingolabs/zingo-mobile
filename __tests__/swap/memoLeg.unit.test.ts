@@ -12,7 +12,6 @@ const t = (key: string) =>
   ({
     'history.sent': 'Sent',
     'history.memo-sent': 'Memo sent',
-    'history.no-funds': 'No funds',
     'history.fee': 'Fee',
     'swap.leg-payment-to': 'Payment to',
     'swap.leg-memo-to': 'Memo to',
@@ -36,10 +35,10 @@ const row = (vt: ValueTransferType) =>
   legRowText({ vt, time: '1:43 pm', currency: 'ZEC', usd: '$0.00', t });
 
 describe('a Maya deposit’s memo note', () => {
-  it('Tests that History calls the 0 ZEC leg a memo with no funds when a shielded deposit sends its memo apart. The fee stays on the line.', () => {
+  it('Tests that History calls the 0 ZEC leg a memo showing its amount when a shielded deposit sends its memo apart. The fee stays on the line.', () => {
     expect(row(leg(0))).toMatchObject({
       title: 'Memo sent',
-      top: 'No funds',
+      top: '0.0 ZEC',
       topTone: 'muted',
       bottom: '',
       lineAmount: ' · Fee 0.00015 ZEC',
