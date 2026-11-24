@@ -304,7 +304,7 @@ export function legRowText(args: {
       titleMono: false,
       line: time,
       lineAmount: fee,
-      top: t('history.no-funds'),
+      top: `${formatAmount(vt.amount)} ${currency}`,
       topTone: 'muted',
       bottom: '',
     };
