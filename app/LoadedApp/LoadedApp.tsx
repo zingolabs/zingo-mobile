@@ -759,7 +759,6 @@ export class LoadedAppClass extends Component<
       sendSwapDeposit: this.sendSwapDeposit,
       resumeSwapDeposit: this.resumeSwapDeposit,
       setServerOption: this.setServerOption,
-      switchServerForRetry: this.switchServerForRetry,
       clearToAddr: this.clearToAddr,
       doRescan: this.doRescan,
       setAddressBook: this.setAddressBook,
@@ -1779,17 +1778,6 @@ export class LoadedAppClass extends Component<
     return true;
   };
 
-  /**
-   * The server switch of a send retry. setServerOption would reopen the wallet,
-   * and the retry would meet a new client with no mixnet attached yet.
-   */
-  switchServerForRetry = async (next: ServerType): Promise<void> => {
-    if (await this.moveToServer(next)) {
-      await this.rpc.clearTimers();
-      await this.rpc.configure();
-    }
-  };
-
   // Dials each candidate in order and activates the first that connects.
   activateReachableServer = async (
     candidates: ServerUrisType[],
@@ -2564,7 +2552,6 @@ export class LoadedAppClass extends Component<
       sendSwapDeposit: this.sendSwapDeposit,
       resumeSwapDeposit: this.resumeSwapDeposit,
       setServerOption: this.setServerOption,
-      switchServerForRetry: this.switchServerForRetry,
       clearToAddr: this.clearToAddr,
       doRescan: this.doRescan,
       setAddressBook: this.setAddressBook,

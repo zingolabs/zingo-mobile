@@ -141,7 +141,6 @@ export default interface AppContextLoaded {
     selectServer: SelectServerEnum,
     toast: boolean,
   ) => Promise<SetServerResult>;
-  switchServerForRetry: (server: ServerType) => Promise<void>;
   clearToAddr: () => void;
   doRescan: () => Promise<void>;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
