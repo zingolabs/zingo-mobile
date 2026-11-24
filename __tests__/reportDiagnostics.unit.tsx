@@ -37,6 +37,7 @@ import {
   ABSENT_MIXNET_VIEW,
   INITIAL_MIXNET_VIEW,
 } from '@app/walletBackend/transforms/mixnetView';
+import { INITIAL_SERVER_HEALTH_VIEW } from '@app/services/serverHealthMonitor';
 
 const translate = (k: string) => k;
 
@@ -60,6 +61,12 @@ test('Tests that the report names the server, the wallet and the sync when a wal
       readOnly: true,
       lastError: '',
       mixnetView: { ...INITIAL_MIXNET_VIEW, statusKey: 'mixnet.status.ready' },
+      serverHealth: {
+        ...INITIAL_SERVER_HEALTH_VIEW,
+        level: 'slow',
+        lastLatencyMs: 2400,
+        height: 3000000,
+      },
       sync: {
         percentage_total_outputs_scanned: 87.25,
         scan_ranges: [
@@ -87,6 +94,9 @@ test('Tests that the report names the server, the wallet and the sync when a wal
   expect(out).toContain('Network: wifi, internet: unknown');
   expect(out).toContain('Mixnet: mixnet.status.ready');
   expect(out).toContain('Sync: 87.3%, 100 blocks left');
+  expect(out).toContain(
+    'Server health: slow, last answer: 2400 ms, height: 3000000, last error: none',
+  );
   expect(out).toContain('Last error: none');
   expect(out).toContain('Power saving: on');
   expect(out).toContain('Free disk: 1-5 GB, app memory: unknown');
@@ -134,6 +144,7 @@ test('Tests that the mixnet reads absent when a session is open without a transp
       readOnly: false,
       lastError: 'boom',
       mixnetView: ABSENT_MIXNET_VIEW,
+      serverHealth: INITIAL_SERVER_HEALTH_VIEW,
       sync: {},
     },
   });

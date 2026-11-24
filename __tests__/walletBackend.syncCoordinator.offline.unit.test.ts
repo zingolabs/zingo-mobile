@@ -26,14 +26,14 @@ const mockedBridge = RPCModule as unknown as Record<string, jest.Mock>;
 
 function coordinatorFor(server: ServerType) {
   const onError = jest.fn();
-  const onPersistentSyncFailure = jest.fn();
+  const onSyncLaunch = jest.fn();
   const config = mockWalletBackendConfig({
     onError,
-    onPersistentSyncFailure,
+    onSyncLaunch,
     server,
   });
   const coordinator = new SyncCoordinator(config, {} as DataService);
-  return { coordinator, onError, onPersistentSyncFailure };
+  return { coordinator, onError, onSyncLaunch };
 }
 
 afterEach(() => {
@@ -66,17 +66,16 @@ describe('the sync follows the session connectivity', () => {
     expect(mockedBridge.pollSyncInfo).not.toHaveBeenCalled();
   });
 
-  // The refusal used to count towards the threshold that replaces a broken
-  // server. Offline has no server to replace.
-  it('never spends a persistent-failure strike on an absent server', async () => {
-    const { coordinator, onPersistentSyncFailure } = coordinatorFor(OFFLINE);
+  // Offline has no server whose health a refusal could speak for.
+  it('never reports a sync launch for an absent server', async () => {
+    const { coordinator, onSyncLaunch } = coordinatorFor(OFFLINE);
 
     await coordinator.refreshSync();
     await coordinator.refreshSync();
     await coordinator.refreshSync();
     await coordinator.refreshSync();
 
-    expect(onPersistentSyncFailure).not.toHaveBeenCalled();
+    expect(onSyncLaunch).not.toHaveBeenCalled();
   });
 
   // The control: a connected session still syncs.
@@ -87,6 +86,19 @@ describe('the sync follows the session connectivity', () => {
     await coordinator.refreshSync();
 
     expect(mockedBridge.runSyncProcess).toHaveBeenCalledTimes(1);
+  });
+
+  it('reports each launch to the server health, launched or failed', async () => {
+    const { coordinator, onSyncLaunch } = coordinatorFor(ONLINE);
+    mockedBridge.runSyncProcess.mockResolvedValueOnce('Launching sync task...');
+    await coordinator.refreshSync();
+    mockedBridge.runSyncProcess.mockRejectedValueOnce(new Error('boom'));
+    await coordinator.refreshSync();
+
+    expect(onSyncLaunch.mock.calls).toEqual([
+      [{ kind: 'launched' }],
+      [{ kind: 'failed', error: 'Error: boom' }],
+    ]);
   });
 });
 

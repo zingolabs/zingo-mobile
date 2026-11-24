@@ -34,12 +34,6 @@ import {
 // zingolib's refusal to sync a client that has no indexer configured.
 const INDEXERLESS = /no indexer configured/i;
 
-// Consecutive failed sync launches before onPersistentSyncFailure fires.
-// Three failures span ~15 s of the 5 s tick: long enough to ride out a
-// one-off blip, short enough that a dead server gets replaced before the
-// user reaches for Settings.
-const PERSISTENT_SYNC_FAILURE_THRESHOLD = 3;
-
 export class SyncCoordinator {
   config: WalletBackendConfig;
   dataService: DataService;
@@ -50,8 +44,6 @@ export class SyncCoordinator {
   refreshSyncLock: boolean = false;
   fetchSyncStatusLock: boolean = false;
   fetchSyncPollLock: boolean = false;
-
-  syncLaunchFailures: number = 0;
 
   walletConfigPerformanceLevel: RPCPerformanceLevelEnum | undefined;
 
@@ -260,7 +252,7 @@ export class SyncCoordinator {
           );
         }
         console.log('sync RUN', syncStr);
-        this.syncLaunchFailures = 0;
+        this.config.onSyncLaunch?.({ kind: 'launched' });
       }
     } catch (error) {
       // runSyncProcess and runRescanProcess reject on failure (typed FFI
@@ -278,11 +270,7 @@ export class SyncCoordinator {
         this.config.onError(`Error sync/rescan run: ${error}`);
       }
       if (!fullRescan) {
-        this.syncLaunchFailures += 1;
-        if (this.syncLaunchFailures >= PERSISTENT_SYNC_FAILURE_THRESHOLD) {
-          this.syncLaunchFailures = 0;
-          this.config.onPersistentSyncFailure?.();
-        }
+        this.config.onSyncLaunch?.({ kind: 'failed', error: String(error) });
       }
     } finally {
       this.refreshSyncLock = false;

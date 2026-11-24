@@ -444,11 +444,20 @@ export class DataService {
       }
       if (heightStr) {
         this.lastServerBlockHeight = Number(heightStr);
+        this.config.onServerAnswer?.(server.uri, {
+          kind: 'answered',
+          latencyMs: Date.now() - start,
+          height: Number(heightStr),
+        });
       } else {
         console.log('Internal Error server height');
       }
     } catch (error) {
       this.config.onError(`Error server height: ${error}`);
+      this.config.onServerAnswer?.(server.uri, {
+        kind: 'failed',
+        error: String(error),
+      });
     }
   }
 

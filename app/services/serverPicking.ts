@@ -4,7 +4,9 @@ import {
   ServerUrisType,
   TranslateType,
 } from '@app/AppState';
+import { minBy, uniqBy } from 'lodash';
 import { fetchServerList, serverUris } from '@app/uris';
+import { upToDate } from './serverHealth';
 import { getLatestBlockServerInfo } from '@app/walletBackend';
 
 type Translate = (key: string) => TranslateType | void;
@@ -94,4 +96,64 @@ export const otherServersFor = async (
       ? live
       : known.filter(s => s.chainName === chain && !s.obsolete);
   return list.filter(s => !recommended.has(s.uri));
+};
+
+export type MeasuredServer = {
+  uri: string;
+  chainName: ChainNameEnum;
+  latency: number | null;
+  height: number;
+};
+
+/**
+ * The server the health sheet offers instead of `current`: the default when
+ * it answers up to date, else the fastest one that does. The tip is the
+ * highest block any of them, or `tip`, gave.
+ */
+export const healthyCandidate = (
+  measured: MeasuredServer[],
+  current: string,
+  defaultUri: string | null,
+  tip: number,
+): MeasuredServer | null => {
+  const reference = Math.max(tip, ...measured.map(m => m.height));
+  const fit = measured.filter(
+    m =>
+      m.uri !== current && m.latency !== null && upToDate(m.height, reference),
+  );
+  return (
+    fit.find(m => m.uri === defaultUri) ??
+    minBy(fit, m => m.latency ?? Infinity) ??
+    null
+  );
+};
+
+/** Measures the default, the recommended and the other servers of `chain`, each once. */
+export const measureServers = async (
+  translate: Translate,
+  chain: ChainNameEnum,
+  online: boolean,
+): Promise<MeasuredServer[]> => {
+  const others = await otherServersFor(translate, chain, online);
+  const pool = uniqBy(
+    [
+      ...[defaultServer(translate, chain)].filter(
+        (s): s is ServerUrisType => s !== null,
+      ),
+      ...recommendedServers(translate, chain),
+      ...others,
+    ],
+    s => s.uri,
+  );
+  return Promise.all(
+    pool.map(async s => {
+      const probe = await probeUri(s.uri);
+      return {
+        uri: s.uri,
+        chainName: s.chainName,
+        latency: probe.latency,
+        height: Number(probe.height) || 0,
+      };
+    }),
+  );
 };
