@@ -20,6 +20,7 @@ import { RPCDrainType } from '@app/walletBackend/types/RPCDrainType';
 import { RPCDrainStatusType } from '@app/walletBackend/types/RPCDrainStatusType';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
+import ErrorDetails from '@ui/widgets/ErrorDetails';
 
 type MigrationSendingProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -258,15 +259,10 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
             >
               {translate('migrationsending.error-title') as string}
             </Text>
-            <Text
-              style={{
-                color: colors.fgMuted,
-                fontSize: 14,
-                textAlign: 'center',
-              }}
-            >
-              {errorMsg}
-            </Text>
+            <ErrorDetails
+              subject={translate('migrationsending.error-title') as string}
+              text={errorMsg}
+            />
           </View>
         </ScrollView>
         {fades}

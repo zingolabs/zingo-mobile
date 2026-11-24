@@ -38,7 +38,7 @@ import {
   failureOf,
   followTxids,
 } from './sendProgress';
-import ErrorDetails from './ErrorDetails';
+import ErrorDetails from '@ui/widgets/ErrorDetails';
 import TransactionsSheet from './TransactionsSheet';
 
 /**

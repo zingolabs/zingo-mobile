@@ -242,10 +242,10 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
       // try again.
       navigation.replace(Route.SwapDeposit, {
         recordId,
-        broadcastError:
+        broadcastFailure:
           e instanceof DepositAfterDeshieldError && e.kind === 'pending'
-            ? (translate('swap.deposit-other-held') as string)
-            : `${e}`,
+            ? { kind: 'heldByOther' }
+            : { kind: 'failed', text: `${e}` },
       });
     }
   }, [

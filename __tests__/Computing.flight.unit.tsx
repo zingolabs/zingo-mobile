@@ -375,14 +375,14 @@ describe('Computing failures', () => {
       },
       [],
     );
-    expect(view.queryByTestId('computing.error.text')).toBeNull();
-    fireEvent.press(view.getByTestId('computing.error.toggle'));
-    expect(view.getByTestId('computing.error.text')).toHaveTextContent(
+    expect(view.queryByTestId('error-details.text')).toBeNull();
+    fireEvent.press(view.getByTestId('error-details.toggle'));
+    expect(view.getByTestId('error-details.text')).toHaveTextContent(
       'checkpoint not found',
     );
-    fireEvent.press(view.getByTestId('computing.error.copy'));
+    fireEvent.press(view.getByTestId('error-details.copy'));
     expect(Clipboard.setString).toHaveBeenCalledWith('checkpoint not found');
-    fireEvent.press(view.getByTestId('computing.error.email'));
+    fireEvent.press(view.getByTestId('error-details.email'));
     expect(sendEmail).toHaveBeenCalledWith(
       translate,
       '',

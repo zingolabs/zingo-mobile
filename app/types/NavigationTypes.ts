@@ -229,11 +229,14 @@ export type SwapTransactionNavigationState = {
   slot: number;
 };
 
+/** Why the wallet's own broadcast of an outbound deposit did not go out: another sale holds its deposit, or the backend failed. */
+export type DepositFailure =
+  { kind: 'none' } | { kind: 'heldByOther' } | { kind: 'failed'; text: string };
+
 // A swap by its local record id; the screen reads the live record.
 export type SwapRecordNavigationState = {
   recordId: string;
-  // Why the wallet's own broadcast of an outbound deposit did not go out.
-  broadcastError?: string;
+  broadcastFailure?: DepositFailure;
 };
 
 // What `useNavigation()` gives inside the wallet: the wallet stack and the
