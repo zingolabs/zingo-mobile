@@ -118,7 +118,7 @@ describe('SyncLine', () => {
     );
   });
 
-  test('Tests that a synced or syncing wallet names the server only when it is Zingo’s own', () => {
+  test('Tests that a synced wallet names the server only when it is Zingo’s own, and a syncing one never does', () => {
     const ours = line({ server: zecGlobal });
     expect(ours.getByTestId('header.syncline')).toHaveTextContent(
       'zec.global · header.sync-synced',
@@ -130,7 +130,7 @@ describe('SyncLine', () => {
       syncInProgress: true,
     });
     expect(syncing.getByTestId('header.syncline')).toHaveTextContent(
-      /^zec\.global · header\.sync-syncing/,
+      /^header\.sync-syncing/,
     );
     syncing.unmount();
     const other = line({});

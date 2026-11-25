@@ -140,7 +140,7 @@ function Spinner({ track, arc }: { track: string; arc: string }) {
  * How old the balance is shows only when the wallet stopped keeping up: no
  * internet, Offline, or a sync that falls behind the tip. Mobile data is
  * added at the end. While the server works, the line names it only when it
- * is Zingo's own. Tapping it opens the Sync report, or, while the server
+ * is Zingo's own, and never beside the sync bar. Tapping it opens the Sync report, or, while the server
  * is slow or down, the server health sheet. When the default server works
  * again it says so, and a tap asks whether to go back.
  */
@@ -317,17 +317,14 @@ export default function SyncLine({
           />
         </View>
       );
-      words = named(
-        strong(
-          t('header.sync-syncing').replace(
-            '{n}',
-            String(Math.floor(percentage)),
-          ),
-          colors.fgSyncing,
-        ),
-      );
-      label = namedLabel(
+      /** The bar and the percentage say enough: no server name here. */
+      words = strong(
         t('header.sync-syncing').replace('{n}', String(Math.floor(percentage))),
+        colors.fgSyncing,
+      );
+      label = t('header.sync-syncing').replace(
+        '{n}',
+        String(Math.floor(percentage)),
       );
       break;
     case 'serverSlow':
