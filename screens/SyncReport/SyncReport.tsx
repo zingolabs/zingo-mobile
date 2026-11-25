@@ -55,6 +55,8 @@ import {
   backgroundOutcome,
   CellState,
   chainTip,
+  hasSession,
+  scannedPercent,
   heights,
   MAP_COLS,
   MAP_ROWS,
@@ -184,8 +186,15 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     birthday,
     knownTip(liveTip, freshness.walletHeight),
   );
-  const synced = !syncInProgress && percentageOutputsScanned > 0;
-  const pct = synced ? 100 : Math.floor(percentageOutputsScanned);
+  /** Without a sync session, as after a start without internet, the wallet's ranges tell the progress. */
+  const session = hasSession(syncingStatus);
+  const resting = scannedPercent(syncingStatus, birthday, serverTip);
+  const synced = session
+    ? !syncInProgress && percentageOutputsScanned > 0
+    : resting >= 100;
+  const pct = synced
+    ? 100
+    : Math.floor(session ? percentageOutputsScanned : resting);
   const h = heights(syncingStatus, birthday, serverTip, synced);
   const cells = mapCells(syncingStatus, birthday, serverTip, synced);
 
