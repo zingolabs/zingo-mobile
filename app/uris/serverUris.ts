@@ -1,5 +1,15 @@
 import { ServerUrisType, TranslateType, ChainNameEnum } from '@app/AppState';
 
+/** The host of Zingo's own server. */
+export const OUR_SERVER_HOST = 'zec.global';
+
+/** Whether `uri` points at Zingo's own server. */
+export const isOurServer = (uri: string): boolean =>
+  uri
+    .replace(/^[a-z]+:\/\//i, '')
+    .replace(/[:/].*$/, '')
+    .toLowerCase() === OUR_SERVER_HOST;
+
 const serverUris = (
   translate: (key: string) => TranslateType | void,
 ): ServerUrisType[] => {

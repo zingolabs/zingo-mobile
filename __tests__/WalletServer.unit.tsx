@@ -14,7 +14,7 @@ import {
 } from '@app/AppState';
 import { remoteServer } from '@app/AppState/types/ServerType';
 import WalletServer from '@screens/Server/WalletServer';
-import { pickAutomatic } from '@app/services/serverPicking';
+import { defaultServer } from '@app/services/serverPicking';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 
 jest.mock('@app/walletBackend', () => ({ probeServer: jest.fn() }));
@@ -34,7 +34,10 @@ jest.mock('@app/services/SettingsFileImpl', () => ({
 }));
 jest.mock('@app/services/serverPicking', () => ({
   otherServersFor: jest.fn().mockResolvedValue([]),
-  pickAutomatic: jest.fn(),
+  defaultServer: jest.fn((_translate: unknown, chainName: string) => ({
+    uri: 'https://zec.global:443',
+    chainName,
+  })),
   probeUri: jest.fn().mockResolvedValue({ latency: 40, height: '3473752' }),
   recommendedServers: jest.fn().mockReturnValue([]),
 }));
@@ -57,7 +60,7 @@ const mount = (setServerOption: jest.Mock, forWallet = '') => {
         ...defaultAppContextLoaded,
         translate,
         server: remoteServer(
-          'https://zec.rocks:443',
+          'https://zec.global:443',
           ChainNameEnum.mainChainName,
         ),
         selectServer: SelectServerEnum.list,
@@ -95,20 +98,13 @@ const mount = (setServerOption: jest.Mock, forWallet = '') => {
 };
 
 test('Tests that Automatic on the wallet’s network reconnects the wallet and stays', async () => {
-  (pickAutomatic as jest.Mock).mockResolvedValue({
-    server: {
-      uri: 'https://na.zec.rocks:443',
-      chainName: ChainNameEnum.mainChainName,
-    },
-    tier: 'registry',
-  });
   const setServerOption = jest.fn().mockResolvedValue({ kind: 'ok' });
   const navigation = mount(setServerOption);
   await act(async () => {
     fireEvent.press(screen.getByTestId('server.auto'));
   });
   expect(setServerOption).toHaveBeenCalledWith(
-    remoteServer('https://na.zec.rocks:443', ChainNameEnum.mainChainName),
+    remoteServer('https://zec.global:443', ChainNameEnum.mainChainName),
     SelectServerEnum.auto,
     true,
   );
@@ -116,13 +112,6 @@ test('Tests that Automatic on the wallet’s network reconnects the wallet and s
 });
 
 test('Tests that the network stays the wallet’s when another network is tapped', async () => {
-  (pickAutomatic as jest.Mock).mockResolvedValue({
-    server: {
-      uri: 'https://zec.rocks:443',
-      chainName: ChainNameEnum.mainChainName,
-    },
-    tier: 'registry',
-  });
   const setServerOption = jest.fn().mockResolvedValue({ kind: 'ok' });
   const navigation = mount(setServerOption);
   fireEvent.press(
@@ -131,13 +120,12 @@ test('Tests that the network stays the wallet’s when another network is tapped
   await act(async () => {
     fireEvent.press(screen.getByTestId('server.auto'));
   });
-  expect(pickAutomatic).toHaveBeenCalledWith(
+  expect(defaultServer).toHaveBeenCalledWith(
     expect.anything(),
     ChainNameEnum.mainChainName,
-    expect.anything(),
   );
   expect(setServerOption).toHaveBeenCalledWith(
-    remoteServer('https://zec.rocks:443', ChainNameEnum.mainChainName),
+    remoteServer('https://zec.global:443', ChainNameEnum.mainChainName),
     SelectServerEnum.auto,
     true,
   );
@@ -161,13 +149,6 @@ test('Tests that nothing holds the back when nothing is unsaved, and the back ar
 });
 
 test('Tests that a server picked for another wallet is kept in its meta without reconnecting the open one', async () => {
-  (pickAutomatic as jest.Mock).mockResolvedValue({
-    server: {
-      uri: 'https://zec.rocks:443',
-      chainName: ChainNameEnum.mainChainName,
-    },
-    tier: 'registry',
-  });
   const setServerOption = jest.fn();
   mount(setServerOption, 'w2');
   await act(async () => {
@@ -175,7 +156,7 @@ test('Tests that a server picked for another wallet is kept in its meta without 
   });
   expect(SettingsFileImpl.writeWalletServer).toHaveBeenCalledWith(
     'w2',
-    remoteServer('https://zec.rocks:443', ChainNameEnum.mainChainName),
+    remoteServer('https://zec.global:443', ChainNameEnum.mainChainName),
     SelectServerEnum.auto,
   );
   expect(setServerOption).not.toHaveBeenCalled();

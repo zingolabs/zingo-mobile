@@ -1,8 +1,16 @@
-import { ChainNameEnum, ServerUrisType, TranslateType } from '@app/AppState';
+import {
+  ChainNameEnum,
+  ServerType,
+  ServerUrisType,
+  TranslateType,
+} from '@app/AppState';
+import { minBy, uniqBy } from 'lodash';
 import { fetchServerList, serverUris } from '@app/uris';
+import { upToDate } from './serverHealth';
 import { getLatestBlockServerInfo } from '@app/walletBackend';
 
 type Translate = (key: string) => TranslateType | void;
+type RemoteServer = Extract<ServerType, { kind: 'remote' }>;
 
 // The bound on one tip request when timing a server.
 export const PROBE_TIMEOUT_MS = 15 * 1000;
@@ -33,69 +41,38 @@ export const recommendedServers = (
     s => s.recommended && !s.obsolete && s.chainName === chain,
   );
 
-// The first of `servers` to answer, with its latency; null when none does.
-const fastestOf = async (
-  servers: ServerUrisType[],
-): Promise<ServerUrisType | null> =>
-  new Promise(resolve => {
-    let pending = servers.length;
-    if (pending === 0) {
-      resolve(null);
-      return;
-    }
-    servers.forEach(async s => {
-      const probe = await probeUri(s.uri);
-      if (probe.latency !== null) {
-        resolve({ ...s, latency: probe.latency });
-      } else if (--pending === 0) {
-        resolve(null);
-      }
-    });
-  });
-
-// Where Automatic's pick came from; 'default' means no server answered.
-export type AutomaticTier = 'recommended' | 'registry' | 'static' | 'default';
-
-// The chain's one default server from the static list.
+// The chain's one default server from the static list, which Automatic
+// always takes; null only for a chain without a default (regtest).
 export const defaultServer = (
   translate: Translate,
   chain: ChainNameEnum,
 ): ServerUrisType | null =>
   serverUris(translate).find(s => s.chainName === chain && s.default) ?? null;
 
-// Automatic, in order: the fastest recommended (Zaino) server, the fastest
-// of the live registry, the fastest of the static list, and the chain's
-// default when none answers or there is no internet. Null only for a chain
-// without a default (regtest).
-export const pickAutomatic = async (
+/**
+ * Whether a server chosen from the list keeps its place at boot: in service
+ * in the static list, listed by the live registry or the static list, and
+ * answering. Without internet only the static list is read.
+ */
+export const keepListedServer = async (
   translate: Translate,
-  chain: ChainNameEnum,
+  server: RemoteServer,
   online: boolean,
-): Promise<{ server: ServerUrisType; tier: AutomaticTier } | null> => {
-  if (online) {
-    const recommended = recommendedServers(translate, chain);
-    const fromRecommended = await fastestOf(recommended);
-    if (fromRecommended) {
-      return { server: fromRecommended, tier: 'recommended' };
-    }
-    const tried = new Set(recommended.map(r => r.uri));
-    const live = (await fetchServerList(chain)).filter(r => !tried.has(r.uri));
-    const fromRegistry = await fastestOf(live);
-    if (fromRegistry) {
-      return { server: fromRegistry, tier: 'registry' };
-    }
-    live.forEach(r => tried.add(r.uri));
-    const fromStatic = await fastestOf(
-      serverUris(translate).filter(
-        r => r.chainName === chain && !r.obsolete && !tried.has(r.uri),
-      ),
-    );
-    if (fromStatic) {
-      return { server: fromStatic, tier: 'static' };
-    }
+): Promise<boolean> => {
+  const known = serverUris(translate).find(
+    s => s.uri === server.uri && s.chainName === server.chainName,
+  );
+  if (known?.obsolete) {
+    return false;
   }
-  const fallback = defaultServer(translate, chain);
-  return fallback ? { server: fallback, tier: 'default' } : null;
+  if (!online) {
+    return true;
+  }
+  const live = await fetchServerList(server.chainName);
+  if (live.length > 0 && !known && !live.some(s => s.uri === server.uri)) {
+    return false;
+  }
+  return (await probeUri(server.uri)).latency !== null;
 };
 
 // The servers under Other servers: the live registry or, when it gives
@@ -119,4 +96,64 @@ export const otherServersFor = async (
       ? live
       : known.filter(s => s.chainName === chain && !s.obsolete);
   return list.filter(s => !recommended.has(s.uri));
+};
+
+export type MeasuredServer = {
+  uri: string;
+  chainName: ChainNameEnum;
+  latency: number | null;
+  height: number;
+};
+
+/**
+ * The server the health sheet offers instead of `current`: the default when
+ * it answers up to date, else the fastest one that does. The tip is the
+ * highest block any of them, or `tip`, gave.
+ */
+export const healthyCandidate = (
+  measured: MeasuredServer[],
+  current: string,
+  defaultUri: string | null,
+  tip: number,
+): MeasuredServer | null => {
+  const reference = Math.max(tip, ...measured.map(m => m.height));
+  const fit = measured.filter(
+    m =>
+      m.uri !== current && m.latency !== null && upToDate(m.height, reference),
+  );
+  return (
+    fit.find(m => m.uri === defaultUri) ??
+    minBy(fit, m => m.latency ?? Infinity) ??
+    null
+  );
+};
+
+/** Measures the default, the recommended and the other servers of `chain`, each once. */
+export const measureServers = async (
+  translate: Translate,
+  chain: ChainNameEnum,
+  online: boolean,
+): Promise<MeasuredServer[]> => {
+  const others = await otherServersFor(translate, chain, online);
+  const pool = uniqBy(
+    [
+      ...[defaultServer(translate, chain)].filter(
+        (s): s is ServerUrisType => s !== null,
+      ),
+      ...recommendedServers(translate, chain),
+      ...others,
+    ],
+    s => s.uri,
+  );
+  return Promise.all(
+    pool.map(async s => {
+      const probe = await probeUri(s.uri);
+      return {
+        uri: s.uri,
+        chainName: s.chainName,
+        latency: probe.latency,
+        height: Number(probe.height) || 0,
+      };
+    }),
+  );
 };

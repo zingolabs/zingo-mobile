@@ -28,8 +28,8 @@ import { ServerStatus } from '@app/AppState/types/ServerStatus';
 import { AppDrawerParamList } from '@app/types';
 import { serverUris } from '@app/uris';
 import {
+  defaultServer,
   otherServersFor,
-  pickAutomatic,
   probeUri,
   recommendedServers,
 } from '@app/services/serverPicking';
@@ -102,6 +102,7 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation, route }) => {
   const [blockHeight, setBlockHeight] = useState('');
   const [busy, setBusy] = useState(false);
   const [latencies, setLatencies] = useState<Record<string, number | null>>({});
+  const [heights, setHeights] = useState<Record<string, number>>({});
   const [lists, setLists] = useState<Record<string, ServerUrisType[]>>({});
   const [other, setOther] = useState<ChainNameEnum | null>(null);
   const backGuard = useRef<(() => boolean) | null>(null);
@@ -140,6 +141,7 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation, route }) => {
     setStatus(probe.latency === null ? 'bad' : 'ok');
     setBlockHeight(probe.height);
     setLatencies(l => ({ ...l, [probed.uri]: probe.latency }));
+    setHeights(h => ({ ...h, [probed.uri]: Number(probe.height) || 0 }));
   }, []);
 
   useEffect(() => {
@@ -166,6 +168,7 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation, route }) => {
           const probe = await probeUri(s.uri);
           if (mounted.current) {
             setLatencies(l => ({ ...l, [s.uri]: probe.latency }));
+            setHeights(h => ({ ...h, [s.uri]: Number(probe.height) || 0 }));
           }
         }),
       );
@@ -218,21 +221,14 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation, route }) => {
   const chooseAutomatic = async (chain: ChainNameEnum) => {
     setBusy(true);
     setStatus('wait');
-    const pick = await pickAutomatic(translate, chain, online);
-    if (!mounted.current) {
-      return;
-    }
-    if (!pick) {
+    const automatic = defaultServer(translate, chain);
+    if (!automatic) {
       setBusy(false);
       addLastSnackbar(translate('loadedapp.connection-error') as string);
       probeCurrent(server);
       return;
     }
-    // No server answered: Automatic still settles on the chain's default.
-    if (pick.tier === 'default') {
-      addLastSnackbar(translate('loadedapp.connection-error') as string);
-    }
-    await apply(remoteServer(pick.server.uri, chain), SelectServerEnum.auto);
+    await apply(remoteServer(automatic.uri, chain), SelectServerEnum.auto);
   };
 
   const close = () => setLeaving('back');
@@ -373,6 +369,7 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation, route }) => {
               servers={lists[other] ?? []}
               loading={!lists[other]}
               latencies={latencies}
+              heights={heights}
               selectedUri={
                 server.kind === 'remote' &&
                 server.chainName === other &&

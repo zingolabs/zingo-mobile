@@ -24,7 +24,7 @@ const Unfolding = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-/** The raw error of a send, unfolded on demand, to copy or to mail to support. */
+/** The raw error of a failed transaction, unfolded on demand, to copy or to mail to support. */
 export default function ErrorDetails({
   subject,
   text,
@@ -41,7 +41,7 @@ export default function ErrorDetails({
     <View style={{ marginTop: 14, alignSelf: 'stretch', alignItems: 'center' }}>
       <Pressable
         kind="link"
-        testID="computing.error.toggle"
+        testID="error-details.toggle"
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
         onPress={() => setOpen(v => !v)}
@@ -72,12 +72,12 @@ export default function ErrorDetails({
               backgroundColor: colors.bgCanvas,
             }}
           >
-            <Text testID="computing.error.text" variant="address" selectable>
+            <Text testID="error-details.text" variant="address" selectable>
               {text}
             </Text>
             <Pressable
               kind="icon"
-              testID="computing.error.copy"
+              testID="error-details.copy"
               accessibilityRole="button"
               accessibilityLabel={translate('copy') as string}
               onPress={() => {
@@ -102,7 +102,7 @@ export default function ErrorDetails({
           </View>
           <View style={{ marginTop: 4, alignItems: 'center' }}>
             <Button
-              testID="computing.error.email"
+              testID="error-details.email"
               variant="text"
               icon={MailIcon}
               title={translate('support') as string}

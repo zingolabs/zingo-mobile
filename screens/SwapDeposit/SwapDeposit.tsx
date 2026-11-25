@@ -9,7 +9,7 @@ import React, {
 import { View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { space12, space8 } from '@app/theme';
-import { AppDrawerParamList } from '@app/types';
+import { AppDrawerParamList, DepositFailure } from '@app/types';
 import { Route } from '@app/AppState';
 import { ContextAppLoaded, useSwapService } from '@app/context';
 import {
@@ -32,6 +32,7 @@ import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
 import Banner from '@ui/widgets/Banner';
+import ErrorDetails from '@ui/widgets/ErrorDetails';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import DepositSlip from '@screens/Swap/components/DepositSlip';
 import DepositSentSheet from '@screens/Swap/components/DepositSentSheet';
@@ -58,14 +59,16 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
   navigation,
   route,
 }) => {
-  const { recordId, broadcastError } = route.params;
+  const { recordId, broadcastFailure } = route.params;
   const { translate, sendSwapDeposit, resumeSwapDeposit, valueTransfers } =
     useContext(ContextAppLoaded);
   const swapService = useSwapService();
   const record = useSwapRecord(recordId);
 
   const [nowMs, setNowMs] = useState<number>(() => Date.now());
-  const [retryError, setRetryError] = useState<string>(broadcastError ?? '');
+  const [failure, setFailure] = useState<DepositFailure>(
+    broadcastFailure ?? { kind: 'none' },
+  );
   const [retrying, setRetrying] = useState<boolean>(false);
   const sentSheetRef = useRef<BottomSheetModal>(null);
   const authorize = useAuthorize();
@@ -123,7 +126,7 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
       return;
     }
     setRetrying(true);
-    setRetryError('');
+    setFailure({ kind: 'none' });
     /** A deposit the wallet already shows leaving is this sale's: never pay twice. */
     const found = await swapService
       .claimSaleDeposits(sentPaymentsFrom(valueTransfers ?? []))
@@ -171,12 +174,12 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
       navigation.replace(Route.SwapTracking, { recordId });
     } catch (e) {
       // Another sale's held deposit refuses this one before anything leaves.
-      setRetryError(
+      setFailure(
         e instanceof DepositAfterDeshieldError &&
           e.kind === 'pending' &&
           e.deshieldTxId !== deshieldTxId
-          ? (translate('swap.deposit-other-held') as string)
-          : `${e}`,
+          ? { kind: 'heldByOther' }
+          : { kind: 'failed', text: `${e}` },
       );
     } finally {
       setRetrying(false);
@@ -188,7 +191,6 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
     sendSwapDeposit,
     recordId,
     navigation,
-    translate,
     valueTransfers,
   ]);
   const onRetry = async () => {
@@ -263,8 +265,16 @@ const SwapDeposit: React.FunctionComponent<SwapDepositProps> = ({
             ) as string
           }
         >
-          {(resendable && retryError) || undefined}
+          {resendable && failure.kind === 'heldByOther'
+            ? (translate('swap.deposit-other-held') as string)
+            : undefined}
         </Banner>
+        {resendable && failure.kind === 'failed' && (
+          <ErrorDetails
+            subject={translate('swap.deposit-unsent-title') as string}
+            text={failure.text}
+          />
+        )}
         {!isThorchainFamily(record.provider) && (
           <>
             <View style={{ height: space12 }} />

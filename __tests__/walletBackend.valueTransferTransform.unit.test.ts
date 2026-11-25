@@ -90,6 +90,19 @@ describe('transformValueTransfer — confirmations', () => {
     );
     expect(result.confirmations).toBe(101);
   });
+
+  test('Tests that a confirmed transfer counts from the wallet height when the server gave none', () => {
+    expect(
+      transformValueTransfer(makeVt({ blockheight: 1000 }), 0, 1100)
+        .confirmations,
+    ).toBe(101);
+  });
+
+  test('Tests that a confirmed transfer has 1 confirmation when no height is known. A count below its own block never shows.', () => {
+    expect(
+      transformValueTransfer(makeVt({ blockheight: 1000 }), 0, 0).confirmations,
+    ).toBe(1);
+  });
 });
 
 describe('transformValueTransfer — amount and fee conversion', () => {

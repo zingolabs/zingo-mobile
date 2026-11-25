@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react';
 import { useShallowMemo } from './useShallowMemo';
 import { PERMITTED } from '@app/walletBackend/transforms/sendPermit';
 import { ABSENT_MIXNET_VIEW } from '@app/walletBackend/transforms/mixnetView';
+import { INITIAL_SERVER_HEALTH_VIEW } from '@app/services/serverHealthMonitor';
 
 import {
   InfoType,
@@ -70,7 +71,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   sendSwapDeposit: async () => [],
   resumeSwapDeposit: async () => [],
   setServerOption: async () => ({ kind: 'ok' }),
-  switchServerForRetry: async () => {},
   clearToAddr: () => {},
   doRescan: async () => {},
   setAddressBook: () => {},
@@ -108,6 +108,11 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   mixnetView: ABSENT_MIXNET_VIEW,
   reenableMixnet: async () => {},
   sendPermitNow: () => PERMITTED,
+  serverHealth: INITIAL_SERVER_HEALTH_VIEW,
+  reportServerProbe: () => {},
+  switchServerFromHealth: async () => false,
+  returnToDefaultServer: async () => {},
+  stayOnServer: () => {},
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

@@ -72,10 +72,8 @@ import {
   SendPageStateClass,
   ToAddrClass,
   offlineServer,
-  remoteServer,
 } from '@app/AppState';
 import type { TranslateType } from '@app/AppState';
-import { errorKeyed } from '@app/AppState/types/Result';
 import { HomeTabScreenProps } from '@app/types';
 import { fetchServerList } from '@app/uris';
 import Utils from '@app/utils';
@@ -135,7 +133,6 @@ const sendUi = (
   inputs: SendPermitInputs,
   sendTransaction: jest.Mock,
   addLastSnackbar: jest.Mock,
-  switchServerForRetry: jest.Mock = jest.fn(),
 ) => {
   appState = inputs;
   const state = { ...defaultAppContextLoaded };
@@ -151,7 +148,6 @@ const sendUi = (
   state.mixnetView = inputs.mixnetView;
   state.sendPermitNow = () => sendPermit(appState);
   state.sendTransaction = sendTransaction;
-  state.switchServerForRetry = switchServerForRetry;
   return (
     <ContextAppLoadedProvider value={state}>
       <Send {...makeDrawerProps()} />
@@ -283,41 +279,23 @@ describe('Send confirm send permit', () => {
     );
   });
 
-  test('Tests that the Computing screen receives the refusal when the retry on another server is refused. The first attempt fails with a server error, and the live list holds one other server.', async () => {
-    const other = {
-      uri: 'https://other.example:443',
-      chainName: ChainNameEnum.mainChainName,
-      region: '',
-      default: false,
-      latency: 1,
-      obsolete: false,
-    };
-    (fetchServerList as jest.Mock).mockResolvedValue([other]);
+  test('Tests that the send runs once and the Computing screen receives the failure when the backend rejects it with a server error.', async () => {
     const sendTransaction = jest
       .fn()
-      .mockRejectedValueOnce('Error: server unreachable')
-      .mockResolvedValueOnce(errorKeyed('send.nym-blocked'));
-    const switchServerForRetry = jest.fn();
-    const view = render(
-      sendUi(online, sendTransaction, jest.fn(), switchServerForRetry),
-    );
+      .mockRejectedValue('Error: server unreachable');
+    const view = render(sendUi(online, sendTransaction, jest.fn()));
     layoutSend();
     const confirmSend = await openConfirmScreen(view);
 
     await confirmSend();
 
-    expect(switchServerForRetry).toHaveBeenCalledWith(
-      remoteServer(other.uri, other.chainName),
-    );
-    expect(sendTransaction).toHaveBeenCalledTimes(2);
-    expect(switchServerForRetry.mock.invocationCallOrder[0]).toBeLessThan(
-      sendTransaction.mock.invocationCallOrder[1],
-    );
+    expect(sendTransaction).toHaveBeenCalledTimes(1);
+    expect(fetchServerList).not.toHaveBeenCalled();
     expect(navigate).toHaveBeenLastCalledWith(
       Route.Computing,
       expect.objectContaining({
         phase: 'failed',
-        failure: errorKeyed('send.nym-blocked'),
+        failure: { kind: 'verbatim', text: 'Error: server unreachable' },
       }),
     );
   });

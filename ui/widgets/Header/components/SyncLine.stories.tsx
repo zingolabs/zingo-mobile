@@ -3,6 +3,7 @@ import { NetInfoStateType } from '@react-native-community/netinfo';
 import { ChainNameEnum, remoteServer } from '@app/AppState';
 import { offlineServer } from '@app/AppState/types/ServerType';
 import SyncLine from './SyncLine';
+import { INITIAL_SERVER_HEALTH_VIEW } from '@app/services/serverHealthMonitor';
 import {
   mockTranslate,
   withNavigation,
@@ -31,6 +32,8 @@ const meta: Meta<typeof SyncLine> = {
     percentage: 100,
     syncInProgress: false,
     opening: '',
+    health: INITIAL_SERVER_HEALTH_VIEW,
+    onDefaultBack: () => {},
   },
 };
 
@@ -56,6 +59,30 @@ export const NoInternet: Story = {
       isConnected: false,
       type: NetInfoStateType.none,
       isConnectionExpensive: false,
+    },
+  },
+};
+
+/** Zingo's own server is named while it works, and any other is not. */
+export const SyncedOnZecGlobal: Story = {
+  args: {
+    server: remoteServer('https://zec.global:443', ChainNameEnum.mainChainName),
+  },
+};
+
+/** The server states: only the dot takes a color, the words stay muted. */
+export const ServerSlow: Story = {
+  args: { health: { ...INITIAL_SERVER_HEALTH_VIEW, level: 'slow' } },
+};
+export const ServerDown: Story = {
+  args: { health: { ...INITIAL_SERVER_HEALTH_VIEW, level: 'down' } },
+};
+export const DefaultBack: Story = {
+  args: {
+    health: {
+      ...INITIAL_SERVER_HEALTH_VIEW,
+      defaultBack: true,
+      defaultUri: 'https://zec.global:443',
     },
   },
 };

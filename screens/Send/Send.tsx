@@ -44,7 +44,6 @@ import {
   SendPageStateClass,
   ToAddrClass,
   GlobalConst,
-  SelectServerEnum,
   Route,
   ProposalPoolsType,
 } from '@app/AppState';
@@ -95,7 +94,6 @@ import Text from '@ui/primitives/Text';
 import { PlusIcon } from '@ui/primitives/Icons/PlusIcon';
 import SendErrorSheet from './components/SendErrorSheet';
 import { sendEmail } from '@app/services/sendEmail';
-import { retryServer } from '@app/services/retryServer';
 import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
@@ -126,7 +124,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
     clearToAddr,
     setScrollToTop,
     setScrollToBottom,
-    switchServerForRetry,
     setShieldingAmount,
     translate,
     info,
@@ -142,7 +139,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
     launchAddTagModal,
     defaultUnifiedAddress,
     shieldingAmount,
-    selectServer,
     zingolibVersion,
     setPrivacyOption,
     mixnetView,
@@ -844,16 +840,8 @@ const Send: React.FunctionComponent<SendProps> = () => {
     // The MAX send travels the send-all path all the way: quoted and sent by
     // the same proposal, so the amount confirmed is the amount broadcast.
     const sendAllSend = isSendAllAmount(sendPageStatePar.toaddr.amount);
-    const settlement = await settleSend(
-      () => sendTransaction(sendPageStatePar, sendAllSend),
-      async () => {
-        const target = await retryServer(server, translate);
-        if (target !== server) {
-          await switchServerForRetry(target);
-        }
-      },
-      // A `custom` server is the user's own choice, and the retry keeps it.
-      selectServer !== SelectServerEnum.custom && server.kind !== 'offline',
+    const settlement = await settleSend(() =>
+      sendTransaction(sendPageStatePar, sendAllSend),
     );
 
     if (settlement.kind === 'sent') {

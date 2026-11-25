@@ -49,112 +49,57 @@ describe('settleSend', () => {
       .fn()
       .mockResolvedValue({ kind: 'sent', receipt: 'hop, payment' });
 
-    const settlement = await settleSend(attempt, jest.fn(), true);
+    const settlement = await settleSend(attempt);
 
     expect(settlement).toEqual({ kind: 'sent', txids: ['hop', 'payment'] });
   });
 
-  test('Tests that the send settles as sent when the first attempt sends.', async () => {
+  test('Tests that the send settles as sent when the attempt sends.', async () => {
     const attempt = jest.fn().mockResolvedValue(sent);
-    const switchServer = jest.fn();
 
-    const settlement = await settleSend(attempt, switchServer, true);
+    const settlement = await settleSend(attempt);
 
     expect(settlement).toEqual({ kind: 'sent', txids: ['txid'] });
-    expect(attempt).toHaveBeenCalledTimes(1);
-    expect(switchServer).not.toHaveBeenCalled();
   });
 
-  test('Tests that the send settles as the refusal, failed while creating, when the permit refuses the first attempt.', async () => {
+  test('Tests that the send settles as the refusal, failed while creating, when the permit refuses the attempt.', async () => {
     const attempt = jest.fn().mockResolvedValue(refusal);
-    const switchServer = jest.fn();
 
-    const settlement = await settleSend(attempt, switchServer, true);
+    const settlement = await settleSend(attempt);
 
     expect(settlement).toEqual(failed(refusal, 'create'));
-    expect(attempt).toHaveBeenCalledTimes(1);
-    expect(switchServer).not.toHaveBeenCalled();
   });
 
-  test('Tests that the send settles as rejected with one attempt when the node rejects it.', async () => {
+  test('Tests that the send settles as rejected when the node rejects it.', async () => {
     const attempt = jest.fn().mockRejectedValue(dust);
-    const switchServer = jest.fn();
 
-    const settlement = await settleSend(attempt, switchServer, true);
+    const settlement = await settleSend(attempt);
 
     expect(settlement).toEqual(
       failed(errorKeyed('send.dust-error'), 'rejected'),
     );
-    expect(attempt).toHaveBeenCalledTimes(1);
-    expect(switchServer).not.toHaveBeenCalled();
   });
 
-  test('Tests that the send settles as the failure with one attempt when the backend rejects with a server failure and a switch is disallowed.', async () => {
+  test('Tests that the send runs once and settles as the failure when the backend rejects it with a server failure.', async () => {
     const attempt = jest.fn().mockRejectedValue(serverError);
-    const switchServer = jest.fn();
 
-    const settlement = await settleSend(attempt, switchServer, false);
+    const settlement = await settleSend(attempt);
 
     expect(settlement).toEqual(
       failed({ kind: 'verbatim', text: serverError }, 'create'),
     );
     expect(attempt).toHaveBeenCalledTimes(1);
-    expect(switchServer).not.toHaveBeenCalled();
   });
 
-  test('Tests that the server switch runs between the two attempts when the backend rejects the first attempt with a server failure.', async () => {
-    const attempt = jest
-      .fn()
-      .mockRejectedValueOnce(serverError)
-      .mockResolvedValueOnce(sent);
-    const switchServer = jest.fn().mockResolvedValue(undefined);
+  test('Tests that the send runs once and settles as failed while sending when the transmission fails. zingolib already retried the same transaction.', async () => {
+    const attempt = jest.fn().mockRejectedValue(unreached);
 
-    const settlement = await settleSend(attempt, switchServer, true);
+    const settlement = await settleSend(attempt);
 
-    expect(settlement).toEqual({ kind: 'sent', txids: ['txid'] });
-    expect(attempt.mock.invocationCallOrder[0]).toBeLessThan(
-      switchServer.mock.invocationCallOrder[0],
+    expect(settlement).toEqual(
+      failed({ kind: 'verbatim', text: unreached }, 'send'),
     );
-    expect(switchServer.mock.invocationCallOrder[0]).toBeLessThan(
-      attempt.mock.invocationCallOrder[1],
-    );
-  });
-
-  test('Tests that the send settles as the refusal when the permit refuses the second attempt.', async () => {
-    const attempt = jest
-      .fn()
-      .mockRejectedValueOnce(serverError)
-      .mockResolvedValueOnce(refusal);
-
-    const settlement = await settleSend(attempt, jest.fn(), true);
-
-    expect(settlement).toEqual(failed(refusal, 'create'));
-  });
-
-  test('Tests that the send settles as the second failure, since the second attempt, when the backend rejects both attempts.', async () => {
-    const attempt = jest
-      .fn()
-      .mockRejectedValueOnce(serverError)
-      .mockImplementationOnce(() => {
-        (Date.now as jest.Mock).mockReturnValue((NOW + 5) * 1000);
-        return Promise.reject(unreached);
-      });
-
-    const settlement = await settleSend(
-      attempt,
-      jest.fn().mockImplementation(async () => {
-        (Date.now as jest.Mock).mockReturnValue((NOW + 3) * 1000);
-      }),
-      true,
-    );
-
-    expect(settlement).toEqual({
-      kind: 'failed',
-      failure: { kind: 'verbatim', text: unreached },
-      stage: 'send',
-      since: NOW + 3,
-    });
-    expect(attempt).toHaveBeenCalledTimes(2);
+    expect(attempt).toHaveBeenCalledTimes(1);
   });
 });
 

@@ -15,4 +15,5 @@ export type {
   CardRect,
   SeedBackupEntry,
   ViewingKeyEntry,
+  DepositFailure,
 } from './NavigationTypes';

@@ -14,6 +14,7 @@ import {
   TakeProxyDeathReason,
 } from '@app/walletBackend/modules/MixnetCoordinator';
 import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
+import { ProbeAnswer, SyncLaunch } from '@app/services/serverHealth';
 
 // Every sub-service shares one reference to this config.
 export type WalletBackendConfig = {
@@ -31,8 +32,10 @@ export type WalletBackendConfig = {
   // was given above 0 to Sapling activation.
   onBirthdayAdjusted: (height: number) => void;
   onError: (error: string) => void;
-  // Called after several consecutive sync-launch failures.
-  onPersistentSyncFailure?: () => void;
+  /** Each sync launch, launched or failed. */
+  onSyncLaunch?: (launch: SyncLaunch) => void;
+  /** Each direct answer of the server, or its failure. */
+  onServerAnswer?: (uri: string, answer: ProbeAnswer) => void;
   onMixnetViewChanged: (view: MixnetTransportView) => void;
   startMixnetTransport: StartMixnetTransport;
   stopMixnetTransport: StopMixnetTransport;

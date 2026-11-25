@@ -71,6 +71,8 @@ export const Latency: React.FC<LatencyProps> = ({ ms, notResponding }) => {
 
 type ServerRowProps = {
   title: string;
+  /** A warning after the subtitle, as a server behind the tip. */
+  note?: string;
   sub?: string;
   selected: boolean;
   disabled?: boolean;
@@ -85,6 +87,7 @@ type ServerRowProps = {
 
 const ServerRow: React.FC<ServerRowProps> = ({
   title,
+  note,
   sub,
   selected,
   disabled = false,
@@ -138,9 +141,19 @@ const ServerRow: React.FC<ServerRowProps> = ({
           <Text variant="bodyStrong" numberOfLines={1}>
             {title}
           </Text>
-          {!!sub && (
+          {(!!sub || !!note) && (
             <Text variant="bodySmall" tone="muted">
               {sub}
+              {!!sub && !!note && ' · '}
+              {!!note && (
+                <Text
+                  testID={`${testID}.behind`}
+                  variant="bodySmall"
+                  tone="warning"
+                >
+                  {note}
+                </Text>
+              )}
             </Text>
           )}
         </View>

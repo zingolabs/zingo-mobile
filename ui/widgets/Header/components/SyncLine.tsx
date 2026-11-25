@@ -30,6 +30,10 @@ import { isFallingBehind } from '@app/walletBackend/utils/syncFreshness';
 import Text from '@ui/primitives/Text';
 import { CARD_MARGIN_TOP } from './PriceRow';
 import { CloudDownloadIcon } from '@ui/primitives/Icons/CloudDownloadIcon';
+import { ServerHealthView } from '@app/services/serverHealthMonitor';
+import { showServerHealth } from '@app/services/showServerHealth';
+import { hostOf as hostOfUri } from '@screens/Server/useCustomServer';
+import { isOurServer } from '@app/uris/serverUris';
 
 type SyncState =
   | 'opening'
@@ -38,7 +42,11 @@ type SyncState =
   | 'starting'
   | 'syncing'
   | 'behind'
-  | 'synced';
+  | 'synced'
+  | 'serverSlow'
+  | 'serverDown'
+  | 'serverUnusable'
+  | 'defaultBack';
 
 const MINUTE_MS = 60 * 1000;
 
@@ -131,7 +139,11 @@ function Spinner({ track, arc }: { track: string; arc: string }) {
  * with a green dot, connecting with a spinner, syncing with a yellow bar.
  * How old the balance is shows only when the wallet stopped keeping up: no
  * internet, Offline, or a sync that falls behind the tip. Mobile data is
- * added at the end. Tapping it opens the Sync report.
+ * added at the end. While the server works, the line names it only when it
+ * is Zingo's own, and never beside the sync bar. Tapping it opens the Sync
+ * report, the Server screen when Offline, or, while the server is slow or
+ * down, the server health sheet. When the default server works again it says
+ * so, and a tap asks whether to go back.
  */
 export default function SyncLine({
   server,
@@ -140,6 +152,8 @@ export default function SyncLine({
   syncInProgress,
   translate,
   opening,
+  health,
+  onDefaultBack,
 }: {
   server: ServerType;
   netInfo: NetInfoType;
@@ -149,6 +163,9 @@ export default function SyncLine({
   translate: (key: string) => TranslateType;
   /** The wallet being opened in place, '' when none is. */
   opening: string;
+  health: ServerHealthView;
+  /** Asks whether to go back to the default server. */
+  onDefaultBack: () => void;
 }) {
   const navigation = useNavigation<WalletNavigation>();
   const { colors } = useTheme();
@@ -164,13 +181,21 @@ export default function SyncLine({
       ? 'noInternet'
       : server.kind === 'offline'
         ? 'offline'
-        : percentage === 0
-          ? 'starting'
-          : syncInProgress
-            ? 'syncing'
-            : isFallingBehind(freshness, nowMs)
-              ? 'behind'
-              : 'synced';
+        : health.level === 'down'
+          ? 'serverDown'
+          : health.level === 'unusable'
+            ? 'serverUnusable'
+            : health.level === 'slow'
+              ? 'serverSlow'
+              : health.defaultBack
+                ? 'defaultBack'
+                : percentage === 0
+                  ? 'starting'
+                  : syncInProgress
+                    ? 'syncing'
+                    : isFallingBehind(freshness, nowMs)
+                      ? 'behind'
+                      : 'synced';
   const metered =
     !!netInfo.isConnected &&
     (netInfo.type === NetInfoStateType.cellular ||
@@ -194,6 +219,19 @@ export default function SyncLine({
       {text}
     </Text>
   );
+  /** Zingo's own server is named while it works, any other only when it fails. */
+  const ours = server.kind === 'remote' && isOurServer(server.uri);
+  const named = (head: React.ReactNode): React.ReactNode =>
+    ours ? (
+      <>
+        {`${hostOf(server)} · `}
+        {head}
+      </>
+    ) : (
+      head
+    );
+  const namedLabel = (text: string): string =>
+    ours ? `${hostOf(server)} · ${text}` : text;
   /** What the line says, the strong part first; " · " and the age follow. */
   const aged = (head: React.ReactNode): React.ReactNode => (
     <>
@@ -247,13 +285,17 @@ export default function SyncLine({
           }}
         />
       );
-      words = aged(strong(t('header.sync-behind'), colors.fgWarning));
-      label = [t('header.sync-behind'), balanceAge].filter(Boolean).join('. ');
+      words = named(aged(strong(t('header.sync-behind'), colors.fgWarning)));
+      label = [namedLabel(t('header.sync-behind')), balanceAge]
+        .filter(Boolean)
+        .join('. ');
       break;
     case 'starting':
       lead = <Spinner track={colors.sheetHandle} arc={colors.fgMuted} />;
-      words = t('header.sync-connecting').replace('{host}', hostOf(server));
-      label = t('header.sync-connecting').replace('{host}', hostOf(server));
+      words = ours
+        ? t('header.sync-connecting').replace('{host}', hostOf(server))
+        : t('server.connecting');
+      label = words as string;
       break;
     case 'syncing':
       lead = (
@@ -276,6 +318,7 @@ export default function SyncLine({
           />
         </View>
       );
+      /** The bar and the percentage say enough: no server name here. */
       words = strong(
         t('header.sync-syncing').replace('{n}', String(Math.floor(percentage))),
         colors.fgSyncing,
@@ -285,6 +328,40 @@ export default function SyncLine({
         String(Math.floor(percentage)),
       );
       break;
+    case 'serverSlow':
+    case 'serverDown':
+    case 'serverUnusable':
+    case 'defaultBack': {
+      const key = {
+        serverSlow: 'header.sync-server-slow',
+        serverDown: 'header.sync-server-down',
+        serverUnusable: 'header.sync-server-unusable',
+        defaultBack: 'header.sync-server-back',
+      }[state];
+      const said = t(key).replace(
+        '{host}',
+        state === 'defaultBack' ? hostOfUri(health.defaultUri) : hostOf(server),
+      );
+      lead = (
+        <View
+          testID={`header.sync-${state}`}
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: radiusPill,
+            backgroundColor:
+              state === 'serverSlow'
+                ? colors.fgWarning
+                : state === 'defaultBack'
+                  ? colors.fgAccent
+                  : colors.fgDanger,
+          }}
+        />
+      );
+      words = said;
+      label = said;
+      break;
+    }
     default:
       lead = (
         <View
@@ -297,9 +374,29 @@ export default function SyncLine({
           }}
         />
       );
-      words = t('header.sync-synced');
-      label = t('header.sync-synced');
+      words = named(t('header.sync-synced'));
+      label = namedLabel(t('header.sync-synced'));
   }
+
+  const serverState =
+    state === 'serverSlow' ||
+    state === 'serverDown' ||
+    state === 'serverUnusable';
+  /** Offline has no sync to report on: the way out of it is the Server screen. */
+  const onPress = serverState
+    ? showServerHealth
+    : state === 'defaultBack'
+      ? onDefaultBack
+      : state === 'offline'
+        ? () => navigation.navigate(Route.Server)
+        : () => navigation.navigate(Route.SyncReport);
+  const action = serverState
+    ? t('header.sync-open-health')
+    : state === 'defaultBack'
+      ? ''
+      : state === 'offline'
+        ? t('header.sync-open-server')
+        : t('header.sync-open-report');
 
   return (
     <Pressable
@@ -309,11 +406,11 @@ export default function SyncLine({
       accessibilityLabel={[
         label,
         showMetered ? t('header.sync-mobile-data') : '',
-        t('header.sync-open-report'),
+        action,
       ]
         .filter(Boolean)
         .join('. ')}
-      onPress={() => navigation.navigate(Route.SyncReport)}
+      onPress={onPress}
       style={{
         flexDirection: 'row',
         alignItems: 'center',

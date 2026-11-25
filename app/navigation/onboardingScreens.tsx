@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 
-import { Route, SelectServerEnum } from '@app/AppState';
+import { Route, SelectServerEnum, SnackbarDurationEnum } from '@app/AppState';
+import { sendEmail } from '@app/services/sendEmail';
 import { ContextAppLoading } from '@app/context';
 import { OnboardingParamList } from '@app/types';
 import { serverUris } from '@app/uris';
@@ -92,14 +93,18 @@ export function OpenErrorScreen() {
     retrying,
     errorShake,
     retryOpenWallet,
+    retryCreateWallet,
     getwalletToRestore,
     createNewWallet,
     openServer,
     switchToWalletChain,
+    zingolibVersion,
+    addLastSnackbar,
   } = useContext(ContextAppLoading);
   if (!walletError) {
     return null;
   }
+  const { stage } = walletError;
   return (
     <WalletError
       translate={translate}
@@ -120,7 +125,27 @@ export function OpenErrorScreen() {
       resolved={errorResolved}
       busy={retrying}
       shake={errorShake}
-      onRetry={retryOpenWallet}
+      stage={stage}
+      retried={walletError.retried}
+      onRetry={
+        stage.kind === 'create'
+          ? () => retryCreateWallet(stage.name)
+          : retryOpenWallet
+      }
+      onReport={() =>
+        sendEmail(
+          translate,
+          zingolibVersion,
+          translate('walleterror.server-title') as string,
+          walletError.details,
+        )
+      }
+      onCopied={() =>
+        addLastSnackbar(
+          translate('txtcopied') as string,
+          SnackbarDurationEnum.short,
+        )
+      }
       onImport={getwalletToRestore}
       onCreate={createNewWallet}
       onServer={() => openServer(walletError.walletChain)}
@@ -186,6 +211,7 @@ export function ServerListScreen({
     selectServer,
     serverLists,
     serverLatencies,
+    serverHeights,
     busy,
     serversFor,
     pickServer,
@@ -198,6 +224,7 @@ export function ServerListScreen({
       servers={serversFor(chain)}
       loading={!serverLists[chain]}
       latencies={serverLatencies}
+      heights={serverHeights}
       selectedUri={
         server.kind === 'remote' && selectServer === SelectServerEnum.list
           ? server.uri

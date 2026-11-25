@@ -1,10 +1,8 @@
 import type { FfiResult } from '@app/walletBackend/ffi';
 import { RPCShieldType } from '@app/walletBackend/types/RPCShieldType';
 import {
-  SendFailureClass,
   SendFailureText,
   classifySendFailure,
-  retryOnAnotherServer,
   sendFailureText,
 } from './sendFailureTransform';
 import type { SendOutcome } from './sendPermit';
@@ -80,13 +78,10 @@ const txidsOf = (receipt: unknown): string[] =>
         .filter(Boolean)
     : [];
 
-type Attempted =
-  | SendSettlement
-  | { kind: 'rejected'; failure: SendFailureClass; since: number };
-
-const attemptOnce = async (
+/** Runs `attempt` once and settles it as sent or failed. */
+export async function settleSend(
   attempt: () => Promise<SendOutcome<unknown>>,
-): Promise<Attempted> => {
+): Promise<SendSettlement> {
   const since = nowSeconds();
   try {
     const outcome = await attempt();
@@ -94,39 +89,14 @@ const attemptOnce = async (
       ? { kind: 'failed', failure: outcome, stage: 'create', since }
       : { kind: 'sent', txids: txidsOf(outcome.receipt) };
   } catch (thrown) {
+    const error = String(thrown);
     return {
-      kind: 'rejected',
-      failure: classifySendFailure(String(thrown)),
+      kind: 'failed',
+      failure: sendFailureText(classifySendFailure(error)),
+      stage: sendStage(error),
       since,
     };
   }
-};
-
-const failedWith = (
-  rejected: Extract<Attempted, { kind: 'rejected' }>,
-): SendSettlement => ({
-  kind: 'failed',
-  failure: sendFailureText(rejected.failure),
-  stage: sendStage(rejected.failure.error),
-  since: rejected.since,
-});
-
-/** Runs `attempt`, and runs it once more after `switchServer` when the backend rejects with a failure that another server can cure. */
-export async function settleSend(
-  attempt: () => Promise<SendOutcome<unknown>>,
-  switchServer: () => Promise<void>,
-  switchAllowed: boolean,
-): Promise<SendSettlement> {
-  const first = await attemptOnce(attempt);
-  if (first.kind !== 'rejected') {
-    return first;
-  }
-  if (!switchAllowed || !retryOnAnotherServer(first.failure)) {
-    return failedWith(first);
-  }
-  await switchServer();
-  const second = await attemptOnce(attempt);
-  return second.kind === 'rejected' ? failedWith(second) : second;
 }
 
 /** Maps the settlement of a send to the final phase of the Computing screen. */
