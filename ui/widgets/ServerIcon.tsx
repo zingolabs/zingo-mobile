@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Svg, Path, Circle } from 'react-native-svg';
+import { ServerHealthLevel } from '@app/services/serverHealth';
 import Animated, {
   interpolateColor,
   useAnimatedProps,
@@ -17,10 +18,10 @@ import { useTheme } from '@app/theme';
 const STROKE = 2.4;
 
 type ServerIconProps = {
-  // No internet or a server that doesn't answer turns the dot red, Offline
-  // grey; otherwise it is green.
+  // No internet or a slow server turns the dot amber, a down server red,
+  // Offline grey, and otherwise it is green.
   noInternet: boolean;
-  unreachable?: boolean;
+  health?: ServerHealthLevel;
   offline: boolean;
   size?: number;
   // The surface behind the icon, for the ring that cuts the dot out.
@@ -30,18 +31,21 @@ type ServerIconProps = {
 // The server icon: a database cylinder with a status dot.
 const ServerIcon: React.FC<ServerIconProps> = ({
   noInternet,
-  unreachable,
+  health = 'ok',
   offline,
   size = 32,
   background,
 }) => {
   const { colors } = useTheme();
-  const dot =
-    noInternet || (unreachable && !offline)
-      ? colors.fgWarning
-      : offline
-        ? colors.fgMuted
-        : colors.fgAccent;
+  const dot = noInternet
+    ? colors.fgWarning
+    : offline
+      ? colors.fgMuted
+      : health === 'down' || health === 'unusable'
+        ? colors.fgDanger
+        : health === 'slow'
+          ? colors.fgWarning
+          : colors.fgAccent;
   const from = useSharedValue(dot);
   const to = useSharedValue(dot);
   const mix = useSharedValue(1);

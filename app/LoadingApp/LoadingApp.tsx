@@ -376,6 +376,8 @@ export class LoadingAppClass extends Component<
   appstate?: NativeEventSubscription;
   unsubscribeNetInfo?: NetInfoSubscription;
   retryStartedAt = 0;
+  /** The server an error screen failed on, so a change of server retries on leaving the Server screen. */
+  errorServerUri = '';
 
   constructor(props: LoadingAppClassProps) {
     super(props);
@@ -426,6 +428,7 @@ export class LoadingAppClass extends Component<
       serverStatus: 'ok',
       serverBlockHeight: '',
       serverLatencies: {},
+      serverHeights: {},
       serverLists: {},
       errorResolved: false,
     };
@@ -713,6 +716,8 @@ export class LoadingAppClass extends Component<
         walletChain,
         others: false,
         name: '',
+        stage: { kind: 'open' },
+        retried: false,
       },
       errorResolved: false,
       retrying: false,
@@ -821,29 +826,33 @@ export class LoadingAppClass extends Component<
       )
       .join('\n');
 
-  // A retry that fails again shakes the icon and says so; its dots stay up
-  // for at least RETRY_MIN_MS so the attempt reads as one.
+  // A retry that fails again shakes the icon and says so, in a toast or, for
+  // a server, in the title. Its dots stay up for at least RETRY_MIN_MS so the
+  // attempt reads as one.
   showWalletError = (details: string) => {
     const kind = walletErrorKind(details);
     const again = currentRoute() === Route.OpenError;
     const apply = async () => {
       const failed = await this.failedWallet(kind);
-      if (again) {
+      if (again && kind !== 'server') {
         this.addLastSnackbar(
-          this.state.translate(
-            kind === 'server'
-              ? 'walleterror.still-server'
-              : 'walleterror.still-open',
-          ) as string,
+          this.state.translate('walleterror.still-open') as string,
         );
       }
       this.setState(state => ({
-        walletError: { kind, details, ...failed },
+        walletError: {
+          kind,
+          details,
+          ...failed,
+          stage: { kind: 'open' },
+          retried: again,
+        },
         errorResolved: false,
         retrying: false,
         errorShake: again ? state.errorShake + 1 : state.errorShake,
         actionButtonsDisabled: false,
       }));
+      this.errorServerUri = nativeUri(this.state.server);
       this.openError();
     };
     const elapsed = Date.now() - this.retryStartedAt;
@@ -1032,7 +1041,10 @@ export class LoadingAppClass extends Component<
     );
   };
 
-  createNewWallet = async (name: string = ''): Promise<void> => {
+  createNewWallet = async (
+    name: string = '',
+    fromError: boolean = false,
+  ): Promise<void> => {
     const offline = this.state.server.kind === 'offline';
     // Block only when the device is genuinely offline AND not in explicit
     // Offline mode. Offline mode is a deliberate no-server flow: the wallet is
@@ -1046,14 +1058,16 @@ export class LoadingAppClass extends Component<
     this.setState({ actionButtonsDisabled: true });
     // The leaves part at once and the creating screen fades up in their
     // place; no button collapse first.
-    const showProgress = setTimeout(
-      () =>
-        navigateOnboarding({
-          screen: Route.Progress,
-          params: { kind: 'create' },
-        }),
-      0,
-    );
+    const showProgress = fromError
+      ? undefined
+      : setTimeout(
+          () =>
+            navigateOnboarding({
+              screen: Route.Progress,
+              params: { kind: 'create' },
+            }),
+          0,
+        );
     // Pass "0" in both modes. Online, the Indexer supplies the chain tip.
     // Offline (Indexerless), the FFI falls back to zingolib's Library Birthday
     // — a per-chain height already mined when the linked zingolib release was
@@ -1076,33 +1090,15 @@ export class LoadingAppClass extends Component<
         seedJSON = await JSON.parse(seed.value);
         if (seedJSON.error) {
           clearTimeout(showProgress);
-          this.setState({ actionButtonsDisabled: false });
-          returnTo(Route.Welcome);
-          createAlert(
-            this.setBackgroundError,
-            this.addLastSnackbar,
-            this.state.translate('loadingapp.creatingwallet-label') as string,
-            seedJSON.error,
-            false,
-            this.state.translate,
-            sendEmail,
-            this.state.zingolibVersion,
-          );
+          this.createFailed(seedJSON.error, name, fromError);
           return;
         }
       } catch (e: unknown) {
         clearTimeout(showProgress);
-        this.setState({ actionButtonsDisabled: false });
-        returnTo(Route.Welcome);
-        createAlert(
-          this.setBackgroundError,
-          this.addLastSnackbar,
-          this.state.translate('loadingapp.creatingwallet-label') as string,
+        this.createFailed(
           e instanceof Error ? e.message : String(e),
-          false,
-          this.state.translate,
-          sendEmail,
-          this.state.zingolibVersion,
+          name,
+          fromError,
         );
         return;
       }
@@ -1144,19 +1140,64 @@ export class LoadingAppClass extends Component<
       askDiskRetry(this.state.translate, () => this.createNewWallet(name));
     } else {
       clearTimeout(showProgress);
-      this.setState({ actionButtonsDisabled: false });
+      this.createFailed(
+        seed.ok ? seed.value : seed.error.message,
+        name,
+        fromError,
+      );
+    }
+  };
+
+  /**
+   * A wallet that could not be created: on the server error screen when the
+   * server is at fault, else back on the welcome with the alert.
+   */
+  createFailed = (text: string, name: string, fromError: boolean) => {
+    if (walletErrorKind(text) !== 'server') {
+      this.setState({ actionButtonsDisabled: false, retrying: false });
       returnTo(Route.Welcome);
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
         this.state.translate('loadingapp.creatingwallet-label') as string,
-        seed.ok ? seed.value : seed.error.message,
+        text,
         false,
         this.state.translate,
         sendEmail,
         this.state.zingolibVersion,
       );
+      return;
     }
+    const apply = () => {
+      this.setState(state => ({
+        walletError: {
+          kind: 'server',
+          details: sanitizePaths(text),
+          others: false,
+          name: '',
+          stage: { kind: 'create', name },
+          retried: fromError,
+        },
+        errorResolved: false,
+        retrying: false,
+        errorShake: fromError ? state.errorShake + 1 : state.errorShake,
+        actionButtonsDisabled: false,
+      }));
+      this.errorServerUri = nativeUri(this.state.server);
+      if (!fromError) {
+        returnTo(Route.Welcome);
+        navigateOnboarding({ screen: Route.OpenError });
+      }
+    };
+    const elapsed = Date.now() - this.retryStartedAt;
+    setTimeout(apply, fromError ? Math.max(0, RETRY_MIN_MS - elapsed) : 0);
+  };
+
+  /** Creates the wallet again from the server error screen, which stays up meanwhile. */
+  retryCreateWallet = async (name: string) => {
+    this.retryStartedAt = Date.now();
+    this.setState({ retrying: true, actionButtonsDisabled: true });
+    await this.createNewWallet(name, true);
   };
 
   getwalletToRestore = async () => {
@@ -1386,8 +1427,16 @@ export class LoadingAppClass extends Component<
       walletError?.kind === 'chain' &&
       (server.kind === 'offline' ||
         server.chainName === walletError.walletChain);
+    const moved =
+      below === Route.OpenError &&
+      walletError?.kind === 'server' &&
+      nativeUri(server) !== this.errorServerUri;
     goBack();
     if (fixed) {
+      this.retryOpenWallet();
+    } else if (moved && walletError.stage.kind === 'create') {
+      this.retryCreateWallet(walletError.stage.name);
+    } else if (moved) {
       this.retryOpenWallet();
     }
   };
@@ -1410,6 +1459,10 @@ export class LoadingAppClass extends Component<
       serverLatencies: {
         ...state.serverLatencies,
         [server.uri]: probe.latency,
+      },
+      serverHeights: {
+        ...state.serverHeights,
+        [server.uri]: Number(probe.height) || 0,
       },
     }));
   };
@@ -1449,6 +1502,10 @@ export class LoadingAppClass extends Component<
         }
         this.setState(state => ({
           serverLatencies: { ...state.serverLatencies, [s.uri]: probe.latency },
+          serverHeights: {
+            ...state.serverHeights,
+            [s.uri]: Number(probe.height) || 0,
+          },
         }));
       }),
     );
@@ -1774,6 +1831,7 @@ export class LoadingAppClass extends Component<
       serverStatus: this.state.serverStatus,
       serverBlockHeight: this.state.serverBlockHeight,
       serverLatencies: this.state.serverLatencies,
+      serverHeights: this.state.serverHeights,
       serverLists: this.state.serverLists,
       serverBackGuard: this.serverBackGuard,
       openServer: this.openServer,
@@ -1783,6 +1841,7 @@ export class LoadingAppClass extends Component<
       createNewWallet: this.toNameCreate,
       getwalletToRestore: this.getwalletToRestore,
       retryOpenWallet: this.retryOpenWallet,
+      retryCreateWallet: this.retryCreateWallet,
       switchToWalletChain: this.switchToWalletChain,
       chooseAutomatic: this.chooseAutomatic,
       pickServer: this.pickServer,

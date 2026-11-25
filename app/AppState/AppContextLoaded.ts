@@ -22,6 +22,7 @@ import { RescanState } from '@app/walletBackend/utils/syncProgress';
 import { TransparentAddressClass } from '@app/wallet/classes';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import { ServerHealthView } from '@app/services/serverHealthMonitor';
 import type { SwapDepositArgs } from '@app/walletBackend/modules/TransactionService';
 import type {
   SendOutcome,
@@ -237,4 +238,14 @@ export default interface AppContextLoaded {
   reenableMixnet: () => Promise<void>;
   // Reads the send permit from the state at call time.
   sendPermitNow: () => SendPermit;
+
+  /** The open wallet's server health, as the monitor last saw it. */
+  serverHealth: ServerHealthView;
+  reportServerProbe: (
+    uri: string,
+    probe: { latency: number | null; height: string },
+  ) => void;
+  switchServerFromHealth: (server: ServerType) => Promise<boolean>;
+  returnToDefaultServer: () => Promise<void>;
+  stayOnServer: () => void;
 }

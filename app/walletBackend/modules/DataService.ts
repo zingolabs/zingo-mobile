@@ -45,6 +45,7 @@ import {
 } from '@app/walletBackend/config/WalletBackendConfig';
 import { transformValueTransfer } from '@app/walletBackend/transforms/valueTransferTransform';
 import { fetchWallet } from '@app/walletBackend/utils/walletUtils';
+import { knownTip } from '@app/walletBackend/utils/knownTip';
 
 // The info a session publishes when no server answered.
 function emptyInfo(): InfoType {
@@ -60,6 +61,8 @@ export class DataService {
 
   lastWalletBlockHeight: number = 0;
   lastServerBlockHeight: number = 0;
+  /** The tip the published lists counted their confirmations at. */
+  listTip: { kind: 'none' } | { kind: 'at'; tip: number } = { kind: 'none' };
   walletBirthday: number = 0;
 
   // Block-spacing observation: the last (height, wall-clock) pair a server
@@ -266,6 +269,20 @@ export class DataService {
     } finally {
       this.fetchWalletHeightLock = false;
     }
+    await this.followTip();
+  }
+
+  /** Counts the lists again once the known tip moved from the one they were counted at. */
+  private async followTip(): Promise<void> {
+    if (
+      this.listTip.kind === 'none' ||
+      this.listTip.tip ===
+        knownTip(this.lastServerBlockHeight, this.lastWalletBlockHeight)
+    ) {
+      return;
+    }
+    await this.fetchTandZandOValueTransfers();
+    await this.fetchTandZandOMessages();
   }
 
   private publishNoServerInfo(): void {
@@ -340,6 +357,7 @@ export class DataService {
     } finally {
       this.fetchInfoAndServerHeightLock = false;
     }
+    await this.followTip();
   }
 
   // One sample per height change: the wall-clock gap since the last reading
@@ -444,11 +462,20 @@ export class DataService {
       }
       if (heightStr) {
         this.lastServerBlockHeight = Number(heightStr);
+        this.config.onServerAnswer?.(server.uri, {
+          kind: 'answered',
+          latencyMs: Date.now() - start,
+          height: Number(heightStr),
+        });
       } else {
         console.log('Internal Error server height');
       }
     } catch (error) {
       this.config.onError(`Error server height: ${error}`);
+      this.config.onServerAnswer?.(server.uri, {
+        kind: 'failed',
+        error: String(error),
+      });
     }
   }
 
@@ -493,6 +520,10 @@ export class DataService {
           return result;
         }) ?? [];
 
+      this.listTip = {
+        kind: 'at',
+        tip: knownTip(this.lastServerBlockHeight, this.lastWalletBlockHeight),
+      };
       this.config.onValueTransfersChanged(vtList, vtList.length);
     } catch (error) {
       console.log(`Critical Error value transfers ${error}`);

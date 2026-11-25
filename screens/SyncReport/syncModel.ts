@@ -121,3 +121,23 @@ export const backgroundOutcome = (info: BackgroundType): BackgroundOutcome =>
         ? 'skipped'
         : 'ok'
       : 'interrupted';
+
+/** Whether a sync session reports the status, with its own totals. */
+export const hasSession = (status: RPCSyncStatusType): boolean =>
+  !!status.total_blocks;
+
+/** The share of the span from the birthday to `tip` the wallet's ranges scanned, 0 to 100. */
+export const scannedPercent = (
+  status: RPCSyncStatusType,
+  birthday: number,
+  tip: number,
+): number => {
+  const span = tip - birthday;
+  if (span <= 0) {
+    return 0;
+  }
+  return Math.min(
+    100,
+    (heights(status, birthday, tip, false).scanned / span) * 100,
+  );
+};

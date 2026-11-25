@@ -34,12 +34,6 @@ import {
 // zingolib's refusal to sync a client that has no indexer configured.
 const INDEXERLESS = /no indexer configured/i;
 
-// Consecutive failed sync launches before onPersistentSyncFailure fires.
-// Three failures span ~15 s of the 5 s tick: long enough to ride out a
-// one-off blip, short enough that a dead server gets replaced before the
-// user reaches for Settings.
-const PERSISTENT_SYNC_FAILURE_THRESHOLD = 3;
-
 export class SyncCoordinator {
   config: WalletBackendConfig;
   dataService: DataService;
@@ -51,8 +45,6 @@ export class SyncCoordinator {
   fetchSyncStatusLock: boolean = false;
   fetchSyncPollLock: boolean = false;
 
-  syncLaunchFailures: number = 0;
-
   walletConfigPerformanceLevel: RPCPerformanceLevelEnum | undefined;
 
   constructor(config: WalletBackendConfig, dataService: DataService) {
@@ -61,13 +53,14 @@ export class SyncCoordinator {
   }
 
   async configure(): Promise<void> {
+    await this.dataService.fetchWalletHeight();
+    await this.fetchSyncStatus();
     await this.dataService.fetchTandZandOValueTransfers();
     await this.dataService.fetchAddresses();
     await this.dataService.fetchTotalBalance();
     await this.dataService.fetchInfoAndServerHeight();
     await this.dataService.fetchZingolibVersion();
     await this.dataService.fetchTandZandOMessages();
-    await this.dataService.fetchWalletHeight();
     await this.dataService.fetchWalletBirthdaySeedUfvk();
 
     if (!this.updateTimerID) {
@@ -260,7 +253,7 @@ export class SyncCoordinator {
           );
         }
         console.log('sync RUN', syncStr);
-        this.syncLaunchFailures = 0;
+        this.config.onSyncLaunch?.({ kind: 'launched' });
       }
     } catch (error) {
       // runSyncProcess and runRescanProcess reject on failure (typed FFI
@@ -278,11 +271,7 @@ export class SyncCoordinator {
         this.config.onError(`Error sync/rescan run: ${error}`);
       }
       if (!fullRescan) {
-        this.syncLaunchFailures += 1;
-        if (this.syncLaunchFailures >= PERSISTENT_SYNC_FAILURE_THRESHOLD) {
-          this.syncLaunchFailures = 0;
-          this.config.onPersistentSyncFailure?.();
-        }
+        this.config.onSyncLaunch?.({ kind: 'failed', error: String(error) });
       }
     } finally {
       this.refreshSyncLock = false;
@@ -344,12 +333,10 @@ export class SyncCoordinator {
             ? 99.99
             : Number(ss.percentage_total_blocks_scanned?.toFixed(2));
 
-      // Close the poll timer if the sync finished(checked via promise above)
-      const inR = scanInProgress(ss);
-      if (!inR) {
-        this.config.keepAwake(false);
-      } else {
-        this.config.keepAwake(true);
+      // Close the poll timer if the sync finished(checked via promise above).
+      // A status read with no session running leaves the screen as it is.
+      if (ss.total_blocks) {
+        this.config.keepAwake(scanInProgress(ss));
       }
 
       // store SyncStatus object for a new screen

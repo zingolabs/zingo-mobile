@@ -50,6 +50,9 @@ import { getZingoLogo } from '@app/utils/ZingoAppData';
 import { useSyncStatus } from '@app/hooks/useSyncStatus';
 import TitleBar from '@ui/widgets/TitleBar';
 import SyncLine from './components/SyncLine';
+import { menuDotTone } from './menuDot';
+import { showConfirm } from '@app/services/showConfirm';
+import { hostOf } from '@screens/Server/useCustomServer';
 import MixnetIcon from '@ui/primitives/Icons/MixnetIcon';
 import { viewPhase } from '@app/walletBackend/transforms/mixnetView';
 import BalanceRow from './components/BalanceRow';
@@ -142,6 +145,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     wallets,
     walletId,
     switching,
+    serverHealth,
+    returnToDefaultServer,
+    stayOnServer,
   } = context;
   /** The wallet being opened takes the switcher at once, while Home still shows the last one. */
   const shownWallet =
@@ -154,6 +160,33 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const privacy = privacyProp !== undefined ? privacyProp : context.privacy;
 
   const { colors } = useTheme();
+
+  const menuDot = {
+    danger: colors.fgDanger,
+    warning: colors.fgWarning,
+    none: null,
+  }[menuDotTone(serverHealth.level, !readOnly && !seedBackedUp)];
+
+  const askDefaultBack = () => {
+    const t = (key: string) => translate(key) as string;
+    const home = hostOf(serverHealth.defaultUri);
+    const here = hostOf(serverHealth.uri);
+    showConfirm({
+      title: t('server-health.back-title').replace('{host}', home),
+      message: t('server-health.back-message').replace('{host}', here),
+      buttons: [
+        {
+          text: t('server-health.back-return').replace('{host}', home),
+          onPress: returnToDefaultServer,
+        },
+        {
+          text: t('server-health.back-stay').replace('{host}', here),
+          style: 'ghost',
+          onPress: stayOnServer,
+        },
+      ],
+    });
+  };
 
   const {
     isOpen: optionsPanelOpen,
@@ -286,6 +319,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               opening={
                 switching.kind === 'opening' ? switching.wallet.meta.name : ''
               }
+              health={serverHealth}
+              onDefaultBack={askDefaultBack}
             />
           )}
 
@@ -428,7 +463,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 onPress={toggleMenuDrawer}
               >
                 <MenuMorphIcon />
-                {!readOnly && !seedBackedUp && (
+                {menuDot !== null && (
                   <View
                     testID="header.menudot"
                     pointerEvents="none"
@@ -441,7 +476,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                       borderRadius: 5,
                       borderWidth: 2,
                       borderColor: colors.bgCanvas,
-                      backgroundColor: colors.fgWarning,
+                      backgroundColor: menuDot,
                       boxSizing: 'content-box',
                     }}
                   />

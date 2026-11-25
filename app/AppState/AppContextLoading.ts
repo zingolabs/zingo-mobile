@@ -74,6 +74,8 @@ export interface OnboardingContext {
   serverBlockHeight: string;
   // uri → latency in ms, null when the server did not answer the probe.
   serverLatencies: Record<string, number | null>;
+  /** The block each probed server gave, 0 when it gave none. */
+  serverHeights: Record<string, number>;
   // chain → servers under Other servers; absent until its list has loaded.
   serverLists: Record<string, ServerUrisType[]>;
   serverBackGuard: BackGuard;
@@ -86,6 +88,8 @@ export interface OnboardingContext {
   createNewWallet: () => void;
   getwalletToRestore: () => void;
   retryOpenWallet: () => void;
+  /** Creates the named wallet again from the server error screen. */
+  retryCreateWallet: (name: string) => void;
   // The hold-to-delete sheet, then the import or the create.
   switchToWalletChain: (chain: ChainNameEnum) => void;
   chooseAutomatic: (chain: ChainNameEnum) => Promise<void>;
