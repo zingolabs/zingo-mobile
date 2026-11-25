@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { ActivityIndicator, ScrollView, View } from 'react-native';
 import Animated, {
   Keyframe,
   ReduceMotion,
@@ -31,7 +31,10 @@ import Pressable from '@ui/primitives/Pressable';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import Tag from '@ui/widgets/Tag';
-import { WalletErrorKind } from '@app/wallet/types';
+import { WalletErrorKind, WalletErrorStage } from '@app/wallet/types';
+import Clipboard from '@react-native-clipboard/clipboard';
+import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
+import { MailIcon } from '@ui/primitives/Icons/MailIcon';
 import { ChainNameEnum, ServerType, TranslateType } from '@app/AppState';
 import { showConfirm } from '@app/services/showConfirm';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
@@ -65,6 +68,14 @@ type WalletErrorProps = {
   onSwitchChain: (chain: ChainNameEnum) => void;
   // A retry worked: the badge shrinks away and the server dot turns green.
   resolved?: boolean;
+  /** Opening a wallet on disk, or creating one, for the 'server' kind. */
+  stage?: WalletErrorStage;
+  /** A retry of this same error failed again. */
+  retried?: boolean;
+  /** Mails the error to support. */
+  onReport?: () => void;
+  /** Says the error text was copied. */
+  onCopied?: () => void;
 };
 
 const ICON_TOP = 226 / 874;
@@ -148,6 +159,15 @@ const DetailsBox: React.FunctionComponent<{
   );
 };
 
+/** The spinner beside "Retrying…", in the link's color. */
+const RetrySpinner = ({ color }: { size?: number; color?: string }) => (
+  <ActivityIndicator
+    testID="walleterror.retry.spinner"
+    size="small"
+    color={color}
+  />
+);
+
 const WalletError: React.FunctionComponent<WalletErrorProps> = ({
   translate,
   online,
@@ -164,6 +184,10 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
   onServer,
   onSwitchChain,
   resolved = false,
+  stage = { kind: 'open' },
+  retried = false,
+  onReport,
+  onCopied,
 }) => {
   const { colors } = useTheme();
   const { edges, fades } = useScrollEdges();
@@ -249,7 +273,9 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         )
       : (translate(
           kind === 'server'
-            ? 'walleterror.server-title'
+            ? retried
+              ? 'walleterror.still-server'
+              : 'walleterror.server-title'
             : 'walleterror.open-title',
         ) as string);
   const sub = chain
@@ -257,18 +283,28 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         .replace('{server}', netName(server.chainName))
         .replace('{net}', netName(chain))
     : kind === 'server'
-      ? (translate('walleterror.server-sub') as string).replace('{host}', host)
+      ? (
+          translate(
+            stage.kind === 'create'
+              ? 'walleterror.server-sub-create'
+              : 'walleterror.server-sub',
+          ) as string
+        ).replace('{host}', host.replace(/:\d+$/, ''))
       : (translate(
           failed.kind === 'oneOfMany'
             ? 'wallets.wont-open-body'
             : 'walleterror.open-sub',
         ) as string);
-  const primaryLabel = chain
-    ? (translate('walleterror.chain-action') as string).replace(
-        '{net}',
-        netName(chain),
-      )
-    : (translate('walleterror.open') as string);
+  /** A server error offers no wallet actions: the fix is another server, or a retry. */
+  const serverKind = kind === 'server';
+  const primaryLabel = serverKind
+    ? (translate('walleterror.change-server') as string)
+    : chain
+      ? (translate('walleterror.chain-action') as string).replace(
+          '{net}',
+          netName(chain),
+        )
+      : (translate('walleterror.open') as string);
 
   // Import and Create are not needed to fix a network mismatch; they wait in
   // a sheet that says they add a wallet beside this one.
@@ -546,35 +582,71 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
               <Text selectable variant="address">
                 {details}
               </Text>
+              {serverKind && (
+                <Pressable
+                  kind="icon"
+                  testID="walleterror.copy"
+                  accessibilityRole="button"
+                  accessibilityLabel={translate('copy') as string}
+                  onPress={() => {
+                    Clipboard.setString(details);
+                    onCopied?.();
+                  }}
+                  style={{
+                    position: 'absolute',
+                    right: 4,
+                    top: 4,
+                    width: 36,
+                    height: 36,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <CopyIcon size={iconSizeSm} color={colors.fgMuted} />
+                </Pressable>
+              )}
             </View>
+            {serverKind && !!onReport && (
+              <View style={{ marginTop: space4, alignItems: 'center' }}>
+                <Button
+                  testID="walleterror.email"
+                  variant="text"
+                  icon={MailIcon}
+                  title={translate('support') as string}
+                  onPress={onReport}
+                />
+              </View>
+            )}
           </DetailsBox>
         </View>
       </ScrollView>
       {fades}
 
-      {chain
-        ? link(
-            translate('walleterror.more') as string,
-            moreOptions,
-            topLinkBottom,
-            'walleterror.more',
-            true,
-          )
-        : failed.kind === 'oneOfMany'
+      {serverKind
+        ? null
+        : chain
           ? link(
-              translate('wallets.open-other') as string,
-              failed.onOpenOther,
+              translate('walleterror.more') as string,
+              moreOptions,
               topLinkBottom,
-              'walleterror.other',
+              'walleterror.more',
               true,
             )
-          : link(
-              translate('walleterror.import') as string,
-              onImport,
-              topLinkBottom,
-              'walleterror.import',
-              true,
-            )}
+          : failed.kind === 'oneOfMany'
+            ? link(
+                translate('wallets.open-other') as string,
+                failed.onOpenOther,
+                topLinkBottom,
+                'walleterror.other',
+                true,
+              )
+            : link(
+                translate('walleterror.import') as string,
+                onImport,
+                topLinkBottom,
+                'walleterror.import',
+                true,
+              )}
       <View
         style={{
           position: 'absolute',
@@ -584,20 +656,55 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         }}
       >
         <Button
-          testID={chain ? 'walleterror.chain' : 'walleterror.open'}
+          testID={
+            serverKind
+              ? 'walleterror.change-server'
+              : chain
+                ? 'walleterror.chain'
+                : 'walleterror.open'
+          }
           variant="primary"
-          busy={busy}
+          busy={busy && !serverKind}
+          disabled={busy && serverKind}
           title={primaryLabel}
-          onPress={chain ? () => onSwitchChain(chain) : onRetry}
+          onPress={
+            serverKind ? onServer : chain ? () => onSwitchChain(chain) : onRetry
+          }
         />
       </View>
-      {!chain &&
+      {serverKind ? (
+        <View
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: bottomPad,
+            alignItems: 'center',
+          }}
+        >
+          <Button
+            testID="walleterror.retry"
+            variant="text"
+            inline
+            icon={busy ? RetrySpinner : undefined}
+            disabled={busy}
+            title={
+              translate(
+                busy ? 'walleterror.retrying' : 'walleterror.retry-connection',
+              ) as string
+            }
+            onPress={onRetry}
+          />
+        </View>
+      ) : (
+        !chain &&
         link(
           translate('walleterror.create') as string,
           onCreate,
           bottomPad,
           'walleterror.create',
-        )}
+        )
+      )}
     </View>
   );
 };
