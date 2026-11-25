@@ -452,7 +452,7 @@
     "sync-server-unusable": "{host} no sincroniza",
     "sync-server-back": "{host} vuelve a funcionar",
     "sync-open-health": "Abrir el estado del servidor",
-    "sync-behind": "Se está quedando atrás"
+    "sync-behind": "La sincronización se está quedando atrás"
   },
   "info": {
     "error-price-fetch": "No se pudo obtener el precio de ZEC.",

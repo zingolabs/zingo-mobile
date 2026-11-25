@@ -452,7 +452,7 @@
     "sync-server-unusable": "{host} senkronize etmiyor",
     "sync-server-back": "{host} yeniden çalışıyor",
     "sync-open-health": "Sunucu durumunu aç",
-    "sync-behind": "Geride kalıyor"
+    "sync-behind": "Senkronizasyon geride kalıyor"
   },
   "info": {
     "error-price-fetch": "ZEC fiyatı alınamadı.",
