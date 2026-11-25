@@ -62,6 +62,13 @@ export const NoInternet: Story = {
   },
 };
 
+/** Zingo's own server is named while it works, and any other is not. */
+export const SyncedOnZecGlobal: Story = {
+  args: {
+    server: remoteServer('https://zec.global:443', ChainNameEnum.mainChainName),
+  },
+};
+
 /** The server states: only the dot takes a color, the words stay muted. */
 export const ServerSlow: Story = {
   args: { health: { ...INITIAL_SERVER_HEALTH_VIEW, level: 'slow' } },

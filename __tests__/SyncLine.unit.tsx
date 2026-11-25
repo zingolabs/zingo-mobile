@@ -32,6 +32,10 @@ const zecRocks = remoteServer(
   'https://zec.rocks:443',
   ChainNameEnum.mainChainName,
 );
+const zecGlobal = remoteServer(
+  'https://zec.global:443',
+  ChainNameEnum.mainChainName,
+);
 const online = {
   isConnected: true,
   type: NetInfoStateType.wifi,
@@ -98,10 +102,40 @@ describe('SyncLine', () => {
     expect(screen.queryByTestId('header.sync-behind')).toBeNull();
   });
 
-  test('Tests that the first connection names the server it is reaching', () => {
-    const screen = line({ percentage: 0, syncInProgress: true });
-    expect(screen.getByTestId('header.syncline')).toHaveTextContent(
+  test('Tests that the first connection names the server when it is Zingo’s own, and only says connecting on any other', () => {
+    const ours = line({
+      server: zecGlobal,
+      percentage: 0,
+      syncInProgress: true,
+    });
+    expect(ours.getByTestId('header.syncline')).toHaveTextContent(
       /header\.sync-connecting/,
+    );
+    ours.unmount();
+    const other = line({ percentage: 0, syncInProgress: true });
+    expect(other.getByTestId('header.syncline')).toHaveTextContent(
+      /^server\.connecting/,
+    );
+  });
+
+  test('Tests that a synced or syncing wallet names the server only when it is Zingo’s own', () => {
+    const ours = line({ server: zecGlobal });
+    expect(ours.getByTestId('header.syncline')).toHaveTextContent(
+      'zec.global · header.sync-synced',
+    );
+    ours.unmount();
+    const syncing = line({
+      server: zecGlobal,
+      percentage: 42,
+      syncInProgress: true,
+    });
+    expect(syncing.getByTestId('header.syncline')).toHaveTextContent(
+      /^zec\.global · header\.sync-syncing/,
+    );
+    syncing.unmount();
+    const other = line({});
+    expect(other.getByTestId('header.syncline')).toHaveTextContent(
+      /^header\.sync-synced/,
     );
   });
 

@@ -33,6 +33,7 @@ import { CloudDownloadIcon } from '@ui/primitives/Icons/CloudDownloadIcon';
 import { ServerHealthView } from '@app/services/serverHealthMonitor';
 import { showServerHealth } from '@app/services/showServerHealth';
 import { hostOf as hostOfUri } from '@screens/Server/useCustomServer';
+import { isOurServer } from '@app/uris/serverUris';
 
 type SyncState =
   | 'opening'
@@ -138,7 +139,8 @@ function Spinner({ track, arc }: { track: string; arc: string }) {
  * with a green dot, connecting with a spinner, syncing with a yellow bar.
  * How old the balance is shows only when the wallet stopped keeping up: no
  * internet, Offline, or a sync that falls behind the tip. Mobile data is
- * added at the end. Tapping it opens the Sync report, or, while the server
+ * added at the end. While the server works, the line names it only when it
+ * is Zingo's own. Tapping it opens the Sync report, or, while the server
  * is slow or down, the server health sheet. When the default server works
  * again it says so, and a tap asks whether to go back.
  */
@@ -216,6 +218,19 @@ export default function SyncLine({
       {text}
     </Text>
   );
+  /** Zingo's own server is named while it works, any other only when it fails. */
+  const ours = server.kind === 'remote' && isOurServer(server.uri);
+  const named = (head: React.ReactNode): React.ReactNode =>
+    ours ? (
+      <>
+        {`${hostOf(server)} · `}
+        {head}
+      </>
+    ) : (
+      head
+    );
+  const namedLabel = (text: string): string =>
+    ours ? `${hostOf(server)} · ${text}` : text;
   /** What the line says, the strong part first; " · " and the age follow. */
   const aged = (head: React.ReactNode): React.ReactNode => (
     <>
@@ -269,13 +284,17 @@ export default function SyncLine({
           }}
         />
       );
-      words = aged(strong(t('header.sync-behind'), colors.fgWarning));
-      label = [t('header.sync-behind'), balanceAge].filter(Boolean).join('. ');
+      words = named(aged(strong(t('header.sync-behind'), colors.fgWarning)));
+      label = [namedLabel(t('header.sync-behind')), balanceAge]
+        .filter(Boolean)
+        .join('. ');
       break;
     case 'starting':
       lead = <Spinner track={colors.sheetHandle} arc={colors.fgMuted} />;
-      words = t('header.sync-connecting').replace('{host}', hostOf(server));
-      label = t('header.sync-connecting').replace('{host}', hostOf(server));
+      words = ours
+        ? t('header.sync-connecting').replace('{host}', hostOf(server))
+        : t('server.connecting');
+      label = words as string;
       break;
     case 'syncing':
       lead = (
@@ -298,13 +317,17 @@ export default function SyncLine({
           />
         </View>
       );
-      words = strong(
-        t('header.sync-syncing').replace('{n}', String(Math.floor(percentage))),
-        colors.fgSyncing,
+      words = named(
+        strong(
+          t('header.sync-syncing').replace(
+            '{n}',
+            String(Math.floor(percentage)),
+          ),
+          colors.fgSyncing,
+        ),
       );
-      label = t('header.sync-syncing').replace(
-        '{n}',
-        String(Math.floor(percentage)),
+      label = namedLabel(
+        t('header.sync-syncing').replace('{n}', String(Math.floor(percentage))),
       );
       break;
     case 'serverSlow':
@@ -317,7 +340,7 @@ export default function SyncLine({
         serverUnusable: 'header.sync-server-unusable',
         defaultBack: 'header.sync-server-back',
       }[state];
-      const named = t(key).replace(
+      const said = t(key).replace(
         '{host}',
         state === 'defaultBack' ? hostOfUri(health.defaultUri) : hostOf(server),
       );
@@ -337,8 +360,8 @@ export default function SyncLine({
           }}
         />
       );
-      words = named;
-      label = named;
+      words = said;
+      label = said;
       break;
     }
     default:
@@ -353,8 +376,8 @@ export default function SyncLine({
           }}
         />
       );
-      words = t('header.sync-synced');
-      label = t('header.sync-synced');
+      words = named(t('header.sync-synced'));
+      label = namedLabel(t('header.sync-synced'));
   }
 
   const serverState =
