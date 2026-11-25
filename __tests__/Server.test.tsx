@@ -328,3 +328,32 @@ test('Tests that the screen opens on the network it is asked for', () => {
   ).toBe(true);
   expect(h.onProbe).toHaveBeenLastCalledWith(ChainNameEnum.testChainName);
 });
+
+test('Tests that a server more than five blocks behind the others is marked behind in Other servers', () => {
+  render(
+    <ServerList
+      translate={translate}
+      servers={others}
+      latencies={{
+        'https://zec.rocks:443': 90,
+        'https://na.zec.rocks:443': 142,
+      }}
+      heights={{
+        'https://zec.rocks:443': 3000000,
+        'https://na.zec.rocks:443': 2303502,
+      }}
+      selectedUri={null}
+      loading={false}
+      busy={false}
+      onPick={jest.fn()}
+      onUnreachable={jest.fn()}
+      onBack={jest.fn()}
+    />,
+  );
+  expect(
+    screen.queryByTestId('serverlist.pick.zec.rocks:443.behind'),
+  ).toBeNull();
+  expect(
+    screen.getByTestId('serverlist.pick.na.zec.rocks:443.behind'),
+  ).toHaveTextContent('Behind (-696,498 blocks)');
+});

@@ -119,3 +119,7 @@ export const MAX_BEHIND_BLOCKS = 5;
 /** Whether `height` is within reach of the tip `tip`, always true while the tip is unknown. */
 export const upToDate = (height: number, tip: number): boolean =>
   tip === 0 || height >= tip - MAX_BEHIND_BLOCKS;
+
+/** How many blocks `height` trails the tip `tip` by, 0 while it is up to date or nothing is known. */
+export const blocksBehind = (height: number, tip: number): number =>
+  height > 0 && !upToDate(height, tip) ? tip - height : 0;

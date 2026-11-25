@@ -53,13 +53,14 @@ export class SyncCoordinator {
   }
 
   async configure(): Promise<void> {
+    await this.dataService.fetchWalletHeight();
+    await this.fetchSyncStatus();
     await this.dataService.fetchTandZandOValueTransfers();
     await this.dataService.fetchAddresses();
     await this.dataService.fetchTotalBalance();
     await this.dataService.fetchInfoAndServerHeight();
     await this.dataService.fetchZingolibVersion();
     await this.dataService.fetchTandZandOMessages();
-    await this.dataService.fetchWalletHeight();
     await this.dataService.fetchWalletBirthdaySeedUfvk();
 
     if (!this.updateTimerID) {
@@ -332,12 +333,10 @@ export class SyncCoordinator {
             ? 99.99
             : Number(ss.percentage_total_blocks_scanned?.toFixed(2));
 
-      // Close the poll timer if the sync finished(checked via promise above)
-      const inR = scanInProgress(ss);
-      if (!inR) {
-        this.config.keepAwake(false);
-      } else {
-        this.config.keepAwake(true);
+      // Close the poll timer if the sync finished(checked via promise above).
+      // A status read with no session running leaves the screen as it is.
+      if (ss.total_blocks) {
+        this.config.keepAwake(scanInProgress(ss));
       }
 
       // store SyncStatus object for a new screen

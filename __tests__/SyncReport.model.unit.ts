@@ -9,6 +9,8 @@ import {
   cellState,
   mapCells,
   scaleMax,
+  hasSession,
+  scannedPercent,
 } from '@screens/SyncReport/syncModel';
 
 const status = (ranges: [Priority, number, number][]): RPCSyncStatusType => ({
@@ -147,4 +149,21 @@ test('Tests that the background sync failed when the message ends in KO without 
 
 test('Tests that the background sync was interrupted when the task never wrote its end time.', () => {
   expect(backgroundOutcome(background('Starting OK.', 0))).toBe('interrupted');
+});
+
+test('Tests that the progress comes from the scanned ranges when no sync session reports one. A wallet restarted without internet has ranges and no totals.', () => {
+  const resting = status([
+    [Priority.Scanned, BIRTHDAY, BIRTHDAY + 90],
+    [Priority.Historic, BIRTHDAY + 90, TIP + 1],
+  ]);
+  expect(hasSession(resting)).toBe(false);
+  expect(scannedPercent(resting, BIRTHDAY, TIP)).toBe(50);
+  expect(
+    scannedPercent(
+      status([[Priority.Scanned, BIRTHDAY, TIP + 1]]),
+      BIRTHDAY,
+      TIP,
+    ),
+  ).toBe(100);
+  expect(hasSession({ ...resting, total_blocks: 181 })).toBe(true);
 });

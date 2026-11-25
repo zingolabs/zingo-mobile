@@ -146,3 +146,85 @@ test('Tests that More options holds Import and Create behind a note that they ad
   expect(h.onCreate).toHaveBeenCalledTimes(1);
   registerConfirmListener(null);
 });
+
+const mountServer = (
+  props: Partial<React.ComponentProps<typeof WalletError>>,
+  h = handlers(),
+) => {
+  const en = require('../app/translations/en.json');
+  const translate = (key: string) =>
+    key.split('.').reduce((o: any, k) => o?.[k], en) ?? key;
+  const extra = { onReport: jest.fn(), onCopied: jest.fn() };
+  render(
+    <ContextAppLoadingProvider
+      value={{ ...defaultAppContextLoading, translate }}
+    >
+      <WalletError
+        translate={translate}
+        online={true}
+        server={remoteServer(
+          'https://zec.global:443',
+          ChainNameEnum.mainChainName,
+        )}
+        failed={{ kind: 'oneOfMany', name: 'Savings', onOpenOther: jest.fn() }}
+        kind="server"
+        details="connect ETIMEDOUT zec.global:443"
+        busy={false}
+        shake={0}
+        {...h}
+        {...extra}
+        {...props}
+      />
+    </ContextAppLoadingProvider>,
+  );
+  return { ...h, ...extra };
+};
+
+test('Tests that a server error offers only Change server and Retry connection, without wallet actions', () => {
+  const h = mountServer({});
+  expect(screen.getByText("Can't connect to the server")).toBeOnTheScreen();
+  expect(
+    screen.getByText(
+      "zec.global isn't responding. Your wallet is still saved on this device.",
+    ),
+  ).toBeOnTheScreen();
+  expect(screen.queryByTestId('walleterror.import')).toBeNull();
+  expect(screen.queryByTestId('walleterror.create')).toBeNull();
+  expect(screen.queryByTestId('walleterror.other')).toBeNull();
+  fireEvent.press(screen.getByTestId('walleterror.change-server'));
+  fireEvent.press(screen.getByTestId('walleterror.retry'));
+  expect(h.onServer).toHaveBeenCalledTimes(1);
+  expect(h.onRetry).toHaveBeenCalledTimes(1);
+});
+
+test('Tests that the title says it still cannot connect when a retry failed, and a failed create says no wallet was created', () => {
+  mountServer({ retried: true, stage: { kind: 'create', name: 'Wallet 1' } });
+  expect(screen.getByText("Still can't reach the server")).toBeOnTheScreen();
+  expect(
+    screen.getByText("zec.global isn't responding. No wallet was created."),
+  ).toBeOnTheScreen();
+});
+
+test('Tests that a running retry shows Retrying with a spinner and holds both actions', () => {
+  const h = mountServer({ busy: true });
+  expect(screen.getByText('Retrying…')).toBeOnTheScreen();
+  expect(screen.getByTestId('walleterror.retry.spinner')).toBeOnTheScreen();
+  fireEvent.press(screen.getByTestId('walleterror.change-server'));
+  fireEvent.press(screen.getByTestId('walleterror.retry'));
+  expect(h.onServer).not.toHaveBeenCalled();
+  expect(h.onRetry).not.toHaveBeenCalled();
+});
+
+test('Tests that the server error details copy the text and mail it to support', () => {
+  const h = mountServer({});
+  fireEvent.press(screen.getByTestId('walleterror.details'));
+  fireEvent.press(screen.getAllByTestId('walleterror.copy').at(-1)!);
+  fireEvent.press(screen.getAllByTestId('walleterror.email').at(-1)!);
+  expect(h.onCopied).toHaveBeenCalledTimes(1);
+  expect(h.onReport).toHaveBeenCalledTimes(1);
+});
+
+test('Tests that the error badge draws its exclamation as an icon when the wallet will not open', () => {
+  mount({});
+  expect(screen.queryByText('!')).toBeNull();
+});

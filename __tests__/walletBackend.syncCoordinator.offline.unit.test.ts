@@ -137,3 +137,36 @@ describe('an online session whose wallet opened with no indexer', () => {
     expect(mockedBridge.changeServerProcess).not.toHaveBeenCalled();
   });
 });
+
+describe('the screen stays awake only for a running sync', () => {
+  const ranges = [{ priority: 'Historic', start_block: 0, end_block: 100 }];
+
+  it('leaves the screen as it is for a status read with no session running', async () => {
+    mockedBridge.statusSyncInfo.mockResolvedValue(
+      JSON.stringify({
+        scan_ranges: ranges,
+        percentage_total_outputs_scanned: 0,
+      }),
+    );
+    const { coordinator } = coordinatorFor(ONLINE);
+
+    await coordinator.fetchSyncStatus();
+
+    expect(coordinator.config.keepAwake).not.toHaveBeenCalled();
+  });
+
+  it('keeps the screen awake while a session scans', async () => {
+    mockedBridge.statusSyncInfo.mockResolvedValue(
+      JSON.stringify({
+        scan_ranges: ranges,
+        total_blocks: 100,
+        percentage_total_outputs_scanned: 40,
+      }),
+    );
+    const { coordinator } = coordinatorFor(ONLINE);
+
+    await coordinator.fetchSyncStatus();
+
+    expect(coordinator.config.keepAwake).toHaveBeenCalledWith(true);
+  });
+});
