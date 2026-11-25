@@ -428,6 +428,7 @@ export class LoadingAppClass extends Component<
       serverStatus: 'ok',
       serverBlockHeight: '',
       serverLatencies: {},
+      serverHeights: {},
       serverLists: {},
       errorResolved: false,
     };
@@ -1459,6 +1460,10 @@ export class LoadingAppClass extends Component<
         ...state.serverLatencies,
         [server.uri]: probe.latency,
       },
+      serverHeights: {
+        ...state.serverHeights,
+        [server.uri]: Number(probe.height) || 0,
+      },
     }));
   };
 
@@ -1497,6 +1502,10 @@ export class LoadingAppClass extends Component<
         }
         this.setState(state => ({
           serverLatencies: { ...state.serverLatencies, [s.uri]: probe.latency },
+          serverHeights: {
+            ...state.serverHeights,
+            [s.uri]: Number(probe.height) || 0,
+          },
         }));
       }),
     );
@@ -1822,6 +1831,7 @@ export class LoadingAppClass extends Component<
       serverStatus: this.state.serverStatus,
       serverBlockHeight: this.state.serverBlockHeight,
       serverLatencies: this.state.serverLatencies,
+      serverHeights: this.state.serverHeights,
       serverLists: this.state.serverLists,
       serverBackGuard: this.serverBackGuard,
       openServer: this.openServer,

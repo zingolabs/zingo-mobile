@@ -206,47 +206,26 @@ const ServerHealthSheet: React.FC = () => {
               : 'server-health.manual',
           )} · ${t(`server-health.${level}-sub`)}`}
         </Text>
-        <View
+        <Pressable
+          kind="link"
+          testID="server-health.details"
+          accessibilityRole="button"
+          accessibilityState={{ expanded: open }}
+          onPress={() => setOpen(v => !v)}
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            alignSelf: 'flex-start',
+            columnGap: space4,
+            minHeight: 36,
             marginTop: space8,
           }}
         >
-          <Pressable
-            kind="link"
-            testID="server-health.details"
-            accessibilityRole="button"
-            accessibilityState={{ expanded: open }}
-            onPress={() => setOpen(v => !v)}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              columnGap: space4,
-              minHeight: 36,
-            }}
-          >
-            <Text variant="caption" tone="muted">
-              {t('server-health.details')}
-            </Text>
-            <Chevron size={iconSizeSm} color={colors.fgMuted} />
-          </Pressable>
-          <Button
-            testID="server-health.send"
-            variant="text"
-            icon={MailIcon}
-            title={t('server-health.send')}
-            onPress={() =>
-              sendEmail(
-                translate,
-                zingolibVersion,
-                t('server-health.send-subject'),
-                detail,
-              )
-            }
-          />
-        </View>
+          <Text variant="caption" tone="muted">
+            {t('server-health.details')}
+          </Text>
+          <Chevron size={iconSizeSm} color={colors.fgMuted} />
+        </Pressable>
         {open && (
           <Unfolding>
             <View
@@ -283,6 +262,22 @@ const ServerHealthSheet: React.FC = () => {
               >
                 <CopyIcon size={iconSizeSm} color={colors.fgMuted} />
               </Pressable>
+            </View>
+            <View style={{ marginTop: space4, alignItems: 'center' }}>
+              <Button
+                testID="server-health.send"
+                variant="text"
+                icon={MailIcon}
+                title={t('server-health.send')}
+                onPress={() =>
+                  sendEmail(
+                    translate,
+                    zingolibVersion,
+                    t('server-health.send-subject'),
+                    detail,
+                  )
+                }
+              />
             </View>
           </Unfolding>
         )}

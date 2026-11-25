@@ -211,6 +211,7 @@ export function ServerListScreen({
     selectServer,
     serverLists,
     serverLatencies,
+    serverHeights,
     busy,
     serversFor,
     pickServer,
@@ -223,6 +224,7 @@ export function ServerListScreen({
       servers={serversFor(chain)}
       loading={!serverLists[chain]}
       latencies={serverLatencies}
+      heights={serverHeights}
       selectedUri={
         server.kind === 'remote' && selectServer === SelectServerEnum.list
           ? server.uri

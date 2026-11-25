@@ -41,6 +41,7 @@ import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import { DatabaseIcon } from '@ui/primitives/Icons/DatabaseIcon';
 import { ChevronDown } from '@ui/primitives/Icons/Chevron';
 import { WalletIcon } from '@ui/primitives/Icons/WalletIcon';
+import { ExclamationIcon } from '@ui/primitives/Icons/ExclamationIcon';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 
 /** The wallet that failed, named when it is one of several, with the way to another one. */
@@ -82,6 +83,8 @@ const ICON_TOP = 226 / 874;
 const COLUMN_TOP = 328 / 874;
 const ICON = 75;
 const BADGE = 17;
+/** The exclamation inside the badge, clear of its 2 pt ring. */
+const BADGE_ICON = 11;
 const SHAKE_STEP_MS = 64;
 const BADGE_OUT_MS = 200;
 const DETAILS_OPEN_MS = 240;
@@ -90,6 +93,8 @@ const DETAILS_CLOSE_MS = 180;
 const LINK_TO_BUTTON = 46;
 const BUTTON_TO_LINK = 60;
 const SERVER_DOT = 8;
+/** The ring that cuts the server dot out of the canvas, outside the dot. */
+const SERVER_RING = 2;
 const SUB_MAX = 310;
 
 const badgeEnter = () =>
@@ -410,14 +415,15 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         <View
           style={{
             position: 'absolute',
-            right: space8,
-            bottom: space8,
+            right: space8 - SERVER_RING,
+            bottom: space8 - SERVER_RING,
             width: SERVER_DOT,
             height: SERVER_DOT,
             borderRadius: radiusPill,
             backgroundColor: dotColor,
-            borderWidth: 2,
+            borderWidth: SERVER_RING,
             borderColor: colors.bgCanvas,
+            boxSizing: 'content-box',
           }}
         />
       </Pressable>
@@ -482,13 +488,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
                 justifyContent: 'center',
               }}
             >
-              <Text
-                variant="caption"
-                color={colors.fgOnAccent}
-                style={{ fontWeight: '700' }}
-              >
-                !
-              </Text>
+              <ExclamationIcon size={BADGE_ICON} color={colors.fgOnAccent} />
             </Animated.View>
           )}
         </Animated.View>

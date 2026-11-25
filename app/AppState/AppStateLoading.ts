@@ -33,6 +33,7 @@ export default interface AppStateLoading {
   serverBlockHeight: string;
   // uri → latency in ms, null when the server did not answer the probe.
   serverLatencies: Record<string, number | null>;
+  serverHeights: Record<string, number>;
   // chain → servers under Other servers; absent until its list has loaded.
   serverLists: Record<string, ServerUrisType[]>;
   // The network Other servers lists.
