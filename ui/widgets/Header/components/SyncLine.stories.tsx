@@ -23,6 +23,7 @@ const mobileData = {
 const meta: Meta<typeof SyncLine> = {
   title: 'Header/SyncLine',
   component: SyncLine,
+  tags: ['loop'],
   decorators: [withNavigation],
   args: {
     translate: mockTranslate,
