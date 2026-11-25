@@ -63,6 +63,7 @@ export const defaultAppContextLoading: AppContextLoading = {
   createNewWallet: () => {},
   getwalletToRestore: () => {},
   retryOpenWallet: () => {},
+  retryCreateWallet: () => {},
   switchToWalletChain: () => {},
   chooseAutomatic: async () => {},
   pickServer: async () => {},

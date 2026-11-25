@@ -86,6 +86,8 @@ export interface OnboardingContext {
   createNewWallet: () => void;
   getwalletToRestore: () => void;
   retryOpenWallet: () => void;
+  /** Creates the named wallet again from the server error screen. */
+  retryCreateWallet: (name: string) => void;
   // The hold-to-delete sheet, then the import or the create.
   switchToWalletChain: (chain: ChainNameEnum) => void;
   chooseAutomatic: (chain: ChainNameEnum) => Promise<void>;
