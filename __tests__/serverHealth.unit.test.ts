@@ -1,4 +1,5 @@
 import {
+  blocksBehind,
   DOWN_RUN,
   INITIAL_SERVER_HEALTH,
   ProbeAnswer,
@@ -63,4 +64,10 @@ test('Tests that a height counts as up to date within five blocks of the tip, an
   expect(upToDate(995, 1000)).toBe(true);
   expect(upToDate(994, 1000)).toBe(false);
   expect(upToDate(1, 0)).toBe(true);
+});
+
+test('Tests that a server more than five blocks behind the tip counts its gap, and an unknown height counts none', () => {
+  expect(blocksBehind(990, 1000)).toBe(10);
+  expect(blocksBehind(995, 1000)).toBe(0);
+  expect(blocksBehind(0, 1000)).toBe(0);
 });

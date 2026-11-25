@@ -54,6 +54,7 @@ export const defaultAppContextLoading: AppContextLoading = {
   serverStatus: 'ok',
   serverBlockHeight: '',
   serverLatencies: {},
+  serverHeights: {},
   serverLists: {},
   serverBackGuard: { current: null },
   openServer: () => {},
