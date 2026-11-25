@@ -140,9 +140,10 @@ function Spinner({ track, arc }: { track: string; arc: string }) {
  * How old the balance is shows only when the wallet stopped keeping up: no
  * internet, Offline, or a sync that falls behind the tip. Mobile data is
  * added at the end. While the server works, the line names it only when it
- * is Zingo's own, and never beside the sync bar. Tapping it opens the Sync report, or, while the server
- * is slow or down, the server health sheet. When the default server works
- * again it says so, and a tap asks whether to go back.
+ * is Zingo's own, and never beside the sync bar. Tapping it opens the Sync
+ * report, the Server screen when Offline, or, while the server is slow or
+ * down, the server health sheet. When the default server works again it says
+ * so, and a tap asks whether to go back.
  */
 export default function SyncLine({
   server,
@@ -381,16 +382,21 @@ export default function SyncLine({
     state === 'serverSlow' ||
     state === 'serverDown' ||
     state === 'serverUnusable';
+  /** Offline has no sync to report on: the way out of it is the Server screen. */
   const onPress = serverState
     ? showServerHealth
     : state === 'defaultBack'
       ? onDefaultBack
-      : () => navigation.navigate(Route.SyncReport);
+      : state === 'offline'
+        ? () => navigation.navigate(Route.Server)
+        : () => navigation.navigate(Route.SyncReport);
   const action = serverState
     ? t('header.sync-open-health')
     : state === 'defaultBack'
       ? ''
-      : t('header.sync-open-report');
+      : state === 'offline'
+        ? t('header.sync-open-server')
+        : t('header.sync-open-report');
 
   return (
     <Pressable

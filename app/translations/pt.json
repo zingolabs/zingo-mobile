@@ -452,6 +452,7 @@
     "sync-server-unusable": "{host} não sincroniza",
     "sync-server-back": "{host} voltou a funcionar",
     "sync-open-health": "Abrir o estado do servidor",
+    "sync-open-server": "Abrir a tela do servidor",
     "sync-behind": "A sincronização está ficando para trás"
   },
   "info": {

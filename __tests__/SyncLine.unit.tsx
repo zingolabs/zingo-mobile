@@ -260,3 +260,12 @@ test('Tests that a healthy server keeps the tap on the Sync report', () => {
   fireEvent.press(screen.getByTestId('header.syncline'));
   expect(mockNavigate).toHaveBeenCalledWith('SyncReport');
 });
+
+test('Tests that a tap opens the Server screen when the wallet is Offline', () => {
+  const screen = line({ server: offlineServer(ChainNameEnum.mainChainName) });
+  fireEvent.press(screen.getByTestId('header.syncline'));
+  expect(mockNavigate).toHaveBeenCalledWith('Server');
+  expect(screen.getByTestId('header.syncline')).toHaveAccessibleName(
+    /header\.sync-open-server/,
+  );
+});
