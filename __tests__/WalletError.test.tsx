@@ -223,3 +223,8 @@ test('Tests that the server error details copy the text and mail it to support',
   expect(h.onCopied).toHaveBeenCalledTimes(1);
   expect(h.onReport).toHaveBeenCalledTimes(1);
 });
+
+test('Tests that the error badge draws its exclamation as an icon when the wallet will not open', () => {
+  mount({});
+  expect(screen.queryByText('!')).toBeNull();
+});

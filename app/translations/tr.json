@@ -1547,7 +1547,6 @@
     "scanned-n": "{n} blok tarandı",
     "birthday-at": "Cüzdan doğum bloğu · {n}",
     "tip-at": "Sunucu ucu · {n}",
-    "server-known": "Sunucu (bilinen son)",
     "tip-known": "Sunucunun bilinen son bloğu · {n}",
     "at-known": "Cüzdan {wallet}. blokta · sunucunun bilinen son bloğu {tip}",
     "both-at-known": "Cüzdan {tip}. blokta, sunucunun verdiği son blok",

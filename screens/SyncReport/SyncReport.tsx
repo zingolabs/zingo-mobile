@@ -560,13 +560,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                     }}
                   />
                   <Text variant="caption" tone="muted">
-                    {
-                      translate(
-                        t.key === 'sync.server' && lastKnown
-                          ? 'sync.server-known'
-                          : t.key,
-                      ) as string
-                    }
+                    {translate(t.key) as string}
                   </Text>
                 </View>
                 <Text

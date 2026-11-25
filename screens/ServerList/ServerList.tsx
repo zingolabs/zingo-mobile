@@ -14,6 +14,7 @@ import ServerRow, {
 } from '@screens/Server/ServerRow';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { blocksBehind } from '@app/services/serverHealth';
+import { formatInteger } from '@app/utils/formatAmount';
 
 type ServerListProps = {
   translate: (key: string) => TranslateType;
@@ -89,7 +90,7 @@ const ServerList: React.FunctionComponent<ServerListProps> = ({
                   blocksBehind(heights[s.uri] ?? 0, tip) > 0
                     ? (translate('server.behind') as string).replace(
                         '{n}',
-                        String(blocksBehind(heights[s.uri] ?? 0, tip)),
+                        formatInteger(blocksBehind(heights[s.uri] ?? 0, tip)),
                       )
                     : undefined
                 }

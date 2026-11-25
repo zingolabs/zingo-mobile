@@ -340,7 +340,7 @@ test('Tests that a server more than five blocks behind the others is marked behi
       }}
       heights={{
         'https://zec.rocks:443': 3000000,
-        'https://na.zec.rocks:443': 2999990,
+        'https://na.zec.rocks:443': 2303502,
       }}
       selectedUri={null}
       loading={false}
@@ -355,5 +355,5 @@ test('Tests that a server more than five blocks behind the others is marked behi
   ).toBeNull();
   expect(
     screen.getByTestId('serverlist.pick.na.zec.rocks:443.behind'),
-  ).toHaveTextContent('Behind (-10 blocks)');
+  ).toHaveTextContent('Behind (-696,498 blocks)');
 });

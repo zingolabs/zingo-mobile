@@ -52,7 +52,11 @@ test('Tests that the server bar shows the last known height when the server gave
   act(() => noteHeights(3_000_000, 0, Date.now()));
   const view = screen(0);
 
-  expect(view.getByText('Server (last known)')).toBeOnTheScreen();
+  expect(
+    view.getByText(
+      'Wallet at block 2,000,000 · server last known at 3,000,000',
+    ),
+  ).toBeOnTheScreen();
   expect(view.getByTestId('syncreport.server')).toHaveTextContent(/3,000,000/);
 });
 
@@ -60,7 +64,7 @@ test('Tests that the server bar shows the server height when the server gave one
   act(() => noteHeights(3_000_000, 3_000_010, Date.now()));
   const view = screen(3_000_010);
 
-  expect(view.queryByText('Server (last known)')).toBeNull();
+  expect(view.queryByText(/last known/)).toBeNull();
   expect(view.getByTestId('syncreport.server')).toHaveTextContent(/3,000,010/);
 });
 
