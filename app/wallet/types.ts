@@ -86,6 +86,10 @@ export type ProposalPoolsType = {
 // 'chain': the wallet is on another network than the server it would open on.
 export type WalletErrorKind = 'open' | 'server' | 'chain';
 
+/** Where the error came from: a wallet on disk that would not open, or one being created that was never saved. */
+export type WalletErrorStage =
+  { kind: 'open' } | { kind: 'create'; name: string };
+
 // What the error screen shows when the wallet on disk will not open.
 export type WalletErrorInfo = {
   kind: WalletErrorKind;
@@ -95,4 +99,7 @@ export type WalletErrorInfo = {
   name: string;
   // The wallet's own network, for the 'chain' kind.
   walletChain?: ChainNameEnum;
+  stage: WalletErrorStage;
+  /** A retry of this same error failed again. */
+  retried: boolean;
 };

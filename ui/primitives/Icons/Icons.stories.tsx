@@ -26,6 +26,7 @@ import { ShieldIcon } from './ShieldIcon';
 import { SkullIcon } from './SkullIcon';
 import { SproutIcon } from './SproutIcon';
 import { TriangleAlert } from './TriangleAlert';
+import { ExclamationIcon } from './ExclamationIcon';
 import { VerifyCheckIcon } from './VerifyCheckIcon';
 import { VerifyXIcon } from './VerifyXIcon';
 import { XIcon } from './XIcon';
@@ -61,6 +62,7 @@ const icons = {
   ChevronRight,
   ChevronUp,
   Copy: CopyIcon,
+  Exclamation: ExclamationIcon,
   Eye: EyeIcon,
   EyeOff: EyeOffIcon,
   Filters: FiltersIcon,

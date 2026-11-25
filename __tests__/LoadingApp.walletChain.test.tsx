@@ -54,7 +54,7 @@ const bootApp = (selectServer: SelectServerEnum) => {
   const applyServer = jest
     .spyOn(app, 'applyServer')
     .mockResolvedValue(undefined);
-  jest.spyOn(app, 'selectServerOnBoot').mockResolvedValue(true);
+  jest.spyOn(app, 'selectServerOnBoot').mockResolvedValue(undefined);
   const showChainError = jest.spyOn(app, 'showChainError');
   return { app, applyServer, showChainError };
 };

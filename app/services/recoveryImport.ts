@@ -1,8 +1,6 @@
 import { ChainNameEnum, SelectServerEnum } from '@app/AppState';
 import ServerType, { remoteServer } from '@app/AppState/types/ServerType';
-import type { TranslateType } from '@app/AppState';
 import { serverUris } from '@app/uris';
-import { pickAutomatic } from '@app/services/serverPicking';
 import type { RecoveryEntry } from '@app/services/recoveryWalletInfo';
 
 type ServerChoice = { server: ServerType; selectServer: SelectServerEnum };
@@ -21,24 +19,8 @@ const defaultServer = (chain: ChainNameEnum): ServerType => {
   return remoteServer(pick.uri, pick.chainName);
 };
 
-/**
- * The server a saved wallet comes back on, in Automatic: Mainnet's
- * recommended one, and on Testnet the best that answers.
- */
-export const entryServer = async (
-  chain: ChainNameEnum,
-  translate: (key: string) => TranslateType,
-  online: boolean,
-): Promise<ServerChoice> => {
-  if (chain !== ChainNameEnum.testChainName) {
-    return {
-      server: defaultServer(chain),
-      selectServer: SelectServerEnum.auto,
-    };
-  }
-  const pick = await pickAutomatic(translate, chain, online);
-  return {
-    server: pick ? remoteServer(pick.server.uri, chain) : defaultServer(chain),
-    selectServer: SelectServerEnum.auto,
-  };
-};
+/** The server a saved wallet comes back on: Automatic, the network's default. */
+export const entryServer = (chain: ChainNameEnum): ServerChoice => ({
+  server: defaultServer(chain),
+  selectServer: SelectServerEnum.auto,
+});

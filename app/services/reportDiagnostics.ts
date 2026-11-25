@@ -13,6 +13,7 @@ import { serverUris } from '@app/uris';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCSyncScanRangePriorityStatusEnum } from '@app/walletBackend/enums/RPCSyncScanRangePriorityStatusEnum';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import { ServerHealthView } from '@app/services/serverHealthMonitor';
 import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
 
 export type Served =
@@ -28,6 +29,7 @@ export type Session =
       sync: RPCSyncStatusType;
       lastError: string;
       mixnetView: MixnetView;
+      serverHealth: ServerHealthView;
     };
 
 export type ReportState = { served: Served; session: Session };
@@ -134,11 +136,20 @@ export const syncLine = (sync: RPCSyncStatusType): string => {
   return `${percent.toFixed(1)}%, ${left} blocks left`;
 };
 
+export const healthLine = (health: ServerHealthView): string =>
+  [
+    health.level,
+    `last answer: ${health.lastLatencyMs === null ? 'none' : `${health.lastLatencyMs} ms`}`,
+    `height: ${health.height}`,
+    `last error: ${health.lastError || 'none'}`,
+  ].join(', ');
+
 export const sessionLines = ({ served, session }: ReportState): string[] => {
   if (session.kind === 'closed') {
     return ['Wallet: not open'];
   }
-  const { chain, readOnly, mixnetView, sync, lastError } = session;
+  const { chain, readOnly, mixnetView, sync, lastError, serverHealth } =
+    session;
   const match: string =
     served.kind === 'chosen'
       ? yesNo(served.server.chainName === chain)
@@ -147,6 +158,7 @@ export const sessionLines = ({ served, session }: ReportState): string[] => {
     `Wallet: ${readOnly ? 'view-only' : 'seed'}, ${chain}, matches server: ${match}`,
     `Mixnet: ${mixnetView.kind === 'transport' ? mixnetView.statusKey : 'absent'}`,
     `Sync: ${syncLine(sync)}`,
+    `Server health: ${healthLine(serverHealth)}`,
     `Last error: ${lastError || 'none'}`,
   ];
 };

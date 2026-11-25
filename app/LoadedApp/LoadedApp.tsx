@@ -60,7 +60,6 @@ import {
   nativeUri,
   offlineServer,
   remoteServer,
-  ServerUrisType,
   SetServerResult,
   AddressBookFileClass,
   LanguageEnum,
@@ -102,9 +101,7 @@ import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import SwapExpiryNotice from '@screens/Swap/components/SwapExpiryNotice';
 import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
 import { ContextAppLoadedProvider, SwapServiceProvider } from '@app/context';
-import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
-import { otherServers, staticAlternatives } from '@app/uris/serverChoice';
-import selectingServer from '@app/services/selectingServer';
+import { parseZcashURI, serverUris } from '@app/uris';
 import BackgroundFileImpl from '@app/services/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '@app/services/createAlert';
@@ -129,9 +126,17 @@ import AddTagModalHost from './components/AddTagModalHost';
 import { showAddTag } from '@app/services/showAddTag';
 import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
+import ServerHealthSheet from '@ui/widgets/ServerHealthSheet';
 import WalletsSheet from '@screens/Wallets';
 import FadeInOnMount from '@ui/widgets/FadeInOnMount';
 import { showConfirm } from '@app/services/showConfirm';
+import {
+  INITIAL_SERVER_HEALTH_VIEW,
+  ServerHealthMonitor,
+  ServerHealthView,
+} from '@app/services/serverHealthMonitor';
+import { defaultServer, probeUri } from '@app/services/serverPicking';
+import { spendInFlight } from '@app/walletBackend/utils/syncBracket';
 import { WalletNavigator } from '@app/navigation/WalletNavigator';
 import TooltipHost from '@ui/widgets/TooltipHost';
 import {
@@ -695,7 +700,7 @@ export class LoadedAppClass extends Component<
   LoadedAppClassState
 > {
   rpc: WalletBackend;
-  recoveringServer: boolean = false;
+  health: ServerHealthMonitor;
   appstate: NativeEventSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
   constructor(props: LoadedAppClassProps) {
@@ -798,6 +803,11 @@ export class LoadedAppClass extends Component<
 
       mixnetView: INITIAL_MIXNET_VIEW,
       reenableMixnet: this.reenableMixnet,
+      serverHealth: INITIAL_SERVER_HEALTH_VIEW,
+      reportServerProbe: this.reportServerProbe,
+      switchServerFromHealth: this.switchServerFromHealth,
+      returnToDefaultServer: this.returnToDefaultServer,
+      stayOnServer: this.stayOnServer,
       sendPermitNow: this.sendPermitNow,
 
       // state
@@ -827,7 +837,8 @@ export class LoadedAppClass extends Component<
       onBirthdayChanged: this.setBirthday,
       onBirthdayAdjusted: this.noticeBirthdayAdjusted,
       onError: this.setLastError,
-      onPersistentSyncFailure: this.recoverServer,
+      onSyncLaunch: launch => this.health.syncLaunch(launch),
+      onServerAnswer: (uri, answer) => this.health.answer(uri, answer),
       onMixnetViewChanged: this.setMixnetView,
       startMixnetTransport: startMixnetTransport,
       stopMixnetTransport: stopMixnetTransport,
@@ -836,6 +847,12 @@ export class LoadedAppClass extends Component<
       readOnly: props.readOnly,
       server: props.server,
       performanceLevel: DEFAULT_PERFORMANCE_LEVEL,
+    });
+
+    this.health = new ServerHealthMonitor({
+      probe: probeUri,
+      spending: spendInFlight,
+      onChange: this.setServerHealth,
     });
 
     this.appstate = {} as NativeEventSubscription;
@@ -880,6 +897,7 @@ export class LoadedAppClass extends Component<
     }
 
     // Configure the RPC to start doing refreshes
+    this.watchServer();
     await this.rpc.clearTimers();
     await this.rpc.configure();
 
@@ -1032,12 +1050,23 @@ export class LoadedAppClass extends Component<
     if (this.props.pendingLink !== prevProps.pendingLink) {
       this.deliverLink();
     }
+    this.health.setConditions({
+      online: !!this.state.netInfo.isConnected,
+      foreground: this.state.appStateStatus === AppStateStatusEnum.active,
+      network: this.state.netInfo.type ?? '',
+    });
     this.publishReportState();
   };
 
   publishReportState = (): void => {
-    const { server, selectServer, readOnly, lastError, mixnetView } =
-      this.state;
+    const {
+      server,
+      selectServer,
+      readOnly,
+      lastError,
+      mixnetView,
+      serverHealth,
+    } = this.state;
     publishReport({
       served: { kind: 'chosen', server, selectServer },
       session: {
@@ -1047,6 +1076,7 @@ export class LoadedAppClass extends Component<
         sync: this.state.syncingStatus,
         lastError,
         mixnetView,
+        serverHealth,
       },
     });
   };
@@ -1182,6 +1212,7 @@ export class LoadedAppClass extends Component<
 
   componentWillUnmount = async () => {
     clearTimeout(this.openingTimer);
+    this.health.stop();
     publishReport({ session: { kind: 'closed' } });
     await this.rpc.clearTimers();
     this.rpc.stopMixnetPolling();
@@ -1729,6 +1760,7 @@ export class LoadedAppClass extends Component<
       // (DataService etc.) stop using the URI captured at construction.
       this.rpc.setServer(value);
       this.rpc.walletReopened();
+      this.watchServer(value, selectServer);
       await this.rpc.clearTimers();
       await this.rpc.configure();
       return { kind: 'ok' };
@@ -1756,87 +1788,78 @@ export class LoadedAppClass extends Component<
     };
   };
 
+  setServerHealth = (serverHealth: ServerHealthView) => {
+    if (!isEqual(this.state.serverHealth, serverHealth)) {
+      this.setState({ serverHealth });
+    }
+  };
+
+  /** Watches `server`, and the default too while the wallet is elsewhere in Automatic. */
+  watchServer = (
+    server: ServerType = this.state.server,
+    mode: SelectServerEnum = this.state.selectServer,
+  ) => {
+    const home =
+      mode === SelectServerEnum.auto
+        ? defaultServer(this.state.translate, server.chainName)
+        : null;
+    this.health.watch(server, home?.uri ?? null);
+  };
+
+  /** A probe of the open wallet's server made elsewhere, as the options panel's. */
+  reportServerProbe = (
+    uri: string,
+    probe: { latency: number | null; height: string },
+  ) => {
+    this.health.answer(
+      uri,
+      probe.latency === null
+        ? { kind: 'failed', error: `${uri} did not answer` }
+        : {
+            kind: 'answered',
+            latencyMs: probe.latency,
+            height: Number(probe.height) || 0,
+          },
+    );
+  };
+
   /**
-   * Points the open wallet at `next` without reopening it, so the client keeps
-   * its mixnet. The dial is capped: a dead server's changeServer can otherwise
-   * block for minutes (see checkServerURI).
+   * The health sheet's switch: Automatic stays Automatic for this session,
+   * any other mode keeps the server as a list choice. Nothing moves while a
+   * transaction is on its way.
    */
-  moveToServer = async (next: ServerType): Promise<boolean> => {
-    if (next.kind !== 'remote') {
-      return false;
-    }
-    const changed = await Promise.race([
-      changeServer(next.uri).then(result => result.ok),
-      new Promise<boolean>(resolve => setTimeout(() => resolve(false), 15_000)),
-    ]);
-    if (!changed) {
-      return false;
-    }
-    await SettingsFileImpl.writeServer(next, this.state.selectServer);
-    this.setState({ server: next });
-    this.rpc.setServer(next);
-    return true;
-  };
-
-  // Dials each candidate in order and activates the first that connects.
-  activateReachableServer = async (
-    candidates: ServerUrisType[],
-  ): Promise<boolean> => {
-    for (const candidate of candidates) {
-      if (!candidate.uri) {
-        continue;
-      }
-      if (
-        !(await this.moveToServer(
-          remoteServer(candidate.uri, candidate.chainName),
-        ))
-      ) {
-        continue;
-      }
+  switchServerFromHealth = async (next: ServerType): Promise<boolean> => {
+    if (spendInFlight()) {
       this.addLastSnackbar(
-        `${this.state.translate('loadedapp.selectingserverbest') as string} ${candidate.uri}`,
-        SnackbarDurationEnum.long,
+        this.state.translate('server-health.wait-send') as string,
       );
-      return true;
+      return false;
     }
-    return false;
+    const mode =
+      this.state.selectServer === SelectServerEnum.auto
+        ? SelectServerEnum.auto
+        : SelectServerEnum.list;
+    const result = await this.setServerOption(next, mode, true);
+    return result.kind === 'ok';
   };
 
-  // The runtime half of the old boot-time server rescue: after repeated
-  // sync-launch failures, silently activate a working server (live registry
-  // first, then the static list by latency) and reattach the client to it.
-  // Custom and offline modes are exempt: custom users opted out of automatic
-  // selection (Audit Issue S) and offline has no server at all.
-  recoverServer = async (): Promise<void> => {
-    const current = this.state.server;
-    if (
-      this.recoveringServer ||
-      !this.state.netInfo.isConnected ||
-      current.kind === 'offline' ||
-      (this.state.selectServer !== SelectServerEnum.auto &&
-        this.state.selectServer !== SelectServerEnum.list)
-    ) {
+  /** Back on the default server in Automatic, once the user says so. */
+  returnToDefaultServer = async (): Promise<void> => {
+    const home = defaultServer(
+      this.state.translate,
+      this.state.walletChainName,
+    );
+    if (!home || spendInFlight()) {
       return;
     }
-    this.recoveringServer = true;
-    try {
-      const live = otherServers(
-        await fetchServerList(current.chainName),
-        current,
-      );
-      if (await this.activateReachableServer(live)) {
-        return;
-      }
-      const fallback = await selectingServer(
-        staticAlternatives(serverUris(this.state.translate), current),
-      );
-      if (fallback) {
-        await this.activateReachableServer([fallback]);
-      }
-    } finally {
-      this.recoveringServer = false;
-    }
+    await this.setServerOption(
+      remoteServer(home.uri, home.chainName),
+      SelectServerEnum.auto,
+      true,
+    );
   };
+
+  stayOnServer = () => this.health.decline();
 
   setLanguageOption = async (value: string): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.language, value);
@@ -2195,11 +2218,7 @@ export class LoadedAppClass extends Component<
     let message = '';
     for (const entry of entries) {
       const chain = entryChain(entry);
-      const choice = await entryServer(
-        chain,
-        this.state.translate,
-        !!this.state.netInfo.isConnected,
-      );
+      const choice = entryServer(chain);
       const listed = await walletsOnDevice();
       const names = listed.ok ? listed.value.wallets.map(w => w.meta.name) : [];
       const name = entry.name || defaultWalletName(this.state.translate, names);
@@ -2541,6 +2560,11 @@ export class LoadedAppClass extends Component<
       mixnetView: this.state.mixnetView,
       reenableMixnet: this.reenableMixnet,
       sendPermitNow: this.sendPermitNow,
+      serverHealth: this.state.serverHealth,
+      reportServerProbe: this.reportServerProbe,
+      switchServerFromHealth: this.switchServerFromHealth,
+      returnToDefaultServer: this.returnToDefaultServer,
+      stayOnServer: this.stayOnServer,
 
       // scroll signals and wallet actions for the screens
       scrollToTop: this.state.scrollToTop,
@@ -2581,6 +2605,7 @@ export class LoadedAppClass extends Component<
                 <BottomSheetBackHandler />
                 <ConfirmBottomSheet />
                 <WalletsSheet />
+                <ServerHealthSheet />
                 <OptionsPanelProvider>
                   <FadeInOnMount
                     duration={

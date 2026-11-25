@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import type { NavigatorScreenParams } from '@react-navigation/native';
 
 import { OptionsPanelHost } from '@screens/OptionsPanel';
@@ -98,12 +98,13 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     netInfo,
     seedBackedUp,
     zingolibVersion,
+    serverHealth,
+    reportServerProbe,
   } = context;
   const { isOpen, sink } = useOptionsPanel();
 
-  // The Server tile's dot turns red when the server doesn't answer; it is
-  // asked each time the panel opens.
-  const [unreachable, setUnreachable] = useState(false);
+  // The Server tile's dot is the server's health, and the server is asked
+  // each time the panel opens.
   useEffect(() => {
     if (!isOpen || server.kind !== 'remote' || !netInfo.isConnected) {
       return;
@@ -112,13 +113,13 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     (async () => {
       const probe = await probeUri(server.uri);
       if (live) {
-        setUnreachable(probe.latency === null);
+        reportServerProbe(server.uri, probe);
       }
     })();
     return () => {
       live = false;
     };
-  }, [isOpen, server, netInfo.isConnected]);
+  }, [isOpen, server, netInfo.isConnected, reportServerProbe]);
 
   // Audit Issue D: the gates live in the destination screens, at the
   // action that reveals or spends, so no navigation path skips them.
@@ -204,7 +205,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
           /** One more than its neighbours: the cylinder sits inside its box with more margin. */
           size={31}
           noInternet={!netInfo.isConnected}
-          unreachable={unreachable}
+          health={serverHealth.level}
           offline={isOffline}
           background={themeTokens.bgSurface}
         />
@@ -220,7 +221,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     seedBackedUp,
     server,
     netInfo,
-    unreachable,
+    serverHealth.level,
   ]);
 
   const socials = useMemo<OptionsPanelSocial[]>(
