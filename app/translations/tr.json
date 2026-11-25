@@ -1215,6 +1215,7 @@
     "regtest-label": "Regtest sunucunuz",
     "test": "Dene",
     "not-responding": "Yanıt vermiyor",
+    "behind": "Geride (-{n} blok)",
     "server-unreachable": "Bu sunucu yanıt vermiyor",
     "offline": "Çevrimdışı",
     "offline-sub": "Hiçbir sunucuya bağlanma.",

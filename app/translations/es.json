@@ -1215,6 +1215,7 @@
     "regtest-label": "Tu servidor regtest",
     "test": "Probar",
     "not-responding": "No responde",
+    "behind": "Atrasado (-{n} bloques)",
     "server-unreachable": "Este servidor no responde",
     "offline": "Sin conexión",
     "offline-sub": "No conectar con ningún servidor.",

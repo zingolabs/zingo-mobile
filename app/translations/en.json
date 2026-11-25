@@ -1215,6 +1215,7 @@
     "regtest-label": "Your regtest server",
     "test": "Test",
     "not-responding": "Not responding",
+    "behind": "Behind (-{n} blocks)",
     "server-unreachable": "This server isn't responding",
     "offline": "Offline",
     "offline-sub": "Don't connect to any server.",

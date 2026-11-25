@@ -1215,6 +1215,7 @@
     "regtest-label": "Ваш сервер regtest",
     "test": "Проверить",
     "not-responding": "Не отвечает",
+    "behind": "Отстаёт (-{n} блоков)",
     "server-unreachable": "Этот сервер не отвечает",
     "offline": "Офлайн",
     "offline-sub": "Не подключаться ни к какому серверу.",

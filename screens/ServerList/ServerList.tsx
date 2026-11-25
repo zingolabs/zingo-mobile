@@ -13,12 +13,15 @@ import ServerRow, {
   useLift,
 } from '@screens/Server/ServerRow';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
+import { blocksBehind } from '@app/services/serverHealth';
 
 type ServerListProps = {
   translate: (key: string) => TranslateType;
   servers: ServerUrisType[];
   loading: boolean;
   latencies: Record<string, number | null>;
+  /** The block each server gave, to mark the ones behind the tip. */
+  heights?: Record<string, number>;
   selectedUri: string | null;
   busy: boolean;
   onPick: (server: ServerUrisType) => void;
@@ -39,6 +42,7 @@ const ServerList: React.FunctionComponent<ServerListProps> = ({
   servers,
   loading,
   latencies,
+  heights = {},
   selectedUri,
   busy,
   onPick,
@@ -49,6 +53,8 @@ const ServerList: React.FunctionComponent<ServerListProps> = ({
   const [shakes, setShakes] = useState<Record<string, number>>({});
   const { lift, onLayout } = useLift(placement, BODY_TOP);
   const { edges, fades } = useScrollEdges();
+  /** The highest block any server here gave. */
+  const tip = Math.max(0, ...Object.values(heights));
 
   return (
     <View style={{ flex: 1 }} onLayout={onLayout}>
@@ -79,6 +85,14 @@ const ServerList: React.FunctionComponent<ServerListProps> = ({
                 testID={`serverlist.pick.${hostOf(s.uri)}`}
                 first={i === 0}
                 title={hostOf(s.uri)}
+                note={
+                  blocksBehind(heights[s.uri] ?? 0, tip) > 0
+                    ? (translate('server.behind') as string).replace(
+                        '{n}',
+                        String(blocksBehind(heights[s.uri] ?? 0, tip)),
+                      )
+                    : undefined
+                }
                 sub={s.region}
                 selected={selectedUri === s.uri}
                 disabled={busy}
