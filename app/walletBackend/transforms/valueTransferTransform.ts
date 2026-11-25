@@ -2,15 +2,16 @@ import { ValueTransferType, ValueTransferKindEnum } from '@app/AppState';
 import { RPCValueTransferType } from '@app/walletBackend/types/RPCValueTransferType';
 import { RPCValueTransfersKindEnum } from '@app/walletBackend/enums/RPCValueTransfersKindEnum';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { knownTip } from '@app/walletBackend/utils/knownTip';
 
 /**
  * Maps a raw zingolib value transfer to the app's ValueTransferType.
  *
  * Pure function — no side effects, safe to call in `.map()`.
  *
- * Confirmation count is derived from block heights: server height is preferred
- * when it is ahead of the wallet height (mid-sync), otherwise wallet height is
- * used. Unconfirmed/mempool/failed transfers always get confirmations = 0.
+ * Confirmation count is derived from the known tip (see knownTip), never below
+ * 1 for a confirmed transfer. Unconfirmed/mempool/failed transfers always get
+ * confirmations = 0.
  * Amounts and fees are converted from zats (integer) to ZEC (÷ 10^8).
  */
 export function transformValueTransfer(
@@ -49,10 +50,12 @@ export function transformValueTransfer(
   ) {
     result.confirmations = 0;
   } else if (vt.status === RPCValueTransfersStatusEnum.confirmed) {
-    result.confirmations =
-      lastServerBlockHeight && lastServerBlockHeight >= lastWalletBlockHeight
-        ? lastServerBlockHeight - vt.blockheight + 1
-        : lastWalletBlockHeight - vt.blockheight + 1;
+    result.confirmations = Math.max(
+      1,
+      knownTip(lastServerBlockHeight, lastWalletBlockHeight) -
+        vt.blockheight +
+        1,
+    );
   } else {
     // impossible case... I guess.
     result.confirmations = 0;

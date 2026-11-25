@@ -53,13 +53,13 @@ export class SyncCoordinator {
   }
 
   async configure(): Promise<void> {
+    await this.dataService.fetchWalletHeight();
     await this.dataService.fetchTandZandOValueTransfers();
     await this.dataService.fetchAddresses();
     await this.dataService.fetchTotalBalance();
     await this.dataService.fetchInfoAndServerHeight();
     await this.dataService.fetchZingolibVersion();
     await this.dataService.fetchTandZandOMessages();
-    await this.dataService.fetchWalletHeight();
     await this.dataService.fetchWalletBirthdaySeedUfvk();
 
     if (!this.updateTimerID) {
