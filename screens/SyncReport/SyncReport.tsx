@@ -64,6 +64,8 @@ import {
 import { themeTokens } from '@app/theme';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { useCompact } from '@app/hooks/useCompact';
+import { useSyncFreshness } from '@app/hooks/lastSynced';
+import { knownTip } from '@app/walletBackend/utils/knownTip';
 
 const SIDE = space20;
 const SOFT_INK = themeTokens.fgMuted;
@@ -172,7 +174,16 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const toggle = (next: 'server' | 'wallet' | null) =>
     setFocus(prev => (next === null || prev === next ? null : next));
 
-  const serverTip = chainTip(syncingStatus, birthday, info.latestBlock || 0);
+  const freshness = useSyncFreshness();
+  const liveTip = info.latestBlock || 0;
+  /** The server gave no height, and the one zingolib kept from the last sync stands in. */
+  const lastKnown =
+    !syncingStatus.total_blocks && liveTip === 0 && freshness.walletHeight > 0;
+  const serverTip = chainTip(
+    syncingStatus,
+    birthday,
+    knownTip(liveTip, freshness.walletHeight),
+  );
   const synced = !syncInProgress && percentageOutputsScanned > 0;
   const pct = synced ? 100 : Math.floor(percentageOutputsScanned);
   const h = heights(syncingStatus, birthday, serverTip, synced);
@@ -279,10 +290,15 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const sub = !netInfo.isConnected
     ? (translate('sync.offline') as string)
     : synced
-      ? fill(translate('sync.both-at') as string, {
-          tip: formatInteger(serverTip),
-        })
-      : fill(translate('sync.at') as string, {
+      ? fill(
+          translate(
+            lastKnown ? 'sync.both-at-known' : 'sync.both-at',
+          ) as string,
+          {
+            tip: formatInteger(serverTip),
+          },
+        )
+      : fill(translate(lastKnown ? 'sync.at-known' : 'sync.at') as string, {
           wallet: formatInteger(h.wallet),
           tip: formatInteger(serverTip),
         });
@@ -535,7 +551,13 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                     }}
                   />
                   <Text variant="caption" tone="muted">
-                    {translate(t.key) as string}
+                    {
+                      translate(
+                        t.key === 'sync.server' && lastKnown
+                          ? 'sync.server-known'
+                          : t.key,
+                      ) as string
+                    }
                   </Text>
                 </View>
                 <Text
@@ -618,9 +640,12 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                 fill={CODE_INK}
                 textAnchor="end"
               >
-                {fill(translate('sync.tip-at') as string, {
-                  n: formatInteger(serverTip),
-                })}
+                {fill(
+                  translate(
+                    lastKnown ? 'sync.tip-known' : 'sync.tip-at',
+                  ) as string,
+                  { n: formatInteger(serverTip) },
+                )}
               </SvgText>
             </Svg>
             {/* Over the chart: the wallet's green bar sits on the server's blue one. */}
