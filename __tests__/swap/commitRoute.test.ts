@@ -250,9 +250,23 @@ describe('SwapService.commitRoute purchase destination', () => {
     expect(record.destinationAddress).toBe('t1ephemeral');
   });
 
-  it('Tests that the order keeps the transparent address when the provider is not Maya', async () => {
-    const { committed, newShieldedAddress } = commitPurchase({
+  it('Tests that the order names a new unified address when NEAR buys, even from Bitcoin', async () => {
+    const { committed, swap } = commitPurchase({
+      sellAsset: BTC,
       provider: SwapKitProviderEnum.Near,
+    });
+    const { record, ordered } = await committed;
+
+    expect(swap).toHaveBeenCalledWith(
+      expect.objectContaining({ destinationAddress: UA }),
+    );
+    expect(record.destinationAddress).toBe(UA);
+    expect(ordered.sourceAddress).toBe('0xrefund');
+  });
+
+  it('Tests that the order keeps the transparent address when the provider is THORChain', async () => {
+    const { committed, newShieldedAddress } = commitPurchase({
+      provider: SwapKitProviderEnum.ThorchainStreaming,
     });
     const { record } = await committed;
 
@@ -298,6 +312,83 @@ describe('SwapService.commitRoute purchase destination', () => {
 
     await expect(committed).rejects.toThrow('503');
     expect(swap).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('SwapService.commitRoute sale refund', () => {
+  const commitSale = (
+    provider: SwapKitProviderEnum,
+    newShieldedAddress: jest.Mock,
+  ) => {
+    const swap = jest.fn(async () => ({
+      tx: { to: 't1deposit' },
+      inboundAddress: 't1deposit',
+    }));
+    const service = new SwapService({
+      client: { swap } as unknown as SwapKitClient,
+      registry: createDefaultProviderRegistry(),
+      store: {
+        getByRecordId: async () => null,
+        upsert: jest.fn(async () => undefined),
+      } as unknown as typeof SwapStore,
+      poller: { start: jest.fn() } as unknown as SwapPoller,
+      tokenCatalog: null as unknown as TokenCatalog,
+      newShieldedAddress,
+    });
+    const committed = service.commitRoute({
+      quoteInput: {
+        sellAsset: ZEC,
+        receiveAsset: BTC,
+        sellAmountHumanDecimal: '0.05',
+        sourceAddress: 't1ephemeral',
+        destinationAddress: 'bc1qdestination',
+      },
+      chosenRoute: {
+        routeId: 'route-1',
+        provider,
+        expectedReceiveAmount: '0.0005',
+        minReceiveAmount: '0.00049',
+      },
+      direction: SwapDirectionEnum.Outbound,
+      fiatValueBasis: {
+        sellUsdUnitPrice: 1000,
+        receiveUsdUnitPrice: 100000,
+        capturedAt: 0,
+      },
+    });
+    return { committed, swap };
+  };
+
+  it('Tests that a NEAR sale names a new unified address as the refund when the wallet makes one', async () => {
+    const { committed, swap } = commitSale(
+      SwapKitProviderEnum.Near,
+      jest.fn(async () => 'u1refund'),
+    );
+    const { record, ordered } = await committed;
+
+    expect(swap).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sourceAddress: 'u1refund',
+        destinationAddress: 'bc1qdestination',
+      }),
+    );
+    expect(ordered.sourceAddress).toBe('u1refund');
+    expect(record.refundAddress).toBe('u1refund');
+    expect(record.sourceAddress).toBe('t1ephemeral');
+  });
+
+  it('Tests that a NEAR sale keeps the transparent refund when the wallet makes no address', async () => {
+    const { committed, swap } = commitSale(
+      SwapKitProviderEnum.Near,
+      jest.fn(async () => {
+        throw new Error('wallet busy');
+      }),
+    );
+    const { record, ordered } = await committed;
+
+    expect(swap).toHaveBeenCalledTimes(1);
+    expect(ordered.sourceAddress).toBe('t1ephemeral');
+    expect(record.refundAddress).toBeUndefined();
   });
 });
 

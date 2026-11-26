@@ -18,7 +18,20 @@ describe('routeIsShielded', () => {
     ).toBe(true);
   });
 
-  it('Tests that a purchase is not shielded when paid with BTC or DASH, or through another provider', () => {
+  it('Tests that a NEAR purchase lands shielded when paid from any chain', () => {
+    for (const sellChain of ['ETH', 'BTC']) {
+      expect(
+        routeIsShielded({
+          provider: SwapKitProviderEnum.Near,
+          direction: buy,
+          sellChain,
+          shieldedMemoOn: false,
+        }),
+      ).toBe(true);
+    }
+  });
+
+  it('Tests that a purchase is not shielded when Maya is paid with BTC or DASH, or through THORChain', () => {
     for (const sellChain of ['BTC', 'DASH']) {
       expect(
         routeIsShielded({
@@ -31,7 +44,7 @@ describe('routeIsShielded', () => {
     }
     expect(
       routeIsShielded({
-        provider: SwapKitProviderEnum.Near,
+        provider: SwapKitProviderEnum.ThorchainStreaming,
         direction: buy,
         sellChain: 'ETH',
         shieldedMemoOn: true,
@@ -43,6 +56,17 @@ describe('routeIsShielded', () => {
     const sale = { provider: maya, direction: sell, sellChain: 'ZEC' };
     expect(routeIsShielded({ ...sale, shieldedMemoOn: true })).toBe(true);
     expect(routeIsShielded({ ...sale, shieldedMemoOn: false })).toBe(false);
+  });
+
+  it('Tests that a NEAR sale refunds shielded whatever mayanode says', () => {
+    expect(
+      routeIsShielded({
+        provider: SwapKitProviderEnum.Near,
+        direction: sell,
+        sellChain: 'ZEC',
+        shieldedMemoOn: false,
+      }),
+    ).toBe(true);
   });
 });
 

@@ -251,8 +251,10 @@ export {
 } from './rateLimited';
 export {
   chainCarriesShieldedPurchase,
+  ordersShieldedRefund,
   paysPurchaseShielded,
   routeIsShielded,
+  shieldedPool,
   swapAddressOf,
 } from './shieldedPurchase';
 export { fetchMayaShieldedMemoTarget } from './mayaShieldedMemo';

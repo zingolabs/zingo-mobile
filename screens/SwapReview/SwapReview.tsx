@@ -175,8 +175,8 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
       depositSpendsSourceAddress(depositRequest(committed.instructions));
     const named = orderNamesEphemeral({
       isOutbound,
-      quotedDestination: quoteInput.destinationAddress,
-      orderedDestination: committed.record.destinationAddress,
+      quoted: quoteInput,
+      ordered: committed.ordered,
     });
     if (named && !claimedByDeposit) {
       const reserved = await reserveRefundAddress();
