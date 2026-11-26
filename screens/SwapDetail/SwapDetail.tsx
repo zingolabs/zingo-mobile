@@ -241,7 +241,7 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
       },
       { pop: true },
     );
-  /** The new unified address a Maya swap used: where a purchase landed, or a sale's refund. */
+  /** The new unified address the swap used: where a purchase landed, or a sale's refund. */
   const shieldedAddress = swapAddressOf(record);
   const depositMemo = depositMemoOf(record);
   const rows: DetailRow[] = [

@@ -12,6 +12,7 @@ import {
   canonicalChainAddress,
   formatAmountForDisplay,
   swapAddressOf,
+  shieldedPool,
 } from '@app/swap';
 import Utils from '@app/utils';
 import { leaveFlow } from '@app/navigation/navigate';
@@ -75,7 +76,7 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
     record.receiveAsset.ticker ?? record.receiveAsset.symbol;
   const received = record.actualReceiveAmount ?? record.expectedReceiveAmount;
   const transparentFunds = (totalBalance?.totalTransparentBalance ?? 0) > 0;
-  /** Maya paid the purchase to a new unified address: nothing to shield. */
+  /** The purchase was paid to a new unified address: nothing to shield. */
   const arrivedShielded = !isOutbound && !!swapAddressOf(record);
   const shieldAfter = !isOutbound && transparentFunds && !arrivedShielded;
   const refund = record.refundInfo;
@@ -215,7 +216,10 @@ const SwapResult: React.FunctionComponent<SwapResultProps> = ({
                 who,
               )
             : arrivedShielded
-              ? (translate('swap.result-in-sapling') as string)
+              ? (translate('swap.result-in-pool') as string).replace(
+                  '{pool}',
+                  shieldedPool(record.provider),
+                )
               : transparentFunds
                 ? ''
                 : (translate('swap.result-in-your-wallet') as string),

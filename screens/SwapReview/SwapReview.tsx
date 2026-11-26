@@ -23,6 +23,7 @@ import {
   renderSwapText,
   zecNetworkFeeReserve,
   swapAddressOf,
+  shieldedPool,
 } from '@app/swap';
 import type { DepositInstructionsType } from '@app/swap';
 import { reserveRefundAddress } from '@app/walletBackend';
@@ -406,7 +407,9 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
                         ? 'swap.tip-get-shielded'
                         : 'swap.tip-get-transparent',
                     ) as string
-                  ).replace('{provider}', providerShortLabel(chosen.provider)),
+                  )
+                    .replace('{provider}', providerShortLabel(chosen.provider))
+                    .replace('{pool}', shieldedPool(chosen.provider)),
                 },
             {
               label: translate('swap.review-fees') as string,

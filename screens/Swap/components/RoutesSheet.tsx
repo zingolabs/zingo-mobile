@@ -212,11 +212,16 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
                         '{coin}',
                         payCoin,
                       )
-                    : (translate(
-                        shieldedNote === 'refund'
-                          ? 'swap.routes-shielded-refund-note'
-                          : 'swap.routes-shielded-note',
-                      ) as string)
+                    : (
+                        translate(
+                          shieldedNote === 'refund'
+                            ? 'swap.routes-shielded-refund-note'
+                            : 'swap.routes-shielded-note',
+                        ) as string
+                      ).replace(
+                        '{tag}',
+                        translate('swap.routes-shielded') as string,
+                      )
                 }
               />
             </View>
