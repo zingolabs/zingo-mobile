@@ -86,8 +86,10 @@ zingodisclosure@proton.me
 - A Maya deposit is paid in one shielded transaction, with its memo in a 0 ZEC note to Maya's memo
   address, when Maya takes it; otherwise, and for THORChain, the memo rides in an OP_RETURN after a
   deshield. A deposit whose second transaction did not go out is finished by Try Again
-- A Maya purchase lands shielded when its memo can carry a unified address, and a Maya sale's refund
-  comes back shielded
+- A Maya purchase lands shielded, in Sapling, when its memo can carry a unified address, and a Maya
+  sale's refund comes back shielded
+- A NEAR purchase lands shielded, in Ironwood, from any chain, and a NEAR sale's refund goes to a new
+  unified address
 - An expired purchase is still watched for a late payment
 - The addresses made for swaps have their own group in Receive
 - When the swap service is busy (it rate-limits the app's key), quotes pause with a countdown and resume
