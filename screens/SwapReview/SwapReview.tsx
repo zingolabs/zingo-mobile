@@ -12,7 +12,6 @@ import {
   SwapDirectionEnum,
   canonicalChainAddress,
   commitRefusalCondemnsRoute,
-  depositCarriesMemo,
   depositSpendsSourceAddress,
   describeCommitFailure,
   formatAmountForDisplay,
@@ -21,6 +20,7 @@ import {
   providerRequiresMemo,
   providerShortLabel,
   renderSwapText,
+  saleTransactionCount,
   zecNetworkFeeReserve,
   swapAddressOf,
   shieldedPool,
@@ -39,11 +39,9 @@ import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
 import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
 import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import PairHero from '@screens/Swap/components/PairHero';
-import NymNote from '@screens/Swap/components/NymNote';
 import DetailRows from '@screens/Swap/components/DetailRows';
 import { routeFeeValue } from '@screens/Swap/routeFeeValue';
 import { useShieldedRoutes } from '@screens/Swap/useShieldedRoutes';
-import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import { formatSlippagePercent } from '@screens/Swap/components/SwapSettingsSheet';
 import { formatAmount, formatUsd } from '@app/utils/formatAmount';
 
@@ -134,7 +132,11 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
    */
   const memoAckNeeded = paysWithMemo && isTokenAsset(quoteInput.sellAsset);
   const slippage = quoteInput.slippageBps ?? 0;
-  const feeReserve = isOutbound ? zecNetworkFeeReserve(chosen.provider) : 0;
+  /** Selling through Maya, a shielded route means Maya takes the memo in a shielded note. */
+  const saleTransactions = saleTransactionCount(chosen.provider, shielded);
+  const feeReserve = isOutbound
+    ? zecNetworkFeeReserve(chosen.provider, shielded)
+    : 0;
   // Inbound, the far side is the source: where the sold asset returns.
   const address = isOutbound
     ? quoteInput.destinationAddress
@@ -348,11 +350,12 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
       footer={footer}
     >
       <PairHero
-        from={quoteInput.sellAsset}
-        to={quoteInput.receiveAsset}
         processing={
           isOutbound
-            ? (translate('send.nym-processing-title') as string)
+            ? {
+                label: translate('send.nym-processing-title') as string,
+                note: translate('swap.review-nym-note') as string,
+              }
             : undefined
         }
         title={(
@@ -360,57 +363,54 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
             isOutbound ? 'swap.review-swap-to' : 'swap.review-swap-from',
           ) as string
         ).replace('{coin}', isOutbound ? receiveSymbol : sellSymbol)}
-        amount={`≈ ${formatAmountForDisplay(chosen.expectedReceiveAmount)}`}
-        unit={receiveSymbol}
-        line={[
-          (translate('swap.review-for') as string).replace(
-            '{amount}',
-            `${formatAmountForDisplay(quoteInput.sellAmountHumanDecimal)} ${sellSymbol}`,
-          ),
+        sent={{
+          asset: quoteInput.sellAsset,
+          label: translate('swap.you-send') as string,
+          amount: formatAmountForDisplay(quoteInput.sellAmountHumanDecimal),
+          unit: sellSymbol,
+        }}
+        received={{
+          asset: quoteInput.receiveAsset,
+          label: translate('swap.you-receive') as string,
+          amount: `≈ ${formatAmountForDisplay(chosen.expectedReceiveAmount)}`,
+          unit: receiveSymbol,
+        }}
+        fiat={
           fiatValueBasis.receiveUsdUnitPrice > 0 && Number.isFinite(receiveUsd)
             ? `≈ ${formatUsd(receiveUsd)}`
-            : '',
-        ]
-          .filter(Boolean)
-          .join(' · ')}
+            : ''
+        }
       />
       <View style={{ marginTop: 24 }}>
         <DetailRows
           rows={[
-            {
-              label: translate('swap.you-send') as string,
-              value: `${formatAmountForDisplay(quoteInput.sellAmountHumanDecimal)} ${sellSymbol}`,
-            },
-            isOutbound
-              ? {
-                  label: translate('swap.review-min') as string,
-                  value: minReceive,
-                  tone: 'positive' as const,
-                  tip: (translate('swap.tip-min') as string).replace(
-                    '{coin}',
-                    sellSymbol,
-                  ),
-                }
-              : {
-                  label: translate('swap.review-you-get') as string,
-                  value: translate(
-                    shielded
-                      ? 'swap.review-get-shielded'
-                      : 'swap.review-get-transparent',
-                  ) as string,
-                  leading: shielded ? (
-                    <ShieldIcon size={iconSizeSm} color={colors.fgAccent} />
-                  ) : undefined,
-                  tip: (
-                    translate(
+            ...(isOutbound
+              ? []
+              : [
+                  {
+                    label: translate('swap.review-you-get') as string,
+                    value: translate(
                       shielded
-                        ? 'swap.tip-get-shielded'
-                        : 'swap.tip-get-transparent',
-                    ) as string
-                  )
-                    .replace('{provider}', providerShortLabel(chosen.provider))
-                    .replace('{pool}', shieldedPool(chosen.provider)),
-                },
+                        ? 'swap.review-get-shielded'
+                        : 'swap.review-get-transparent',
+                    ) as string,
+                    leading: shielded ? (
+                      <ShieldIcon size={iconSizeSm} color={colors.fgAccent} />
+                    ) : undefined,
+                    tip: (
+                      translate(
+                        shielded
+                          ? 'swap.tip-get-shielded'
+                          : 'swap.tip-get-transparent',
+                      ) as string
+                    )
+                      .replace(
+                        '{provider}',
+                        providerShortLabel(chosen.provider),
+                      )
+                      .replace('{pool}', shieldedPool(chosen.provider)),
+                  },
+                ]),
             {
               label: translate('swap.review-fees') as string,
               value: feeValue,
@@ -422,7 +422,7 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
                     label: translate('swap.review-zcash-fee') as string,
                     value: `${formatAmount(feeReserve)} ${info.currencyName} · ${
                       translate(
-                        depositCarriesMemo(chosen.provider)
+                        saleTransactions === 2
                           ? 'swap.review-two-tx'
                           : 'swap.review-one-tx',
                       ) as string
@@ -445,47 +445,34 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
               : []),
             {
               label: translate('swap.review-arrives') as string,
-              value: [
-                chosen.estimatedTimeText ?? '',
-                providerShortLabel(chosen.provider),
-              ]
-                .filter(Boolean)
-                .join(' · '),
+              value: chosen.estimatedTimeText || '—',
               tip: isOutbound
                 ? undefined
                 : (translate('swap.tip-arrives') as string)
                     .replace('{min}', minReceive)
                     .replace('{sellCoin}', sellSymbol),
             },
-            ...(isOutbound
-              ? []
-              : [
+            {
+              label: translate('swap.provider') as string,
+              value: providerShortLabel(chosen.provider),
+            },
+            ...(paysWithMemo
+              ? [
                   {
                     label: translate('swap.review-how-you-pay') as string,
-                    value: translate(
-                      paysWithMemo
-                        ? 'swap.pay-address-memo'
-                        : 'swap.pay-address-only',
-                    ) as string,
-                    tone: paysWithMemo ? ('warning' as const) : undefined,
+                    value: translate('swap.pay-address-memo') as string,
+                    tone: 'warning' as const,
                   },
-                ]),
+                ]
+              : []),
             {
               label: translate(
                 isOutbound ? 'swap.review-to' : 'swap.refund-address',
               ) as string,
               value: contact
-                ? `${contact.label}  ${Utils.trimToSmall(address ?? '', 6)}`
+                ? contact.label
                 : Utils.trimToSmall(address ?? '', 6),
               mono: !contact,
-              leading: contact ? (
-                <Avatar
-                  kind="contact"
-                  name={contact.label}
-                  category={avatarCategoryOf(contact.color)}
-                  size="md"
-                />
-              ) : undefined,
             },
             {
               label: translate('swap.slippage') as string,
@@ -501,6 +488,7 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
                         ? 'swap.review-refund-new-shielded'
                         : 'swap.review-refund-new-address',
                     ) as string,
+                    tone: 'muted' as const,
                   },
                 ]
               : []),
@@ -520,15 +508,6 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
         <Text variant="caption" tone="muted" style={{ flexShrink: 1 }}>
           {translate('swap.review-price-fixed') as string}
         </Text>
-      </View>
-      <View style={{ marginTop: 16 }}>
-        {isOutbound ? (
-          <NymNote text={translate('swap.review-nym-note') as string} />
-        ) : (
-          <Text variant="caption" tone="muted" style={{ textAlign: 'center' }}>
-            {translate('swap.review-next-address') as string}
-          </Text>
-        )}
       </View>
     </SwapFlowScreen>
   );

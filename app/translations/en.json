@@ -984,7 +984,7 @@
     "tip-get-transparent": "With {provider} your ZEC arrives in the transparent pool. Shield it afterwards to make it private.",
     "tip-arrives": "The price can move while the swap runs. You never get less than {min}. If that can’t be met, your {sellCoin} comes back.",
     "tip-fees": "What the network and the exchange service charge. It’s already taken out of what you get.",
-    "tip-net": "With NEAR it’s one transaction. With Maya or THORChain it’s two: first the ZEC leaves your private balance, then it pays with the memo.",
+    "tip-net": "With NEAR, or with Maya when its memo goes in a shielded note, it’s one transaction. With THORChain or Flashnet it’s two: first the ZEC leaves your private balance, then it pays from a transparent address.",
     "tip-exact": "The service looks for this exact amount to recognize your payment. A different amount can take longer or be refunded.",
     "assets-on-network": "On that network",
     "routes-sub": "Best price first. Prices refresh every 20 seconds.",

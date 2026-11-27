@@ -984,7 +984,7 @@
     "tip-get-transparent": "{provider} ile ZEC’iniz şeffaf havuza gelir. Gizli kılmak için sonra koruyun.",
     "tip-arrives": "Takas sürerken fiyat oynayabilir. Asla {min} miktarından azını almazsınız. Karşılanamazsa {sellCoin}’iniz geri döner.",
     "tip-fees": "Ağın ve takas hizmetinin aldığı ücret. Aldığınız tutardan zaten düşülmüştür.",
-    "tip-net": "NEAR ile tek işlemdir. Maya veya THORChain ile iki işlemdir: önce ZEC gizli bakiyenizden çıkar, sonra notla ödeme yapılır.",
+    "tip-net": "NEAR ile ya da notu korumalı bir notta giden Maya ile tek işlemdir. THORChain veya Flashnet ile iki işlemdir: önce ZEC gizli bakiyenizden çıkar, sonra şeffaf bir adresten ödeme yapılır.",
     "tip-exact": "Hizmet ödemenizi tanımak için tam bu tutarı arar. Farklı bir tutar daha uzun sürebilir ya da iade edilebilir.",
     "assets-on-network": "O ağda",
     "routes-sub": "Önce en iyi fiyat. Fiyatlar her 20 saniyede yenilenir.",
