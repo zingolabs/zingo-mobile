@@ -90,6 +90,7 @@ zingodisclosure@proton.me
   sale's refund comes back shielded
 - A NEAR purchase lands shielded, in Ironwood, from any chain, and a NEAR sale's refund goes to a new
   unified address
+- When SwapKit refuses the unified address, the swap goes ahead with the transparent one
 - An expired purchase is still watched for a late payment
 - The addresses made for swaps have their own group in Receive
 - When the swap service is busy (it rate-limits the app's key), quotes pause with a countdown and resume
