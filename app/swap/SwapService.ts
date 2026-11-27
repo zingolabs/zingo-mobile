@@ -322,46 +322,57 @@ export class SwapService {
     const { quoteInput, chosenRoute, direction, fiatValueBasis } = args;
     const executor = this.registry.get(chosenRoute.provider);
 
-    const { swapResponse, ordered } = await this.order(args);
-    const { destinationAddress } = ordered;
-
-    // Maya may take the memo in a shielded note: SwapKit names the address
-    // for a shielded source, and mayanode says whether it is on for the vault.
+    /** Maya takes the memo in a shielded note only while mayanode has it on for the vault. */
     const shieldedMemoTarget =
       chosenRoute.provider === SwapKitProviderEnum.MayachainStreaming &&
       quoteInput.sellAsset.chain === 'ZEC'
         ? await fetchMayaShieldedMemoTarget()
         : null;
-    const namedBySwapKit = shieldedMemoAddressFromSwap(swapResponse);
-    /** A shielded memo has room for a unified address: the refund comes back shielded. */
-    const shieldedRefund =
-      shieldedMemoTarget && this.newShieldedAddress
-        ? await this.newShieldedAddress().catch(error => {
-            console.error(
-              `SwapService: no shielded address for the refund ${error}`,
-            );
-            return undefined;
-          })
-        : undefined;
+    const extract = (
+      swapResponse: SwapResponseType,
+      ordered: OrderedAddresses,
+    ) => {
+      const namedBySwapKit = shieldedMemoAddressFromSwap(swapResponse);
+      return executor.extractDepositInstructions({
+        swapResponse,
+        shieldedMemoTarget:
+          shieldedMemoTarget && namedBySwapKit
+            ? { ...shieldedMemoTarget, unifiedAddress: namedBySwapKit }
+            : shieldedMemoTarget,
+        sellAsset: quoteInput.sellAsset,
+        receiveAsset: quoteInput.receiveAsset,
+        sellAmountHumanDecimal: quoteInput.sellAmountHumanDecimal,
+        destinationAddress: ordered.destinationAddress,
+        sourceAddress: ordered.sourceAddress,
+      });
+    };
 
-    const instructions = executor.extractDepositInstructions({
-      swapResponse,
-      shieldedMemoTarget:
-        shieldedMemoTarget && namedBySwapKit
-          ? { ...shieldedMemoTarget, unifiedAddress: namedBySwapKit }
-          : shieldedMemoTarget,
-      sellAsset: quoteInput.sellAsset,
-      receiveAsset: quoteInput.receiveAsset,
-      sellAmountHumanDecimal: quoteInput.sellAmountHumanDecimal,
-      destinationAddress,
-      sourceAddress: shieldedRefund ?? quoteInput.sourceAddress,
-    });
+    let { swapResponse, ordered } = await this.order(
+      args,
+      !!shieldedMemoTarget,
+    );
+    let instructions = extract(swapResponse, ordered);
+    /** A Maya memo naming a unified refund fits only a shielded note, never an OP_RETURN. */
+    if (
+      shieldedMemoTarget &&
+      ordered.sourceAddress !== quoteInput.sourceAddress &&
+      !instructions.shieldedMemoAddress
+    ) {
+      ordered = {
+        sourceAddress: quoteInput.sourceAddress,
+        destinationAddress: ordered.destinationAddress,
+      };
+      swapResponse = await this.client.swap({
+        routeId: chosenRoute.routeId,
+        ...ordered,
+      });
+      instructions = extract(swapResponse, ordered);
+    }
+    const { destinationAddress } = ordered;
     const refundAddress =
       ordered.sourceAddress !== quoteInput.sourceAddress
         ? ordered.sourceAddress
-        : shieldedRefund && instructions.shieldedMemoAddress
-          ? shieldedRefund
-          : undefined;
+        : undefined;
 
     const now = Date.now();
     const initialStatus =
@@ -416,11 +427,14 @@ export class SwapService {
 
   /**
    * Builds the order. A purchase that can land shielded goes to a new unified
-   * address, and a NEAR sale names one for the refund. The route quoted with
+   * address, and a sale that can refund shielded names one for the refund. The route quoted with
    * the transparent address takes it at `/v3/swap`. Where Maya's memo would
    * not fit, or no address could be made, the order keeps the quoted pair.
    */
-  private async order(args: CommitRouteArgs): Promise<{
+  private async order(
+    args: CommitRouteArgs,
+    shieldedMemoOn: boolean,
+  ): Promise<{
     swapResponse: SwapResponseType;
     ordered: OrderedAddresses;
   }> {
@@ -440,6 +454,7 @@ export class SwapService {
       provider: chosenRoute.provider,
       direction,
       sellChain: quoteInput.sellAsset.chain,
+      shieldedMemoOn,
     };
     const purchase = paysPurchaseShielded(route);
     const unified =

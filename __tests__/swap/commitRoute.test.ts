@@ -11,6 +11,7 @@ import type { SwapRecordType } from '@app/swap/types/SwapRecordType';
 import { SwapStatusEnum } from '@app/swap/enums/SwapStatusEnum';
 import { SwapKitHttpError } from '@app/swap/errors';
 import { SwapOperationEnum } from '@app/swap/enums/SwapErrorCategoryEnum';
+import * as mayaShieldedMemo from '@app/swap/mayaShieldedMemo';
 
 const ZEC: SwapAssetType = {
   swapKitId: 'ZEC.ZEC',
@@ -319,11 +320,11 @@ describe('SwapService.commitRoute sale refund', () => {
   const commitSale = (
     provider: SwapKitProviderEnum,
     newShieldedAddress: jest.Mock,
-  ) => {
-    const swap = jest.fn(async () => ({
+    swap: jest.Mock = jest.fn(async () => ({
       tx: { to: 't1deposit' },
       inboundAddress: 't1deposit',
-    }));
+    })),
+  ) => {
     const service = new SwapService({
       client: { swap } as unknown as SwapKitClient,
       registry: createDefaultProviderRegistry(),
@@ -375,6 +376,85 @@ describe('SwapService.commitRoute sale refund', () => {
     expect(ordered.sourceAddress).toBe('u1refund');
     expect(record.refundAddress).toBe('u1refund');
     expect(record.sourceAddress).toBe('t1ephemeral');
+  });
+
+  const mayaSwap = () =>
+    jest.fn(async (params: { sourceAddress: string }) => ({
+      inboundAddress: 't1vault',
+      memo: params.sourceAddress.startsWith('u1')
+        ? '=:e:0xdest/' + params.sourceAddress + ':0/3/0'
+        : '=:e:0xdest:0/3/0',
+      ...(params.sourceAddress.startsWith('u1') && {
+        shieldedMemo: { unifiedAddress: 'u1memo' },
+      }),
+    }));
+
+  afterEach(() => jest.restoreAllMocks());
+
+  it('Tests that a Maya sale names a new unified address as the refund when mayanode takes a shielded memo', async () => {
+    jest
+      .spyOn(mayaShieldedMemo, 'fetchMayaShieldedMemoTarget')
+      .mockResolvedValue({
+        vaultAddress: 't1vault',
+        unifiedAddress: 'u1mayanode',
+      });
+    const { committed, swap } = commitSale(
+      SwapKitProviderEnum.MayachainStreaming,
+      jest.fn(async () => 'u1refund'),
+      mayaSwap(),
+    );
+    const { record, instructions } = await committed;
+
+    expect(swap).toHaveBeenCalledTimes(1);
+    expect(swap).toHaveBeenCalledWith(
+      expect.objectContaining({ sourceAddress: 'u1refund' }),
+    );
+    expect(instructions.shieldedMemoAddress).toBe('u1memo');
+    expect(instructions.memoText).toBe('=:e:0xdest/u1refund:0/3/0');
+    expect(record.refundAddress).toBe('u1refund');
+  });
+
+  it('Tests that a Maya sale orders again with the transparent address when the vault takes no shielded memo. Its memo then fits an OP_RETURN.', async () => {
+    jest
+      .spyOn(mayaShieldedMemo, 'fetchMayaShieldedMemoTarget')
+      .mockResolvedValue({
+        vaultAddress: 't1other',
+        unifiedAddress: 'u1mayanode',
+      });
+    const { committed, swap } = commitSale(
+      SwapKitProviderEnum.MayachainStreaming,
+      jest.fn(async () => 'u1refund'),
+      mayaSwap(),
+    );
+    const { record, instructions, ordered } = await committed;
+
+    expect(swap).toHaveBeenCalledTimes(2);
+    expect(swap).toHaveBeenLastCalledWith(
+      expect.objectContaining({ sourceAddress: 't1ephemeral' }),
+    );
+    expect(instructions.shieldedMemoAddress).toBeUndefined();
+    expect(instructions.memoText).toBe('=:e:0xdest:0/3/0');
+    expect(ordered.sourceAddress).toBe('t1ephemeral');
+    expect(record.refundAddress).toBeUndefined();
+  });
+
+  it('Tests that a Maya sale keeps the transparent address when mayanode has the shielded memo off', async () => {
+    jest
+      .spyOn(mayaShieldedMemo, 'fetchMayaShieldedMemoTarget')
+      .mockResolvedValue(null);
+    const newShieldedAddress = jest.fn(async () => 'u1refund');
+    const { committed, swap } = commitSale(
+      SwapKitProviderEnum.MayachainStreaming,
+      newShieldedAddress,
+      mayaSwap(),
+    );
+    const { record } = await committed;
+
+    expect(newShieldedAddress).not.toHaveBeenCalled();
+    expect(swap).toHaveBeenCalledWith(
+      expect.objectContaining({ sourceAddress: 't1ephemeral' }),
+    );
+    expect(record.refundAddress).toBeUndefined();
   });
 
   it('Tests that a NEAR sale keeps the transparent refund when the wallet makes no address', async () => {
