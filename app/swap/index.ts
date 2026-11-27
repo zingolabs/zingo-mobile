@@ -191,6 +191,7 @@ export {
 export {
   depositCarriesMemo,
   depositSpendsSourceAddress,
+  saleTransactionCount,
   zecNetworkFeeReserve,
 } from './depositRouting';
 export {
