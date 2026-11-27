@@ -305,6 +305,45 @@ describe('SwapService.commitRoute purchase destination', () => {
     expect(record.destinationAddress).toBe('t1ephemeral');
   });
 
+  it('Tests that the order falls back to the transparent address when SwapKit refuses the unified one on NEAR', async () => {
+    const refused = new SwapKitHttpError({
+      operation: SwapOperationEnum.Swap,
+      httpStatus: 400,
+      body: JSON.stringify({ message: 'Invalid destinationAddress' }),
+    });
+    const swap = jest
+      .fn()
+      .mockRejectedValueOnce(refused)
+      .mockImplementation(async () => ({ tx: { to: '0xdeposit' } }));
+    const { committed } = commitPurchase({
+      provider: SwapKitProviderEnum.Near,
+      swap,
+    });
+    const { record } = await committed;
+
+    expect(swap).toHaveBeenCalledTimes(2);
+    expect(swap).toHaveBeenLastCalledWith(
+      expect.objectContaining({ destinationAddress: 't1ephemeral' }),
+    );
+    expect(record.destinationAddress).toBe('t1ephemeral');
+  });
+
+  it('Tests that the commit fails without a second order when SwapKit rate-limits the shielded one', async () => {
+    const limited = new SwapKitHttpError({
+      operation: SwapOperationEnum.Swap,
+      httpStatus: 429,
+      body: '',
+    });
+    const swap = jest.fn().mockRejectedValue(limited);
+    const { committed } = commitPurchase({
+      provider: SwapKitProviderEnum.Near,
+      swap,
+    });
+
+    await expect(committed).rejects.toBe(limited);
+    expect(swap).toHaveBeenCalledTimes(1);
+  });
+
   it('Tests that the commit fails when SwapKit refuses the shielded order for another reason', async () => {
     const swap = jest.fn(async () => {
       throw new Error('SwapKit swap HTTP 503: unavailable');
@@ -454,6 +493,32 @@ describe('SwapService.commitRoute sale refund', () => {
     expect(swap).toHaveBeenCalledWith(
       expect.objectContaining({ sourceAddress: 't1ephemeral' }),
     );
+    expect(record.refundAddress).toBeUndefined();
+  });
+
+  it('Tests that a NEAR sale orders with the transparent refund when SwapKit refuses the unified one', async () => {
+    const swap = jest
+      .fn()
+      .mockRejectedValueOnce(
+        new SwapKitHttpError({
+          operation: SwapOperationEnum.Swap,
+          httpStatus: 400,
+          body: JSON.stringify({ message: 'Invalid sourceAddress' }),
+        }),
+      )
+      .mockImplementation(async () => ({
+        tx: { to: 't1deposit' },
+        inboundAddress: 't1deposit',
+      }));
+    const { committed } = commitSale(
+      SwapKitProviderEnum.Near,
+      jest.fn(async () => 'u1refund'),
+      swap,
+    );
+    const { record, ordered } = await committed;
+
+    expect(swap).toHaveBeenCalledTimes(2);
+    expect(ordered.sourceAddress).toBe('t1ephemeral');
     expect(record.refundAddress).toBeUndefined();
   });
 

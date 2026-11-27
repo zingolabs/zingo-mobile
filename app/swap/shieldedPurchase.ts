@@ -1,5 +1,6 @@
 import { SwapDirectionEnum } from './enums/SwapDirectionEnum';
 import { SwapKitProviderEnum } from './enums/SwapKitProviderEnum';
+import { SwapKitHttpError } from './errors';
 
 /**
  * Chains whose memo holds 80 bytes. Maya's memo to a unified address runs
@@ -67,6 +68,22 @@ export function shieldedPool(
 /** Whether a Maya purchase paid with this chain can land shielded. */
 export function chainCarriesShieldedPurchase(sellChain: string): boolean {
   return !SHORT_MEMO_CHAINS.includes(sellChain.toUpperCase());
+}
+
+/**
+ * Whether SwapKit refused an order for the address it names: a 4xx other
+ * than the rate limit, or a destination too long for the memo. The same
+ * route can still be ordered with the transparent address.
+ */
+export function refusesUnifiedAddress(error: unknown): boolean {
+  return (
+    isMemoTooLong(error) ||
+    (error instanceof SwapKitHttpError &&
+      error.httpStatus !== undefined &&
+      error.httpStatus >= 400 &&
+      error.httpStatus < 500 &&
+      error.httpStatus !== 429)
+  );
 }
 
 /** SwapKit's answer when the destination does not fit the source chain's memo. */
