@@ -43,6 +43,7 @@ import {
   BlockExplorerEnum,
 } from '@app/AppState';
 import { fetchWallet } from '@app/walletBackend';
+import { faceDownAvailable } from '@app/services/faceDown';
 import {
   DeviceSecurityProbe,
   probeDeviceSecurity,
@@ -77,7 +78,8 @@ type Options = {
   text: string;
 };
 
-type SettingName = 'language' | 'privacy' | 'biometrics' | 'blockexplorer';
+type SettingName =
+  'language' | 'privacy' | 'flip' | 'biometrics' | 'blockexplorer';
 
 const fill = (text: string, values: Record<string, string>) =>
   Object.entries(values).reduce((s, [k, v]) => s.split(`{${k}}`).join(v), text);
@@ -92,13 +94,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
     setBlockExplorerOption,
     translate,
     language: languageContext,
-    privacy: privacyContext,
+    privacySetting: privacySettingContext,
+    flipToHide: flipToHideContext,
     addLastSnackbar,
     biometrics: biometricsContext,
     mixnetView,
     blockExplorer: blockExplorerContext,
     readOnly,
     setPrivacyOption,
+    setFlipToHideOption,
     setBackgroundError,
     zingolibVersion,
     lastError,
@@ -131,7 +135,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   const authorize = useAuthorize();
 
   const [language, setLanguage] = useState<LanguageEnum>(languageContext);
-  const [privacy, setPrivacy] = useState<boolean>(privacyContext);
+  const [privacy, setPrivacy] = useState<boolean>(privacySettingContext);
+  const [flipToHide, setFlipToHide] = useState<boolean>(flipToHideContext);
+  const [flipAvailable, setFlipAvailable] = useState<boolean>(false);
   const [biometrics, setBiometrics] = useState<boolean>(biometricsContext);
   const [blockExplorer, setBlockExplorer] =
     useState<BlockExplorerEnum>(blockExplorerContext);
@@ -219,9 +225,22 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+    faceDownAvailable().then(available => {
+      if (!cancelled) {
+        setFlipAvailable(available);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     if (
       languageContext === language &&
-      privacyContext === privacy &&
+      privacySettingContext === privacy &&
+      flipToHideContext === flipToHide &&
       biometricsContext === biometrics &&
       blockExplorerContext === blockExplorer
     ) {
@@ -233,7 +252,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
     language,
     languageContext,
     privacy,
-    privacyContext,
+    privacySettingContext,
+    flipToHide,
+    flipToHideContext,
     blockExplorer,
     blockExplorerContext,
     biometrics,
@@ -254,7 +275,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   const edited: SettingName[] = (
     [
       ['language', languageContext !== language],
-      ['privacy', privacyContext !== privacy],
+      ['privacy', privacySettingContext !== privacy],
+      ['flip', flipToHideContext !== flipToHide],
       ['biometrics', biometricsContext !== biometrics],
       ['blockexplorer', blockExplorerContext !== blockExplorer],
     ] as const
@@ -329,8 +351,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
     // ───────────────────────────────────────────────────────────────
     setDisabled(true);
     try {
-      if (privacyContext !== privacy) {
+      if (privacySettingContext !== privacy) {
         await setPrivacyOption(privacy);
+      }
+      if (flipToHideContext !== flipToHide) {
+        await setFlipToHideOption(flipToHide);
       }
       if (biometricsContext !== biometrics) {
         await setBiometricsOption(biometrics);
@@ -578,6 +603,49 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                   }
                 />
               </View>
+
+              {flipAvailable && (
+                <View
+                  style={[
+                    rowStyle(false),
+                    {
+                      flexDirection: 'column',
+                      alignItems: 'stretch',
+                      justifyContent: 'center',
+                    },
+                  ]}
+                >
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <Text variant="bodyStrong">
+                        {translate('settings.flip-to-hide-title') as string}
+                      </Text>
+                      <Text
+                        variant="bodySmall"
+                        tone="muted"
+                        style={{ marginTop: space4 }}
+                      >
+                        {translate('settings.flip-to-hide-hint') as string}
+                      </Text>
+                    </View>
+                    <Switch
+                      testID="settings.flip"
+                      value={flipToHide}
+                      disabled={disabled}
+                      onValueChange={next => setFlipToHide(next)}
+                      accessibilityLabel={
+                        translate('settings.flip-to-hide-title') as string
+                      }
+                    />
+                  </View>
+                </View>
+              )}
 
               <View
                 style={[

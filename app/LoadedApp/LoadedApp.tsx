@@ -96,6 +96,7 @@ import {
   substituteZingoName,
 } from '@app/utils/ZingoAppData';
 import { AppTheme } from '@app/theme';
+import { watchFaceDown } from '@app/services/faceDown';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import SwapExpiryNotice from '@screens/Swap/components/SwapExpiryNotice';
@@ -230,6 +231,22 @@ const HOME_FADE_MS = 300;
 
 const FILL = { flex: 1 } as const;
 
+type FaceDownProps = {
+  enabled: boolean;
+  onChange: (down: boolean) => void;
+};
+
+const FaceDown: React.FC<FaceDownProps> = ({ enabled, onChange }) => {
+  useEffect(() => {
+    if (!enabled) {
+      onChange(false);
+      return;
+    }
+    return watchFaceDown(onChange);
+  }, [enabled, onChange]);
+  return null;
+};
+
 /** How long Home waits faded for a wallet opened in place before it shows what it has. */
 const OPENING_MAX_MS = 15 * 1000;
 
@@ -260,6 +277,9 @@ export default function LoadedApp(props: LoadedAppProps) {
   );
   const [privacy, setPrivacy] = useState<boolean>(() =>
     carried(c => c.privacy, false),
+  );
+  const [flipToHide, setFlipToHide] = useState<boolean>(() =>
+    carried(c => c.flipToHide, false),
   );
   const [backgroundSyncInfo, setBackgroundSyncInfo] = useState<BackgroundType>(
     () =>
@@ -425,6 +445,14 @@ export default function LoadedApp(props: LoadedAppProps) {
         setPrivacy(settings.privacy);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, privacy);
+      }
+      if (settings.flipToHide === true || settings.flipToHide === false) {
+        setFlipToHide(settings.flipToHide);
+      } else {
+        await SettingsFileImpl.writeSettings(
+          SettingsNameEnum.flipToHide,
+          flipToHide,
+        );
       }
       setSeedBackedUp(settings.seedBackedUp === true);
       setViewOnlyNoticeDismissed(settings.viewOnlyNoticeDismissed === true);
@@ -635,6 +663,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         language={language}
         server={server}
         privacy={privacy}
+        flipToHide={flipToHide}
         backgroundSyncInfo={backgroundSyncInfo}
         readOnly={readOnly}
         orchardPool={orchardPool}
@@ -677,6 +706,7 @@ type LoadedAppClassProps = {
   language: LanguageEnum;
   server: ServerType;
   privacy: boolean;
+  flipToHide: boolean;
   backgroundSyncInfo: BackgroundType;
   readOnly: boolean;
   orchardPool: boolean;
@@ -693,7 +723,10 @@ type LoadedAppClassProps = {
   blockExplorer: BlockExplorerEnum;
 };
 
-type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
+type LoadedAppClassState = AppStateLoaded &
+  AppContextLoaded & {
+    faceDown: boolean;
+  };
 
 export class LoadedAppClass extends Component<
   LoadedAppClassProps,
@@ -786,6 +819,10 @@ export class LoadedAppClass extends Component<
       setZecPrice: this.setZecPrice,
       zingolibVersion: '',
       setPrivacyOption: this.setPrivacyOption,
+      privacySetting: props.privacy,
+      flipToHide: props.flipToHide,
+      setFlipToHideOption: this.setFlipToHideOption,
+      faceDown: false,
       seedBackedUp: props.seedBackedUp,
       seedBackedUpAt: props.seedBackedUpAt,
       setSeedBackedUp: this.setSeedBackedUp,
@@ -1878,7 +1915,21 @@ export class LoadedAppClass extends Component<
     await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, value);
     this.setState({
       privacy: value as boolean,
+      privacySetting: value as boolean,
     });
+  };
+
+  setFlipToHideOption = async (value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.flipToHide, value);
+    this.setState({
+      flipToHide: value,
+    });
+  };
+
+  setFaceDown = (down: boolean): void => {
+    if (down !== this.state.faceDown) {
+      this.setState({ faceDown: down });
+    }
   };
 
   setSeedBackedUp = async (value: boolean): Promise<void> => {
@@ -2344,6 +2395,7 @@ export class LoadedAppClass extends Component<
       settings: {
         language: this.state.language,
         privacy: this.state.privacy,
+        flipToHide: this.state.flipToHide,
         biometrics: this.state.biometrics,
         blockExplorer: this.state.blockExplorer,
         addressBook: this.state.addressBook,
@@ -2543,6 +2595,7 @@ export class LoadedAppClass extends Component<
       setZecPrice: this.state.setZecPrice,
       zingolibVersion: this.state.zingolibVersion,
       setPrivacyOption: this.setPrivacyOption,
+      setFlipToHideOption: this.setFlipToHideOption,
       seedBackedUp: this.state.seedBackedUp,
       seedBackedUpAt: this.state.seedBackedUpAt,
       setSeedBackedUp: this.setSeedBackedUp,
@@ -2552,7 +2605,9 @@ export class LoadedAppClass extends Component<
       // context settings
       server: this.state.server,
       language: this.state.language,
-      privacy: this.state.privacy,
+      privacy: this.state.privacy || this.state.faceDown,
+      privacySetting: this.state.privacy,
+      flipToHide: this.state.flipToHide,
       biometrics: this.state.biometrics,
       selectServer: this.state.selectServer,
       walletChainName: this.state.walletChainName,
@@ -2597,6 +2652,10 @@ export class LoadedAppClass extends Component<
     return (
       <>
         <ContextAppLoadedProvider value={context}>
+          <FaceDown
+            enabled={this.state.flipToHide}
+            onChange={this.setFaceDown}
+          />
           <SwapServiceProvider chainName={this.state.walletChainName}>
             <PriceTrafficDriver />
             <SwapExpiryNotice />
