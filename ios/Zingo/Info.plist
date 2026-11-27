@@ -61,6 +61,8 @@
 	<string>Allow Zingo to use FaceID to improve the security and privacy?</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Zingo does not use any Location Features</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Zingo reads the motion sensor to hide your amounts when the phone is face down.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Zingo export/share address QRCodes as images</string>
 	<key>RCTNewArchEnabled</key>
