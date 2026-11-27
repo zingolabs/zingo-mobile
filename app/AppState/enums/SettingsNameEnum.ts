@@ -6,6 +6,7 @@ export enum SettingsNameEnum {
   biometrics = 'biometrics',
   selectServer = 'selectServer',
   blockExplorer = 'blockExplorer',
+  flipToHide = 'flipToHide',
 
   // internal management
   firstInstall = 'firstInstall',

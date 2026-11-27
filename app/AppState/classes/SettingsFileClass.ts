@@ -22,6 +22,7 @@ export default class SettingsFileClass {
   seedBackedUpAt: number;
   // The user closed the view-only notice of this wallet.
   viewOnlyNoticeDismissed: boolean = false;
+  flipToHide: boolean = false;
 
   constructor(
     server: ServerType,
