@@ -18,17 +18,19 @@ zingodisclosure@proton.me
 
 - Light client: no full chain download, it syncs from a `lightwalletd` server through zingolib
 - Follows the chain while it is open, so a payment shows up when it lands
-- Background sync of the wallet while the app is closed: once a day on Android, around 3 a.m., on an
-  unmetered network while charging; when iOS grants a background processing task
+- Background sync while the app is closed: once a day on Android, around 3 a.m., on an unmetered
+  network while charging; when iOS grants a background processing task. Each night visits every wallet,
+  the open one first, within 8 minutes 30 seconds on Android
 - Create from a new seed, restore from a seed, or import a Unified Full Viewing Key (view-only)
-- One wallet at a time, with the last one kept as a backup that can be restored from Settings
+- Several wallets, each with its own name, network and server. The header switches between them, and the
+  Wallets sheet adds, renames or deletes one
+- Wallets left on the device by a previous install are found and imported again
 - Mainnet, Testnet and Regtest, fixed when the wallet is created; a server on another network is caught
   on opening, with a switch to the right one
 - Offline mode: create or restore a wallet with no server, and sync once one is chosen
 - Seed backup flow (the words, a check that they are on paper, three words to confirm), with a reminder
   in History until it is done; a restored wallet counts as backed up
 - Seed phrase and viewing key screens, behind device authentication
-- Performance profiles (Maximum, High, Medium, Low)
 - Sync report with a scanning map, the last background sync, and Rescan
 - A birthday below Sapling activation is raised to it, and the app says so once
 - A wallet file that cannot be opened is classified (missing, encrypted…) and explained; Try Again
@@ -44,7 +46,8 @@ zingodisclosure@proton.me
 - Any amount can be typed in USD instead of ZEC (mainnet); what is sent is always ZEC
 - Scan a QR into the recipient field
 - `zcash:` payment links open the app (ZIP-321, first recipient)
-- Send progress in steps (build, mixnet, mempool, confirmations), with what to do when one fails
+- Send progress in steps (build, mixnet, mempool, confirmations), with what to do when one fails. A
+  failed send is never sent again on its own
 - History with filters (received, sent, shielded, failed, memos, swaps), and Messages for transfers
   carrying memos
 - Receive: every address grouped by pool, with tags, pins, ownership check and new addresses by type
@@ -53,10 +56,14 @@ zingodisclosure@proton.me
 
 **Servers**
 
-- Automatic, from a list, custom (with a test that shows each step) or offline
+- Automatic, from a list, custom (with a test that shows each step) or offline, chosen per wallet
 - Live list from the community registry ([hosh.zec.rocks](https://hosh.zec.rocks)), ranked by 30-day
-  uptime and then ping, with the built-in list as the fallback
-- Status dot beside the active server
+  uptime and then ping, with the built-in list as the fallback. A server behind the chain tip is marked
+- Server health in the sync line, the menu and a status sheet: slow, down, or answering without
+  syncing. The sheet offers the best other server it measured. The app never changes server on its own
+- In Automatic on another server, the default server is checked every 10 minutes, and the way back is
+  offered once it answers up to date
+- A wallet that cannot open because of its server offers Change server and Retry connection
 
 **Privacy**
 
@@ -73,7 +80,8 @@ zingodisclosure@proton.me
 
 - Swap ZEC to and from assets on other chains through SwapKit (NEAR Intents, Maya, THORChain and Flashnet)
 - Routes compared against the market rate, with the slippage tolerance chosen
-- Swap history, detail and tracking, with links to each chain's explorer and refund tracking
+- Swap history, detail and tracking, with links to each chain's explorer and refund tracking. A completed
+  swap shows what it cost, and Swap more starts a new one the same way
 - When a provider offers no route, its own reason is given (a minimum to reach, a pair it does not
   trade…); a provider that refuses to start a swap it has just quoted is set aside, with its reason
 - Deposit QR and payment link for paying a purchase from another wallet; a token deposit that needs a
@@ -91,6 +99,8 @@ zingodisclosure@proton.me
 - A NEAR purchase lands shielded, in Ironwood, from any chain, and a NEAR sale's refund goes to a new
   unified address
 - When SwapKit refuses the unified address, the swap goes ahead with the transparent one
+- Buying ZEC through NEAR for less than $300 first warns that NEAR refunds no mistake (wrong coin, wrong
+  network) under that line. The warning can be hidden for good
 - An expired purchase is still watched for a late payment
 - The addresses made for swaps have their own group in Receive
 - When the swap service is busy (it rate-limits the app's key), quotes pause with a countdown and resume
@@ -113,8 +123,10 @@ zingodisclosure@proton.me
 **Settings**
 
 - Languages: English, Spanish, Portuguese, Russian and Turkish
-- Block explorer for transactions and addresses (ZcashExplorer, ZecBlock, ZExplorer or none)
-- Device authentication (biometrics or the device PIN) to open the app and to see the seed
+- Block explorer for transactions and addresses (ZcashExplorer, ZecBlock, ZecBlock Private, ShieldedScan,
+  ZExplorer or none)
+- Device authentication (biometrics or the device PIN) to open the app, and again before a send, a swap
+  deposit, the seed or the viewing key, importing or deleting a wallet, and turning it off
 - Support email with redacted diagnostics
 
 ## Building The App
