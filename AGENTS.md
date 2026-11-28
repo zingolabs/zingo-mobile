@@ -52,6 +52,8 @@ govern every UI change (zingo-adrs zingo-mobile/0024).
   component first, with the designer's approval and a Storybook story, and
   `DESIGN.md` changes in the same commit. CI fails a PR that changes
   `app/theme` values without `DESIGN.md`.
+- A change to a screen updates the Maestro flows in `.maestro/` that open it,
+  in the same PR; a new screen gets a flow. Maestro runs only at night.
 
 ## Code
 

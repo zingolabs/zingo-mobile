@@ -627,10 +627,13 @@ const Server: React.FunctionComponent<ServerProps> = ({
           bottom: BODY_BOTTOM,
         }}
       >
-        {/** Done rides the keyboard, so the focused field stops above it. */}
+        {/** Done rides the keyboard, so the focused field stops above it
+            with Test and Save, the row below it, in view. */}
         <KeyboardAwareScrollView
           {...edges}
-          bottomOffset={BUTTON_HEIGHT + space12 + space16 + EDGE_FADE}
+          bottomOffset={
+            2 * BUTTON_HEIGHT + space8 + space12 + space16 + EDGE_FADE
+          }
           style={{ flex: 1 }}
           contentContainerStyle={{ paddingBottom: 16 }}
           keyboardShouldPersistTaps="handled"

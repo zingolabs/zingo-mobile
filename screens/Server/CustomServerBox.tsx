@@ -265,7 +265,7 @@ const CustomServerBox: React.FC<CustomServerBoxProps> = ({
         nativeID={PORT_DONE}
         testID="server.custom.port.done"
         labels={labels.done}
-        ready={/^d+$/.test(port) && Number(port) >= 1 && Number(port) <= 65535}
+        ready={/^\d+$/.test(port) && Number(port) >= 1 && Number(port) <= 65535}
       />
     </View>
   );

@@ -49,6 +49,19 @@ appId: org.ZingoLabs.Zingo
     timeout: 120000
 - waitForAnimationToEnd:
     timeout: 5000
+
+# The birthday goes in first, while the empty phrase field keeps it high
+# on the screen. Below 24 chips it can sit under the Import button that
+# floats over the keyboard, and a tap there presses Import. The field
+# accepts input once the server reports its latest block.
+- extendedWaitUntil:
+    visible:
+      id: "import.birthdayinput"
+      enabled: true
+    timeout: 60000
+- tapOn:
+    id: "import.birthdayinput"
+- inputText: "1994579"
 - tapOn:
     id: "import.seedufvkinput"
 
@@ -83,24 +96,6 @@ appId: org.ZingoLabs.Zingo
 - assertVisible:
     text: "24 / 24"
 
-# With 24 chips the phrase field is tall enough to push the birthday row
-# below the screen on Android and behind the floating Import button on iOS.
-# Centring it brings it clear of both, the button and the keyboard.
-- scrollUntilVisible:
-    element:
-      id: "import.birthdayinput"
-    centerElement: true
-
-# The birthday field accepts input once the server reports its latest
-# block, and stays disabled until then.
-- extendedWaitUntil:
-    visible:
-      id: "import.birthdayinput"
-      enabled: true
-    timeout: 60000
-- tapOn:
-    id: "import.birthdayinput"
-- inputText: "1994579"
 - tapOn:
     id: "import.button.ok"
     retryTapIfNoChange: true
