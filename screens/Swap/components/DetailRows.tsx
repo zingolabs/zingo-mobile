@@ -23,7 +23,7 @@ export type DetailRow = {
   /** What the label means, behind an info icon. */
   tip?: string;
   /** Green for what you get, amber for what came back, Nym green for the mixnet, grey for a side note. */
-  tone?: 'positive' | 'warning' | 'nym' | 'muted';
+  tone?: 'positive' | 'warning' | 'nym';
   /** Drawn before the value: a contact's avatar. */
   leading?: React.ReactNode;
   /** A shortened address or id, in the monospace face; copied values are, unless false. */
@@ -94,9 +94,7 @@ export default function DetailRows({ rows }: { rows: DetailRow[] }) {
         ? colors.fgWarning
         : tone === 'nym'
           ? colors.fgNym
-          : tone === 'muted'
-            ? colors.fgMuted
-            : colors.fgDefault;
+          : colors.fgDefault;
   return (
     <View
       style={{

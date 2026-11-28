@@ -14,30 +14,32 @@ type Leg = {
   label: string;
   amount: string;
   unit: string;
+  /** The amount in dollars, empty when unpriced. */
+  fiat: string;
 };
 
 /**
  * The top of a swap's review: what is happening, then what leaves and what
- * arrives side by side, the arriving amount in green with its value in
- * dollars. Selling ZEC, "Processing via NYM" sits over it with its note.
+ * arrives side by side with their value in dollars, the arriving amount in
+ * green. Selling ZEC, "Processing via NYM" sits over it with its note.
  */
 export default function PairHero({
   title,
   sent,
   received,
-  fiat,
   processing,
 }: {
   title: string;
   sent: Leg;
   received: Leg;
-  /** The arriving amount in dollars, empty when unpriced. */
-  fiat: string;
   /** The Nym label over the pair and its note; absent when nothing goes through NYM. */
   processing?: { label: string; note: string };
 }) {
   const { colors } = useTheme();
-  const leg = ({ asset, label, amount, unit }: Leg, incoming: boolean) => (
+  const leg = (
+    { asset, label, amount, unit, fiat }: Leg,
+    incoming: boolean,
+  ) => (
     <View style={{ flex: 1, minWidth: 0, alignItems: 'center', rowGap: 8 }}>
       <Text variant="caption" tone="muted">
         {label}
@@ -56,7 +58,7 @@ export default function PairHero({
         {amount}
         <Text variant="bodySmall" tone="muted">{` ${unit}`}</Text>
       </Text>
-      {incoming && !!fiat && (
+      {!!fiat && (
         <Text variant="caption" tone="muted">
           {fiat}
         </Text>

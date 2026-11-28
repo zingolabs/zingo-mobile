@@ -283,6 +283,9 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
   });
   const receiveAmount = parseFloat(chosen.expectedReceiveAmount);
   const receiveUsd = receiveAmount * fiatValueBasis.receiveUsdUnitPrice;
+  const sellUsd =
+    parseFloat(quoteInput.sellAmountHumanDecimal) *
+    fiatValueBasis.sellUsdUnitPrice;
   const minReceive = `${formatAmountForDisplay(chosen.minReceiveAmount)} ${receiveSymbol}`;
 
   const counterpartyChain = counterparty.chain;
@@ -368,18 +371,22 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
           label: translate('swap.you-send') as string,
           amount: formatAmountForDisplay(quoteInput.sellAmountHumanDecimal),
           unit: sellSymbol,
+          fiat:
+            fiatValueBasis.sellUsdUnitPrice > 0 && Number.isFinite(sellUsd)
+              ? `≈ ${formatUsd(sellUsd)}`
+              : '',
         }}
         received={{
           asset: quoteInput.receiveAsset,
           label: translate('swap.you-receive') as string,
           amount: `≈ ${formatAmountForDisplay(chosen.expectedReceiveAmount)}`,
           unit: receiveSymbol,
+          fiat:
+            fiatValueBasis.receiveUsdUnitPrice > 0 &&
+            Number.isFinite(receiveUsd)
+              ? `≈ ${formatUsd(receiveUsd)}`
+              : '',
         }}
-        fiat={
-          fiatValueBasis.receiveUsdUnitPrice > 0 && Number.isFinite(receiveUsd)
-            ? `≈ ${formatUsd(receiveUsd)}`
-            : ''
-        }
       />
       <View style={{ marginTop: 24 }}>
         <DetailRows
@@ -488,7 +495,6 @@ const SwapReview: React.FunctionComponent<SwapReviewProps> = ({
                         ? 'swap.review-refund-new-shielded'
                         : 'swap.review-refund-new-address',
                     ) as string,
-                    tone: 'muted' as const,
                   },
                 ]
               : []),
