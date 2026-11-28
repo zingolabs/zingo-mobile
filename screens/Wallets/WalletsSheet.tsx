@@ -8,7 +8,6 @@ import React, {
 } from 'react';
 import { View } from 'react-native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useSharedValue } from 'react-native-reanimated';
 import {
   ChainNameEnum,
   CurrencyNameEnum,
@@ -45,7 +44,6 @@ import { HistoryIcon } from '@ui/primitives/Icons/HistoryIcon';
 import { DeleteWalletContext } from '@app/wallet/types';
 import AppSheetModal, { SheetScrollView } from '@ui/primitives/AppSheetModal';
 import Button from '@ui/primitives/Button';
-import Pressable from '@ui/primitives/Pressable';
 import Text from '@ui/primitives/Text';
 import TextField from '@ui/primitives/TextField';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
@@ -55,7 +53,7 @@ import Avatar, { AvatarCategory } from '@ui/widgets/Avatar';
 import DeleteWalletSheet from '@ui/widgets/DeleteWalletSheet';
 import { MASK } from '@ui/widgets/PrivateAmount';
 import RadioRow, { RadioList, type Pill } from '@ui/widgets/RadioRow';
-import { DeleteMark, EditMark, flashMark } from '@ui/widgets/RowActionMarks';
+import OverflowMenu from '@ui/widgets/OverflowMenu';
 import TitleBar from '@ui/widgets/TitleBar';
 import DetailRows from '@screens/Swap/components/DetailRows';
 
@@ -64,7 +62,6 @@ const NAME_MAX = 24;
 /** The icon disc of the previous backups row, as an option card's. */
 const HISTORY_DISC = 40;
 /** A row action's square, as Address Book's. */
-const ACTION = 36;
 /** The networks in the order the sheet lists them. */
 const NETWORKS = [
   ChainNameEnum.mainChainName,
@@ -93,7 +90,6 @@ export default function WalletsSheet() {
   } = useContext(ContextAppLoaded);
   const t = useCallback((key: string) => translate(key) as string, [translate]);
   const authorize = useAuthorize();
-  const { colors } = useTheme();
   const listRef = useRef<BottomSheetModal>(null);
   const settingsRef = useRef<BottomSheetModal>(null);
   const deleteRef = useRef<BottomSheetModal>(null);
@@ -266,16 +262,14 @@ export default function WalletsSheet() {
                             : undefined
                     }
                     sub={subOf(wallet)}
-                    editLabel={t('wallets.settings-acc').replace(
-                      '{name}',
-                      wallet.meta.name,
-                    )}
-                    deleteLabel={t('wallets.delete-acc').replace(
-                      '{name}',
-                      wallet.meta.name,
-                    )}
-                    editColor={colors.fgDefault}
-                    deleteColor={colors.fgDanger}
+                    labels={{
+                      actions: t('wallets.actions-acc').replace(
+                        '{name}',
+                        wallet.meta.name,
+                      ),
+                      edit: t('wallets.edit'),
+                      delete: t('wallets.delete'),
+                    }}
                     onPress={() =>
                       wallet.meta.openFailed ? openBroken(wallet) : pick(wallet)
                     }
@@ -392,16 +386,13 @@ type WalletRowProps = {
   unavailable: boolean;
   pill?: Pill;
   sub: string;
-  editLabel: string;
-  deleteLabel: string;
-  editColor: string;
-  deleteColor: string;
+  labels: { actions: string; edit: string; delete: string };
   onPress: () => void;
   onEdit: () => void;
   onDelete: () => void;
 };
 
-/** One wallet: its avatar, name and tag, the saved balance and type, and its two actions. */
+/** One wallet: its avatar, name and tag, the saved balance and type, and its actions menu. */
 function WalletRow({
   wallet,
   first,
@@ -409,41 +400,11 @@ function WalletRow({
   unavailable,
   pill,
   sub,
-  editLabel,
-  deleteLabel,
-  editColor,
-  deleteColor,
+  labels,
   onPress,
   onEdit,
   onDelete,
 }: WalletRowProps) {
-  const pen = useSharedValue(0);
-  const lid = useSharedValue(0);
-  const action = (
-    label: string,
-    testID: string,
-    onAction: () => void,
-    mark: React.ReactNode,
-    nudge: number,
-  ) => (
-    <Pressable
-      kind="icon"
-      testID={testID}
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      hitSlop={space4}
-      onPress={onAction}
-      style={{
-        width: ACTION,
-        height: ACTION,
-        marginLeft: nudge,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      {mark}
-    </Pressable>
-  );
   return (
     <RadioRow
       testID={`wallets.row.${wallet.id}`}
@@ -462,28 +423,23 @@ function WalletRow({
         />
       }
       trailing={
-        <>
-          {action(
-            editLabel,
-            `wallets.row.${wallet.id}.edit`,
-            () => {
-              flashMark(pen, 'edit');
-              onEdit();
+        <OverflowMenu
+          testID={`wallets.row.${wallet.id}.menu`}
+          label={labels.actions}
+          actions={[
+            {
+              label: labels.edit,
+              testID: `wallets.row.${wallet.id}.edit`,
+              onPress: onEdit,
             },
-            <EditMark progress={pen} color={editColor} />,
-            0,
-          )}
-          {action(
-            deleteLabel,
-            `wallets.row.${wallet.id}.delete`,
-            () => {
-              flashMark(lid, 'delete');
-              onDelete();
+            {
+              label: labels.delete,
+              testID: `wallets.row.${wallet.id}.delete`,
+              onPress: onDelete,
+              danger: true,
             },
-            <DeleteMark progress={lid} color={deleteColor} />,
-            -space4,
-          )}
-        </>
+          ]}
+        />
       }
     />
   );
