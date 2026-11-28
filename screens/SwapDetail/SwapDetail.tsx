@@ -485,7 +485,9 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         </View>
       )}
 
-      <DetailRows rows={view.rows} />
+      <View style={{ marginTop: 24 }}>
+        <DetailRows rows={view.rows} />
+      </View>
 
       {refunding && (
         <Text variant="bodySmall" tone="muted" style={{ marginTop: space12 }}>

@@ -102,11 +102,7 @@ export default function AmountCard({
           style={{ flexDirection: 'row', alignItems: 'center', gap: space8 }}
         >
           {unit === 'USD' && (
-            <Text
-              variant="balance"
-              tone="muted"
-              maxFontSizeMultiplier={fontScaleDisplay}
-            >
+            <Text variant="subtitle" tone="muted">
               $
             </Text>
           )}
