@@ -8,12 +8,12 @@ import React, {
 } from 'react';
 import { formatZecAmount } from '@app/utils/formatZecAmount';
 import { formatUsd } from '@app/utils/formatAmount';
-import { inputUsd, settledFeesUsd } from '@app/swap/settledCost';
+import { inputUsd, outputUsd, settledFeesUsd } from '@app/swap/settledCost';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Linking, View } from 'react-native';
 import Pressable from '@ui/primitives/Pressable';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { space12, space8, useTheme, iconSizeMd, iconSizeSm } from '@app/theme';
+import { space12, space8, useTheme, iconSizeSm } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import {
   Route,
@@ -42,10 +42,7 @@ import Utils from '@app/utils';
 import Text from '@ui/primitives/Text';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
-import { TxSwapIcon } from '@ui/primitives/Icons/TxSwapIcon';
 import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
-import { TxPendingIcon } from '@ui/primitives/Icons/TxPendingIcon';
-import { swapInFlight } from '@screens/History/historyRowText';
 import { ChevronRight } from '@ui/primitives/Icons/Chevron';
 import Banner from '@ui/widgets/Banner';
 import FoldSection from './components/FoldSection';
@@ -54,11 +51,11 @@ import SwapFlowScreen from '@screens/Swap/components/SwapFlowScreen';
 import DepositSlip, {
   depositMemoOf,
 } from '@screens/Swap/components/DepositSlip';
-import DetailHero from '@screens/Swap/components/DetailHero';
+import { StatusPill } from '@screens/Swap/components/DetailHero';
+import PairHero from '@screens/Swap/components/PairHero';
 import DetailRows from '@screens/Swap/components/DetailRows';
 import type { DetailRow } from '@screens/Swap/components/DetailRows';
 import SaveContactSheet from '@screens/Swap/components/SaveContactSheet';
-import Avatar, { avatarCategoryOf } from '@ui/widgets/Avatar';
 import SaveContactButton from '@ui/widgets/SaveContactButton';
 import { useSwapRecord } from '@screens/Swap/useSwapRecord';
 import { swapOutcome, swapStatePill } from '@screens/Swap/swapProgress';
@@ -141,7 +138,6 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
   const unfoundPurchase = expired && sharedVault && !sell;
   const sellSym = record.sellAsset.ticker ?? record.sellAsset.symbol;
   const getSym = record.receiveAsset.ticker ?? record.receiveAsset.symbol;
-  const other = sell ? record.receiveAsset : record.sellAsset;
   const got = record.actualReceiveAmount ?? record.expectedReceiveAmount;
   const back = record.refundInfo?.refundedAmountText;
   const usd = (amount: string, unit: number) => {
@@ -309,17 +305,10 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
           {
             label: t('swap.detail-sent-to'),
             value: contact
-              ? `${contact.label}  ${Utils.trimToSmall(record.destinationAddress, 6)}`
+              ? contact.label
               : Utils.trimToSmall(record.destinationAddress, 6),
+            mono: !contact,
             copy: record.destinationAddress,
-            leading: contact ? (
-              <Avatar
-                kind="contact"
-                name={contact.label}
-                category={avatarCategoryOf(contact.color)}
-                size="md"
-              />
-            ) : undefined,
           },
         ]
       : []),
@@ -379,6 +368,14 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         ] as DetailRow[],
       }
     : { hero, pill, rows };
+  /** What never reached the wallet: struck through, without its dollars. */
+  const missed =
+    expired || refunding || outcome === 'refunded' || outcome === 'failed';
+  /** Under the pair: what came back or was never sent; the pair says the rest. */
+  const heroLine =
+    expired || refunding || outcome === 'refunded' ? view.hero.line : '';
+  const receivedValue = outputUsd(record);
+  const receivedUsd = receivedValue > 0 ? `≈ ${formatUsd(receivedValue)}` : '';
 
   const hasDepositEvidence =
     isRealLegHash(record.broadcast?.txId) ||
@@ -439,24 +436,43 @@ const SwapDetail: React.FunctionComponent<SwapDetailProps> = ({
         </ButtonStack>
       }
     >
-      <DetailHero
-        icon={
-          swapInFlight(record) ? (
-            <TxPendingIcon size={iconSizeMd} color={colors.fgDefault} />
-          ) : (
-            <TxSwapIcon size={iconSizeMd} color={colors.fgDefault} />
-          )
-        }
-        badge={other}
+      <PairHero
         title={title}
-        amount={view.hero.amount}
-        unit={view.hero.unit}
-        tone={view.hero.tone}
-        line={view.hero.line}
-        pill={`${view.pill.text} · ${providerLongLabel(record.provider)}`}
-        pillTone={view.pill.tone}
-        strike={expired || outcome === 'failed'}
-      />
+        sent={{
+          asset: record.sellAsset,
+          label: t(done ? 'history.sent' : 'swap.you-send'),
+          amount: formatAmountForDisplay(record.sellAmountHumanDecimal),
+          unit: sellSym,
+          fiat: sentUsd,
+        }}
+        received={{
+          asset: record.receiveAsset,
+          label: t(done ? 'history.received' : 'swap.you-receive'),
+          amount: `${done ? '+' : '≈ '}${formatAmountForDisplay(got)}`,
+          unit: getSym,
+          fiat: missed ? '' : receivedUsd,
+          tone: done ? 'positive' : missed ? 'muted' : 'default',
+          strike: missed,
+        }}
+      >
+        <View
+          style={{ alignItems: 'center', rowGap: space8, marginTop: space12 }}
+        >
+          {!!heroLine && (
+            <Text
+              variant="bodySmall"
+              tone="muted"
+              style={{ textAlign: 'center' }}
+            >
+              {heroLine}
+            </Text>
+          )}
+          <StatusPill
+            text={`${view.pill.text} · ${providerLongLabel(record.provider)}`}
+            tone={view.pill.tone}
+          />
+        </View>
+      </PairHero>
 
       {awaitingDeposit && (
         <View style={{ marginVertical: space12, rowGap: space12 }}>

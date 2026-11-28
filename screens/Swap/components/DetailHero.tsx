@@ -9,6 +9,32 @@ import HistoryAvatar from '@screens/History/components/HistoryAvatar';
 export type HeroTone = 'positive' | 'default' | 'muted';
 export type PillTone = 'accent' | 'warning' | 'danger' | 'neutral';
 
+/** A detail's status, in a capsule tinted by its tone. */
+export function StatusPill({ text, tone }: { text: string; tone: PillTone }) {
+  const { colors } = useTheme();
+  const paint = {
+    accent: { bg: colors.bgAccentSubtle, fg: colors.fgAccent },
+    warning: { bg: colors.bgWarningSubtle, fg: colors.fgWarning },
+    danger: { bg: colors.bgDangerSubtle, fg: colors.fgDanger },
+    neutral: { bg: colors.bgMutedSubtle, fg: colors.fgMuted },
+  }[tone];
+  return (
+    <View
+      style={{
+        backgroundColor: paint.bg,
+        borderRadius: radiusPill,
+        paddingHorizontal: 12,
+        paddingVertical: 4,
+        marginTop: 4,
+      }}
+    >
+      <Text variant="caption" style={{ color: paint.fg, fontWeight: '700' }}>
+        {text}
+      </Text>
+    </View>
+  );
+}
+
 /**
  * The top of a swap or transaction detail: the icon, what happened, the
  * amount large, what left with its dollars, and a status pill.
@@ -38,12 +64,6 @@ export default function DetailHero({
   strike?: boolean;
 }) {
   const { colors } = useTheme();
-  const paint = {
-    accent: { bg: colors.bgAccentSubtle, fg: colors.fgAccent },
-    warning: { bg: colors.bgWarningSubtle, fg: colors.fgWarning },
-    danger: { bg: colors.bgDangerSubtle, fg: colors.fgDanger },
-    neutral: { bg: colors.bgMutedSubtle, fg: colors.fgMuted },
-  }[pillTone];
   return (
     <View style={{ alignItems: 'center', rowGap: space8, marginVertical: 12 }}>
       <View style={{ transform: [{ scale: 1.33 }], marginBottom: space8 }}>
@@ -73,19 +93,7 @@ export default function DetailHero({
           {line}
         </Text>
       )}
-      <View
-        style={{
-          backgroundColor: paint.bg,
-          borderRadius: radiusPill,
-          paddingHorizontal: 12,
-          paddingVertical: 4,
-          marginTop: 4,
-        }}
-      >
-        <Text variant="caption" style={{ color: paint.fg, fontWeight: '700' }}>
-          {pill}
-        </Text>
-      </View>
+      <StatusPill text={pill} tone={pillTone} />
     </View>
   );
 }
