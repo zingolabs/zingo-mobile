@@ -38,7 +38,6 @@
   "syncing": "Синхронизация",
   "synced": "Синхронизировано",
   "messages": {
-    "bottom-acc": "К последнему сообщению",
     "title": "Сообщения",
     "title-chats": "Сообщения",
     "empty": "Сообщений пока нет.",
@@ -1592,6 +1591,9 @@
     "row-sub": "{balance} {unit} · {type}",
     "settings-acc": "Настройки {name}",
     "delete-acc": "Удалить {name}",
+    "actions-acc": "Действия с {name}",
+    "edit": "Изменить",
+    "delete": "Удалить",
     "opening": "Открываем {name}…",
     "settings": "Настройки кошелька",
     "name": "Название",

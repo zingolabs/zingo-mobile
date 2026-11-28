@@ -7,50 +7,41 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
-import Pressable from '@ui/primitives/Pressable';
 import {
   View,
   RefreshControl,
   ScrollView,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
   ActivityIndicator,
 } from 'react-native';
 
 import { useNavigation } from '@react-navigation/native';
-import {
-  iconSizeMd,
-  radiusPill,
-  slopFor,
-  space8,
-  space20,
-  space32,
-  useTheme,
-} from '@app/theme';
+import { space8, space20, space32, useTheme } from '@app/theme';
 
 import { Route, ValueTransferType } from '@app/AppState';
 import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import Text from '@ui/primitives/Text';
-import FullPanel from '@ui/widgets/FullPanel';
+import Header from '@ui/widgets/Header';
 import { useBottomActionPad } from '@app/hooks/useBottomActionPad';
 import Button from '@ui/primitives/Button';
 import MessageLine from './components/MessageLine';
 import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { ChevronDown } from '@ui/primitives/Icons/Chevron';
 import { useScrollEdges } from '@ui/widgets/ScrollEdges';
 import { useCompact } from '@app/hooks/useCompact';
 
 type MessageListProps = NativeStackScreenProps<AppDrawerParamList, 'Messages'>;
 
+const PAGE_SIZE = 50;
+
+/** Every memo in the wallet, newest first, grouped by month. */
 const MessageList: React.FunctionComponent<MessageListProps> = () => {
   const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
   const bottomPad = useBottomActionPad();
   const {
-    setScrollToBottom,
-    scrollToBottom,
+    setScrollToNewest,
+    scrollToNewest,
     translate,
     messages,
     language,
@@ -58,17 +49,11 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
   } = context;
   const { colors } = useTheme();
 
-  // With FlatList + `inverted`, the visual bottom (newest messages)
-  // corresponds to contentOffset.y ≈ 0. We surface a jump-to-bottom
-  // button when the user has scrolled "up" (i.e. y > threshold).
-  const PAGE_SIZE = 50;
   const [numVt, setNumVt] = useState<number>(PAGE_SIZE);
-  const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
-  const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
 
   const scrollViewRef = useRef<ScrollView>(null);
-  const { edges, fades } = useScrollEdges({ surface: 'surface' });
+  const { edges, fades } = useScrollEdges({ surface: 'canvas' });
   const { gap } = useCompact();
 
   useEffect(() => {
@@ -79,27 +64,23 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
     }
   }, [loading, messages]);
 
-  // Chat-style pagination: only render the newest `numVt` messages.
-  // "Load more" loads OLDER ones (prepended at the top). Keeps the
-  // render cheap when there are thousands of messages — without this,
-  // ScrollView's non-virtualized .map() would re-build every row on
-  // each context update, freezing the main thread on return from
-  // ValueTransferDetail.
-  const messagesData = useMemo(() => {
-    return (messages ?? []).slice(-numVt);
-  }, [messages, numVt]);
+  /** The wallet keeps messages oldest first. */
+  const newestFirst = useMemo(
+    () => [...(messages ?? [])].reverse(),
+    [messages],
+  );
 
-  useEffect(() => {
-    setLoadMoreButton(numVt < (messages?.length ?? 0));
-  }, [messages, numVt]);
+  /**
+   * Only the newest `numVt` render: ScrollView maps every row, and thousands
+   * of them froze the return from ValueTransferDetail.
+   */
+  const messagesData = useMemo(
+    () => newestFirst.slice(0, numVt),
+    [newestFirst, numVt],
+  );
+  const loadMoreButton = numVt < newestFirst.length;
 
-  const loadMoreClicked = useCallback(() => {
-    setNumVt(prev => prev + PAGE_SIZE);
-  }, [PAGE_SIZE]);
-
-  // Precompute the month label per index. A label appears above an item
-  // when its month differs from the previous (older) item, or it's the
-  // first item.
+  /** A label above the first message of each month. */
   const monthLabels = useMemo(() => {
     let last = '';
     return messagesData.map(vt => {
@@ -114,218 +95,125 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
     });
   }, [messagesData, language]);
 
-  // Auto-scroll to end on the first layout of the messages themselves (not
-  // the loading spinner before them) so the newest message is visible.
-  // Re-scroll on later content or viewport size changes only if the user
-  // is already pinned at the bottom (don't yank them away while they read
-  // older messages); the panel still rising changes the viewport.
-  const didInitialScrollRef = useRef<boolean>(false);
-  const isAtBottomRef = useRef<boolean>(true);
-  const loadingRef = useRef<boolean>(true);
-  loadingRef.current = loading;
-  const onContentSizeChange = useCallback(() => {
-    if (loadingRef.current) {
-      return;
-    }
-    if (!didInitialScrollRef.current) {
-      scrollViewRef.current?.scrollToEnd({ animated: false });
-      didInitialScrollRef.current = true;
-      return;
-    }
-    if (isAtBottomRef.current) {
-      scrollViewRef.current?.scrollToEnd({ animated: true });
-    }
-  }, []);
-
-  const handleScrollToBottom = useCallback(() => {
-    scrollViewRef.current?.scrollToEnd({ animated: true });
-    isAtBottomRef.current = true;
-    setIsAtBottom(true);
-  }, []);
-
   useEffect(() => {
-    if (scrollToBottom) {
-      handleScrollToBottom();
-      setScrollToBottom(false);
+    if (scrollToNewest) {
+      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+      setScrollToNewest(false);
     }
-  }, [scrollToBottom, handleScrollToBottom, setScrollToBottom]);
+  }, [scrollToNewest, setScrollToNewest]);
 
-  const handleScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const { contentOffset, contentSize, layoutMeasurement } =
-        event.nativeEvent;
-      const distanceFromBottom =
-        contentSize.height - layoutMeasurement.height - contentOffset.y;
-      const atBottom = distanceFromBottom < 100;
-      isAtBottomRef.current = atBottom;
-      setIsAtBottom(atBottom);
-    },
-    [],
-  );
-
-  // Keep a ref to the latest messages so the callback below stays
-  // identity-stable across context updates. Without this, every sync
-  // poll allocates a new `messages` reference, the useCallback returns
-  // a new function, and `React.memo` on MessageLine is bypassed for
-  // every row — re-rendering thousands of items on the main thread
-  // (the 7-second freeze observed on back-from-ValueTransferDetail).
-  const messagesRef = useRef(messages);
+  /**
+   * The latest list in a ref keeps the press identity-stable across sync
+   * polls, so `React.memo` on MessageLine holds.
+   */
+  const newestFirstRef = useRef(newestFirst);
   useEffect(() => {
-    messagesRef.current = messages;
-  }, [messages]);
+    newestFirstRef.current = newestFirst;
+  }, [newestFirst]);
 
   const setValueTransferDetailModalShow = useCallback(
     async (index: number, vt: ValueTransferType) => {
-      const current = messagesRef.current;
+      const current = newestFirstRef.current;
       navigation.navigate(Route.ValueTransferDetail, {
         index,
         vt,
-        valueTransfersSliced: current ?? [],
-        totalLength: current ? current.length : 0,
+        valueTransfersSliced: current,
+        totalLength: current.length,
       });
     },
     [navigation],
   );
 
   return (
-    <FullPanel
-      title={translate('messages.title') as string}
-      onBack={() => navigation.goBack()}
-      ownScroll
+    <View
       testID="messages"
+      style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}
     >
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        ref={scrollViewRef}
-        onScroll={e => {
-          edges.onScroll(e);
-          handleScroll(e);
-        }}
-        onContentSizeChange={(w, h) => {
-          edges.onContentSizeChange(w, h);
-          onContentSizeChange();
-        }}
-        onLayout={e => {
-          edges.onLayout(e);
-          if (!loadingRef.current && isAtBottomRef.current) {
-            scrollViewRef.current?.scrollToEnd({ animated: false });
+      <Header
+        title={translate('messages.title') as string}
+        closeScreen={() => navigation.goBack()}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+        noUfvkIcon={true}
+      />
+      <View style={{ flex: 1 }}>
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          ref={scrollViewRef}
+          onScroll={edges.onScroll}
+          onContentSizeChange={edges.onContentSizeChange}
+          onLayout={edges.onLayout}
+          scrollEventThrottle={100}
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingBottom: bottomPad }}
+          refreshControl={
+            <RefreshControl
+              refreshing={false}
+              onRefresh={() => doRefresh('messages')}
+              tintColor={colors.fgDefault}
+              title={translate('history.refreshing') as string}
+            />
           }
-        }}
-        scrollEventThrottle={100}
-        bounces={false}
-        alwaysBounceVertical={false}
-        style={{
-          flex: 1,
-        }}
-        contentContainerStyle={{
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          justifyContent: 'flex-start',
-        }}
-        refreshControl={
-          <RefreshControl
-            refreshing={false}
-            onRefresh={() => doRefresh('messages')}
-            tintColor={colors.fgDefault}
-            title={translate('history.refreshing') as string}
-          />
-        }
-      >
-        {loading ? (
-          <ActivityIndicator
-            size="large"
-            color={colors.fgMuted}
-            style={{ marginVertical: 20 }}
-          />
-        ) : messagesData.length === 0 ? (
-          <View
-            style={{
-              alignItems: 'center',
-              marginTop: gap(space32),
-              paddingHorizontal: space20,
-            }}
-          >
-            <Text variant="body" tone="muted">
-              {translate('messages.empty') as string}
-            </Text>
-          </View>
-        ) : (
-          <>
-            {loadMoreButton ? (
-              <View
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
-                  paddingHorizontal: space20,
-                  marginTop: space20,
-                  marginBottom: space8,
-                }}
-              >
-                <Button
-                  variant="text"
-                  title={translate('history.loadmore') as string}
-                  onPress={loadMoreClicked}
-                />
-              </View>
-            ) : (
-              <View
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
-                  marginTop: space20,
-                  marginBottom: space8,
-                }}
-              >
-                <Text variant="body" tone="muted">
-                  {translate('history.end') as string}
-                </Text>
-              </View>
-            )}
-            {messagesData.map((vt, index) => (
-              <MessageLine
-                key={`${index}-${vt.txid}-${vt.kind}`}
-                index={index}
-                vt={vt}
-                month={monthLabels[index] ?? ''}
-                setValueTransferDetailModalShow={
-                  setValueTransferDetailModalShow
-                }
-              />
-            ))}
-            {/* Breathing room below the newest message so it doesn't
-                    sit flush against the bottom edge of the sheet. */}
-            <View style={{ height: space20 }} />
-          </>
-        )}
-      </ScrollView>
-      {fades}
-      {!isAtBottom && !loading && (
-        <Pressable
-          kind="button"
-          hitSlop={slopFor(36)}
-          onPress={handleScrollToBottom}
-          accessibilityRole="button"
-          accessibilityLabel={translate('messages.bottom-acc') as string}
-          style={{
-            position: 'absolute',
-            bottom: bottomPad,
-            right: space20,
-            width: 36,
-            height: 36,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: colors.bgSurface,
-            borderRadius: radiusPill,
-            borderWidth: 1,
-            borderColor: colors.borderMuted,
-          }}
         >
-          <ChevronDown size={iconSizeMd} color={colors.fgMuted} />
-        </Pressable>
-      )}
-    </FullPanel>
+          {loading ? (
+            <ActivityIndicator
+              size="large"
+              color={colors.fgMuted}
+              style={{ marginVertical: 20 }}
+            />
+          ) : messagesData.length === 0 ? (
+            <View
+              style={{
+                alignItems: 'center',
+                marginTop: gap(space32),
+                paddingHorizontal: space20,
+              }}
+            >
+              <Text variant="body" tone="muted">
+                {translate('messages.empty') as string}
+              </Text>
+            </View>
+          ) : (
+            <>
+              {messagesData.map((vt, index) => (
+                <MessageLine
+                  key={`${index}-${vt.txid}-${vt.kind}`}
+                  index={index}
+                  vt={vt}
+                  month={monthLabels[index] ?? ''}
+                  setValueTransferDetailModalShow={
+                    setValueTransferDetailModalShow
+                  }
+                />
+              ))}
+              <View
+                style={{
+                  alignItems: 'center',
+                  paddingHorizontal: space20,
+                  marginTop: space8,
+                  marginBottom: space20,
+                }}
+              >
+                {loadMoreButton ? (
+                  <Button
+                    variant="text"
+                    title={translate('history.loadmore') as string}
+                    onPress={() => setNumVt(prev => prev + PAGE_SIZE)}
+                  />
+                ) : (
+                  <Text variant="body" tone="muted">
+                    {translate('history.end') as string}
+                  </Text>
+                )}
+              </View>
+            </>
+          )}
+        </ScrollView>
+        {fades}
+      </View>
+    </View>
   );
 };
 

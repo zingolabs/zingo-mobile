@@ -249,7 +249,7 @@ export function WalletNavigator() {
         <Stack.Screen
           name={Route.Messages}
           component={MessageList}
-          options={PANEL}
+          options={MENU}
         />
         <Stack.Screen
           name={Route.Confirm}

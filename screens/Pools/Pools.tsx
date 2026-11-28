@@ -88,7 +88,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
     setShieldingAmount,
     setBackgroundError,
     setScrollToTop,
-    setScrollToBottom,
+    setScrollToNewest,
     sendPermitNow,
     mixnetView,
   } = context;
@@ -112,7 +112,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
     addLastSnackbar,
     setBackgroundError,
     setScrollToTop,
-    setScrollToBottom,
+    setScrollToNewest,
     sendPermitNow,
   });
   const orchardResidualOnly = useOrchardResidualOnly();

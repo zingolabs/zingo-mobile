@@ -46,7 +46,7 @@ describe('MessageLine - snapshots', () => {
     ).toMatchSnapshot();
   });
 
-  test('MessageLine received with messageAddress, no month', () => {
+  test('MessageLine received, no month', () => {
     const vt = fixedValueTransfers[3];
     expect(
       render(
@@ -56,7 +56,6 @@ describe('MessageLine - snapshots', () => {
             month=""
             vt={vt}
             setValueTransferDetailModalShow={onFn}
-            messageAddress="u1abc123def456"
           />
         </ContextAppLoadedProvider>,
       ).toJSON(),

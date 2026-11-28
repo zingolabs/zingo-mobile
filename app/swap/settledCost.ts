@@ -74,3 +74,15 @@ export function inputUsd(record: SwapRecordType): number {
     record.fiatValueBasis.sellUsdUnitPrice;
   return Number.isFinite(v) && v > 0 ? v : 0;
 }
+
+/**
+ * What the output was worth: SwapKit's settled value once the swap settled,
+ * the quote's price before that.
+ */
+export function outputUsd(record: SwapRecordType): number {
+  if (record.settledCost) return record.settledCost.outUsd;
+  const v =
+    parseFloat(record.actualReceiveAmount ?? record.expectedReceiveAmount) *
+    record.fiatValueBasis.receiveUsdUnitPrice;
+  return Number.isFinite(v) && v > 0 ? v : 0;
+}

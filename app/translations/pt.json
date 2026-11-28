@@ -38,7 +38,6 @@
   "syncing": "Sincronizando",
   "synced": "Sincronizada",
   "messages": {
-    "bottom-acc": "Ir para a mensagem mais recente",
     "title": "Mensagens",
     "title-chats": "Mensagens",
     "empty": "Nenhuma mensagem ainda.",
@@ -1592,6 +1591,9 @@
     "row-sub": "{balance} {unit} · {type}",
     "settings-acc": "Ajustes de {name}",
     "delete-acc": "Excluir {name}",
+    "actions-acc": "Ações de {name}",
+    "edit": "Editar",
+    "delete": "Excluir",
     "opening": "Abrindo {name}…",
     "settings": "Ajustes da carteira",
     "name": "Nome",

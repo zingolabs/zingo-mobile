@@ -123,7 +123,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
     sendTransaction,
     clearToAddr,
     setScrollToTop,
-    setScrollToBottom,
+    setScrollToNewest,
     setShieldingAmount,
     translate,
     info,
@@ -847,7 +847,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
     if (settlement.kind === 'sent') {
       clearState();
       setScrollToTop(true);
-      setScrollToBottom(true);
+      setScrollToNewest(true);
     }
     if (isOnTop(Route.Computing)) {
       navigation.navigate(Route.Computing, {

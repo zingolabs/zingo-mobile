@@ -64,7 +64,7 @@ const hookInput = (
     addLastSnackbar,
     setBackgroundError: jest.fn(),
     setScrollToTop: jest.fn(),
-    setScrollToBottom: jest.fn(),
+    setScrollToNewest: jest.fn(),
     sendPermitNow: () => sendPermit(appState),
   };
 };

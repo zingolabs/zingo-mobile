@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
+import React, { useContext, useRef } from 'react';
 import Pressable from '@ui/primitives/Pressable';
 import { TextInput, View } from 'react-native';
 import {
@@ -7,7 +7,6 @@ import {
   fontScaleDisplay,
   iconSizeSm,
   radiusMd,
-  radiusPill,
   space4,
   space8,
   space12,
@@ -51,9 +50,9 @@ type AmountCardProps = {
 
 /**
  * Send's amount (the designer's exception C): a dark card with the number
- * in the balance style and its unit pill (ZEC or USD), the converted value
- * under it, and a bottom row with "Available" (tap it to send the most you
- * can) and the network fee.
+ * in the balance style beside its unit, the converted value under it with
+ * the unit switch, and a bottom row with "Available" (tap it to send the most
+ * you can) and the network fee.
  */
 export default function AmountCard({
   value,
@@ -75,6 +74,7 @@ export default function AmountCard({
   const inset = useInsetFill();
   const t = (key: string) => (translate(key) as string).trim();
   const amountStyle = textVariants.balance;
+  const input = useRef<TextInput>(null);
   return (
     <View style={{ gap: space8, marginTop: space16 }}>
       <Text variant="bodySmall" tone="muted" style={{ fontWeight: '600' }}>
@@ -95,10 +95,19 @@ export default function AmountCard({
           paddingBottom: space4,
         }}
       >
-        <View
-          style={{ flexDirection: 'row', alignItems: 'center', gap: space12 }}
+        <Pressable
+          kind="link"
+          accessible={false}
+          onPress={() => input.current?.focus()}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: space8 }}
         >
+          {unit === 'USD' && (
+            <Text variant="subtitle" tone="muted">
+              $
+            </Text>
+          )}
           <TextInput
+            ref={input}
             testID="send.amount"
             value={value}
             onChangeText={onChangeText}
@@ -114,8 +123,8 @@ export default function AmountCard({
               unit === 'USD' ? 'send.usd-acc' : 'send.zec-acc',
             )}
             style={{
-              flex: 1,
-              minWidth: 0,
+              flexShrink: 1,
+              minWidth: space12,
               fontSize: amountStyle.fontSize,
               fontWeight: amountStyle.fontWeight,
               fontVariant: ['tabular-nums'],
@@ -124,43 +133,37 @@ export default function AmountCard({
               ...singleLineInput(amountStyle.lineHeight),
             }}
           />
-          <Pressable
-            kind="button"
-            testID="send.swap-entry"
-            accessibilityRole="button"
-            accessibilityLabel={t('send.switch-unit-acc')}
-            disabled={!onToggleUnit}
-            onPress={onToggleUnit}
-            hitSlop={slopFor(chipMinHeight)}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: space4,
-              minHeight: chipMinHeight,
-              paddingHorizontal: space12,
-              borderRadius: radiusPill,
-              borderWidth: 1,
-              borderColor: colors.bottomSheetBorder,
-            }}
-          >
-            <Text variant="bodySmall" style={{ fontWeight: '700' }}>
+          {unit !== 'USD' && (
+            <Text variant="subtitle" tone="muted">
               {unit}
             </Text>
-            {!!onToggleUnit && (
-              <View style={{ transform: [{ rotate: '90deg' }] }}>
-                <SwapIcon size={iconSizeSm} color={colors.fgMuted} />
-              </View>
-            )}
-          </Pressable>
-        </View>
-        <Text
-          testID="send.zec-derived"
-          variant="bodySmall"
-          tone="muted"
-          style={{ marginTop: space4 }}
+          )}
+        </Pressable>
+        <Pressable
+          kind="link"
+          testID="send.swap-entry"
+          accessibilityRole="button"
+          accessibilityLabel={t('send.switch-unit-acc')}
+          disabled={!onToggleUnit}
+          onPress={onToggleUnit}
+          hitSlop={slopFor(iconSizeSm)}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            alignSelf: 'flex-start',
+            gap: space8,
+            marginTop: space4,
+          }}
         >
-          {converted}
-        </Text>
+          <Text testID="send.zec-derived" variant="bodySmall" tone="muted">
+            {converted}
+          </Text>
+          {!!onToggleUnit && (
+            <View style={{ transform: [{ rotate: '90deg' }] }}>
+              <SwapIcon size={iconSizeSm} color={colors.fgMuted} />
+            </View>
+          )}
+        </Pressable>
         <View
           style={{
             flexDirection: 'row',

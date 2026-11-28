@@ -38,7 +38,6 @@
   "syncing": "Senkronize ediliyor",
   "synced": "Senkronize edildi",
   "messages": {
-    "bottom-acc": "En yeni mesaja git",
     "title": "Mesajlar",
     "title-chats": "Mesajlar",
     "empty": "Henüz mesaj yok.",
@@ -1592,6 +1591,9 @@
     "row-sub": "{balance} {unit} · {type}",
     "settings-acc": "{name} ayarları",
     "delete-acc": "{name} cüzdanını sil",
+    "actions-acc": "{name} işlemleri",
+    "edit": "Düzenle",
+    "delete": "Sil",
     "opening": "{name} açılıyor…",
     "settings": "Cüzdan ayarları",
     "name": "Ad",
