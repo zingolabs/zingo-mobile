@@ -19,6 +19,9 @@ import { useInsetFill } from '@ui/primitives/Surface';
 /** A pool, a recommendation or a wallet's state beside a row's title. */
 export type PillTone = TagTone;
 
+/** A tag beside a row's title. */
+export type Pill = { text: string; tone: PillTone };
+
 /** The dimmed radio of a choice that can't be picked. */
 const UNAVAILABLE_OPACITY = 0.35;
 
@@ -91,7 +94,7 @@ export function RadioListSlice({
 
 type RadioRowProps = {
   title: string;
-  pill?: { text: string; tone: PillTone };
+  pills?: ReadonlyArray<Pill>;
   /** The line under the title. */
   sub?: React.ReactNode;
   selected: boolean;
@@ -108,10 +111,10 @@ type RadioRowProps = {
   testID?: string;
 };
 
-/** One choice in a radio list: the mark, the title with its pill, a line under it. */
+/** One choice in a radio list: the mark, the title with its pills, a line under it. */
 export default function RadioRow({
   title,
-  pill,
+  pills = [],
   sub,
   selected,
   onPress,
@@ -176,7 +179,11 @@ export default function RadioRow({
             >
               {title}
             </Text>
-            {!!pill && <Tag tone={pill.tone}>{pill.text}</Tag>}
+            {pills.map(pill => (
+              <Tag key={pill.text} tone={pill.tone}>
+                {pill.text}
+              </Tag>
+            ))}
           </View>
           {!!sub && (
             <Text variant="bodySmall" tone="muted">

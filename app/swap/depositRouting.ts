@@ -90,13 +90,28 @@ const BUDGETED_ACTIONS = 4;
  * already committed the route at the provider. The two mistakes are not the
  * same size.
  *
- * Doubled for a memo-bearing deposit, which is two transactions (Maya's
- * shielded memo deposit is one, but that is known only at the commit): the deshield
- * that funds the transparent address, and the transparent spend that pays the
- * vault with the memo. Each pays its own fee.
+ * Doubled for a deposit of two transactions, each paying its own fee.
  */
-export function zecNetworkFeeReserve(provider: SwapKitProviderEnum): number {
+export function zecNetworkFeeReserve(
+  provider: SwapKitProviderEnum,
+  shieldedMemo = false,
+): number {
   const perTransactionZats = MARGINAL_FEE_ZATS * BUDGETED_ACTIONS;
-  const transactions = depositCarriesMemo(provider) ? 2 : 1;
-  return (perTransactionZats * transactions) / 1e8;
+  return (
+    (perTransactionZats * saleTransactionCount(provider, shieldedMemo)) / 1e8
+  );
+}
+
+/**
+ * The transactions a sale's deposit takes: two through a transparent address,
+ * one when Maya takes the memo in a shielded note.
+ */
+export function saleTransactionCount(
+  provider: SwapKitProviderEnum,
+  shieldedMemo: boolean,
+): 1 | 2 {
+  return depositCarriesMemo(provider) &&
+    !(provider === SwapKitProviderEnum.MayachainStreaming && shieldedMemo)
+    ? 2
+    : 1;
 }

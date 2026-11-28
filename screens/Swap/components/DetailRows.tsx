@@ -22,7 +22,7 @@ export type DetailRow = {
   wrap?: boolean;
   /** What the label means, behind an info icon. */
   tip?: string;
-  /** Green for what you get, amber for what came back, Nym green for the mixnet. */
+  /** Green for what you get, amber for what came back, Nym green for the mixnet, grey for a side note. */
   tone?: 'positive' | 'warning' | 'nym';
   /** Drawn before the value: a contact's avatar. */
   leading?: React.ReactNode;

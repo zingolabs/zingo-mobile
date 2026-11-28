@@ -138,12 +138,12 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
             first={index === 0}
             title={t(k.title)}
             sub={t(k.sub)}
-            pill={
+            pills={
               k.pill === 'best'
-                ? { text: t('receive.best'), tone: 'accent' }
+                ? [{ text: t('receive.best'), tone: 'accent' }]
                 : k.pill === 'public'
-                  ? { text: t('receive.public'), tone: 'transparent' }
-                  : undefined
+                  ? [{ text: t('receive.public'), tone: 'transparent' }]
+                  : []
             }
             selected={kind === k.kind}
             onPress={() => setKind(k.kind)}

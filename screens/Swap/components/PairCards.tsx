@@ -407,7 +407,7 @@ export default function PairCards({
             }}
           >
             {unit === 'usd' && (
-              <Text variant="balance" tone="muted">
+              <Text variant="screenTitle" tone="muted">
                 $
               </Text>
             )}
@@ -423,12 +423,12 @@ export default function PairCards({
                 flex: 1,
                 minWidth: 0,
                 textAlign: 'right',
-                fontSize: textVariants.balance.fontSize,
-                fontWeight: textVariants.balance.fontWeight,
+                fontSize: textVariants.screenTitle.fontSize,
+                fontWeight: textVariants.screenTitle.fontWeight,
                 fontVariant: ['tabular-nums'],
                 color: invalid ? colors.fgDanger : colors.fgDefault,
                 padding: 0,
-                ...singleLineInput(textVariants.balance.lineHeight),
+                ...singleLineInput(textVariants.screenTitle.lineHeight),
               }}
             />
           </View>

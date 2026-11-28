@@ -94,8 +94,11 @@ zingodisclosure@proton.me
 - A Maya deposit is paid in one shielded transaction, with its memo in a 0 ZEC note to Maya's memo
   address, when Maya takes it; otherwise, and for THORChain, the memo rides in an OP_RETURN after a
   deshield. A deposit whose second transaction did not go out is finished by Try Again
-- A Maya purchase lands shielded when its memo can carry a unified address, and a Maya sale's refund
-  comes back shielded
+- A Maya purchase lands shielded, in Sapling, when its memo can carry a unified address, and a Maya
+  sale's refund comes back shielded
+- A NEAR purchase lands shielded, in Ironwood, from any chain, and a NEAR sale's refund goes to a new
+  unified address
+- When SwapKit refuses the unified address, the swap goes ahead with the transparent one
 - Buying ZEC through NEAR for less than $300 first warns that NEAR refunds no mistake (wrong coin, wrong
   network) under that line. The warning can be hidden for good
 - An expired purchase is still watched for a late payment

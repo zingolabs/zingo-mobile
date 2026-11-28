@@ -1,89 +1,107 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { View } from 'react-native';
-import { useTheme, iconSizeMd } from '@app/theme';
+import { useTheme, iconSizeMd, textVariants } from '@app/theme';
 import type { SwapAssetType } from '@app/swap';
 import Text from '@ui/primitives/Text';
 import { ChevronRight } from '@ui/primitives/Icons/Chevron';
+import InfoTooltip from '@ui/widgets/InfoTooltip';
 import TokenLogo from './TokenLogo';
 import { tokenEntryOf } from '@screens/Swap/swapAssets';
 
-/**
- * The top of a swap's review: what leaves and what arrives as two coins
- * with an arrow, what is happening, what you get at 36 in green and what it
- * costs. Selling ZEC, "Processing via NYM" sits over it.
- */
-export default function PairHero({
-  from,
-  to,
-  title,
-  amount,
-  unit,
-  line,
-  processing,
-}: {
-  from: SwapAssetType;
-  to: SwapAssetType;
-  title: string;
+type Leg = {
+  asset: SwapAssetType;
+  label: string;
   amount: string;
   unit: string;
-  line: string;
-  /** The Nym label over the pair; absent when nothing goes through NYM. */
-  processing?: string;
+  /** The amount in dollars, empty when unpriced. */
+  fiat: string;
+};
+
+/**
+ * The top of a swap's review: what is happening, then what leaves and what
+ * arrives side by side with their value in dollars, the arriving amount in
+ * green. Selling ZEC, "Processing via NYM" sits over it with its note.
+ */
+export default function PairHero({
+  title,
+  sent,
+  received,
+  processing,
+}: {
+  title: string;
+  sent: Leg;
+  received: Leg;
+  /** The Nym label over the pair and its note; absent when nothing goes through NYM. */
+  processing?: { label: string; note: string };
 }) {
   const { colors } = useTheme();
+  const leg = (
+    { asset, label, amount, unit, fiat }: Leg,
+    incoming: boolean,
+  ) => (
+    <View style={{ flex: 1, minWidth: 0, alignItems: 'center', rowGap: 8 }}>
+      <Text variant="caption" tone="muted">
+        {label}
+      </Text>
+      <TokenLogo
+        token={tokenEntryOf(asset)}
+        size={44}
+        surfaceColor={colors.bgSurface}
+        forceBadge={asset.chain !== asset.symbol}
+      />
+      <Text
+        variant="subtitle"
+        color={incoming ? colors.fgAccent : undefined}
+        style={{ textAlign: 'center', fontVariant: ['tabular-nums'] }}
+      >
+        {amount}
+        <Text variant="bodySmall" tone="muted">{` ${unit}`}</Text>
+      </Text>
+      {!!fiat && (
+        <Text variant="caption" tone="muted">
+          {fiat}
+        </Text>
+      )}
+    </View>
+  );
   return (
     <View style={{ alignItems: 'center', paddingTop: 8 }}>
       {!!processing && (
-        <Text
-          variant="caption"
-          style={{
-            color: colors.fgNym,
-            fontWeight: '600',
-            textTransform: 'uppercase',
-            marginBottom: 12,
-          }}
-        >
-          {processing}
-        </Text>
+        <View style={{ marginBottom: 12 }}>
+          <InfoTooltip
+            testID="swap.review.nym-info"
+            label={processing.label}
+            labelStyle={{
+              fontSize: textVariants.caption.fontSize,
+              fontWeight: '600',
+              textTransform: 'uppercase',
+              color: colors.fgNym,
+            }}
+            text={processing.note}
+          />
+        </View>
       )}
-      <View
-        style={{ flexDirection: 'row', alignItems: 'center', columnGap: 8 }}
-      >
-        <TokenLogo
-          token={tokenEntryOf(from)}
-          size={44}
-          surfaceColor={colors.bgSurface}
-        />
-        <ChevronRight size={iconSizeMd} color={colors.fgMuted} />
-        <TokenLogo
-          token={tokenEntryOf(to)}
-          size={44}
-          surfaceColor={colors.bgSurface}
-          forceBadge={to.chain !== to.symbol}
-        />
-      </View>
       <Text
         variant="bodyStrong"
-        style={{ marginTop: 12, fontWeight: '600', textAlign: 'center' }}
+        style={{ fontWeight: '600', textAlign: 'center' }}
       >
         {title}
       </Text>
-      <Text
-        variant="balance"
-        color={colors.fgAccent}
-        style={{ marginTop: 12, fontVariant: ['tabular-nums'] }}
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          alignSelf: 'stretch',
+          marginTop: 16,
+        }}
       >
-        {amount}
-        <Text variant="subtitle" tone="muted">{` ${unit}`}</Text>
-      </Text>
-      <Text
-        variant="bodySmall"
-        tone="muted"
-        style={{ marginTop: 4, textAlign: 'center' }}
-      >
-        {line}
-      </Text>
+        {leg(sent, false)}
+        <View style={{ marginTop: 32 }}>
+          <ChevronRight size={iconSizeMd} color={colors.fgMuted} />
+        </View>
+        {leg(received, true)}
+      </View>
     </View>
   );
 }

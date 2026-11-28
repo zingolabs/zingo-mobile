@@ -72,18 +72,19 @@ export function quoteBindsAddress({
 
 /**
  * Whether the committed order uses the wallet's ZIP-320 address the quote
- * carried. A sale always does. A purchase does unless Maya pays it to a
- * unified address instead, and reserving one nothing can pay would burn a
- * refund index.
+ * carried. An order that names a new unified address on the wallet's side
+ * leaves it free, and reserving one nothing can pay would burn a refund index.
  */
 export function orderNamesEphemeral({
   isOutbound,
-  quotedDestination,
-  orderedDestination,
+  quoted,
+  ordered,
 }: {
   isOutbound: boolean;
-  quotedDestination: string;
-  orderedDestination: string;
+  quoted: { sourceAddress: string; destinationAddress: string };
+  ordered: { sourceAddress: string; destinationAddress: string };
 }): boolean {
-  return isOutbound || orderedDestination === quotedDestination;
+  return isOutbound
+    ? ordered.sourceAddress === quoted.sourceAddress
+    : ordered.destinationAddress === quoted.destinationAddress;
 }

@@ -118,9 +118,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
         testID={`addresslist.row.${address.address}`}
         first={index === 0}
         title={tag || kind}
-        pill={
-          isT ? { text: t('receive.public'), tone: 'transparent' } : undefined
-        }
+        pills={isT ? [{ text: t('receive.public'), tone: 'transparent' }] : []}
         sub={
           <>
             <Text variant="address">

@@ -1,6 +1,7 @@
 import {
   depositCarriesMemo,
   depositSpendsSourceAddress,
+  saleTransactionCount,
   zecNetworkFeeReserve,
 } from '@app/swap/depositRouting';
 import { SwapKitProviderEnum } from '@app/swap/enums/SwapKitProviderEnum';
@@ -100,5 +101,30 @@ describe('zecNetworkFeeReserve', () => {
     const zats = zecNetworkFeeReserve(SwapKitProviderEnum.Near) * 1e8;
     expect(Number.isInteger(Math.round(zats))).toBe(true);
     expect(Math.abs(zats - Math.round(zats))).toBeLessThan(1e-6);
+  });
+});
+
+describe('saleTransactionCount', () => {
+  it('Tests that a Maya sale is one transaction when Maya takes the memo in a shielded note', () => {
+    expect(
+      saleTransactionCount(SwapKitProviderEnum.MayachainStreaming, true),
+    ).toBe(1);
+    expect(
+      zecNetworkFeeReserve(SwapKitProviderEnum.MayachainStreaming, true),
+    ).toBe(zecNetworkFeeReserve(SwapKitProviderEnum.Near));
+  });
+
+  it('Tests that a sale is two transactions when its deposit goes out through a transparent address', () => {
+    expect(
+      saleTransactionCount(SwapKitProviderEnum.MayachainStreaming, false),
+    ).toBe(2);
+    expect(
+      saleTransactionCount(SwapKitProviderEnum.ThorchainStreaming, true),
+    ).toBe(2);
+    expect(saleTransactionCount(SwapKitProviderEnum.Flashnet, true)).toBe(2);
+  });
+
+  it('Tests that a NEAR sale is one transaction', () => {
+    expect(saleTransactionCount(SwapKitProviderEnum.Near, false)).toBe(1);
   });
 });

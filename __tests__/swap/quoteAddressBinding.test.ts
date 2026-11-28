@@ -134,32 +134,41 @@ describe('quoteBindsAddress', () => {
 });
 
 describe('orderNamesEphemeral', () => {
-  it('Tests that a sale uses the wallet address whatever it ordered', () => {
+  const sale = { sourceAddress: EPHEMERAL, destinationAddress: 'bc1quser' };
+  const purchase = { sourceAddress: 'bc1quser', destinationAddress: EPHEMERAL };
+
+  it('Tests that a sale uses the wallet address when the order kept the quoted source', () => {
+    expect(
+      orderNamesEphemeral({ isOutbound: true, quoted: sale, ordered: sale }),
+    ).toBe(true);
+  });
+
+  it('Tests that a sale leaves it free when NEAR refunds to a unified address', () => {
     expect(
       orderNamesEphemeral({
         isOutbound: true,
-        quotedDestination: 'bc1quser',
-        orderedDestination: 'bc1quser',
+        quoted: sale,
+        ordered: { ...sale, sourceAddress: 'u1refund' },
       }),
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it('Tests that a purchase uses it when the order kept the quoted destination', () => {
     expect(
       orderNamesEphemeral({
         isOutbound: false,
-        quotedDestination: EPHEMERAL,
-        orderedDestination: EPHEMERAL,
+        quoted: purchase,
+        ordered: purchase,
       }),
     ).toBe(true);
   });
 
-  it('Tests that a purchase leaves it free when Maya pays a unified address', () => {
+  it('Tests that a purchase leaves it free when the order pays a unified address', () => {
     expect(
       orderNamesEphemeral({
         isOutbound: false,
-        quotedDestination: EPHEMERAL,
-        orderedDestination: 'u1shielded',
+        quoted: purchase,
+        ordered: { ...purchase, destinationAddress: 'u1shielded' },
       }),
     ).toBe(false);
   });

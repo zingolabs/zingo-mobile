@@ -142,19 +142,24 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
                     testID={`swap.route.${route.provider}`}
                     first={index === 0}
                     title={`${formatAmountForDisplay(route.expectedReceiveAmount)} ${receiveSymbol}`}
-                    pill={
-                      best
-                        ? {
-                            text: translate('swap.routes-best') as string,
-                            tone: 'accent',
-                          }
-                        : isShielded(route.provider)
-                          ? {
+                    pills={[
+                      ...(best
+                        ? [
+                            {
+                              text: translate('swap.routes-best') as string,
+                              tone: 'accent' as const,
+                            },
+                          ]
+                        : []),
+                      ...(isShielded(route.provider)
+                        ? [
+                            {
                               text: translate('swap.routes-shielded') as string,
-                              tone: 'accent',
-                            }
-                          : undefined
-                    }
+                              tone: 'accent' as const,
+                            },
+                          ]
+                        : []),
+                    ]}
                     sub={
                       warning ? (
                         <>
@@ -212,11 +217,16 @@ const RoutesSheet = forwardRef<BottomSheetModal, RoutesSheetProps>(
                         '{coin}',
                         payCoin,
                       )
-                    : (translate(
-                        shieldedNote === 'refund'
-                          ? 'swap.routes-shielded-refund-note'
-                          : 'swap.routes-shielded-note',
-                      ) as string)
+                    : (
+                        translate(
+                          shieldedNote === 'refund'
+                            ? 'swap.routes-shielded-refund-note'
+                            : 'swap.routes-shielded-note',
+                        ) as string
+                      ).replace(
+                        '{tag}',
+                        translate('swap.routes-shielded') as string,
+                      )
                 }
               />
             </View>

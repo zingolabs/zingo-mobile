@@ -54,7 +54,7 @@ import { PlusIcon } from '@ui/primitives/Icons/PlusIcon';
 import Avatar, { AvatarCategory } from '@ui/widgets/Avatar';
 import DeleteWalletSheet from '@ui/widgets/DeleteWalletSheet';
 import { MASK } from '@ui/widgets/PrivateAmount';
-import RadioRow, { RadioList } from '@ui/widgets/RadioRow';
+import RadioRow, { RadioList, type Pill } from '@ui/widgets/RadioRow';
 import { DeleteMark, EditMark, flashMark } from '@ui/widgets/RowActionMarks';
 import TitleBar from '@ui/widgets/TitleBar';
 import DetailRows from '@screens/Swap/components/DetailRows';
@@ -390,7 +390,7 @@ type WalletRowProps = {
   first: boolean;
   selected: boolean;
   unavailable: boolean;
-  pill: React.ComponentProps<typeof RadioRow>['pill'];
+  pill?: Pill;
   sub: string;
   editLabel: string;
   deleteLabel: string;
@@ -449,7 +449,7 @@ function WalletRow({
       testID={`wallets.row.${wallet.id}`}
       first={first}
       title={wallet.meta.name}
-      pill={pill}
+      pills={pill && [pill]}
       sub={sub}
       selected={selected}
       unavailable={unavailable}

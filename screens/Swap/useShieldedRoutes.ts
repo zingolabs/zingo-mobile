@@ -12,8 +12,7 @@ export type ShieldedNoteType = 'purchase' | 'refund' | 'none' | null;
 
 /**
  * Which routes land shielded, and the note that goes with them. A sale asks
- * mayanode once whether Maya takes a shielded memo: without one the refund
- * cannot name a unified address, so nothing is offered.
+ * mayanode once whether Maya takes a shielded memo for the refund.
  */
 export function useShieldedRoutes(args: {
   direction: SwapDirectionEnum;
