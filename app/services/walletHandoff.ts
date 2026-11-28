@@ -22,6 +22,7 @@ export type WalletHandoff = {
   settings: {
     language: LanguageEnum;
     privacy: boolean;
+    flipToHide: boolean;
     biometrics: boolean;
     blockExplorer: BlockExplorerEnum;
     addressBook: AddressBookFileClass[];

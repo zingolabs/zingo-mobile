@@ -44,6 +44,8 @@ export const defaultAppContextLoaded: AppContextLoaded = {
     date: 0,
   } as ZecPriceType,
   privacy: false,
+  privacySetting: false,
+  flipToHide: false,
   readOnly: false,
   translate: () => '',
   backgroundSyncInfo: {
@@ -99,6 +101,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   setZecPrice: () => {},
   zingolibVersion: '',
   setPrivacyOption: async () => {},
+  setFlipToHideOption: async () => {},
   seedBackedUp: true,
   seedBackedUpAt: 0,
   setSeedBackedUp: async () => {},

@@ -19,6 +19,7 @@ class RPCPackage : ReactPackage {
         modules.add(DeviceAuthModule(reactContext))
         modules.add(ScreenSecurityModule(reactContext))
         modules.add(PrivacyGuardModule(reactContext))
+        modules.add(FlipDetectorModule(reactContext))
         return modules
     }
 }

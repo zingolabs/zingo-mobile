@@ -211,6 +211,9 @@ export default interface AppContextLoaded {
 
   // Change the privacy everywhere
   setPrivacyOption: (value: boolean) => Promise<void>;
+  privacySetting: boolean;
+  flipToHide: boolean;
+  setFlipToHideOption: (value: boolean) => Promise<void>;
 
   // The user confirmed the seed phrase in the backup flow, or restored it.
   seedBackedUp: boolean;
