@@ -1,3 +1,4 @@
+import { sameAsset } from './sameAsset';
 import type { FiatValueBasisType } from './types/FiatValueBasisType';
 import type { QuoteResponseType } from './types/QuoteResponseType';
 
@@ -39,7 +40,7 @@ export function extractFiatValueBasis(args: {
 
   const priced = [...routeLevel, ...topLevel];
   const priceOf = (id: string): number =>
-    priced.find(entry => entry.asset === id)?.price ?? 0;
+    priced.find(entry => sameAsset(entry.asset, id))?.price ?? 0;
 
   return {
     sellUsdUnitPrice: priceOf(sellAssetId),

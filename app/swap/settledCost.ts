@@ -1,3 +1,4 @@
+import { sameAsset } from './sameAsset';
 import type { SwapRecordType } from './types/SwapRecordType';
 import type { TrackResponseType } from './types/TrackResponseType';
 import type { SettledCostType } from './types/SettledCostType';
@@ -49,15 +50,13 @@ export function settledFeesUsd(
   cost: SettledCostType,
 ): number {
   const prices = settledUnitPrices(record, cost);
-  const same = (a: string | undefined, b: string) =>
-    !!a && a.toUpperCase() === b.toUpperCase();
   return cost.fees.reduce((sum, fee) => {
     const amount = parseFloat(fee.amount ?? '');
     if (!Number.isFinite(amount)) return sum;
-    if (same(fee.asset, record.sellAsset.swapKitId)) {
+    if (sameAsset(fee.asset, record.sellAsset.swapKitId)) {
       return sum + amount * prices.sell;
     }
-    if (same(fee.asset, record.receiveAsset.swapKitId)) {
+    if (sameAsset(fee.asset, record.receiveAsset.swapKitId)) {
       return sum + amount * prices.receive;
     }
     return sum;

@@ -1,3 +1,4 @@
+import { sameAsset } from './sameAsset';
 import { ChainNameEnum } from './enums/ChainNameEnum';
 import { MidgardClient, findSwapByInboundHash } from './MidgardClient';
 import { SwapKitClient } from './SwapKitClient';
@@ -915,16 +916,16 @@ function toRouteOption(
     amount: number,
     asset: string | undefined,
   ): number => {
-    if (asset === receiveAssetId) return amount;
-    if (asset === sellAssetId && receivePerSellRate !== undefined) {
+    if (sameAsset(asset, receiveAssetId)) return amount;
+    if (sameAsset(asset, sellAssetId) && receivePerSellRate !== undefined) {
       return amount * receivePerSellRate;
     }
     return 0;
   };
   const convertToSell = (amount: number, asset: string | undefined): number => {
-    if (asset === sellAssetId) return amount;
+    if (sameAsset(asset, sellAssetId)) return amount;
     if (
-      asset === receiveAssetId &&
+      sameAsset(asset, receiveAssetId) &&
       receivePerSellRate !== undefined &&
       receivePerSellRate > 0
     ) {
