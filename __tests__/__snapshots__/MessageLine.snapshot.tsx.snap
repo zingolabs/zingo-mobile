@@ -1,11 +1,9 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`MessageLine - snapshots MessageLine received with messageAddress, no month 1`] = `
+exports[`MessageLine - snapshots MessageLine received, no month 1`] = `
 <View
   style={
     {
-      "display": "flex",
-      "flexDirection": "column",
       "marginHorizontal": 20,
     }
   }
@@ -43,9 +41,7 @@ exports[`MessageLine - snapshots MessageLine received with messageAddress, no mo
     onStartShouldSetResponder={[Function]}
     style={
       [
-        {
-          "zIndex": 999,
-        },
+        undefined,
         {},
       ]
     }
@@ -54,18 +50,13 @@ exports[`MessageLine - snapshots MessageLine received with messageAddress, no mo
       style={
         [
           {
-            "alignItems": "flex-start",
-            "backgroundColor": "#18bd181F",
-            "borderBottomEndRadius": 12,
-            "borderBottomStartRadius": 0,
+            "backgroundColor": "#031124",
+            "borderColor": "#05234C",
             "borderRadius": 12,
-            "display": "flex",
-            "flexDirection": "column",
-            "justifyContent": "flex-start",
+            "borderWidth": 1,
             "marginBottom": 8,
-            "marginLeft": 0,
-            "marginRight": 48,
             "padding": 12,
+            "rowGap": 8,
           },
           {},
         ]
@@ -74,208 +65,114 @@ exports[`MessageLine - snapshots MessageLine received with messageAddress, no mo
       <View
         style={
           {
-            "marginTop": 0,
-          }
-        }
-      >
-        <View
-          accessibilityState={
-            {
-              "busy": undefined,
-              "checked": undefined,
-              "disabled": undefined,
-              "expanded": undefined,
-              "selected": undefined,
-            }
-          }
-          accessibilityValue={
-            {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
-            }
-          }
-          accessible={true}
-          collapsable={false}
-          focusable={true}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onFocus={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            [
-              {
-                "zIndex": 999,
-              },
-              {},
-            ]
-          }
-        >
-          <Text
-            maxFontSizeMultiplier={2}
-            selectable={true}
-            style={
-              {
-                "color": "#c3c3c3",
-                "fontSize": 15,
-                "fontWeight": "400",
-                "lineHeight": 21,
-              }
-            }
-          >
-            hola
-  & 
-hello
-          </Text>
-        </View>
-      </View>
-      <View
-        style={
-          {
             "alignItems": "center",
-            "alignSelf": "flex-end",
-            "display": "flex",
+            "columnGap": 8,
             "flexDirection": "row",
           }
         }
       >
-        <View
+        <Text
+          maxFontSizeMultiplier={2}
+          numberOfLines={1}
           style={
             {
-              "flexDirection": "row",
-              "marginHorizontal": 5,
-              "paddingRight": 4,
+              "color": "#18bd18",
+              "flexShrink": 1,
+              "fontSize": 13,
+              "fontWeight": "600",
+              "lineHeight": 18,
             }
           }
         >
-          <View
-            accessibilityState={
-              {
-                "busy": undefined,
-                "checked": undefined,
-                "disabled": true,
-                "expanded": undefined,
-                "selected": undefined,
-              }
-            }
-            accessibilityValue={
-              {
-                "max": undefined,
-                "min": undefined,
-                "now": undefined,
-                "text": undefined,
-              }
-            }
-            accessible={true}
-            collapsable={false}
-            focusable={true}
-            onBlur={[Function]}
-            onClick={[Function]}
-            onFocus={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            style={
-              [
-                undefined,
-                {},
-              ]
-            }
-          >
-            <View
-              style={
-                {
-                  "alignItems": "baseline",
-                  "flexDirection": "row",
-                  "margin": 0,
-                  "padding": 0,
-                }
-              }
-            >
-              <View
-                style={
-                  {
-                    "height": 20.225993866741007,
-                    "marginRight": 2.2944856425982714,
-                    "width": 13.939514914970726,
-                  }
-                }
-              />
-              <Text
-                maxFontSizeMultiplier={2}
-                style={
-                  {
-                    "color": "#18bd18",
-                    "fontSize": 12,
-                    "fontWeight": "700",
-                    "margin": 0,
-                    "padding": 0,
-                  }
-                }
-              >
-                EC
-              </Text>
-              <Text
-                maxFontSizeMultiplier={2}
-                style={
-                  {
-                    "color": "#18bd18",
-                    "fontSize": 12,
-                    "fontWeight": "700",
-                    "margin": 0,
-                    "padding": 0,
-                  }
-                }
-                testID="undefined.big-part"
-              >
-                 0.77654321
-              </Text>
-            </View>
-          </View>
-        </View>
-        <View>
-          <Text
-            maxFontSizeMultiplier={2}
-            style={
-              {
-                "color": "#888888",
-                "fontSize": 12,
-                "fontWeight": "400",
-                "lineHeight": 16,
-              }
-            }
-          >
-            Jan 1, 12:00 am
-          </Text>
-        </View>
-        <View
+          text translated
+        </Text>
+        <Text
+          maxFontSizeMultiplier={2}
           style={
             {
-              "alignItems": "center",
-              "display": "flex",
-              "justifyContent": "center",
+              "color": "#888888",
+              "fontSize": 12,
+              "fontWeight": "400",
+              "lineHeight": 16,
             }
           }
         >
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "justifyContent": "center",
-              }
+          Jan 1, 12:00 am
+        </Text>
+        <View
+          style={
+            {
+              "flex": 1,
             }
-          />
-        </View>
+          }
+        />
+        <Text
+          maxFontSizeMultiplier={2}
+          style={
+            {
+              "color": "#18bd18",
+              "fontSize": 13,
+              "fontWeight": "600",
+              "lineHeight": 18,
+            }
+          }
+        >
+          +0.77654321 ZEC
+        </Text>
+      </View>
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          [
+            undefined,
+            {},
+          ]
+        }
+      >
+        <Text
+          maxFontSizeMultiplier={2}
+          selectable={true}
+          style={
+            {
+              "color": "#c3c3c3",
+              "fontSize": 15,
+              "fontWeight": "400",
+              "lineHeight": 21,
+            }
+          }
+        >
+          hola
+  & 
+hello
+        </Text>
       </View>
     </View>
   </View>
@@ -286,8 +183,6 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
 <View
   style={
     {
-      "display": "flex",
-      "flexDirection": "column",
       "marginHorizontal": 20,
     }
   }
@@ -348,9 +243,7 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
     onStartShouldSetResponder={[Function]}
     style={
       [
-        {
-          "zIndex": 999,
-        },
+        undefined,
         {},
       ]
     }
@@ -359,18 +252,13 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
       style={
         [
           {
-            "alignItems": "flex-start",
-            "backgroundColor": "#18bd181F",
-            "borderBottomEndRadius": 0,
-            "borderBottomStartRadius": 12,
+            "backgroundColor": "#031124",
+            "borderColor": "#05234C",
             "borderRadius": 12,
-            "display": "flex",
-            "flexDirection": "column",
-            "justifyContent": "flex-start",
+            "borderWidth": 1,
             "marginBottom": 8,
-            "marginLeft": 48,
-            "marginRight": 0,
             "padding": 12,
+            "rowGap": 8,
           },
           {},
         ]
@@ -379,298 +267,114 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
       <View
         style={
           {
-            "marginBottom": 8,
-          }
-        }
-      >
-        <View
-          style={
-            {
-              "alignItems": "flex-start",
-              "display": "flex",
-              "flexDirection": "row",
-            }
-          }
-        >
-          <View
-            style={
-              {
-                "alignItems": "flex-start",
-                "display": "flex",
-                "flexDirection": "column",
-                "marginRight": 10,
-              }
-            }
-          >
-            <View
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              style={
-                [
-                  undefined,
-                  {},
-                ]
-              }
-            >
-              <View
-                style={
-                  {
-                    "display": "flex",
-                    "flexDirection": "column",
-                    "flexWrap": "wrap",
-                  }
-                }
-              >
-                <Text
-                  maxFontSizeMultiplier={2}
-                  style={
-                    {
-                      "color": "#c3c3c3",
-                      "fontSize": 15,
-                      "fontWeight": "400",
-                      "lineHeight": 21,
-                    }
-                  }
-                >
-                  sent-ad...4567890
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
-      </View>
-      <View
-        style={
-          {
-            "marginTop": 0,
-          }
-        }
-      >
-        <View
-          accessibilityState={
-            {
-              "busy": undefined,
-              "checked": undefined,
-              "disabled": undefined,
-              "expanded": undefined,
-              "selected": undefined,
-            }
-          }
-          accessibilityValue={
-            {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
-            }
-          }
-          accessible={true}
-          collapsable={false}
-          focusable={true}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onFocus={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            [
-              {
-                "zIndex": 999,
-              },
-              {},
-            ]
-          }
-        >
-          <Text
-            maxFontSizeMultiplier={2}
-            selectable={true}
-            style={
-              {
-                "color": "#c3c3c3",
-                "fontSize": 15,
-                "fontWeight": "400",
-                "lineHeight": 21,
-              }
-            }
-          >
-            hola
-  & 
-hello
-          </Text>
-        </View>
-      </View>
-      <View
-        style={
-          {
             "alignItems": "center",
-            "alignSelf": "flex-end",
-            "display": "flex",
+            "columnGap": 8,
             "flexDirection": "row",
           }
         }
       >
-        <View
+        <Text
+          maxFontSizeMultiplier={2}
+          numberOfLines={1}
           style={
             {
-              "flexDirection": "row",
-              "marginHorizontal": 5,
-              "paddingRight": 4,
+              "color": "#c3c3c3",
+              "flexShrink": 1,
+              "fontSize": 13,
+              "fontWeight": "600",
+              "lineHeight": 18,
             }
           }
         >
-          <View
-            accessibilityState={
-              {
-                "busy": undefined,
-                "checked": undefined,
-                "disabled": true,
-                "expanded": undefined,
-                "selected": undefined,
-              }
-            }
-            accessibilityValue={
-              {
-                "max": undefined,
-                "min": undefined,
-                "now": undefined,
-                "text": undefined,
-              }
-            }
-            accessible={true}
-            collapsable={false}
-            focusable={true}
-            onBlur={[Function]}
-            onClick={[Function]}
-            onFocus={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            style={
-              [
-                undefined,
-                {},
-              ]
-            }
-          >
-            <View
-              style={
-                {
-                  "alignItems": "baseline",
-                  "flexDirection": "row",
-                  "margin": 0,
-                  "padding": 0,
-                }
-              }
-            >
-              <View
-                style={
-                  {
-                    "height": 20.225993866741007,
-                    "marginRight": 2.2944856425982714,
-                    "width": 13.939514914970726,
-                  }
-                }
-              />
-              <Text
-                maxFontSizeMultiplier={2}
-                style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 12,
-                    "fontWeight": "700",
-                    "margin": 0,
-                    "padding": 0,
-                  }
-                }
-              >
-                EC
-              </Text>
-              <Text
-                maxFontSizeMultiplier={2}
-                style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 12,
-                    "fontWeight": "700",
-                    "margin": 0,
-                    "padding": 0,
-                  }
-                }
-                testID="undefined.big-part"
-              >
-                 0.12345678
-              </Text>
-            </View>
-          </View>
-        </View>
-        <View>
-          <Text
-            maxFontSizeMultiplier={2}
-            style={
-              {
-                "color": "#888888",
-                "fontSize": 12,
-                "fontWeight": "400",
-                "lineHeight": 16,
-              }
-            }
-          >
-            Jan 1, 12:00 am
-          </Text>
-        </View>
-        <View
+          text translated
+        </Text>
+        <Text
+          maxFontSizeMultiplier={2}
           style={
             {
-              "alignItems": "center",
-              "display": "flex",
-              "justifyContent": "center",
+              "color": "#888888",
+              "fontSize": 12,
+              "fontWeight": "400",
+              "lineHeight": 16,
             }
           }
         >
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "justifyContent": "center",
-              }
+          Jan 1, 12:00 am
+        </Text>
+        <View
+          style={
+            {
+              "flex": 1,
             }
-          />
-        </View>
+          }
+        />
+        <Text
+          maxFontSizeMultiplier={2}
+          style={
+            {
+              "color": "#c3c3c3",
+              "fontSize": 13,
+              "fontWeight": "600",
+              "lineHeight": 18,
+            }
+          }
+        >
+          −0.12345678 ZEC
+        </Text>
+      </View>
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          [
+            undefined,
+            {},
+          ]
+        }
+      >
+        <Text
+          maxFontSizeMultiplier={2}
+          selectable={true}
+          style={
+            {
+              "color": "#c3c3c3",
+              "fontSize": 15,
+              "fontWeight": "400",
+              "lineHeight": 21,
+            }
+          }
+        >
+          hola
+  & 
+hello
+        </Text>
       </View>
     </View>
   </View>

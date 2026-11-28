@@ -124,8 +124,8 @@ export default interface AppContextLoaded {
   // The header asks the lists to scroll; a list clears the request.
   scrollToTop: boolean;
   setScrollToTop: (value: boolean) => void;
-  scrollToBottom: boolean;
-  setScrollToBottom: (value: boolean) => void;
+  scrollToNewest: boolean;
+  setScrollToNewest: (value: boolean) => void;
   setShieldingAmount: (value: number) => void;
 
   // Wallet actions the screens run; the provider owns the wallet backend.

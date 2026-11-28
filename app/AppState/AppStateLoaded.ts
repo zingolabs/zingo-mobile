@@ -8,5 +8,5 @@ export default interface AppStateLoaded {
   scrollToTop: boolean;
 
   // to do scroll to bottom in messages
-  scrollToBottom: boolean;
+  scrollToNewest: boolean;
 }

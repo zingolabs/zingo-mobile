@@ -139,7 +139,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     shieldingAmount,
     mixnetView,
     sendPermitNow,
-    setScrollToBottom,
+    setScrollToNewest,
     addressBook,
   } = context;
   const shieldSheetRef = useRef<BottomSheetModal>(null);
@@ -154,7 +154,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     addLastSnackbar,
     setBackgroundError,
     setScrollToTop,
-    setScrollToBottom,
+    setScrollToNewest,
     sendPermitNow,
   });
   const { colors } = useTheme();

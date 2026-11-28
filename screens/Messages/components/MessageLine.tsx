@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import Pressable, { PressTile } from '@ui/primitives/Pressable';
-import { View, ActivityIndicator, Platform } from 'react-native';
+import { View } from 'react-native';
 import {
   iconSizeSm,
   radiusMd,
@@ -9,18 +9,17 @@ import {
   space8,
   space12,
   space16,
-  space24,
+  space20,
   useTheme,
 } from '@app/theme';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
-import ZecAmount from '@ui/widgets/ZecAmount';
 import Text from '@ui/primitives/Text';
+import PrivateAmount from '@ui/widgets/PrivateAmount';
 import {
   ValueTransferType,
   ValueTransferKindEnum,
-  AddressBookFileClass,
   SnackbarDurationEnum,
   GlobalConst,
   UnifiedAddressClass,
@@ -30,97 +29,61 @@ import {
 import { ContextAppLoaded } from '@app/context';
 import AddressItem from '@ui/widgets/AddressItem';
 import Utils from '@app/utils';
+import { formatAmount } from '@app/utils/formatAmount';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
-import { VerifyXIcon } from '@ui/primitives/Icons/VerifyXIcon';
-import { CheckCircleLineIcon } from '@ui/primitives/Icons/CheckCircleLineIcon';
-import { CheckCircleIcon } from '@ui/primitives/Icons/CheckCircleIcon';
+import { ArrowDownIcon } from '@ui/primitives/Icons/ArrowDownIcon';
+import { ArrowUpIcon } from '@ui/primitives/Icons/ArrowUpIcon';
 
 type MessageLineProps = {
   index: number;
   month: string;
   vt: ValueTransferType;
   setValueTransferDetailModalShow: (i: number, vt: ValueTransferType) => void;
-  messageAddress?: string;
 };
-// Amounts under this are not worth a line of their own — the message is the
-// point, not the dust attached to it.
+/** Amounts under this are dust beside the message and are left out. */
 const MIN_AMOUNT_SHOWN = 0.01;
-/** How far a bubble stays from the far side, so sent and received read apart. */
-const BUBBLE_INSET = space24 * 2;
-/** The corner a bubble points from, toward its sender. */
-const TAIL_CORNER = 0;
 
+/**
+ * One memo as a card under its month: who it came from or went to, when,
+ * and the amount on top, then the memo. A press opens the transaction.
+ */
 const MessageLine: React.FunctionComponent<MessageLineProps> = ({
   index,
   vt,
   month,
   setValueTransferDetailModalShow,
-  messageAddress,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const {
-    translate,
-    language,
-    privacy,
-    info,
-    addressBook,
-    addresses,
-    addLastSnackbar,
-  } = context;
+  const { translate, language, info, addressBook, addresses, addLastSnackbar } =
+    context;
   const { colors } = useTheme();
+  const t = (key: string) => (translate(key) as string).trim();
 
   const { memo, memoUA } = Utils.splitMemo(vt.memos);
+  const received = vt.kind === ValueTransferKindEnum.Received;
+  const sent = vt.kind === ValueTransferKindEnum.Sent;
+  const failed = vt.status === RPCValueTransfersStatusEnum.failed;
 
-  const getAmountColor = (_vt: ValueTransferType) => {
-    return _vt.kind === ValueTransferKindEnum.Received ||
-      _vt.kind === ValueTransferKindEnum.Shield
-      ? colors.fgAccent
-      : colors.fgDefault;
-  };
+  const contact = vt.address
+    ? addressBook.find(ab => ab.address === vt.address)
+    : undefined;
+  const who = received
+    ? t('history.received')
+    : sent
+      ? contact
+        ? `${t('history.tx-to')}: ${contact.label}`
+        : t('history.sent')
+      : t('history.tx-self');
+  const whoColor = received ? colors.fgAccent : colors.fgDefault;
 
-  const contactFound = (add: string) => {
-    if (!add) {
-      return {
-        found: false,
-      };
-    }
-    const contact: AddressBookFileClass[] = addressBook.filter(
-      (ab: AddressBookFileClass) => ab.address === add,
+  const thisWalletAddress = (add: string) =>
+    (addresses ?? []).some(
+      (a: UnifiedAddressClass | TransparentAddressClass) => a.address === add,
     );
-    return {
-      found: contact.length >= 1,
-    };
-  };
-
-  const thisWalletAddress: (add: string) => boolean = (add: string) => {
-    const address: (UnifiedAddressClass | TransparentAddressClass)[] = addresses
-      ? addresses.filter(
-          (a: UnifiedAddressClass | TransparentAddressClass) =>
-            a.address === add,
-        )
-      : [];
-    return address.length >= 1;
-  };
-
-  //console.log('render ValueTransferLine - 5', index, nextLineWithSameTxid);
-
-  //if (index === 0) {
-  //  vt.confirmations = 0;
-  //  vt.status = RPCValueTransfersStatusEnum.failed;
-  //  vt.kind = ValueTransferKindEnum.Shield;
-  //}
-  //if (index === 1) {
-  //  vt.confirmations = 0;
-  //  vt.status = RPCValueTransfersStatusEnum.failed;
-  //  vt.kind = ValueTransferKindEnum.Sent;
-  //}
 
   return (
-    <View
-      testID={`m-${index + 1}`}
-      style={{ display: 'flex', flexDirection: 'column', marginHorizontal: 20 }}
-    >
+    <View testID={`m-${index + 1}`} style={{ marginHorizontal: space20 }}>
       {month !== '' && (
         <View style={{ paddingTop: space16, paddingBottom: space8 }}>
           <Text
@@ -132,218 +95,121 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
           </Text>
         </View>
       )}
-      {/* The row is the tap target; only the bubble answers the press. */}
       <Pressable
         kind="tile"
-        style={{ zIndex: 999 }}
-        onPress={() => {
-          setValueTransferDetailModalShow(index, vt);
-        }}
+        onPress={() => setValueTransferDetailModalShow(index, vt)}
       >
         <PressTile
           large
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            justifyContent: 'flex-start',
             padding: space12,
             marginBottom: space8,
-            marginLeft:
-              vt.kind === ValueTransferKindEnum.Received ? 0 : BUBBLE_INSET,
-            marginRight:
-              vt.kind === ValueTransferKindEnum.Received ? BUBBLE_INSET : 0,
+            rowGap: space8,
             borderRadius: radiusMd,
-            borderBottomEndRadius:
-              vt.kind === ValueTransferKindEnum.Received
-                ? radiusMd
-                : TAIL_CORNER,
-            borderBottomStartRadius:
-              vt.kind === ValueTransferKindEnum.Received
-                ? TAIL_CORNER
-                : radiusMd,
-            backgroundColor:
-              vt.status === RPCValueTransfersStatusEnum.failed
-                ? colors.bgMutedSubtle
-                : colors.bgAccentSubtle,
+            borderWidth: 1,
+            borderColor: colors.bottomSheetBorder,
+            backgroundColor: colors.bgSurface,
           }}
         >
-          {!!vt.address && !messageAddress && (
-            <View style={{ marginBottom: space8 }}>
-              <AddressItem address={vt.address} oneLine={true} />
-            </View>
-          )}
-          {(!!memo || !!memoUA) && (
-            <View style={{ marginTop: 0 }}>
-              {!!memo && (
-                <Pressable
-                  kind="link"
-                  style={{ zIndex: 999 }}
-                  onPress={() => {
-                    Clipboard.setString(memo);
-                    addLastSnackbar(
-                      translate('history.memocopied') as string,
-                      SnackbarDurationEnum.short,
-                    );
-                  }}
-                >
-                  <Text variant="body" selectable={true}>
-                    {memo}
-                  </Text>
-                </Pressable>
-              )}
-              {!!memoUA && (
-                <Pressable
-                  kind="link"
-                  style={{ zIndex: 999 }}
-                  onPress={() => {
-                    Clipboard.setString(memoUA);
-                    if (!thisWalletAddress(memoUA)) {
-                      addLastSnackbar(
-                        translate('history.address-http') as string,
-                        SnackbarDurationEnum.long,
-                      );
-                    }
-                    addLastSnackbar(
-                      translate('history.addresscopied') as string,
-                      SnackbarDurationEnum.short,
-                    );
-                  }}
-                >
-                  {!thisWalletAddress(memoUA) && memoUA !== messageAddress && (
-                    <>
-                      <Text variant="body">{GlobalConst.replyTo}</Text>
-                      <TriangleAlert
-                        color={colors.fgWarning}
-                        size={iconSizeSm}
-                      />
-                      <Text variant="address" tone="muted">
-                        {memoUA}
-                      </Text>
-                      {contactFound(memoUA).found && (
-                        <View style={{ flexDirection: 'row' }}>
-                          {!thisWalletAddress(memoUA) && (
-                            <Text variant="bodySmall" tone="muted">
-                              {translate('addressbook.likely') as string}
-                            </Text>
-                          )}
-                          <AddressItem address={memoUA} onlyContact={true} />
-                        </View>
-                      )}
-                    </>
-                  )}
-                </Pressable>
-              )}
-            </View>
-          )}
           <View
             style={{
-              display: 'flex',
               flexDirection: 'row',
               alignItems: 'center',
-              alignSelf: 'flex-end',
+              columnGap: space8,
             }}
           >
-            {vt.status === RPCValueTransfersStatusEnum.failed && (
+            {received ? (
+              <ArrowDownIcon size={iconSizeSm} color={whoColor} />
+            ) : (
+              <ArrowUpIcon size={iconSizeSm} color={whoColor} />
+            )}
+            <Text
+              variant="bodySmall"
+              numberOfLines={1}
+              color={whoColor}
+              style={{ fontWeight: '600', flexShrink: 1 }}
+            >
+              {who}
+            </Text>
+            <Text variant="caption" tone="muted">
+              {vt.time
+                ? Utils.formatDate(vt.time * 1000, 'MMM d, h:mm aaa', language)
+                : '--'}
+            </Text>
+            {failed && (
               <Text
                 variant="caption"
                 tone="danger"
-                style={{ fontWeight: '600', marginRight: space8 }}
+                style={{ fontWeight: '600' }}
               >
-                {translate(`history.${vt.status}`) as string}
+                {t(`history.${vt.status}`)}
               </Text>
             )}
+            <View style={{ flex: 1 }} />
             {vt.amount >= MIN_AMOUNT_SHOWN && (
-              <ZecAmount
-                style={{ paddingRight: space4 }}
-                size={12}
-                currencyName={info.currencyName}
-                color={getAmountColor(vt)}
-                amtZec={vt.amount}
-                privacy={privacy}
+              <PrivateAmount
+                text={`${received ? '+' : sent ? '−' : ''}${formatAmount(vt.amount)} ${info.currencyName}`}
+                variant="bodySmall"
+                color={received ? colors.fgAccent : colors.fgDefault}
+                style={{ fontWeight: '600' }}
               />
             )}
-            <View>
-              <Text variant="caption" tone="muted">
-                {vt.time
-                  ? Utils.formatDate(
-                      (vt.time || 0) * 1000,
-                      'MMM d, h:mm aaa',
-                      language,
-                    )
-                  : '--'}
-              </Text>
-            </View>
-            <View
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
+          </View>
+          {!!memo && (
+            <Pressable
+              kind="link"
+              onPress={() => {
+                Clipboard.setString(memo);
+                addLastSnackbar(
+                  t('history.memocopied'),
+                  SnackbarDurationEnum.short,
+                );
               }}
+            >
+              <Text variant="body" selectable={true}>
+                {memo}
+              </Text>
+            </Pressable>
+          )}
+          {!!memoUA && !thisWalletAddress(memoUA) && (
+            <Pressable
+              kind="link"
+              onPress={() => {
+                Clipboard.setString(memoUA);
+                addLastSnackbar(
+                  t('history.address-http'),
+                  SnackbarDurationEnum.long,
+                );
+                addLastSnackbar(
+                  t('history.addresscopied'),
+                  SnackbarDurationEnum.short,
+                );
+              }}
+              style={{ rowGap: space4 }}
             >
               <View
                 style={{
                   flexDirection: 'row',
-                  justifyContent: 'center',
                   alignItems: 'center',
+                  columnGap: space4,
                 }}
               >
-                {vt.status === RPCValueTransfersStatusEnum.failed && (
-                  <VerifyXIcon
-                    style={{ marginLeft: 5, marginRight: 1, marginTop: 2 }}
-                    size={iconSizeSm}
-                    color={colors.fgDanger}
-                  />
-                )}
-                {(vt.status === RPCValueTransfersStatusEnum.calculated ||
-                  vt.status === RPCValueTransfersStatusEnum.transmitted ||
-                  vt.status === RPCValueTransfersStatusEnum.mempool) && (
-                  <CheckCircleLineIcon
-                    style={{ marginLeft: 5, marginRight: 1, marginTop: 2 }}
-                    size={iconSizeSm}
-                    color={colors.fgWarning}
-                  />
-                )}
-                {vt.status === RPCValueTransfersStatusEnum.confirmed && (
-                  <CheckCircleIcon
-                    style={{ marginLeft: 5, marginRight: 1, marginTop: 2 }}
-                    size={iconSizeSm}
-                    color={colors.fgAccent}
-                    checkColor={colors.fgOnAccent}
-                  />
-                )}
-                {vt.status !== RPCValueTransfersStatusEnum.confirmed &&
-                  vt.status !== RPCValueTransfersStatusEnum.failed && (
-                    <CheckCircleLineIcon
-                      style={{ marginLeft: 1, marginRight: 0, marginTop: 2 }}
-                      size={iconSizeSm}
-                      color={colors.fgWarning}
-                    />
-                  )}
-                {vt.status === RPCValueTransfersStatusEnum.confirmed && (
-                  <CheckCircleIcon
-                    style={{ marginLeft: 1, marginRight: 0, marginTop: 2 }}
-                    size={iconSizeSm}
-                    color={colors.fgAccent}
-                    checkColor={colors.fgOnAccent}
-                  />
-                )}
-                {vt.status !== RPCValueTransfersStatusEnum.confirmed &&
-                  vt.status !== RPCValueTransfersStatusEnum.failed && (
-                    <View style={{ marginLeft: 2, marginTop: 2 }}>
-                      <ActivityIndicator
-                        size={
-                          Platform.OS === GlobalConst.platformOSios
-                            ? 'small'
-                            : 12
-                        }
-                        color={colors.fgMuted}
-                      />
-                    </View>
-                  )}
+                <Text variant="bodySmall">{GlobalConst.replyTo}</Text>
+                <TriangleAlert color={colors.fgWarning} size={iconSizeSm} />
               </View>
-            </View>
-          </View>
+              <Text variant="address" tone="muted">
+                {memoUA}
+              </Text>
+              {addressBook.some(ab => ab.address === memoUA) && (
+                <View style={{ flexDirection: 'row' }}>
+                  <Text variant="bodySmall" tone="muted">
+                    {t('addressbook.likely')}
+                  </Text>
+                  <AddressItem address={memoUA} onlyContact={true} />
+                </View>
+              )}
+            </Pressable>
+          )}
         </PressTile>
       </Pressable>
     </View>

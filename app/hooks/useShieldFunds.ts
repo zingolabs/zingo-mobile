@@ -38,7 +38,7 @@ type UseShieldFundsInput = {
     ((msg: string, duration?: SnackbarDurationEnum) => void) | undefined;
   setBackgroundError: ((title: string, err: string) => void) | undefined;
   setScrollToTop: ((v: boolean) => void) | undefined;
-  setScrollToBottom: ((v: boolean) => void) | undefined;
+  setScrollToNewest: ((v: boolean) => void) | undefined;
   sendPermitNow: () => SendPermit;
 };
 
@@ -76,7 +76,7 @@ export function useShieldFunds({
   addLastSnackbar,
   setBackgroundError,
   setScrollToTop,
-  setScrollToBottom,
+  setScrollToNewest,
   sendPermitNow,
 }: UseShieldFundsInput): UseShieldFundsResult {
   const navigation = useNavigation<WalletNavigation>();
@@ -172,7 +172,7 @@ export function useShieldFunds({
     });
 
     setScrollToTop?.(true);
-    setScrollToBottom?.(true);
+    setScrollToNewest?.(true);
     setShieldingFee(0);
     setShieldingAmount?.(0);
     const end = shieldEnd(shield, since);
@@ -189,7 +189,7 @@ export function useShieldFunds({
     navigation,
     shieldingAmount,
     setScrollToTop,
-    setScrollToBottom,
+    setScrollToNewest,
     setShieldingAmount,
   ]);
 

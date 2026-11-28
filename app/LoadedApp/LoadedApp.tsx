@@ -758,7 +758,7 @@ export class LoadedAppClass extends Component<
           newWallet: false,
         }),
       setScrollToTop: this.setScrollToTop,
-      setScrollToBottom: this.setScrollToBottom,
+      setScrollToNewest: this.setScrollToNewest,
       setShieldingAmount: this.setShieldingAmount,
       sendTransaction: this.sendTransaction,
       sendSwapDeposit: this.sendSwapDeposit,
@@ -822,7 +822,7 @@ export class LoadedAppClass extends Component<
           : { kind: 'none' },
       wallets: [],
       scrollToTop: false,
-      scrollToBottom: false,
+      scrollToNewest: false,
     };
 
     this.rpc = new WalletBackend({
@@ -2497,9 +2497,9 @@ export class LoadedAppClass extends Component<
     });
   };
 
-  setScrollToBottom = (value: boolean) => {
+  setScrollToNewest = (value: boolean) => {
     this.setState({
-      scrollToBottom: value,
+      scrollToNewest: value,
     });
   };
 
@@ -2569,8 +2569,8 @@ export class LoadedAppClass extends Component<
       // scroll signals and wallet actions for the screens
       scrollToTop: this.state.scrollToTop,
       setScrollToTop: this.setScrollToTop,
-      scrollToBottom: this.state.scrollToBottom,
-      setScrollToBottom: this.setScrollToBottom,
+      scrollToNewest: this.state.scrollToNewest,
+      setScrollToNewest: this.setScrollToNewest,
       setShieldingAmount: this.setShieldingAmount,
       sendTransaction: this.sendTransaction,
       sendSwapDeposit: this.sendSwapDeposit,
