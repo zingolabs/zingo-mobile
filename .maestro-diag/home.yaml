@@ -1,0 +1,8 @@
+appId: org.ZingoLabs.Zingo
+---
+- runFlow:
+    file: ../.maestro/common/create_wallet.yaml
+- extendedWaitUntil:
+    visible:
+      id: "header.checkicon"
+    timeout: 300000
