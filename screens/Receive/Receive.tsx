@@ -193,6 +193,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = () => {
         }}
       >
         <Header
+          switchWallets
           title={''}
           noBalance={true}
           noSyncingStatus={true}

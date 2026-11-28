@@ -899,6 +899,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       >
         <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
           <Header
+            switchWallets
             testID="valuetransfer text"
             title={''}
             setPrivacyOption={setPrivacyOption}

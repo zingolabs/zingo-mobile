@@ -69,6 +69,8 @@ type HeaderProps = {
   title: string;
   // side menu
   noDrawMenu?: boolean;
+  /** The wallet switcher opens Wallets; otherwise it only names the open wallet. */
+  switchWallets?: boolean;
   closeScreen?: () => void;
   /** The back arrow does nothing for now (a server being set). */
   backDisabled?: boolean;
@@ -112,6 +114,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   noBalance,
   noSyncingStatus,
   noDrawMenu,
+  switchWallets = false,
   testID,
   translate: translateProp,
   netInfo: netInfoProp,
@@ -417,7 +420,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   accessibilityLabel={(
                     translate('wallets.switch-acc') as string
                   ).replace('{name}', shownWallet.meta.name)}
-                  onPress={showWallets}
+                  onPress={switchWallets ? showWallets : undefined}
                 />
               </Animated.View>
             )}
