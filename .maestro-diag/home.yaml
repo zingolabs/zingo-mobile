@@ -6,3 +6,29 @@ appId: org.ZingoLabs.Zingo
     visible:
       id: "header.checkicon"
     timeout: 300000
+- assertVisible:
+    id: "header.wallets"
+    optional: true
+- assertVisible:
+    text: "Wallet 1"
+    optional: true
+- assertVisible:
+    text: "Wallet: Wallet 1.*"
+    optional: true
+- assertVisible:
+    id: "header.mixnet-status"
+    optional: true
+- assertVisible:
+    id: "header.drawmenu"
+    optional: true
+- assertVisible:
+    id: "header"
+    optional: true
+- tapOn:
+    point: "15%,9%"
+- waitForAnimationToEnd:
+    timeout: 5000
+- assertVisible:
+    id: "wallets.list"
+    optional: true
+- takeScreenshot: /tmp/after-tap

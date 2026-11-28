@@ -92,7 +92,7 @@ jobs:
           name: maestro-android-report
           path: |
             ~/.maestro/tests/**
-            /tmp/home-hierarchy.json
+            /tmp/after-tap.png
             /tmp/maestro-logcat.log
             /tmp/dumpsys-power.txt
 
@@ -243,7 +243,6 @@ jobs:
           echo "--- Devices booted right before maestro test ---"
           xcrun simctl list devices booted
           maestro --device "$SIM_UDID" test .maestro-diag/home.yaml
-          maestro --device "$SIM_UDID" hierarchy > /tmp/home-hierarchy.json
           exit 1
 
       # Android captures logcat for the whole run; iOS captured nothing, so a
