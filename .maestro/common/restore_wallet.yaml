@@ -83,9 +83,12 @@ appId: org.ZingoLabs.Zingo
 - assertVisible:
     text: "24 / 24"
 
+# With the keyboard open the Import button floats above it and can cover
+# the birthday row. A tap there pressed Import on Android.
+- hideKeyboard
+
 # With 24 chips the phrase field is tall enough to push the birthday row
-# below the screen on Android and behind the floating Import button on iOS.
-# Centring it brings it clear of both, the button and the keyboard.
+# below the screen.
 - scrollUntilVisible:
     element:
       id: "import.birthdayinput"
